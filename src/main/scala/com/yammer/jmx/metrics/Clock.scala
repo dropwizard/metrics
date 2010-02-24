@@ -1,4 +1,4 @@
-package com.yammer.jmx.measurements
+package com.yammer.jmx.metrics
 
 /**
  * A clock object which returns the current time in nanoseconds for timing

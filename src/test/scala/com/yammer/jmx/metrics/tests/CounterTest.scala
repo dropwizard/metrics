@@ -1,7 +1,7 @@
-package com.yammer.jmx.measurements.tests
+package com.yammer.jmx.metrics.tests
 
 import org.scalatest.matchers.MustMatchers
-import com.yammer.jmx.measurements.Counter
+import com.yammer.jmx.metrics.Counter
 import org.scalatest.Spec
 
 class CounterTest extends Spec with MustMatchers {

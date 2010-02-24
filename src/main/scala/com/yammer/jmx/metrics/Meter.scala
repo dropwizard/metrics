@@ -1,4 +1,4 @@
-package com.yammer.jmx.measurements
+package com.yammer.jmx.metrics
 
 import java.util.concurrent.TimeUnit
 
