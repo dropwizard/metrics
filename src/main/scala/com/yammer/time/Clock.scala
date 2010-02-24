@@ -1,4 +1,4 @@
-package com.yammer.jmx.metrics
+package com.yammer.time
 
 /**
  * A clock object which returns the current time in nanoseconds for timing
@@ -7,7 +7,7 @@ package com.yammer.jmx.metrics
  * @author coda
  */
 object Clock {
-  private val UseCurrentTime = 0L
+  private val UseCurrentTime = -1L
   @volatile private var frozenTime = UseCurrentTime
 
   /**

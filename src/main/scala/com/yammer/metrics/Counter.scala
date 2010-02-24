@@ -1,4 +1,4 @@
-package com.yammer.jmx.metrics
+package com.yammer.metrics
 
 import java.util.concurrent.atomic.AtomicLong
 

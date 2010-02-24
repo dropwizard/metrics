@@ -1,9 +1,9 @@
-package com.yammer.jmx.metrics.tests
+package com.yammer.time.tests
 
 
 import org.scalatest.matchers.MustMatchers
-import com.yammer.jmx.metrics.Clock
 import org.scalatest.{BeforeAndAfterEach, Spec}
+import com.yammer.time.Clock
 
 class ClockTest extends Spec with MustMatchers with BeforeAndAfterEach {
   override protected def afterEach() {

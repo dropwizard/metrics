@@ -1,6 +1,7 @@
-package com.yammer.jmx.metrics
+package com.yammer.metrics
 
 import java.util.concurrent.TimeUnit
+import com.yammer.time.Clock
 
 /**
  * A meter which measures the rate of events occuring in time.

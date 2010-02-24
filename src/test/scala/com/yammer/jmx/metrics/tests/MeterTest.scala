@@ -3,8 +3,9 @@ package com.yammer.jmx.metrics.tests
 
 import org.scalatest.matchers.MustMatchers
 import java.util.concurrent.TimeUnit
-import com.yammer.jmx.metrics.{Clock, Meter}
 import org.scalatest.{BeforeAndAfterEach, Spec}
+import com.yammer.time.Clock
+import com.yammer.metrics.Meter
 
 class MeterTest extends Spec with MustMatchers with BeforeAndAfterEach {
   override protected def afterEach() {
