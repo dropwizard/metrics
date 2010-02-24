@@ -1,4 +1,4 @@
-package com.yammer.jmx.metrics.tests
+package com.yammer.metrics.tests
 
 import org.scalatest.matchers.MustMatchers
 import com.yammer.metrics.Counter
