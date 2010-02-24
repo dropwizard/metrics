@@ -53,6 +53,8 @@ case class Duration(magnitude: Double, unit: TimeUnit) {
    * Returns the duration in days.
    */
   def d  = convert(TimeUnit.DAYS)
+
+  def toDouble = magnitude
   
   private def convert(u: TimeUnit) = Duration(magnitude / ratio(u), u)
   private def ratio(u: TimeUnit) = {

@@ -9,6 +9,12 @@ import java.util.concurrent.TimeUnit
 class DurationTest extends Spec with MustMatchers {
   val precision = 1e-5
 
+  describe("a duration") {
+    it("is convertible to a Double") {
+      Duration.inNanos(30.2).toDouble must be (30.2 plusOrMinus precision)
+    }
+  }
+
   describe("a duration of three nanoseconds") {
     val d = Duration.inNanos(3)
 
