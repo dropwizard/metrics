@@ -16,6 +16,9 @@ class Percentile(var p: Double,
   require(p > 0.0 && p < 100.0)
   private val sample = new Sample(sampleSize)(0.0)
 
+  /**
+   * Adds a value to the data set.
+   */
   def +=(x: Double): this.type = {
     require(x >= 0)
     synchronized {
@@ -24,6 +27,9 @@ class Percentile(var p: Double,
     this
   }
 
+  /**
+   * Clears the data set.
+   */
   def clear() {
     sample.clear()
   }

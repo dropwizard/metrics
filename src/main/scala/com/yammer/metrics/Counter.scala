@@ -4,6 +4,8 @@ import java.util.concurrent.atomic.AtomicLong
 
 /**
  * A thread-safe counter which can go up or down from its initial value.
+ *
+ * @author coda
  */
 class Counter(initial: Long) {
   protected val value = new AtomicLong(initial)
