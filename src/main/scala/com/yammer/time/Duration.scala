@@ -54,9 +54,16 @@ case class Duration(magnitude: Double, unit: TimeUnit) {
    */
   def d  = convert(TimeUnit.DAYS)
 
+  /**
+   * Returns the length of time as a double.
+   */
   def toDouble = magnitude
+
+  /**
+   * Convert to an arbitrary time unit.
+   */
+  def convert(u: TimeUnit) = Duration(magnitude / ratio(u), u)
   
-  private def convert(u: TimeUnit) = Duration(magnitude / ratio(u), u)
   private def ratio(u: TimeUnit) = {
     val r = unit.convert(1, u)
     if (r > 0) {
