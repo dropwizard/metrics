@@ -24,7 +24,7 @@ class PercentileTest extends Spec with MustMatchers {
   }
 
   describe("the 99th percentile of 1 through 1000") {
-    val percentile = new Percentile(99, 1000)
+    val percentile = new Percentile(99, 10000)
     percentile ++= Range.inclusive(1, 1000).map { _.toDouble }
 
     it("is the largest element of the set") {
