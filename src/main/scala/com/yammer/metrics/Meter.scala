@@ -2,6 +2,7 @@ package com.yammer.metrics
 
 import java.util.concurrent.TimeUnit
 import com.yammer.time.Clock
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * A meter which measures the rate of events occuring in time.
@@ -9,41 +10,41 @@ import com.yammer.time.Clock
  * @author coda
  */
 class Meter {
-  private val counter = new Counter
+  private val counter = new AtomicLong
   private val startTime = Clock.nanoTime
 
   /**
    * Mark the occurence of an event.
    */
   def mark() {
-    counter.inc()
+    mark(1)
   }
 
   /**
    * Mark the occurence of an arbitrary number of events.
    */
   def mark(count: Long) {
-    counter.inc(count)
+    counter.addAndGet(count)
   }
 
   /**
    * Unmark the occurence of an event.
    */
   def unmark() {
-    counter.dec()
+    mark(-1)
   }
 
   /**
    * Unmark the occurence of an arbitrary number of events.
    */
   def unmark(count: Long) {
-    counter.dec(count)
+    mark(-count)
   }
 
   /**
    * Returns the number of events marked.
    */
-  def count = counter.count
+  def count = counter.get
 
   /**
    * Returns the rate of events in the given unit of time.
