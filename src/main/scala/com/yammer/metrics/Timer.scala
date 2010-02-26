@@ -77,8 +77,8 @@ class Timer extends Growable[Duration] {
    * Adds a duration recorded elsewhere.
    */
   def +=(duration: Duration): this.type = {
-    if (duration.magnitude >= 0) {
-      val ns = duration.ns.magnitude.toLong
+    if (duration.value >= 0) {
+      val ns = duration.ns.value.toLong
       count_.incrementAndGet
       setMax(ns)
       setMin(ns)
@@ -90,7 +90,7 @@ class Timer extends Growable[Duration] {
   }
 
   private def variance = if (count > 1) {
-    (sumOfSquares_.get - (sum_.get * mean.magnitude)) / (count - 1).toDouble
+    (sumOfSquares_.get - (sum_.get * mean.value)) / (count - 1).toDouble
   } else {
     0.0
   }

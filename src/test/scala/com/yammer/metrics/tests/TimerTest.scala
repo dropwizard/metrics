@@ -18,7 +18,7 @@ class TimerTest extends Spec with MustMatchers {
     it("records the duration of the event") {
       val timer = new Timer
       timer.time { Thread.sleep(10) }
-      timer.mean.ms.toDouble must be(10.0 plusOrMinus precision)
+      timer.mean.ms.value must be(10.0 plusOrMinus precision)
     }
 
     it("records the existence of the event") {
@@ -40,23 +40,23 @@ class TimerTest extends Spec with MustMatchers {
     )
 
     it("calculates the maximum duration") {
-      timer.max.ms.toDouble must be(40.0 plusOrMinus precision)
+      timer.max.ms.value must be(40.0 plusOrMinus precision)
     }
 
     it("calculates the minimum duration") {
-      timer.min.ms.toDouble must be(10.0 plusOrMinus precision)
+      timer.min.ms.value must be(10.0 plusOrMinus precision)
     }
 
     it("calculates the mean") {
-      timer.mean.ms.toDouble must be(24.0 plusOrMinus precision)
+      timer.mean.ms.value must be(24.0 plusOrMinus precision)
     }
 
     it("calculates the standard deviation") {
-      timer.standardDeviation.ms.toDouble must be(11.4 plusOrMinus precision)
+      timer.standardDeviation.ms.value must be(11.4 plusOrMinus precision)
     }
 
     it("calculates the 99.9th percentile") {
-      timer.p999.ms.toDouble must be(40.0 plusOrMinus precision)
+      timer.p999.ms.value must be(40.0 plusOrMinus precision)
     }
 
     it("records the count") {
