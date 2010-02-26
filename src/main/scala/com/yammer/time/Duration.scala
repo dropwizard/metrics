@@ -6,13 +6,13 @@ import java.util.concurrent.TimeUnit
  * Duration's companion object with unit-specific factory methods.
  */
 object Duration {
-  def inNanos(value: Double) = Duration(value, TimeUnit.NANOSECONDS)
-  def inMicros(value: Double) = Duration(value, TimeUnit.MICROSECONDS)
-  def inMillis(value: Double) = Duration(value, TimeUnit.MILLISECONDS)
-  def inSeconds(value: Double) = Duration(value, TimeUnit.SECONDS)
-  def inMinutes(value: Double) = Duration(value, TimeUnit.MINUTES)
-  def inHours(value: Double) = Duration(value, TimeUnit.HOURS)
-  def inDays(value: Double) = Duration(value, TimeUnit.DAYS)
+  def nanoseconds(value: Double) = Duration(value, TimeUnit.NANOSECONDS)
+  def microseconds(value: Double) = Duration(value, TimeUnit.MICROSECONDS)
+  def milliseconds(value: Double) = Duration(value, TimeUnit.MILLISECONDS)
+  def seconds(value: Double) = Duration(value, TimeUnit.SECONDS)
+  def minutes(value: Double) = Duration(value, TimeUnit.MINUTES)
+  def hours(value: Double) = Duration(value, TimeUnit.HOURS)
+  def days(value: Double) = Duration(value, TimeUnit.DAYS)
 }
 
 /**

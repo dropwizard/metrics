@@ -10,7 +10,7 @@ class DurationTest extends Spec with MustMatchers {
   val precision = 1e-5
 
   describe("a duration of three nanoseconds") {
-    val d = Duration.inNanos(3)
+    val d = Duration.nanoseconds(3)
 
     it("is in nanoseconds") {
       d.value must be(3.0 plusOrMinus precision)
@@ -23,7 +23,7 @@ class DurationTest extends Spec with MustMatchers {
   }
 
   describe("a duration of three microseconds") {
-    val d = Duration.inMicros(3)
+    val d = Duration.microseconds(3)
 
     it("is in microseconds") {
       d.value must be(3.0 plusOrMinus precision)
@@ -36,7 +36,7 @@ class DurationTest extends Spec with MustMatchers {
   }
 
   describe("a duration of three milliseconds") {
-    val d = Duration.inMillis(3)
+    val d = Duration.milliseconds(3)
 
     it("is in milliseconds") {
       d.value must be(3.0 plusOrMinus precision)
@@ -49,7 +49,7 @@ class DurationTest extends Spec with MustMatchers {
   }
 
   describe("a duration of three seconds") {
-    val d = Duration.inSeconds(3)
+    val d = Duration.seconds(3)
 
     it("is in seconds") {
       d.value must be(3.0 plusOrMinus precision)
@@ -62,7 +62,7 @@ class DurationTest extends Spec with MustMatchers {
   }
 
   describe("a duration of three minutes") {
-    val d = Duration.inMinutes(3)
+    val d = Duration.minutes(3)
 
     it("is in minutes") {
       d.value must be(3.0 plusOrMinus precision)
@@ -110,7 +110,7 @@ class DurationTest extends Spec with MustMatchers {
   }
 
   describe("a duration of three hours") {
-    val d = Duration.inHours(3)
+    val d = Duration.hours(3)
 
     it("is in hours") {
       d.value must be(3.0 plusOrMinus precision)
@@ -123,7 +123,7 @@ class DurationTest extends Spec with MustMatchers {
   }
 
   describe("a duration of three days") {
-    val d = Duration.inDays(3)
+    val d = Duration.days(3)
 
     it("is in days") {
       d.value must be(3.0 plusOrMinus precision)

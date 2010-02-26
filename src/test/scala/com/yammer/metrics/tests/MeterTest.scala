@@ -19,7 +19,7 @@ class MeterTest extends Spec with MustMatchers with BeforeAndAfterEach {
     Clock.freezeTime(100 + TimeUnit.NANOSECONDS.convert(1, TimeUnit.SECONDS))
 
     it("has a rate of two events per second") {
-      meter.rate(TimeUnit.SECONDS) must be (2.0 plusOrMinus 0.0000001)
+      meter.rate.s.value must be (2.0 plusOrMinus 0.0000001)
     }
 
     it("has two events") {
@@ -31,7 +31,7 @@ class MeterTest extends Spec with MustMatchers with BeforeAndAfterEach {
     val meter = new Meter
 
     it("has a rate of zero") {
-      meter.rate(TimeUnit.DAYS) must be (0.0 plusOrMinus 0.0000001)
+      meter.rate.d.value must be (0.0 plusOrMinus 0.0000001)
     }
   }
 

@@ -26,37 +26,44 @@ trait Convertible[A] {
   /**
    * Returns the value in nanoseconds.
    */
-  def ns = convert(TimeUnit.NANOSECONDS)
+  def nanoseconds = convert(TimeUnit.NANOSECONDS)
+  def ns = nanoseconds
 
   /**
    * Returns the value in microseconds.
    */
-  def us = convert(TimeUnit.MICROSECONDS)
+  def microseconds = convert(TimeUnit.MICROSECONDS)
+  def us = microseconds
 
   /**
    * Returns the value in milliseconds.
    */
-  def ms = convert(TimeUnit.MILLISECONDS)
+  def milliseconds = convert(TimeUnit.MILLISECONDS)
+  def ms = milliseconds
 
   /**
    * Returns the value in seconds.
    */
-  def s  = convert(TimeUnit.SECONDS)
+  def seconds = convert(TimeUnit.SECONDS)
+  def s = seconds
 
   /**
    * Returns the value in minutes.
    */
-  def m  = convert(TimeUnit.MINUTES)
+  def minutes = convert(TimeUnit.MINUTES)
+  def m = minutes
 
   /**
    * Returns the value in hours.
    */
-  def h  = convert(TimeUnit.HOURS)
+  def hours = convert(TimeUnit.HOURS)
+  def h = hours
 
   /**
    * Returns the value in days.
    */
-  def d  = convert(TimeUnit.DAYS)
+  def days = convert(TimeUnit.DAYS)
+  def d = days
 
   /**
    * Returns the SI abbreviate for the given unit.

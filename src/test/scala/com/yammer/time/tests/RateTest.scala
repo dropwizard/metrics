@@ -10,7 +10,7 @@ class RateTest extends Spec with MustMatchers {
   val precision = 1e-5
 
   describe("a rate of 3 events per nanosecond") {
-    val r = Rate.inNanos(3)
+    val r = Rate.perNanosecond(3)
 
     it("is in nanoseconds") {
       r.value must be(3.0 plusOrMinus precision)
@@ -23,7 +23,7 @@ class RateTest extends Spec with MustMatchers {
   }
 
   describe("a rate of 3 events per microsecond") {
-    val r = Rate.inMicros(3)
+    val r = Rate.perMicrosecond(3)
 
     it("is in microseconds") {
       r.value must be(3.0 plusOrMinus precision)
@@ -36,7 +36,7 @@ class RateTest extends Spec with MustMatchers {
   }
 
   describe("a rate of 3 events per millisecond") {
-    val r = Rate.inMillis(3)
+    val r = Rate.perMillisecond(3)
 
     it("is in milliseconds") {
       r.value must be(3.0 plusOrMinus precision)
@@ -49,7 +49,7 @@ class RateTest extends Spec with MustMatchers {
   }
 
   describe("a rate of 3 events per second") {
-    val r = Rate.inSeconds(3)
+    val r = Rate.perSecond(3)
 
     it("is in seconds") {
       r.value must be(3.0 plusOrMinus precision)
@@ -62,7 +62,7 @@ class RateTest extends Spec with MustMatchers {
   }
 
   describe("a rate of 3 events per minute") {
-    val r = Rate.inMinutes(3)
+    val r = Rate.perMinute(3)
 
     it("is in minutes") {
       r.value must be(3.0 plusOrMinus precision)
@@ -110,7 +110,7 @@ class RateTest extends Spec with MustMatchers {
   }
 
   describe("a rate of 3 events per hour") {
-    val r = Rate.inHours(3)
+    val r = Rate.perHour(3)
 
     it("is in hours") {
       r.value must be(3.0 plusOrMinus precision)
@@ -123,7 +123,7 @@ class RateTest extends Spec with MustMatchers {
   }
 
   describe("a rate of 3 events per day") {
-    val r = Rate.inDays(3)
+    val r = Rate.perDay(3)
 
     it("is in days") {
       r.value must be(3.0 plusOrMinus precision)

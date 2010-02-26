@@ -2,6 +2,7 @@ package com.yammer.metrics
 
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.{Executors, TimeUnit}
+import com.yammer.time.Rate
 
 object WeightedMeter {
   val interval = 5
@@ -31,31 +32,29 @@ object WeightedMeter {
 class WeightedMeter private(factor: Double) extends Meter with Runnable {
   import WeightedMeter._
   private val uncounted = new AtomicLong(0)
-  private val rate = new AtomicLong(0)
+  private val weightedRate = new AtomicLong(0)
 
   override def mark(count: Long) {
     uncounted.addAndGet(count)
     super.mark(count)
   }
   
-  override def rate(unit: TimeUnit) = {
-    if (rate.get != 0) {
-      fromLong(rate.get) / intervalUnit.convert(interval, unit)
-    } else {
-      0.0
-    }
-  }
+  override def rate = Rate(if (weightedRate.get != 0)
+    fromLong(weightedRate.get) / interval
+  else
+    0.0,
+  intervalUnit)
 
   @deprecated("don't update the average yourself")
   def run() {
     var updated = false
     while (!updated) {
-      val oldCas = rate.get
-      updated = rate.compareAndSet(oldCas, toLong(calculateEMA(fromLong(oldCas), uncounted.getAndSet(0))))
+      val oldCas = weightedRate.get
+      updated = weightedRate.compareAndSet(oldCas, toLong(calculateEMA(fromLong(oldCas), uncounted.getAndSet(0))))
     }
   }
 
-  def unweightedRate(unit: TimeUnit) = super.rate(unit)
+  def unweightedRate = super.rate
 
   private def calculateEMA(oldEma: Double, n: Long) = oldEma + (factor * (n - oldEma))
   private def fromLong(n: Long) = java.lang.Double.longBitsToDouble(n)

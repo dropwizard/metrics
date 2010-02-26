@@ -1,8 +1,7 @@
 package com.yammer.metrics
 
-import java.util.concurrent.TimeUnit
-import com.yammer.time.Clock
 import java.util.concurrent.atomic.AtomicLong
+import com.yammer.time.{Rate, Clock}
 
 /**
  * A meter which measures the rate of events occuring in time.
@@ -49,9 +48,7 @@ class Meter {
   /**
    * Returns the rate of events in the given unit of time.
    */
-  def rate(unit: TimeUnit) = if (count > 0)
-    count / ((Clock.nanoTime - startTime) / ratio(unit))
-  else 0.0
-
-  private def ratio(unit: TimeUnit) = TimeUnit.NANOSECONDS.convert(1, unit).toDouble
+  def rate = Rate.perNanosecond(if (count > 0)
+    count / (Clock.nanoTime - startTime)
+  else 0.0)
 }

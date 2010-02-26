@@ -27,7 +27,7 @@ class Timer extends Growable[Duration] {
   def time[T](f: => T): T = {
     val startTime = Clock.nanoTime
     val t = f
-    this += Duration.inNanos(Clock.nanoTime - startTime)
+    this += Duration.nanoseconds(Clock.nanoTime - startTime)
     return t
   }
 
@@ -39,27 +39,27 @@ class Timer extends Growable[Duration] {
   /**
    * Returns the greatest amount of time recorded.
    */
-  def max = Duration.inNanos(max_.get)
+  def max = Duration.nanoseconds(max_.get)
 
   /**
    * Returns the least amount of time recorded.
    */
-  def min = Duration.inNanos(min_.get)
+  def min = Duration.nanoseconds(min_.get)
 
   /**
    * Returns the arthimetic mean of the recorded durations.
    */
-  def mean = Duration.inNanos(sum_.get / count.toDouble)
+  def mean = Duration.nanoseconds(sum_.get / count.toDouble)
 
   /**
    * Returns the standard deviation of the recorded durations.
    */
-  def standardDeviation = Duration.inNanos(Math.sqrt(variance))
+  def standardDeviation = Duration.nanoseconds(Math.sqrt(variance))
 
   /**
    * Returns the duration at the 99.9th percentile.
    */
-  def p999 = Duration.inNanos(p999_.value)
+  def p999 = Duration.nanoseconds(p999_.value)
 
   /**
    * Clears all timings.

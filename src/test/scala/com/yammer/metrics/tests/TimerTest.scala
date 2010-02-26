@@ -32,11 +32,11 @@ class TimerTest extends Spec with MustMatchers {
   describe("timing a series of events") {
     val timer = new Timer
     timer ++= List(
-      Duration.inMillis(10),
-      Duration.inMillis(20),
-      Duration.inMillis(20),
-      Duration.inMillis(30),
-      Duration.inMillis(40)
+      Duration.milliseconds(10),
+      Duration.milliseconds(20),
+      Duration.milliseconds(20),
+      Duration.milliseconds(30),
+      Duration.milliseconds(40)
     )
 
     it("calculates the maximum duration") {

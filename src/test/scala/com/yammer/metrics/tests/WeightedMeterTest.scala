@@ -14,9 +14,9 @@ class WeightedMeterTest extends Spec with MustMatchers {
       for (i <- 1 to 100) {
         meter.mark()
       }
-      meter.rate(TimeUnit.SECONDS) must be(0.0 plusOrMinus 0.00001)
+      meter.rate.s.value must be(0.0 plusOrMinus 0.00001)
       Thread.sleep(5000)
-      meter.rate(TimeUnit.SECONDS) must be(18.0 plusOrMinus 5.0)
+      meter.rate.s.value must be(18.0 plusOrMinus 5.0)
     }
   }
 }
