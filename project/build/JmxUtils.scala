@@ -14,4 +14,5 @@ class JmxUtils(info: sbt.ProjectInfo) extends sbt.DefaultProject(info) {
    * Dependencies
    */
   val scalaTest = "org.scalatest" % "scalatest" % "1.0.1-for-scala-2.8.0.Beta1-with-test-interfaces-0.3-SNAPSHOT" % "test" withSources()
+  val mockito = "org.mockito" % "mockito-core" % "1.8.0" % "test" withSources()
 }
