@@ -1,10 +1,8 @@
 package com.yammer.metrics.tests
 
-
 import org.scalatest.Spec
 import org.scalatest.matchers.MustMatchers
 import com.yammer.metrics.WeightedMeter
-import java.util.concurrent.TimeUnit
 
 class WeightedMeterTest extends Spec with MustMatchers {
   describe("a one-minute weighted meter") {
