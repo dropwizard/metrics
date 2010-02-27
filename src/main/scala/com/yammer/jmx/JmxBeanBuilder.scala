@@ -1,8 +1,8 @@
 package com.yammer.jmx
 
 import scala.collection.mutable
-import com.yammer.metrics.{Meter, Timer, Counter}
 import java.util.concurrent.TimeUnit
+import com.yammer.metrics.{LoadMeter, Meter, Timer, Counter}
 
 /**
  * A builder class for JmxBeans.
@@ -30,6 +30,18 @@ class JmxBeanBuilder(description: String, obj: AnyRef) {
   def addMeter(name: String, meter: Meter, unit: TimeUnit) {
     addAttribute("%s-count".format(name)) { meter.count }
     addAttribute("%s-rate".format(name)) { meter.rate.convert(unit) }
+  }
+
+  /**
+   * Adds a LoadMeter as a JMX attribute. (Adds count, mean rate, 1-minute rate,
+   * 5-minute rate, and 15-minute rate values.)
+   */
+  def addLoadMeter(name: String, meter: LoadMeter, unit: TimeUnit) {
+    addAttribute("%s-count".format(name)) { meter.count }
+    addAttribute("%s-mean-rate".format(name)) { meter.rate.convert(unit) }
+    addAttribute("%s-01min-rate".format(name)) { meter.oneMinuteRate.convert(unit) }
+    addAttribute("%s-05min-rate".format(name)) { meter.fiveMinuteRate.convert(unit) }
+    addAttribute("%s-15min-rate".format(name)) { meter.fifteenMinuteRate.convert(unit) }
   }
 
   /**

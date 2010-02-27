@@ -6,8 +6,8 @@ import com.yammer.jmx.JmxBeanBuilder
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito.{when, verify}
 import java.util.concurrent.TimeUnit
-import com.yammer.metrics.{Timer, Meter, Counter}
 import com.yammer.time.{Rate, Duration}
+import com.yammer.metrics.{LoadMeter, Timer, Meter, Counter}
 
 class JmxBeanBuilderTest extends Spec with MustMatchers with MockitoSugar {
   describe("building a JMX bean") {
@@ -74,7 +74,6 @@ class JmxBeanBuilderTest extends Spec with MustMatchers with MockitoSugar {
       }
     }
 
-
     describe("with a timer") {
       val timer = mock[Timer]
       when(timer.max).thenReturn(Duration.milliseconds(400))
@@ -127,6 +126,53 @@ class JmxBeanBuilderTest extends Spec with MustMatchers with MockitoSugar {
 
         attr.name must equal("ninjas-99.9%")
         attr() must equal("320.00ms")
+      }
+    }
+
+    describe("with a load meter") {
+      val meter = mock[LoadMeter]
+      when(meter.rate).thenReturn(Rate.perSecond(0.32))
+      when(meter.oneMinuteRate).thenReturn(Rate.perSecond(1.68))
+      when(meter.fiveMinuteRate).thenReturn(Rate.perSecond(0.84))
+      when(meter.fifteenMinuteRate).thenReturn(Rate.perSecond(0.16))
+      when(meter.count).thenReturn(11)
+
+      val builder = new JmxBeanBuilder("funky", this)
+      builder.addLoadMeter("ninjas", meter, TimeUnit.SECONDS)
+
+      it("builds a bean with a read-only count attribute") {
+        val attr = builder.build.attributes("ninjas-count")
+
+        attr.name must equal("ninjas-count")
+        attr() must equal("11")
+      }
+
+      it("builds a bean with a read-only mean rate attribute") {
+        val attr = builder.build.attributes("ninjas-mean-rate")
+
+        attr.name must equal("ninjas-mean-rate")
+        attr() must equal("0.32/s")
+      }
+
+      it("builds a bean with a read-only 1 minute rate attribute") {
+        val attr = builder.build.attributes("ninjas-01min-rate")
+
+        attr.name must equal("ninjas-01min-rate")
+        attr() must equal("1.68/s")
+      }
+
+      it("builds a bean with a read-only 5 minute rate attribute") {
+        val attr = builder.build.attributes("ninjas-05min-rate")
+
+        attr.name must equal("ninjas-05min-rate")
+        attr() must equal("0.84/s")
+      }
+
+      it("builds a bean with a read-only 15 minute rate attribute") {
+        val attr = builder.build.attributes("ninjas-15min-rate")
+
+        attr.name must equal("ninjas-15min-rate")
+        attr() must equal("0.16/s")
       }
     }
   }
