@@ -13,7 +13,7 @@ class JmxUtils(info: sbt.ProjectInfo) extends sbt.DefaultProject(info) {
     log.info("Uploading to repo.codahale.com")
     sbt.Process("rsync", "-avz" :: "target/repo/" :: "codahale.com:/home/codahale/repo.codahale.com" :: Nil) ! log
     None
-  } describedAs("what") dependsOn(publishToLocalRepoAction)
+  } describedAs("what") dependsOn(test, publishToLocalRepoAction)
 
   /**
    * Publish the source as well as the class files.
