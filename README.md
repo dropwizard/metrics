@@ -41,6 +41,10 @@ How To Use
       }
     }
 
+(You also might like `LoadMeter`, a meter class which provides 1-minute,
+5-minute, and 15-minute moving weighted averages, much like the load values in
+`top`. It's generally a more useful metric than `Meter`'s averaged rate.)
+
 **Third**, expose these metrics via JMX:
     
     import java.util.concurrency.TimeUnit
