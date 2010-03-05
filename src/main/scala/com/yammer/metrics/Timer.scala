@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.TimeUnit
 import com.yammer.time.{Duration, Clock}
 import collection.generic.Growable
+import java.lang.Double.{doubleToLongBits, longBitsToDouble}
 
 /**
  * A class which tracks the amount of time it takes to perform a particular
@@ -16,7 +17,8 @@ class Timer extends Growable[Duration] {
   private val min_ = new AtomicLong(Long.MaxValue)
   private val max_ = new AtomicLong(Long.MinValue)
   private val sum_ = new AtomicLong(0)
-  private val sumOfSquares_ = new AtomicLong(0)
+  private val varianceM = new AtomicLong(-1)
+  private val varianceS = new AtomicLong(0)
   private val p999_ = new Percentile(99.9, 1000)
 
   /**
@@ -69,7 +71,8 @@ class Timer extends Growable[Duration] {
     min_.set(Long.MaxValue)
     max_.set(Long.MinValue)
     sum_.set(0)
-    sumOfSquares_.set(0)
+    varianceM.set(-1)
+    varianceS.set(0)
     p999_.clear()
   }
 
@@ -83,14 +86,33 @@ class Timer extends Growable[Duration] {
       setMax(ns)
       setMin(ns)
       sum_.getAndAdd(ns)
-      sumOfSquares_.getAndAdd(ns * ns)
+      updateVariance(ns)
       p999_ += ns.toDouble
     }
     this
   }
 
+  private def updateVariance(ns: Long) {
+    // initialize varianceM to the first reading if it's still blank
+    if (!varianceM.compareAndSet(-1, doubleToLongBits(ns))) {
+      var updated = false
+      while (!updated) {
+        val oldMCas = varianceM.get
+        val oldM = longBitsToDouble(oldMCas)
+        val newM = oldM + ((ns - oldM) / count)
+
+        val oldSCas = varianceS.get
+        val oldS = longBitsToDouble(oldSCas)
+        val newS = oldS + ((ns - oldM) * (ns - newM))
+
+        updated = varianceM.compareAndSet(oldMCas, doubleToLongBits(newM)) &&
+                  varianceS.compareAndSet(oldSCas, doubleToLongBits(newS))
+      }
+    }
+  }
+
   private def variance = if (count > 1) {
-    (sumOfSquares_.get - (sum_.get * mean.value)) / (count - 1).toDouble
+    longBitsToDouble(varianceS.get) / (count - 1)
   } else {
     0.0
   }

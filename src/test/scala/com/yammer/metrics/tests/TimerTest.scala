@@ -63,4 +63,16 @@ class TimerTest extends Spec with MustMatchers {
       timer.count must be (5)
     }
   }
+
+  describe("timing crazy-variant values") {
+    val timer = new Timer
+    timer ++= List(
+      Duration.milliseconds(Long.MaxValue),
+      Duration.milliseconds(0)
+    )
+
+    it("calculates the standard deviation without overflowing") {
+      timer.standardDeviation.ms.value must be(6.521908912666392E12 plusOrMinus 1E3)
+    }
+  }
 }
