@@ -1,8 +1,8 @@
 package com.yammer.metrics
 
 import util.Random
-import java.util.concurrent.atomic.AtomicLong
 import collection.generic.Growable
+import java.util.concurrent.atomic.{AtomicReferenceArray, AtomicLong}
 
 /**
  * A random sample of a stream. Uses Vitter's Algorithm R to produce a
@@ -17,8 +17,9 @@ class Sample[A](val window: Int)
         extends Iterable[A] with Growable[A] {
 
   private val random = new Random()
-  private val values = Array.fill(window)(init)
+  private val values = new AtomicReferenceArray[A](window)
   private val count = new AtomicLong(0)
+  clear()
 
   /**
    * Returns the number of values recorded.
@@ -29,8 +30,8 @@ class Sample[A](val window: Int)
    * Clears all recorded values.
    */
   def clear() {
-    for (i <- 0 until values.size) {
-      values(i) = init
+    for (i <- 0 until window) {
+      values.set(i, init)
     }
     count.set(0)
   }
@@ -41,18 +42,24 @@ class Sample[A](val window: Int)
   def +=(elem : A): this.type = {
     val c = count.incrementAndGet
     if (c < window) {
-      values(c.toInt - 1) = elem
+      values.set(c.toInt - 1, elem)
     } else {
       val r = random.nextLong.abs % c
       if (r < window) {
-        values(r.toInt) = elem
+        values.set(r.toInt, elem)
       }
     }
     this
   }
 
   /**
-   * Returns an iterator for the sample set.
+   * Returns an iterator for a snapshot of the sample set.
    */
-  def iterator = values.take(size).iterator
+  def iterator = {
+    val copy: Array[A] = Array.fill(window)(init)
+    for (i <- 0 until size) {
+      copy(i) = values.get(i)
+    }
+    copy.iterator
+  }
 }
