@@ -77,11 +77,10 @@ class Timer extends Growable[Duration] {
   }
 
   /**
-   * Adds a duration recorded elsewhere.
+   * Adds a timing in nanoseconds.
    */
-  def +=(duration: Duration): this.type = {
-    if (duration.value >= 0) {
-      val ns = duration.ns.value.toLong
+  def +=(ns: Long): this.type = {
+    if (ns >= 0) {
       count_.incrementAndGet
       setMax(ns)
       setMin(ns)
@@ -91,6 +90,11 @@ class Timer extends Growable[Duration] {
     }
     this
   }
+
+  /**
+   * Adds a duration recorded elsewhere.
+   */
+  def +=(duration: Duration): this.type = (this += duration.ns.value.toLong)
 
   private def updateVariance(ns: Long) {
     // initialize varianceM to the first reading if it's still blank
