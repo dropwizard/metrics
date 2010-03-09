@@ -19,7 +19,11 @@ class Timer extends Growable[Duration] {
   private val sum_ = new AtomicLong(0)
   private val varianceM = new AtomicLong(-1)
   private val varianceS = new AtomicLong(0)
-  private val p999_ = new Percentile(99.9, 1000)
+  // Calculates the 99.9th percentile using a sample size of 1028, which offers
+  // a 99.9% confidence level with a 5% margin of error assuming a normal
+  // distribution. This might need to be parameterized, but I'm only going to do
+  // that when someone complains.
+  private val p999_ = new Percentile(99.9, 1028)
 
   /**
    * Record the amount of time it takes to execute the given function.
