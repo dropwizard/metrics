@@ -1,4 +1,4 @@
-class Metrics(info: sbt.ProjectInfo) extends sbt.DefaultProject(info) {
+class Metrics(info: sbt.ProjectInfo) extends sbt.DefaultProject(info) with posterous.Publish {
   /**
    * Home Repo
    */
