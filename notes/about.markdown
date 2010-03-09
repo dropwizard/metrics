@@ -1,1 +1,2 @@
-Metrics is a Scala library for exposing application metrics via JMX.
+[Metrics](http://github.com/codahale/metrics) is a Scala library for exposing
+application metrics via JMX.
