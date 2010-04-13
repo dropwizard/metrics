@@ -30,5 +30,9 @@ class SampleTest extends Spec with MustMatchers {
     it("is convertable to an array") {
       sample.toArray.toList must equal(Range(0, 10).toArray.toList)
     }
+
+    it("has 10 elements") {
+      sample.iterator.toList must have size (10)
+    }
   }
 }

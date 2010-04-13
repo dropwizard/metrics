@@ -56,7 +56,7 @@ class Sample[A](val window: Int)
    * Returns an iterator for a snapshot of the sample set.
    */
   def iterator = {
-    val copy: Array[A] = Array.fill(window)(init)
+    val copy: Array[A] = Array.fill(size)(init)
     for (i <- 0 until size) {
       copy(i) = values.get(i)
     }
