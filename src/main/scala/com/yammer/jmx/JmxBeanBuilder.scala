@@ -29,7 +29,8 @@ class JmxBeanBuilder(description: String, obj: AnyRef) {
    */
   def addMeter(name: String, meter: Meter, unit: TimeUnit) {
     addAttribute("%s-count".format(name)) { meter.count }
-    addAttribute("%s-rate".format(name)) { meter.rate.convert(unit) }
+    addAttribute("%s-rate".format(name)) { meter.rate.convert(unit).value }
+    addAttribute("%s-unit".format(name)) { unit.toString.toLowerCase }
   }
 
   /**
@@ -38,10 +39,11 @@ class JmxBeanBuilder(description: String, obj: AnyRef) {
    */
   def addLoadMeter(name: String, meter: LoadMeter, unit: TimeUnit) {
     addAttribute("%s-count".format(name)) { meter.count }
-    addAttribute("%s-mean-rate".format(name)) { meter.rate.convert(unit) }
-    addAttribute("%s-01min-rate".format(name)) { meter.oneMinuteRate.convert(unit) }
-    addAttribute("%s-05min-rate".format(name)) { meter.fiveMinuteRate.convert(unit) }
-    addAttribute("%s-15min-rate".format(name)) { meter.fifteenMinuteRate.convert(unit) }
+    addAttribute("%s-mean-rate".format(name)) { meter.rate.convert(unit).value }
+    addAttribute("%s-01min-rate".format(name)) { meter.oneMinuteRate.convert(unit).value }
+    addAttribute("%s-05min-rate".format(name)) { meter.fiveMinuteRate.convert(unit).value }
+    addAttribute("%s-15min-rate".format(name)) { meter.fifteenMinuteRate.convert(unit).value }
+    addAttribute("%s-unit".format(name)) { unit.toString.toLowerCase }
   }
 
   /**
@@ -50,11 +52,12 @@ class JmxBeanBuilder(description: String, obj: AnyRef) {
    */
   def addTimer(name: String, timer: Timer, unit: TimeUnit) {
     addAttribute("%s-count".format(name)) { timer.count }
-    addAttribute("%s-max".format(name)) { timer.max.convert(unit) }
-    addAttribute("%s-min".format(name)) { timer.min.convert(unit) }
-    addAttribute("%s-mean".format(name)) { timer.mean.convert(unit) }
-    addAttribute("%s-stddev".format(name)) { timer.standardDeviation.convert(unit) }
-    addAttribute("%s-99.9%%".format(name)) { timer.p999.convert(unit) }
+    addAttribute("%s-max".format(name)) { timer.max.convert(unit).value }
+    addAttribute("%s-min".format(name)) { timer.min.convert(unit).value }
+    addAttribute("%s-mean".format(name)) { timer.mean.convert(unit).value }
+    addAttribute("%s-stddev".format(name)) { timer.standardDeviation.convert(unit).value }
+    addAttribute("%s-99.9%%".format(name)) { timer.p999.convert(unit).value }
+    addAttribute("%s-unit".format(name)) { unit.toString.toLowerCase }
   }
 
   /**

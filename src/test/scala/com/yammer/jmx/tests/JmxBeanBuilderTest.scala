@@ -70,7 +70,14 @@ class JmxBeanBuilderTest extends Spec with MustMatchers with MockitoSugar {
         val attr = builder.build.attributes("ninjas-rate")
 
         attr.name must equal("ninjas-rate")
-        attr() must equal("0.32/s")
+        attr() must equal("0.32")
+      }
+
+      it("builds a bean with a read-only unit attribute") {
+        val attr = builder.build.attributes("ninjas-unit")
+
+        attr.name must equal("ninjas-unit")
+        attr() must equal("seconds")
       }
     }
 
@@ -97,35 +104,42 @@ class JmxBeanBuilderTest extends Spec with MustMatchers with MockitoSugar {
         val attr = builder.build.attributes("ninjas-max")
 
         attr.name must equal("ninjas-max")
-        attr() must equal("400.00ms")
+        attr() must equal("400.0")
       }
 
       it("builds a bean with a read-only min attribute") {
         val attr = builder.build.attributes("ninjas-min")
 
         attr.name must equal("ninjas-min")
-        attr() must equal("20.00ms")
+        attr() must equal("20.0")
       }
 
       it("builds a bean with a read-only mean attribute") {
         val attr = builder.build.attributes("ninjas-mean")
 
         attr.name must equal("ninjas-mean")
-        attr() must equal("123.00ms")
+        attr() must equal("123.0")
       }
 
       it("builds a bean with a read-only stddev attribute") {
         val attr = builder.build.attributes("ninjas-stddev")
 
         attr.name must equal("ninjas-stddev")
-        attr() must equal("12.00ms")
+        attr() must equal("12.0")
       }
 
       it("builds a bean with a read-only 99.9% attribute") {
         val attr = builder.build.attributes("ninjas-99.9%")
 
         attr.name must equal("ninjas-99.9%")
-        attr() must equal("320.00ms")
+        attr() must equal("320.0")
+      }
+
+      it("builds a bean with a read-only unit attribute") {
+        val attr = builder.build.attributes("ninjas-unit")
+
+        attr.name must equal("ninjas-unit")
+        attr() must equal("milliseconds")
       }
     }
 
@@ -151,28 +165,35 @@ class JmxBeanBuilderTest extends Spec with MustMatchers with MockitoSugar {
         val attr = builder.build.attributes("ninjas-mean-rate")
 
         attr.name must equal("ninjas-mean-rate")
-        attr() must equal("0.32/s")
+        attr() must equal("0.32")
       }
 
       it("builds a bean with a read-only 1 minute rate attribute") {
         val attr = builder.build.attributes("ninjas-01min-rate")
 
         attr.name must equal("ninjas-01min-rate")
-        attr() must equal("1.68/s")
+        attr() must equal("1.68")
       }
 
       it("builds a bean with a read-only 5 minute rate attribute") {
         val attr = builder.build.attributes("ninjas-05min-rate")
 
         attr.name must equal("ninjas-05min-rate")
-        attr() must equal("0.84/s")
+        attr() must equal("0.84")
       }
 
       it("builds a bean with a read-only 15 minute rate attribute") {
         val attr = builder.build.attributes("ninjas-15min-rate")
 
         attr.name must equal("ninjas-15min-rate")
-        attr() must equal("0.16/s")
+        attr() must equal("0.16")
+      }
+
+      it("builds a bean with a read-only unit attribute") {
+        val attr = builder.build.attributes("ninjas-unit")
+
+        attr.name must equal("ninjas-unit")
+        attr() must equal("seconds")
       }
     }
   }
