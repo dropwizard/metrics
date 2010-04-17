@@ -26,7 +26,7 @@ case class JmxBean(klass: Class[_],
       )
     }
     new MBeanInfo(
-      klass.getCanonicalName,
+      clean(klass.getCanonicalName),
       description,
       attributeInfos.toArray,
       Array(), Array(), Array()
@@ -42,4 +42,10 @@ case class JmxBean(klass: Class[_],
   }
 
   def getAttribute(name: String) = attributes(name)()
+
+  private def clean(s: String) = if (s.endsWith("$")) {
+    s.substring(0, s.length-1)
+  } else {
+    s
+  }.replaceAll("\\$", ".")
 }
