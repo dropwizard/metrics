@@ -4,7 +4,7 @@ import org.scalatest.Spec
 import org.scalatest.matchers.MustMatchers
 import com.yammer.jmx.JmxBeanBuilder
 import org.scalatest.mock.MockitoSugar
-import org.mockito.Mockito.{when, verify}
+import org.mockito.Mockito.when
 import java.util.concurrent.TimeUnit
 import com.yammer.time.{Rate, Duration}
 import com.yammer.metrics.{LoadMeter, Timer, Meter, Counter}
