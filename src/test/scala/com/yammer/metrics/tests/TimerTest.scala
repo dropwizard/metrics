@@ -29,6 +29,34 @@ class TimerTest extends Spec with MustMatchers {
     }
   }
 
+  describe("a blank timer") {
+    val timer = new Timer
+
+    it("has a max of zero") {
+      timer.max.ms.value must be(0.0 plusOrMinus precision)
+    }
+
+    it("has a min of zero") {
+      timer.min.ms.value must be(0.0 plusOrMinus precision)
+    }
+
+    it("has a mean of zero") {
+      timer.mean.ms.value must be(0.0 plusOrMinus precision)
+    }
+
+    it("has a standard deviation of zero") {
+      timer.standardDeviation.ms.value must be(0.0 plusOrMinus precision)
+    }
+
+    it("has a 99.9th percentile of zero") {
+      timer.p999.ms.value must be(0.0 plusOrMinus precision)
+    }
+
+    it("has a count of zero") {
+      timer.count must be (0)
+    }
+  }
+
   describe("timing a series of events") {
     val timer = new Timer
     timer ++= List(

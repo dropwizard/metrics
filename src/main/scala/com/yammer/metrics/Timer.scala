@@ -45,27 +45,27 @@ class Timer extends Growable[Duration] {
   /**
    * Returns the greatest amount of time recorded.
    */
-  def max = Duration.nanoseconds(max_.get)
+  def max = safeNS(max_.get)
 
   /**
    * Returns the least amount of time recorded.
    */
-  def min = Duration.nanoseconds(min_.get)
+  def min = safeNS(min_.get)
 
   /**
    * Returns the arthimetic mean of the recorded durations.
    */
-  def mean = Duration.nanoseconds(sum_.get / count.toDouble)
+  def mean = safeNS(sum_.get / count.toDouble)
 
   /**
    * Returns the standard deviation of the recorded durations.
    */
-  def standardDeviation = Duration.nanoseconds(Math.sqrt(variance))
+  def standardDeviation = safeNS(Math.sqrt(variance))
 
   /**
    * Returns the duration at the 99.9th percentile.
    */
-  def p999 = Duration.nanoseconds(p999_.value)
+  def p999 = safeNS(p999_.value)
 
   /**
    * Clears all timings.
@@ -136,6 +136,14 @@ class Timer extends Growable[Duration] {
   private def setMin(duration: Long) {
     while (min_.get > duration) {
       min_.compareAndSet(min_.get, duration)
+    }
+  }
+
+  private def safeNS(f: => Double) = {
+    if (count > 0) {
+      Duration.nanoseconds(f)
+    } else {
+      Duration.nanoseconds(0)
     }
   }
 }
