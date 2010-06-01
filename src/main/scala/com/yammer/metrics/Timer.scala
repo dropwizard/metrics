@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit
 import com.yammer.time.{Duration, Clock}
 import collection.generic.Growable
 import java.lang.Double.{doubleToLongBits, longBitsToDouble}
+import scala.math.sqrt
 
 /**
  * A class which tracks the amount of time it takes to perform a particular
@@ -60,7 +61,7 @@ class Timer extends Growable[Duration] {
   /**
    * Returns the standard deviation of the recorded durations.
    */
-  def standardDeviation = safeNS(Math.sqrt(variance))
+  def standardDeviation = safeNS(sqrt(variance))
 
   /**
    * Returns the duration at the 99.9th percentile.

@@ -2,10 +2,11 @@ package com.yammer.metrics
 
 import java.util.concurrent.TimeUnit
 import com.yammer.time.{Clock, Duration, Rate}
+import scala.math.exp
 
 object WeightedMeter {
   val interval = Duration.seconds(5)
-  private val oneMinuteFactor = 1 / Math.exp(interval.minutes.value)
+  private val oneMinuteFactor = 1 / exp(interval.minutes.value)
   private val fiveMinuteFactor = oneMinuteFactor / 5
   private val fifteenMinuteFactor = oneMinuteFactor / 15
 

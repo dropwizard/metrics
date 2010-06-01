@@ -1,6 +1,7 @@
 package com.yammer.metrics
 
 import collection.generic.Growable
+import scala.math.floor
 
 /**
  * Calculates the value of the given percentile (0..100) for a sample of the
@@ -48,7 +49,7 @@ class Percentile(var p: Double,
     } else {
       val lower = measurements(pos.toInt - 1)
       val upper = measurements(pos.toInt)
-      lower + (pos - Math.floor(pos)) * (upper - lower)
+      lower + (pos - floor(pos)) * (upper - lower)
     }
   }
 }
