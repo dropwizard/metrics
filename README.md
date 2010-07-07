@@ -47,7 +47,7 @@ How To Use
 
 **Third**, expose these metrics via JMX:
     
-    import java.util.concurrency.TimeUnit
+    import java.util.concurrent.TimeUnit
     import com.yammer.jmx.JmxManaged
     
     class ThingFinder extends JmxManaged {
