@@ -1,0 +1,3 @@
+Moving to 2.8.0 final:
+
+* Now compiled exclusively for 2.8.0 final.
