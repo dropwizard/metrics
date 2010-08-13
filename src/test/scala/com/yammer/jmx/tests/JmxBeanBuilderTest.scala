@@ -87,6 +87,10 @@ class JmxBeanBuilderTest extends Spec with MustMatchers with MockitoSugar {
       when(timer.min).thenReturn(Duration.milliseconds(20))
       when(timer.mean).thenReturn(Duration.milliseconds(123))
       when(timer.standardDeviation).thenReturn(Duration.milliseconds(12))
+      when(timer.median).thenReturn(Duration.milliseconds(120))
+      when(timer.p95).thenReturn(Duration.milliseconds(289))
+      when(timer.p98).thenReturn(Duration.milliseconds(301))
+      when(timer.p99).thenReturn(Duration.milliseconds(318))
       when(timer.p999).thenReturn(Duration.milliseconds(320))
       when(timer.count).thenReturn(11)
 
@@ -126,6 +130,34 @@ class JmxBeanBuilderTest extends Spec with MustMatchers with MockitoSugar {
 
         attr.name must equal("ninjas-stddev")
         attr() must equal("12.0")
+      }
+
+      it("builds a bean with a read-only median attribute") {
+        val attr = builder.build.attributes("ninjas-median")
+
+        attr.name must equal("ninjas-median")
+        attr() must equal("120.0")
+      }
+
+      it("builds a bean with a read-only 95% attribute") {
+        val attr = builder.build.attributes("ninjas-95%")
+
+        attr.name must equal("ninjas-95%")
+        attr() must equal("289.0")
+      }
+
+      it("builds a bean with a read-only 98% attribute") {
+        val attr = builder.build.attributes("ninjas-98%")
+
+        attr.name must equal("ninjas-98%")
+        attr() must equal("301.0")
+      }
+
+      it("builds a bean with a read-only 99% attribute") {
+        val attr = builder.build.attributes("ninjas-99%")
+
+        attr.name must equal("ninjas-99%")
+        attr() must equal("318.0")
       }
 
       it("builds a bean with a read-only 99.9% attribute") {
