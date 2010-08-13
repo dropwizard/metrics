@@ -20,11 +20,10 @@ class Timer extends Growable[Duration] {
   private val sum_ = new AtomicLong(0)
   private val varianceM = new AtomicLong(-1)
   private val varianceS = new AtomicLong(0)
-  // Calculates the 99.9th percentile using a sample size of 1028, which offers
-  // a 99.9% confidence level with a 5% margin of error assuming a normal
-  // distribution. This might need to be parameterized, but I'm only going to do
-  // that when someone complains.
-  private val p999_ = new Percentile(99.9, 1028)
+  // Using a sample size of 1028, which offers a 99.9% confidence level with a
+  // 5% margin of error assuming a normal distribution. This might need to be
+  // parameterized, but I'm only going to do that when someone complains.
+  private val percentile = new Percentile(1028)
 
   /**
    * Record the amount of time it takes to execute the given function.
@@ -64,9 +63,29 @@ class Timer extends Growable[Duration] {
   def standardDeviation = safeNS(sqrt(variance))
 
   /**
+   * Returns the duration at the 50th percentile.
+   */
+  def median = safeNS(percentile.value(50))
+
+  /**
+   * Returns the duration at the 95th percentile.
+   */
+  def p95 = safeNS(percentile.value(95))
+
+  /**
+   * Returns the duration at the 98th percentile.
+   */
+  def p98 = safeNS(percentile.value(98))
+
+  /**
+   * Returns the duration at the 99th percentile.
+   */
+  def p99 = safeNS(percentile.value(99))
+
+  /**
    * Returns the duration at the 99.9th percentile.
    */
-  def p999 = safeNS(p999_.value)
+  def p999 = safeNS(percentile.value(99.9))
 
   /**
    * Clears all timings.
@@ -78,7 +97,7 @@ class Timer extends Growable[Duration] {
     sum_.set(0)
     varianceM.set(-1)
     varianceS.set(0)
-    p999_.clear()
+    percentile.clear()
   }
 
   /**
@@ -91,7 +110,7 @@ class Timer extends Growable[Duration] {
       setMin(ns)
       sum_.getAndAdd(ns)
       updateVariance(ns)
-      p999_ += ns.toDouble
+      percentile += ns.toDouble
     }
     this
   }

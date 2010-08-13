@@ -48,6 +48,22 @@ class TimerTest extends Spec with MustMatchers {
       timer.standardDeviation.ms.value must be(0.0 plusOrMinus precision)
     }
 
+    it("has a median of zero") {
+      timer.median.ms.value must be(0.0 plusOrMinus precision)
+    }
+
+    it("has a 95th percentile of zero") {
+      timer.p95.ms.value must be(0.0 plusOrMinus precision)
+    }
+
+    it("has a 98th percentile of zero") {
+      timer.p98.ms.value must be(0.0 plusOrMinus precision)
+    }
+
+    it("has a 99th percentile of zero") {
+      timer.p99.ms.value must be(0.0 plusOrMinus precision)
+    }
+
     it("has a 99.9th percentile of zero") {
       timer.p999.ms.value must be(0.0 plusOrMinus precision)
     }
@@ -81,6 +97,22 @@ class TimerTest extends Spec with MustMatchers {
 
     it("calculates the standard deviation") {
       timer.standardDeviation.ms.value must be(11.4 plusOrMinus precision)
+    }
+
+    it("calculates the median") {
+      timer.median.ms.value must be(20.0 plusOrMinus precision)
+    }
+
+    it("calculates the 95th percentile") {
+      timer.p95.ms.value must be(40.0 plusOrMinus precision)
+    }
+
+    it("calculates the 98th percentile") {
+      timer.p98.ms.value must be(40.0 plusOrMinus precision)
+    }
+
+    it("calculates the 99th percentile") {
+      timer.p99.ms.value must be(40.0 plusOrMinus precision)
     }
 
     it("calculates the 99.9th percentile") {
