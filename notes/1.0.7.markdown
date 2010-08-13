@@ -1,0 +1,6 @@
+More `Timer` metrics:
+
+* Added `median` to `Timer`.
+* Added `p95` to `Timer` (95th percentile).
+* Added `p98` to `Timer` (98th percentile).
+* Added `p99` to `Timer` (99th percentile).
