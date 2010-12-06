@@ -23,7 +23,6 @@ object WeightedMeter {
  * @see <a href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average">EMA</a>
  */
 class WeightedMeter private(factor: Double, interval: Duration) extends Meter {
-  import WeightedMeter._
   private val intervalInTicks = interval.ns.value.toLong
   private var uncounted = 0L
   private var initialized = false
