@@ -1,20 +1,23 @@
-class Metrics(info: sbt.ProjectInfo) extends sbt.DefaultProject(info) with posterous.Publish with rsync.RsyncPublishing {
+import sbt._
+
+class Metrics(info: ProjectInfo) extends DefaultProject(info)
+                                         with posterous.Publish
+                                         with IdeaProject {
   /**
    * Publish the source as well as the class files.
    */
-  override def packageSrcJar= defaultJarPath("-sources.jar")
-  val sourceArtifact = sbt.Artifact(artifactID, "src", "jar", Some("sources"), Nil, None)
+  override def packageSrcJar = defaultJarPath("-sources.jar")
+  val sourceArtifact = Artifact.sources(artifactID)
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageSrc)
 
   /**
-   * Publish via rsync.
+   * Publish via Ivy.
    */
-  def rsyncRepo = "codahale.com:/home/codahale/repo.codahale.com"
 
-  /**
-   * Repositories
-   */
-  val scalaTools = "scala-tools.org Releases" at "http://scala-tools.org/repo-releases"
+  lazy val publishTo = Resolver.sftp("Personal Repo",
+                                     "codahale.com",
+                                     "/home/codahale/repo.codahale.com/") as ("codahale")
+  override def managedStyle = ManagedStyle.Maven
 
   /**
    * Dependencies
