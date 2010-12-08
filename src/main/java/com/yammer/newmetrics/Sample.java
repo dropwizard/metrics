@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLongArray;
  * @see <a href="http://www.cs.umd.edu/~samir/498/vitter.pdf">Random Sampling
  *      with a Reservoir</a>
  */
-public class Sample implements Iterable<Long> {
+public class Sample {
 	private static final Random RANDOM = new Random();
 	private final AtomicLong count = new AtomicLong();
 	private final AtomicLongArray values;
@@ -69,14 +69,18 @@ public class Sample implements Iterable<Long> {
 			}
 		}
 	}
-	
-	@Override
-	public Iterator<Long> iterator() {
+
+	/**
+	 * Returns a copy of the sample's values.
+	 *
+	 * @return a copy of the sample's values
+	 */
+	public List<Long> values() {
 		final int s = size();
 		final List<Long> copy = new ArrayList<Long>(s);
 		for (int i = 0; i < s; i++) {
 			copy.add(values.get(i));
 		}
-		return copy.iterator();
+		return copy;
 	}
 }

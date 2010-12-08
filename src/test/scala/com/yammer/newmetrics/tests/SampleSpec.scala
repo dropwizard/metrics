@@ -12,11 +12,11 @@ object SampleSpec extends Spec {
 
     def `should have 100 elements` {
       sample.size must beEqualTo(100)
-      sample.toList must haveSize(100)
+      sample.values.toList must haveSize(100)
     }
 
     def `should only have elements from the population` {
-      population must containAll(sample)
+      population must containAll(sample.values)
     }
   }
 
@@ -27,11 +27,11 @@ object SampleSpec extends Spec {
 
     def `should have 10 elements` {
       sample.size must beEqualTo(10)
-      sample.toList must haveSize(10)
+      sample.values.toList must haveSize(10)
     }
 
     def `should only have elements from the population` {
-      population must containAll(sample)
+      population must containAll(sample.values)
     }
   }
 }
