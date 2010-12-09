@@ -19,14 +19,14 @@ trait JmxManaged {
   /**
    * Enables JMX, passing a JmxBeanBuilder to the provided function.
    */
-  protected def enableJMX(description: String)
+  protected def enableJMX(description : String, name: String = getClass.getSimpleName)
                          (configure: JmxBeanBuilder => Unit) {
     val builder = new JmxBeanBuilder(description, this)
     configure(builder)
-    JMX.register(builder.build, objectName)
+    JMX.register(builder.build, objectName(name))
   }
 
-  private def objectName = new ObjectName(
-    "%s:type=%s".format(getClass.getPackage.getName, getClass.getSimpleName)
+  private def objectName(name : String) = new ObjectName(
+    "%s:type=%s".format(getClass.getPackage.getName, name)
   )
 }
