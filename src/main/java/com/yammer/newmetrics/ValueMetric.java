@@ -15,7 +15,7 @@ package com.yammer.newmetrics;
  * @author coda
  * @param <T> the type of the metric's value
  */
-public abstract class ValueMetric<T> {
+public abstract class ValueMetric<T> implements Metric {
 	/**
 	 * Returns the metric's current value.
 	 *

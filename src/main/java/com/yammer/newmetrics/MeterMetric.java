@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author coda
  * @see <a href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average">EMA</a>
  */
-public class MeterMetric {
+public class MeterMetric implements Metric {
 	private static final ScheduledExecutorService TICK_THREAD =
 			Executors.newScheduledThreadPool(2, new NamedThreadFactory("meter-tick"));
 	private static final long INTERVAL = 5; // seconds

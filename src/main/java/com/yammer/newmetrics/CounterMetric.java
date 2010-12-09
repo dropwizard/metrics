@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author coda
  */
-public class CounterMetric {
+public class CounterMetric implements Metric {
 	private final AtomicLong count = new AtomicLong();
 
 	/**

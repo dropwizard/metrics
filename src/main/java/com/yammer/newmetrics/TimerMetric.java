@@ -18,7 +18,7 @@ import static java.lang.Math.sqrt;
  * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately
  * computing running variance</a>
  */
-public class TimerMetric {
+public class TimerMetric implements Metric {
 	private final MeterMetric meter = MeterMetric.newMeter();
 	// Using a sample size of 1028, which offers a 99.9% confidence level with a
 	// 5% margin of error assuming a normal distribution. This might need to be
