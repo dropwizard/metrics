@@ -24,42 +24,55 @@ public class MeterMetric implements Metric {
 	/**
 	 * Creates a new {@link MeterMetric}.
 	 *
+	 * @param unit the scale unit of the new meter
 	 * @return a new {@link MeterMetric}
 	 */
-	public static MeterMetric newMeter() {
-		return newMeter(INTERVAL, TimeUnit.SECONDS);
+	public static MeterMetric newMeter(TimeUnit unit) {
+		return newMeter(INTERVAL, TimeUnit.SECONDS, unit);
 	}
 
 	/**
 	 * Creates a new {@link MeterMetric} with a given tick interval.
 	 *
 	 * @param interval the duration of a meter tick
-	 * @param unit the unit of {@code interval}
+	 * @param intervalUnit the unit of {@code interval}
+	 * @param unit the scale unit of the new meter
 	 * @return a new {@link MeterMetric}
 	 */
-	public static MeterMetric newMeter(long interval, TimeUnit unit) {
-		final MeterMetric meter = new MeterMetric();
+	public static MeterMetric newMeter(long interval, TimeUnit intervalUnit, TimeUnit unit) {
+		final MeterMetric meter = new MeterMetric(unit);
 		final Runnable ticker = new Runnable() {
 			@Override
 			public void run() {
 				meter.tick();
 			}
 		};
-		TICK_THREAD.scheduleAtFixedRate(ticker, interval, interval, unit);
+		TICK_THREAD.scheduleAtFixedRate(ticker, interval, interval, intervalUnit);
 		return meter;
 	}
 
 	private final AtomicLong uncounted = new AtomicLong();
 	private final AtomicLong count = new AtomicLong();
 	private final long startTime = System.nanoTime();
+	private final TimeUnit unit;
 	private volatile boolean initialized;
 	private volatile double _oneMinuteRate;
 	private volatile double _fiveMinuteRate;
 	private volatile double _fifteenMinuteRate;
 
-	private MeterMetric() {
+	private MeterMetric(TimeUnit unit) {
 		initialized = false;
 		_oneMinuteRate = _fiveMinuteRate = _fifteenMinuteRate = 0.0;
+		this.unit = unit;
+	}
+
+	/**
+	 * Returns the meter's scale unit.
+	 *
+	 * @return the meter's scale unit
+	 */
+	public TimeUnit getUnit() {
+		return unit;
 	}
 
 	/**
@@ -110,12 +123,11 @@ public class MeterMetric implements Metric {
 	 * This rate has the same exponential decay factor as the fifteen-minute load
 	 * average in the {@code top} Unix command.
 	 *
-	 * @param unit the scale unit of the rate
 	 * @return the fifteen-minute exponentially-weighted moving average rate at
 	 *         which events have occured since the meter was created
 	 */
-	public double fifteenMinuteRate(TimeUnit unit) {
-		return convertNsRate(_fifteenMinuteRate, unit);
+	public double fifteenMinuteRate() {
+		return convertNsRate(_fifteenMinuteRate);
 	}
 
 	/**
@@ -125,28 +137,26 @@ public class MeterMetric implements Metric {
 	 * This rate has the same exponential decay factor as the five-minute load
 	 * average in the {@code top} Unix command.
 	 *
-	 * @param unit the scale unit of the rate
 	 * @return the five-minute exponentially-weighted moving average rate at
 	 *         which events have occured since the meter was created
 	 */
-	public double fiveMinuteRate(TimeUnit unit) {
-		return convertNsRate(_fiveMinuteRate, unit);
+	public double fiveMinuteRate() {
+		return convertNsRate(_fiveMinuteRate);
 	}
 
 	/**
 	 * Returns the mean rate at which events have occured since the meter was
 	 * created.
 	 *
-	 * @param unit the scale unit of the rate
 	 * @return the mean rate at which events have occured since the meter was
 	 *         created
 	 */
-	public double meanRate(TimeUnit unit) {
+	public double meanRate() {
 		if (count() == 0) {
 			return 0.0;
 		} else {
 			final long elapsed = (System.nanoTime() - startTime);
-			return convertNsRate(count() / (double) elapsed, unit);
+			return convertNsRate(count() / (double) elapsed);
 		}
 	}
 
@@ -157,15 +167,14 @@ public class MeterMetric implements Metric {
 	 * This rate has the same exponential decay factor as the one-minute load
 	 * average in the {@code top} Unix command.
 	 *
-	 * @param unit the scale unit of the rate
 	 * @return the one-minute exponentially-weighted moving average rate at
 	 *         which events have occured since the meter was created
 	 */
-	public double oneMinuteRate(TimeUnit unit) {
-		return convertNsRate(_oneMinuteRate, unit);
+	public double oneMinuteRate() {
+		return convertNsRate(_oneMinuteRate);
 	}
 
-	private double convertNsRate(double ratePerNs, TimeUnit unit) {
+	private double convertNsRate(double ratePerNs) {
 		return ratePerNs * (double) unit.toNanos(1);
 	}
 }

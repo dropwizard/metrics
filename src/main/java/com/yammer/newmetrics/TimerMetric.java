@@ -42,7 +42,7 @@ public class TimerMetric implements Metric {
 	public TimerMetric(TimeUnit latencyUnit, TimeUnit rateUnit) {
 		this.latencyUnit = latencyUnit;
 		this.rateUnit = rateUnit;
-		this.meter = MeterMetric.newMeter();
+		this.meter = MeterMetric.newMeter(rateUnit);
 		clear();
 	}
 
@@ -104,33 +104,33 @@ public class TimerMetric implements Metric {
 	 * Returns the fifteen-minute rate of timings.
 	 *
 	 * @return the fifteen-minute rate of timings
-	 * @see MeterMetric#fifteenMinuteRate(java.util.concurrent.TimeUnit)
+	 * @see MeterMetric#fifteenMinuteRate()
 	 */
-	public double fifteenMinuteRate() { return meter.fifteenMinuteRate(rateUnit); }
+	public double fifteenMinuteRate() { return meter.fifteenMinuteRate(); }
 
 	/**
 	 * Returns the five-minute rate of timings.
 	 *
 	 * @return the five-minute rate of timings
-	 * @see MeterMetric#fiveMinuteRate(java.util.concurrent.TimeUnit)
+	 * @see MeterMetric#fiveMinuteRate()
 	 */
-	public double fiveMinuteRate() { return meter.fiveMinuteRate(rateUnit); }
+	public double fiveMinuteRate() { return meter.fiveMinuteRate(); }
 
 	/**
 	 * Returns the mean rate of timings.
 	 *
 	 * @return the mean rate of timings
-	 * @see MeterMetric#meanRate(java.util.concurrent.TimeUnit)
+	 * @see MeterMetric#meanRate()
 	 */
-	public double meanRate() { return meter.meanRate(rateUnit); }
+	public double meanRate() { return meter.meanRate(); }
 
 	/**
 	 * Returns the one-minute rate of timings.
 	 *
 	 * @return the one-minute rate of timings
-	 * @see MeterMetric#oneMinuteRate(java.util.concurrent.TimeUnit)
+	 * @see MeterMetric#oneMinuteRate()
 	 */
-	public double oneMinuteRate() { return meter.oneMinuteRate(rateUnit); }
+	public double oneMinuteRate() { return meter.oneMinuteRate(); }
 
 	/**
 	 * Returns the longest recorded duration.

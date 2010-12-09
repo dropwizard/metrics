@@ -9,7 +9,7 @@ import org.specs.matcher.Matcher
 object MeterMetricSpec extends Spec {
   class `A meter's one-minute rate` {
     def `should decrease exponentially` {
-      rates { _.oneMinuteRate(TimeUnit.SECONDS) } must eventually(
+      rates { _.oneMinuteRate } must eventually(
         haveElementsCloseTo(List(0.0, 0.0, 0.0, 0.0, 0.4, 0.4, 0.4, 0.4, 0.4,
                                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0)))
     }
@@ -17,7 +17,7 @@ object MeterMetricSpec extends Spec {
 
   class `A meter's five-minute rate` {
     def `should decrease exponentially` {
-      rates { _.fiveMinuteRate(TimeUnit.SECONDS) } must eventually(
+      rates { _.fiveMinuteRate } must eventually(
         haveElementsCloseTo(List(0.0, 0.0, 0.0, 0.0, 0.4, 0.4, 0.4, 0.4, 0.4,
                                  0.32, 0.32, 0.32, 0.32, 0.32, 0.25)))
     }
@@ -25,7 +25,7 @@ object MeterMetricSpec extends Spec {
 
   class `A meter's fifteen-minute rate` {
     def `should decrease exponentially` {
-      rates { _.fifteenMinuteRate(TimeUnit.SECONDS) } must eventually(
+      rates { _.fifteenMinuteRate } must eventually(
         haveElementsCloseTo(List(0.0, 0.0, 0.0, 0.0, 0.4, 0.4, 0.4, 0.4,
                                  0.4, 0.37, 0.37, 0.37, 0.37, 0.37, 0.35)))
     }
@@ -39,19 +39,19 @@ object MeterMetricSpec extends Spec {
   }
 
   class `A meter metric with no events` {
-    val meter = MeterMetric.newMeter()
+    val meter = MeterMetric.newMeter(TimeUnit.SECONDS)
 
     def `should have a count of zero` {
       meter.count must beEqualTo(0)
     }
 
     def `should have a mean rate of 0 events/sec` {
-      meter.meanRate(TimeUnit.SECONDS) must beEqualTo(0.0)
+      meter.meanRate must beEqualTo(0.0)
     }
   }
 
   class `A meter metric with three events` {
-    val meter = MeterMetric.newMeter()
+    val meter = MeterMetric.newMeter(TimeUnit.SECONDS)
     meter.mark(3)
 
     def `should have a count of three` {
@@ -60,7 +60,7 @@ object MeterMetricSpec extends Spec {
   }
 
   def rates[A](f : MeterMetric => A) = {
-    val meter = MeterMetric.newMeter(50, TimeUnit.MILLISECONDS)
+    val meter = MeterMetric.newMeter(50, TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
     meter.mark()
     meter.mark(1)
 
@@ -73,14 +73,14 @@ object MeterMetricSpec extends Spec {
   }
 
   def meanRates = {
-    val meter = MeterMetric.newMeter()
+    val meter = MeterMetric.newMeter(TimeUnit.SECONDS)
     meter.mark()
     meter.mark(1)
 
     val metrics = new ArrayBuffer[Double]
     for (i <- 1 to 4) {
       Thread.sleep(1000)
-      metrics += meter.meanRate(TimeUnit.SECONDS)
+      metrics += meter.meanRate()
     }
     metrics.toList
   }
