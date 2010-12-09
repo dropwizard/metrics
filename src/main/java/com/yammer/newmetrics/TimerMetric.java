@@ -19,11 +19,12 @@ import static java.lang.Math.sqrt;
  * computing running variance</a>
  */
 public class TimerMetric implements Metric {
-	private final MeterMetric meter = MeterMetric.newMeter();
+	private final MeterMetric meter;
 	// Using a sample size of 1028, which offers a 99.9% confidence level with a
 	// 5% margin of error assuming a normal distribution. This might need to be
 	// parameterized, but I'm only going to do that when someone complains.
 	private final Sample sample = new Sample(1028);
+	private final TimeUnit latencyUnit, rateUnit;
 	private final AtomicLong _min = new AtomicLong();
 	private final AtomicLong _max = new AtomicLong();
 	private final AtomicLong _sum = new AtomicLong();
@@ -34,9 +35,33 @@ public class TimerMetric implements Metric {
 
 	/**
 	 * Creates a new {@link TimerMetric}.
+	 *
+	 * @param latencyUnit the scale unit for this timer's latency metrics
+	 * @param rateUnit the scale unit for this timer's rate metrics
 	 */
-	public TimerMetric() {
+	public TimerMetric(TimeUnit latencyUnit, TimeUnit rateUnit) {
+		this.latencyUnit = latencyUnit;
+		this.rateUnit = rateUnit;
+		this.meter = MeterMetric.newMeter();
 		clear();
+	}
+
+	/**
+	 * Returns the timer's latency scale unit.
+	 *
+	 * @return the timer's latency scale unit
+	 */
+	public TimeUnit getLatencyUnit() {
+		return latencyUnit;
+	}
+
+	/**
+	 * Returns the timer's rate scale unit.
+	 *
+	 * @return the timer's rate scale unit
+	 */
+	public TimeUnit getRateUnit() {
+		return rateUnit;
 	}
 
 	/**
@@ -55,10 +80,9 @@ public class TimerMetric implements Metric {
 	 * Adds a recorded duration.
 	 *
 	 * @param duration the length of the duration
-	 * @param unit the unit of {@code duration}
 	 */
-	public void update(long duration, TimeUnit unit) {
-		final long ns = unit.toNanos(duration);
+	public void update(long duration) {
+		final long ns = latencyUnit.toNanos(duration);
 		if (ns >= 0) {
 			meter.mark();
 			sample.update(ns);
@@ -79,79 +103,70 @@ public class TimerMetric implements Metric {
 	/**
 	 * Returns the fifteen-minute rate of timings.
 	 *
-	 * @param unit the scale unit of the returned rate
 	 * @return the fifteen-minute rate of timings
 	 * @see MeterMetric#fifteenMinuteRate(java.util.concurrent.TimeUnit)
 	 */
-	public double fifteenMinuteRate(TimeUnit unit) { return meter.fifteenMinuteRate(unit); }
+	public double fifteenMinuteRate() { return meter.fifteenMinuteRate(rateUnit); }
 
 	/**
 	 * Returns the five-minute rate of timings.
 	 *
-	 * @param unit the scale unit of the returned rate
 	 * @return the five-minute rate of timings
 	 * @see MeterMetric#fiveMinuteRate(java.util.concurrent.TimeUnit)
 	 */
-	public double fiveMinuteRate(TimeUnit unit) { return meter.fiveMinuteRate(unit); }
+	public double fiveMinuteRate() { return meter.fiveMinuteRate(rateUnit); }
 
 	/**
 	 * Returns the mean rate of timings.
 	 *
-	 * @param unit the scale unit of the returned rate
 	 * @return the mean rate of timings
 	 * @see MeterMetric#meanRate(java.util.concurrent.TimeUnit)
 	 */
-	public double meanRate(TimeUnit unit) { return meter.meanRate(unit); }
+	public double meanRate() { return meter.meanRate(rateUnit); }
 
 	/**
 	 * Returns the one-minute rate of timings.
 	 *
-	 * @param unit the scale unit of the returned rate
 	 * @return the one-minute rate of timings
 	 * @see MeterMetric#oneMinuteRate(java.util.concurrent.TimeUnit)
 	 */
-	public double oneMinuteRate(TimeUnit unit) { return meter.oneMinuteRate(unit); }
+	public double oneMinuteRate() { return meter.oneMinuteRate(rateUnit); }
 
 	/**
 	 * Returns the longest recorded duration.
 	 *
-	 * @param unit the scale unit of the duration
 	 * @return the longest recorded duration
 	 */
-	public double max(TimeUnit unit) { return convertFromNS(_max.get(), unit); }
+	public double max() { return convertFromNS(_max.get()); }
 
 	/**
 	 * Returns the shortest recorded duration.
 	 *
-	 * @param unit the scale unit of the duration
 	 * @return the shortest recorded duration
 	 */
-	public double min(TimeUnit unit) { return convertFromNS(_min.get(), unit); }
+	public double min() { return convertFromNS(_min.get()); }
 
 	/**
 	 * Returns the arithmetic mean of all recorded durations.
 	 *
-	 * @param unit the scale unit of the duration
 	 * @return the arithmetic mean of all recorded durations
 	 */
-	public double mean(TimeUnit unit) { return convertFromNS(_sum.get() / (double) count(), unit); }
+	public double mean() { return convertFromNS(_sum.get() / (double) count()); }
 
 	/**
 	 * Returns the standard deviation of all recorded durations.
 	 *
-	 * @param unit the scale unit of the duration
 	 * @return the standard deviation of all recorded durations
 	 */
-	public double stdDev(TimeUnit unit) { return convertFromNS(sqrt(variance()), unit); }
+	public double stdDev() { return convertFromNS(sqrt(variance())); }
 
 	/**
 	 * Returns an array of durations at the given percentiles.
 	 *
-	 * @param unit the scale unit of the durations
 	 * @param percentiles one or more percentiles ({@code 0..1})
 	 * @return an array of durations at the given percentiles
 	 */
-	public double[] percentiles(TimeUnit unit, double... percentiles) {
+	public double[] percentiles(double... percentiles) {
 		final double[] scores = new double[percentiles.length];
 		for (int i = 0; i < scores.length; i++) {
 			scores[i] = 0.0;
@@ -166,13 +181,13 @@ public class TimerMetric implements Metric {
 				final double p = percentiles[i];
 				final double pos = p * (values.size() + 1);
 				if (pos < 1) {
-					scores[i] = convertFromNS(values.get(0), unit);
+					scores[i] = convertFromNS(values.get(0));
 				} else if (pos >= values.size()) {
-					scores[i] = convertFromNS(values.get(values.size() - 1), unit);
+					scores[i] = convertFromNS(values.get(values.size() - 1));
 				} else {
 					final double lower = values.get((int) pos - 1);
 					final double upper = values.get((int) pos);
-					scores[i] = convertFromNS(lower + (pos - floor(pos)) * (upper - lower), unit);
+					scores[i] = convertFromNS(lower + (pos - floor(pos)) * (upper - lower));
 				}
 			}
 		}
@@ -206,11 +221,11 @@ public class TimerMetric implements Metric {
 		return longBitsToDouble(varianceS.get()) / (count() - 1);
 	}
 
-	private double convertFromNS(double ns, TimeUnit unit) {
+	private double convertFromNS(double ns) {
 		if (count() <= 0) {
 			return 0.0;
 		}
-		return ns / TimeUnit.NANOSECONDS.convert(1, unit);
+		return ns / TimeUnit.NANOSECONDS.convert(1, latencyUnit);
 	}
 
 	private void setMax(long ns) {
