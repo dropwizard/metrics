@@ -49,6 +49,6 @@ class Meter {
    * Returns the rate of events in the given unit of time.
    */
   def rate = Rate.perNanosecond(if (count > 0)
-    count / (Clock.nanoTime - startTime)
+    count.toDouble / (Clock.nanoTime - startTime)
   else 0.0)
 }

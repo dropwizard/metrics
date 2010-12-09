@@ -10,11 +10,10 @@ import scala.math.floor
  * @author coda
  * @see Sample
  */
-class Percentile(var p: Double,
-                 var sampleSize: Int)
+class Percentile(val sampleSize: Int)
         extends Growable[Double] {
   
-  require(p > 0.0 && p < 100.0)
+
   private val sample = new Sample(sampleSize)(0.0)
 
   /**
@@ -38,7 +37,7 @@ class Percentile(var p: Double,
   /**
    * Returns the value of the given percentile.
    */
-  def value = {
+  def value(p: Double) = {
     val measurements = synchronized { sample.toArray.sortWith { _ < _ } }
     val pos = (p / 100.0) * (measurements.size + 1)
 
