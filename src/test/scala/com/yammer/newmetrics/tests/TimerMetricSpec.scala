@@ -4,7 +4,7 @@ import com.codahale.simplespec.Spec
 import com.yammer.newmetrics.TimerMetric
 import java.util.concurrent.TimeUnit
 
-object TimerSpec extends Spec {
+object TimerMetricSpec extends Spec {
   class `A blank timer` {
     val timer = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
 
