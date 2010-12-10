@@ -2,7 +2,7 @@ package com.yammer.newmetrics.tests
 
 import com.codahale.simplespec.Spec
 import com.yammer.newmetrics.TimerMetric
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.{Callable, TimeUnit}
 
 object TimerMetricSpec extends Spec {
   class `A blank timer` {
@@ -64,11 +64,11 @@ object TimerMetricSpec extends Spec {
 
   class `Timing a series of events` {
     val timer = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
-    timer.update(10)
-    timer.update(20)
-    timer.update(20)
-    timer.update(30)
-    timer.update(40)
+    timer.update(10, TimeUnit.MILLISECONDS)
+    timer.update(20, TimeUnit.MILLISECONDS)
+    timer.update(20, TimeUnit.MILLISECONDS)
+    timer.update(30, TimeUnit.MILLISECONDS)
+    timer.update(40, TimeUnit.MILLISECONDS)
 
     def `should record the count` {
       timer.count must beEqualTo(5)
@@ -101,12 +101,12 @@ object TimerMetricSpec extends Spec {
   }
 
   class `Timing crazy-variant values` {
-    val timer = new TimerMetric(TimeUnit.NANOSECONDS, TimeUnit.SECONDS)
+    val timer = new TimerMetric(TimeUnit.DAYS, TimeUnit.SECONDS)
     timer.update(Long.MaxValue)
     timer.update(0)
 
     def `should calculate the standard deviation without overflowing` {
-      timer.stdDev must beCloseTo(6.5219089126663916E18, 3)
+      timer.stdDev must beCloseTo(75485.05, 0.01)
     }
   }
 }

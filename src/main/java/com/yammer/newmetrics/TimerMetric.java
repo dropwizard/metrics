@@ -77,20 +77,29 @@ public class TimerMetric implements Metric {
 	}
 
 	/**
+	 * Adds a recorded duration in nanoseconds.
+	 *
+	 * @param duration the length of the duration <b>in nanoseconds</b>
+	 */
+	public void update(long duration) {
+		if (duration >= 0) {
+			meter.mark();
+			sample.update(duration);
+			setMax(duration);
+			setMin(duration);
+			_sum.getAndAdd(duration);
+			updateVariance(duration);
+		}
+	}
+
+	/**
 	 * Adds a recorded duration.
 	 *
 	 * @param duration the length of the duration
+	 * @param unit the scale unit of {@code duration}
 	 */
-	public void update(long duration) {
-		final long ns = latencyUnit.toNanos(duration);
-		if (ns >= 0) {
-			meter.mark();
-			sample.update(ns);
-			setMax(ns);
-			setMin(ns);
-			_sum.getAndAdd(ns);
-			updateVariance(ns);
-		}
+	public void update(long duration, TimeUnit unit) {
+		update(unit.toNanos(duration));
 	}
 
 	/**
