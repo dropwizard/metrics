@@ -109,4 +109,20 @@ object TimerMetricSpec extends Spec {
       timer.stdDev must beCloseTo(75485.05, 0.01)
     }
   }
+
+  class `Timing Callable instances` {
+    val timer = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
+
+    def `should record the duration of the Callable#call()` {
+      timer.time(new Callable[String] {
+        def call = {
+          Thread.sleep(50)
+          "woo"
+        }
+      })
+
+      timer.count must beEqualTo(1)
+      timer.max must beCloseTo(50.0, 1)
+    }
+  }
 }

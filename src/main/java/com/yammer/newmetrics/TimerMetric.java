@@ -2,6 +2,7 @@ package com.yammer.newmetrics;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -100,6 +101,24 @@ public class TimerMetric implements Metric {
 	 */
 	public void update(long duration, TimeUnit unit) {
 		update(unit.toNanos(duration));
+	}
+
+	/**
+	 * Times and records the duration of event.
+	 *
+	 * @param event a {@link Callable} whose {@link Callable#call()} method
+	 * implements a process whose duration should be timed
+	 * @param <T> the type of the value returned by {@code event}
+	 * @return the value returned by {@code event}
+	 * @throws Exception if {@code event} throws an {@link Exception}
+	 */
+	public <T> T time(Callable<T> event) throws Exception {
+		final long startTime = System.nanoTime();
+		try {
+			return event.call();
+		} finally {
+			update(System.nanoTime() - startTime);
+		}
 	}
 
 	/**
