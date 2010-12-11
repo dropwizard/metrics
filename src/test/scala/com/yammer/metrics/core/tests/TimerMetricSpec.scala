@@ -114,15 +114,25 @@ object TimerMetricSpec extends Spec {
     val timer = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
 
     def `should record the duration of the Callable#call()` {
+      time must eventually(beCloseTo(50.0, 1))
+    }
+
+    def `should return the result of the callable` {
+      timer.time(new Callable[String] {
+        def call = {
+          "woo"
+        }
+      }) must beEqualTo("woo")
+    }
+
+    def time = {
       timer.time(new Callable[String] {
         def call = {
           Thread.sleep(50)
           "woo"
         }
       })
-
-      timer.count must beEqualTo(1)
-      timer.max must beCloseTo(50.0, 1)
+      timer.max
     }
   }
 }
