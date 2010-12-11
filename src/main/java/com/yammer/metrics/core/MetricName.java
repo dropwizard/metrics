@@ -1,4 +1,4 @@
-package com.yammer.newmetrics;
+package com.yammer.metrics.core;
 
 /**
  * A value class encapsulating a metric's owning class and name.

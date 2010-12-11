@@ -1,4 +1,4 @@
-package com.yammer.newmetrics;
+package com.yammer.metrics.core;
 
 import java.util.Collections;
 import java.util.List;

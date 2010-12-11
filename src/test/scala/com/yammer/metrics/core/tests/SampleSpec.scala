@@ -1,8 +1,8 @@
-package com.yammer.newmetrics.tests
+package com.yammer.metrics.core.tests
 
 import collection.JavaConversions._
 import com.codahale.simplespec.Spec
-import com.yammer.newmetrics.Sample
+import com.yammer.metrics.core.Sample
 
 object SampleSpec extends Spec {
   class `A sample of 100 out of 1000 elements` {

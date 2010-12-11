@@ -1,7 +1,7 @@
-package com.yammer.newmetrics.tests
+package com.yammer.metrics.core.tests
 
 import com.codahale.simplespec.Spec
-import com.yammer.newmetrics.CounterMetric
+import com.yammer.metrics.core.CounterMetric
 
 object CounterMetricSpec extends Spec {
   class `A counter metric` {

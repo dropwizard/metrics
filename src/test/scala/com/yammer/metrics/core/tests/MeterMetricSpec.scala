@@ -1,10 +1,10 @@
-package com.yammer.newmetrics.tests
+package com.yammer.metrics.core.tests
 
 import com.codahale.simplespec.Spec
-import com.yammer.newmetrics.MeterMetric
 import java.util.concurrent.TimeUnit
 import collection.mutable.ArrayBuffer
 import org.specs.matcher.Matcher
+import com.yammer.metrics.core.MeterMetric
 
 object MeterMetricSpec extends Spec {
   class `A meter's one-minute rate` {

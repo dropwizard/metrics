@@ -1,7 +1,7 @@
-package com.yammer.newmetrics.tests
+package com.yammer.metrics.core.tests
 
 import com.codahale.simplespec.Spec
-import com.yammer.newmetrics.ValueMetric
+import com.yammer.metrics.core.ValueMetric
 
 object ValueMetricSpec extends Spec {
 

@@ -1,4 +1,4 @@
-package com.yammer.newmetrics;
+package com.yammer.metrics.core;
 
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;

@@ -1,4 +1,4 @@
-package com.yammer.newmetrics;
+package com.yammer.metrics.core;
 
 /**
  * A value metric is an instantaneous reading of a partiular value. To

@@ -1,8 +1,8 @@
-package com.yammer.newmetrics.tests
+package com.yammer.metrics.core.tests
 
 import com.codahale.simplespec.Spec
-import com.yammer.newmetrics.TimerMetric
 import java.util.concurrent.{Callable, TimeUnit}
+import com.yammer.metrics.core.TimerMetric
 
 object TimerMetricSpec extends Spec {
   class `A blank timer` {
