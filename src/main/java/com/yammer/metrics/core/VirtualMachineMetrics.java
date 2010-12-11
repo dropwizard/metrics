@@ -159,8 +159,12 @@ public class VirtualMachineMetrics {
 	public static double fileDescriptorUsage() {
 		try {
 			final OperatingSystemMXBean bean = getOperatingSystemMXBean();
-			final Long openFds = (Long) bean.getClass().getDeclaredMethod("getOpenFileDescriptorCount").invoke(bean);
-			final Long maxFds = (Long) bean.getClass().getDeclaredMethod("getMaxFileDescriptorCount").invoke(bean);
+			final Method getOpenFileDescriptorCount = bean.getClass().getDeclaredMethod("getOpenFileDescriptorCount");
+			getOpenFileDescriptorCount.setAccessible(true);
+			final Long openFds = (Long) getOpenFileDescriptorCount.invoke(bean);
+			final Method getMaxFileDescriptorCount = bean.getClass().getDeclaredMethod("getMaxFileDescriptorCount");
+			getMaxFileDescriptorCount.setAccessible(true);
+			final Long maxFds = (Long) getMaxFileDescriptorCount.invoke(bean);
 			return openFds.doubleValue() / maxFds.doubleValue();
 		} catch (Exception e) {
 			return Double.NaN;
