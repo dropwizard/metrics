@@ -22,6 +22,11 @@ class Metrics(info: ProjectInfo) extends DefaultProject(info)
   /**
    * Dependencies
    */
+  val jackson = "org.codehaus.jackson" % "jackson-core-asl" % "1.6.3" withSources()
+
+  /**
+   * Test Dependencies
+   */
   val specs = "org.scala-tools.testing" %% "specs" % "1.6.6" % "test" withSources ()
   val simplespec = "com.codahale" %% "simplespec" % "0.2.0" % "test" withSources ()
   val scalaTest = "org.scalatest" % "scalatest" % "1.2" % "test" withSources() intransitive()
