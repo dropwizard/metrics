@@ -1,5 +1,6 @@
 package com.yammer.metrics.core;
 
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -65,6 +66,18 @@ public class MetricsFactory {
 	 */
 	public static TimerMetric newTimer(Class<?> klass, String name, TimeUnit latencyUnit, TimeUnit rateUnit) {
 		return getOrAdd(new MetricName(klass, name), new TimerMetric(latencyUnit, rateUnit));
+	}
+
+	/**
+	 * Enables the HTTP/JSON reporter on the given port.
+	 *
+	 * @param port the port on which the HTTP server will listen
+	 * @throws IOException
+	 * @see HttpReporter
+	 */
+	public static void enableHttpReporting(int port) throws IOException {
+		final HttpReporter reporter = new HttpReporter(METRICS, port);
+		reporter.start();
 	}
 
 	@SuppressWarnings("unchecked")
