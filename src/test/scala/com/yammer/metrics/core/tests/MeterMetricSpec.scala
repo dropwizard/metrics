@@ -39,7 +39,7 @@ object MeterMetricSpec extends Spec {
   }
 
   class `A meter metric with no events` {
-    val meter = MeterMetric.newMeter(TimeUnit.SECONDS)
+    val meter = MeterMetric.newMeter("thangs", TimeUnit.SECONDS)
 
     def `should have a count of zero` {
       meter.count must beEqualTo(0)
@@ -51,7 +51,7 @@ object MeterMetricSpec extends Spec {
   }
 
   class `A meter metric with three events` {
-    val meter = MeterMetric.newMeter(TimeUnit.SECONDS)
+    val meter = MeterMetric.newMeter("thangs", TimeUnit.SECONDS)
     meter.mark(3)
 
     def `should have a count of three` {
@@ -60,7 +60,7 @@ object MeterMetricSpec extends Spec {
   }
 
   def rates[A](f : MeterMetric => A) = {
-    val meter = MeterMetric.newMeter(50, TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
+    val meter = MeterMetric.newMeter(50, TimeUnit.MILLISECONDS, "things", TimeUnit.SECONDS)
     meter.mark()
     meter.mark(1)
 
@@ -73,7 +73,7 @@ object MeterMetricSpec extends Spec {
   }
 
   def meanRates = {
-    val meter = MeterMetric.newMeter(TimeUnit.SECONDS)
+    val meter = MeterMetric.newMeter("thangs", TimeUnit.SECONDS)
     meter.mark()
     meter.mark(1)
 

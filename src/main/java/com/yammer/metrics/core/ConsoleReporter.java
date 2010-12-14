@@ -128,12 +128,12 @@ public class ConsoleReporter implements Runnable {
 
 	private void printMeter(MeterMetric metric) {
 		final MeterMetric meter = metric;
-		final String unit = abbrev(meter.getUnit());
+		final String unit = abbrev(meter.getScaleUnit());
 		out.printf("             count = %d\n", meter.count());
-		out.printf("         mean rate = %2.2f events/%s\n", meter.meanRate(), unit);
-		out.printf("     1-minute rate = %2.2f events/%s\n", meter.oneMinuteRate(), unit);
-		out.printf("     5-minute rate = %2.2f events/%s\n", meter.fiveMinuteRate(), unit);
-		out.printf("    15-minute rate = %2.2f events/%s\n", meter.fifteenMinuteRate(), unit);
+		out.printf("         mean rate = %2.2f %s/%s\n", meter.meanRate(), meter.getEventType(), unit);
+		out.printf("     1-minute rate = %2.2f %s/%s\n", meter.oneMinuteRate(), meter.getEventType(), unit);
+		out.printf("     5-minute rate = %2.2f %s/%s\n", meter.fiveMinuteRate(), meter.getEventType(), unit);
+		out.printf("    15-minute rate = %2.2f %s/%s\n", meter.fifteenMinuteRate(), meter.getEventType(), unit);
 	}
 
 	private void printTimer(TimerMetric metric) {
@@ -142,10 +142,10 @@ public class ConsoleReporter implements Runnable {
 		final String latencyUnit = abbrev(timer.getLatencyUnit());
 
 		out.printf("             count = %d\n", timer.count());
-		out.printf("         mean rate = %2.2f events/%s\n", timer.meanRate(), rateUnit);
-		out.printf("     1-minute rate = %2.2f events/%s\n", timer.oneMinuteRate(), rateUnit);
-		out.printf("     5-minute rate = %2.2f events/%s\n", timer.fiveMinuteRate(), rateUnit);
-		out.printf("    15-minute rate = %2.2f events/%s\n", timer.fifteenMinuteRate(), rateUnit);
+		out.printf("         mean rate = %2.2f %s/%s\n", timer.meanRate(), timer.getEventType(), rateUnit);
+		out.printf("     1-minute rate = %2.2f %s/%s\n", timer.oneMinuteRate(), timer.getEventType(), rateUnit);
+		out.printf("     5-minute rate = %2.2f %s/%s\n", timer.fiveMinuteRate(), timer.getEventType(), rateUnit);
+		out.printf("    15-minute rate = %2.2f %s/%s\n", timer.fifteenMinuteRate(), timer.getEventType(), rateUnit);
 
 		final double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
 		out.printf("               min = %2.2f%s\n", timer.min(), latencyUnit);

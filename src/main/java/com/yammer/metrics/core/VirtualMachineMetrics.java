@@ -68,7 +68,7 @@ public class VirtualMachineMetrics {
 		private void collectGcThroughput(String name, Object gcInfo) throws Exception {
 			MeterMetric meter = gcMeters.get(name);
 			if (meter == null) {
-				meter = MeterMetric.newMeter(TimeUnit.SECONDS);
+				meter = MeterMetric.newMeter("bytes", TimeUnit.SECONDS);
 				gcMeters.put(name, meter);
 			}
 

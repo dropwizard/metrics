@@ -27,23 +27,27 @@ public class MeterMetric implements Metric {
 	/**
 	 * Creates a new {@link MeterMetric}.
 	 *
-	 * @param unit the scale unit of the new meter
+	 * @param eventType the plural name of the event the meter is measuring
+	 *                  (e.g., {@code "requests"})
+	 * @param scaleUnit the scale unit of the new meter
 	 * @return a new {@link MeterMetric}
 	 */
-	public static MeterMetric newMeter(TimeUnit unit) {
-		return newMeter(INTERVAL, TimeUnit.SECONDS, unit);
+	public static MeterMetric newMeter(String eventType, TimeUnit scaleUnit) {
+		return newMeter(INTERVAL, TimeUnit.SECONDS, eventType, scaleUnit);
 	}
 
 	/**
 	 * Creates a new {@link MeterMetric} with a given tick interval.
 	 *
+	 *
 	 * @param interval the duration of a meter tick
 	 * @param intervalUnit the unit of {@code interval}
-	 * @param unit the scale unit of the new meter
-	 * @return a new {@link MeterMetric}
+	 * @param eventType the plural name of the event the meter is measuring
+	 *                  (e.g., {@code "requests"})
+	 *@param scaleUnit the scale unit of the new meter  @return a new {@link MeterMetric}
 	 */
-	public static MeterMetric newMeter(long interval, TimeUnit intervalUnit, TimeUnit unit) {
-		final MeterMetric meter = new MeterMetric(unit);
+	public static MeterMetric newMeter(long interval, TimeUnit intervalUnit, String eventType, TimeUnit scaleUnit) {
+		final MeterMetric meter = new MeterMetric(eventType, scaleUnit);
 		final SoftReference<MeterMetric> reference = new SoftReference<MeterMetric>(meter);
 		final Runnable job = new Runnable() {
 			@Override
@@ -62,16 +66,18 @@ public class MeterMetric implements Metric {
 	private final AtomicLong uncounted = new AtomicLong();
 	private final AtomicLong count = new AtomicLong();
 	private final long startTime = System.nanoTime();
-	private final TimeUnit unit;
+	private final TimeUnit scaleUnit;
+	private final String eventType;
 	private volatile boolean initialized;
 	private volatile double _oneMinuteRate;
 	private volatile double _fiveMinuteRate;
 	private volatile double _fifteenMinuteRate;
 
-	private MeterMetric(TimeUnit unit) {
+	private MeterMetric(String eventType, TimeUnit scaleUnit) {
 		initialized = false;
 		_oneMinuteRate = _fiveMinuteRate = _fifteenMinuteRate = 0.0;
-		this.unit = unit;
+		this.scaleUnit = scaleUnit;
+		this.eventType = eventType;
 	}
 
 	/**
@@ -79,8 +85,17 @@ public class MeterMetric implements Metric {
 	 *
 	 * @return the meter's scale unit
 	 */
-	public TimeUnit getUnit() {
-		return unit;
+	public TimeUnit getScaleUnit() {
+		return scaleUnit;
+	}
+
+	/**
+	 * Returns the type of events the meter is measuring.
+	 *
+	 * @return the meter's event type
+	 */
+	public String getEventType() {
+		return eventType;
 	}
 
 	/**
@@ -183,6 +198,6 @@ public class MeterMetric implements Metric {
 	}
 
 	private double convertNsRate(double ratePerNs) {
-		return ratePerNs * (double) unit.toNanos(1);
+		return ratePerNs * (double) scaleUnit.toNanos(1);
 	}
 }

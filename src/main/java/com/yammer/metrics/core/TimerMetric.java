@@ -43,7 +43,7 @@ public class TimerMetric implements Metric {
 	public TimerMetric(TimeUnit latencyUnit, TimeUnit rateUnit) {
 		this.latencyUnit = latencyUnit;
 		this.rateUnit = rateUnit;
-		this.meter = MeterMetric.newMeter(rateUnit);
+		this.meter = MeterMetric.newMeter("calls", rateUnit);
 		clear();
 	}
 
@@ -221,6 +221,15 @@ public class TimerMetric implements Metric {
 		}
 
 		return scores;
+	}
+
+	/**
+	 * Returns the type of events the timer is measuring ({@code "calls"}).
+	 *
+	 * @return the timer's event type
+	 */
+	public String getEventType() {
+		return meter.getEventType();
 	}
 
 	private void updateVariance(long ns) {

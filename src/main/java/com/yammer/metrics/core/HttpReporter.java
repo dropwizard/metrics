@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
@@ -191,7 +190,8 @@ public class HttpReporter {
 	private void writeMeter(JsonGenerator json, MeterMetric meter) throws IOException {
 		json.writeStartObject();
 		{
-			json.writeStringField("unit", meter.getUnit().toString().toLowerCase());
+			json.writeStringField("event_type", meter.getEventType());
+			json.writeStringField("unit", meter.getScaleUnit().toString().toLowerCase());
 			json.writeNumberField("count", meter.count());
 			json.writeNumberField("mean", meter.meanRate());
 			json.writeNumberField("m1", meter.oneMinuteRate());
