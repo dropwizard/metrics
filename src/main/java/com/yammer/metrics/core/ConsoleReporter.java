@@ -94,8 +94,8 @@ public class ConsoleReporter implements Runnable {
 					out.println(':');
 
 					final Metric metric = subEntry.getValue();
-					if (metric instanceof ValueMetric<?>) {
-						printValue((ValueMetric) metric);
+					if (metric instanceof GaugeMetric<?>) {
+						printGauge((GaugeMetric) metric);
 					} else if (metric instanceof CounterMetric) {
 						printCounter((CounterMetric) metric);
 					} else if (metric instanceof MeterMetric) {
@@ -114,8 +114,8 @@ public class ConsoleReporter implements Runnable {
 		}
 	}
 
-	private void printValue(ValueMetric metric) {
-		final ValueMetric valueMetric = metric;
+	private void printGauge(GaugeMetric metric) {
+		final GaugeMetric valueMetric = metric;
 		out.print("    value = ");
 		out.println(valueMetric.value());
 	}

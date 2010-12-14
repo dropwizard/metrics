@@ -123,8 +123,8 @@ public class HttpReporter {
 	}
 
 	private void writeMetric(JsonGenerator json, String key, Metric metric) throws IOException {
-		if (metric instanceof ValueMetric<?>) {
-			json.writeStringField(key, ((ValueMetric) metric).value().toString());
+		if (metric instanceof GaugeMetric<?>) {
+			json.writeStringField(key, ((GaugeMetric) metric).value().toString());
 		} else if (metric instanceof CounterMetric) {
 			json.writeNumberField(key, ((CounterMetric) metric).count());
 		} else if (metric instanceof MeterMetric) {

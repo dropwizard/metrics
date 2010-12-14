@@ -1,12 +1,12 @@
 package com.yammer.metrics.core.tests
 
 import com.codahale.simplespec.Spec
-import com.yammer.metrics.core.ValueMetric
+import com.yammer.metrics.core.GaugeMetric
 
-object ValueMetricSpec extends Spec {
+object GaugeMetricSpec extends Spec {
 
-  class `A value metric` {
-    val metric = new ValueMetric[String] {
+  class `A gauge metric` {
+    val metric = new GaugeMetric[String] {
       def value = "woo"
     }
 

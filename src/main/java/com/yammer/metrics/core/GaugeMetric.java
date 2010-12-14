@@ -1,11 +1,11 @@
 package com.yammer.metrics.core;
 
 /**
- * A value metric is an instantaneous reading of a partiular value. To
+ * A gauge metric is an instantaneous reading of a partiular value. To
  * instrument a qeue's depth, for example:<br>
  * <pre><code>
  * Queue<String> queue = new ConcurrentLinkedQueue<String>();
- * ValueMetric<Integer> queueDepth = new ValueMetric<Integer>() {
+ * GaugeMetric<Integer> queueDepth = new GaugeMetric<Integer>() {
  *     public Integer value() {
  *         return queue.size();
  *     }
@@ -15,7 +15,7 @@ package com.yammer.metrics.core;
  * @author coda
  * @param <T> the type of the metric's value
  */
-public abstract class ValueMetric<T> implements Metric {
+public abstract class GaugeMetric<T> implements Metric {
 	/**
 	 * Returns the metric's current value.
 	 *

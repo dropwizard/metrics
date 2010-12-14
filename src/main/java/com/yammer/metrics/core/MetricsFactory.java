@@ -16,7 +16,7 @@ public class MetricsFactory {
 	private MetricsFactory() { /* unused */ }
 
 	/**
-	 * Given a new {@link ValueMetric}, registers it under the given class and
+	 * Given a new {@link GaugeMetric}, registers it under the given class and
 	 * name.
 	 *
 	 * @param klass the class which owns the metric
@@ -25,7 +25,7 @@ public class MetricsFactory {
 	 * @param <T> the type of the value returned by the metric
 	 * @return {@code metric}
 	 */
-	public static <T> ValueMetric<T> newValue(Class<?> klass, String name, ValueMetric<T> metric) {
+	public static <T> GaugeMetric<T> newGauge(Class<?> klass, String name, GaugeMetric<T> metric) {
 		return getOrAdd(new MetricName(klass, name), metric);
 	}
 
