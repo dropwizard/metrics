@@ -102,8 +102,8 @@ object TimerMetricSpec extends Spec {
 
   class `Timing crazy-variant values` {
     val timer = new TimerMetric(TimeUnit.DAYS, TimeUnit.SECONDS)
-    timer.update(Long.MaxValue)
-    timer.update(0)
+    timer.update(Long.MaxValue, TimeUnit.NANOSECONDS)
+    timer.update(0, TimeUnit.NANOSECONDS)
 
     def `should calculate the standard deviation without overflowing` {
       timer.stdDev must beCloseTo(75485.05, 0.01)

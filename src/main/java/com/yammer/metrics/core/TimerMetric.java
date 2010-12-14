@@ -78,22 +78,6 @@ public class TimerMetric implements Metric {
 	}
 
 	/**
-	 * Adds a recorded duration in nanoseconds.
-	 *
-	 * @param duration the length of the duration <b>in nanoseconds</b>
-	 */
-	public void update(long duration) {
-		if (duration >= 0) {
-			meter.mark();
-			sample.update(duration);
-			setMax(duration);
-			setMin(duration);
-			_sum.getAndAdd(duration);
-			updateVariance(duration);
-		}
-	}
-
-	/**
 	 * Adds a recorded duration.
 	 *
 	 * @param duration the length of the duration
@@ -248,6 +232,17 @@ public class TimerMetric implements Metric {
 				done = varianceM.compareAndSet(oldMCas, doubleToLongBits(newM)) &&
 						varianceS.compareAndSet(oldSCas, doubleToLongBits(newS));
 			}
+		}
+	}
+
+	private void update(long duration) {
+		if (duration >= 0) {
+			meter.mark();
+			sample.update(duration);
+			setMax(duration);
+			setMin(duration);
+			_sum.getAndAdd(duration);
+			updateVariance(duration);
 		}
 	}
 
