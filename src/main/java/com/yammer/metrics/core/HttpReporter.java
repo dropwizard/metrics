@@ -151,7 +151,12 @@ public class HttpReporter {
 		json.writeStartObject();
 		{
 			json.writeStringField("type", "gauge");
-			json.writeStringField("value", gauge.value().toString());
+			final Object value = gauge.value();
+			if (value == null) {
+				json.writeNullField("value");
+			} else {
+				json.writeStringField("value", gauge.value().toString());
+			}
 		}
 		json.writeEndObject();
 	}
