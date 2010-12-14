@@ -72,6 +72,8 @@ public class HttpReporter {
 
 	/**
 	 * Begins listening on the specified port.
+	 *
+	 * @throws IOException if there is an error listening on the port
 	 */
 	public void start() throws IOException {
 		this.serverSocket = new ServerSocket(port);
@@ -80,6 +82,8 @@ public class HttpReporter {
 
 	/**
 	 * Stops listening if the server thread is running.
+	 *
+	 * @throws IOException if there is an error stopping the HTTP server
 	 */
 	public void stop() throws IOException {
 		if (future != null) {
