@@ -124,9 +124,11 @@ public class HttpReporter {
 
 	private void writeMetric(JsonGenerator json, String key, Metric metric) throws IOException {
 		if (metric instanceof GaugeMetric<?>) {
-			json.writeStringField(key, ((GaugeMetric) metric).value().toString());
+			json.writeFieldName(key);
+			writeGauge(json, (GaugeMetric) metric);
 		} else if (metric instanceof CounterMetric) {
-			json.writeNumberField(key, ((CounterMetric) metric).count());
+			json.writeFieldName(key);
+			writeCounter(json, (CounterMetric) metric);
 		} else if (metric instanceof MeterMetric) {
 			json.writeFieldName(key);
 			writeMeter(json, (MeterMetric) metric);
@@ -134,6 +136,24 @@ public class HttpReporter {
 			json.writeFieldName(key);
 			writeTimer(json, (TimerMetric) metric);
 		}
+	}
+
+	private void writeCounter(JsonGenerator json, CounterMetric counter) throws IOException {
+		json.writeStartObject();
+		{
+			json.writeStringField("type", "counter");
+			json.writeNumberField("count", counter.count());
+		}
+		json.writeEndObject();
+	}
+
+	private void writeGauge(JsonGenerator json, GaugeMetric gauge) throws IOException {
+		json.writeStartObject();
+		{
+			json.writeStringField("type", "gauge");
+			json.writeStringField("value", gauge.value().toString());
+		}
+		json.writeEndObject();
 	}
 
 	private void writeVmMetrics(JsonGenerator json) throws IOException {
@@ -194,6 +214,7 @@ public class HttpReporter {
 	private void writeMeter(JsonGenerator json, MeterMetric meter) throws IOException {
 		json.writeStartObject();
 		{
+			json.writeStringField("type", "meter");
 			json.writeStringField("event_type", meter.getEventType());
 			json.writeStringField("unit", meter.getScaleUnit().toString().toLowerCase());
 			json.writeNumberField("count", meter.count());
@@ -208,6 +229,7 @@ public class HttpReporter {
 	private void writeTimer(JsonGenerator json, TimerMetric timer) throws IOException {
 		json.writeStartObject();
 		{
+			json.writeStringField("type", "timer");
 			json.writeFieldName("latency");
 			json.writeStartObject();
 			{
