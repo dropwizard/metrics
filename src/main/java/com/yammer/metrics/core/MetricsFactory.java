@@ -72,7 +72,7 @@ public class MetricsFactory {
 	 * Enables the HTTP/JSON reporter on the given port.
 	 *
 	 * @param port the port on which the HTTP server will listen
-	 * @throws IOException
+	 * @throws IOException if there is a problem listening on the given port
 	 * @see HttpReporter
 	 */
 	public static void enableHttpReporting(int port) throws IOException {
