@@ -80,6 +80,18 @@ public class MetricsFactory {
 		reporter.start();
 	}
 
+	/**
+	 * Enables the console reporter and causes it to print to STDOUT with the
+	 * specified period.
+	 *
+	 * @param period the period between successive outputs
+	 * @param unit the time unit of {@code period}
+	 */
+	public static void enableConsoleReporting(long period, TimeUnit unit) {
+		final ConsoleReporter reporter = new ConsoleReporter(METRICS, System.out);
+		reporter.start(period, unit);
+	}
+
 	@SuppressWarnings("unchecked")
 	private static <T extends Metric> T getOrAdd(MetricName name, T metric) {
 		final Metric existingMetric = METRICS.get(name);
