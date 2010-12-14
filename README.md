@@ -1,13 +1,14 @@
 Metrics
 =======
 
-*Capturing and exposing application metrics via JMX. For funsies.*
+*Capturing JVM- and application-level metrics. So you know what's going on.*
 
 Requirements
 ------------
 
 * Java SE 6
-* Scala 2.8.0
+* Scala 2.8.1
+* Jackson 1.6.3
 
 
 How To Use
@@ -16,17 +17,21 @@ How To Use
 **First**, specify Metrics as a dependency:
 
     val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
-    val metrics = "com.yammer" %% "metrics" % "1.0.7" withSources()
+    val metrics = "com.yammer" %% "metrics" % "2.0.0" withSources()
 
 (Or whatever it takes for you to get Maven or Ivy happy.)
 
 **Second**, instrument your classes:
 
-    import com.yammer.metrics.{Counter, Meter, Timer}
+    import java.util.concurrent.TimeUnit
+    import com.yammer.metrics.Instrumented
     
-    class ThingFinder {
-      private val resultsMeter = new Meter
-      private val dbTimer = new Timer
+    class ThingFinder extends Instrumented {
+      // measure the # of records per second returned
+      private val resultsMeter = metrics.meter("results", "records", TimeUnit.SECONDS)
+      // measure the # of milliseconds each query takes and the number of
+      // queries per second being performed
+      private val dbTimer = metrics.timer("database", TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
       
       def findThings() = {
         val results = dbTimer.time {
@@ -41,36 +46,30 @@ How To Use
       }
     }
 
-`Timer` calculates the count, maximum, minimum, mean, standard deviation,
-median, 95th percentile, 98th percentile, 99th percentile, and 99.9th percentile
-of timings. It does so using a method called reservoir sampling which allows it
-to efficiently keep a small, statistically representative sample of all the
-measurements.
+Metrics comes with four types of metrics:
 
-(You also might like `LoadMeter`, a meter class which provides 1-minute,
-5-minute, and 15-minute moving weighted averages, much like the load values in
-`top`. It's generally a more useful metric than `Meter`'s averaged rate.)
+* **Gauges** are instantaneous readings of values (e.g., a queue depth).
+* **Counters** are 64-bit integers which can be incremented or decremented.
+* **Meters** are increment-only counters which keep track of the rate of events.
+  They provide mean rates, plus exponentially-weighted moving averages which
+  use the same formula that the UNIX 1-, 5-, and 15-minute load averages use.
+* **Timers** record the duration as well as the rate of events. In addition to
+  the rate information that meters provide, timers also provide the count,
+  maximum, minimum, mean, standard deviation, median, 75th percentile, 95th
+  percentile, 98th percentile, 99th percentile, and 99.9th percentile
+  of timings. (They do so using a method called reservoir sampling which allows
+  them to efficiently keep a small, statistically representative sample of all
+  the measurements.)
 
-**Third**, expose these metrics via JMX:
+**Third**, report these metrics via either the console, HTTP+JSON, or JMX:    
+
+    import com.yammer.metrics.Metrics
     
-    import java.util.concurrent.TimeUnit
-    import com.yammer.jmx.JmxManaged
-    
-    class ThingFinder extends JmxManaged {
-      private val resultsMeter = new Meter
-      private val dbTimer = new Timer
-      
-      enableJMX("our thing processor") { jmx =>
-        // exposes the total count of results, plus the results/sec rate
-        jmx.addMeter("results", resultsMeter, TimeUnit.SECONDS)
-        
-        // exposes the count, max, min, mean, stddev, median, 95th, 98th, 99th,
-        // and 99.9th percentile of query timings in milliseconds
-        jmx.addTimer("database-query", dbTimer, TimeUnit.MILLISECONDS)
-      }
-      
-      def findThings() = {
-        // etc.
+    object MyAppRunner  {
+      def main(args: Array[String]) {
+        Metrics.enableHttpReporting(8081) // listen on port 8081
+        Metrics.enableConsoleReporting(10, TimeUnit.SECONDS) // print to STDERR every 10s
+        Metrics.enableJmxReporting()
       }
     }
 
