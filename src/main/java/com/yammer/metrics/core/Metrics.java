@@ -106,4 +106,9 @@ public class Metrics {
 		}
 		return (T) existingMetric;
 	}
+
+	public static void enableJmxReporting() {
+		final JmxReporter reporter = new JmxReporter(METRICS);
+		reporter.start();
+	}
 }
