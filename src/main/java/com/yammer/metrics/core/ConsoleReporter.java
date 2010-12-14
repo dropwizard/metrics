@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ConsoleReporter implements Runnable {
 	private static final ScheduledExecutorService TICK_THREAD =
-			Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("console-reporter"));
+			Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("metrics-console-reporter"));
 	private final PrintStream out;
 	private final Map<MetricName,Metric> metrics;
 	private ScheduledFuture<?> future;

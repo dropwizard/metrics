@@ -28,7 +28,7 @@ import org.codehaus.jackson.JsonGenerator;
  */
 public class HttpReporter {
 	private final JsonFactory factory = new JsonFactory();
-	private final ExecutorService serverThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("http-metric-reporter"));
+	private final ExecutorService serverThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("metrics-http-reporter"));
 	private final Map<MetricName, Metric> metrics;
 	private final int port;
 	private ServerSocket serverSocket;

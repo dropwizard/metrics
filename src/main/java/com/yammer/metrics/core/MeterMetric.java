@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class MeterMetric implements Metric {
 	private static final ScheduledExecutorService TICK_THREAD =
-			Executors.newScheduledThreadPool(2, new NamedThreadFactory("meter-tick"));
+			Executors.newScheduledThreadPool(2, new NamedThreadFactory("metrics-meter-tick"));
 	private static final long INTERVAL = 5; // seconds
 	private static final double INTERVAL_IN_NS = TimeUnit.SECONDS.toNanos(INTERVAL);
 	private static final double ONE_MINUTE_FACTOR = 1 / Math.exp(TimeUnit.SECONDS.toMinutes(INTERVAL));
