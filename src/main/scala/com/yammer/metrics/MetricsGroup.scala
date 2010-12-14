@@ -1,6 +1,6 @@
 package com.yammer.metrics
 
-import core.{MetricsFactory, GaugeMetric}
+import core.{Metrics, GaugeMetric}
 import java.util.concurrent.TimeUnit
 
 /**
@@ -16,7 +16,7 @@ class MetricsGroup(val klass: Class[_]) {
    * @param name the name of the gauge
    */
   def gauge[A](name: String)(f: => A) {
-    MetricsFactory.newGauge(klass, name, new GaugeMetric[A] {
+    Metrics.newGauge(klass, name, new GaugeMetric[A] {
       def value = f
     })
   }
@@ -26,7 +26,7 @@ class MetricsGroup(val klass: Class[_]) {
    *
    * @param name the name of the counter
    */
-  def counter(name: String) = new Counter(MetricsFactory.newCounter(klass, name))
+  def counter(name: String) = new Counter(Metrics.newCounter(klass, name))
 
   /**
    * Creates a new meter metric.
@@ -37,7 +37,7 @@ class MetricsGroup(val klass: Class[_]) {
    * @param unit the time unit of the meter
    */
   def meter(name: String, eventType: String, unit: TimeUnit) =
-    new Meter(MetricsFactory.newMeter(klass, name, eventType, unit))
+    new Meter(Metrics.newMeter(klass, name, eventType, unit))
 
   /**
    * Creates a new timer metric.
@@ -47,5 +47,5 @@ class MetricsGroup(val klass: Class[_]) {
    * @param rateUnit the time unit for measuring rate
    */
   def timer(name: String, latencyUnit: TimeUnit, rateUnit: TimeUnit) =
-    new Timer(MetricsFactory.newTimer(klass, name, latencyUnit, rateUnit))
+    new Timer(Metrics.newTimer(klass, name, latencyUnit, rateUnit))
 }

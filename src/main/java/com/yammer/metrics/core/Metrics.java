@@ -10,10 +10,10 @@ import java.util.concurrent.TimeUnit;
  *
  * @author coda
  */
-public class MetricsFactory {
+public class Metrics {
 	private static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
 
-	private MetricsFactory() { /* unused */ }
+	private Metrics() { /* unused */ }
 
 	/**
 	 * Given a new {@link GaugeMetric}, registers it under the given class and
