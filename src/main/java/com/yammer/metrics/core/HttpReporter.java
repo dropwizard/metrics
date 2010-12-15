@@ -49,7 +49,7 @@ public class HttpReporter {
 					writer.write("Connection: close\n");
 					writer.write("\n");
 
-					final JsonGenerator json = factory.createJsonGenerator(writer).useDefaultPrettyPrinter();
+					final JsonGenerator json = factory.createJsonGenerator(writer);
 					json.writeStartObject();
 					{
 						writeVmMetrics(json);
