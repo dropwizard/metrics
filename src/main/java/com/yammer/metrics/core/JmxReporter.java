@@ -307,7 +307,7 @@ public class JmxReporter implements Runnable {
 					final ObjectName objectName = new ObjectName(
 							String.format("%s:type=%s,name=%s",
 										  name.getKlass().getPackage().getName(),
-										  name.getKlass().getSimpleName(),
+										  name.getKlass().getSimpleName().replaceAll("\\$$", ""),
 										  name.getName()));
 					if (metric instanceof GaugeMetric) {
 						registerBean(name, new Gauge((GaugeMetric<?>) metric, objectName), objectName);
