@@ -6,8 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -57,21 +55,6 @@ public class ConsoleReporter implements Runnable {
 		}
 	}
 
-	private SortedMap<String, SortedMap<String, Metric>> sortedMetrics() {
-		final SortedMap<String, SortedMap<String, Metric>> sortedMetrics =
-				new TreeMap<String, SortedMap<String, Metric>>();
-		for (Entry<MetricName, Metric> entry : metrics.entrySet()) {
-			final String packageName = entry.getKey().getKlass().getCanonicalName();
-			SortedMap<String, Metric> submetrics = sortedMetrics.get(packageName);
-			if (submetrics == null) {
-				submetrics = new TreeMap<String, Metric>();
-				sortedMetrics.put(packageName, submetrics);
-			}
-			submetrics.put(entry.getKey().getName(), entry.getValue());
-		}
-		return sortedMetrics;
-	}
-
 	@Override
 	public void run() {
 		try {
@@ -84,7 +67,7 @@ public class ConsoleReporter implements Runnable {
 			}
 			out.println();
 
-			for (Entry<String, SortedMap<String, Metric>> entry : sortedMetrics().entrySet()) {
+			for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(metrics).entrySet()) {
 				out.print(entry.getKey());
 				out.println(':');
 

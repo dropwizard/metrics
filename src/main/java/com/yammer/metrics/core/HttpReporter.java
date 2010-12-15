@@ -8,8 +8,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -95,7 +93,7 @@ public class HttpReporter {
 	}
 
 	private void writeRegularMetrics(JsonGenerator json) throws IOException {
-		for (Entry<String, SortedMap<String, Metric>> entry : sortedMetrics().entrySet()) {
+		for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(metrics).entrySet()) {
 			json.writeFieldName(entry.getKey());
 			json.writeStartObject();
 			{
@@ -105,21 +103,6 @@ public class HttpReporter {
 			}
 			json.writeEndObject();
 		}
-	}
-
-	private SortedMap<String, SortedMap<String, Metric>> sortedMetrics() {
-		final SortedMap<String, SortedMap<String, Metric>> sortedMetrics =
-				new TreeMap<String, SortedMap<String, Metric>>();
-		for (Entry<MetricName, Metric> entry : metrics.entrySet()) {
-			final String packageName = entry.getKey().getKlass().getCanonicalName();
-			SortedMap<String, Metric> submetrics = sortedMetrics.get(packageName);
-			if (submetrics == null) {
-				submetrics = new TreeMap<String, Metric>();
-				sortedMetrics.put(packageName, submetrics);
-			}
-			submetrics.put(entry.getKey().getName(), entry.getValue());
-		}
-		return sortedMetrics;
 	}
 
 	private void writeMetric(JsonGenerator json, String key, Metric metric) throws IOException {
