@@ -223,7 +223,7 @@ public class JmxReporter implements Runnable {
 
 		@Override
 		public TimeUnit getLatencyUnit() {
-			return metric.getLatencyUnit();
+			return metric.getDurationUnit();
 		}
 
 		@Override

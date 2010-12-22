@@ -122,7 +122,7 @@ public class ConsoleReporter implements Runnable {
 	private void printTimer(TimerMetric metric) {
 		final TimerMetric timer = metric;
 		final String rateUnit = abbrev(timer.getRateUnit());
-		final String latencyUnit = abbrev(timer.getLatencyUnit());
+		final String durationUnit = abbrev(timer.getDurationUnit());
 
 		out.printf("             count = %d\n", timer.count());
 		out.printf("         mean rate = %2.2f %s/%s\n", timer.meanRate(), timer.getEventType(), rateUnit);
@@ -131,16 +131,16 @@ public class ConsoleReporter implements Runnable {
 		out.printf("    15-minute rate = %2.2f %s/%s\n", timer.fifteenMinuteRate(), timer.getEventType(), rateUnit);
 
 		final double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
-		out.printf("               min = %2.2f%s\n", timer.min(), latencyUnit);
-		out.printf("               max = %2.2f%s\n", timer.max(), latencyUnit);
-		out.printf("              mean = %2.2f%s\n", timer.mean(), latencyUnit);
-		out.printf("            stddev = %2.2f%s\n", timer.stdDev(), latencyUnit);
-		out.printf("            median = %2.2f%s\n", percentiles[0], latencyUnit);
-		out.printf("              75%% <= %2.2f%s\n", percentiles[1], latencyUnit);
-		out.printf("              95%% <= %2.2f%s\n", percentiles[2], latencyUnit);
-		out.printf("              98%% <= %2.2f%s\n", percentiles[3], latencyUnit);
-		out.printf("              99%% <= %2.2f%s\n", percentiles[4], latencyUnit);
-		out.printf("            99.9%% <= %2.2f%s\n", percentiles[5], latencyUnit);
+		out.printf("               min = %2.2f%s\n", timer.min(), durationUnit);
+		out.printf("               max = %2.2f%s\n", timer.max(), durationUnit);
+		out.printf("              mean = %2.2f%s\n", timer.mean(), durationUnit);
+		out.printf("            stddev = %2.2f%s\n", timer.stdDev(), durationUnit);
+		out.printf("            median = %2.2f%s\n", percentiles[0], durationUnit);
+		out.printf("              75%% <= %2.2f%s\n", percentiles[1], durationUnit);
+		out.printf("              95%% <= %2.2f%s\n", percentiles[2], durationUnit);
+		out.printf("              98%% <= %2.2f%s\n", percentiles[3], durationUnit);
+		out.printf("              99%% <= %2.2f%s\n", percentiles[4], durationUnit);
+		out.printf("            99.9%% <= %2.2f%s\n", percentiles[5], durationUnit);
 	}
 
 	private String abbrev(TimeUnit unit) {

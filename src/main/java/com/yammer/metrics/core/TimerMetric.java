@@ -12,7 +12,7 @@ import static java.lang.Math.floor;
 import static java.lang.Math.sqrt;
 
 /**
- * A timer metric which aggregates timing durations and provides latency
+ * A timer metric which aggregates timing durations and provides duration
  * statistics, plus throughput statistics via {@link MeterMetric}.
  *
  * @author coda
@@ -25,7 +25,7 @@ public class TimerMetric implements Metric {
 	// 5% margin of error assuming a normal distribution. This might need to be
 	// parameterized, but I'm only going to do that when someone complains.
 	private final Sample sample = new Sample(1028);
-	private final TimeUnit latencyUnit, rateUnit;
+	private final TimeUnit durationUnit, rateUnit;
 	private final AtomicLong _min = new AtomicLong();
 	private final AtomicLong _max = new AtomicLong();
 	private final AtomicLong _sum = new AtomicLong();
@@ -37,23 +37,23 @@ public class TimerMetric implements Metric {
 	/**
 	 * Creates a new {@link TimerMetric}.
 	 *
-	 * @param latencyUnit the scale unit for this timer's latency metrics
+	 * @param durationUnit the scale unit for this timer's duration metrics
 	 * @param rateUnit the scale unit for this timer's rate metrics
 	 */
-	public TimerMetric(TimeUnit latencyUnit, TimeUnit rateUnit) {
-		this.latencyUnit = latencyUnit;
+	public TimerMetric(TimeUnit durationUnit, TimeUnit rateUnit) {
+		this.durationUnit = durationUnit;
 		this.rateUnit = rateUnit;
 		this.meter = MeterMetric.newMeter("calls", rateUnit);
 		clear();
 	}
 
 	/**
-	 * Returns the timer's latency scale unit.
+	 * Returns the timer's duration scale unit.
 	 *
-	 * @return the timer's latency scale unit
+	 * @return the timer's duration scale unit
 	 */
-	public TimeUnit getLatencyUnit() {
-		return latencyUnit;
+	public TimeUnit getDurationUnit() {
+		return durationUnit;
 	}
 
 	/**
@@ -257,7 +257,7 @@ public class TimerMetric implements Metric {
 		if (count() <= 0) {
 			return 0.0;
 		}
-		return ns / TimeUnit.NANOSECONDS.convert(1, latencyUnit);
+		return ns / TimeUnit.NANOSECONDS.convert(1, durationUnit);
 	}
 
 	private void setMax(long ns) {

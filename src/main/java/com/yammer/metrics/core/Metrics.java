@@ -62,12 +62,12 @@ public class Metrics {
 	 *
 	 * @param klass the class which owns the metric
 	 * @param name the name of the metric
-	 * @param latencyUnit the latency scale unit of the new meter
-	 * @param rateUnit the rate scale unit of the new meter
+	 * @param durationUnit the duration scale unit of the new timer
+	 * @param rateUnit the rate scale unit of the new timer
 	 * @return a new {@link TimerMetric}
 	 */
-	public static TimerMetric newTimer(Class<?> klass, String name, TimeUnit latencyUnit, TimeUnit rateUnit) {
-		return getOrAdd(new MetricName(klass, name), new TimerMetric(latencyUnit, rateUnit));
+	public static TimerMetric newTimer(Class<?> klass, String name, TimeUnit durationUnit, TimeUnit rateUnit) {
+		return getOrAdd(new MetricName(klass, name), new TimerMetric(durationUnit, rateUnit));
 	}
 
 	/**

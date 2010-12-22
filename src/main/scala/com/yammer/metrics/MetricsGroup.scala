@@ -43,9 +43,9 @@ class MetricsGroup(val klass: Class[_]) {
    * Creates a new timer metric.
    *
    * @param name the name of the timer
-   * @param latencyUnit the time unit for measuring latency
+   * @param durationUnit the time unit for measuring duration
    * @param rateUnit the time unit for measuring rate
    */
-  def timer(name: String, latencyUnit: TimeUnit, rateUnit: TimeUnit) =
-    new Timer(Metrics.newTimer(klass, name, latencyUnit, rateUnit))
+  def timer(name: String, durationUnit: TimeUnit, rateUnit: TimeUnit) =
+    new Timer(Metrics.newTimer(klass, name, durationUnit, rateUnit))
 }

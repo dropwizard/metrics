@@ -8,8 +8,8 @@ object TimerMetricSpec extends Spec {
   class `A blank timer` {
     val timer = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
 
-    def `should have a latency unit` {
-      timer.getLatencyUnit must be(TimeUnit.MILLISECONDS)
+    def `should have a duration unit` {
+      timer.getDurationUnit must be(TimeUnit.MILLISECONDS)
     }
 
     def `should have a rate unit` {

@@ -219,10 +219,10 @@ public class HttpReporter {
 		json.writeStartObject();
 		{
 			json.writeStringField("type", "timer");
-			json.writeFieldName("latency");
+			json.writeFieldName("duration");
 			json.writeStartObject();
 			{
-				json.writeStringField("unit", timer.getLatencyUnit().toString().toLowerCase());
+				json.writeStringField("unit", timer.getDurationUnit().toString().toLowerCase());
 				json.writeNumberField("min", timer.min());
 				json.writeNumberField("max", timer.max());
 				json.writeNumberField("mean", timer.mean());
