@@ -1,54 +1,26 @@
 package com.yammer.metrics
 
-import java.util.concurrent.atomic.AtomicLong
-import com.yammer.time.{Rate, Clock}
+import core.MeterMetric
 
 /**
- * A meter which measures the rate of events occuring in time.
+ * A Scala façade class for {@link MeterMetric}.
  *
  * @author coda
+ * @see MeterMetric
  */
-class Meter {
-  private val counter = new AtomicLong
-  private val startTime = Clock.nanoTime
+class Meter(metric: MeterMetric) {
 
   /**
-   * Mark the occurence of an event.
+   * Marks the occurance of an event.
    */
   def mark() {
-    mark(1)
+    metric.mark()
   }
 
   /**
-   * Mark the occurence of an arbitrary number of events.
+   * Marks the occurance of a given number of events.
    */
   def mark(count: Long) {
-    counter.addAndGet(count)
+    metric.mark(count)
   }
-
-  /**
-   * Unmark the occurence of an event.
-   */
-  def unmark() {
-    mark(-1)
-  }
-
-  /**
-   * Unmark the occurence of an arbitrary number of events.
-   */
-  def unmark(count: Long) {
-    mark(-count)
-  }
-
-  /**
-   * Returns the number of events marked.
-   */
-  def count = counter.get
-
-  /**
-   * Returns the rate of events in the given unit of time.
-   */
-  def rate = Rate.perNanosecond(if (count > 0)
-    count.toDouble / (Clock.nanoTime - startTime)
-  else 0.0)
 }
