@@ -17,7 +17,7 @@ How To Use
 **First**, specify Metrics as a dependency:
 
     val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
-    val metrics = "com.yammer" %% "metrics" % "2.0.0" withSources()
+    val metrics = "com.yammer" %% "metrics" % "2.0.0-BETA1" withSources()
 
 (Or whatever it takes for you to get Maven or Ivy happy.)
 
