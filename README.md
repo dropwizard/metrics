@@ -8,7 +8,7 @@ Requirements
 
 * Java SE 6
 * Scala 2.8.1
-* Jackson 1.6.3
+* Jackson 1.6.4
 
 
 How To Use
