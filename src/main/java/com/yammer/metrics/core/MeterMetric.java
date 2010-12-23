@@ -41,7 +41,8 @@ public class MeterMetric implements Metric {
 	 * @param intervalUnit the unit of {@code interval}
 	 * @param eventType the plural name of the event the meter is measuring
 	 *                  (e.g., {@code "requests"})
-	 *@param scaleUnit the scale unit of the new meter  @return a new {@link MeterMetric}
+	 * @param scaleUnit the scale unit of the new meter  @return a new {@link MeterMetric}
+	 * @return a new {@link MeterMetric}
 	 */
 	public static MeterMetric newMeter(long interval, TimeUnit intervalUnit, String eventType, TimeUnit scaleUnit) {
 		final MeterMetric meter = new MeterMetric(eventType, scaleUnit);
