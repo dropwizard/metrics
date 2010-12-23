@@ -279,7 +279,7 @@ public class JmxReporter implements Runnable {
 	}
 
 	public void start() {
-		this.future = TICK_THREAD.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
+		this.future = TICK_THREAD.scheduleAtFixedRate(this, 0, 1, TimeUnit.MINUTES);
 	}
 
 	public void stop() {

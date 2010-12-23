@@ -1,12 +1,9 @@
 package com.yammer.metrics.core;
 
-import java.lang.ref.SoftReference;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-
-// TODO: 12/10/10 <coda> -- this could use a unit and scale unit (e.g., "requests", TimeUnit.SECONDS)
 
 /**
  * A meter metric which measures mean throughput and one-, five-, and
@@ -44,19 +41,15 @@ public class MeterMetric implements Metric {
 	 * @param intervalUnit the unit of {@code interval}
 	 * @param eventType the plural name of the event the meter is measuring
 	 *                  (e.g., {@code "requests"})
-	 *@param scaleUnit the scale unit of the new meter  @return a new {@link MeterMetric}
+	 * @param scaleUnit the scale unit of the new meter  @return a new {@link MeterMetric}
+	 * @return a new {@link MeterMetric}
 	 */
 	public static MeterMetric newMeter(long interval, TimeUnit intervalUnit, String eventType, TimeUnit scaleUnit) {
 		final MeterMetric meter = new MeterMetric(eventType, scaleUnit);
-		final SoftReference<MeterMetric> reference = new SoftReference<MeterMetric>(meter);
 		final Runnable job = new Runnable() {
 			@Override
 			public void run() {
-				// This will throw a NullPointerException if the meter has been
-				// collected. This is actually the desired behavior, as the
-				// NPE will cause the ScheduledExecutorService to deschedule
-				// this job.
-				reference.get().tick();
+				meter.tick();
 			}
 		};
 		TICK_THREAD.scheduleAtFixedRate(job, interval, interval, intervalUnit);

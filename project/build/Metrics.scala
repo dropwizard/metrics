@@ -2,6 +2,7 @@ import sbt._
 
 class Metrics(info: ProjectInfo) extends DefaultProject(info)
                                          with posterous.Publish
+                                         with maven.MavenDependencies
                                          with IdeaProject {
   /**
    * Publish the source as well as the class files.
@@ -14,10 +15,15 @@ class Metrics(info: ProjectInfo) extends DefaultProject(info)
    * Publish via Ivy.
    */
 
-  lazy val publishTo = Resolver.sftp("Personal Repo",
+  lazy val publishTo = Resolver.sftp("repo.codahale.com",
                                      "codahale.com",
                                      "/home/codahale/repo.codahale.com/") as ("codahale")
   override def managedStyle = ManagedStyle.Maven
+
+  /**
+   * Repositories
+   */
+  val dropWizard = "Coda's Repo" at "http://repo.codahale.com"
 
   /**
    * Dependencies
