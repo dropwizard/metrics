@@ -2,6 +2,7 @@ import sbt._
 
 class Metrics(info: ProjectInfo) extends DefaultProject(info)
                                          with posterous.Publish
+                                         with maven.MavenDependencies
                                          with IdeaProject {
   /**
    * Publish the source as well as the class files.
