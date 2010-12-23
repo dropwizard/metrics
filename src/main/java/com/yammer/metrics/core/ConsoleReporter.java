@@ -97,20 +97,17 @@ public class ConsoleReporter implements Runnable {
 		}
 	}
 
-	private void printGauge(GaugeMetric metric) {
-		final GaugeMetric valueMetric = metric;
+	private void printGauge(GaugeMetric gauge) {
 		out.print("    value = ");
-		out.println(valueMetric.value());
+		out.println(gauge.value());
 	}
 
-	private void printCounter(CounterMetric metric) {
-		final CounterMetric counter = metric;
+	private void printCounter(CounterMetric counter) {
 		out.print("    count = ");
 		out.println(counter.count());
 	}
 
-	private void printMeter(MeterMetric metric) {
-		final MeterMetric meter = metric;
+	private void printMeter(MeterMetric meter) {
 		final String unit = abbrev(meter.getScaleUnit());
 		out.printf("             count = %d\n", meter.count());
 		out.printf("         mean rate = %2.2f %s/%s\n", meter.meanRate(), meter.getEventType(), unit);
@@ -119,8 +116,7 @@ public class ConsoleReporter implements Runnable {
 		out.printf("    15-minute rate = %2.2f %s/%s\n", meter.fifteenMinuteRate(), meter.getEventType(), unit);
 	}
 
-	private void printTimer(TimerMetric metric) {
-		final TimerMetric timer = metric;
+	private void printTimer(TimerMetric timer) {
 		final String rateUnit = abbrev(timer.getRateUnit());
 		final String durationUnit = abbrev(timer.getDurationUnit());
 
