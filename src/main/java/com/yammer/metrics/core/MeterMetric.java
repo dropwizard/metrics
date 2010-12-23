@@ -1,6 +1,5 @@
 package com.yammer.metrics.core;
 
-import java.lang.ref.SoftReference;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -46,15 +45,10 @@ public class MeterMetric implements Metric {
 	 */
 	public static MeterMetric newMeter(long interval, TimeUnit intervalUnit, String eventType, TimeUnit scaleUnit) {
 		final MeterMetric meter = new MeterMetric(eventType, scaleUnit);
-		final SoftReference<MeterMetric> reference = new SoftReference<MeterMetric>(meter);
 		final Runnable job = new Runnable() {
 			@Override
 			public void run() {
-				// This will throw a NullPointerException if the meter has been
-				// collected. This is actually the desired behavior, as the
-				// NPE will cause the ScheduledExecutorService to deschedule
-				// this job.
-				reference.get().tick();
+				meter.tick();
 			}
 		};
 		TICK_THREAD.scheduleAtFixedRate(job, interval, interval, intervalUnit);
