@@ -53,7 +53,17 @@ public class Metrics {
 	 * @return a new {@link MeterMetric}
 	 */
 	public static MeterMetric newMeter(Class<?> klass, String name, String eventType, TimeUnit unit) {
-		return getOrAdd(new MetricName(klass, name), MeterMetric.newMeter(eventType, unit));
+		MetricName metricName = new MetricName(klass, name);
+		final Metric existingMetric = METRICS.get(metricName);
+		if (existingMetric == null) {
+			final MeterMetric metric = MeterMetric.newMeter(eventType, unit);
+			final Metric justAddedMetric = METRICS.putIfAbsent(metricName, metric);
+			if (justAddedMetric == null) {
+				return metric;
+			}
+			return (MeterMetric) justAddedMetric;
+		}
+		return (MeterMetric) existingMetric;
 	}
 
 	/**
@@ -67,7 +77,17 @@ public class Metrics {
 	 * @return a new {@link TimerMetric}
 	 */
 	public static TimerMetric newTimer(Class<?> klass, String name, TimeUnit durationUnit, TimeUnit rateUnit) {
-		return getOrAdd(new MetricName(klass, name), new TimerMetric(durationUnit, rateUnit));
+		MetricName metricName = new MetricName(klass, name);
+		final Metric existingMetric = METRICS.get(metricName);
+		if (existingMetric == null) {
+			final TimerMetric metric = new TimerMetric(durationUnit, rateUnit);
+			final Metric justAddedMetric = METRICS.putIfAbsent(metricName, metric);
+			if (justAddedMetric == null) {
+				return metric;
+			}
+			return (TimerMetric) justAddedMetric;
+		}
+		return (TimerMetric) existingMetric;
 	}
 
 	/**
