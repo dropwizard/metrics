@@ -15,7 +15,7 @@ class Metrics(info: ProjectInfo) extends DefaultProject(info)
    * Publish via Ivy.
    */
 
-  lazy val publishTo = Resolver.sftp("Personal Repo",
+  lazy val publishTo = Resolver.sftp("repo.codahale.com",
                                      "codahale.com",
                                      "/home/codahale/repo.codahale.com/") as ("codahale")
   override def managedStyle = ManagedStyle.Maven
