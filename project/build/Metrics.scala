@@ -20,6 +20,11 @@ class Metrics(info: ProjectInfo) extends DefaultProject(info)
   override def managedStyle = ManagedStyle.Maven
 
   /**
+   * Repositories
+   */
+  val dropWizard = "Coda's Repo" at "http://repo.codahale.com"
+
+  /**
    * Dependencies
    */
   val jackson = "org.codehaus.jackson" % "jackson-core-asl" % "1.6.3" withSources()
