@@ -21,4 +21,11 @@ class Timer(metric: TimerMetric) {
       metric.update(System.nanoTime - startTime, TimeUnit.NANOSECONDS)
     }
   }
+
+  /**
+   * Adds a recorded duration.
+   */
+  def update(duration: Long, unit: TimeUnit) {
+    metric.update(duration, unit)
+  }
 }
