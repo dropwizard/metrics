@@ -1,9 +1,6 @@
 package com.yammer.metrics.core;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
@@ -39,26 +36,35 @@ public class HttpReporter {
 				try {
 
 					final Socket client = serverSocket.accept();
-					final BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-					while (!reader.readLine().equals("")) { /* I don't care */ }
-					final OutputStreamWriter writer = new OutputStreamWriter(client.getOutputStream());
-					writer.write("HTTP/1.1 200 OK\n");
-					writer.write("Server: Metrics\n");
-					writer.write("Content-Type: application/json\n");
-					writer.write("Connection: close\n");
-					writer.write("\n");
+					try {
+						final BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+						while (!reader.readLine().equals("")) { /* I don't care */ }
+						final OutputStreamWriter writer = new OutputStreamWriter(client.getOutputStream());
+						writer.write("HTTP/1.1 200 OK\n");
+						writer.write("Server: Metrics\n");
+						writer.write("Content-Type: application/json\n");
+						writer.write("Connection: close\n");
+						writer.write("\n");
 
-					final JsonGenerator json = factory.createJsonGenerator(writer);
-					json.writeStartObject();
-					{
-						writeVmMetrics(json);
-						writeRegularMetrics(json);
+						final JsonGenerator json = factory.createJsonGenerator(writer);
+						json.writeStartObject();
+						{
+							writeVmMetrics(json);
+							writeRegularMetrics(json);
+						}
+						json.writeEndObject();
+						json.close();
+					} catch (Throwable e) {
+						if (e instanceof IOException) {
+							client.close();
+							throw (IOException) e;
+						} else {
+							e.printStackTrace(System.out);
+						}
 					}
-					json.writeEndObject();
-					json.close();
 					client.close();
 				} catch (IOException ignored) {
-	//					ignored.printStackTrace();
+//						ignored.printStackTrace();
 				}
 			}
 		}
