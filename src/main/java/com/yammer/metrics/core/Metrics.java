@@ -12,6 +12,7 @@ import javax.servlet.Servlet;
  */
 public class Metrics {
 	private static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
+	private static final ConcurrentMap<String, HealthCheck> HEALTH_CHECKS = new ConcurrentHashMap<String, HealthCheck>();
 	private static final JmxReporter JMX_REPORTER = new JmxReporter(METRICS);
 	{{
 		JMX_REPORTER.start();
@@ -100,7 +101,7 @@ public class Metrics {
 	 * @return a new {@link ReporterServlet}
 	 */
 	public static Servlet newServlet() {
-		return new ReporterServlet(METRICS);
+		return new ReporterServlet(METRICS, HEALTH_CHECKS);
 	}
 
 	/**
@@ -113,6 +114,10 @@ public class Metrics {
 	public static void enableConsoleReporting(long period, TimeUnit unit) {
 		final ConsoleReporter reporter = new ConsoleReporter(METRICS, System.out);
 		reporter.start(period, unit);
+	}
+
+	public static void registerHealthCheck(String name, HealthCheck healthCheck) {
+		HEALTH_CHECKS.putIfAbsent(name, healthCheck);
 	}
 
 	@SuppressWarnings("unchecked")
