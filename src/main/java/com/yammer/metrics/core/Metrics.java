@@ -1,9 +1,9 @@
 package com.yammer.metrics.core;
 
-import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import javax.servlet.Servlet;
 
 /**
  * A set of factory methods for creating centrally registered metric instances.
@@ -12,6 +12,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class Metrics {
 	private static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
+	private static final JmxReporter JMX_REPORTER = new JmxReporter(METRICS);
+	{{
+		JMX_REPORTER.start();
+	}}
 
 	private Metrics() { /* unused */ }
 
@@ -91,15 +95,12 @@ public class Metrics {
 	}
 
 	/**
-	 * Enables the HTTP/JSON reporter on the given port.
+	 * Creates a new {@link ReporterServlet} for reporting metrics via HTTP.
 	 *
-	 * @param port the port on which the HTTP server will listen
-	 * @throws IOException if there is a problem listening on the given port
-	 * @see HttpReporter
+	 * @return a new {@link ReporterServlet}
 	 */
-	public static void enableHttpReporting(int port) throws IOException {
-		final HttpReporter reporter = new HttpReporter(METRICS, port);
-		reporter.start();
+	public static Servlet newServlet() {
+		return new ReporterServlet(METRICS);
 	}
 
 	/**
