@@ -26,8 +26,7 @@ public class ReporterServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		final String uri = req.getRequestURI();
-		// TODO: 1/11/11 <coda> -- healthcheck
+		final String uri = req.getPathInfo();
 		if (uri.equals("/metrics")) {
 			handleStats(resp);
 		} else if (uri.equals("/ping")) {
@@ -35,6 +34,7 @@ public class ReporterServlet extends HttpServlet {
 		} else if (uri.equals("/thread-dump")) {
 			handleThreadDump(resp);
 		} else {
+			// TODO: 1/11/11 <coda> -- healthcheck
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
