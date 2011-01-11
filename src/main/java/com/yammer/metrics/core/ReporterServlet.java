@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -12,16 +13,19 @@ import javax.servlet.http.HttpServletResponse;
 
 import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 
+import com.yammer.metrics.core.HealthCheck.Result;
 import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 
 public class ReporterServlet extends HttpServlet {
 	private final Map<MetricName, Metric> metrics;
+	private final Map<String, HealthCheck> healthChecks;
 	private final JsonFactory factory = new JsonFactory();
 
-	/*package*/ ReporterServlet(Map<MetricName, Metric> metrics) {
+	/*package*/ ReporterServlet(Map<MetricName, Metric> metrics, Map<String, HealthCheck> healthChecks) {
 		this.metrics = metrics;
+		this.healthChecks = healthChecks;
 	}
 
 	@Override
@@ -33,10 +37,52 @@ public class ReporterServlet extends HttpServlet {
 			handlePing(resp);
 		} else if (uri.equals("/thread-dump")) {
 			handleThreadDump(resp);
+		} else if (uri.equals("/healthcheck")) {
+			handleHealthCheck(resp);
 		} else {
-			// TODO: 1/11/11 <coda> -- healthcheck
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
+	}
+
+	private void handleHealthCheck(HttpServletResponse resp) throws IOException {
+		boolean allHealthy = true;
+		final Map<String, Result> results = new TreeMap<String, Result>();
+		for (Entry<String, HealthCheck> entry : healthChecks.entrySet()) {
+			final Result result = entry.getValue().execute();
+			allHealthy &= result.isHealthy();
+			results.put(entry.getKey(), result);
+		}
+
+		PrintWriter writer;
+		if (allHealthy) {
+			resp.setStatus(HttpServletResponse.SC_OK);
+			resp.setContentType("text/plain");
+			writer = resp.getWriter();
+
+
+		} else {
+			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			resp.setContentType("text/plain");
+			writer = resp.getWriter();
+		}
+
+		for (Entry<String, Result> entry : results.entrySet()) {
+			final Result result = entry.getValue();
+			if (result.isHealthy()) {
+				writer.format("* %s: OK\n", entry.getKey());
+			} else {
+				if (result.getMessage() != null) {
+					writer.format("! %s: ERROR\n!  %s\n", entry.getKey(), result.getMessage());
+				}
+
+				if (result.getError() != null) {
+					writer.println();
+					result.getError().printStackTrace(writer);
+					writer.println();
+				}
+			}
+		}
+
 	}
 
 	private void handleThreadDump(HttpServletResponse resp) throws IOException {
