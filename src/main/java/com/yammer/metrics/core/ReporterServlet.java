@@ -35,7 +35,7 @@ public class ReporterServlet extends HttpServlet {
 			handleStats(resp);
 		} else if (uri.equals("/ping")) {
 			handlePing(resp);
-		} else if (uri.equals("/thread-dump")) {
+		} else if (uri.equals("/threads")) {
 			handleThreadDump(resp);
 		} else if (uri.equals("/healthcheck")) {
 			handleHealthCheck(resp);
