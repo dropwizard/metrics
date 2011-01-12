@@ -14,7 +14,7 @@ public class Metrics {
 	/*package*/ static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
 	/*package*/ static final ConcurrentMap<String, HealthCheck> HEALTH_CHECKS = new ConcurrentHashMap<String, HealthCheck>();
 	private static final JmxReporter JMX_REPORTER = new JmxReporter(METRICS);
-	{{
+	static {{
 		JMX_REPORTER.start();
 	}}
 
