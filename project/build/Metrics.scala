@@ -17,8 +17,7 @@ class Metrics(info: ProjectInfo) extends DefaultProject(info)
 
   lazy val publishTo = Resolver.sftp("repo.codahale.com",
                                      "codahale.com",
-                                     "/home/codahale/repo.codahale.com/") as ("codahale")
-  override def managedStyle = ManagedStyle.Maven
+                                     "/home/codahale/repo.codahale.com/")
 
   /**
    * Repositories
@@ -28,12 +27,12 @@ class Metrics(info: ProjectInfo) extends DefaultProject(info)
   /**
    * Dependencies
    */
-  val jackson = "org.codehaus.jackson" % "jackson-core-asl" % "1.6.3" withSources()
+  val jackson = "org.codehaus.jackson" % "jackson-core-asl" % "1.7.0" withSources()
+  val servletApi = "javax.servlet" % "servlet-api" % "2.5"
 
   /**
    * Test Dependencies
    */
-  val specs = "org.scala-tools.testing" %% "specs" % "1.6.6" % "test" withSources ()
   val simplespec = "com.codahale" %% "simplespec" % "0.2.0" % "test" withSources ()
   val mockito = "org.mockito" % "mockito-all" % "1.8.4" % "test" withSources()
 }

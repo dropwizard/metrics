@@ -18,23 +18,9 @@ class Counter(metric: CounterMetric) {
   }
 
   /**
-   * Increments the counter by one.
-   */
-  def ++ {
-    metric.inc()
-  }
-
-  /**
    * Decrements the counter by delta.
    */
   def -=(delta: Long) {
     metric.dec(delta)
-  }
-
-  /**
-   * Decrements the counter by one.
-   */
-  def -- {
-    metric.dec()
   }
 }

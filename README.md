@@ -8,7 +8,7 @@ Requirements
 
 * Java SE 6
 * Scala 2.8.1
-* Jackson 1.6.4
+* Jackson 1.7.0
 
 
 How To Use
@@ -17,7 +17,7 @@ How To Use
 **First**, specify Metrics as a dependency:
 
     val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
-    val metrics = "com.yammer" %% "metrics" % "2.0.0-BETA3" withSources()
+    val metrics = "com.yammer" %% "metrics" % "2.0.0-BETA5"
 
 (Or whatever it takes for you to get Maven or Ivy happy.)
 
@@ -61,17 +61,36 @@ Metrics comes with four types of metrics:
   them to efficiently keep a small, statistically representative sample of all
   the measurements.)
 
-**Third**, report these metrics via either the console, HTTP+JSON, or JMX:    
+Metrics also has support for health checks:
 
-    import com.yammer.metrics.Metrics
-    
-    object MyAppRunner  {
-      def main(args: Array[String]) {
-        Metrics.enableHttpReporting(8081) // listen on port 8081
-        Metrics.enableConsoleReporting(10, TimeUnit.SECONDS) // print to STDERR every 10s
-        Metrics.enableJmxReporting()
+    Metrics.registerHealthCheck("database", new HealthCheck {
+      def check = {
+        if (Database.isConnected) {
+          Result.healthy()
+        } else {
+          Result.unhealthy("Not connected to database")
+        }
       }
-    }
+    })
+
+**Third**, start collecting your metrics.
+
+All metrics are reported via JMX, which you can view using VisualVM or JConsole.
+
+If you're simply running a benchmark, you can print registered metrics to 
+standard error every 10s like this:
+
+    Metrics.enableConsoleReporting(10, TimeUnit.SECONDS) // print to STDERR every 10s
+
+If you're writing a Servlet-based web service, you can add `MetricsServlet` to
+an internally-accessible context. It'll respond to the following URIs:
+    
+* `/metrics`: A JSON object of all registered metrics and a host of JVM metrics.
+* `/ping`: A simple `text/plain` "pong" for load-balancers.
+* `/healthcheck`: Runs through all registered `HealthCheck` instances and 
+                  reports the results. Returns a `200 OK` if all succeeded, or a
+                  `500 Internal Server Error` if any failed.
+* `/threads`: A `text/plain` dump of all threads and their stack traces.
 
 
 License

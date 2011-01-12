@@ -1,100 +1,126 @@
 package com.yammer.metrics.core;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.TreeMap;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 
+import com.yammer.metrics.core.HealthCheck.Result;
+import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 
-/**
- * A very simple HTTP reporter which listens on the given port and returns all
- * JVM and application metrics as a JSON value.
- *
- * @author coda
- * @see VirtualMachineMetrics
- */
-public class HttpReporter {
+public class MetricsServlet extends HttpServlet {
 	private final JsonFactory factory = new JsonFactory();
-	private final ExecutorService serverThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("metrics-http-reporter"));
-	private final Map<MetricName, Metric> metrics;
-	private final int port;
-	private ServerSocket serverSocket;
-	private Future<?> future;
 
-	private class ServerThread implements Runnable {
-		@Override
-		public void run() {
-			while (serverSocket.isBound()) {
-				try {
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		final String uri = req.getPathInfo();
+		if (uri.equals("/metrics")) {
+			handleStats(resp);
+		} else if (uri.equals("/ping")) {
+			handlePing(resp);
+		} else if (uri.equals("/threads")) {
+			handleThreadDump(resp);
+		} else if (uri.equals("/healthcheck")) {
+			handleHealthCheck(resp);
+		} else {
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+		}
+	}
 
-					final Socket client = serverSocket.accept();
-					final BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-					while (!reader.readLine().equals("")) { /* I don't care */ }
-					final OutputStreamWriter writer = new OutputStreamWriter(client.getOutputStream());
-					writer.write("HTTP/1.1 200 OK\n");
-					writer.write("Server: Metrics\n");
-					writer.write("Content-Type: application/json\n");
-					writer.write("Connection: close\n");
-					writer.write("\n");
+	private void handleHealthCheck(HttpServletResponse resp) throws IOException {
+		boolean allHealthy = true;
+		final Map<String, Result> results = new TreeMap<String, Result>();
+		for (Entry<String, HealthCheck> entry : Metrics.HEALTH_CHECKS.entrySet()) {
+			final Result result = entry.getValue().execute();
+			allHealthy &= result.isHealthy();
+			results.put(entry.getKey(), result);
+		}
 
-					final JsonGenerator json = factory.createJsonGenerator(writer);
-					json.writeStartObject();
-					{
-						writeVmMetrics(json);
-						writeRegularMetrics(json);
-					}
-					json.writeEndObject();
-					json.close();
-					client.close();
-				} catch (IOException ignored) {
-	//					ignored.printStackTrace();
+		PrintWriter writer;
+		if (allHealthy) {
+			resp.setStatus(HttpServletResponse.SC_OK);
+			resp.setContentType("text/plain");
+			writer = resp.getWriter();
+
+
+		} else {
+			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			resp.setContentType("text/plain");
+			writer = resp.getWriter();
+		}
+
+		for (Entry<String, Result> entry : results.entrySet()) {
+			final Result result = entry.getValue();
+			if (result.isHealthy()) {
+				writer.format("* %s: OK\n", entry.getKey());
+			} else {
+				if (result.getMessage() != null) {
+					writer.format("! %s: ERROR\n!  %s\n", entry.getKey(), result.getMessage());
+				}
+
+				if (result.getError() != null) {
+					writer.println();
+					result.getError().printStackTrace(writer);
+					writer.println();
 				}
 			}
 		}
+
 	}
 
-	/*package*/ HttpReporter(Map<MetricName, Metric> metrics, int port) {
-		this.port = port;
-		this.metrics = metrics;
-	}
+	private void handleThreadDump(HttpServletResponse resp) throws IOException {
+		resp.setStatus(HttpServletResponse.SC_OK);
+		resp.setContentType("text/plain");
+		final PrintWriter writer = resp.getWriter();
 
-	/**
-	 * Begins listening on the specified port.
-	 *
-	 * @throws IOException if there is an error listening on the port
-	 */
-	public void start() throws IOException {
-		this.serverSocket = new ServerSocket(port);
-		this.future = serverThread.submit(new ServerThread());
-	}
-
-	/**
-	 * Stops listening if the server thread is running.
-	 *
-	 * @throws IOException if there is an error stopping the HTTP server
-	 */
-	public void stop() throws IOException {
-		if (future != null) {
-			serverSocket.close();
-			future.cancel(false);
-			future = null;
-			serverSocket = null;
+		Map<Thread, StackTraceElement[]> traces = Thread.getAllStackTraces();
+		for (Entry<Thread, StackTraceElement[]> entry : traces.entrySet()) {
+			Thread t = entry.getKey();
+			writer.format("Thread: %s  %s\n", t.getName(), t.isDaemon() ? "daemon" : "non-daemon");
+			if (!t.isDaemon()) {
+				for (StackTraceElement frame : entry.getValue()) {
+					writer.format("\t%s.%s[%s:%d]\n", frame.getClassName(), frame.getMethodName(),
+							frame.getFileName(), frame.getLineNumber());
+				}
+			}
 		}
+		writer.close();
+	}
+
+	private void handlePing(HttpServletResponse resp) throws IOException {
+		resp.setStatus(HttpServletResponse.SC_OK);
+		resp.setContentType("text/plain");
+		final PrintWriter writer = resp.getWriter();
+		writer.println("pong");
+		writer.close();
+	}
+
+	private void handleStats(HttpServletResponse resp) throws IOException {
+		resp.setStatus(HttpServletResponse.SC_OK);
+		resp.setContentType("text/plain");
+		final OutputStream output = resp.getOutputStream();
+		final JsonGenerator json = factory.createJsonGenerator(output, JsonEncoding.UTF8);
+		json.writeStartObject();
+		{
+			writeVmMetrics(json);
+			writeRegularMetrics(json);
+		}
+		json.writeEndObject();
+		json.close();
 	}
 
 	private void writeRegularMetrics(JsonGenerator json) throws IOException {
-		for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(metrics).entrySet()) {
+		for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(Metrics.METRICS).entrySet()) {
 			json.writeFieldName(entry.getKey());
 			json.writeStartObject();
 			{

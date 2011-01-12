@@ -35,8 +35,6 @@ public class ExampleRunner {
 
 	public static void main(String[] args) throws Exception {
 		Metrics.enableConsoleReporting(10, TimeUnit.SECONDS);
-		Metrics.enableHttpReporting(8081);
-		Metrics.enableJmxReporting();
 
 		System.err.println("Scanning all files on your hard drive...");
 

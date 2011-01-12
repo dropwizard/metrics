@@ -1,9 +1,9 @@
 package com.yammer.metrics.core;
 
-import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import javax.servlet.Servlet;
 
 /**
  * A set of factory methods for creating centrally registered metric instances.
@@ -11,7 +11,12 @@ import java.util.concurrent.TimeUnit;
  * @author coda
  */
 public class Metrics {
-	private static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
+	/*package*/ static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
+	/*package*/ static final ConcurrentMap<String, HealthCheck> HEALTH_CHECKS = new ConcurrentHashMap<String, HealthCheck>();
+	private static final JmxReporter JMX_REPORTER = new JmxReporter(METRICS);
+	{{
+		JMX_REPORTER.start();
+	}}
 
 	private Metrics() { /* unused */ }
 
@@ -91,18 +96,6 @@ public class Metrics {
 	}
 
 	/**
-	 * Enables the HTTP/JSON reporter on the given port.
-	 *
-	 * @param port the port on which the HTTP server will listen
-	 * @throws IOException if there is a problem listening on the given port
-	 * @see HttpReporter
-	 */
-	public static void enableHttpReporting(int port) throws IOException {
-		final HttpReporter reporter = new HttpReporter(METRICS, port);
-		reporter.start();
-	}
-
-	/**
 	 * Enables the console reporter and causes it to print to STDOUT with the
 	 * specified period.
 	 *
@@ -112,6 +105,10 @@ public class Metrics {
 	public static void enableConsoleReporting(long period, TimeUnit unit) {
 		final ConsoleReporter reporter = new ConsoleReporter(METRICS, System.out);
 		reporter.start(period, unit);
+	}
+
+	public static void registerHealthCheck(String name, HealthCheck healthCheck) {
+		HEALTH_CHECKS.putIfAbsent(name, healthCheck);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -125,10 +122,5 @@ public class Metrics {
 			return (T) justAddedMetric;
 		}
 		return (T) existingMetric;
-	}
-
-	public static void enableJmxReporting() {
-		final JmxReporter reporter = new JmxReporter(METRICS);
-		reporter.start();
 	}
 }
