@@ -18,15 +18,8 @@ import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 
-public class ReporterServlet extends HttpServlet {
-	private final Map<MetricName, Metric> metrics;
-	private final Map<String, HealthCheck> healthChecks;
+public class MetricsServlet extends HttpServlet {
 	private final JsonFactory factory = new JsonFactory();
-
-	/*package*/ ReporterServlet(Map<MetricName, Metric> metrics, Map<String, HealthCheck> healthChecks) {
-		this.metrics = metrics;
-		this.healthChecks = healthChecks;
-	}
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -47,7 +40,7 @@ public class ReporterServlet extends HttpServlet {
 	private void handleHealthCheck(HttpServletResponse resp) throws IOException {
 		boolean allHealthy = true;
 		final Map<String, Result> results = new TreeMap<String, Result>();
-		for (Entry<String, HealthCheck> entry : healthChecks.entrySet()) {
+		for (Entry<String, HealthCheck> entry : Metrics.HEALTH_CHECKS.entrySet()) {
 			final Result result = entry.getValue().execute();
 			allHealthy &= result.isHealthy();
 			results.put(entry.getKey(), result);
@@ -127,7 +120,7 @@ public class ReporterServlet extends HttpServlet {
 	}
 
 	private void writeRegularMetrics(JsonGenerator json) throws IOException {
-		for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(metrics).entrySet()) {
+		for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(Metrics.METRICS).entrySet()) {
 			json.writeFieldName(entry.getKey());
 			json.writeStartObject();
 			{

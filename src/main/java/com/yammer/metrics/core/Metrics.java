@@ -11,8 +11,8 @@ import javax.servlet.Servlet;
  * @author coda
  */
 public class Metrics {
-	private static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
-	private static final ConcurrentMap<String, HealthCheck> HEALTH_CHECKS = new ConcurrentHashMap<String, HealthCheck>();
+	/*package*/ static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
+	/*package*/ static final ConcurrentMap<String, HealthCheck> HEALTH_CHECKS = new ConcurrentHashMap<String, HealthCheck>();
 	private static final JmxReporter JMX_REPORTER = new JmxReporter(METRICS);
 	{{
 		JMX_REPORTER.start();
@@ -93,15 +93,6 @@ public class Metrics {
 			return (TimerMetric) justAddedMetric;
 		}
 		return (TimerMetric) existingMetric;
-	}
-
-	/**
-	 * Creates a new {@link ReporterServlet} for reporting metrics via HTTP.
-	 *
-	 * @return a new {@link ReporterServlet}
-	 */
-	public static Servlet newServlet() {
-		return new ReporterServlet(METRICS, HEALTH_CHECKS);
 	}
 
 	/**
