@@ -33,6 +33,7 @@ class Metrics(info: ProjectInfo) extends DefaultProject(info)
    * Optional Dependencies
    */
   val servletApi = "javax.servlet" % "servlet-api" % "2.5" % "optional"
+  val jetty = "org.eclipse.jetty" % "jetty-server" % "7.2.2.v20101205" % "optional"
 
   /**
    * Test Dependencies
