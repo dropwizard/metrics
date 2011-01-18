@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,17 +21,55 @@ import org.codehaus.jackson.JsonGenerator;
 
 public class MetricsServlet extends HttpServlet {
 	private final JsonFactory factory = new JsonFactory();
+	private String metricsUri, pingUri, threadsUri, healthcheckUri;
+
+	public MetricsServlet() {
+		this("/healthcheck", "/metrics", "/ping", "/threads");
+	}
+
+	public MetricsServlet(String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
+		this.healthcheckUri = healthcheckUri;
+		this.metricsUri = metricsUri;
+		this.pingUri = pingUri;
+		this.threadsUri = threadsUri;
+	}
+
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+
+		final String metricsUri = config.getInitParameter("metrics-uri");
+		final String pingUri = config.getInitParameter("ping-uri");
+		final String threadsUri = config.getInitParameter("threads-uri");
+		final String healthcheckUri = config.getInitParameter("healthcheck-uri");
+
+		if (metricsUri != null) {
+			this.metricsUri = metricsUri;
+		}
+
+		if (pingUri != null) {
+			this.pingUri = pingUri;
+		}
+
+		if (threadsUri != null) {
+			this.threadsUri = threadsUri;
+		}
+
+		if (healthcheckUri != null) {
+			this.healthcheckUri = healthcheckUri;
+		}
+	}
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		final String uri = req.getPathInfo();
-		if (uri.equals("/metrics")) {
-			handleStats(resp);
-		} else if (uri.equals("/ping")) {
+		if (uri.startsWith(metricsUri)) {
+			handleMetrics(resp);
+		} else if (uri.equals(pingUri)) {
 			handlePing(resp);
-		} else if (uri.equals("/threads")) {
+		} else if (uri.equals(threadsUri)) {
 			handleThreadDump(resp);
-		} else if (uri.equals("/healthcheck")) {
+		} else if (uri.equals(healthcheckUri)) {
 			handleHealthCheck(resp);
 		} else {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
