@@ -1,38 +1,18 @@
 package com.yammer.metrics.core;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-
-import static java.lang.Double.doubleToLongBits;
-import static java.lang.Double.longBitsToDouble;
-import static java.lang.Math.floor;
-import static java.lang.Math.sqrt;
 
 /**
  * A timer metric which aggregates timing durations and provides duration
  * statistics, plus throughput statistics via {@link MeterMetric}.
  *
  * @author coda
- * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately
- * computing running variance</a>
  */
 public class TimerMetric implements Metric {
-	private final MeterMetric meter;
-	// Using a sample size of 1028, which offers a 99.9% confidence level with a
-	// 5% margin of error assuming a normal distribution. This might need to be
-	// parameterized, but I'm only going to do that when someone complains.
-	private final Sample sample = new Sample(1028);
 	private final TimeUnit durationUnit, rateUnit;
-	private final AtomicLong _min = new AtomicLong();
-	private final AtomicLong _max = new AtomicLong();
-	private final AtomicLong _sum = new AtomicLong();
-	// These are for the Welford algorithm for calculating running variance
-	// without floating-point doom.
-	private final AtomicLong varianceM = new AtomicLong();
-	private final AtomicLong varianceS = new AtomicLong();
+	private final MeterMetric meter;
+	private final HistogramMetric histogram = new HistogramMetric();
 
 	/**
 	 * Creates a new {@link TimerMetric}.
@@ -69,12 +49,7 @@ public class TimerMetric implements Metric {
 	 * Clears all recorded durations.
 	 */
 	public void clear() {
-		sample.clear();
-		_max.set(Long.MIN_VALUE);
-		_min.set(Long.MAX_VALUE);
-		_sum.set(0);
-		varianceM.set(-1);
-		varianceS.set(0);
+		histogram.clear();
 	}
 
 	/**
@@ -110,7 +85,7 @@ public class TimerMetric implements Metric {
 	 *
 	 * @return the number of durations recorded
 	 */
-	public long count() { return meter.count(); }
+	public long count() { return histogram.count(); }
 
 	/**
 	 * Returns the fifteen-minute rate of timings.
@@ -149,28 +124,28 @@ public class TimerMetric implements Metric {
 	 *
 	 * @return the longest recorded duration
 	 */
-	public double max() { return convertFromNS(_max.get()); }
+	public double max() { return convertFromNS(histogram.max()); }
 
 	/**
 	 * Returns the shortest recorded duration.
 	 *
 	 * @return the shortest recorded duration
 	 */
-	public double min() { return convertFromNS(_min.get()); }
+	public double min() { return convertFromNS(histogram.min()); }
 
 	/**
 	 * Returns the arithmetic mean of all recorded durations.
 	 *
 	 * @return the arithmetic mean of all recorded durations
 	 */
-	public double mean() { return convertFromNS(_sum.get() / (double) count()); }
+	public double mean() { return convertFromNS(histogram.mean()); }
 
 	/**
 	 * Returns the standard deviation of all recorded durations.
 	 *
 	 * @return the standard deviation of all recorded durations
 	 */
-	public double stdDev() { return convertFromNS(sqrt(variance())); }
+	public double stdDev() { return convertFromNS(histogram.stdDev()); }
 
 	/**
 	 * Returns an array of durations at the given percentiles.
@@ -179,29 +154,9 @@ public class TimerMetric implements Metric {
 	 * @return an array of durations at the given percentiles
 	 */
 	public double[] percentiles(double... percentiles) {
-		final double[] scores = new double[percentiles.length];
+		final double[] scores = histogram.percentiles(percentiles);
 		for (int i = 0; i < scores.length; i++) {
-			scores[i] = 0.0;
-
-		}
-
-		if (count() > 0) {
-			final List<Long> values = sample.values();
-			Collections.sort(values);
-
-			for (int i = 0; i < percentiles.length; i++) {
-				final double p = percentiles[i];
-				final double pos = p * (values.size() + 1);
-				if (pos < 1) {
-					scores[i] = convertFromNS(values.get(0));
-				} else if (pos >= values.size()) {
-					scores[i] = convertFromNS(values.get(values.size() - 1));
-				} else {
-					final double lower = values.get((int) pos - 1);
-					final double upper = values.get((int) pos);
-					scores[i] = convertFromNS(lower + (pos - floor(pos)) * (upper - lower));
-				}
-			}
+			scores[i] = convertFromNS(scores[i]);
 		}
 
 		return scores;
@@ -216,41 +171,11 @@ public class TimerMetric implements Metric {
 		return meter.getEventType();
 	}
 
-	private void updateVariance(long ns) {
-		// initialize varianceM to the first reading if it's still blank
-		if (!varianceM.compareAndSet(-1, doubleToLongBits(ns))) {
-			boolean done = false;
-			while (!done) {
-				final long oldMCas = varianceM.get();
-				final double oldM = longBitsToDouble(oldMCas);
-				final double newM = oldM + ((ns - oldM) / count());
-
-				final long oldSCas = varianceS.get();
-				final double oldS = longBitsToDouble(oldSCas);
-				final double newS = oldS + ((ns - oldM) * (ns - newM));
-
-				done = varianceM.compareAndSet(oldMCas, doubleToLongBits(newM)) &&
-						varianceS.compareAndSet(oldSCas, doubleToLongBits(newS));
-			}
-		}
-	}
-
 	private void update(long duration) {
 		if (duration >= 0) {
+			histogram.update(duration);
 			meter.mark();
-			sample.update(duration);
-			setMax(duration);
-			setMin(duration);
-			_sum.getAndAdd(duration);
-			updateVariance(duration);
 		}
-	}
-
-	private double variance() {
-		if (count() <= 1) {
-			return 0.0;
-		}
-		return longBitsToDouble(varianceS.get()) / (count() - 1);
 	}
 
 	private double convertFromNS(double ns) {
@@ -260,19 +185,4 @@ public class TimerMetric implements Metric {
 		return ns / TimeUnit.NANOSECONDS.convert(1, durationUnit);
 	}
 
-	private void setMax(long ns) {
-		boolean done = false;
-		while (!done) {
-			long value = _max.get();
-			done = value >= ns || _max.compareAndSet(value, ns);
-		}
-	}
-
-	private void setMin(long ns) {
-		boolean done = false;
-		while (!done) {
-			long value = _min.get();
-			done = value <= ns || _min.compareAndSet(value, ns);
-		}
-	}
 }
