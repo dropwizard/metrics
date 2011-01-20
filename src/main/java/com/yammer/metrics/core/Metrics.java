@@ -118,6 +118,12 @@ public class Metrics {
 		reporter.start(period, unit);
 	}
 
+	/**
+	 * Registers an application {@link HealthCheck} with a given name.
+	 *
+	 * @param name the name of the healthcheck (usually the name of the dependency)
+	 * @param healthCheck the {@link HealthCheck} instance
+	 */
 	public static void registerHealthCheck(String name, HealthCheck healthCheck) {
 		HEALTH_CHECKS.putIfAbsent(name, healthCheck);
 	}
