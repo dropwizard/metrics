@@ -74,14 +74,12 @@ public class HistogramMetric implements Metric {
 	 * @param value the length of the value
 	 */
 	public void update(long value) {
-		if (value >= 0) {
-			count.incrementAndGet();
-			sample.update(value);
-			setMax(value);
-			setMin(value);
-			_sum.getAndAdd(value);
-			updateVariance(value);
-		}
+		count.incrementAndGet();
+		sample.update(value);
+		setMax(value);
+		setMin(value);
+		_sum.getAndAdd(value);
+		updateVariance(value);
 	}
 
 	/**
@@ -96,14 +94,24 @@ public class HistogramMetric implements Metric {
 	 *
 	 * @return the longest recorded value
 	 */
-	public double max() { return _max.get(); }
+	public double max() {
+		if (count() > 0) {
+			return _max.get();
+		}
+		return 0.0;
+	}
 
 	/**
 	 * Returns the shortest recorded value.
 	 *
 	 * @return the shortest recorded value
 	 */
-	public double min() { return _min.get(); }
+	public double min() {
+		if (count() > 0) {
+			return _min.get();
+		}
+		return 0.0;
+	}
 
 	/**
 	 * Returns the arithmetic mean of all recorded values.
@@ -111,7 +119,10 @@ public class HistogramMetric implements Metric {
 	 * @return the arithmetic mean of all recorded values
 	 */
 	public double mean() {
-		return _sum.get() / (double) count();
+		if (count() > 0) {
+			return _sum.get() / (double) count();
+		}
+		return 0.0;
 	}
 
 	/**
@@ -119,7 +130,12 @@ public class HistogramMetric implements Metric {
 	 *
 	 * @return the standard deviation of all recorded values
 	 */
-	public double stdDev() { return sqrt(variance()); }
+	public double stdDev() {
+		if (count() > 0) {
+			return sqrt(variance());
+		}
+		return 0.0;
+	}
 
 	/**
 	 * Returns an array of values at the given percentiles.

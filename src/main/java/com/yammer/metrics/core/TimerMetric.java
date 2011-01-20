@@ -179,9 +179,6 @@ public class TimerMetric implements Metric {
 	}
 
 	private double convertFromNS(double ns) {
-		if (count() <= 0) {
-			return 0.0;
-		}
 		return ns / TimeUnit.NANOSECONDS.convert(1, durationUnit);
 	}
 
