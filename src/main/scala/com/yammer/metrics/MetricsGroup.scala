@@ -29,6 +29,13 @@ class MetricsGroup(val klass: Class[_]) {
   def counter(name: String) = new Counter(Metrics.newCounter(klass, name))
 
   /**
+   * Creates a new histogram metrics.
+   *
+   * @param name the name of the histogram
+   */
+  def histogram(name: String) = new Histogram(Metrics.newHistogram(klass, name))
+
+  /**
    * Creates a new meter metric.
    *
    * @param name the name of the meter
