@@ -12,9 +12,8 @@ class Metrics(info: ProjectInfo) extends DefaultProject(info)
   override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageSrc)
 
   /**
-   * Publish via Ivy.
+   * Publish via maven-sbt.
    */
-
   lazy val publishTo = Resolver.sftp("repo.codahale.com",
                                      "codahale.com",
                                      "/home/codahale/repo.codahale.com/")
