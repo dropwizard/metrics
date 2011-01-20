@@ -18,16 +18,27 @@ import com.yammer.metrics.core.HealthCheck.Result;
 import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class MetricsServlet extends HttpServlet {
-	private final JsonFactory factory = new JsonFactory();
+	private JsonFactory factory;
 	private String metricsUri, pingUri, threadsUri, healthcheckUri;
 
 	public MetricsServlet() {
-		this("/healthcheck", "/metrics", "/ping", "/threads");
+		this(new JsonFactory(new ObjectMapper()), "/healthcheck", "/metrics", "/ping", "/threads");
+	}
+
+	public MetricsServlet(JsonFactory factory) {
+		this(factory, "/healthcheck", "/metrics", "/ping", "/threads");
 	}
 
 	public MetricsServlet(String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
+		this(new JsonFactory(new ObjectMapper()), healthcheckUri, metricsUri, pingUri, threadsUri);
+	}
+
+	public MetricsServlet(JsonFactory factory, String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
+		this.factory = factory;
 		this.healthcheckUri = healthcheckUri;
 		this.metricsUri = metricsUri;
 		this.pingUri = pingUri;
@@ -57,6 +68,11 @@ public class MetricsServlet extends HttpServlet {
 
 		if (healthcheckUri != null) {
 			this.healthcheckUri = healthcheckUri;
+		}
+
+		final Object factory = config.getServletContext().getAttribute(JsonFactory.class.getCanonicalName());
+		if (factory != null && factory instanceof JsonFactory) {
+			this.factory = (JsonFactory) factory;
 		}
 	}
 
@@ -228,11 +244,12 @@ public class MetricsServlet extends HttpServlet {
 		json.writeStartObject();
 		{
 			json.writeStringField("type", "gauge");
+			json.writeFieldName("value");
 			final Object value = gauge.value();
-			if (value == null) {
-				json.writeNullField("value");
-			} else {
-				json.writeStringField("value", gauge.value().toString());
+			try {
+				json.writeObject(value);
+			} catch (JsonMappingException e) {
+				json.writeString("unknown value type: " + value.getClass());
 			}
 		}
 		json.writeEndObject();
