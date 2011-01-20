@@ -1,5 +1,6 @@
 package com.yammer.metrics.core;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -170,6 +171,15 @@ public class HistogramMetric implements Metric {
 		}
 
 		return scores;
+	}
+
+	/**
+	 * Returns a list of all values in the histogram's sample.
+	 *
+	 * @return a list of all values in the histogram's sample
+	 */
+	public List<Long> values() {
+		return sample.values();
 	}
 
 	private double variance() {

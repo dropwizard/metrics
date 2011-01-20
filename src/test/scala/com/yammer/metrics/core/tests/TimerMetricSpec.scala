@@ -1,5 +1,6 @@
 package com.yammer.metrics.core.tests
 
+import scala.collection.JavaConversions._
 import com.codahale.simplespec.Spec
 import java.util.concurrent.{Callable, TimeUnit}
 import com.yammer.metrics.core.TimerMetric
@@ -60,6 +61,10 @@ object TimerMetricSpec extends Spec {
     def `should have a fifteen-minute rate of zero` {
       timer.fifteenMinuteRate must beCloseTo(0.0, 0.001)
     }
+
+    def `should have no values` {
+      timer.values.toList must beEmpty
+    }
   }
 
   class `Timing a series of events` {
@@ -97,6 +102,10 @@ object TimerMetricSpec extends Spec {
       p98 must beCloseTo(40.0, 0.001)
       p99 must beCloseTo(40.0, 0.001)
       p999 must beCloseTo(40.0, 0.001)
+    }
+
+    def `should have a series of values` {
+      timer.values.toList must beEqualTo(Seq(10, 20, 20, 30, 40))
     }
   }
 

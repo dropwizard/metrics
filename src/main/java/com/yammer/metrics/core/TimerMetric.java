@@ -1,5 +1,7 @@
 package com.yammer.metrics.core;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -169,6 +171,19 @@ public class TimerMetric implements Metric {
 	 */
 	public String getEventType() {
 		return meter.getEventType();
+	}
+
+	/**
+	 * Returns a list of all recorded durations in the timers's sample.
+	 *
+	 * @return a list of all recorded durations in the timers's sample
+	 */
+	public List<Double> values() {
+		final List<Double> values = new ArrayList<Double>();
+		for (Long value : histogram.values()) {
+			values.add(convertFromNS(value));
+		}
+		return values;
 	}
 
 	private void update(long duration) {

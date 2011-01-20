@@ -1,5 +1,6 @@
 package com.yammer.metrics.core.tests
 
+import scala.collection.JavaConversions._
 import com.codahale.simplespec.Spec
 import com.yammer.metrics.core.HistogramMetric
 
@@ -34,6 +35,10 @@ object HistogramMetricSpec extends Spec {
       percentiles(1) must beCloseTo(0.0, 0.01)
       percentiles(2) must beCloseTo(0.0, 0.01)
     }
+
+    def `should have no values` {
+      histogram.values.toList must beEmpty
+    }
   }
 
   class `A histogram of the numbers 1 through 10000` {
@@ -66,6 +71,10 @@ object HistogramMetricSpec extends Spec {
       percentiles(0) must beCloseTo(5000.5, 0.01)
       percentiles(1) must beCloseTo(7500.75, 0.01)
       percentiles(2) must beCloseTo(9900.99, 0.01)
+    }
+
+    def `should have 10000 values` {
+      histogram.values.toList must beEqualTo((1 to 10000).toList)
     }
   }
 
