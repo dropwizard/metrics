@@ -179,34 +179,34 @@ public class HistogramMetric implements Metric {
 		return longBitsToDouble(varianceS.get()) / (count() - 1);
 	}
 
-	private void setMax(long ns) {
+	private void setMax(long potentialMax) {
 		boolean done = false;
 		while (!done) {
-			long value = _max.get();
-			done = value >= ns || _max.compareAndSet(value, ns);
+			long currentMax = _max.get();
+			done = currentMax >= potentialMax || _max.compareAndSet(currentMax, potentialMax);
 		}
 	}
 
-	private void setMin(long ns) {
+	private void setMin(long potentialMin) {
 		boolean done = false;
 		while (!done) {
-			long value = _min.get();
-			done = value <= ns || _min.compareAndSet(value, ns);
+			long currentMin = _min.get();
+			done = currentMin <= potentialMin || _min.compareAndSet(currentMin, potentialMin);
 		}
 	}
 
-	private void updateVariance(long ns) {
+	private void updateVariance(long value) {
 		// initialize varianceM to the first reading if it's still blank
-		if (!varianceM.compareAndSet(-1, doubleToLongBits(ns))) {
+		if (!varianceM.compareAndSet(-1, doubleToLongBits(value))) {
 			boolean done = false;
 			while (!done) {
 				final long oldMCas = varianceM.get();
 				final double oldM = longBitsToDouble(oldMCas);
-				final double newM = oldM + ((ns - oldM) / count());
+				final double newM = oldM + ((value - oldM) / count());
 
 				final long oldSCas = varianceS.get();
 				final double oldS = longBitsToDouble(oldSCas);
-				final double newS = oldS + ((ns - oldM) * (ns - newM));
+				final double newS = oldS + ((value - oldM) * (value - newM));
 
 				done = varianceM.compareAndSet(oldMCas, doubleToLongBits(newM)) &&
 						varianceS.compareAndSet(oldSCas, doubleToLongBits(newS));
