@@ -8,7 +8,9 @@ Requirements
 
 * Java SE 6
 * Scala 2.8.1
-* Jackson 1.7.1
+* Servlet API 2.5 (for reporting via HTTP)
+* Jackson 1.7.1 (for reporting via HTTP)
+* Jetty 7.2.2.v20101205 (for instrumenting Jetty handlers)
 
 
 How To Use

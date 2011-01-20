@@ -25,13 +25,9 @@ class Metrics(info: ProjectInfo) extends DefaultProject(info)
   val dropWizard = "Coda's Repo" at "http://repo.codahale.com"
 
   /**
-   * Dependencies
-   */
-  val jackson = "org.codehaus.jackson" % "jackson-core-asl" % "1.7.1"
-
-  /**
    * Optional Dependencies
    */
+  val jackson = "org.codehaus.jackson" % "jackson-core-asl" % "1.7.1" % "optional"
   val servletApi = "javax.servlet" % "servlet-api" % "2.5" % "optional"
   val jetty = "org.eclipse.jetty" % "jetty-server" % "7.2.2.v20101205" % "optional"
 
