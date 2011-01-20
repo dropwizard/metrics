@@ -186,10 +186,33 @@ public class MetricsServlet extends HttpServlet {
 		} else if (metric instanceof MeterMetric) {
 			json.writeFieldName(key);
 			writeMeter(json, (MeterMetric) metric);
+		} else if (metric instanceof HistogramMetric) {
+			json.writeFieldName(key);
+			writeHistogram(json, (HistogramMetric) metric);
 		} else if (metric instanceof TimerMetric) {
 			json.writeFieldName(key);
 			writeTimer(json, (TimerMetric) metric);
 		}
+	}
+
+	private void writeHistogram(JsonGenerator json, HistogramMetric timer) throws IOException {
+		json.writeStartObject();
+		{
+			json.writeStringField("type", "histogram");
+			json.writeNumberField("min", timer.min());
+			json.writeNumberField("max", timer.max());
+			json.writeNumberField("mean", timer.mean());
+			json.writeNumberField("std_dev", timer.stdDev());
+
+			final double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
+			json.writeNumberField("median", percentiles[0]);
+			json.writeNumberField("p75", percentiles[1]);
+			json.writeNumberField("p95", percentiles[2]);
+			json.writeNumberField("p98", percentiles[3]);
+			json.writeNumberField("p99", percentiles[4]);
+			json.writeNumberField("p999", percentiles[5]);
+		}
+		json.writeEndObject();
 	}
 
 	private void writeCounter(JsonGenerator json, CounterMetric counter) throws IOException {

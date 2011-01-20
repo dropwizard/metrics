@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import com.yammer.metrics.core.CounterMetric;
+import com.yammer.metrics.core.HistogramMetric;
 import com.yammer.metrics.core.Metrics;
 
 public class ExampleRunner {
@@ -12,6 +13,7 @@ public class ExampleRunner {
 	private static final BlockingQueue<File> JOBS = new LinkedBlockingQueue<File>();
 	private static final ExecutorService POOL = Executors.newFixedThreadPool(WORKER_COUNT);
 	private static final CounterMetric QUEUE_DEPTH = Metrics.newCounter(ExampleRunner.class, "queue-depth");
+	private static final HistogramMetric DIRECTORY_SIZE = Metrics.newHistogram(ExampleRunner.class, "directory-size");
 
 	public static class Job implements Runnable {
 		@Override
@@ -22,6 +24,7 @@ public class ExampleRunner {
 					QUEUE_DEPTH.dec();
 					if (file.isDirectory()) {
 						final List<File> contents = new DirectoryLister(file).list();
+						DIRECTORY_SIZE.update(contents.size());
 						QUEUE_DEPTH.inc(contents.size());
 						JOBS.addAll(contents);
 					}
