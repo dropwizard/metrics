@@ -8,7 +8,7 @@ Requirements
 
 * Java SE 6
 * Scala 2.8.1
-* Jackson 1.7.0
+* Jackson 1.7.1
 
 
 How To Use
@@ -46,20 +46,22 @@ How To Use
       }
     }
 
-Metrics comes with four types of metrics:
+Metrics comes with five types of metrics:
 
 * **Gauges** are instantaneous readings of values (e.g., a queue depth).
 * **Counters** are 64-bit integers which can be incremented or decremented.
 * **Meters** are increment-only counters which keep track of the rate of events.
   They provide mean rates, plus exponentially-weighted moving averages which
   use the same formula that the UNIX 1-, 5-, and 15-minute load averages use.
-* **Timers** record the duration as well as the rate of events. In addition to
-  the rate information that meters provide, timers also provide the count,
+* **Histograms** capture distribution measurements about a metric: the count,
   maximum, minimum, mean, standard deviation, median, 75th percentile, 95th
-  percentile, 98th percentile, 99th percentile, and 99.9th percentile
-  of timings. (They do so using a method called reservoir sampling which allows
-  them to efficiently keep a small, statistically representative sample of all
-  the measurements.)
+  percentile, 98th percentile, 99th percentile, and 99.9th percentile of the
+  recorded values. (They do so using a method called reservoir sampling which
+  allows them to efficiently keep a small, statistically representative sample
+  of all the measurements.)
+* **Timers** record the duration as well as the rate of events. In addition to
+  the rate information that meters provide, timers also provide the same metrics
+  as histograms about the recorded durations.
 
 Metrics also has support for health checks:
 
@@ -92,10 +94,15 @@ an internally-accessible context. It'll respond to the following URIs:
                   `500 Internal Server Error` if any failed.
 * `/threads`: A `text/plain` dump of all threads and their stack traces.
 
+The URIs of these resources can be configured by passing the servlet the
+`init-param`s `"metrics-uri"`, `"ping-uri"`, `"healthcheck-uri"`, and
+`"threads-uri"`, or by passing these values to the servlet's constructor
+(if you happen to be wiring your servlets by code).
+
 
 License
 -------
 
-Copyright (c) 2010 Coda Hale, Yammer.com
+Copyright (c) 2010-2011 Coda Hale, Yammer.com
 
 Published under The MIT License, see LICENSE
