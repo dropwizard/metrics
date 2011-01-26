@@ -22,10 +22,11 @@ public class UniformSample implements Sample {
 	/**
 	 * Creates a new {@link UniformSample}.
 	 *
-	 * @param windowSize the number of samples to keep
+	 * @param reservoirSize the number of samples to keep in the sampling
+	 *                      reservoir
 	 */
-	public UniformSample(int windowSize) {
-		this.values = new AtomicLongArray(windowSize);
+	public UniformSample(int reservoirSize) {
+		this.values = new AtomicLongArray(reservoirSize);
 		clear();
 	}
 
