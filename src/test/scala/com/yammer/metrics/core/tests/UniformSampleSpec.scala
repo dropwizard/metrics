@@ -2,12 +2,12 @@ package com.yammer.metrics.core.tests
 
 import collection.JavaConversions._
 import com.codahale.simplespec.Spec
-import com.yammer.metrics.core.Sample
+import com.yammer.metrics.core.UniformSample
 
-object SampleSpec extends Spec {
+object UniformSampleSpec extends Spec {
   class `A sample of 100 out of 1000 elements` {
     val population = Range(0, 1000)
-    val sample = new Sample(100)
+    val sample = new UniformSample(100)
     population.foreach { i => sample.update(i) }
 
     def `should have 100 elements` {
@@ -22,7 +22,7 @@ object SampleSpec extends Spec {
 
   class `A sample of 100 out of 10 elements` {
     val population = Range(0, 10)
-    val sample = new Sample(100)
+    val sample = new UniformSample(100)
     population.foreach { i => sample.update(i) }
 
     def `should have 10 elements` {

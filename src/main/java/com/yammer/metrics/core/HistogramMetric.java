@@ -1,6 +1,5 @@
 package com.yammer.metrics.core;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -40,10 +39,10 @@ public class HistogramMetric implements Metric {
 	/**
 	 * Creates a new {@link HistogramMetric}.
 	 *
-	 * @param sampleSize the {@link Sample} size for distribution calculations
+	 * @param sampleSize the {@link UniformSample} size for distribution calculations
 	 */
 	public HistogramMetric(int sampleSize) {
-		this.sample = new Sample(sampleSize);
+		this.sample = new UniformSample(sampleSize);
 		clear();
 	}
 
