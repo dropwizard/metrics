@@ -113,7 +113,7 @@ public class ExponentiallyDecayingSample implements Sample {
 		final double priority = weight(timestamp - startTime) / random;
 		final long newCount = count.incrementAndGet();
 
-		if (newCount < reservoirSize) {
+		if (newCount <= reservoirSize) {
 			values.put(new Value(newCount, value, priority));
 		} else {
 			if (values.peek().priority < priority) {
