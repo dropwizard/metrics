@@ -50,7 +50,7 @@ public class UniformSample implements Sample {
 	@Override
 	public void update(long value) {
 		final long c = count.incrementAndGet();
-		if (c < values.length()) {
+		if (c <= values.length()) {
 			values.set((int) c - 1, value);
 		} else {
 			final int r = (int) (Math.abs(RANDOM.nextLong()) % c);
