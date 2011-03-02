@@ -19,7 +19,7 @@ How To Use
 **First**, specify Metrics as a dependency:
 
     val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
-    val metrics = "com.yammer" %% "metrics" % "2.0.0-BETA7"
+    val metrics = "com.yammer" %% "metrics" % "2.0.0-BETA8"
 
 (Or whatever it takes for you to get Maven or Ivy happy.)
 
@@ -63,7 +63,10 @@ Metrics comes with five types of metrics:
   of all the measurements.)
 * **Timers** record the duration as well as the rate of events. In addition to
   the rate information that meters provide, timers also provide the same metrics
-  as histograms about the recorded durations.
+  as histograms about the recorded durations. (The samples that timers keep in
+  order to calculate percentiles and such are biased towards more recent data,
+  since you probably care more about how your application is doing *now* as
+  opposed to how it's done historically.)
 
 Metrics also has support for health checks:
 
