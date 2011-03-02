@@ -81,6 +81,8 @@ public class ConsoleReporter implements Runnable {
 						printGauge((GaugeMetric) metric);
 					} else if (metric instanceof CounterMetric) {
 						printCounter((CounterMetric) metric);
+					} else if (metric instanceof HistogramMetric) {
+						printHistogram((HistogramMetric) metric);
 					} else if (metric instanceof MeterMetric) {
 						printMeter((MeterMetric) metric);
 					} else if (metric instanceof TimerMetric) {
@@ -114,6 +116,20 @@ public class ConsoleReporter implements Runnable {
 		out.printf("     1-minute rate = %2.2f %s/%s\n", meter.oneMinuteRate(), meter.getEventType(), unit);
 		out.printf("     5-minute rate = %2.2f %s/%s\n", meter.fiveMinuteRate(), meter.getEventType(), unit);
 		out.printf("    15-minute rate = %2.2f %s/%s\n", meter.fifteenMinuteRate(), meter.getEventType(), unit);
+	}
+
+	private void printHistogram(HistogramMetric histogram) {
+		final double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
+		out.printf("               min = %2.2f\n", histogram.min());
+		out.printf("               max = %2.2f\n", histogram.max());
+		out.printf("              mean = %2.2f\n", histogram.mean());
+		out.printf("            stddev = %2.2f\n", histogram.stdDev());
+		out.printf("            median = %2.2f\n", percentiles[0]);
+		out.printf("              75%% <= %2.2f\n", percentiles[1]);
+		out.printf("              95%% <= %2.2f\n", percentiles[2]);
+		out.printf("              98%% <= %2.2f\n", percentiles[3]);
+		out.printf("              99%% <= %2.2f\n", percentiles[4]);
+		out.printf("            99.9%% <= %2.2f\n", percentiles[5]);
 	}
 
 	private void printTimer(TimerMetric timer) {

@@ -1,10 +1,7 @@
 package com.yammer.metrics.core;
 
 import java.lang.management.ManagementFactory;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -136,6 +133,107 @@ public class JmxReporter implements Runnable {
 		}
 	}
 
+	public static interface HistogramMBean extends MetricMBean {
+		public long getCount();
+
+		public double getMin();
+
+		public double getMax();
+
+		public double getMean();
+
+		public double getStdDev();
+
+		public double get50thPercentile();
+
+		public double get75thPercentile();
+
+		public double get95thPercentile();
+
+		public double get98thPercentile();
+
+		public double get99thPercentile();
+
+		public double get999thPercentile();
+
+		public List<Long> values();
+	}
+
+	public class Histogram implements HistogramMBean {
+		private final ObjectName objectName;
+		private final HistogramMetric metric;
+
+		public Histogram(HistogramMetric metric, ObjectName objectName) {
+			this.metric = metric;
+			this.objectName = objectName;
+		}
+
+		@Override
+		public ObjectName objectName() {
+			return objectName;
+		}
+
+		@Override
+		public double get50thPercentile() {
+			return metric.percentiles(0.5)[0];
+		}
+
+		@Override
+		public long getCount() {
+			return metric.count();
+		}
+
+		@Override
+		public double getMin() {
+			return metric.min();
+		}
+
+		@Override
+		public double getMax() {
+			return metric.max();
+		}
+
+		@Override
+		public double getMean() {
+			return metric.mean();
+		}
+
+		@Override
+		public double getStdDev() {
+			return metric.stdDev();
+		}
+
+		@Override
+		public double get75thPercentile() {
+			return metric.percentiles(0.75)[0];
+		}
+
+		@Override
+		public double get95thPercentile() {
+			return metric.percentiles(0.95)[0];
+		}
+
+		@Override
+		public double get98thPercentile() {
+			return metric.percentiles(0.98)[0];
+		}
+
+		@Override
+		public double get99thPercentile() {
+			return metric.percentiles(0.99)[0];
+		}
+
+		@Override
+		public double get999thPercentile() {
+			return metric.percentiles(0.999)[0];
+		}
+
+		@Override
+		public List<Long> values() {
+			return metric.values();
+		}
+	}
+
 	public static interface TimerMBean extends MetricMBean {
 		public long getCount();
 
@@ -170,6 +268,8 @@ public class JmxReporter implements Runnable {
 		public double get99thPercentile();
 
 		public double get999thPercentile();
+
+		public List<Double> values();
 	}
 
 	public class Timer implements TimerMBean {
@@ -270,6 +370,11 @@ public class JmxReporter implements Runnable {
 		public double get999thPercentile() {
 			return metric.percentiles(0.999)[0];
 		}
+
+		@Override
+		public List<Double> values() {
+			return metric.values();
+		}
 	}
 
 	public JmxReporter(Map<MetricName, Metric> metrics) {
@@ -313,6 +418,8 @@ public class JmxReporter implements Runnable {
 						registerBean(name, new Gauge((GaugeMetric<?>) metric, objectName), objectName);
 					} else if (metric instanceof CounterMetric) {
 						registerBean(name, new Counter((CounterMetric) metric, objectName), objectName);
+					} else if (metric instanceof HistogramMetric) {
+						registerBean(name, new Histogram((HistogramMetric) metric, objectName), objectName);
 					} else if (metric instanceof MeterMetric) {
 						registerBean(name, new Meter((MeterMetric) metric, objectName), objectName);
 					} else if (metric instanceof TimerMetric) {

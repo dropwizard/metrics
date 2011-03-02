@@ -1,9 +1,12 @@
 package com.yammer.metrics.core;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-import javax.servlet.Servlet;
+
+import com.yammer.metrics.core.HistogramMetric.SampleType;
 
 /**
  * A set of factory methods for creating centrally registered metric instances.
@@ -44,6 +47,33 @@ public class Metrics {
 	 */
 	public static CounterMetric newCounter(Class<?> klass, String name) {
 		return getOrAdd(new MetricName(klass, name), new CounterMetric());
+	}
+
+	/**
+	 * Creates a new {@link HistogramMetric} and registers it under the given
+	 * class and name.
+	 *
+	 * @param klass the class which owns the metric
+	 * @param name the name of the metric
+	 * @param biased whether or not the histogram should be biased
+	 * @return a new {@link HistogramMetric}
+	 */
+	public static HistogramMetric newHistogram(Class<?> klass, String name,
+											   boolean biased) {
+		return getOrAdd(new MetricName(klass, name),
+				new HistogramMetric(biased ? SampleType.BIASED : SampleType.UNIFORM));
+	}
+
+	/**
+	 * Creates a new non-baised {@link HistogramMetric} and registers it under
+	 * the given class and name.
+	 *
+	 * @param klass the class which owns the metric
+	 * @param name the name of the metric
+	 * @return a new {@link HistogramMetric}
+	 */
+	public static HistogramMetric newHistogram(Class<?> klass, String name) {
+		return newHistogram(klass, name, false);
 	}
 
 	/**
@@ -107,8 +137,23 @@ public class Metrics {
 		reporter.start(period, unit);
 	}
 
+	/**
+	 * Registers an application {@link HealthCheck} with a given name.
+	 *
+	 * @param name the name of the healthcheck (usually the name of the dependency)
+	 * @param healthCheck the {@link HealthCheck} instance
+	 */
 	public static void registerHealthCheck(String name, HealthCheck healthCheck) {
 		HEALTH_CHECKS.putIfAbsent(name, healthCheck);
+	}
+
+	/**
+	 * Returns an unmodifiable map of all metrics and their names.
+	 *
+	 * @return an unmodifiable map of all metrics and their names
+	 */
+	public static Map<MetricName, Metric> allMetrics() {
+		return Collections.unmodifiableMap(METRICS);
 	}
 
 	@SuppressWarnings("unchecked")

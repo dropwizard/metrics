@@ -29,6 +29,15 @@ class MetricsGroup(val klass: Class[_]) {
   def counter(name: String) = new Counter(Metrics.newCounter(klass, name))
 
   /**
+   * Creates a new histogram metrics.
+   *
+   * @param name the name of the histogram
+   * @param biased whether or not to use a biased sample
+   */
+  def histogram(name: String, biased: Boolean = false) =
+    new Histogram(Metrics.newHistogram(klass, name, biased))
+
+  /**
    * Creates a new meter metric.
    *
    * @param name the name of the meter
