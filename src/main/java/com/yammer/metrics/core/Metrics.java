@@ -6,6 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+import com.yammer.metrics.core.HistogramMetric.SampleType;
+
 /**
  * A set of factory methods for creating centrally registered metric instances.
  *
@@ -48,15 +50,30 @@ public class Metrics {
 	}
 
 	/**
-	 * Creates a new {@link HistogramMetric} and registers it under the given class
-	 * and name.
+	 * Creates a new {@link HistogramMetric} and registers it under the given
+	 * class and name.
+	 *
+	 * @param klass the class which owns the metric
+	 * @param name the name of the metric
+	 * @param biased whether or not the histogram should be biased
+	 * @return a new {@link HistogramMetric}
+	 */
+	public static HistogramMetric newHistogram(Class<?> klass, String name,
+											   boolean biased) {
+		return getOrAdd(new MetricName(klass, name),
+				new HistogramMetric(biased ? SampleType.BIASED : SampleType.UNIFORM));
+	}
+
+	/**
+	 * Creates a new non-baised {@link HistogramMetric} and registers it under
+	 * the given class and name.
 	 *
 	 * @param klass the class which owns the metric
 	 * @param name the name of the metric
 	 * @return a new {@link HistogramMetric}
 	 */
 	public static HistogramMetric newHistogram(Class<?> klass, String name) {
-		return getOrAdd(new MetricName(klass, name), new HistogramMetric());
+		return newHistogram(klass, name, false);
 	}
 
 	/**

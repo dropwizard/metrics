@@ -32,8 +32,10 @@ class MetricsGroup(val klass: Class[_]) {
    * Creates a new histogram metrics.
    *
    * @param name the name of the histogram
+   * @param biased whether or not to use a biased sample
    */
-  def histogram(name: String) = new Histogram(Metrics.newHistogram(klass, name))
+  def histogram(name: String, biased: Boolean = false) =
+    new Histogram(Metrics.newHistogram(klass, name, biased))
 
   /**
    * Creates a new meter metric.

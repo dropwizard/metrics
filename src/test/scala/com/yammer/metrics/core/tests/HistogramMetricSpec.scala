@@ -2,11 +2,11 @@ package com.yammer.metrics.core.tests
 
 import scala.collection.JavaConversions._
 import com.codahale.simplespec.Spec
-import com.yammer.metrics.core.HistogramMetric
+import com.yammer.metrics.core.{UniformSample, HistogramMetric}
 
 object HistogramMetricSpec extends Spec {
   class `A histogram with zero recorded valeus` {
-    val histogram = new HistogramMetric(100)
+    val histogram = new HistogramMetric(new UniformSample(100))
 
     def `should have a count of 0` {
       histogram.count must beEqualTo(0)
@@ -42,7 +42,7 @@ object HistogramMetricSpec extends Spec {
   }
 
   class `A histogram of the numbers 1 through 10000` {
-    val histogram = new HistogramMetric(100000)
+    val histogram = new HistogramMetric(new UniformSample(100000))
     (1 to 10000).foreach(histogram.update)
 
     def `should have a count of 10000` {

@@ -17,6 +17,38 @@ import static java.lang.Math.sqrt;
  * computing running variance</a>
  */
 public class HistogramMetric implements Metric {
+	/**
+	 * The type of sampling the histogram should be performing.
+	 */
+	public enum SampleType {
+		/**
+		 * Uses a uniform sample of 1028 elements, which offers a 99.9%
+		 * confidence level with a 5% margin of error assuming a normal
+		 * distribution.
+		 */
+		UNIFORM {
+			@Override
+			public Sample newSample() {
+				return new UniformSample(1028);
+			}
+		},
+
+		/**
+		 * Uses an exponentially decaying sample of 1028 elements, which offers
+		 * a 99.9% confidence level with a 5% margin of error assuming a normal
+		 * distribution, and an alpha factor of 0.015, which heavily biases
+		 * the sample to the past 5 minutes of measurements.
+		 */
+		BIASED {
+			@Override
+			public Sample newSample() {
+				return new ExponentiallyDecayingSample(1028, 0.015);
+			}
+		};
+
+		public abstract Sample newSample();
+	}
+
 	private final Sample sample;
 	private final AtomicLong _min = new AtomicLong();
 	private final AtomicLong _max = new AtomicLong();
@@ -28,21 +60,21 @@ public class HistogramMetric implements Metric {
 	private final AtomicLong count = new AtomicLong();
 
 	/**
-	 * Creates a new {@link HistogramMetric} with a default size of 1028, which
-	 * offers a 99.9% confidence level with a 5% margin of error assuming a
-	 * normal distribution.
+	 * Creates a new {@link HistogramMetric} with the given sample type.
+	 *
+	 * @param type the type of sample to use
 	 */
-	public HistogramMetric() {
-		this(1028);
+	public HistogramMetric(SampleType type) {
+		this(type.newSample());
 	}
 
 	/**
-	 * Creates a new {@link HistogramMetric}.
+	 * Creates a new {@link HistogramMetric} with the given sample.
 	 *
-	 * @param sampleSize the {@link UniformSample} size for distribution calculations
+	 * @param sample the sample to create a histogram from
 	 */
-	public HistogramMetric(int sampleSize) {
-		this.sample = new UniformSample(sampleSize);
+	public HistogramMetric(Sample sample) {
+		this.sample = sample;
 		clear();
 	}
 

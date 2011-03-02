@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import com.yammer.metrics.core.HistogramMetric.SampleType;
+
 /**
  * A timer metric which aggregates timing durations and provides duration
  * statistics, plus throughput statistics via {@link MeterMetric}.
@@ -14,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class TimerMetric implements Metric {
 	private final TimeUnit durationUnit, rateUnit;
 	private final MeterMetric meter;
-	private final HistogramMetric histogram = new HistogramMetric();
+	private final HistogramMetric histogram = new HistogramMetric(SampleType.BIASED);
 
 	/**
 	 * Creates a new {@link TimerMetric}.

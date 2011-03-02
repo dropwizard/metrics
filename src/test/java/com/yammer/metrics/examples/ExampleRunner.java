@@ -13,7 +13,7 @@ public class ExampleRunner {
 	private static final BlockingQueue<File> JOBS = new LinkedBlockingQueue<File>();
 	private static final ExecutorService POOL = Executors.newFixedThreadPool(WORKER_COUNT);
 	private static final CounterMetric QUEUE_DEPTH = Metrics.newCounter(ExampleRunner.class, "queue-depth");
-	private static final HistogramMetric DIRECTORY_SIZE = Metrics.newHistogram(ExampleRunner.class, "directory-size");
+	private static final HistogramMetric DIRECTORY_SIZE = Metrics.newHistogram(ExampleRunner.class, "directory-size", false);
 
 	public static class Job implements Runnable {
 		@Override

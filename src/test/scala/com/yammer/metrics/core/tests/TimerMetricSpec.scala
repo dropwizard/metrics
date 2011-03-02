@@ -105,7 +105,7 @@ object TimerMetricSpec extends Spec {
     }
 
     def `should have a series of values` {
-      timer.values.toList must beEqualTo(Seq(10, 20, 20, 30, 40))
+      timer.values.toSet must beEqualTo(Set(10, 20, 20, 30, 40))
     }
   }
 
