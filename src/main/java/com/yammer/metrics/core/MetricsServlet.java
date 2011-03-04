@@ -3,6 +3,7 @@ package com.yammer.metrics.core;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -22,6 +23,22 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 public class MetricsServlet extends HttpServlet {
+	private static final String TEMPLATE = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n" +
+										   "        \"http://www.w3.org/TR/html4/loose.dtd\">\n" +
+										   "<html>\n" +
+										   "<head>\n" +
+										   "  <title>Metrics</title>\n" +
+										   "</head>\n" +
+										   "<body>\n" +
+										   "  <h1>Operational Menu</h1>\n" +
+										   "  <ul>\n" +
+										   "    <li><a href=\"{0}\">Metrics</a></li>\n" +
+										   "    <li><a href=\"{1}\">Ping</a></li>\n" +
+										   "    <li><a href=\"{2}\">Threads</a></li>\n" +
+										   "    <li><a href=\"{3}\">Healthcheck</a></li>\n" +
+										   "  </ul>\n" +
+										   "</body>\n" +
+										   "</html>";
 	private JsonFactory factory;
 	private String metricsUri, pingUri, threadsUri, healthcheckUri;
 
@@ -79,7 +96,9 @@ public class MetricsServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		final String uri = req.getPathInfo();
-		if (uri.startsWith(metricsUri)) {
+		if (uri.equals("/")) {
+			handleHome(resp);
+		} else if (uri.startsWith(metricsUri)) {
 			handleMetrics(req.getParameter("class"), Boolean.parseBoolean(req.getParameter("full-samples")), resp);
 		} else if (uri.equals(pingUri)) {
 			handlePing(resp);
@@ -90,6 +109,15 @@ public class MetricsServlet extends HttpServlet {
 		} else {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
+	}
+
+	private void handleHome(HttpServletResponse resp) throws IOException {
+		resp.setStatus(HttpServletResponse.SC_OK);
+		resp.setContentType("text/html");
+
+		final PrintWriter writer = resp.getWriter();
+		writer.println(MessageFormat.format(TEMPLATE, metricsUri, pingUri, threadsUri, healthcheckUri));
+		writer.close();
 	}
 
 	private void handleHealthCheck(HttpServletResponse resp) throws IOException {
