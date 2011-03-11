@@ -2,7 +2,7 @@ package com.yammer.metrics.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static java.lang.Math.*;
@@ -19,52 +19,7 @@ import static java.lang.Math.*;
  * Data Engineering (2009)</a>
  */
 public class ExponentiallyDecayingSample implements Sample {
-	static class Value implements Comparable<Value> {
-		public final double priority;
-		public final long value, id;
-
-		Value(long id, long value, double priority) {
-			this.id = id;
-			this.value = value;
-			this.priority = priority;
-		}
-
-		// the lowest value has the highest priority
-		@Override
-		public int compareTo(Value o) {
-			if (o.priority > priority) {
-				return -1;
-			} else if (o.priority < priority) {
-				return 1;
-			}
-			return 0;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) { return true; }
-			if (o == null || getClass() != o.getClass()) { return false; }
-
-			final Value value1 = (Value) o;
-
-			return id == value1.id &&
-					Double.compare(value1.priority, priority) == 0 &&
-					value == value1.value;
-		}
-
-		@Override
-		public int hashCode() {
-			int result;
-			long temp;
-			temp = priority != +0.0d ? Double.doubleToLongBits(priority) : 0L;
-			result = (int) (temp ^ (temp >>> 32));
-			result = 31 * result + (int) (value ^ (value >>> 32));
-			result = 31 * result + (int) (id ^ (id >>> 32));
-			return result;
-		}
-	}
-
-	private final PriorityBlockingQueue<Value> values;
+	private final ConcurrentSkipListMap<Double, Long> values;
 	private final double alpha;
 	private final int reservoirSize;
 	private final AtomicLong count = new AtomicLong();
@@ -79,7 +34,7 @@ public class ExponentiallyDecayingSample implements Sample {
 	 *              biased the sample will be towards newer values
 	 */
 	public ExponentiallyDecayingSample(int reservoirSize, double alpha) {
-		this.values = new PriorityBlockingQueue<Value>(reservoirSize);
+		this.values = new ConcurrentSkipListMap<Double, Long>();
 		this.alpha = alpha;
 		this.reservoirSize = reservoirSize;
 		clear();
@@ -114,24 +69,19 @@ public class ExponentiallyDecayingSample implements Sample {
 		final long newCount = count.incrementAndGet();
 
 		if (newCount <= reservoirSize) {
-			values.put(new Value(newCount, value, priority));
+			values.put(priority, value);
 		} else {
-			if (values.peek().priority < priority) {
-				values.add(new Value(newCount, value, priority));
-				try {
-					values.take();// this may remove the just-added value; that's OK
-				} catch (InterruptedException ignored) {}
+			final Double first = values.firstKey();
+			if (first < priority) {
+				values.put(priority, value);
+				values.remove(first);
 			}
 		}
 	}
 
 	@Override
 	public List<Long> values() {
-		final List<Long> v = new ArrayList<Long>(size());
-		for (Value value : values) {
-			v.add(value.value);
-		}
-		return v;
+		return new ArrayList<Long>(values.values());
 	}
 
 	private long tick() { return System.currentTimeMillis() / 1000; }
