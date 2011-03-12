@@ -71,10 +71,14 @@ public class ExponentiallyDecayingSample implements Sample {
 		if (newCount <= reservoirSize) {
 			values.put(priority, value);
 		} else {
-			final Double first = values.firstKey();
+			Double first = values.firstKey();
 			if (first < priority) {
 				values.put(priority, value);
-				values.remove(first);
+
+				// ensure we always remove an item
+				while (values.remove(first) == null) {
+					first = values.firstKey();
+				}
 			}
 		}
 	}
