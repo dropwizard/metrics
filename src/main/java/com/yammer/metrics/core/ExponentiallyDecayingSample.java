@@ -64,8 +64,7 @@ public class ExponentiallyDecayingSample implements Sample {
 	 * @param timestamp the epoch timestamp of {@code value} in milliseconds
 	 */
 	public void update(long value, long timestamp) {
-		final double random = random();
-		final double priority = weight(timestamp - startTime) / random;
+		final double priority = weight(timestamp - startTime) / random();
 		final long newCount = count.incrementAndGet();
 
 		if (newCount <= reservoirSize) {
