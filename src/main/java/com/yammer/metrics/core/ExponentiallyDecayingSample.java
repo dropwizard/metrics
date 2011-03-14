@@ -37,7 +37,6 @@ public class ExponentiallyDecayingSample implements Sample {
 	 *                      reservoir
 	 * @param alpha the exponential decay factor; the higher this is, the more
 	 *              biased the sample will be towards newer values
-	 * @return a new sample
 	 */
 	public ExponentiallyDecayingSample(int reservoirSize, double alpha) {
 		this.values = new ConcurrentSkipListMap<Double, Long>();
