@@ -385,6 +385,12 @@ public class JmxReporter implements Runnable {
 
 	public void start() {
 		this.future = TICK_THREAD.scheduleAtFixedRate(this, 0, 1, TimeUnit.MINUTES);
+		// then schedule the tick thread every 100ms for the next second so
+		// as to pick up the initialization of most metrics (in the first 1s of
+		// the application lifecycle) w/o incurring a high penalty later on
+		for (int i = 1; i <= 900; i++) {
+			TICK_THREAD.schedule(this, i * 100, TimeUnit.MILLISECONDS);
+		}
 	}
 
 	public void stop() {

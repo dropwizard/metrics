@@ -45,7 +45,9 @@ class MetricsGroup(val klass: Class[_]) {
    *                  measuring (e.g., {@code "requests"})
    * @param unit the time unit of the meter
    */
-  def meter(name: String, eventType: String, unit: TimeUnit) =
+  def meter(name: String,
+            eventType: String,
+            unit: TimeUnit = TimeUnit.SECONDS) =
     new Meter(Metrics.newMeter(klass, name, eventType, unit))
 
   /**
@@ -55,6 +57,8 @@ class MetricsGroup(val klass: Class[_]) {
    * @param durationUnit the time unit for measuring duration
    * @param rateUnit the time unit for measuring rate
    */
-  def timer(name: String, durationUnit: TimeUnit, rateUnit: TimeUnit) =
+  def timer(name: String,
+            durationUnit: TimeUnit = TimeUnit.MILLISECONDS,
+            rateUnit: TimeUnit = TimeUnit.SECONDS) =
     new Timer(Metrics.newTimer(klass, name, durationUnit, rateUnit))
 }
