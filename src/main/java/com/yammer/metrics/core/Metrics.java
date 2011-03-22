@@ -148,6 +148,16 @@ public class Metrics {
 	}
 
 	/**
+	 * Returns {@code true} if any {@link HealthCheck}s have been registered,
+	 * {@code false} otherwise.
+	 *
+	 * @return if any {@link HealthCheck}s have been registered
+	 */
+	public static boolean hasHealthChecks() {
+		return !HEALTH_CHECKS.isEmpty();
+	}
+
+	/**
 	 * Returns an unmodifiable map of all metrics and their names.
 	 *
 	 * @return an unmodifiable map of all metrics and their names
