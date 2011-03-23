@@ -190,7 +190,7 @@ public class MetricsServlet extends HttpServlet {
 
 	private void handleMetrics(String classPrefix, boolean showFullSamples, HttpServletResponse resp) throws IOException {
 		resp.setStatus(HttpServletResponse.SC_OK);
-		resp.setContentType("text/plain");
+		resp.setContentType("application/json");
 		final OutputStream output = resp.getOutputStream();
 		final JsonGenerator json = factory.createJsonGenerator(output, JsonEncoding.UTF8);
 		json.writeStartObject();
