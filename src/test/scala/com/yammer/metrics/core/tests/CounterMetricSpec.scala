@@ -34,6 +34,13 @@ object CounterMetricSpec extends Spec {
 
       counter.count must beEqualTo(-3)
     }
+
+    def `should be zero after being cleared` {
+      counter.inc(3)
+      counter.clear()
+
+      counter.count must beEqualTo(0)
+    }
   }
 
 }
