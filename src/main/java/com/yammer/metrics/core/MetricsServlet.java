@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -122,26 +121,20 @@ public class MetricsServlet extends HttpServlet {
 
 	private void handleHealthCheck(HttpServletResponse resp) throws IOException {
 		boolean allHealthy = true;
-		final Map<String, Result> results = new TreeMap<String, Result>();
-		for (Entry<String, HealthCheck> entry : Metrics.HEALTH_CHECKS.entrySet()) {
-			final Result result = entry.getValue().execute();
+		final Map<String, Result> results = HealthChecks.runHealthChecks();
+		for (Result result : results.values()) {
 			allHealthy &= result.isHealthy();
-			results.put(entry.getKey(), result);
 		}
 
-		PrintWriter writer;
 		if (allHealthy) {
 			resp.setStatus(HttpServletResponse.SC_OK);
-			resp.setContentType("text/plain");
-			writer = resp.getWriter();
-
-
 		} else {
 			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			resp.setContentType("text/plain");
-			writer = resp.getWriter();
 		}
 
+		resp.setContentType("text/plain");
+
+		final PrintWriter writer = resp.getWriter();
 		for (Entry<String, Result> entry : results.entrySet()) {
 			final Result result = entry.getValue();
 			if (result.isHealthy()) {

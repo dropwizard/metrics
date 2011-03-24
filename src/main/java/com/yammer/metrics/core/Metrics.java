@@ -15,7 +15,6 @@ import com.yammer.metrics.core.HistogramMetric.SampleType;
  */
 public class Metrics {
 	private static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
-	/*package*/ static final ConcurrentMap<String, HealthCheck> HEALTH_CHECKS = new ConcurrentHashMap<String, HealthCheck>();
 	private static final JmxReporter JMX_REPORTER = new JmxReporter();
 	static {{
 		JMX_REPORTER.start();
@@ -135,26 +134,6 @@ public class Metrics {
 	public static void enableConsoleReporting(long period, TimeUnit unit) {
 		final ConsoleReporter reporter = new ConsoleReporter(System.out);
 		reporter.start(period, unit);
-	}
-
-	/**
-	 * Registers an application {@link HealthCheck} with a given name.
-	 *
-	 * @param name the name of the healthcheck (usually the name of the dependency)
-	 * @param healthCheck the {@link HealthCheck} instance
-	 */
-	public static void registerHealthCheck(String name, HealthCheck healthCheck) {
-		HEALTH_CHECKS.putIfAbsent(name, healthCheck);
-	}
-
-	/**
-	 * Returns {@code true} if any {@link HealthCheck}s have been registered,
-	 * {@code false} otherwise.
-	 *
-	 * @return if any {@link HealthCheck}s have been registered
-	 */
-	public static boolean hasHealthChecks() {
-		return !HEALTH_CHECKS.isEmpty();
 	}
 
 	/**
