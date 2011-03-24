@@ -104,12 +104,12 @@ public class JmxReporter implements Runnable {
 
 		@Override
 		public String getEventType() {
-			return metric.getEventType();
+			return metric.eventType();
 		}
 
 		@Override
 		public TimeUnit getUnit() {
-			return metric.getScaleUnit();
+			return metric.scaleUnit();
 		}
 
 		@Override
@@ -298,7 +298,7 @@ public class JmxReporter implements Runnable {
 
 		@Override
 		public TimeUnit getRateUnit() {
-			return metric.getRateUnit();
+			return metric.rateUnit();
 		}
 
 		@Override
@@ -323,7 +323,7 @@ public class JmxReporter implements Runnable {
 
 		@Override
 		public TimeUnit getLatencyUnit() {
-			return metric.getDurationUnit();
+			return metric.durationUnit();
 		}
 
 		@Override

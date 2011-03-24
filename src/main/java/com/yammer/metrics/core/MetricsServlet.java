@@ -346,8 +346,8 @@ public class MetricsServlet extends HttpServlet {
 		json.writeStartObject();
 		{
 			json.writeStringField("type", "meter");
-			json.writeStringField("event_type", meter.getEventType());
-			json.writeStringField("unit", meter.getScaleUnit().toString().toLowerCase());
+			json.writeStringField("event_type", meter.eventType());
+			json.writeStringField("unit", meter.scaleUnit().toString().toLowerCase());
 			json.writeNumberField("count", meter.count());
 			json.writeNumberField("mean", meter.meanRate());
 			json.writeNumberField("m1", meter.oneMinuteRate());
@@ -364,7 +364,7 @@ public class MetricsServlet extends HttpServlet {
 			json.writeFieldName("duration");
 			json.writeStartObject();
 			{
-				json.writeStringField("unit", timer.getDurationUnit().toString().toLowerCase());
+				json.writeStringField("unit", timer.durationUnit().toString().toLowerCase());
 				json.writeNumberField("min", timer.min());
 				json.writeNumberField("max", timer.max());
 				json.writeNumberField("mean", timer.mean());
@@ -387,7 +387,7 @@ public class MetricsServlet extends HttpServlet {
 			json.writeFieldName("rate");
 			json.writeStartObject();
 			{
-				json.writeStringField("unit", timer.getRateUnit().toString().toLowerCase());
+				json.writeStringField("unit", timer.rateUnit().toString().toLowerCase());
 				json.writeNumberField("count", timer.count());
 				json.writeNumberField("mean", timer.meanRate());
 				json.writeNumberField("m1", timer.oneMinuteRate());

@@ -36,7 +36,7 @@ public class TimerMetric implements Metric {
 	 *
 	 * @return the timer's duration scale unit
 	 */
-	public TimeUnit getDurationUnit() {
+	public TimeUnit durationUnit() {
 		return durationUnit;
 	}
 
@@ -45,7 +45,7 @@ public class TimerMetric implements Metric {
 	 *
 	 * @return the timer's rate scale unit
 	 */
-	public TimeUnit getRateUnit() {
+	public TimeUnit rateUnit() {
 		return rateUnit;
 	}
 
@@ -171,8 +171,8 @@ public class TimerMetric implements Metric {
 	 *
 	 * @return the timer's event type
 	 */
-	public String getEventType() {
-		return meter.getEventType();
+	public String eventType() {
+		return meter.eventType();
 	}
 
 	/**

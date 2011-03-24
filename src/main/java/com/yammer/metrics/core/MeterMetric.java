@@ -78,7 +78,7 @@ public class MeterMetric implements Metric {
 	 *
 	 * @return the meter's scale unit
 	 */
-	public TimeUnit getScaleUnit() {
+	public TimeUnit scaleUnit() {
 		return scaleUnit;
 	}
 
@@ -87,7 +87,7 @@ public class MeterMetric implements Metric {
 	 *
 	 * @return the meter's event type
 	 */
-	public String getEventType() {
+	public String eventType() {
 		return eventType;
 	}
 

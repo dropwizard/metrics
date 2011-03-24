@@ -110,12 +110,12 @@ public class ConsoleReporter implements Runnable {
 	}
 
 	private void printMeter(MeterMetric meter) {
-		final String unit = abbrev(meter.getScaleUnit());
+		final String unit = abbrev(meter.scaleUnit());
 		out.printf("             count = %d\n", meter.count());
-		out.printf("         mean rate = %2.2f %s/%s\n", meter.meanRate(), meter.getEventType(), unit);
-		out.printf("     1-minute rate = %2.2f %s/%s\n", meter.oneMinuteRate(), meter.getEventType(), unit);
-		out.printf("     5-minute rate = %2.2f %s/%s\n", meter.fiveMinuteRate(), meter.getEventType(), unit);
-		out.printf("    15-minute rate = %2.2f %s/%s\n", meter.fifteenMinuteRate(), meter.getEventType(), unit);
+		out.printf("         mean rate = %2.2f %s/%s\n", meter.meanRate(), meter.eventType(), unit);
+		out.printf("     1-minute rate = %2.2f %s/%s\n", meter.oneMinuteRate(), meter.eventType(), unit);
+		out.printf("     5-minute rate = %2.2f %s/%s\n", meter.fiveMinuteRate(), meter.eventType(), unit);
+		out.printf("    15-minute rate = %2.2f %s/%s\n", meter.fifteenMinuteRate(), meter.eventType(), unit);
 	}
 
 	private void printHistogram(HistogramMetric histogram) {
@@ -133,14 +133,14 @@ public class ConsoleReporter implements Runnable {
 	}
 
 	private void printTimer(TimerMetric timer) {
-		final String rateUnit = abbrev(timer.getRateUnit());
-		final String durationUnit = abbrev(timer.getDurationUnit());
+		final String rateUnit = abbrev(timer.rateUnit());
+		final String durationUnit = abbrev(timer.durationUnit());
 
 		out.printf("             count = %d\n", timer.count());
-		out.printf("         mean rate = %2.2f %s/%s\n", timer.meanRate(), timer.getEventType(), rateUnit);
-		out.printf("     1-minute rate = %2.2f %s/%s\n", timer.oneMinuteRate(), timer.getEventType(), rateUnit);
-		out.printf("     5-minute rate = %2.2f %s/%s\n", timer.fiveMinuteRate(), timer.getEventType(), rateUnit);
-		out.printf("    15-minute rate = %2.2f %s/%s\n", timer.fifteenMinuteRate(), timer.getEventType(), rateUnit);
+		out.printf("         mean rate = %2.2f %s/%s\n", timer.meanRate(), timer.eventType(), rateUnit);
+		out.printf("     1-minute rate = %2.2f %s/%s\n", timer.oneMinuteRate(), timer.eventType(), rateUnit);
+		out.printf("     5-minute rate = %2.2f %s/%s\n", timer.fiveMinuteRate(), timer.eventType(), rateUnit);
+		out.printf("    15-minute rate = %2.2f %s/%s\n", timer.fifteenMinuteRate(), timer.eventType(), rateUnit);
 
 		final double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
 		out.printf("               min = %2.2f%s\n", timer.min(), durationUnit);
