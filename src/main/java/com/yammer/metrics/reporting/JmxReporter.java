@@ -26,22 +26,29 @@ public class JmxReporter implements Runnable {
 		public ObjectName objectName();
 	}
 
-	public static interface GaugeMBean extends MetricMBean {
-		public Object getValue();
-	}
-
-	public static class Gauge implements GaugeMBean {
+	public static abstract class AbstractBean implements MetricMBean {
 		private final ObjectName objectName;
-		private final GaugeMetric<?> metric;
 
-		public Gauge(GaugeMetric<?> metric, ObjectName objectName) {
-			this.metric = metric;
+		protected AbstractBean(ObjectName objectName) {
 			this.objectName = objectName;
 		}
 
 		@Override
 		public ObjectName objectName() {
 			return objectName;
+		}
+	}
+
+	public static interface GaugeMBean extends MetricMBean {
+		public Object getValue();
+	}
+
+	public static class Gauge extends AbstractBean implements GaugeMBean {
+		private final GaugeMetric<?> metric;
+
+		public Gauge(GaugeMetric<?> metric, ObjectName objectName) {
+			super(objectName);
+			this.metric = metric;
 		}
 
 		@Override
@@ -54,18 +61,12 @@ public class JmxReporter implements Runnable {
 		public long getCount();
 	}
 
-	public static class Counter implements CounterMBean {
-		private final ObjectName objectName;
+	public static class Counter extends AbstractBean implements CounterMBean {
 		private final CounterMetric metric;
 
 		public Counter(CounterMetric metric, ObjectName objectName) {
+			super(objectName);
 			this.metric = metric;
-			this.objectName = objectName;
-		}
-
-		@Override
-		public ObjectName objectName() {
-			return objectName;
 		}
 
 		@Override
@@ -77,25 +78,19 @@ public class JmxReporter implements Runnable {
 	public static interface MeterMBean extends MetricMBean {
 		public long getCount();
 		public String getEventType();
-		public TimeUnit getUnit();
+		public TimeUnit getRateUnit();
 		public double getMeanRate();
 		public double getOneMinuteRate();
 		public double getFiveMinuteRate();
 		public double getFifteenMinuteRate();
 	}
 
-	public static class Meter implements MeterMBean {
-		private final ObjectName objectName;
-		private final MeterMetric metric;
+	public static class Meter extends AbstractBean implements MeterMBean {
+		private final Metered metric;
 
-		public Meter(MeterMetric metric, ObjectName objectName) {
+		public Meter(Metered metric, ObjectName objectName) {
+			super(objectName);
 			this.metric = metric;
-			this.objectName = objectName;
-		}
-
-		@Override
-		public ObjectName objectName() {
-			return objectName;
 		}
 
 		@Override
@@ -109,7 +104,7 @@ public class JmxReporter implements Runnable {
 		}
 
 		@Override
-		public TimeUnit getUnit() {
+		public TimeUnit getRateUnit() {
 			return metric.rateUnit();
 		}
 
@@ -136,28 +131,17 @@ public class JmxReporter implements Runnable {
 
 	public static interface HistogramMBean extends MetricMBean {
 		public long getCount();
-
 		public double getMin();
-
 		public double getMax();
-
 		public double getMean();
-
 		public double getStdDev();
-
 		public double get50thPercentile();
-
 		public double get75thPercentile();
-
 		public double get95thPercentile();
-
 		public double get98thPercentile();
-
 		public double get99thPercentile();
-
 		public double get999thPercentile();
-
-		public List<Long> values();
+		public List<?> values();
 	}
 
 	public class Histogram implements HistogramMBean {
@@ -230,96 +214,26 @@ public class JmxReporter implements Runnable {
 		}
 
 		@Override
-		public List<Long> values() {
+		public List<?> values() {
 			return metric.values();
 		}
 	}
 
-	public static interface TimerMBean extends MetricMBean {
-		public long getCount();
-
-		public TimeUnit getRateUnit();
-
-		public double getMeanRate();
-
-		public double getOneMinuteRate();
-
-		public double getFiveMinuteRate();
-
-		public double getFifteenMinuteRate();
-
+	public static interface TimerMBean extends MeterMBean, HistogramMBean {
 		public TimeUnit getLatencyUnit();
-
-		public double getMin();
-
-		public double getMax();
-
-		public double getMean();
-
-		public double getStdDev();
-
-		public double get50thPercentile();
-
-		public double get75thPercentile();
-
-		public double get95thPercentile();
-
-		public double get98thPercentile();
-
-		public double get99thPercentile();
-
-		public double get999thPercentile();
-
-		public List<Double> values();
 	}
 
-	public class Timer implements TimerMBean {
-		private final ObjectName objectName;
+	public class Timer extends Meter implements TimerMBean {
 		private final TimerMetric metric;
 
 		public Timer(TimerMetric metric, ObjectName objectName) {
+			super(metric, objectName);
 			this.metric = metric;
-			this.objectName = objectName;
-		}
-
-		@Override
-		public ObjectName objectName() {
-			return objectName;
 		}
 
 		@Override
 		public double get50thPercentile() {
 			return metric.percentiles(0.5)[0];
-		}
-
-		@Override
-		public long getCount() {
-			return metric.count();
-		}
-
-		@Override
-		public TimeUnit getRateUnit() {
-			return metric.rateUnit();
-		}
-
-		@Override
-		public double getMeanRate() {
-			return metric.meanRate();
-		}
-
-		@Override
-		public double getOneMinuteRate() {
-			return metric.oneMinuteRate();
-		}
-
-		@Override
-		public double getFiveMinuteRate() {
-			return metric.fiveMinuteRate();
-		}
-
-		@Override
-		public double getFifteenMinuteRate() {
-			return metric.fifteenMinuteRate();
 		}
 
 		@Override
@@ -373,7 +287,7 @@ public class JmxReporter implements Runnable {
 		}
 
 		@Override
-		public List<Double> values() {
+		public List<?> values() {
 			return metric.values();
 		}
 	}

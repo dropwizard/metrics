@@ -74,7 +74,7 @@ public class ConsoleReporter implements Runnable {
 					} else if (metric instanceof HistogramMetric) {
 						printHistogram((HistogramMetric) metric);
 					} else if (metric instanceof MeterMetric) {
-						printMeter((MeterMetric) metric);
+						printMetered((MeterMetric) metric);
 					} else if (metric instanceof TimerMetric) {
 						printTimer((TimerMetric) metric);
 					}
@@ -99,7 +99,7 @@ public class ConsoleReporter implements Runnable {
 		out.println(counter.count());
 	}
 
-	private void printMeter(MeterMetric meter) {
+	private void printMetered(Metered meter) {
 		final String unit = abbrev(meter.rateUnit());
 		out.printf("             count = %d\n", meter.count());
 		out.printf("         mean rate = %2.2f %s/%s\n", meter.meanRate(), meter.eventType(), unit);
@@ -123,14 +123,9 @@ public class ConsoleReporter implements Runnable {
 	}
 
 	private void printTimer(TimerMetric timer) {
-		final String rateUnit = abbrev(timer.rateUnit());
-		final String durationUnit = abbrev(timer.durationUnit());
+		printMetered(timer);
 
-		out.printf("             count = %d\n", timer.count());
-		out.printf("         mean rate = %2.2f %s/%s\n", timer.meanRate(), timer.eventType(), rateUnit);
-		out.printf("     1-minute rate = %2.2f %s/%s\n", timer.oneMinuteRate(), timer.eventType(), rateUnit);
-		out.printf("     5-minute rate = %2.2f %s/%s\n", timer.fiveMinuteRate(), timer.eventType(), rateUnit);
-		out.printf("    15-minute rate = %2.2f %s/%s\n", timer.fifteenMinuteRate(), timer.eventType(), rateUnit);
+		final String durationUnit = abbrev(timer.durationUnit());
 
 		final double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
 		out.printf("               min = %2.2f%s\n", timer.min(), durationUnit);
