@@ -25,9 +25,9 @@ class Meter(metric: MeterMetric) {
   }
 
   /**
-   * Returns the meter's scale unit.
+   * Returns the meter's rate unit.
    */
-  def scaleUnit = metric.scaleUnit
+  def rateUnit = metric.rateUnit
 
   /**
    * Returns the type of events the meter is measuring.

@@ -344,7 +344,7 @@ public class MetricsServlet extends HttpServlet {
 		{
 			json.writeStringField("type", "meter");
 			json.writeStringField("event_type", meter.eventType());
-			json.writeStringField("unit", meter.scaleUnit().toString().toLowerCase());
+			json.writeStringField("unit", meter.rateUnit().toString().toLowerCase());
 			json.writeNumberField("count", meter.count());
 			json.writeNumberField("mean", meter.meanRate());
 			json.writeNumberField("m1", meter.oneMinuteRate());

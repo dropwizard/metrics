@@ -13,7 +13,7 @@ import com.yammer.metrics.core.HistogramMetric.SampleType;
  *
  * @author coda
  */
-public class TimerMetric implements Metric {
+public class TimerMetric implements Metered {
 	private final TimeUnit durationUnit, rateUnit;
 	private final MeterMetric meter;
 	private final HistogramMetric histogram = new HistogramMetric(SampleType.BIASED);
@@ -40,11 +40,7 @@ public class TimerMetric implements Metric {
 		return durationUnit;
 	}
 
-	/**
-	 * Returns the timer's rate scale unit.
-	 *
-	 * @return the timer's rate scale unit
-	 */
+	@Override
 	public TimeUnit rateUnit() {
 		return rateUnit;
 	}
@@ -84,43 +80,19 @@ public class TimerMetric implements Metric {
 		}
 	}
 
-	/**
-	 * Returns the number of durations recorded.
-	 *
-	 * @return the number of durations recorded
-	 */
+	@Override
 	public long count() { return histogram.count(); }
 
-	/**
-	 * Returns the fifteen-minute rate of timings.
-	 *
-	 * @return the fifteen-minute rate of timings
-	 * @see MeterMetric#fifteenMinuteRate()
-	 */
+	@Override
 	public double fifteenMinuteRate() { return meter.fifteenMinuteRate(); }
 
-	/**
-	 * Returns the five-minute rate of timings.
-	 *
-	 * @return the five-minute rate of timings
-	 * @see MeterMetric#fiveMinuteRate()
-	 */
+	@Override
 	public double fiveMinuteRate() { return meter.fiveMinuteRate(); }
 
-	/**
-	 * Returns the mean rate of timings.
-	 *
-	 * @return the mean rate of timings
-	 * @see MeterMetric#meanRate()
-	 */
+	@Override
 	public double meanRate() { return meter.meanRate(); }
 
-	/**
-	 * Returns the one-minute rate of timings.
-	 *
-	 * @return the one-minute rate of timings
-	 * @see MeterMetric#oneMinuteRate()
-	 */
+	@Override
 	public double oneMinuteRate() { return meter.oneMinuteRate(); }
 
 	/**
@@ -166,11 +138,7 @@ public class TimerMetric implements Metric {
 		return scores;
 	}
 
-	/**
-	 * Returns the type of events the timer is measuring ({@code "calls"}).
-	 *
-	 * @return the timer's event type
-	 */
+	@Override
 	public String eventType() {
 		return meter.eventType();
 	}

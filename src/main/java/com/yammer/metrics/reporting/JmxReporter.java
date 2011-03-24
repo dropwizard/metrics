@@ -110,7 +110,7 @@ public class JmxReporter implements Runnable {
 
 		@Override
 		public TimeUnit getUnit() {
-			return metric.scaleUnit();
+			return metric.rateUnit();
 		}
 
 		@Override

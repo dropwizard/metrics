@@ -100,7 +100,7 @@ public class ConsoleReporter implements Runnable {
 	}
 
 	private void printMeter(MeterMetric meter) {
-		final String unit = abbrev(meter.scaleUnit());
+		final String unit = abbrev(meter.rateUnit());
 		out.printf("             count = %d\n", meter.count());
 		out.printf("         mean rate = %2.2f %s/%s\n", meter.meanRate(), meter.eventType(), unit);
 		out.printf("     1-minute rate = %2.2f %s/%s\n", meter.oneMinuteRate(), meter.eventType(), unit);
