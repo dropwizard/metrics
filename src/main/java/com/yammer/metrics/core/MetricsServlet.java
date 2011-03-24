@@ -206,7 +206,7 @@ public class MetricsServlet extends HttpServlet {
 	}
 
 	private void writeRegularMetrics(JsonGenerator json, String classPrefix, boolean showFullSamples) throws IOException {
-		for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(Metrics.METRICS).entrySet()) {
+		for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(Metrics.allMetrics()).entrySet()) {
 			if (classPrefix == null || entry.getKey().startsWith(classPrefix)) {
 				json.writeFieldName(entry.getKey());
 				json.writeStartObject();

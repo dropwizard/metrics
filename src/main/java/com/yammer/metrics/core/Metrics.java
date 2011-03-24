@@ -14,9 +14,9 @@ import com.yammer.metrics.core.HistogramMetric.SampleType;
  * @author coda
  */
 public class Metrics {
-	/*package*/ static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
+	private static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
 	/*package*/ static final ConcurrentMap<String, HealthCheck> HEALTH_CHECKS = new ConcurrentHashMap<String, HealthCheck>();
-	private static final JmxReporter JMX_REPORTER = new JmxReporter(METRICS);
+	private static final JmxReporter JMX_REPORTER = new JmxReporter();
 	static {{
 		JMX_REPORTER.start();
 	}}
@@ -133,7 +133,7 @@ public class Metrics {
 	 * @param unit the time unit of {@code period}
 	 */
 	public static void enableConsoleReporting(long period, TimeUnit unit) {
-		final ConsoleReporter reporter = new ConsoleReporter(METRICS, System.out);
+		final ConsoleReporter reporter = new ConsoleReporter(System.out);
 		reporter.start(period, unit);
 	}
 

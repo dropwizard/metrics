@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -21,17 +20,13 @@ public class ConsoleReporter implements Runnable {
 	private static final ScheduledExecutorService TICK_THREAD =
 			Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("metrics-console-reporter"));
 	private final PrintStream out;
-	private final Map<MetricName,Metric> metrics;
-	private ScheduledFuture<?> future;
 
 	/**
 	 * Creates a new {@link ConsoleReporter}.
 	 *
-	 * @param metrics a map of {@link MetricName}s to {@link Metric}s
-	 * @param out the {@link PrintStream} to which output will be written
+	 * @param out the {@link java.io.PrintStream} to which output will be written
 	 */
-	/*package*/ ConsoleReporter(Map<MetricName, Metric> metrics, PrintStream out) {
-		this.metrics = metrics;
+	public ConsoleReporter(PrintStream out) {
 		this.out = out;
 	}
 
@@ -42,17 +37,7 @@ public class ConsoleReporter implements Runnable {
 	 * @param unit the time unit of {@code period}
 	 */
 	public void start(long period, TimeUnit unit) {
-		this.future = TICK_THREAD.scheduleAtFixedRate(this, period, period, unit);
-	}
-
-	/**
-	 * Stops printing to the console.
-	 */
-	public void stop() {
-		if (future != null) {
-			future.cancel(true);
-			future = null;
-		}
+		TICK_THREAD.scheduleAtFixedRate(this, period, period, unit);
 	}
 
 	@Override
@@ -67,7 +52,7 @@ public class ConsoleReporter implements Runnable {
 			}
 			out.println();
 
-			for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(metrics).entrySet()) {
+			for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(Metrics.allMetrics()).entrySet()) {
 				out.print(entry.getKey());
 				out.println(':');
 
