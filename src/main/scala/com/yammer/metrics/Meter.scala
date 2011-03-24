@@ -23,4 +23,52 @@ class Meter(metric: MeterMetric) {
   def mark(count: Long) {
     metric.mark(count)
   }
+
+  /**
+   * Returns the meter's scale unit.
+   */
+  def scaleUnit = metric.scaleUnit
+
+  /**
+   * Returns the type of events the meter is measuring.
+   */
+  def eventType = metric.eventType
+
+  /**
+   * Returns the number of events which have been marked.
+   */
+  def count = metric.count
+
+  /**
+   * Returns the fifteen-minute exponentially-weighted moving average rate at
+   * which events have occured since the meter was created.
+   * <p>
+   * This rate has the same exponential decay factor as the fifteen-minute load
+   * average in the {@code top} Unix command.
+   */
+  def fifteenMinuteRate = metric.fifteenMinuteRate
+
+  /**
+   * Returns the five-minute exponentially-weighted moving average rate at
+   * which events have occured since the meter was created.
+   * <p>
+   * This rate has the same exponential decay factor as the five-minute load
+   * average in the {@code top} Unix command.
+   */
+  def fiveMinuteRate = metric.fiveMinuteRate
+
+  /**
+   * Returns the mean rate at which events have occured since the meter was
+   * created.
+   */
+  def meanRate = metric.meanRate
+
+  /**
+   * Returns the one-minute exponentially-weighted moving average rate at
+   * which events have occured since the meter was created.
+   * <p>
+   * This rate has the same exponential decay factor as the one-minute load
+   * average in the {@code top} Unix command.
+   */
+  def oneMinuteRate = metric.oneMinuteRate
 }
