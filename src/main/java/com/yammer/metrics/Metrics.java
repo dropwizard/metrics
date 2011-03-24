@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import javax.management.MalformedObjectNameException;
 
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HistogramMetric.SampleType;
@@ -36,6 +37,21 @@ public class Metrics {
 	 */
 	public static <T> GaugeMetric<T> newGauge(Class<?> klass, String name, GaugeMetric<T> metric) {
 		return getOrAdd(new MetricName(klass, name), metric);
+	}
+
+	/**
+	 * Given a JMX MBean's object name and an attribute name, registers a gauge
+	 * for that attribute under the given class ane name.
+	 *
+	 * @param klass the class which owns the metric
+	 * @param name the name of the metric
+	 * @param objectName the object name of the MBean
+	 * @param attribute the name of the bean's attribute
+	 * @return a new {@link JmxGauge}
+	 * @throws MalformedObjectNameException if the object name is malformed
+	 */
+	public static JmxGauge newJmxGauge(Class<?> klass, String name, String objectName, String attribute) throws MalformedObjectNameException {
+		return getOrAdd(new MetricName(klass, name), new JmxGauge(objectName, attribute));
 	}
 
 	/**
