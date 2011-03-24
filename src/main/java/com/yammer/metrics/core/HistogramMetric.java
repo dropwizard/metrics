@@ -122,9 +122,9 @@ public class HistogramMetric implements Metric {
 	public long count() { return count.get(); }
 
 	/**
-	 * Returns the longest recorded value.
+	 * Returns the largest recorded value.
 	 *
-	 * @return the longest recorded value
+	 * @return the largest recorded value
 	 */
 	public double max() {
 		if (count() > 0) {
@@ -134,9 +134,9 @@ public class HistogramMetric implements Metric {
 	}
 
 	/**
-	 * Returns the shortest recorded value.
+	 * Returns the smallest recorded value.
 	 *
-	 * @return the shortest recorded value
+	 * @return the smallest recorded value
 	 */
 	public double min() {
 		if (count() > 0) {
