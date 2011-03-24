@@ -2,7 +2,8 @@ package com.yammer.metrics.core.tests
 
 import scala.collection.JavaConversions._
 import com.codahale.simplespec.Spec
-import com.yammer.metrics.core.{UniformSample, HistogramMetric}
+import com.yammer.metrics.stats.{UniformSample}
+import com.yammer.metrics.core.{HistogramMetric}
 
 object HistogramMetricSpec extends Spec {
   class `A histogram with zero recorded valeus` {

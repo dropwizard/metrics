@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.CounterMetric;
 import com.yammer.metrics.core.MeterMetric;
-import com.yammer.metrics.core.Metrics;
 import com.yammer.metrics.core.TimerMetric;
 
 public class DirectoryLister {

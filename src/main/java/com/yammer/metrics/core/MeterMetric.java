@@ -5,6 +5,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.yammer.metrics.util.NamedThreadFactory;
+
 /**
  * A meter metric which measures mean throughput and one-, five-, and
  * fifteen-minute exponentially-weighted moving average throughputs.

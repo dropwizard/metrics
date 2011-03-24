@@ -9,6 +9,10 @@ import static java.lang.Double.longBitsToDouble;
 import static java.lang.Math.floor;
 import static java.lang.Math.sqrt;
 
+import com.yammer.metrics.stats.ExponentiallyDecayingSample;
+import com.yammer.metrics.stats.Sample;
+import com.yammer.metrics.stats.UniformSample;
+
 /**
  * A metric which calculates the distribution of a value.
  *

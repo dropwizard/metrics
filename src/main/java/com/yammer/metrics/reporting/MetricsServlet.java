@@ -1,4 +1,4 @@
-package com.yammer.metrics.core;
+package com.yammer.metrics.reporting;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,7 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 
+import com.yammer.metrics.HealthChecks;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HealthCheck.Result;
+import com.yammer.metrics.util.Utils;
 import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;

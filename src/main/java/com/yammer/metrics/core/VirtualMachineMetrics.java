@@ -14,6 +14,8 @@ import javax.management.ObjectName;
 
 import static java.lang.management.ManagementFactory.*;
 
+import com.yammer.metrics.util.NamedThreadFactory;
+
 /**
  * A collection of Java Virtual Machine metrics.
  *

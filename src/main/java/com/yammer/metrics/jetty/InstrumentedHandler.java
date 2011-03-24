@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.yammer.metrics.core.CounterMetric;
 import com.yammer.metrics.core.MeterMetric;
-import com.yammer.metrics.core.Metrics;
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.TimerMetric;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationListener;

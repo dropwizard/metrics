@@ -1,4 +1,4 @@
-package com.yammer.metrics.core;
+package com.yammer.metrics;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -6,6 +6,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.core.HealthCheck.Result;
 
 /**

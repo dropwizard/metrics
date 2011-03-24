@@ -1,6 +1,6 @@
 package com.yammer.metrics
 
-import core.{Metrics, GaugeMetric}
+import core.GaugeMetric
 import java.util.concurrent.TimeUnit
 
 /**

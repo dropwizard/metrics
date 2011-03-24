@@ -1,12 +1,15 @@
-package com.yammer.metrics.core;
+package com.yammer.metrics.reporting;
 
 import java.lang.management.ManagementFactory;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import javax.management.*;
+
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.*;
+import com.yammer.metrics.util.NamedThreadFactory;
 
 /**
  * A reporter which exposes application metric as JMX MBeans.
@@ -374,6 +377,8 @@ public class JmxReporter implements Runnable {
 			return metric.values();
 		}
 	}
+
+	public static final JmxReporter INSTANCE = new JmxReporter();
 
 	/*package*/ JmxReporter() {
 		this.beans = new HashMap<MetricName, MetricMBean>(Metrics.allMetrics().size());

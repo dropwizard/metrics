@@ -1,4 +1,4 @@
-package com.yammer.metrics.core;
+package com.yammer.metrics;
 
 import java.util.Collections;
 import java.util.Map;
@@ -6,7 +6,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HistogramMetric.SampleType;
+import com.yammer.metrics.reporting.ConsoleReporter;
+import com.yammer.metrics.reporting.JmxReporter;
 
 /**
  * A set of factory methods for creating centrally registered metric instances.
@@ -15,15 +18,14 @@ import com.yammer.metrics.core.HistogramMetric.SampleType;
  */
 public class Metrics {
 	private static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
-	private static final JmxReporter JMX_REPORTER = new JmxReporter();
 	static {{
-		JMX_REPORTER.start();
+		JmxReporter.INSTANCE.start();
 	}}
 
 	private Metrics() { /* unused */ }
 
 	/**
-	 * Given a new {@link GaugeMetric}, registers it under the given class and
+	 * Given a new {@link com.yammer.metrics.core.GaugeMetric}, registers it under the given class and
 	 * name.
 	 *
 	 * @param klass the class which owns the metric
@@ -37,12 +39,12 @@ public class Metrics {
 	}
 
 	/**
-	 * Creates a new {@link CounterMetric} and registers it under the given
+	 * Creates a new {@link com.yammer.metrics.core.CounterMetric} and registers it under the given
 	 * class and name.
 	 *
 	 * @param klass the class which owns the metric
 	 * @param name the name of the metric
-	 * @return a new {@link CounterMetric}
+	 * @return a new {@link com.yammer.metrics.core.CounterMetric}
 	 */
 	public static CounterMetric newCounter(Class<?> klass, String name) {
 		return getOrAdd(new MetricName(klass, name), new CounterMetric());

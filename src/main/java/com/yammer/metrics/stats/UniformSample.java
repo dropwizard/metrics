@@ -1,4 +1,4 @@
-package com.yammer.metrics.core;
+package com.yammer.metrics.stats;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.yammer.metrics.core;
+package com.yammer.metrics.reporting;
 
 import java.io.PrintStream;
 import java.text.DateFormat;
@@ -9,6 +9,11 @@ import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.*;
+import com.yammer.metrics.util.NamedThreadFactory;
+import com.yammer.metrics.util.Utils;
 
 /**
  * A simple reporters which prints out application metrics to a

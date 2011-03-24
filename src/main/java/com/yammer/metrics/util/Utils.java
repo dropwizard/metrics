@@ -1,13 +1,16 @@
-package com.yammer.metrics.core;
+package com.yammer.metrics.util;
 
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-class Utils {
+import com.yammer.metrics.core.Metric;
+import com.yammer.metrics.core.MetricName;
+
+public class Utils {
 	private Utils() { /* unused */ }
 
-	static Map<String, Map<String, Metric>> sortMetrics(Map<MetricName, Metric> metrics) {
+	public static Map<String, Map<String, Metric>> sortMetrics(Map<MetricName, Metric> metrics) {
 		final Map<String, Map<String, Metric>> sortedMetrics =
 				new TreeMap<String, Map<String, Metric>>();
 		for (Entry<MetricName, Metric> entry : metrics.entrySet()) {

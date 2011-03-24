@@ -1,8 +1,9 @@
 package com.yammer.metrics.experiments
 
-import com.yammer.metrics.Instrumented
-import com.yammer.metrics.core.{Metrics, ExponentiallyDecayingSample}
+import com.yammer.metrics.{Metrics}
+import com.yammer.metrics.stats.{ExponentiallyDecayingSample}
 import java.util.concurrent.{CountDownLatch, TimeUnit, Executors}
+import com.yammer.metrics.{Metrics, Instrumented}
 
 object BiasedSampleBenchmark extends Instrumented {
   val updateTimer = metrics.timer("update", durationUnit = TimeUnit.MICROSECONDS)
