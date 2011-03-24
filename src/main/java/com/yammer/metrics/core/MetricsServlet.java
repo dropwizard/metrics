@@ -96,7 +96,7 @@ public class MetricsServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		final String uri = req.getPathInfo();
-		if (uri.equals("/")) {
+		if (uri == null || uri.equals("/")) {
 			handleHome(resp);
 		} else if (uri.startsWith(metricsUri)) {
 			handleMetrics(req.getParameter("class"), Boolean.parseBoolean(req.getParameter("full-samples")), resp);
