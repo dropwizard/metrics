@@ -1,9 +1,9 @@
 import sbt._
+import maven._
 
-class Metrics(info: ProjectInfo) extends DefaultProject(info)
-                                         with posterous.Publish
-                                         with maven.MavenDependencies
-                                         with IdeaProject {
+class MetricsProject(info: ProjectInfo) extends DefaultProject(info)
+                                                with MavenDependencies
+                                                with IdeaProject {
   /**
    * Publish the source as well as the class files.
    */
