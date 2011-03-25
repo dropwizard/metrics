@@ -4,9 +4,9 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.*;
 
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.CounterMetric;
 import com.yammer.metrics.core.HistogramMetric;
-import com.yammer.metrics.core.Metrics;
 
 public class ExampleRunner {
 	private static final int WORKER_COUNT = 10;

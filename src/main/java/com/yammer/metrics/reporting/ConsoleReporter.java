@@ -1,4 +1,4 @@
-package com.yammer.metrics.core;
+package com.yammer.metrics.reporting;
 
 import java.io.PrintStream;
 import java.text.DateFormat;
@@ -8,8 +8,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.*;
+import com.yammer.metrics.util.NamedThreadFactory;
+import com.yammer.metrics.util.Utils;
 
 /**
  * A simple reporters which prints out application metrics to a
@@ -21,17 +25,13 @@ public class ConsoleReporter implements Runnable {
 	private static final ScheduledExecutorService TICK_THREAD =
 			Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("metrics-console-reporter"));
 	private final PrintStream out;
-	private final Map<MetricName,Metric> metrics;
-	private ScheduledFuture<?> future;
 
 	/**
 	 * Creates a new {@link ConsoleReporter}.
 	 *
-	 * @param metrics a map of {@link MetricName}s to {@link Metric}s
-	 * @param out the {@link PrintStream} to which output will be written
+	 * @param out the {@link java.io.PrintStream} to which output will be written
 	 */
-	/*package*/ ConsoleReporter(Map<MetricName, Metric> metrics, PrintStream out) {
-		this.metrics = metrics;
+	public ConsoleReporter(PrintStream out) {
 		this.out = out;
 	}
 
@@ -42,17 +42,7 @@ public class ConsoleReporter implements Runnable {
 	 * @param unit the time unit of {@code period}
 	 */
 	public void start(long period, TimeUnit unit) {
-		this.future = TICK_THREAD.scheduleAtFixedRate(this, period, period, unit);
-	}
-
-	/**
-	 * Stops printing to the console.
-	 */
-	public void stop() {
-		if (future != null) {
-			future.cancel(true);
-			future = null;
-		}
+		TICK_THREAD.scheduleAtFixedRate(this, period, period, unit);
 	}
 
 	@Override
@@ -67,7 +57,7 @@ public class ConsoleReporter implements Runnable {
 			}
 			out.println();
 
-			for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(metrics).entrySet()) {
+			for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(Metrics.allMetrics()).entrySet()) {
 				out.print(entry.getKey());
 				out.println(':');
 
@@ -84,7 +74,7 @@ public class ConsoleReporter implements Runnable {
 					} else if (metric instanceof HistogramMetric) {
 						printHistogram((HistogramMetric) metric);
 					} else if (metric instanceof MeterMetric) {
-						printMeter((MeterMetric) metric);
+						printMetered((MeterMetric) metric);
 					} else if (metric instanceof TimerMetric) {
 						printTimer((TimerMetric) metric);
 					}
@@ -109,13 +99,13 @@ public class ConsoleReporter implements Runnable {
 		out.println(counter.count());
 	}
 
-	private void printMeter(MeterMetric meter) {
-		final String unit = abbrev(meter.getScaleUnit());
+	private void printMetered(Metered meter) {
+		final String unit = abbrev(meter.rateUnit());
 		out.printf("             count = %d\n", meter.count());
-		out.printf("         mean rate = %2.2f %s/%s\n", meter.meanRate(), meter.getEventType(), unit);
-		out.printf("     1-minute rate = %2.2f %s/%s\n", meter.oneMinuteRate(), meter.getEventType(), unit);
-		out.printf("     5-minute rate = %2.2f %s/%s\n", meter.fiveMinuteRate(), meter.getEventType(), unit);
-		out.printf("    15-minute rate = %2.2f %s/%s\n", meter.fifteenMinuteRate(), meter.getEventType(), unit);
+		out.printf("         mean rate = %2.2f %s/%s\n", meter.meanRate(), meter.eventType(), unit);
+		out.printf("     1-minute rate = %2.2f %s/%s\n", meter.oneMinuteRate(), meter.eventType(), unit);
+		out.printf("     5-minute rate = %2.2f %s/%s\n", meter.fiveMinuteRate(), meter.eventType(), unit);
+		out.printf("    15-minute rate = %2.2f %s/%s\n", meter.fifteenMinuteRate(), meter.eventType(), unit);
 	}
 
 	private void printHistogram(HistogramMetric histogram) {
@@ -133,14 +123,9 @@ public class ConsoleReporter implements Runnable {
 	}
 
 	private void printTimer(TimerMetric timer) {
-		final String rateUnit = abbrev(timer.getRateUnit());
-		final String durationUnit = abbrev(timer.getDurationUnit());
+		printMetered(timer);
 
-		out.printf("             count = %d\n", timer.count());
-		out.printf("         mean rate = %2.2f %s/%s\n", timer.meanRate(), timer.getEventType(), rateUnit);
-		out.printf("     1-minute rate = %2.2f %s/%s\n", timer.oneMinuteRate(), timer.getEventType(), rateUnit);
-		out.printf("     5-minute rate = %2.2f %s/%s\n", timer.fiveMinuteRate(), timer.getEventType(), rateUnit);
-		out.printf("    15-minute rate = %2.2f %s/%s\n", timer.fifteenMinuteRate(), timer.getEventType(), rateUnit);
+		final String durationUnit = abbrev(timer.durationUnit());
 
 		final double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
 		out.printf("               min = %2.2f%s\n", timer.min(), durationUnit);

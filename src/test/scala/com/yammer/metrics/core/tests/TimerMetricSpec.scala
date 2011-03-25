@@ -10,11 +10,11 @@ object TimerMetricSpec extends Spec {
     val timer = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
 
     def `should have a duration unit` {
-      timer.getDurationUnit must be(TimeUnit.MILLISECONDS)
+      timer.durationUnit must be(TimeUnit.MILLISECONDS)
     }
 
     def `should have a rate unit` {
-      timer.getRateUnit must be(TimeUnit.SECONDS)
+      timer.rateUnit must be(TimeUnit.SECONDS)
     }
 
     def `should have a max of zero` {

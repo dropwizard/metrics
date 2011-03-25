@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author coda
  */
 public class CounterMetric implements Metric {
-	private final AtomicLong count = new AtomicLong();
+	private final AtomicLong count = new AtomicLong(0);
 
 	/**
 	 * Increment the counter by one.
@@ -49,5 +49,12 @@ public class CounterMetric implements Metric {
 	 */
 	public long count() {
 		return count.get();
+	}
+
+	/**
+	 * Resets the counter to 0.
+	 */
+	public void clear() {
+		count.set(0);
 	}
 }

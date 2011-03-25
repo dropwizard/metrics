@@ -5,6 +5,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.yammer.metrics.util.NamedThreadFactory;
+
 /**
  * A meter metric which measures mean throughput and one-, five-, and
  * fifteen-minute exponentially-weighted moving average throughputs.
@@ -12,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author coda
  * @see <a href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average">EMA</a>
  */
-public class MeterMetric implements Metric {
+public class MeterMetric implements Metered {
 	private static final ScheduledExecutorService TICK_THREAD =
 			Executors.newScheduledThreadPool(2, new NamedThreadFactory("metrics-meter-tick"));
 	private static final long INTERVAL = 5; // seconds
@@ -59,35 +61,27 @@ public class MeterMetric implements Metric {
 	private final AtomicLong uncounted = new AtomicLong();
 	private final AtomicLong count = new AtomicLong();
 	private final long startTime = System.nanoTime();
-	private final TimeUnit scaleUnit;
+	private final TimeUnit rateUnit;
 	private final String eventType;
 	private volatile boolean initialized;
 	private volatile double _oneMinuteRate;
 	private volatile double _fiveMinuteRate;
 	private volatile double _fifteenMinuteRate;
 
-	private MeterMetric(String eventType, TimeUnit scaleUnit) {
+	private MeterMetric(String eventType, TimeUnit rateUnit) {
 		initialized = false;
 		_oneMinuteRate = _fiveMinuteRate = _fifteenMinuteRate = 0.0;
-		this.scaleUnit = scaleUnit;
+		this.rateUnit = rateUnit;
 		this.eventType = eventType;
 	}
 
-	/**
-	 * Returns the meter's scale unit.
-	 *
-	 * @return the meter's scale unit
-	 */
-	public TimeUnit getScaleUnit() {
-		return scaleUnit;
+	@Override
+	public TimeUnit rateUnit() {
+		return rateUnit;
 	}
 
-	/**
-	 * Returns the type of events the meter is measuring.
-	 *
-	 * @return the meter's event type
-	 */
-	public String getEventType() {
+	@Override
+	public String eventType() {
 		return eventType;
 	}
 
@@ -123,50 +117,22 @@ public class MeterMetric implements Metric {
 		uncounted.addAndGet(n);
 	}
 
-	/**
-	 * Returns the number of events which have been marked.
-	 *
-	 * @return the number of events which have been marked
-	 */
+	@Override
 	public long count() {
 		return count.get();
 	}
 
-	/**
-	 * Returns the fifteen-minute exponentially-weighted moving average rate at
-	 * which events have occured since the meter was created.
-	 * <p>
-	 * This rate has the same exponential decay factor as the fifteen-minute load
-	 * average in the {@code top} Unix command.
-	 *
-	 * @return the fifteen-minute exponentially-weighted moving average rate at
-	 *         which events have occured since the meter was created
-	 */
+	@Override
 	public double fifteenMinuteRate() {
 		return convertNsRate(_fifteenMinuteRate);
 	}
 
-	/**
-	 * Returns the five-minute exponentially-weighted moving average rate at
-	 * which events have occured since the meter was created.
-	 * <p>
-	 * This rate has the same exponential decay factor as the five-minute load
-	 * average in the {@code top} Unix command.
-	 *
-	 * @return the five-minute exponentially-weighted moving average rate at
-	 *         which events have occured since the meter was created
-	 */
+	@Override
 	public double fiveMinuteRate() {
 		return convertNsRate(_fiveMinuteRate);
 	}
 
-	/**
-	 * Returns the mean rate at which events have occured since the meter was
-	 * created.
-	 *
-	 * @return the mean rate at which events have occured since the meter was
-	 *         created
-	 */
+	@Override
 	public double meanRate() {
 		if (count() == 0) {
 			return 0.0;
@@ -176,21 +142,12 @@ public class MeterMetric implements Metric {
 		}
 	}
 
-	/**
-	 * Returns the one-minute exponentially-weighted moving average rate at
-	 * which events have occured since the meter was created.
-	 * <p>
-	 * This rate has the same exponential decay factor as the one-minute load
-	 * average in the {@code top} Unix command.
-	 *
-	 * @return the one-minute exponentially-weighted moving average rate at
-	 *         which events have occured since the meter was created
-	 */
+	@Override
 	public double oneMinuteRate() {
 		return convertNsRate(_oneMinuteRate);
 	}
 
 	private double convertNsRate(double ratePerNs) {
-		return ratePerNs * (double) scaleUnit.toNanos(1);
+		return ratePerNs * (double) rateUnit.toNanos(1);
 	}
 }

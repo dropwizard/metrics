@@ -43,6 +43,8 @@ public abstract class HealthCheck {
 		}
 	}
 
+	public abstract String name();
+
 	public abstract Result check() throws Exception;
 
 	public Result execute() {

@@ -1,12 +1,16 @@
-package com.yammer.metrics.core;
+package com.yammer.metrics;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import javax.management.MalformedObjectNameException;
 
+import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HistogramMetric.SampleType;
+import com.yammer.metrics.reporting.ConsoleReporter;
+import com.yammer.metrics.reporting.JmxReporter;
 
 /**
  * A set of factory methods for creating centrally registered metric instances.
@@ -14,17 +18,15 @@ import com.yammer.metrics.core.HistogramMetric.SampleType;
  * @author coda
  */
 public class Metrics {
-	/*package*/ static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
-	/*package*/ static final ConcurrentMap<String, HealthCheck> HEALTH_CHECKS = new ConcurrentHashMap<String, HealthCheck>();
-	private static final JmxReporter JMX_REPORTER = new JmxReporter(METRICS);
+	private static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
 	static {{
-		JMX_REPORTER.start();
+		JmxReporter.INSTANCE.start();
 	}}
 
 	private Metrics() { /* unused */ }
 
 	/**
-	 * Given a new {@link GaugeMetric}, registers it under the given class and
+	 * Given a new {@link com.yammer.metrics.core.GaugeMetric}, registers it under the given class and
 	 * name.
 	 *
 	 * @param klass the class which owns the metric
@@ -38,12 +40,27 @@ public class Metrics {
 	}
 
 	/**
-	 * Creates a new {@link CounterMetric} and registers it under the given
+	 * Given a JMX MBean's object name and an attribute name, registers a gauge
+	 * for that attribute under the given class ane name.
+	 *
+	 * @param klass the class which owns the metric
+	 * @param name the name of the metric
+	 * @param objectName the object name of the MBean
+	 * @param attribute the name of the bean's attribute
+	 * @return a new {@link JmxGauge}
+	 * @throws MalformedObjectNameException if the object name is malformed
+	 */
+	public static JmxGauge newJmxGauge(Class<?> klass, String name, String objectName, String attribute) throws MalformedObjectNameException {
+		return getOrAdd(new MetricName(klass, name), new JmxGauge(objectName, attribute));
+	}
+
+	/**
+	 * Creates a new {@link com.yammer.metrics.core.CounterMetric} and registers it under the given
 	 * class and name.
 	 *
 	 * @param klass the class which owns the metric
 	 * @param name the name of the metric
-	 * @return a new {@link CounterMetric}
+	 * @return a new {@link com.yammer.metrics.core.CounterMetric}
 	 */
 	public static CounterMetric newCounter(Class<?> klass, String name) {
 		return getOrAdd(new MetricName(klass, name), new CounterMetric());
@@ -133,18 +150,8 @@ public class Metrics {
 	 * @param unit the time unit of {@code period}
 	 */
 	public static void enableConsoleReporting(long period, TimeUnit unit) {
-		final ConsoleReporter reporter = new ConsoleReporter(METRICS, System.out);
+		final ConsoleReporter reporter = new ConsoleReporter(System.out);
 		reporter.start(period, unit);
-	}
-
-	/**
-	 * Registers an application {@link HealthCheck} with a given name.
-	 *
-	 * @param name the name of the healthcheck (usually the name of the dependency)
-	 * @param healthCheck the {@link HealthCheck} instance
-	 */
-	public static void registerHealthCheck(String name, HealthCheck healthCheck) {
-		HEALTH_CHECKS.putIfAbsent(name, healthCheck);
 	}
 
 	/**

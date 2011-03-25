@@ -8,6 +8,7 @@ Requirements
 
 * Java SE 6
 * Scala 2.8.1
+* Guice 2.0 (for instrumenting via annotation)
 * Servlet API 2.5 (for reporting via HTTP)
 * Jackson 1.7.1 (for reporting via HTTP)
 * Jetty 7.2.2.v20101205 (for instrumenting Jetty handlers)
@@ -19,7 +20,7 @@ How To Use
 **First**, specify Metrics as a dependency:
 
     val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
-    val metrics = "com.yammer" %% "metrics" % "2.0.0-BETA9"
+    val metrics = "com.yammer" %% "metrics" % "2.0.0-BETA10"
 
 (Or whatever it takes for you to get Maven or Ivy happy.)
 
@@ -48,6 +49,27 @@ How To Use
       }
     }
 
+If you're using Guice (and maybe you should be), you can instrument your
+Guice-provided classes via the `@Timed` and `@Metered` annotations in
+conjunction with `InstrumentationModule`:
+
+    val injector = Guice.createInjector(new InstrumentationModule, ...)
+
+    class Database {
+      @Timed
+      def query(q: String): Seq[Result] = {
+        // ...
+      }
+
+      @Metered
+      def things() {
+        // ...
+      }
+    }
+
+This will add a timer with the annotated method's name which records the
+duration of method invocation or a meter which records the rate of invocation.
+
 Metrics comes with five types of metrics:
 
 * **Gauges** are instantaneous readings of values (e.g., a queue depth).
@@ -70,7 +92,7 @@ Metrics comes with five types of metrics:
 
 Metrics also has support for health checks:
 
-    Metrics.registerHealthCheck("database", new HealthCheck {
+    HealthChecks.registerHealthCheck("database", new HealthCheck {
       def check = {
         if (Database.isConnected) {
           Result.healthy()

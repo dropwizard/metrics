@@ -1,8 +1,8 @@
-package com.yammer.metrics.core.tests
+package com.yammer.metrics.stats.tests
 
 import collection.JavaConversions._
 import com.codahale.simplespec.Spec
-import com.yammer.metrics.core.ExponentiallyDecayingSample
+import com.yammer.metrics.stats.ExponentiallyDecayingSample
 
 object ExponentiallyDecayingSampleSpec extends Spec {
   class `A sample of 100 out of 1000 elements` {

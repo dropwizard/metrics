@@ -23,4 +23,14 @@ class Counter(metric: CounterMetric) {
   def -=(delta: Long) {
     metric.dec(delta)
   }
+
+  /**
+   * Returns the current count.
+   */
+  def count = metric.count
+
+  /**
+   * Resets the counter to 0.
+   */
+  def clear() { metric.clear() }
 }

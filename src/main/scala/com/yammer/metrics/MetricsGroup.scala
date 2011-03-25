@@ -1,6 +1,6 @@
 package com.yammer.metrics
 
-import core.{Metrics, GaugeMetric}
+import core.GaugeMetric
 import java.util.concurrent.TimeUnit
 
 /**
@@ -15,7 +15,7 @@ class MetricsGroup(val klass: Class[_]) {
    *
    * @param name the name of the gauge
    */
-  def gauge[A](name: String)(f: => A) {
+  def gauge[A](name: String)(f: => A) = {
     Metrics.newGauge(klass, name, new GaugeMetric[A] {
       def value = f
     })

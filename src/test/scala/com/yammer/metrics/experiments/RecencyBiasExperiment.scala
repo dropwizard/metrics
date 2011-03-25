@@ -2,7 +2,8 @@ package com.yammer.metrics.experiments
 
 import collection.JavaConversions._
 import java.util.concurrent.TimeUnit
-import com.yammer.metrics.core.{UniformSample, ExponentiallyDecayingSample}
+import com.yammer.metrics.stats.{ExponentiallyDecayingSample}
+import com.yammer.metrics.stats.{UniformSample}
 import java.io.{PrintWriter, FileOutputStream}
 
 /**

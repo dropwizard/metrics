@@ -1,4 +1,4 @@
-package com.yammer.metrics.core;
+package com.yammer.metrics.reporting;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,7 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 
+import com.yammer.metrics.HealthChecks;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HealthCheck.Result;
+import com.yammer.metrics.util.Utils;
 import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
@@ -96,7 +99,7 @@ public class MetricsServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		final String uri = req.getPathInfo();
-		if (uri.equals("/")) {
+		if (uri == null || uri.equals("/")) {
 			handleHome(resp);
 		} else if (uri.startsWith(metricsUri)) {
 			handleMetrics(req.getParameter("class"), Boolean.parseBoolean(req.getParameter("full-samples")), resp);
@@ -122,26 +125,20 @@ public class MetricsServlet extends HttpServlet {
 
 	private void handleHealthCheck(HttpServletResponse resp) throws IOException {
 		boolean allHealthy = true;
-		final Map<String, Result> results = new TreeMap<String, Result>();
-		for (Entry<String, HealthCheck> entry : Metrics.HEALTH_CHECKS.entrySet()) {
-			final Result result = entry.getValue().execute();
+		final Map<String, Result> results = HealthChecks.runHealthChecks();
+		for (Result result : results.values()) {
 			allHealthy &= result.isHealthy();
-			results.put(entry.getKey(), result);
 		}
 
-		PrintWriter writer;
 		if (allHealthy) {
 			resp.setStatus(HttpServletResponse.SC_OK);
-			resp.setContentType("text/plain");
-			writer = resp.getWriter();
-
-
 		} else {
 			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			resp.setContentType("text/plain");
-			writer = resp.getWriter();
 		}
 
+		resp.setContentType("text/plain");
+
+		final PrintWriter writer = resp.getWriter();
 		for (Entry<String, Result> entry : results.entrySet()) {
 			final Result result = entry.getValue();
 			if (result.isHealthy()) {
@@ -190,7 +187,7 @@ public class MetricsServlet extends HttpServlet {
 
 	private void handleMetrics(String classPrefix, boolean showFullSamples, HttpServletResponse resp) throws IOException {
 		resp.setStatus(HttpServletResponse.SC_OK);
-		resp.setContentType("text/plain");
+		resp.setContentType("application/json");
 		final OutputStream output = resp.getOutputStream();
 		final JsonGenerator json = factory.createJsonGenerator(output, JsonEncoding.UTF8);
 		json.writeStartObject();
@@ -206,7 +203,7 @@ public class MetricsServlet extends HttpServlet {
 	}
 
 	private void writeRegularMetrics(JsonGenerator json, String classPrefix, boolean showFullSamples) throws IOException {
-		for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(Metrics.METRICS).entrySet()) {
+		for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(Metrics.allMetrics()).entrySet()) {
 			if (classPrefix == null || entry.getKey().startsWith(classPrefix)) {
 				json.writeFieldName(entry.getKey());
 				json.writeStartObject();
@@ -346,8 +343,8 @@ public class MetricsServlet extends HttpServlet {
 		json.writeStartObject();
 		{
 			json.writeStringField("type", "meter");
-			json.writeStringField("event_type", meter.getEventType());
-			json.writeStringField("unit", meter.getScaleUnit().toString().toLowerCase());
+			json.writeStringField("event_type", meter.eventType());
+			json.writeStringField("unit", meter.rateUnit().toString().toLowerCase());
 			json.writeNumberField("count", meter.count());
 			json.writeNumberField("mean", meter.meanRate());
 			json.writeNumberField("m1", meter.oneMinuteRate());
@@ -364,7 +361,7 @@ public class MetricsServlet extends HttpServlet {
 			json.writeFieldName("duration");
 			json.writeStartObject();
 			{
-				json.writeStringField("unit", timer.getDurationUnit().toString().toLowerCase());
+				json.writeStringField("unit", timer.durationUnit().toString().toLowerCase());
 				json.writeNumberField("min", timer.min());
 				json.writeNumberField("max", timer.max());
 				json.writeNumberField("mean", timer.mean());
@@ -387,7 +384,7 @@ public class MetricsServlet extends HttpServlet {
 			json.writeFieldName("rate");
 			json.writeStartObject();
 			{
-				json.writeStringField("unit", timer.getRateUnit().toString().toLowerCase());
+				json.writeStringField("unit", timer.rateUnit().toString().toLowerCase());
 				json.writeNumberField("count", timer.count());
 				json.writeNumberField("mean", timer.meanRate());
 				json.writeNumberField("m1", timer.oneMinuteRate());

@@ -1,5 +1,6 @@
 package com.yammer.metrics
 
+import collection.JavaConversions._
 import core.HistogramMetric
 
 /**
@@ -23,4 +24,44 @@ class Histogram(metric: HistogramMetric) {
   def +=(value: Int) {
     metric.update(value)
   }
+
+  /**
+   * Returns the number of values recorded.
+   */
+  def count = metric.count
+
+  /**
+   * Clears all recorded values.
+   */
+  def clear() { metric.clear() }
+
+  /**
+   * Returns the largest recorded value.
+   */
+  def max = metric.max
+
+  /**
+   * Returns the smallest recorded value.
+   */
+  def min = metric.min
+
+  /**
+   * Returns the arithmetic mean of all recorded values.
+   */
+  def mean = metric.mean
+
+  /**
+   * Returns the standard deviation of all recorded values.
+   */
+  def stdDev = metric.stdDev
+
+  /**
+   * Returns a sequence of all values in the histogram's sample.
+   */
+  def values = metric.values.toSeq
+
+  /**
+   * Returns an array of values at the given percentiles.
+   */
+  def percentiles(percentiles: Double*) = metric.percentiles(percentiles:_*)
 }
