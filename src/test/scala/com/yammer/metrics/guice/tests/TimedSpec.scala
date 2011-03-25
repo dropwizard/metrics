@@ -22,13 +22,13 @@ object TimedSpec extends Spec {
     def `should create and call a meter for the class with the given parameters` {
       instance.doAThing()
 
-      val meter = Metrics.allMetrics.get(new MetricName(classOf[InstrumentedWithTimed], "things"))
+      val timer = Metrics.allMetrics.get(new MetricName(classOf[InstrumentedWithTimed], "things"))
 
-      meter must not(beNull)
-      meter.isInstanceOf[TimerMetric] must beTrue
-      meter.asInstanceOf[TimerMetric].count must beEqualTo(1)
-      meter.asInstanceOf[TimerMetric].rateUnit must beEqualTo(TimeUnit.MINUTES)
-      meter.asInstanceOf[TimerMetric].durationUnit must beEqualTo(TimeUnit.MICROSECONDS)
+      timer must not(beNull)
+      timer.isInstanceOf[TimerMetric] must beTrue
+      timer.asInstanceOf[TimerMetric].count must beEqualTo(1)
+      timer.asInstanceOf[TimerMetric].rateUnit must beEqualTo(TimeUnit.MINUTES)
+      timer.asInstanceOf[TimerMetric].durationUnit must beEqualTo(TimeUnit.MICROSECONDS)
     }
   }
 }

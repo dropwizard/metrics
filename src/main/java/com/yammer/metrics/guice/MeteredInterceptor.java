@@ -1,8 +1,5 @@
 package com.yammer.metrics.guice;
 
-import java.lang.reflect.Method;
-
-import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.MeterMetric;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -13,16 +10,15 @@ import org.aopalliance.intercept.MethodInvocation;
  * the rate at which the annotated method is invoked.
  */
 public class MeteredInterceptor implements MethodInterceptor {
+	private final MeterMetric meter;
+
+	public MeteredInterceptor(MeterMetric meter) {
+		this.meter = meter;
+	}
+
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
-		final Method method = invocation.getMethod();
-		final Metered annotation = method.getAnnotation(Metered.class);
-		if (annotation != null) {
-			final String name = annotation.name().isEmpty() ? method.getName() : annotation.name();
-			final MeterMetric meter = Metrics.newMeter(method.getDeclaringClass(),
-					name, annotation.eventType(), annotation.rateUnit());
-			meter.mark();
-		}
+		meter.mark();
 		return invocation.proceed();
 	}
 }

@@ -15,7 +15,7 @@ import com.google.inject.matcher.Matchers;
 public class InstrumentationModule extends AbstractModule {
 	@Override
 	protected void configure() {
-		bindInterceptor(Matchers.any(), Matchers.annotatedWith(Metered.class), new MeteredInterceptor());
-		bindInterceptor(Matchers.any(), Matchers.annotatedWith(Timed.class), new TimedInterceptor());
+		bindListener(Matchers.any(), new MeteredListener());
+		bindListener(Matchers.any(), new TimedListener());
 	}
 }

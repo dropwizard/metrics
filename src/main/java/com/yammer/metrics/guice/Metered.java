@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Metered {
-
 	/**
 	 * The name of the meter.
 	 */
