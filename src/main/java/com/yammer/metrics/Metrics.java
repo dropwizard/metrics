@@ -21,6 +21,7 @@ public class Metrics {
 	private static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
 	static {{
 		JmxReporter.INSTANCE.start();
+		VirtualMachineMetrics.daemonThreadCount(); // make sure we initialize this
 	}}
 
 	private Metrics() { /* unused */ }
