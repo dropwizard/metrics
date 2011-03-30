@@ -43,15 +43,19 @@ public class MetricsServlet extends HttpServlet {
 										   "  </ul>\n" +
 										   "</body>\n" +
 										   "</html>";
+	private static final String HEALTHCHECK_URI = "/healthcheck";
+	private static final String METRICS_URI = "/metrics";
+	private static final String PING_URI = "/ping";
+	private static final String THREADS_URI = "/threads";
 	private JsonFactory factory;
 	private String metricsUri, pingUri, threadsUri, healthcheckUri;
 
 	public MetricsServlet() {
-		this(new JsonFactory(new ObjectMapper()), "/healthcheck", "/metrics", "/ping", "/threads");
+		this(new JsonFactory(new ObjectMapper()), HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI);
 	}
 
 	public MetricsServlet(JsonFactory factory) {
-		this(factory, "/healthcheck", "/metrics", "/ping", "/threads");
+		this(factory, HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI);
 	}
 
 	public MetricsServlet(String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
@@ -70,31 +74,20 @@ public class MetricsServlet extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 
-		final String metricsUri = config.getInitParameter("metrics-uri");
-		final String pingUri = config.getInitParameter("ping-uri");
-		final String threadsUri = config.getInitParameter("threads-uri");
-		final String healthcheckUri = config.getInitParameter("healthcheck-uri");
-
-		if (metricsUri != null) {
-			this.metricsUri = metricsUri;
-		}
-
-		if (pingUri != null) {
-			this.pingUri = pingUri;
-		}
-
-		if (threadsUri != null) {
-			this.threadsUri = threadsUri;
-		}
-
-		if (healthcheckUri != null) {
-			this.healthcheckUri = healthcheckUri;
-		}
+		final String contextPath = config.getServletContext().getContextPath();
+		this.metricsUri = addContextPath(contextPath, config.getInitParameter("metrics-uri"), this.metricsUri);
+		this.pingUri = addContextPath(contextPath, config.getInitParameter("ping-uri"), this.pingUri);
+		this.threadsUri = addContextPath(contextPath, config.getInitParameter("threads-uri"), this.threadsUri);
+		this.healthcheckUri = addContextPath(contextPath, config.getInitParameter("healthcheck-uri"), this.healthcheckUri);
 
 		final Object factory = config.getServletContext().getAttribute(JsonFactory.class.getCanonicalName());
 		if (factory != null && factory instanceof JsonFactory) {
 			this.factory = (JsonFactory) factory;
 		}
+	}
+
+	private String addContextPath(String contextPath, String initParam, String defaultValue) {
+		return contextPath + (initParam == null ? defaultValue : initParam);
 	}
 
 	@Override
