@@ -1,8 +1,10 @@
 package com.yammer.metrics.core;
 
+import java.lang.Thread.State;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
+import java.lang.management.ThreadInfo;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -224,5 +226,53 @@ public class VirtualMachineMetrics {
 			return Collections.emptyMap();
 		}
 		return GC_MONITOR.gcMeters;
+	}
+
+	/**
+	 * Returns a set of strings describing deadlocked threads, if any are
+	 * deadlocked.
+	 *
+	 * @return a set of any deadlocked threads
+	 */
+	public static Set<String> deadlockedThreads() {
+		final Set<String> threads = new HashSet<String>();
+		for (long id : getThreadMXBean().findDeadlockedThreads()) {
+			final ThreadInfo threadInfo = getThreadMXBean().getThreadInfo(id);
+			threads.add(
+					String.format(
+							"%s locked on %s (owned by %s)",
+							threadInfo.getThreadName(), threadInfo.getLockName(),
+							threadInfo.getLockOwnerName()
+					)
+			);
+		}
+		return threads;
+	}
+
+	/**
+	 * Returns a map of thread states to the percentage of all threads which
+	 * are in that state.
+	 *
+	 * @return a map of thread states to percentages
+	 */
+	public static Map<State, Double> threadStatePercentages() {
+		final Map<State, Double> conditions = new HashMap<State, Double>();
+		final long[] threadIds = getThreadMXBean().getAllThreadIds();
+		for (long threadId : threadIds) {
+			final ThreadInfo info = getThreadMXBean().getThreadInfo(threadId);
+			final State state = info.getThreadState();
+			final Double value = conditions.get(state);
+			if (value == null) {
+				conditions.put(state, 1.0);
+			} else {
+				conditions.put(state, value + 1);
+			}
+		}
+
+		for (State state : new ArrayList<State>(conditions.keySet())) {
+			conditions.put(state, conditions.get(state) / threadIds.length);
+		}
+
+		return conditions;
 	}
 }
