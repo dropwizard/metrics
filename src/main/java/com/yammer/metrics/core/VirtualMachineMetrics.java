@@ -261,16 +261,15 @@ public class VirtualMachineMetrics {
 	 */
 	public static Map<State, Double> threadStatePercentages() {
 		final Map<State, Double> conditions = new HashMap<State, Double>();
+		for (State state : State.values()) {
+			conditions.put(state, 0.0);
+		}
+
 		final long[] threadIds = getThreadMXBean().getAllThreadIds();
 		for (long threadId : threadIds) {
 			final ThreadInfo info = getThreadMXBean().getThreadInfo(threadId);
 			final State state = info.getThreadState();
-			final Double value = conditions.get(state);
-			if (value == null) {
-				conditions.put(state, 1.0);
-			} else {
-				conditions.put(state, value + 1);
-			}
+			conditions.put(state, conditions.get(state) + 1);
 		}
 
 		for (State state : new ArrayList<State>(conditions.keySet())) {
