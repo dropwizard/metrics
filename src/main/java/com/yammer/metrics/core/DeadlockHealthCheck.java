@@ -10,7 +10,7 @@ public class DeadlockHealthCheck extends HealthCheck {
 	@Override
 	public Result check() throws Exception {
 		final Set<String> threads = VirtualMachineMetrics.deadlockedThreads();
-		if (threads.isEmpty()) {
+		if (!threads.isEmpty()) {
 			final StringBuilder builder = new StringBuilder("Deadlocked threads detected:\n");
 			for (String thread : threads) {
 				builder.append(thread).append('\n');
