@@ -235,18 +235,22 @@ public class VirtualMachineMetrics {
 	 * @return a set of any deadlocked threads
 	 */
 	public static Set<String> deadlockedThreads() {
-		final Set<String> threads = new HashSet<String>();
-		for (long id : getThreadMXBean().findDeadlockedThreads()) {
-			final ThreadInfo threadInfo = getThreadMXBean().getThreadInfo(id);
-			threads.add(
-					String.format(
-							"%s locked on %s (owned by %s)",
-							threadInfo.getThreadName(), threadInfo.getLockName(),
-							threadInfo.getLockOwnerName()
-					)
-			);
+		final long[] threadIds = getThreadMXBean().findDeadlockedThreads();
+		if (threadIds != null) {
+			final Set<String> threads = new HashSet<String>();
+			for (long id : threadIds) {
+				final ThreadInfo threadInfo = getThreadMXBean().getThreadInfo(id);
+				threads.add(
+						String.format(
+								"%s locked on %s (owned by %s)",
+								threadInfo.getThreadName(), threadInfo.getLockName(),
+								threadInfo.getLockOwnerName()
+						)
+				);
+			}
+			return threads;
 		}
-		return threads;
+		return Collections.emptySet();
 	}
 
 	/**
