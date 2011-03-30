@@ -6,6 +6,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import com.yammer.metrics.core.DeadlockHealthCheck;
 import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.core.HealthCheck.Result;
 
@@ -14,6 +15,9 @@ import com.yammer.metrics.core.HealthCheck.Result;
  */
 public class HealthChecks {
 	private static final ConcurrentMap<String, HealthCheck> HEALTH_CHECKS = new ConcurrentHashMap<String, HealthCheck>();
+	static {
+		registerHealthCheck(new DeadlockHealthCheck());
+	}
 
 	private HealthChecks() { /* unused */ }
 
