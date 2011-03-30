@@ -3,6 +3,7 @@ package com.yammer.metrics.reporting;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.lang.Thread.State;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -309,6 +310,15 @@ public class MetricsServlet extends HttpServlet {
 			json.writeNumberField("thread_count", threadCount());
 			json.writeNumberField("uptime", uptime());
 			json.writeNumberField("fd_usage", fileDescriptorUsage());
+
+			json.writeFieldName("thread-states");
+			json.writeStartObject();
+			{
+				for (Entry<State, Double> entry : threadStatePercentages().entrySet()) {
+					json.writeNumberField(entry.getKey().toString().toLowerCase(), entry.getValue());
+				}
+			}
+			json.writeEndObject();
 
 			json.writeFieldName("gc");
 			json.writeStartObject();
