@@ -238,20 +238,20 @@ public class VirtualMachineMetrics {
 		final long[] threadIds = getThreadMXBean().findDeadlockedThreads();
 		if (threadIds != null) {
 			final Set<String> threads = new HashSet<String>();
-			for (long id : threadIds) {
-				final ThreadInfo threadInfo = getThreadMXBean().getThreadInfo(id);
+			final ThreadInfo[] infos = getThreadMXBean().getThreadInfo(threadIds, 100);
+			for (ThreadInfo info : infos) {
 				final StringBuilder stackTrace = new StringBuilder();
-				for (StackTraceElement element : threadInfo.getStackTrace()) {
+				for (StackTraceElement element : info.getStackTrace()) {
 					stackTrace.append("\t at ").append(element.toString()).append('\n');
 				}
 
 				threads.add(
-						String.format(
-								"%s locked on %s (owned by %s):\n%s",
-								threadInfo.getThreadName(), threadInfo.getLockName(),
-								threadInfo.getLockOwnerName(),
-								stackTrace
-						)
+					String.format(
+							"%s locked on %s (owned by %s):\n%s",
+							info.getThreadName(), info.getLockName(),
+							info.getLockOwnerName(),
+							stackTrace.toString()
+					)
 				);
 			}
 			return threads;
@@ -271,15 +271,15 @@ public class VirtualMachineMetrics {
 			conditions.put(state, 0.0);
 		}
 
-		final long[] threadIds = getThreadMXBean().getAllThreadIds();
-		for (long threadId : threadIds) {
-			final ThreadInfo info = getThreadMXBean().getThreadInfo(threadId);
+		final long[] allThreadIds = getThreadMXBean().getAllThreadIds();
+		final ThreadInfo[] allThreads = getThreadMXBean().getThreadInfo(allThreadIds);
+		for (ThreadInfo info : allThreads) {
 			final State state = info.getThreadState();
 			conditions.put(state, conditions.get(state) + 1);
 		}
 
 		for (State state : new ArrayList<State>(conditions.keySet())) {
-			conditions.put(state, conditions.get(state) / threadIds.length);
+			conditions.put(state, conditions.get(state) / allThreads.length);
 		}
 
 		return conditions;
