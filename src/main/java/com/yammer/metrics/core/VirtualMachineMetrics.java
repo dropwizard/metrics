@@ -240,11 +240,17 @@ public class VirtualMachineMetrics {
 			final Set<String> threads = new HashSet<String>();
 			for (long id : threadIds) {
 				final ThreadInfo threadInfo = getThreadMXBean().getThreadInfo(id);
+				final StringBuilder stackTrace = new StringBuilder();
+				for (StackTraceElement element : threadInfo.getStackTrace()) {
+					stackTrace.append("\t at ").append(element.toString()).append('\n');
+				}
+
 				threads.add(
 						String.format(
-								"%s locked on %s (owned by %s)",
+								"%s locked on %s (owned by %s):\n%s",
 								threadInfo.getThreadName(), threadInfo.getLockName(),
-								threadInfo.getLockOwnerName()
+								threadInfo.getLockOwnerName(),
+								stackTrace
 						)
 				);
 			}
