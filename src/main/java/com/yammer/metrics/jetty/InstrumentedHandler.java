@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.yammer.metrics.core.CounterMetric;
 import com.yammer.metrics.core.MeterMetric;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.*;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationListener;
 import org.eclipse.jetty.server.AsyncContinuation;
@@ -45,22 +45,22 @@ public class InstrumentedHandler extends HandlerWrapper {
 	 */
 	public InstrumentedHandler(Handler underlying) {
 		super();
-		this.dispatches = Metrics.newTimer(underlying.getClass(), "dispatches", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-		this.requests = Metrics.newMeter(underlying.getClass(), "requests", "requests", TimeUnit.SECONDS);
-		this.resumes = Metrics.newMeter(underlying.getClass(), "resumes", "requests", TimeUnit.SECONDS);
-		this.suspends = Metrics.newMeter(underlying.getClass(), "suspends", "requests", TimeUnit.SECONDS);
-		this.expires = Metrics.newMeter(underlying.getClass(), "expires", "requests", TimeUnit.SECONDS);
+		this.dispatches = Metrics.newTimer(new MetricName(underlying.getClass(), "dispatches"), TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		this.requests = Metrics.newMeter(new MetricName(underlying.getClass(), "requests"), "requests", TimeUnit.SECONDS);
+		this.resumes = Metrics.newMeter(new MetricName(underlying.getClass(), "resumes"), "requests", TimeUnit.SECONDS);
+		this.suspends = Metrics.newMeter(new MetricName(underlying.getClass(), "suspends"), "requests", TimeUnit.SECONDS);
+		this.expires = Metrics.newMeter(new MetricName(underlying.getClass(), "expires"), "requests", TimeUnit.SECONDS);
 
-		this.activeRequests = Metrics.newCounter(underlying.getClass(), "active-requests");
-		this.activeSuspendedRequests = Metrics.newCounter(underlying.getClass(), "active-suspended-requests");
-		this.activeDispatches = Metrics.newCounter(underlying.getClass(), "active-dispatches");
+		this.activeRequests = Metrics.newCounter(new MetricName(underlying.getClass(), "active-requests"));
+		this.activeSuspendedRequests = Metrics.newCounter(new MetricName(underlying.getClass(), "active-suspended-requests"));
+		this.activeDispatches = Metrics.newCounter(new MetricName(underlying.getClass(), "active-dispatches"));
 
 		this.responses = new MeterMetric[]{
-				Metrics.newMeter(underlying.getClass(), "1xx-reponses", "responses", TimeUnit.SECONDS), // 1xx
-				Metrics.newMeter(underlying.getClass(), "2xx-reponses", "responses", TimeUnit.SECONDS), // 2xx
-				Metrics.newMeter(underlying.getClass(), "3xx-reponses", "responses", TimeUnit.SECONDS), // 3xx
-				Metrics.newMeter(underlying.getClass(), "4xx-reponses", "responses", TimeUnit.SECONDS), // 4xx
-				Metrics.newMeter(underlying.getClass(), "5xx-reponses", "responses", TimeUnit.SECONDS)  // 5xx
+				Metrics.newMeter(new MetricName(underlying.getClass(), "1xx-reponses"), "responses", TimeUnit.SECONDS), // 1xx
+				Metrics.newMeter(new MetricName(underlying.getClass(), "2xx-reponses"), "responses", TimeUnit.SECONDS), // 2xx
+				Metrics.newMeter(new MetricName(underlying.getClass(), "3xx-reponses"), "responses", TimeUnit.SECONDS), // 3xx
+				Metrics.newMeter(new MetricName(underlying.getClass(), "4xx-reponses"), "responses", TimeUnit.SECONDS), // 4xx
+				Metrics.newMeter(new MetricName(underlying.getClass(), "5xx-reponses"), "responses", TimeUnit.SECONDS)  // 5xx
 		};
 
 		this.listener = new ContinuationListener() {

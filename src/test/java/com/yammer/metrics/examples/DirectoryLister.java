@@ -11,12 +11,13 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.CounterMetric;
 import com.yammer.metrics.core.MeterMetric;
 import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.MetricName;
 
 public class DirectoryLister {
-	private final CounterMetric counter = Metrics.newCounter(getClass(), "directories");
-	private final MeterMetric meter = Metrics.newMeter(getClass(), "files", "files", TimeUnit.SECONDS);
-	private final TimerMetric timer = Metrics.newTimer(getClass(),
-													   "directory-listing",
+	private final CounterMetric counter = Metrics.newCounter(new MetricName(getClass(), "directories"));
+	private final MeterMetric meter = Metrics.newMeter(new MetricName(getClass(), "files"), "files", TimeUnit.SECONDS);
+	private final TimerMetric timer = Metrics.newTimer(new MetricName(getClass(),
+													   "directory-listing"),
 													   TimeUnit.MILLISECONDS,
 													   TimeUnit.SECONDS);
 	private final File directory;

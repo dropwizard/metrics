@@ -1,32 +1,44 @@
 package com.yammer.metrics.core;
 
+import javax.management.*;
+
 /**
  * A value class encapsulating a metric's owning class and name.
  *
  * @author
  */
 public class MetricName {
-	private final Class<?> klass;
+	private final String domain;
+	private final String type;
 	private final String name;
+
+  public MetricName(Class<?> klass, String name) {
+    this.domain = klass.getPackage().getName();
+    this.type = klass.getSimpleName();
+    this.name = name;
+  }
 
 	/**
 	 * Creates a new {@link MetricName}.
 	 *
-	 * @param klass the {@link Class} to which the {@link Metric} belongs
+	 * @param domain the domain of the {@link Metric}. Typically the containing
+	 *               classes package name.
+	 * @param type the type of the {@link Metric}. Typically the containing
+	 *               classes simple name.
 	 * @param name the name of the {@link Metric}
 	 */
-	public MetricName(Class<?> klass, String name) {
-		this.klass = klass;
-		this.name = name;
+	public MetricName(String domain, String type, String name) {
+	  this.domain = domain;
+	  this.type = type;
+	  this.name = name;
 	}
 
-	/**
-	 * Returns the {@link Class} to which the {@link Metric} belongs.
-	 *
-	 * @return the {@link Class} to which the {@link Metric} belongs
-	 */
-	public Class<?> getKlass() {
-		return klass;
+	public String getDomain() {
+	  return domain;
+	}
+	
+	public String getType() {
+	  return type;
 	}
 
 	/**
@@ -38,6 +50,11 @@ public class MetricName {
 		return name;
 	}
 
+  public ObjectName getObjectName() throws MalformedObjectNameException {
+    return new ObjectName(
+				String.format("%s:type=%s,name=%s", domain, type.replaceAll("\\$$", ""), name));
+  }
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) { return true; }
@@ -45,7 +62,10 @@ public class MetricName {
 
 		final MetricName that = (MetricName) o;
 
-		if (klass != null ? !klass.equals(that.klass) : that.klass != null) {
+		if (domain != null ? !domain.equals(that.domain) : that.domain != null) {
+			return false;
+		}
+		if (type != null ? !type.equals(that.type) : that.type != null) {
 			return false;
 		}
 		return !(name != null ? !name.equals(that.name) : that.name != null);
@@ -54,7 +74,8 @@ public class MetricName {
 
 	@Override
 	public int hashCode() {
-		int result = klass != null ? klass.hashCode() : 0;
+		int result = domain != null ? domain.hashCode() : 0;
+		result = 31 * result + (type != null ? type.hashCode() : 0);
 		result = 31 * result + (name != null ? name.hashCode() : 0);
 		return result;
 	}

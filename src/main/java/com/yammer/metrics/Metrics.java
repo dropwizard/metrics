@@ -35,8 +35,8 @@ public class Metrics {
 	 * @param <T> the type of the value returned by the metric
 	 * @return {@code metric}
 	 */
-	public static <T> GaugeMetric<T> newGauge(Class<?> klass, String name, GaugeMetric<T> metric) {
-		return getOrAdd(new MetricName(klass, name), metric);
+	public static <T> GaugeMetric<T> newGauge(MetricName name, GaugeMetric<T> metric) {
+		return getOrAdd(name, metric);
 	}
 
 	/**
@@ -50,8 +50,8 @@ public class Metrics {
 	 * @return a new {@link JmxGauge}
 	 * @throws MalformedObjectNameException if the object name is malformed
 	 */
-	public static JmxGauge newJmxGauge(Class<?> klass, String name, String objectName, String attribute) throws MalformedObjectNameException {
-		return getOrAdd(new MetricName(klass, name), new JmxGauge(objectName, attribute));
+	public static JmxGauge newJmxGauge(MetricName name, String objectName, String attribute) throws MalformedObjectNameException {
+		return getOrAdd(name, new JmxGauge(objectName, attribute));
 	}
 
 	/**
@@ -62,8 +62,8 @@ public class Metrics {
 	 * @param name the name of the metric
 	 * @return a new {@link com.yammer.metrics.core.CounterMetric}
 	 */
-	public static CounterMetric newCounter(Class<?> klass, String name) {
-		return getOrAdd(new MetricName(klass, name), new CounterMetric());
+	public static CounterMetric newCounter(MetricName name) {
+		return getOrAdd(name, new CounterMetric());
 	}
 
 	/**
@@ -75,9 +75,9 @@ public class Metrics {
 	 * @param biased whether or not the histogram should be biased
 	 * @return a new {@link HistogramMetric}
 	 */
-	public static HistogramMetric newHistogram(Class<?> klass, String name,
+	public static HistogramMetric newHistogram(MetricName name,
 											   boolean biased) {
-		return getOrAdd(new MetricName(klass, name),
+		return getOrAdd(name,
 				new HistogramMetric(biased ? SampleType.BIASED : SampleType.UNIFORM));
 	}
 
@@ -89,8 +89,8 @@ public class Metrics {
 	 * @param name the name of the metric
 	 * @return a new {@link HistogramMetric}
 	 */
-	public static HistogramMetric newHistogram(Class<?> klass, String name) {
-		return newHistogram(klass, name, false);
+	public static HistogramMetric newHistogram(MetricName name) {
+		return newHistogram(name, false);
 	}
 
 	/**
@@ -104,8 +104,7 @@ public class Metrics {
 	 * @param unit the scale unit of the new meter
 	 * @return a new {@link MeterMetric}
 	 */
-	public static MeterMetric newMeter(Class<?> klass, String name, String eventType, TimeUnit unit) {
-		MetricName metricName = new MetricName(klass, name);
+	public static MeterMetric newMeter(MetricName metricName, String eventType, TimeUnit unit) {
 		final Metric existingMetric = METRICS.get(metricName);
 		if (existingMetric == null) {
 			final MeterMetric metric = MeterMetric.newMeter(eventType, unit);
@@ -128,8 +127,7 @@ public class Metrics {
 	 * @param rateUnit the rate scale unit of the new timer
 	 * @return a new {@link TimerMetric}
 	 */
-	public static TimerMetric newTimer(Class<?> klass, String name, TimeUnit durationUnit, TimeUnit rateUnit) {
-		MetricName metricName = new MetricName(klass, name);
+	public static TimerMetric newTimer(MetricName metricName, TimeUnit durationUnit, TimeUnit rateUnit) {
 		final Metric existingMetric = METRICS.get(metricName);
 		if (existingMetric == null) {
 			final TimerMetric metric = new TimerMetric(durationUnit, rateUnit);

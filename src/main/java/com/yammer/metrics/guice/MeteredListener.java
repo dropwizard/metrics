@@ -7,7 +7,7 @@ import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.*;
 
 /**
  * A listener which adds method interceptors to metered methods.
@@ -20,7 +20,7 @@ public class MeteredListener implements TypeListener {
 			final Metered annotation = method.getAnnotation(Metered.class);
 			if (annotation != null) {
 				final String name = annotation.name().isEmpty() ? method.getName() : annotation.name();
-				final MeterMetric meter = Metrics.newMeter(literal.getRawType(), name, annotation.eventType(), annotation.rateUnit());
+				final MeterMetric meter = Metrics.newMeter(new MetricName(literal.getRawType(), name), annotation.eventType(), annotation.rateUnit());
 				encounter.bindInterceptor(Matchers.only(method), new MeteredInterceptor(meter));
 			}
 		}

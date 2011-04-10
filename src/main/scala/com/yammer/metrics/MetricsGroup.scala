@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
  *
  * @author coda
  */
-class MetricsGroup(val klass: Class[_]) {
+class MetricsGroup(val builder : NameBuilder) {
 
   /**
    * Registers a new gauge metric.
@@ -16,7 +16,7 @@ class MetricsGroup(val klass: Class[_]) {
    * @param name the name of the gauge
    */
   def gauge[A](name: String)(f: => A) = {
-    Metrics.newGauge(klass, name, new GaugeMetric[A] {
+    Metrics.newGauge(builder(name), new GaugeMetric[A] {
       def value = f
     })
   }
@@ -26,7 +26,7 @@ class MetricsGroup(val klass: Class[_]) {
    *
    * @param name the name of the counter
    */
-  def counter(name: String) = new Counter(Metrics.newCounter(klass, name))
+  def counter(name: String) = new Counter(Metrics.newCounter(builder(name)))
 
   /**
    * Creates a new histogram metrics.
@@ -35,7 +35,7 @@ class MetricsGroup(val klass: Class[_]) {
    * @param biased whether or not to use a biased sample
    */
   def histogram(name: String, biased: Boolean = false) =
-    new Histogram(Metrics.newHistogram(klass, name, biased))
+    new Histogram(Metrics.newHistogram(builder(name), biased))
 
   /**
    * Creates a new meter metric.
@@ -48,7 +48,7 @@ class MetricsGroup(val klass: Class[_]) {
   def meter(name: String,
             eventType: String,
             unit: TimeUnit = TimeUnit.SECONDS) =
-    new Meter(Metrics.newMeter(klass, name, eventType, unit))
+    new Meter(Metrics.newMeter(builder(name), eventType, unit))
 
   /**
    * Creates a new timer metric.
@@ -60,5 +60,5 @@ class MetricsGroup(val klass: Class[_]) {
   def timer(name: String,
             durationUnit: TimeUnit = TimeUnit.MILLISECONDS,
             rateUnit: TimeUnit = TimeUnit.SECONDS) =
-    new Timer(Metrics.newTimer(klass, name, durationUnit, rateUnit))
+    new Timer(Metrics.newTimer(builder(name), durationUnit, rateUnit))
 }

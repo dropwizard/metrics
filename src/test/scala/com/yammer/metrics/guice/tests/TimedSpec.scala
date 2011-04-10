@@ -5,7 +5,8 @@ import java.util.concurrent.TimeUnit
 import com.google.inject.Guice
 import com.yammer.metrics.guice.{InstrumentationModule, Timed}
 import com.yammer.metrics.Metrics
-import com.yammer.metrics.core.{TimerMetric, MetricName}
+import com.yammer.metrics.core.TimerMetric
+import com.yammer.metrics.NameBuilder
 
 class InstrumentedWithTimed {
   @Timed(name = "things", rateUnit = TimeUnit.MINUTES, durationUnit = TimeUnit.MICROSECONDS)
@@ -22,7 +23,7 @@ object TimedSpec extends Spec {
     def `should create and call a meter for the class with the given parameters` {
       instance.doAThing()
 
-      val timer = Metrics.allMetrics.get(new MetricName(classOf[InstrumentedWithTimed], "things"))
+      val timer = Metrics.allMetrics.get(NameBuilder(classOf[InstrumentedWithTimed])("things"))
 
       timer must not(beNull)
       timer.isInstanceOf[TimerMetric] must beTrue
