@@ -11,23 +11,23 @@ object MeterMetricSpec extends Spec {
     def `should decrease exponentially` {
       rates { _.oneMinuteRate } must eventually(
         haveElementsCloseTo(List(0.0, 0.0, 0.0, 0.0, 0.4, 0.4, 0.4, 0.4, 0.4,
-                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)))
+                                 0.36, 0.36, 0.36, 0.36, 0.36, 0.33)))
     }
   }
 
   class `A meter's five-minute rate` {
     def `should decrease exponentially` {
       rates { _.fiveMinuteRate } must eventually(
-        haveElementsCloseTo(List(0.0, 0.0, 0.0, 0.0, 0.4, 0.4, 0.4, 0.4, 0.4,
-                                 0.32, 0.32, 0.32, 0.32, 0.32, 0.25)))
+        haveElementsCloseTo(List(0.0, 0.0, 0.0, 0.0, 0.0, 0.4, 0.4, 0.4, 0.4,
+                                 0.39, 0.39, 0.39, 0.39, 0.39, 0.38)))
     }
   }
 
   class `A meter's fifteen-minute rate` {
     def `should decrease exponentially` {
       rates { _.fifteenMinuteRate } must eventually(
-        haveElementsCloseTo(List(0.0, 0.0, 0.0, 0.0, 0.4, 0.4, 0.4, 0.4,
-                                 0.4, 0.37, 0.37, 0.37, 0.37, 0.37, 0.35)))
+        haveElementsCloseTo(List(0.0, 0.0, 0.0, 0.0, 0.0, 0.4, 0.4, 0.4, 0.4, 0.4,
+                                 0.39, 0.39, 0.39, 0.39, 0.39)))
     }
   }
 

@@ -1,11 +1,12 @@
 package com.yammer.metrics.core;
 
+import com.yammer.metrics.stats.EWMA;
+import com.yammer.metrics.util.NamedThreadFactory;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-
-import com.yammer.metrics.util.NamedThreadFactory;
 
 /**
  * A meter metric which measures mean throughput and one-, five-, and
@@ -18,10 +19,6 @@ public class MeterMetric implements Metered {
 	private static final ScheduledExecutorService TICK_THREAD =
 			Executors.newScheduledThreadPool(2, new NamedThreadFactory("metrics-meter-tick"));
 	private static final long INTERVAL = 5; // seconds
-	private static final double INTERVAL_IN_NS = TimeUnit.SECONDS.toNanos(INTERVAL);
-	private static final double ONE_MINUTE_FACTOR = 1 / Math.exp(TimeUnit.SECONDS.toMinutes(INTERVAL));
-	private static final double FIVE_MINUTE_FACTOR = ONE_MINUTE_FACTOR / 5;
-	private static final double FIFTEEN_MINUTE_FACTOR = ONE_MINUTE_FACTOR / 15;
 
 	/**
 	 * Creates a new {@link MeterMetric}.
@@ -58,19 +55,16 @@ public class MeterMetric implements Metered {
 		return meter;
 	}
 
-	private final AtomicLong uncounted = new AtomicLong();
+    private final EWMA m1Rate = EWMA.oneMinuteEWMA();
+    private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
+    private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
+
 	private final AtomicLong count = new AtomicLong();
 	private final long startTime = System.nanoTime();
 	private final TimeUnit rateUnit;
 	private final String eventType;
-	private volatile boolean initialized;
-	private volatile double _oneMinuteRate;
-	private volatile double _fiveMinuteRate;
-	private volatile double _fifteenMinuteRate;
 
 	private MeterMetric(String eventType, TimeUnit rateUnit) {
-		initialized = false;
-		_oneMinuteRate = _fiveMinuteRate = _fifteenMinuteRate = 0.0;
 		this.rateUnit = rateUnit;
 		this.eventType = eventType;
 	}
@@ -89,15 +83,9 @@ public class MeterMetric implements Metered {
 	 * Updates the moving averages.
 	 */
 	void tick() {
-		final long count = uncounted.getAndSet(0);
-		if (initialized) {
-			_oneMinuteRate += (ONE_MINUTE_FACTOR * ((count / INTERVAL_IN_NS) - _oneMinuteRate));
-			_fiveMinuteRate += (FIVE_MINUTE_FACTOR * ((count / INTERVAL_IN_NS) - _fiveMinuteRate));
-			_fifteenMinuteRate += (FIFTEEN_MINUTE_FACTOR * ((count / INTERVAL_IN_NS) - _fifteenMinuteRate));
-		} else {
-			_oneMinuteRate = _fiveMinuteRate = _fifteenMinuteRate = count / INTERVAL_IN_NS;
-			initialized = true;
-		}
+		m1Rate.tick();
+        m5Rate.tick();
+        m15Rate.tick();
 	}
 
 	/**
@@ -114,7 +102,9 @@ public class MeterMetric implements Metered {
 	 */
 	public void mark(long n) {
 		count.addAndGet(n);
-		uncounted.addAndGet(n);
+		m1Rate.update(n);
+        m5Rate.update(n);
+        m15Rate.update(n);
 	}
 
 	@Override
@@ -124,12 +114,12 @@ public class MeterMetric implements Metered {
 
 	@Override
 	public double fifteenMinuteRate() {
-		return convertNsRate(_fifteenMinuteRate);
+		return m15Rate.rate(rateUnit);
 	}
 
 	@Override
 	public double fiveMinuteRate() {
-		return convertNsRate(_fiveMinuteRate);
+		return m5Rate.rate(rateUnit);
 	}
 
 	@Override
@@ -144,7 +134,7 @@ public class MeterMetric implements Metered {
 
 	@Override
 	public double oneMinuteRate() {
-		return convertNsRate(_oneMinuteRate);
+		return m1Rate.rate(rateUnit);
 	}
 
 	private double convertNsRate(double ratePerNs) {
