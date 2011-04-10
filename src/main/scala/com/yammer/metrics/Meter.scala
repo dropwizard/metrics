@@ -1,54 +1,74 @@
 package com.yammer.metrics
 
-import java.util.concurrent.atomic.AtomicLong
-import com.yammer.time.{Rate, Clock}
+import core.MeterMetric
 
 /**
- * A meter which measures the rate of events occuring in time.
+ * A Scala façade class for {@link MeterMetric}.
  *
  * @author coda
+ * @see MeterMetric
  */
-class Meter {
-  private val counter = new AtomicLong
-  private val startTime = Clock.nanoTime
+class Meter(metric: MeterMetric) {
 
   /**
-   * Mark the occurence of an event.
+   * Marks the occurance of an event.
    */
   def mark() {
-    mark(1)
+    metric.mark()
   }
 
   /**
-   * Mark the occurence of an arbitrary number of events.
+   * Marks the occurance of a given number of events.
    */
   def mark(count: Long) {
-    counter.addAndGet(count)
+    metric.mark(count)
   }
 
   /**
-   * Unmark the occurence of an event.
+   * Returns the meter's rate unit.
    */
-  def unmark() {
-    mark(-1)
-  }
+  def rateUnit = metric.rateUnit
 
   /**
-   * Unmark the occurence of an arbitrary number of events.
+   * Returns the type of events the meter is measuring.
    */
-  def unmark(count: Long) {
-    mark(-count)
-  }
+  def eventType = metric.eventType
 
   /**
-   * Returns the number of events marked.
+   * Returns the number of events which have been marked.
    */
-  def count = counter.get
+  def count = metric.count
 
   /**
-   * Returns the rate of events in the given unit of time.
+   * Returns the fifteen-minute exponentially-weighted moving average rate at
+   * which events have occured since the meter was created.
+   * <p>
+   * This rate has the same exponential decay factor as the fifteen-minute load
+   * average in the {@code top} Unix command.
    */
-  def rate = Rate.perNanosecond(if (count > 0)
-    count.toDouble / (Clock.nanoTime - startTime)
-  else 0.0)
+  def fifteenMinuteRate = metric.fifteenMinuteRate
+
+  /**
+   * Returns the five-minute exponentially-weighted moving average rate at
+   * which events have occured since the meter was created.
+   * <p>
+   * This rate has the same exponential decay factor as the five-minute load
+   * average in the {@code top} Unix command.
+   */
+  def fiveMinuteRate = metric.fiveMinuteRate
+
+  /**
+   * Returns the mean rate at which events have occured since the meter was
+   * created.
+   */
+  def meanRate = metric.meanRate
+
+  /**
+   * Returns the one-minute exponentially-weighted moving average rate at
+   * which events have occured since the meter was created.
+   * <p>
+   * This rate has the same exponential decay factor as the one-minute load
+   * average in the {@code top} Unix command.
+   */
+  def oneMinuteRate = metric.oneMinuteRate
 }

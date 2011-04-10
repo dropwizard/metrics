@@ -1,50 +1,36 @@
 package com.yammer.metrics
 
-import java.util.concurrent.atomic.AtomicLong
+import core.CounterMetric
 
 /**
- * A thread-safe counter which can go up or down from its initial value.
+ * A Scala façade class for {@link CounterMetric}.
  *
  * @author coda
+ * @see CounterMetric
  */
-class Counter(initial: Long) {
-  protected val value = new AtomicLong(initial)
+class Counter(metric: CounterMetric) {
 
   /**
-   * Creates a new counter with an initial value of zero.
+   * Increments the counter by delta.
    */
-  def this() = this(0)
-
-  /**
-   * Increments the counter by one.
-   */
-  def inc() {
-    inc(1)
+  def +=(delta: Long) {
+    metric.inc(delta)
   }
 
   /**
-   * Increments the counter by an arbitrary amount.
+   * Decrements the counter by delta.
    */
-  def inc(delta: Long) {
-    value.getAndAdd(delta)
-  }
-
-  /**
-   * Decrements the counter by one.
-   */
-  def dec() {
-    dec(1)
-  }
-
-  /**
-   * Decrements the counter by an arbitrary amount.
-   */
-  def dec(delta: Long) {
-    inc(0 - delta)
+  def -=(delta: Long) {
+    metric.dec(delta)
   }
 
   /**
    * Returns the current count.
    */
-  def count = value.get
+  def count = metric.count
+
+  /**
+   * Resets the counter to 0.
+   */
+  def clear() { metric.clear() }
 }
