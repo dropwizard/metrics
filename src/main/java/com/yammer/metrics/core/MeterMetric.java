@@ -19,9 +19,9 @@ public class MeterMetric implements Metered {
 			Executors.newScheduledThreadPool(2, new NamedThreadFactory("metrics-meter-tick"));
 	private static final long INTERVAL = 5; // seconds
 	private static final double INTERVAL_IN_NS = TimeUnit.SECONDS.toNanos(INTERVAL);
-	private static final double ONE_MINUTE_FACTOR = 1 / Math.exp(TimeUnit.SECONDS.toMinutes(INTERVAL));
-	private static final double FIVE_MINUTE_FACTOR = ONE_MINUTE_FACTOR / 5;
-	private static final double FIFTEEN_MINUTE_FACTOR = ONE_MINUTE_FACTOR / 15;
+	private static final double ONE_MINUTE_FACTOR = 1 - Math.exp(-TimeUnit.SECONDS.toMinutes(INTERVAL));
+	private static final double FIVE_MINUTE_FACTOR = 1 - Math.exp(-TimeUnit.SECONDS.toMinutes(INTERVAL) / 5);
+	private static final double FIFTEEN_MINUTE_FACTOR = 1 - Math.exp(-TimeUnit.SECONDS.toMinutes(INTERVAL) / 15);
 
 	/**
 	 * Creates a new {@link MeterMetric}.
