@@ -25,31 +25,37 @@ public class EWMA {
     /**
      * Creates a new EWMA which is equivalent to the UNIX one minute load average and which expects to be ticked every
      * 5 seconds.
+     * @param intervalUnit tick interval
+     * @param interval  tick interval unit
      *
      * @return a one-minute EWMA
      */
-    public static EWMA oneMinuteEWMA() {
-        return new EWMA(M1_ALPHA, 5, TimeUnit.SECONDS);
+    public static EWMA oneMinuteEWMA(long interval, TimeUnit intervalUnit) {
+        return new EWMA(M1_ALPHA, interval, intervalUnit);
     }
 
     /**
      * Creates a new EWMA which is equivalent to the UNIX five minute load average and which expects to be ticked every
      * 5 seconds.
+     * @param intervalUnit tick interval
+     * @param interval  tick interval unit
      *
      * @return a five-minute EWMA
      */
-    public static EWMA fiveMinuteEWMA() {
-        return new EWMA(M5_ALPHA, 5, TimeUnit.SECONDS);
+    public static EWMA fiveMinuteEWMA(long interval, TimeUnit intervalUnit) {
+        return new EWMA(M5_ALPHA, interval, intervalUnit);
     }
 
     /**
      * Creates a new EWMA which is equivalent to the UNIX fifteen minute load average and which expects to be ticked
      * every 5 seconds.
+     * @param intervalUnit tick interval
+     * @param interval  tick interval unit
      *
      * @return a fifteen-minute EWMA
      */
-    public static EWMA fifteenMinuteEWMA() {
-        return new EWMA(M15_ALPHA, 5, TimeUnit.SECONDS);
+    public static EWMA fifteenMinuteEWMA(long interval, TimeUnit intervalUnit) {
+        return new EWMA(M15_ALPHA, interval, intervalUnit);
     }
 
     /**
@@ -63,7 +69,6 @@ public class EWMA {
         this.interval = intervalUnit.toNanos(interval);
         this.alpha = alpha;
     }
-
     /**
      * Update the moving average with a new value.
      *

@@ -1,12 +1,12 @@
 package com.yammer.metrics.core;
 
-import com.yammer.metrics.stats.EWMA;
-import com.yammer.metrics.util.NamedThreadFactory;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+import com.yammer.metrics.stats.EWMA;
+import com.yammer.metrics.util.NamedThreadFactory;
 
 /**
  * A meter metric which measures mean throughput and one-, five-, and
@@ -40,11 +40,11 @@ public class MeterMetric implements Metered {
 	 * @param intervalUnit the unit of {@code interval}
 	 * @param eventType the plural name of the event the meter is measuring
 	 *                  (e.g., {@code "requests"})
-	 * @param scaleUnit the scale unit of the new meter  @return a new {@link MeterMetric}
+	 * @param rateUnit the scale unit of the new meter  @return a new {@link MeterMetric}
 	 * @return a new {@link MeterMetric}
 	 */
-	public static MeterMetric newMeter(long interval, TimeUnit intervalUnit, String eventType, TimeUnit scaleUnit) {
-		final MeterMetric meter = new MeterMetric(eventType, scaleUnit);
+	public static MeterMetric newMeter(long interval, TimeUnit intervalUnit, String eventType, TimeUnit rateUnit) {
+		final MeterMetric meter = new MeterMetric(interval, intervalUnit, eventType, rateUnit);
 		final Runnable job = new Runnable() {
 			@Override
 			public void run() {
@@ -55,18 +55,22 @@ public class MeterMetric implements Metered {
 		return meter;
 	}
 
-    private final EWMA m1Rate = EWMA.oneMinuteEWMA();
-    private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
-    private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
+    private final EWMA m1Rate;
+    private final EWMA m5Rate;
+    private final EWMA m15Rate;
 
 	private final AtomicLong count = new AtomicLong();
 	private final long startTime = System.nanoTime();
 	private final TimeUnit rateUnit;
 	private final String eventType;
 
-	private MeterMetric(String eventType, TimeUnit rateUnit) {
+	private MeterMetric(long interval, TimeUnit intervalUnit, String eventType, TimeUnit rateUnit) {
 		this.rateUnit = rateUnit;
 		this.eventType = eventType;
+		
+		this.m1Rate = EWMA.oneMinuteEWMA(interval, intervalUnit);
+		this.m5Rate = EWMA.fiveMinuteEWMA(interval, intervalUnit);
+		this.m15Rate = EWMA.fifteenMinuteEWMA(interval, intervalUnit);
 	}
 
 	@Override
@@ -121,7 +125,7 @@ public class MeterMetric implements Metered {
 	public double fiveMinuteRate() {
 		return m5Rate.rate(rateUnit);
 	}
-
+	
 	@Override
 	public double meanRate() {
 		if (count() == 0) {
@@ -131,7 +135,7 @@ public class MeterMetric implements Metered {
 			return convertNsRate(count() / (double) elapsed);
 		}
 	}
-
+	
 	@Override
 	public double oneMinuteRate() {
 		return m1Rate.rate(rateUnit);
