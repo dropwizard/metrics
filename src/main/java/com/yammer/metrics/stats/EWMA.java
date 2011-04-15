@@ -8,8 +8,8 @@ import static java.lang.Math.exp;
 /**
  * An exponentially-weighted moving average.
  *
- * @see <a href="UNIX Load Average Part 1: How It Works">http://www.teamquest.com/pdfs/whitepaper/ldavg1.pdf</a>
- * @see <a href="UNIX Load Average Part 2: Not Your Average Average">http://www.teamquest.com/pdfs/whitepaper/ldavg2.pdf</a>
+ * @see <a href="http://www.teamquest.com/pdfs/whitepaper/ldavg1.pdf">UNIX Load Average Part 1: How It Works</a>
+ * @see <a href="http://www.teamquest.com/pdfs/whitepaper/ldavg2.pdf">UNIX Load Average Part 2: Not Your Average Average</a>
  */
 public class EWMA {
     private static final double M1_ALPHA  = 1 - exp(-5 / 60.0);
