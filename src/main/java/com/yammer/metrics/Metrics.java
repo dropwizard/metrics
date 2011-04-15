@@ -102,7 +102,7 @@ public class Metrics {
 	 * @param name the name of the metric
 	 * @param eventType the plural name of the type of events the meter is
 	 * 	                measuring (e.g., {@code "requests"})
-	 * @param unit the scale unit of the new meter
+	 * @param unit the rate unit of the new meter
 	 * @return a new {@link MeterMetric}
 	 */
 	public static MeterMetric newMeter(Class<?> klass, String name, String eventType, TimeUnit unit) {

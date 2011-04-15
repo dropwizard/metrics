@@ -25,35 +25,20 @@ public class MeterMetric implements Metered {
 	 *
 	 * @param eventType the plural name of the event the meter is measuring
 	 *                  (e.g., {@code "requests"})
-	 * @param scaleUnit the scale unit of the new meter
+	 * @param rateUnit the rate unit of the new meter
 	 * @return a new {@link MeterMetric}
 	 */
-	public static MeterMetric newMeter(String eventType, TimeUnit scaleUnit) {
-		return newMeter(INTERVAL, TimeUnit.SECONDS, eventType, scaleUnit);
-	}
-
-	/**
-	 * Creates a new {@link MeterMetric} with a given tick interval.
-	 *
-	 *
-	 * @param interval the duration of a meter tick
-	 * @param intervalUnit the unit of {@code interval}
-	 * @param eventType the plural name of the event the meter is measuring
-	 *                  (e.g., {@code "requests"})
-	 * @param scaleUnit the scale unit of the new meter  @return a new {@link MeterMetric}
-	 * @return a new {@link MeterMetric}
-	 */
-	public static MeterMetric newMeter(long interval, TimeUnit intervalUnit, String eventType, TimeUnit scaleUnit) {
-		final MeterMetric meter = new MeterMetric(eventType, scaleUnit);
-		final Runnable job = new Runnable() {
-			@Override
-			public void run() {
-				meter.tick();
-			}
-		};
-		TICK_THREAD.scheduleAtFixedRate(job, interval, interval, intervalUnit);
-		return meter;
-	}
+	public static MeterMetric newMeter(String eventType, TimeUnit rateUnit) {
+        final MeterMetric meter = new MeterMetric(eventType, rateUnit);
+        final Runnable job = new Runnable() {
+            @Override
+            public void run() {
+                meter.tick();
+            }
+        };
+        TICK_THREAD.scheduleAtFixedRate(job, INTERVAL, INTERVAL, TimeUnit.SECONDS);
+        return meter;
+    }
 
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
     private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
