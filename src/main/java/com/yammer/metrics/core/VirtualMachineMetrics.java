@@ -1,22 +1,22 @@
 package com.yammer.metrics.core;
 
+import com.yammer.metrics.util.NamedThreadFactory;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.Thread.State;
-import java.lang.management.MemoryPoolMXBean;
-import java.lang.management.MemoryUsage;
-import java.lang.management.OperatingSystemMXBean;
-import java.lang.management.ThreadInfo;
+import java.lang.management.*;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 import static java.lang.management.ManagementFactory.*;
-
-import com.yammer.metrics.util.NamedThreadFactory;
 
 /**
  * A collection of Java Virtual Machine metrics.
@@ -277,11 +277,45 @@ public class VirtualMachineMetrics {
 			final State state = info.getThreadState();
 			conditions.put(state, conditions.get(state) + 1);
 		}
-
 		for (State state : new ArrayList<State>(conditions.keySet())) {
 			conditions.put(state, conditions.get(state) / allThreads.length);
 		}
 
 		return conditions;
 	}
+
+    /**
+     * Dumps all of the threads' current information to an output stream.
+     *
+     * N.B.: This uses Sun/Oracle-specific APIs via reflection, so while this will compile on non-Sun/Oracle JVMs it
+     * will return an error message instead of a thread dump.
+     *
+     * @param out an output stream
+     * @throws IOException if something goes wrong
+     */
+    public static void threadDump(OutputStream out) throws IOException {
+        final String name = ManagementFactory.getRuntimeMXBean().getName();
+        final int pid = Integer.valueOf(name.substring(0, name.indexOf('@')));
+        try {
+            final Class<?> vmKlass = Class.forName("com.sun.tools.attach.VirtualMachine");
+            final Class<?> hotSpotVmKlass = Class.forName("sun.tools.attach.HotSpotVirtualMachine");
+            final Method attach = vmKlass.getDeclaredMethod("attach", String.class);
+            final Method detach = vmKlass.getDeclaredMethod("detach");
+            final Object vm = attach.invoke(vmKlass, Integer.toString(pid));
+            try {
+                final Method dump = hotSpotVmKlass.getDeclaredMethod("remoteDataDump", Object[].class);
+                final InputStream threadDump = (InputStream) dump.invoke(vm, new Object[] {new Object[]{"-l"}}); // dump all locks
+                final byte[] buf = new byte[1024];
+                int read = 0;
+                while ((read = threadDump.read(buf)) >= 0) {
+                    out.write(buf, 0, read);
+                }
+                out.flush();
+            } finally {
+                detach.invoke(vm);
+            }
+        } catch (Exception e) {
+            out.write("Thread dump unavailable.\n".getBytes());
+        }
+    }
 }

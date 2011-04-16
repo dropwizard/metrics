@@ -1,20 +1,5 @@
 package com.yammer.metrics.reporting;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.lang.Thread.State;
-import java.text.MessageFormat;
-import java.util.Map;
-import java.util.Map.Entry;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import static com.yammer.metrics.core.VirtualMachineMetrics.*;
-
 import com.yammer.metrics.HealthChecks;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
@@ -25,6 +10,21 @@ import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.lang.Thread.State;
+import java.text.MessageFormat;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 
 public class MetricsServlet extends HttpServlet {
 	private static final String TEMPLATE = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n" +
@@ -155,20 +155,9 @@ public class MetricsServlet extends HttpServlet {
 	private void handleThreadDump(HttpServletResponse resp) throws IOException {
 		resp.setStatus(HttpServletResponse.SC_OK);
 		resp.setContentType("text/plain");
-		final PrintWriter writer = resp.getWriter();
-
-		Map<Thread, StackTraceElement[]> traces = Thread.getAllStackTraces();
-		for (Entry<Thread, StackTraceElement[]> entry : traces.entrySet()) {
-			Thread t = entry.getKey();
-			writer.format("Thread: %s  %s\n", t.getName(), t.isDaemon() ? "daemon" : "non-daemon");
-			if (!t.isDaemon()) {
-				for (StackTraceElement frame : entry.getValue()) {
-					writer.format("\t%s.%s[%s:%d]\n", frame.getClassName(), frame.getMethodName(),
-							frame.getFileName(), frame.getLineNumber());
-				}
-			}
-		}
-		writer.close();
+        final OutputStream output = resp.getOutputStream();
+        threadDump(output);
+        output.close();
 	}
 
 	private void handlePing(HttpServletResponse resp) throws IOException {
