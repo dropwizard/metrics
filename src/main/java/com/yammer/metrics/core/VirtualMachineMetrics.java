@@ -290,9 +290,6 @@ public class VirtualMachineMetrics {
     /**
      * Dumps all of the threads' current information to an output stream.
      *
-     * N.B.: This uses Sun/Oracle-specific APIs via reflection, so while this will compile on non-Sun/Oracle JVMs it
-     * will return an error message instead of a thread dump.
-     *
      * @param out an output stream
      * @throws IOException if something goes wrong
      */
