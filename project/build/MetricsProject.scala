@@ -28,7 +28,7 @@ class MetricsProject(info: ProjectInfo) extends DefaultProject(info)
    */
   val jackson = "org.codehaus.jackson" % "jackson-mapper-asl" % "1.7.5" % "optional"
   val servletApi = "javax.servlet" % "servlet-api" % "2.5" % "optional"
-  val jetty = "org.eclipse.jetty" % "jetty-server" % "7.3.1.v20110307" % "optional"
+  val jetty = "org.eclipse.jetty" % "jetty-server" % "7.4.0.v20110414" % "optional"
   val guice = "com.google.inject" % "guice" % "3.0" % "optional"
 
   /**
