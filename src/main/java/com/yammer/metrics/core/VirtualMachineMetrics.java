@@ -315,7 +315,13 @@ public class VirtualMachineMetrics {
                 detach.invoke(vm);
             }
         } catch (Exception e) {
-            out.write("Thread dump unavailable.\n".getBytes());
+            final StringBuilder error = new StringBuilder();
+            error.append("Thread dump unavailable: ").append(e.getMessage()).append('\n');
+            StackTraceElement[] stackTrace = e.getStackTrace();
+            for (StackTraceElement element : stackTrace) {
+                error.append(" at ").append(element).append('\n');
+            }
+            out.write(error.toString().getBytes());
         }
     }
 }
