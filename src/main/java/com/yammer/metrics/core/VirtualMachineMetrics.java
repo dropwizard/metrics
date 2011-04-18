@@ -5,8 +5,8 @@ import com.yammer.metrics.util.NamedThreadFactory;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.lang.Thread.State;
 import java.lang.management.*;
 import java.lang.reflect.Method;
@@ -76,8 +76,10 @@ public class VirtualMachineMetrics {
 				gcMeters.put(name, meter);
 			}
 
-			final Map<String, MemoryUsage> beforeUsages = (Map<String, MemoryUsage>) gcInfo.getClass().getDeclaredMethod("getMemoryUsageBeforeGc").invoke(gcInfo);
-			final Map<String, MemoryUsage> afterUsages = (Map<String, MemoryUsage>) gcInfo.getClass().getDeclaredMethod("getMemoryUsageAfterGc").invoke(gcInfo);
+			final Map<String, MemoryUsage> beforeUsages = (Map<String, MemoryUsage>)
+                    gcInfo.getClass().getDeclaredMethod("getMemoryUsageBeforeGc").invoke(gcInfo);
+			final Map<String, MemoryUsage> afterUsages = (Map<String, MemoryUsage>)
+                    gcInfo.getClass().getDeclaredMethod("getMemoryUsageAfterGc").invoke(gcInfo);
 
 			long memoryCollected = 0;
 			for (MemoryUsage memoryUsage : beforeUsages.values()) {
@@ -101,7 +103,8 @@ public class VirtualMachineMetrics {
 		}
 	}
 
-	private static final ScheduledExecutorService MONITOR_THREAD = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("gc-monitor"));
+	private static final ScheduledExecutorService MONITOR_THREAD =
+            Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("gc-monitor"));
 	private static final GcMonitor GC_MONITOR = initializeGcMonitor();
 	private static GcMonitor initializeGcMonitor() {
 		try {
@@ -294,34 +297,59 @@ public class VirtualMachineMetrics {
      * @throws IOException if something goes wrong
      */
     public static void threadDump(OutputStream out) throws IOException {
-        final String name = ManagementFactory.getRuntimeMXBean().getName();
-        final int pid = Integer.valueOf(name.substring(0, name.indexOf('@')));
-        try {
-            final Class<?> vmKlass = Class.forName("com.sun.tools.attach.VirtualMachine");
-            final Class<?> hotSpotVmKlass = Class.forName("sun.tools.attach.HotSpotVirtualMachine");
-            final Method attach = vmKlass.getDeclaredMethod("attach", String.class);
-            final Method detach = vmKlass.getDeclaredMethod("detach");
-            final Object vm = attach.invoke(vmKlass, Integer.toString(pid));
-            try {
-                final Method dump = hotSpotVmKlass.getDeclaredMethod("remoteDataDump", Object[].class);
-                final InputStream threadDump = (InputStream) dump.invoke(vm, new Object[] {new Object[]{"-l"}}); // dump all locks
-                final byte[] buf = new byte[1024];
-                int read = 0;
-                while ((read = threadDump.read(buf)) >= 0) {
-                    out.write(buf, 0, read);
+        final ThreadInfo[] threads = ManagementFactory.getThreadMXBean().dumpAllThreads(true, true);
+        final PrintWriter writer = new PrintWriter(out, true);
+
+        for (int ti = threads.length - 1; ti > 0; ti--) {
+            final ThreadInfo t = threads[ti];
+            writer.printf("%s id=%d state=%s", t.getThreadName(), t.getThreadId(), t.getThreadState());
+            final LockInfo lock = t.getLockInfo();
+            if (lock != null && t.getThreadState() != Thread.State.BLOCKED) {
+                writer.printf("\n    - waiting on <0x%08x> (a %s)", lock.getIdentityHashCode(), lock.getClassName());
+                writer.printf("\n    - locked <0x%08x> (a %s)", lock.getIdentityHashCode(), lock.getClassName());
+            } else if (lock != null && t.getThreadState() == Thread.State.BLOCKED) {
+                writer.printf("\n    - waiting to lock <0x%08x> (a %s)", lock.getIdentityHashCode(), lock.getClassName());
+            }
+
+            if (t.isSuspended()) {
+                writer.print(" (suspended)");
+            }
+
+            if (t.isInNative()) {
+                writer.print(" (running in native)");
+            }
+
+            writer.println();
+            if (t.getLockOwnerName() != null) {
+                writer.printf("     owned by %s id=%d\n", t.getLockOwnerName(), t.getLockOwnerId());
+            }
+
+            final StackTraceElement[] elements = t.getStackTrace();
+            final MonitorInfo[] monitors = t.getLockedMonitors();
+
+            for (int i = 0; i < elements.length; i++) {
+                final StackTraceElement element = elements[i];
+                writer.printf("    at %s\n", element);
+                for (int j = 1; j < monitors.length; j++) {
+                    final MonitorInfo monitor = monitors[j];
+                    if (monitor.getLockedStackDepth() == i) {
+                        writer.printf("      - locked %s\n", monitor);
+                    }
                 }
-                out.flush();
-            } finally {
-                detach.invoke(vm);
             }
-        } catch (Exception e) {
-            final StringBuilder error = new StringBuilder();
-            error.append("Thread dump unavailable: ").append(e.getMessage()).append('\n');
-            StackTraceElement[] stackTrace = e.getStackTrace();
-            for (StackTraceElement element : stackTrace) {
-                error.append(" at ").append(element).append('\n');
+            writer.println();
+
+            final LockInfo[] locks = t.getLockedSynchronizers();
+            if (locks.length > 0) {
+                writer.printf("    Locked synchronizers: count = %d\n", locks.length);
+                for (LockInfo l : locks) {
+                    writer.printf("      - %s\n", l);
+                }
+                writer.println();
             }
-            out.write(error.toString().getBytes());
         }
+        
+        writer.println();
+        writer.flush();
     }
 }
