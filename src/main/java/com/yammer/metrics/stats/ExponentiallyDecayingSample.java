@@ -68,7 +68,7 @@ public class ExponentiallyDecayingSample implements Sample {
 	 * Adds an old value with a fixed timestamp to the sample.
 	 *
 	 * @param value the value to be added
-	 * @param timestamp the epoch timestamp of {@code value} in milliseconds
+	 * @param timestamp the epoch timestamp of {@code value} in seconds
 	 */
 	public void update(long value, long timestamp) {
 		lock.readLock().lock();
