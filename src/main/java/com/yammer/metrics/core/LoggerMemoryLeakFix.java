@@ -73,9 +73,9 @@ class LoggerMemoryLeakFix implements Runnable {
             LOGGER.fine("Removing null kid entries from logger \"" + name + "\"");
             if (logger != null) {
                 try {
-                    Object lock = lockField.get(logger);
+                    final Object lock = lockField.get(logger);
                     if (lock == null) {
-                        lock = new Object(); // it's unlikely this would change, but hey who knows
+                        throw new IllegalStateException("can't find the lock on logger \"" + name + "\"");
                     }
                     int removed = 0;
                     synchronized (lock) {
