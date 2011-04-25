@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  *
  * <p>All of that hoo-hah calls {@link Logger#setParent(java.util.logging.Logger)} rather a lot, which itself calls a
  * private method {@code doSetParent}, which among other things adds a {@link WeakReference} to the current
- * {@link Logger} to an {@link ArrayList} named {@code kids} in the parrent {@link Logger}. This is all fine and good
+ * {@link Logger} to an {@link ArrayList} named {@code kids} in the parent {@link Logger}. This is all fine and good
  * except for one thing: nothing ever removes references whose referents have been garbage-collected from {@code kids}
  * </p>
  *
