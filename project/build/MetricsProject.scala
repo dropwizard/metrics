@@ -34,6 +34,6 @@ class MetricsProject(info: ProjectInfo) extends DefaultProject(info)
   /**
    * Test Dependencies
    */
-  val simplespec = "com.codahale" %% "simplespec" % "0.2.0" % "test"
+  val simplespec = "com.codahale" % "simplespec_2.8.1" % "0.2.0" % "test"
   val mockito = "org.mockito" % "mockito-all" % "1.8.4" % "test"
 }
