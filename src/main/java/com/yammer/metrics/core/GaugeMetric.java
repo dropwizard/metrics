@@ -1,8 +1,8 @@
 package com.yammer.metrics.core;
 
 /**
- * A gauge metric is an instantaneous reading of a partiular value. To
- * instrument a qeue's depth, for example:<br>
+ * A gauge metric is an instantaneous reading of a particular value. To
+ * instrument a queue's depth, for example:<br>
  * <pre><code>
  * Queue<String> queue = new ConcurrentLinkedQueue<String>();
  * GaugeMetric<Integer> queueDepth = new GaugeMetric<Integer>() {

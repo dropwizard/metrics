@@ -11,14 +11,14 @@ import core.MeterMetric
 class Meter(metric: MeterMetric) {
 
   /**
-   * Marks the occurance of an event.
+   * Marks the occurrence of an event.
    */
   def mark() {
     metric.mark()
   }
 
   /**
-   * Marks the occurance of a given number of events.
+   * Marks the occurrence of a given number of events.
    */
   def mark(count: Long) {
     metric.mark(count)
@@ -41,7 +41,7 @@ class Meter(metric: MeterMetric) {
 
   /**
    * Returns the fifteen-minute exponentially-weighted moving average rate at
-   * which events have occured since the meter was created.
+   * which events have occurred since the meter was created.
    * <p>
    * This rate has the same exponential decay factor as the fifteen-minute load
    * average in the {@code top} Unix command.
@@ -50,7 +50,7 @@ class Meter(metric: MeterMetric) {
 
   /**
    * Returns the five-minute exponentially-weighted moving average rate at
-   * which events have occured since the meter was created.
+   * which events have occurred since the meter was created.
    * <p>
    * This rate has the same exponential decay factor as the five-minute load
    * average in the {@code top} Unix command.
@@ -58,14 +58,14 @@ class Meter(metric: MeterMetric) {
   def fiveMinuteRate = metric.fiveMinuteRate
 
   /**
-   * Returns the mean rate at which events have occured since the meter was
+   * Returns the mean rate at which events have occurred since the meter was
    * created.
    */
   def meanRate = metric.meanRate
 
   /**
    * Returns the one-minute exponentially-weighted moving average rate at
-   * which events have occured since the meter was created.
+   * which events have occurred since the meter was created.
    * <p>
    * This rate has the same exponential decay factor as the one-minute load
    * average in the {@code top} Unix command.
