@@ -74,14 +74,14 @@ public class MeterMetric implements Metered {
 	}
 
 	/**
-	 * Mark the occurence of an event.
+	 * Mark the occurrence of an event.
 	 */
 	public void mark() {
 		mark(1);
 	}
 
 	/**
-	 * Mark the occurence of a given number of events.
+	 * Mark the occurrence of a given number of events.
 	 *
 	 * @param n the number of events
 	 */
