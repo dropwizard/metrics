@@ -8,10 +8,10 @@ Requirements
 
 * Java SE 6
 * Scala 2.8.1
-* Guice 2.0 (for instrumenting via annotation)
+* Guice 3.0 (for instrumenting via annotation)
 * Servlet API 2.5 (for reporting via HTTP)
-* Jackson 1.7.1 (for reporting via HTTP)
-* Jetty 7.2.2.v20101205 (for instrumenting Jetty handlers)
+* Jackson 1.7.5 (for reporting via HTTP)
+* Jetty 7.4.0.v20110414 (for instrumenting Jetty handlers)
 
 
 How To Use

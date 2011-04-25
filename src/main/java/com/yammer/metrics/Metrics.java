@@ -42,7 +42,7 @@ public class Metrics {
 
 	/**
 	 * Given a JMX MBean's object name and an attribute name, registers a gauge
-	 * for that attribute under the given class ane name.
+	 * for that attribute under the given class and name.
 	 *
 	 * @param klass the class which owns the metric
 	 * @param name the name of the metric
@@ -83,7 +83,7 @@ public class Metrics {
 	}
 
 	/**
-	 * Creates a new non-baised {@link HistogramMetric} and registers it under
+	 * Creates a new non-biased {@link HistogramMetric} and registers it under
 	 * the given class and name.
 	 *
 	 * @param klass the class which owns the metric
