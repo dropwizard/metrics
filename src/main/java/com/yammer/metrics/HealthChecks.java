@@ -1,13 +1,13 @@
 package com.yammer.metrics;
 
+import com.yammer.metrics.core.HealthCheck;
+import com.yammer.metrics.core.HealthCheck.Result;
+
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import com.yammer.metrics.core.HealthCheck;
-import com.yammer.metrics.core.HealthCheck.Result;
 
 /**
  * A manager class for health checks.
@@ -22,21 +22,11 @@ public class HealthChecks {
 	 *
 	 * @param healthCheck the {@link HealthCheck} instance
 	 */
-	public static void registerHealthCheck(HealthCheck healthCheck) {
+	public static void register(HealthCheck healthCheck) {
 		HEALTH_CHECKS.putIfAbsent(healthCheck.name(), healthCheck);
 	}
 
-	/**
-	 * Returns {@code true} if any {@link HealthCheck}s have been registered,
-	 * {@code false} otherwise.
-	 *
-	 * @return if any {@link HealthCheck}s have been registered
-	 */
-	public static boolean hasHealthChecks() {
-		return !HEALTH_CHECKS.isEmpty();
-	}
-
-	/**
+    /**
 	 * Runs the registered health checks and returns a map of the results.
 	 *
 	 * @return a map of the health check results
