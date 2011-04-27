@@ -21,6 +21,7 @@ public class Metrics {
 	private static final ConcurrentMap<MetricName, Metric> METRICS = new ConcurrentHashMap<MetricName, Metric>();
 	static {{
 		JmxReporter.INSTANCE.start();
+		VirtualMachineMetrics.daemonThreadCount(); // make sure we initialize this
 	}}
 
 	private Metrics() { /* unused */ }
@@ -41,7 +42,7 @@ public class Metrics {
 
 	/**
 	 * Given a JMX MBean's object name and an attribute name, registers a gauge
-	 * for that attribute under the given class ane name.
+	 * for that attribute under the given class and name.
 	 *
 	 * @param klass the class which owns the metric
 	 * @param name the name of the metric
@@ -82,7 +83,7 @@ public class Metrics {
 	}
 
 	/**
-	 * Creates a new non-baised {@link HistogramMetric} and registers it under
+	 * Creates a new non-biased {@link HistogramMetric} and registers it under
 	 * the given class and name.
 	 *
 	 * @param klass the class which owns the metric
@@ -101,7 +102,7 @@ public class Metrics {
 	 * @param name the name of the metric
 	 * @param eventType the plural name of the type of events the meter is
 	 * 	                measuring (e.g., {@code "requests"})
-	 * @param unit the scale unit of the new meter
+	 * @param unit the rate unit of the new meter
 	 * @return a new {@link MeterMetric}
 	 */
 	public static MeterMetric newMeter(Class<?> klass, String name, String eventType, TimeUnit unit) {

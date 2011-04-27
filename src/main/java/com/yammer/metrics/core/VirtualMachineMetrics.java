@@ -1,20 +1,22 @@
 package com.yammer.metrics.core;
 
-import java.lang.management.MemoryPoolMXBean;
-import java.lang.management.MemoryUsage;
-import java.lang.management.OperatingSystemMXBean;
+import com.yammer.metrics.util.NamedThreadFactory;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.lang.Thread.State;
+import java.lang.management.*;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 import static java.lang.management.ManagementFactory.*;
-
-import com.yammer.metrics.util.NamedThreadFactory;
 
 /**
  * A collection of Java Virtual Machine metrics.
@@ -74,8 +76,10 @@ public class VirtualMachineMetrics {
 				gcMeters.put(name, meter);
 			}
 
-			final Map<String, MemoryUsage> beforeUsages = (Map<String, MemoryUsage>) gcInfo.getClass().getDeclaredMethod("getMemoryUsageBeforeGc").invoke(gcInfo);
-			final Map<String, MemoryUsage> afterUsages = (Map<String, MemoryUsage>) gcInfo.getClass().getDeclaredMethod("getMemoryUsageAfterGc").invoke(gcInfo);
+			final Map<String, MemoryUsage> beforeUsages = (Map<String, MemoryUsage>)
+                    gcInfo.getClass().getDeclaredMethod("getMemoryUsageBeforeGc").invoke(gcInfo);
+			final Map<String, MemoryUsage> afterUsages = (Map<String, MemoryUsage>)
+                    gcInfo.getClass().getDeclaredMethod("getMemoryUsageAfterGc").invoke(gcInfo);
 
 			long memoryCollected = 0;
 			for (MemoryUsage memoryUsage : beforeUsages.values()) {
@@ -99,14 +103,20 @@ public class VirtualMachineMetrics {
 		}
 	}
 
-	private static final ScheduledExecutorService MONITOR_THREAD = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("gc-monitor"));
+	private static final ScheduledExecutorService MONITOR_THREAD =
+            Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("gc-monitor"));
 	private static final GcMonitor GC_MONITOR = initializeGcMonitor();
 	private static GcMonitor initializeGcMonitor() {
 		try {
 			final GcMonitor monitor = new GcMonitor();
 			MONITOR_THREAD.scheduleAtFixedRate(monitor, 0, 5, TimeUnit.SECONDS);
-			return monitor;
-		} catch (Exception e) {
+            try {
+                MONITOR_THREAD.scheduleAtFixedRate(new LoggerMemoryLeakFix(), 0, 10, TimeUnit.MINUTES);
+            } catch (Exception ignored) {
+                // well that's just unfortunate now isn't it
+            }
+            return monitor;
+		} catch (Exception ignored) {
 			return null;
 		}
 	}
@@ -225,4 +235,123 @@ public class VirtualMachineMetrics {
 		}
 		return GC_MONITOR.gcMeters;
 	}
+
+	/**
+	 * Returns a set of strings describing deadlocked threads, if any are
+	 * deadlocked.
+	 *
+	 * @return a set of any deadlocked threads
+	 */
+	public static Set<String> deadlockedThreads() {
+		final long[] threadIds = getThreadMXBean().findDeadlockedThreads();
+		if (threadIds != null) {
+			final Set<String> threads = new HashSet<String>();
+			final ThreadInfo[] infos = getThreadMXBean().getThreadInfo(threadIds, 100);
+			for (ThreadInfo info : infos) {
+				final StringBuilder stackTrace = new StringBuilder();
+				for (StackTraceElement element : info.getStackTrace()) {
+					stackTrace.append("\t at ").append(element.toString()).append('\n');
+				}
+
+				threads.add(
+					String.format(
+							"%s locked on %s (owned by %s):\n%s",
+							info.getThreadName(), info.getLockName(),
+							info.getLockOwnerName(),
+							stackTrace.toString()
+					)
+				);
+			}
+			return threads;
+		}
+		return Collections.emptySet();
+	}
+
+	/**
+	 * Returns a map of thread states to the percentage of all threads which
+	 * are in that state.
+	 *
+	 * @return a map of thread states to percentages
+	 */
+	public static Map<State, Double> threadStatePercentages() {
+		final Map<State, Double> conditions = new HashMap<State, Double>();
+		for (State state : State.values()) {
+			conditions.put(state, 0.0);
+		}
+
+		final long[] allThreadIds = getThreadMXBean().getAllThreadIds();
+		final ThreadInfo[] allThreads = getThreadMXBean().getThreadInfo(allThreadIds);
+		for (ThreadInfo info : allThreads) {
+			final State state = info.getThreadState();
+			conditions.put(state, conditions.get(state) + 1);
+		}
+		for (State state : new ArrayList<State>(conditions.keySet())) {
+			conditions.put(state, conditions.get(state) / allThreads.length);
+		}
+
+		return conditions;
+	}
+
+    /**
+     * Dumps all of the threads' current information to an output stream.
+     *
+     * @param out an output stream
+     * @throws IOException if something goes wrong
+     */
+    public static void threadDump(OutputStream out) throws IOException {
+        final ThreadInfo[] threads = ManagementFactory.getThreadMXBean().dumpAllThreads(true, true);
+        final PrintWriter writer = new PrintWriter(out, true);
+
+        for (int ti = threads.length - 1; ti > 0; ti--) {
+            final ThreadInfo t = threads[ti];
+            writer.printf("%s id=%d state=%s", t.getThreadName(), t.getThreadId(), t.getThreadState());
+            final LockInfo lock = t.getLockInfo();
+            if (lock != null && t.getThreadState() != Thread.State.BLOCKED) {
+                writer.printf("\n    - waiting on <0x%08x> (a %s)", lock.getIdentityHashCode(), lock.getClassName());
+                writer.printf("\n    - locked <0x%08x> (a %s)", lock.getIdentityHashCode(), lock.getClassName());
+            } else if (lock != null && t.getThreadState() == Thread.State.BLOCKED) {
+                writer.printf("\n    - waiting to lock <0x%08x> (a %s)", lock.getIdentityHashCode(), lock.getClassName());
+            }
+
+            if (t.isSuspended()) {
+                writer.print(" (suspended)");
+            }
+
+            if (t.isInNative()) {
+                writer.print(" (running in native)");
+            }
+
+            writer.println();
+            if (t.getLockOwnerName() != null) {
+                writer.printf("     owned by %s id=%d\n", t.getLockOwnerName(), t.getLockOwnerId());
+            }
+
+            final StackTraceElement[] elements = t.getStackTrace();
+            final MonitorInfo[] monitors = t.getLockedMonitors();
+
+            for (int i = 0; i < elements.length; i++) {
+                final StackTraceElement element = elements[i];
+                writer.printf("    at %s\n", element);
+                for (int j = 1; j < monitors.length; j++) {
+                    final MonitorInfo monitor = monitors[j];
+                    if (monitor.getLockedStackDepth() == i) {
+                        writer.printf("      - locked %s\n", monitor);
+                    }
+                }
+            }
+            writer.println();
+
+            final LockInfo[] locks = t.getLockedSynchronizers();
+            if (locks.length > 0) {
+                writer.printf("    Locked synchronizers: count = %d\n", locks.length);
+                for (LockInfo l : locks) {
+                    writer.printf("      - %s\n", l);
+                }
+                writer.println();
+            }
+        }
+        
+        writer.println();
+        writer.flush();
+    }
 }

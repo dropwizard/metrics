@@ -68,7 +68,7 @@ public class ExponentiallyDecayingSample implements Sample {
 	 * Adds an old value with a fixed timestamp to the sample.
 	 *
 	 * @param value the value to be added
-	 * @param timestamp the epoch timestamp of {@code value} in milliseconds
+	 * @param timestamp the epoch timestamp of {@code value} in seconds
 	 */
 	public void update(long value, long timestamp) {
 		lock.readLock().lock();
@@ -80,11 +80,11 @@ public class ExponentiallyDecayingSample implements Sample {
 			} else {
 				Double first = values.firstKey();
 				if (first < priority) {
-					values.put(priority, value);
-
-					// ensure we always remove an item
-					while (values.remove(first) == null) {
-						first = values.firstKey();
+					if (values.putIfAbsent(priority, value) == null) {
+						// ensure we always remove an item
+						while (values.remove(first) == null) {
+							first = values.firstKey();
+						}
 					}
 				}
 			}
