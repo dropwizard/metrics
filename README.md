@@ -7,7 +7,7 @@ Requirements
 ------------
 
 * Java SE 6
-* Scala 2.8.1
+* Scala 2.8.1 or 2.9.0.RC1 or 2.9.0.RC2.
 * Guice 3.0 (for instrumenting via annotation)
 * Servlet API 2.5 (for reporting via HTTP)
 * Jackson 1.7.5 (for reporting via HTTP)
@@ -20,7 +20,7 @@ How To Use
 **First**, specify Metrics as a dependency:
 
     val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
-    val metrics = "com.yammer" %% "metrics" % "2.0.0-BETA10"
+    val metrics = "com.yammer" %% "metrics" % "2.0.0-BETA11"
 
 (Or whatever it takes for you to get Maven or Ivy happy.)
 
@@ -92,7 +92,7 @@ Metrics comes with five types of metrics:
 
 Metrics also has support for health checks:
 
-    HealthChecks.registerHealthCheck("database", new HealthCheck {
+    HealthChecks.register("database", new HealthCheck {
       def check = {
         if (Database.isConnected) {
           Result.healthy()
