@@ -2,6 +2,7 @@ package com.yammer.metrics.jetty;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.CounterMetric;
+import com.yammer.metrics.core.GaugeMetric;
 import com.yammer.metrics.core.MeterMetric;
 import com.yammer.metrics.core.TimerMetric;
 import org.eclipse.jetty.continuation.Continuation;
@@ -62,6 +63,66 @@ public class InstrumentedHandler extends HandlerWrapper {
 				Metrics.newMeter(underlying.getClass(), "4xx-reponses", "responses", TimeUnit.SECONDS), // 4xx
 				Metrics.newMeter(underlying.getClass(), "5xx-reponses", "responses", TimeUnit.SECONDS)  // 5xx
 		};
+
+        Metrics.newGauge(underlying.getClass(), "percent-4xx-1m", new GaugeMetric<Double>() {
+            @Override
+            public Double value() {
+                if (requests.count() > 0) {
+                    return responses[3].oneMinuteRate() / requests.oneMinuteRate();
+                }
+                return 0.0;
+            }
+        });
+
+        Metrics.newGauge(underlying.getClass(), "percent-4xx-5m", new GaugeMetric<Double>() {
+            @Override
+            public Double value() {
+                if (requests.count() > 0) {
+                    return responses[3].fiveMinuteRate() / requests.fiveMinuteRate();
+                }
+                return 0.0;
+            }
+        });
+
+        Metrics.newGauge(underlying.getClass(), "percent-4xx-15m", new GaugeMetric<Double>() {
+            @Override
+            public Double value() {
+                if (requests.count() > 0) {
+                    return responses[3].fifteenMinuteRate() / requests.fifteenMinuteRate();
+                }
+                return 0.0;
+            }
+        });
+
+        Metrics.newGauge(underlying.getClass(), "percent-5xx-1m", new GaugeMetric<Double>() {
+            @Override
+            public Double value() {
+                if (requests.count() > 0) {
+                    return responses[4].oneMinuteRate() / requests.oneMinuteRate();
+                }
+                return 0.0;
+            }
+        });
+
+        Metrics.newGauge(underlying.getClass(), "percent-5xx-5m", new GaugeMetric<Double>() {
+            @Override
+            public Double value() {
+                if (requests.count() > 0) {
+                    return responses[4].fiveMinuteRate() / requests.fiveMinuteRate();
+                }
+                return 0.0;
+            }
+        });
+
+        Metrics.newGauge(underlying.getClass(), "percent-5xx-15m", new GaugeMetric<Double>() {
+            @Override
+            public Double value() {
+                if (requests.count() > 0) {
+                    return responses[4].fifteenMinuteRate() / requests.fifteenMinuteRate();
+                }
+                return 0.0;
+            }
+        });
 
 		this.listener = new ContinuationListener() {
 			@Override
