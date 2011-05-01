@@ -26,17 +26,13 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
     val mockito = "org.mockito" % "mockito-all" % "1.8.4" % "test"
   }
 
-  lazy val core = project("core", "metrics-core", new CoreProject(_))
+  lazy val core = project("core", "metrics-core")
 
   lazy val jetty = project("jetty", "metrics-jetty", new JettyProject(_), core)
 
   lazy val guice = project("guice", "metrics-guice", new GuiceProject(_), core)
 
   lazy val servlet = project("servlet", "metrics-servlet", new ServletProject(_), core)
-
-  class CoreProject(info: ProjectInfo) extends MetricsModule(info) {
-
-  }
 
   class JettyProject(info: ProjectInfo) extends MetricsModule(info) {
     val jetty = "org.eclipse.jetty" % "jetty-server" % "7.4.0.v20110414"
