@@ -34,6 +34,8 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
 
   lazy val servlet = project("servlet", "metrics-servlet", new ServletProject(_), core)
 
+  lazy val log4j = project("log4j", "metrics-log4j", new Log4JProject(_), core)
+
   class JettyProject(info: ProjectInfo) extends MetricsModule(info) {
     val jetty = "org.eclipse.jetty" % "jetty-server" % "7.4.0.v20110414"
   }
@@ -45,5 +47,9 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
   class ServletProject(info: ProjectInfo) extends MetricsModule(info) {
     val jackson = "org.codehaus.jackson" % "jackson-mapper-asl" % "1.7.5"
     val servletApi = "javax.servlet" % "servlet-api" % "2.5"
+  }
+
+  class Log4JProject(info: ProjectInfo) extends MetricsModule(info) {
+    val log4j = "log4j" % "log4j" % "1.2.16"
   }
 }
