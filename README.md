@@ -12,6 +12,7 @@ Requirements
 * Servlet API 2.5 (for `metrics-servlet`)
 * Jackson 1.7.5 (for `metrics-servlet`)
 * Jetty 7.4.0.v20110414 (for `metrics-jetty`)
+* Log4J 1.2.16 (for `metrics-log4j`)
 
 
 How To Use
