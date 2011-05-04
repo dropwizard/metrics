@@ -36,10 +36,10 @@ public class MetricsServlet extends HttpServlet {
 										   "<body>\n" +
 										   "  <h1>Operational Menu</h1>\n" +
 										   "  <ul>\n" +
-										   "    <li><a href=\"{0}\">Metrics</a></li>\n" +
-										   "    <li><a href=\"{1}\">Ping</a></li>\n" +
-										   "    <li><a href=\"{2}\">Threads</a></li>\n" +
-										   "    <li><a href=\"{3}\">Healthcheck</a></li>\n" +
+										   "    <li><a href=\"{0}{1}\">Metrics</a></li>\n" +
+										   "    <li><a href=\"{2}{3}\">Ping</a></li>\n" +
+										   "    <li><a href=\"{4}{5}\">Threads</a></li>\n" +
+										   "    <li><a href=\"{6}{7}\">Healthcheck</a></li>\n" +
 										   "  </ul>\n" +
 										   "</body>\n" +
 										   "</html>";
@@ -94,7 +94,7 @@ public class MetricsServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		final String uri = req.getPathInfo();
 		if (uri == null || uri.equals("/")) {
-			handleHome(resp);
+			handleHome(req.getServletPath(), resp);
 		} else if (uri.startsWith(metricsUri)) {
 			handleMetrics(req.getParameter("class"), Boolean.parseBoolean(req.getParameter("full-samples")), resp);
 		} else if (uri.equals(pingUri)) {
@@ -108,12 +108,12 @@ public class MetricsServlet extends HttpServlet {
 		}
 	}
 
-	private void handleHome(HttpServletResponse resp) throws IOException {
+	private void handleHome(String path, HttpServletResponse resp) throws IOException {
 		resp.setStatus(HttpServletResponse.SC_OK);
 		resp.setContentType("text/html");
 
 		final PrintWriter writer = resp.getWriter();
-		writer.println(MessageFormat.format(TEMPLATE, metricsUri, pingUri, threadsUri, healthcheckUri));
+		writer.println(MessageFormat.format(TEMPLATE, path, metricsUri, path, pingUri, path, threadsUri, path, healthcheckUri));
 		writer.close();
 	}
 
