@@ -2,8 +2,6 @@ package com.yammer.metrics.core;
 
 /**
  * A value class encapsulating a metric's owning class and name.
- *
- * @author
  */
 public class MetricName {
 	private final Class<?> klass;
@@ -45,12 +43,10 @@ public class MetricName {
 
 		final MetricName that = (MetricName) o;
 
-		if (klass != null ? !klass.equals(that.klass) : that.klass != null) {
-			return false;
-		}
-		return !(name != null ? !name.equals(that.name) : that.name != null);
+        return !(klass != null ? !klass.equals(that.klass) : that.klass != null)
+                && !(name != null ? !name.equals(that.name) : that.name != null);
 
-	}
+    }
 
 	@Override
 	public int hashCode() {
