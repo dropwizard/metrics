@@ -1,11 +1,11 @@
 package com.yammer.metrics.util;
 
+import com.yammer.metrics.core.Metric;
+import com.yammer.metrics.core.MetricName;
+
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
 
 public class Utils {
 	private Utils() { /* unused */ }
@@ -18,10 +18,16 @@ public class Utils {
 										  .getCanonicalName()
 										  .replace('$', '.')
 										  .replaceAll("\\.$", "");
-			Map<String, Metric> submetrics = sortedMetrics.get(className);
+            final String scopedName;
+            if (entry.getKey().hasScope()) {
+                scopedName = className + "." + entry.getKey().getScope();
+            } else {
+                scopedName = className;
+            }
+			Map<String, Metric> submetrics = sortedMetrics.get(scopedName);
 			if (submetrics == null) {
 				submetrics = new TreeMap<String, Metric>();
-				sortedMetrics.put(className, submetrics);
+				sortedMetrics.put(scopedName, submetrics);
 			}
 			submetrics.put(entry.getKey().getName(), entry.getValue());
 		}
