@@ -14,10 +14,10 @@ public class Utils {
 		final Map<String, Map<String, Metric>> sortedMetrics =
 				new TreeMap<String, Map<String, Metric>>();
 		for (Entry<MetricName, Metric> entry : metrics.entrySet()) {
-			final String className = entry.getKey().getKlass()
-										  .getCanonicalName()
-										  .replace('$', '.')
-										  .replaceAll("\\.$", "");
+		  final MetricName mname = entry.getKey();
+			final String className = (mname.getDomain() + "." + mname.getType())
+			  .replace('$', '.')
+			  .replaceAll("\\.$", "");
 			Map<String, Metric> submetrics = sortedMetrics.get(className);
 			if (submetrics == null) {
 				submetrics = new TreeMap<String, Metric>();

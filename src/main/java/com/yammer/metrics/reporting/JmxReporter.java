@@ -318,11 +318,7 @@ public class JmxReporter implements Runnable {
 			final Metric metric = Metrics.allMetrics().get(name);
 			if (metric != null) {
 				try {
-					final ObjectName objectName = new ObjectName(
-							String.format("%s:type=%s,name=%s",
-										  name.getKlass().getPackage().getName(),
-										  name.getKlass().getSimpleName().replaceAll("\\$$", ""),
-										  name.getName()));
+					final ObjectName objectName = name.getObjectName();
 					if (metric instanceof GaugeMetric) {
 						registerBean(name, new Gauge((GaugeMetric<?>) metric, objectName), objectName);
 					} else if (metric instanceof CounterMetric) {
