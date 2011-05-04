@@ -7,7 +7,7 @@ Requirements
 ------------
 
 * Java SE 6
-* Scala 2.8.1 or 2.9.0.RC1 or 2.9.0.RC2.
+* Scala 2.8.1 or 2.9.0.RC2 or 2.9.0.RC3.
 * Guice 3.0 (for `metrics-guice`)
 * Servlet API 2.5 (for `metrics-servlet`)
 * Jackson 1.7.5 (for `metrics-servlet`)
