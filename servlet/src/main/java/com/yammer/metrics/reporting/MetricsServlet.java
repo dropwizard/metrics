@@ -124,32 +124,36 @@ public class MetricsServlet extends HttpServlet {
 			allHealthy &= result.isHealthy();
 		}
 
-		if (allHealthy) {
-			resp.setStatus(HttpServletResponse.SC_OK);
-		} else {
-			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
-
 		resp.setContentType("text/plain");
 
 		final PrintWriter writer = resp.getWriter();
-		for (Entry<String, Result> entry : results.entrySet()) {
-			final Result result = entry.getValue();
-			if (result.isHealthy()) {
-				writer.format("* %s: OK\n", entry.getKey());
-			} else {
-				if (result.getMessage() != null) {
-					writer.format("! %s: ERROR\n!  %s\n", entry.getKey(), result.getMessage());
-				}
+        if (results.isEmpty()) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            writer.println("! No health checks registered.");
+        } else {
+            if (allHealthy) {
+                resp.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+            for (Entry<String, Result> entry : results.entrySet()) {
+                final Result result = entry.getValue();
+                if (result.isHealthy()) {
+                    writer.format("* %s: OK\n", entry.getKey());
+                } else {
+                    if (result.getMessage() != null) {
+                        writer.format("! %s: ERROR\n!  %s\n", entry.getKey(), result.getMessage());
+                    }
 
-				if (result.getError() != null) {
-					writer.println();
-					result.getError().printStackTrace(writer);
-					writer.println();
-				}
-			}
-		}
-
+                    if (result.getError() != null) {
+                        writer.println();
+                        result.getError().printStackTrace(writer);
+                        writer.println();
+                    }
+                }
+            }
+        }
+        writer.close();
 	}
 
 	private void handleThreadDump(HttpServletResponse resp) throws IOException {
