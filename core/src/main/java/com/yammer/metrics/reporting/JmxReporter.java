@@ -1,15 +1,15 @@
 package com.yammer.metrics.reporting;
 
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.*;
+import com.yammer.metrics.util.NamedThreadFactory;
+
+import javax.management.*;
 import java.lang.management.ManagementFactory;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import javax.management.*;
-
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.*;
-import com.yammer.metrics.util.NamedThreadFactory;
 
 /**
  * A reporter which exposes application metric as JMX MBeans.
@@ -318,11 +318,20 @@ public class JmxReporter implements Runnable {
 			final Metric metric = Metrics.allMetrics().get(name);
 			if (metric != null) {
 				try {
-					final ObjectName objectName = new ObjectName(
-							String.format("%s:type=%s,name=%s",
-										  name.getKlass().getPackage().getName(),
-										  name.getKlass().getSimpleName().replaceAll("\\$$", ""),
-										  name.getName()));
+                    final String simpleName = name.getKlass().getSimpleName().replaceAll("\\$$", "");
+                    final ObjectName objectName;
+                    if (name.hasScope()) {
+                        objectName = new ObjectName(String.format("%s:type=%s,scope=%s,name=%s",
+                                name.getKlass().getPackage().getName(),
+                                simpleName,
+                                name.getScope(),
+                                name.getName()));
+                    } else {
+                        objectName = new ObjectName(String.format("%s:type=%s,name=%s",
+                                name.getKlass().getPackage().getName(),
+                                simpleName,
+                                name.getName()));
+                    }
 					if (metric instanceof GaugeMetric) {
 						registerBean(name, new Gauge((GaugeMetric<?>) metric, objectName), objectName);
 					} else if (metric instanceof CounterMetric) {
