@@ -14,6 +14,8 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
 
   lazy val log4j = project("log4j", "metrics-log4j", new Log4JProject(_), core)
 
+  lazy val logback = project("logback", "metrics-logback", new LogbackProject(_), core)
+
   class CoreProject(info: ProjectInfo) extends DefaultProject(info) with MavenDependencies with IdeaProject {
     lazy val publishTo = Resolver.sftp("repo.codahale.com", "codahale.com", "/home/codahale/repo.codahale.com/")
 
@@ -53,5 +55,12 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
 
   class Log4JProject(info: ProjectInfo) extends CoreProject(info) {
     val log4j = "log4j" % "log4j" % "1.2.16"
+  }
+
+  class LogbackProject(info: ProjectInfo) extends CoreProject(info) {
+    val logbackCore = "ch.qos.logback" % "logback-core" % "0.9.28" % "compile"
+    val logbackClassic = "ch.qos.logback" % "logback-classic" % "0.9.28" % "compile"
+
+    val slf4j = "org.slf4j" % "slf4j-api" % "1.6.1" % "test"
   }
 }
