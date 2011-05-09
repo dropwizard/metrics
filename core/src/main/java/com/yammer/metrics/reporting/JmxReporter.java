@@ -2,12 +2,11 @@ package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
-import com.yammer.metrics.util.NamedThreadFactory;
+import com.yammer.metrics.util.Utils;
 
 import javax.management.*;
 import java.lang.management.ManagementFactory;
 import java.util.*;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -17,8 +16,7 @@ import java.util.concurrent.TimeUnit;
  * @author coda
  */
 public class JmxReporter implements Runnable {
-    private static final ScheduledExecutorService TICK_THREAD =
-            Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("metrics-jmx-reporter"));
+    private static final ScheduledExecutorService TICK_THREAD = Utils.newScheduledThreadPool(1, "jmx-reporter");
     private final Map<MetricName, MetricMBean> beans;
     private final MBeanServer server;
 

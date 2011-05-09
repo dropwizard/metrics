@@ -2,7 +2,6 @@ package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
-import com.yammer.metrics.util.NamedThreadFactory;
 import com.yammer.metrics.util.Utils;
 
 import java.io.IOException;
@@ -11,7 +10,6 @@ import java.io.Writer;
 import java.net.Socket;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -22,8 +20,7 @@ import java.util.concurrent.TimeUnit;
  * @author Mahesh Tiyyagura <tmahesh@gmail.com>
  */
 public class GraphiteReporter implements Runnable {
-    private static final ScheduledExecutorService TICK_THREAD =
-            Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("metrics-graphite-reporter"));
+    private static final ScheduledExecutorService TICK_THREAD = Utils.newScheduledThreadPool(1, "graphite-reporter");
     private final Writer writer;
 
     /**
