@@ -1,5 +1,10 @@
 package com.yammer.metrics.reporting;
 
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.*;
+import com.yammer.metrics.util.NamedThreadFactory;
+import com.yammer.metrics.util.Utils;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -9,17 +14,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.CounterMetric;
-import com.yammer.metrics.core.GaugeMetric;
-import com.yammer.metrics.core.HistogramMetric;
-import com.yammer.metrics.core.MeterMetric;
-import com.yammer.metrics.core.Metered;
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.TimerMetric;
-import com.yammer.metrics.util.NamedThreadFactory;
-import com.yammer.metrics.util.Utils;
 
 /**
  * A simple reporters which sends out application metrics to a
@@ -31,6 +25,24 @@ public class GraphiteReporter implements Runnable {
 	private static final ScheduledExecutorService TICK_THREAD =
 			Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("metrics-graphite-reporter"));
 	private final Writer writer;
+
+    /**
+     * Enables the graphite reporter sends data to graphite server with the
+     * specified period.
+     *
+     * @param period the period between successive outputs
+     * @param unit   the time unit of {@code period}
+     * @param host   the host name of graphite server (carbon-cache agent)
+     * @param port   the port number on which the graphite server is listening
+     */
+    public static void enable(long period, TimeUnit unit, String host, int port) {
+        try {
+            final GraphiteReporter reporter = new GraphiteReporter(host, port);
+            reporter.start(period, unit);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 	
 	
 	/**
