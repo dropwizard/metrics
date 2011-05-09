@@ -18,15 +18,15 @@ import java.util.concurrent.TimeUnit;
  * @author coda
  */
 public class Metrics {
-	private static final ConcurrentMap<MetricName, Metric> METRICS =
+    private static final ConcurrentMap<MetricName, Metric> METRICS =
             new ConcurrentHashMap<MetricName, Metric>();
-	static {{
-		JmxReporter.INSTANCE.start();
+    static {{
+        JmxReporter.INSTANCE.start();
         // make sure we initialize this so it can monitor GC etc
-		VirtualMachineMetrics.daemonThreadCount();
-	}}
+        VirtualMachineMetrics.daemonThreadCount();
+    }}
 
-	private Metrics() { /* unused */ }
+    private Metrics() { /* unused */ }
 
     /**
      * Given a new {@link com.yammer.metrics.core.GaugeMetric}, registers it
@@ -128,18 +128,18 @@ public class Metrics {
         return getOrAdd(new MetricName(klass, name, scope), new CounterMetric());
     }
 
-	/**
-	 * Creates a new {@link HistogramMetric} and registers it under the given
-	 * class and name.
-	 *
-	 * @param klass the class which owns the metric
-	 * @param name the name of the metric
-	 * @param biased whether or not the histogram should be biased
-	 * @return a new {@link HistogramMetric}
-	 */
-	public static HistogramMetric newHistogram(Class<?> klass,
+    /**
+     * Creates a new {@link HistogramMetric} and registers it under the given
+     * class and name.
+     *
+     * @param klass the class which owns the metric
+     * @param name the name of the metric
+     * @param biased whether or not the histogram should be biased
+     * @return a new {@link HistogramMetric}
+     */
+    public static HistogramMetric newHistogram(Class<?> klass,
                                                String name,
-											   boolean biased) {
+                                               boolean biased) {
         return newHistogram(klass, name, null, biased);
     }
 
@@ -161,17 +161,17 @@ public class Metrics {
                 new HistogramMetric(biased ? SampleType.BIASED : SampleType.UNIFORM));
     }
 
-	/**
-	 * Creates a new non-biased {@link HistogramMetric} and registers it under
-	 * the given class and name.
-	 *
-	 * @param klass the class which owns the metric
-	 * @param name the name of the metric
-	 * @return a new {@link HistogramMetric}
-	 */
-	public static HistogramMetric newHistogram(Class<?> klass, String name) {
-		return newHistogram(klass, name, false);
-	}
+    /**
+     * Creates a new non-biased {@link HistogramMetric} and registers it under
+     * the given class and name.
+     *
+     * @param klass the class which owns the metric
+     * @param name the name of the metric
+     * @return a new {@link HistogramMetric}
+     */
+    public static HistogramMetric newHistogram(Class<?> klass, String name) {
+        return newHistogram(klass, name, false);
+    }
 
     /**
      * Creates a new non-biased {@link HistogramMetric} and registers it under
@@ -188,18 +188,18 @@ public class Metrics {
         return newHistogram(klass, name, scope, false);
     }
 
-	/**
-	 * Creates a new {@link MeterMetric} and registers it under the given
-	 * class and name.
-	 *
-	 * @param klass the class which owns the metric
-	 * @param name the name of the metric
-	 * @param eventType the plural name of the type of events the meter is
-	 * 	                measuring (e.g., {@code "requests"})
-	 * @param unit the rate unit of the new meter
-	 * @return a new {@link MeterMetric}
-	 */
-	public static MeterMetric newMeter(Class<?> klass,
+    /**
+     * Creates a new {@link MeterMetric} and registers it under the given
+     * class and name.
+     *
+     * @param klass the class which owns the metric
+     * @param name the name of the metric
+     * @param eventType the plural name of the type of events the meter is
+     *                     measuring (e.g., {@code "requests"})
+     * @param unit the rate unit of the new meter
+     * @return a new {@link MeterMetric}
+     */
+    public static MeterMetric newMeter(Class<?> klass,
                                        String name,
                                        String eventType,
                                        TimeUnit unit) {
@@ -236,17 +236,17 @@ public class Metrics {
         return (MeterMetric) existingMetric;
     }
 
-	/**
-	 * Creates a new {@link TimerMetric} and registers it under the given
-	 * class and name.
-	 *
-	 * @param klass the class which owns the metric
-	 * @param name the name of the metric
-	 * @param durationUnit the duration scale unit of the new timer
-	 * @param rateUnit the rate scale unit of the new timer
-	 * @return a new {@link TimerMetric}
-	 */
-	public static TimerMetric newTimer(Class<?> klass,
+    /**
+     * Creates a new {@link TimerMetric} and registers it under the given
+     * class and name.
+     *
+     * @param klass the class which owns the metric
+     * @param name the name of the metric
+     * @param durationUnit the duration scale unit of the new timer
+     * @param rateUnit the rate scale unit of the new timer
+     * @return a new {@link TimerMetric}
+     */
+    public static TimerMetric newTimer(Class<?> klass,
                                        String name,
                                        TimeUnit durationUnit,
                                        TimeUnit rateUnit) {
@@ -282,39 +282,39 @@ public class Metrics {
         return (TimerMetric) existingMetric;
     }
 
-	/**
-	 * Enables the console reporter and causes it to print to STDOUT with the
-	 * specified period.
-	 *
-	 * @param period the period between successive outputs
-	 * @param unit the time unit of {@code period}
+    /**
+     * Enables the console reporter and causes it to print to STDOUT with the
+     * specified period.
+     *
+     * @param period the period between successive outputs
+     * @param unit the time unit of {@code period}
      * @deprecated use {@link ConsoleReporter#enable(long, java.util.concurrent.TimeUnit)} instead
-	 */
+     */
     @Deprecated
-	public static void enableConsoleReporting(long period, TimeUnit unit) {
-		final ConsoleReporter reporter = new ConsoleReporter(System.out);
-		reporter.start(period, unit);
-	}
+    public static void enableConsoleReporting(long period, TimeUnit unit) {
+        final ConsoleReporter reporter = new ConsoleReporter(System.out);
+        reporter.start(period, unit);
+    }
 
-	/**
-	 * Returns an unmodifiable map of all metrics and their names.
-	 *
-	 * @return an unmodifiable map of all metrics and their names
-	 */
-	public static Map<MetricName, Metric> allMetrics() {
-		return Collections.unmodifiableMap(METRICS);
-	}
+    /**
+     * Returns an unmodifiable map of all metrics and their names.
+     *
+     * @return an unmodifiable map of all metrics and their names
+     */
+    public static Map<MetricName, Metric> allMetrics() {
+        return Collections.unmodifiableMap(METRICS);
+    }
 
-	@SuppressWarnings("unchecked")
-	private static <T extends Metric> T getOrAdd(MetricName name, T metric) {
-		final Metric existingMetric = METRICS.get(name);
-		if (existingMetric == null) {
-			final Metric justAddedMetric = METRICS.putIfAbsent(name, metric);
-			if (justAddedMetric == null) {
-				return metric;
-			}
-			return (T) justAddedMetric;
-		}
-		return (T) existingMetric;
-	}
+    @SuppressWarnings("unchecked")
+    private static <T extends Metric> T getOrAdd(MetricName name, T metric) {
+        final Metric existingMetric = METRICS.get(name);
+        if (existingMetric == null) {
+            final Metric justAddedMetric = METRICS.putIfAbsent(name, metric);
+            if (justAddedMetric == null) {
+                return metric;
+            }
+            return (T) justAddedMetric;
+        }
+        return (T) existingMetric;
+    }
 }

@@ -10,15 +10,15 @@ import org.aopalliance.intercept.MethodInvocation;
  * the rate at which the annotated method is invoked.
  */
 public class MeteredInterceptor implements MethodInterceptor {
-	private final MeterMetric meter;
+    private final MeterMetric meter;
 
-	public MeteredInterceptor(MeterMetric meter) {
-		this.meter = meter;
-	}
+    public MeteredInterceptor(MeterMetric meter) {
+        this.meter = meter;
+    }
 
-	@Override
-	public Object invoke(MethodInvocation invocation) throws Throwable {
-		meter.mark();
-		return invocation.proceed();
-	}
+    @Override
+    public Object invoke(MethodInvocation invocation) throws Throwable {
+        meter.mark();
+        return invocation.proceed();
+    }
 }

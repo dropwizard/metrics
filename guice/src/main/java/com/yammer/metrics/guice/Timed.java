@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Given a method like this:
  * <pre><code>
- *		@Timed(name = "fancyName", rateUnit = TimeUnit.SECONDS, durationUnit = TimeUnit.MICROSECONDS)
+ *        @Timed(name = "fancyName", rateUnit = TimeUnit.SECONDS, durationUnit = TimeUnit.MICROSECONDS)
  *     public String fancyName(String name) {
  *         return "Sir Captain " + name;
  *     }
@@ -24,18 +24,18 @@ import java.util.concurrent.TimeUnit;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Timed {
-	/**
-	 * The name of the timer.
-	 */
-	String name() default "";
+    /**
+     * The name of the timer.
+     */
+    String name() default "";
 
-	/**
-	 * The time unit of the timer's rate.
-	 */
-	TimeUnit rateUnit() default TimeUnit.SECONDS;
+    /**
+     * The time unit of the timer's rate.
+     */
+    TimeUnit rateUnit() default TimeUnit.SECONDS;
 
-	/**
-	 * The time unit of the timer's duration.
-	 */
-	TimeUnit durationUnit() default TimeUnit.MILLISECONDS;
+    /**
+     * The time unit of the timer's duration.
+     */
+    TimeUnit durationUnit() default TimeUnit.MILLISECONDS;
 }

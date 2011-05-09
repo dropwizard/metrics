@@ -24,18 +24,18 @@ import java.util.concurrent.TimeUnit;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Metered {
-	/**
-	 * The name of the meter.
-	 */
-	String name() default "";
+    /**
+     * The name of the meter.
+     */
+    String name() default "";
 
-	/**
-	 * The name of the type of events the meter is measuring.
-	 */
-	String eventType() default "calls";
+    /**
+     * The name of the type of events the meter is measuring.
+     */
+    String eventType() default "calls";
 
-	/**
-	 * The time unit of the meter's rate.
-	 */
-	TimeUnit rateUnit() default TimeUnit.SECONDS;
+    /**
+     * The time unit of the meter's rate.
+     */
+    TimeUnit rateUnit() default TimeUnit.SECONDS;
 }

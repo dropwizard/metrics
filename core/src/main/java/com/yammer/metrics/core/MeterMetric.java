@@ -16,19 +16,19 @@ import java.util.concurrent.atomic.AtomicLong;
  * @see <a href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average">EMA</a>
  */
 public class MeterMetric implements Metered {
-	private static final ScheduledExecutorService TICK_THREAD =
-			Executors.newScheduledThreadPool(2, new NamedThreadFactory("metrics-meter-tick"));
-	private static final long INTERVAL = 5; // seconds
+    private static final ScheduledExecutorService TICK_THREAD =
+            Executors.newScheduledThreadPool(2, new NamedThreadFactory("metrics-meter-tick"));
+    private static final long INTERVAL = 5; // seconds
 
-	/**
-	 * Creates a new {@link MeterMetric}.
-	 *
-	 * @param eventType the plural name of the event the meter is measuring
-	 *                  (e.g., {@code "requests"})
-	 * @param rateUnit the rate unit of the new meter
-	 * @return a new {@link MeterMetric}
-	 */
-	public static MeterMetric newMeter(String eventType, TimeUnit rateUnit) {
+    /**
+     * Creates a new {@link MeterMetric}.
+     *
+     * @param eventType the plural name of the event the meter is measuring
+     *                  (e.g., {@code "requests"})
+     * @param rateUnit the rate unit of the new meter
+     * @return a new {@link MeterMetric}
+     */
+    public static MeterMetric newMeter(String eventType, TimeUnit rateUnit) {
         final MeterMetric meter = new MeterMetric(eventType, rateUnit);
         final Runnable job = new Runnable() {
             @Override
@@ -44,85 +44,85 @@ public class MeterMetric implements Metered {
     private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
     private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
 
-	private final AtomicLong count = new AtomicLong();
-	private final long startTime = System.nanoTime();
-	private final TimeUnit rateUnit;
-	private final String eventType;
+    private final AtomicLong count = new AtomicLong();
+    private final long startTime = System.nanoTime();
+    private final TimeUnit rateUnit;
+    private final String eventType;
 
-	private MeterMetric(String eventType, TimeUnit rateUnit) {
-		this.rateUnit = rateUnit;
-		this.eventType = eventType;
-	}
+    private MeterMetric(String eventType, TimeUnit rateUnit) {
+        this.rateUnit = rateUnit;
+        this.eventType = eventType;
+    }
 
-	@Override
-	public TimeUnit rateUnit() {
-		return rateUnit;
-	}
+    @Override
+    public TimeUnit rateUnit() {
+        return rateUnit;
+    }
 
-	@Override
-	public String eventType() {
-		return eventType;
-	}
+    @Override
+    public String eventType() {
+        return eventType;
+    }
 
-	/**
-	 * Updates the moving averages.
-	 */
-	void tick() {
-		m1Rate.tick();
+    /**
+     * Updates the moving averages.
+     */
+    void tick() {
+        m1Rate.tick();
         m5Rate.tick();
         m15Rate.tick();
-	}
+    }
 
-	/**
-	 * Mark the occurrence of an event.
-	 */
-	public void mark() {
-		mark(1);
-	}
+    /**
+     * Mark the occurrence of an event.
+     */
+    public void mark() {
+        mark(1);
+    }
 
-	/**
-	 * Mark the occurrence of a given number of events.
-	 *
-	 * @param n the number of events
-	 */
-	public void mark(long n) {
-		count.addAndGet(n);
-		m1Rate.update(n);
+    /**
+     * Mark the occurrence of a given number of events.
+     *
+     * @param n the number of events
+     */
+    public void mark(long n) {
+        count.addAndGet(n);
+        m1Rate.update(n);
         m5Rate.update(n);
         m15Rate.update(n);
-	}
+    }
 
-	@Override
-	public long count() {
-		return count.get();
-	}
+    @Override
+    public long count() {
+        return count.get();
+    }
 
-	@Override
-	public double fifteenMinuteRate() {
-		return m15Rate.rate(rateUnit);
-	}
+    @Override
+    public double fifteenMinuteRate() {
+        return m15Rate.rate(rateUnit);
+    }
 
-	@Override
-	public double fiveMinuteRate() {
-		return m5Rate.rate(rateUnit);
-	}
+    @Override
+    public double fiveMinuteRate() {
+        return m5Rate.rate(rateUnit);
+    }
 
-	@Override
-	public double meanRate() {
-		if (count() == 0) {
-			return 0.0;
-		} else {
-			final long elapsed = (System.nanoTime() - startTime);
-			return convertNsRate(count() / (double) elapsed);
-		}
-	}
+    @Override
+    public double meanRate() {
+        if (count() == 0) {
+            return 0.0;
+        } else {
+            final long elapsed = (System.nanoTime() - startTime);
+            return convertNsRate(count() / (double) elapsed);
+        }
+    }
 
-	@Override
-	public double oneMinuteRate() {
-		return m1Rate.rate(rateUnit);
-	}
+    @Override
+    public double oneMinuteRate() {
+        return m1Rate.rate(rateUnit);
+    }
 
-	private double convertNsRate(double ratePerNs) {
-		return ratePerNs * (double) rateUnit.toNanos(1);
-	}
+    private double convertNsRate(double ratePerNs) {
+        return ratePerNs * (double) rateUnit.toNanos(1);
+    }
 }
