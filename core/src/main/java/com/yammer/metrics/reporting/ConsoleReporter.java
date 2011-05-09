@@ -1,5 +1,10 @@
 package com.yammer.metrics.reporting;
 
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.*;
+import com.yammer.metrics.util.NamedThreadFactory;
+import com.yammer.metrics.util.Utils;
+
 import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -9,11 +14,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.*;
-import com.yammer.metrics.util.NamedThreadFactory;
-import com.yammer.metrics.util.Utils;
 
 /**
  * A simple reporters which prints out application metrics to a
@@ -25,6 +25,18 @@ public class ConsoleReporter implements Runnable {
 	private static final ScheduledExecutorService TICK_THREAD =
 			Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("metrics-console-reporter"));
 	private final PrintStream out;
+
+    /**
+     * Enables the console reporter and causes it to print to STDOUT with the
+     * specified period.
+     *
+     * @param period the period between successive outputs
+     * @param unit   the time unit of {@code period}
+     */
+    public static void enable(long period, TimeUnit unit) {
+        final ConsoleReporter reporter = new ConsoleReporter(System.out);
+        reporter.start(period, unit);
+    }
 
 	/**
 	 * Creates a new {@link ConsoleReporter}.
