@@ -12,19 +12,19 @@ import java.util.concurrent.TimeUnit;
  * the execution of the annotated method.
  */
 public class TimedInterceptor implements MethodInterceptor {
-	private final TimerMetric timer;
+    private final TimerMetric timer;
 
-	public TimedInterceptor(TimerMetric timer) {
-		this.timer = timer;
-	}
+    public TimedInterceptor(TimerMetric timer) {
+        this.timer = timer;
+    }
 
-	@Override
-	public Object invoke(MethodInvocation invocation) throws Throwable {
-		final long startTime = System.nanoTime();
-		try {
-			return invocation.proceed();
-		} finally {
-			timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
-		}
-	}
+    @Override
+    public Object invoke(MethodInvocation invocation) throws Throwable {
+        final long startTime = System.nanoTime();
+        try {
+            return invocation.proceed();
+        } finally {
+            timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
+        }
+    }
 }

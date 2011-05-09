@@ -15,10 +15,10 @@ import com.google.inject.matcher.Matchers;
  * @see GaugeInjectionListener
  */
 public class InstrumentationModule extends AbstractModule {
-	@Override
-	protected void configure() {
-		bindListener(Matchers.any(), new MeteredListener());
-		bindListener(Matchers.any(), new TimedListener());
+    @Override
+    protected void configure() {
+        bindListener(Matchers.any(), new MeteredListener());
+        bindListener(Matchers.any(), new TimedListener());
         bindListener(Matchers.any(), new GaugeListener());
-	}
+    }
 }

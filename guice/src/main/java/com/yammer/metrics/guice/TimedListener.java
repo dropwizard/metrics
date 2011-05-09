@@ -13,16 +13,16 @@ import java.lang.reflect.Method;
  * A listener which adds method interceptors to timed methods.
  */
 public class TimedListener implements TypeListener {
-	@Override
-	public <T> void hear(TypeLiteral<T> literal,
-						 TypeEncounter<T> encounter) {
-		for (Method method : literal.getRawType().getMethods()) {
-			final Timed annotation = method.getAnnotation(Timed.class);
-			if (annotation != null) {
-				final String name = annotation.name().isEmpty() ? method.getName() : annotation.name();
-				final TimerMetric timer = Metrics.newTimer(literal.getRawType(), name, annotation.durationUnit(), annotation.rateUnit());
-				encounter.bindInterceptor(Matchers.only(method), new TimedInterceptor(timer));
-			}
-		}
-	}
+    @Override
+    public <T> void hear(TypeLiteral<T> literal,
+                         TypeEncounter<T> encounter) {
+        for (Method method : literal.getRawType().getMethods()) {
+            final Timed annotation = method.getAnnotation(Timed.class);
+            if (annotation != null) {
+                final String name = annotation.name().isEmpty() ? method.getName() : annotation.name();
+                final TimerMetric timer = Metrics.newTimer(literal.getRawType(), name, annotation.durationUnit(), annotation.rateUnit());
+                encounter.bindInterceptor(Matchers.only(method), new TimedInterceptor(timer));
+            }
+        }
+    }
 }

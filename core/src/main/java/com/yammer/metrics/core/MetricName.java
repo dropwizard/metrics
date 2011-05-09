@@ -4,16 +4,16 @@ package com.yammer.metrics.core;
  * A value class encapsulating a metric's owning class and name.
  */
 public class MetricName {
-	private final Class<?> klass;
-	private final String name, scope;
+    private final Class<?> klass;
+    private final String name, scope;
 
-	/**
-	 * Creates a new {@link MetricName} without a scope.
-	 *
-	 * @param klass the {@link Class} to which the {@link Metric} belongs
-	 * @param name the name of the {@link Metric}
-	 */
-	public MetricName(Class<?> klass, String name) {
+    /**
+     * Creates a new {@link MetricName} without a scope.
+     *
+     * @param klass the {@link Class} to which the {@link Metric} belongs
+     * @param name the name of the {@link Metric}
+     */
+    public MetricName(Class<?> klass, String name) {
         this(klass, name, null);
     }
 
@@ -30,23 +30,23 @@ public class MetricName {
         this.scope = scope;
     }
 
-	/**
-	 * Returns the {@link Class} to which the {@link Metric} belongs.
-	 *
-	 * @return the {@link Class} to which the {@link Metric} belongs
-	 */
-	public Class<?> getKlass() {
-		return klass;
-	}
+    /**
+     * Returns the {@link Class} to which the {@link Metric} belongs.
+     *
+     * @return the {@link Class} to which the {@link Metric} belongs
+     */
+    public Class<?> getKlass() {
+        return klass;
+    }
 
-	/**
-	 * Returns the name of the {@link Metric}.
-	 *
-	 * @return the name of the {@link Metric}
-	 */
-	public String getName() {
-		return name;
-	}
+    /**
+     * Returns the name of the {@link Metric}.
+     *
+     * @return the name of the {@link Metric}
+     */
+    public String getName() {
+        return name;
+    }
 
     /**
      * Returns the scope of the {@link Metric}.
