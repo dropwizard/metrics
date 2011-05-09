@@ -12,6 +12,8 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
 
   lazy val servlet = project("servlet", "metrics-servlet", new ServletProject(_), core)
 
+  lazy val graphite = project("graphite", "metrics-graphite", new GraphiteProject(_), core)
+
   lazy val log4j = project("log4j", "metrics-log4j", new Log4JProject(_), core)
 
   lazy val logback = project("logback", "metrics-logback", new LogbackProject(_), core)
@@ -44,6 +46,9 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
 
   class GuiceProject(info: ProjectInfo) extends CoreProject(info) {
     val guice = "com.google.inject" % "guice" % "3.0"
+  }
+
+  class GraphiteProject(info: ProjectInfo) extends CoreProject(info) {
   }
 
   class ServletProject(info: ProjectInfo) extends CoreProject(info) {
