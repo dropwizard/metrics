@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author coda
  */
-public class NamedThreadFactory implements ThreadFactory {
+class NamedThreadFactory implements ThreadFactory {
     private final ThreadGroup group;
     private final AtomicInteger threadNumber = new AtomicInteger(1);
     private final String namePrefix;
@@ -16,7 +16,7 @@ public class NamedThreadFactory implements ThreadFactory {
     public NamedThreadFactory(String name) {
         final SecurityManager s = System.getSecurityManager();
         this.group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-        this.namePrefix = name + "-thread-";
+        this.namePrefix = "metrics-" + name + "-thread-";
     }
 
     @Override
