@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
@@ -39,10 +38,9 @@ public class GraphiteReporter implements Runnable {
 	 *
 	 * @param host is graphite server
 	 * @param port is port on which graphite server is running
-	 * @throws IOException 
-	 * @throws UnknownHostException 
+	 * @throws IOException if there is an error connecting to the Graphite server
 	 */
-	public GraphiteReporter(String host,int port) throws UnknownHostException, IOException {
+	public GraphiteReporter(String host,int port) throws IOException {
 	    Socket socket = new Socket(host,port);
 	    this.writer = new OutputStreamWriter(socket.getOutputStream());
 	}
