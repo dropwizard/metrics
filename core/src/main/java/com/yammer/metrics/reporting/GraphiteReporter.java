@@ -99,7 +99,7 @@ public class GraphiteReporter implements Runnable {
 
 	private void printGauge(GaugeMetric<?> gauge, String name, long epoch) {
 		StringBuffer line = new StringBuffer();
-		line.append(String.format("%s.%s %d %d\n", name,"value",gauge.value(), epoch));
+		line.append(String.format("%s.%s %s %d\n", name,"value",gauge.value(), epoch));
 		sendToGraphite(line);
 	}
 
