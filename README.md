@@ -120,7 +120,7 @@ If you're simply running a benchmark, you can print registered metrics to
 standard error every 10s like this:
 
 ```scala
-Metrics.enableConsoleReporting(10, TimeUnit.SECONDS) // print to STDERR every 10s
+ConsoleReporter.enable(10, TimeUnit.SECONDS) // print to STDERR every 10s
 ```
 
 If you're writing a Servlet-based web service, you can add `MetricsServlet` from
@@ -138,6 +138,14 @@ The URIs of these resources can be configured by passing the servlet the
 `init-param`s `"metrics-uri"`, `"ping-uri"`, `"healthcheck-uri"`, and
 `"threads-uri"`, or by passing these values to the servlet's constructor
 (if you happen to be wiring your servlets by code).
+
+If you use [Graphite](http://graphite.wikidot.com/), you can use the
+`GraphiteReporter` class from the `metrics-graphite` library to have your
+application report directly to the server:
+
+```scala
+GraphiteReporter.enable(1, TimeUnit.MINUTES, "graphite.example.com", 8080)
+```
 
 
 License
