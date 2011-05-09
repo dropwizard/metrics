@@ -3,6 +3,7 @@ package com.yammer.metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HistogramMetric.SampleType;
 import com.yammer.metrics.reporting.ConsoleReporter;
+import com.yammer.metrics.reporting.GraphiteReporter;
 import com.yammer.metrics.reporting.JmxReporter;
 
 import javax.management.MalformedObjectNameException;
@@ -293,6 +294,25 @@ public class Metrics {
 		final ConsoleReporter reporter = new ConsoleReporter(System.out);
 		reporter.start(period, unit);
 	}
+	
+	/**
+     * Enables the graphite reporter sends data to graphite server with the
+     * specified period.
+     *
+     * @param period the period between successive outputs
+     * @param unit the time unit of {@code period}
+     * @param host the host name of graphite server (carbon-cache agent)
+     * @param port the port number on which the graphite server is listening
+     */
+    public static void enableGraphiteReporting(long period, TimeUnit unit, String host, int port) {
+            try{   
+                    final GraphiteReporter reporter = new GraphiteReporter(host, port);
+                    reporter.start(period, unit);
+            }catch(Exception e){
+                    e.printStackTrace();
+            }
+    }
+
 
 	/**
 	 * Returns an unmodifiable map of all metrics and their names.
