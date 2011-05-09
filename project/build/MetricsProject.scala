@@ -48,7 +48,7 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
 
   class ServletProject(info: ProjectInfo) extends CoreProject(info) {
     val jackson = "org.codehaus.jackson" % "jackson-mapper-asl" % "1.7.5"
-    val servletApi = "javax.servlet" % "servlet-api" % "2.5"
+    val servletApi = "javax.servlet" % "servlet-api" % "2.5" % "provided"
 
     val jetty = "org.eclipse.jetty" % "jetty-servlet" % "7.4.0.v20110414" % "test"
   }
