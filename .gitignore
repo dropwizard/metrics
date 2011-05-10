@@ -4,3 +4,4 @@ project/boot
 target
 project/plugins/project/
 project/plugins/src_managed/
+docs/build
