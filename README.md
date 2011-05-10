@@ -23,7 +23,7 @@ How To Use
 
 ```scala
 val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
-val metrics = "com.yammer.metrics" %% "metrics-core" % "2.0.0-BETA12-SNAPSHOT"
+val metrics = "com.yammer.metrics" %% "metrics-core" % "2.0.0-BETA12"
 ```
 
 (Or whatever it takes for you to get Maven or Ivy happy.)

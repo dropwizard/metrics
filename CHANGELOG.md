@@ -8,7 +8,7 @@ v2.0.0-BETA12: TBD
 * Added a new reporter for the [Graphite](http://graphite.wikidot.com)
   aggregation system. Thanks to Mahesh Tiyyagura (@tmahesh) for the patch.
 * Added scoped metric names.
-* Added Scala 2.9.0.RC{2,3} as build targets.
+* Added Scala 2.9.0.RC{2,3,4} as build targets.
 * Added meters to Jetty handler for the percent of responses which have `4xx` or
   `5xx` status codes.
 * Changed the Servlet API to be a `provided` dependency. Thanks to Mårten
