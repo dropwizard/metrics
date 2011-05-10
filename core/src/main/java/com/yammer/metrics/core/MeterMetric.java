@@ -1,11 +1,12 @@
 package com.yammer.metrics.core;
 
-import com.yammer.metrics.stats.EWMA;
-import com.yammer.metrics.util.Utils;
-
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+import com.yammer.metrics.stats.EWMA;
+import com.yammer.metrics.stats.PerSecondCounter;
+import com.yammer.metrics.util.Utils;
 
 /**
  * A meter metric which measures mean throughput and one-, five-, and
@@ -46,10 +47,12 @@ public class MeterMetric implements Metered {
     private final long startTime = System.nanoTime();
     private final TimeUnit rateUnit;
     private final String eventType;
-
+    private final PerSecondCounter perSecondCounter;
+    
     private MeterMetric(String eventType, TimeUnit rateUnit) {
         this.rateUnit = rateUnit;
         this.eventType = eventType;
+        this.perSecondCounter = PerSecondCounter.newPerSecontCounter();
     }
 
     @Override
@@ -88,6 +91,7 @@ public class MeterMetric implements Metered {
         m1Rate.update(n);
         m5Rate.update(n);
         m15Rate.update(n);
+        perSecondCounter.update(n);
     }
 
     @Override
@@ -123,4 +127,10 @@ public class MeterMetric implements Metered {
     private double convertNsRate(double ratePerNs) {
         return ratePerNs * (double) rateUnit.toNanos(1);
     }
+
+	@Override
+	public long perSecondRate()
+	{
+		return perSecondCounter.rate();
+	}
 }

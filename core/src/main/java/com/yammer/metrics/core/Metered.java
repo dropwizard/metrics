@@ -57,6 +57,12 @@ public interface Metered extends Metric {
      */
     double meanRate();
 
+    
+    /**
+     * @return the number of events the last second.
+     */
+    long perSecondRate();
+    
     /**
      * Returns the one-minute exponentially-weighted moving average rate at
      * which events have occurred since the meter was created.

@@ -81,6 +81,7 @@ public class JmxReporter implements Runnable {
         public double getOneMinuteRate();
         public double getFiveMinuteRate();
         public double getFifteenMinuteRate();
+        public double getPerSecondRate();
     }
 
     public static class Meter extends AbstractBean implements MeterMBean {
@@ -125,6 +126,12 @@ public class JmxReporter implements Runnable {
         public double getFifteenMinuteRate() {
             return metric.fifteenMinuteRate();
         }
+
+		@Override
+		public double getPerSecondRate()
+		{
+			return metric.perSecondRate();
+		}
     }
 
     public static interface HistogramMBean extends MetricMBean {
