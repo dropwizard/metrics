@@ -5,3 +5,6 @@ target
 project/plugins/project/
 project/plugins/src_managed/
 docs/build
+.classpath
+.project
+bin
