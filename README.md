@@ -7,11 +7,13 @@ Requirements
 ------------
 
 * Java SE 6
-* Scala 2.8.1 or 2.9.0.RC1 or 2.9.0.RC2.
-* Guice 3.0 (for instrumenting via annotation)
-* Servlet API 2.5 (for reporting via HTTP)
-* Jackson 1.7.5 (for reporting via HTTP)
-* Jetty 7.4.0.v20110414 (for instrumenting Jetty handlers)
+* Scala 2.8.1 or 2.9.0.RC2 or 2.9.0.RC3.
+* Guice 3.0 (for `metrics-guice`)
+* Servlet API 2.5 (for `metrics-servlet`)
+* Jackson 1.7.6 (for `metrics-servlet`)
+* Jetty 7.4.0.v20110414 (for `metrics-jetty`)
+* Log4J 1.2.16 (for `metrics-log4j`)
+* Logback 0.9.28 (for `metrics-logback`)
 
 
 How To Use
@@ -19,53 +21,59 @@ How To Use
 
 **First**, specify Metrics as a dependency:
 
-    val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
-    val metrics = "com.yammer" %% "metrics" % "2.0.0-BETA11"
+```scala
+val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
+val metrics = "com.yammer.metrics" %% "metrics-core" % "2.0.0-BETA12"
+```
 
 (Or whatever it takes for you to get Maven or Ivy happy.)
 
 **Second**, instrument your classes:
 
-    import java.util.concurrent.TimeUnit
-    import com.yammer.metrics.Instrumented
-    
-    class ThingFinder extends Instrumented {
-      // measure the # of records per second returned
-      private val resultsMeter = metrics.meter("results", "records", TimeUnit.SECONDS)
-      // measure the # of milliseconds each query takes and the number of
-      // queries per second being performed
-      private val dbTimer = metrics.timer("database", TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
-      
-      def findThings() = {
-        val results = dbTimer.time {
-          // perform an action which gets timed
-          Database.query("WHOO")
-        }
-        
-        // calculate the rate of new things found
-        resultsMeter.mark(results.size)
-        
-        // etc.
-      }
+```scala
+import java.util.concurrent.TimeUnit
+import com.yammer.metrics.Instrumented
+
+class ThingFinder extends Instrumented {
+  // measure the # of records per second returned
+  private val resultsMeter = metrics.meter("results", "records", TimeUnit.SECONDS)
+  // measure the # of milliseconds each query takes and the number of
+  // queries per second being performed
+  private val dbTimer = metrics.timer("database", TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
+
+  def findThings() = {
+    val results = dbTimer.time {
+      // perform an action which gets timed
+      Database.query("WHOO")
     }
 
-If you're using Guice (and maybe you should be), you can instrument your
+    // calculate the rate of new things found
+    resultsMeter.mark(results.size)
+
+    // etc.
+  }
+}
+```
+
+If you're using Guice and `metrics-guice`, you can instrument your
 Guice-provided classes via the `@Timed` and `@Metered` annotations in
 conjunction with `InstrumentationModule`:
 
-    val injector = Guice.createInjector(new InstrumentationModule, ...)
+```scala
+val injector = Guice.createInjector(new InstrumentationModule, ...)
 
-    class Database {
-      @Timed
-      def query(q: String): Seq[Result] = {
-        // ...
-      }
+class Database {
+  @Timed
+  def query(q: String): Seq[Result] = {
+    // ...
+  }
 
-      @Metered
-      def things() {
-        // ...
-      }
-    }
+  @Metered
+  def things() {
+    // ...
+  }
+}
+```
 
 This will add a timer with the annotated method's name which records the
 duration of method invocation or a meter which records the rate of invocation.
@@ -92,15 +100,17 @@ Metrics comes with five types of metrics:
 
 Metrics also has support for health checks:
 
-    HealthChecks.register("database", new HealthCheck {
-      def check = {
-        if (Database.isConnected) {
-          Result.healthy()
-        } else {
-          Result.unhealthy("Not connected to database")
-        }
-      }
-    })
+```scala
+HealthChecks.register("database", new HealthCheck {
+  def check = {
+    if (Database.isConnected) {
+      Result.healthy()
+    } else {
+      Result.unhealthy("Not connected to database")
+    }
+  }
+})
+```
 
 **Third**, start collecting your metrics.
 
@@ -109,10 +119,13 @@ All metrics are reported via JMX, which you can view using VisualVM or JConsole.
 If you're simply running a benchmark, you can print registered metrics to 
 standard error every 10s like this:
 
-    Metrics.enableConsoleReporting(10, TimeUnit.SECONDS) // print to STDERR every 10s
+```scala
+ConsoleReporter.enable(10, TimeUnit.SECONDS) // print to STDERR every 10s
+```
 
-If you're writing a Servlet-based web service, you can add `MetricsServlet` to
-an internally-accessible context. It'll respond to the following URIs:
+If you're writing a Servlet-based web service, you can add `MetricsServlet` from
+the `metrics-servlet` subproject to an internally-accessible context. It'll
+respond to the following URIs:
     
 * `/metrics`: A JSON object of all registered metrics and a host of JVM metrics.
 * `/ping`: A simple `text/plain` "pong" for load-balancers.
@@ -125,6 +138,14 @@ The URIs of these resources can be configured by passing the servlet the
 `init-param`s `"metrics-uri"`, `"ping-uri"`, `"healthcheck-uri"`, and
 `"threads-uri"`, or by passing these values to the servlet's constructor
 (if you happen to be wiring your servlets by code).
+
+If you use [Graphite](http://graphite.wikidot.com/), you can use the
+`GraphiteReporter` class from the `metrics-graphite` library to have your
+application report directly to the server:
+
+```scala
+GraphiteReporter.enable(1, TimeUnit.MINUTES, "graphite.example.com", 8080)
+```
 
 
 License

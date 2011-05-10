@@ -1,8 +1,0 @@
-A bit of bugfixin':
-
-* Blank `Timer`s (i.e., those which have recorded no timings yet) no longer
-  explode when asked for metrics for that which does not yet exist.
-* Nested classes, companion objects, and singletons don't have trailing `$`s
-  messing up JMX's good looks.
-
-Enjoy!

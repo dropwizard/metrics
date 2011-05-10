@@ -1,3 +1,0 @@
-Small concurrency correctness fix:
-
-* changed Sample to use an AtomicReferenceArray

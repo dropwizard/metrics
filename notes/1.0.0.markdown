@@ -1,5 +1,0 @@
-Initial release:
-
-* works
-* doesn't explode
-* we're all happy about that
