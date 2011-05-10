@@ -11,7 +11,7 @@ public class PerSecondCounter
 	private static final ScheduledExecutorService TICK_THREAD = Utils.newScheduledThreadPool(2, "per-second-tick");
 	private static final long INTERVAL = 1; // seconds
 	
-	public static PerSecondCounter newPerSecontCounter() {
+	public static PerSecondCounter newPerSecondCounter() {
         final PerSecondCounter counter = new PerSecondCounter();
         final Runnable job = new Runnable() {
             @Override

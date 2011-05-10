@@ -52,7 +52,7 @@ public class MeterMetric implements Metered {
     private MeterMetric(String eventType, TimeUnit rateUnit) {
         this.rateUnit = rateUnit;
         this.eventType = eventType;
-        this.perSecondCounter = PerSecondCounter.newPerSecontCounter();
+        this.perSecondCounter = PerSecondCounter.newPerSecondCounter();
     }
 
     @Override
