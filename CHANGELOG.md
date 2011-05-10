@@ -1,6 +1,7 @@
 v2.0.0-BETA12: TBD
 ==================
 
+* Upgraded to Jackson 1.7.6.
 * Added a new instrumented Log4J appender.
 * Added a new instrumented Logback appender. Thanks to Bruce Mitchener
   (@waywardmonkeys) for the patch.
