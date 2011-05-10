@@ -1,5 +1,6 @@
 import sbt._
 import maven._
+import de.element34.sbteclipsify._
 
 class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaProject with MavenDependencies {
   lazy val publishTo = Resolver.sftp("repo.codahale.com", "codahale.com", "/home/codahale/repo.codahale.com/")
@@ -18,7 +19,7 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
 
   lazy val logback = project("logback", "metrics-logback", new LogbackProject(_), core)
 
-  class CoreProject(info: ProjectInfo) extends DefaultProject(info) with MavenDependencies with IdeaProject {
+  class CoreProject(info: ProjectInfo) extends DefaultProject(info) with MavenDependencies with IdeaProject with Eclipsify {
     lazy val publishTo = Resolver.sftp("repo.codahale.com", "codahale.com", "/home/codahale/repo.codahale.com/")
 
     /**
