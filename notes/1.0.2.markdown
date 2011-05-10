@@ -1,5 +1,0 @@
-A bug fix and a small API addition:
-
-* Timer now uses Welford's algorithm for calculating running variance, which
-  means no more hilariously wrong standard deviations (e.g., `NaN`).
-* Timer now supports `+=(Long)` for pre-recorded, nanosecond-precision timings.

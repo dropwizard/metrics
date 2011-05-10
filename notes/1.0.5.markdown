@@ -1,5 +1,0 @@
-Some more bugfixin':
-
-* Documentation fix.
-* Added `TimedToggle`, which may or may not be useful at all.
-* Now cross-building for RC2 and RC3.
