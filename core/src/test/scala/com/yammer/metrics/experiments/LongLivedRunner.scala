@@ -1,13 +1,14 @@
 package com.yammer.metrics.experiments
 
-import com.yammer.metrics.{Metrics, Instrumented}
+import com.yammer.metrics.Instrumented
 import java.util.concurrent.TimeUnit
+import com.yammer.metrics.reporting.ConsoleReporter
 
 object LongLivedRunner extends Instrumented {
   val counters = Seq("one", "two").map { s => s -> metrics.counter("counter", s) }.toMap
 
   def main(args: Array[String]) {
-    Metrics.enableConsoleReporting(1, TimeUnit.SECONDS)
+    ConsoleReporter.enable(1, TimeUnit.SECONDS)
     
     val thread = new Thread {
       override def run() {
