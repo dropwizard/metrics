@@ -73,7 +73,7 @@ the JAR file out of
 `the Maven repo <http://repo.codahale.com/com/yammer/metrics/>`_ for the
 version you'd like.
 
-(That said, we recommend you use a dependency mangement tool. They make life
+(That said, we recommend you use a dependency management tool. They make life
 easier.)
 
 
