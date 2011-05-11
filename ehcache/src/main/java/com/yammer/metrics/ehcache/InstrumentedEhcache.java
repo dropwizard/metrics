@@ -60,7 +60,7 @@ public class InstrumentedEhcache implements Ehcache {
      * <tr>
      * <td>{@code misses}</td>
      * <td>Number of times a requested item was not found in the
-     * cache<./td>
+     * cache.</td>
      * </tr>
      * <tr>
      * <td>{@code in-memory-misses}</td>
