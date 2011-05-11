@@ -18,6 +18,8 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
 
   lazy val logback = project("logback", "metrics-logback", new LogbackProject(_), core)
 
+  lazy val ehcache = project("ehcache", "metrics-ehcache", new EhcacheProject(_), core)
+
   class CoreProject(info: ProjectInfo) extends DefaultProject(info) with MavenDependencies with IdeaProject {
     lazy val publishTo = Resolver.sftp("repo.codahale.com", "codahale.com", "/home/codahale/repo.codahale.com/")
 
@@ -67,5 +69,9 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "0.9.28" % "compile"
 
     val slf4j = "org.slf4j" % "slf4j-api" % "1.6.1" % "test"
+  }
+
+  class EhcacheProject(info: ProjectInfo) extends CoreProject(info) {
+    val ehcache = "net.sf.ehcache" % "ehcache-core" % "2.4.2"
   }
 }
