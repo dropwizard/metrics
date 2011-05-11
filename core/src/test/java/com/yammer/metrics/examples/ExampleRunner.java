@@ -1,12 +1,13 @@
 package com.yammer.metrics.examples;
 
-import java.io.File;
-import java.util.List;
-import java.util.concurrent.*;
-
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.CounterMetric;
 import com.yammer.metrics.core.HistogramMetric;
+import com.yammer.metrics.reporting.ConsoleReporter;
+
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class ExampleRunner {
     private static final int WORKER_COUNT = 10;
@@ -37,7 +38,7 @@ public class ExampleRunner {
 
 
     public static void main(String[] args) throws Exception {
-        Metrics.enableConsoleReporting(10, TimeUnit.SECONDS);
+        ConsoleReporter.enable(10, TimeUnit.SECONDS);
 
         System.err.println("Scanning all files on your hard drive...");
 
