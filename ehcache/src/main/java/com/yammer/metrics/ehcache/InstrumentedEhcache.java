@@ -33,13 +33,8 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings({"deprecation", "CloneDoesntCallSuperClone"})
 public class InstrumentedEhcache implements Ehcache {
     /**
-     * The suggested accuracy level for
-     * {@link net.sf.ehcache.config.CacheConfiguration}s
-     */
-    public static final int SUGGESTED_ACCURACY_LEVEL = Statistics.STATISTICS_ACCURACY_NONE;
-
-    /**
-     * Creates gauges for the provided {@link Ehcache} instance:
+     * Instruments the given {@link Ehcache} instance with get and put timers
+     * and a set of gauges for Ehcache's built-in statistics:
      * <p/>
      * <table>
      * <tr>
@@ -126,10 +121,17 @@ public class InstrumentedEhcache implements Ehcache {
      * </tr>
      * </table>
      *
+     * <b>N.B.: This enables Ehcache's sampling statistics with an accuracy
+     * level of "none."</b>
+     *
      * @param cache an {@link Ehcache} instance
+     * @return an instrumented decorator for {@code cache}
      * @see Statistics
      */
     public static Ehcache instrument(final Ehcache cache) {
+        cache.setSampledStatisticsEnabled(true);
+        cache.setStatisticsAccuracy(Statistics.STATISTICS_ACCURACY_NONE);
+
         Metrics.newGauge(cache.getClass(), "hits", cache.getName(), new GaugeMetric<Long>() {
             @Override
             public Long value() {
