@@ -14,6 +14,7 @@ Requirements
 * Jetty 7.4.0.v20110414 (for `metrics-jetty`)
 * Log4J 1.2.16 (for `metrics-log4j`)
 * Logback 0.9.28 (for `metrics-logback`)
+* Ehcache 2.4.2 (for `metrics-ehcache`)
 
 
 How To Use
