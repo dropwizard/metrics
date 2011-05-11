@@ -14,7 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A simple reporters which sends out application metrics to a
+ * A simple reporter which sends out application metrics to a
  * <a href="http://graphite.wikidot.com/faq">Graphite</a> server periodically.
  *
  * @author Mahesh Tiyyagura <tmahesh@gmail.com>
@@ -24,7 +24,7 @@ public class GraphiteReporter implements Runnable {
     private final Writer writer;
 
     /**
-     * Enables the graphite reporter sends data to graphite server with the
+     * Enables the graphite reporter to send data to graphite server with the
      * specified period.
      *
      * @param period the period between successive outputs
