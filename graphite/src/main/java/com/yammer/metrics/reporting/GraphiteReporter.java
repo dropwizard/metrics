@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class GraphiteReporter implements Runnable {
     private static final ScheduledExecutorService TICK_THREAD = Utils.newScheduledThreadPool(1, "graphite-reporter");
     private final Writer writer;
+    private final String prefix;
 
     /**
      * Enables the graphite reporter to send data to graphite server with the
@@ -34,7 +35,7 @@ public class GraphiteReporter implements Runnable {
      */
     public static void enable(long period, TimeUnit unit, String host, int port) {
         try {
-            final GraphiteReporter reporter = new GraphiteReporter(host, port);
+            final GraphiteReporter reporter = new GraphiteReporter(host, port, null);
             reporter.start(period, unit);
         } catch (Exception e) {
             e.printStackTrace();
@@ -43,15 +44,40 @@ public class GraphiteReporter implements Runnable {
     
     
     /**
+     * Enables the graphite reporter to send data to graphite server with the
+     * specified period.
+     *
+     * @param period the period between successive outputs
+     * @param unit   the time unit of {@code period}
+     * @param host   the host name of graphite server (carbon-cache agent)
+     * @param port   the port number on which the graphite server is listening
+     * @param prefix the string which is prepended to all metric names
+     */
+    public static void enable(long period, TimeUnit unit, String host, int port, String prefix) {
+        try {
+            final GraphiteReporter reporter = new GraphiteReporter(host, port, prefix);
+            reporter.start(period, unit);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    /**
      * Creates a new {@link GraphiteReporter}.
      *
      * @param host is graphite server
      * @param port is port on which graphite server is running
+     * @param prefix is prepended to all names reported to graphite
      * @throws IOException if there is an error connecting to the Graphite server
      */
-    public GraphiteReporter(String host,int port) throws IOException {
+    public GraphiteReporter(String host,int port, String prefix) throws IOException {
         Socket socket = new Socket(host,port);
         this.writer = new OutputStreamWriter(socket.getOutputStream());
+        if (prefix != null) {
+          // Pre-append the "." so that we don't need to make anything conditional later.
+          this.prefix = prefix + ".";
+        } else {
+          this.prefix = "";
+        }
     }
 
     /**
@@ -96,9 +122,10 @@ public class GraphiteReporter implements Runnable {
         }    
             
     }
-    
+
     private void sendToGraphite(StringBuffer line){
         try {
+            writer.write(prefix);
             writer.write(line.toString());
             writer.flush();
         } catch (IOException e) {
