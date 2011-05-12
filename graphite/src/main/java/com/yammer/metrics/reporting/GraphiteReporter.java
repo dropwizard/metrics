@@ -34,12 +34,7 @@ public class GraphiteReporter implements Runnable {
      * @param port   the port number on which the graphite server is listening
      */
     public static void enable(long period, TimeUnit unit, String host, int port) {
-        try {
-            final GraphiteReporter reporter = new GraphiteReporter(host, port, null);
-            reporter.start(period, unit);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        enable(period, unit, host, port, null);
     }
     
     
