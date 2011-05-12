@@ -1,11 +1,11 @@
 package com.yammer.metrics.core;
 
+import com.yammer.metrics.core.HistogramMetric.SampleType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-
-import com.yammer.metrics.core.HistogramMetric.SampleType;
 
 /**
  * A timer metric which aggregates timing durations and provides duration
@@ -144,9 +144,9 @@ public class TimerMetric implements Metered {
     }
 
     /**
-     * Returns a list of all recorded durations in the timers's sample.
+     * Returns a list of all recorded durations in the timer's sample.
      *
-     * @return a list of all recorded durations in the timers's sample
+     * @return a list of all recorded durations in the timer's sample
      */
     public List<Double> values() {
         final List<Double> values = new ArrayList<Double>();

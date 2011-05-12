@@ -83,15 +83,15 @@ object TimerMetricSpec extends Spec {
       timer.min must beCloseTo(10.0, 0.001)
     }
 
-    def `should calclate the maximum duration` {
+    def `should calculate the maximum duration` {
       timer.max must beCloseTo(40.0, 0.001)
     }
 
-    def `should calclate the mean duration` {
+    def `should calculate the mean duration` {
       timer.mean must beCloseTo(24.0, 0.001)
     }
 
-    def `should calclate the standard deviation` {
+    def `should calculate the standard deviation` {
       timer.stdDev must beCloseTo(11.401, 0.001)
     }
 
