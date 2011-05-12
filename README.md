@@ -148,6 +148,12 @@ application report directly to the server:
 GraphiteReporter.enable(1, TimeUnit.MINUTES, "graphite.example.com", 8080)
 ```
 
+Optionally, you can provide a prefix to prepend to all metric names sent
+to Graphite:
+
+```scala
+GraphiteReporter.enable(1, TimeUnit.MINUTES, "graphite.example.com", 8080, "my.host.name")
+```
 
 License
 -------
