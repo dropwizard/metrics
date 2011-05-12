@@ -98,7 +98,11 @@ public class GraphiteReporter implements Runnable {
             writer.flush();
         } catch (Exception e) {
             e.printStackTrace();
-            writer.flush();
+            try {
+                writer.flush();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 
