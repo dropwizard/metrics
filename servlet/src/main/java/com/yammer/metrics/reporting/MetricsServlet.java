@@ -48,7 +48,7 @@ public class MetricsServlet extends HttpServlet {
     private static final String PING_URI = "/ping";
     private static final String THREADS_URI = "/threads";
     private JsonFactory factory;
-    private String metricsUri, pingUri, threadsUri, healthcheckUri;
+    private String metricsUri, pingUri, threadsUri, healthcheckUri, contextPath;
 
     public MetricsServlet() {
         this(new JsonFactory(new ObjectMapper()), HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI);
@@ -75,10 +75,11 @@ public class MetricsServlet extends HttpServlet {
         super.init(config);
 
         final String contextPath = config.getServletContext().getContextPath();
-        this.metricsUri = addContextPath(contextPath, config.getInitParameter("metrics-uri"), this.metricsUri);
-        this.pingUri = addContextPath(contextPath, config.getInitParameter("ping-uri"), this.pingUri);
-        this.threadsUri = addContextPath(contextPath, config.getInitParameter("threads-uri"), this.threadsUri);
-        this.healthcheckUri = addContextPath(contextPath, config.getInitParameter("healthcheck-uri"), this.healthcheckUri);
+        this.contextPath = contextPath;
+        this.metricsUri = getParam(config.getInitParameter("metrics-uri"), this.metricsUri);
+        this.pingUri = getParam(config.getInitParameter("ping-uri"), this.pingUri);
+        this.threadsUri = getParam(config.getInitParameter("threads-uri"), this.threadsUri);
+        this.healthcheckUri = getParam(config.getInitParameter("healthcheck-uri"), this.healthcheckUri);
 
         final Object factory = config.getServletContext().getAttribute(JsonFactory.class.getCanonicalName());
         if (factory != null && factory instanceof JsonFactory) {
@@ -86,15 +87,16 @@ public class MetricsServlet extends HttpServlet {
         }
     }
 
-    private String addContextPath(String contextPath, String initParam, String defaultValue) {
-        return contextPath + (initParam == null ? defaultValue : initParam);
+    private String getParam(String initParam, String defaultValue) {
+        return initParam == null ? defaultValue : initParam;
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         final String uri = req.getPathInfo();
+        final String path = this.contextPath + req.getServletPath();
         if (uri == null || uri.equals("/")) {
-            handleHome(req.getServletPath(), resp);
+            handleHome(path, resp);
         } else if (uri.startsWith(metricsUri)) {
             handleMetrics(req.getParameter("class"), Boolean.parseBoolean(req.getParameter("full-samples")), resp);
         } else if (uri.equals(pingUri)) {
