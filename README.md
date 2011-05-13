@@ -7,7 +7,7 @@ Requirements
 ------------
 
 * Java SE 6
-* Scala 2.8.1 or 2.9.0.RC2 or 2.9.0.RC3.
+* Scala 2.8.1 or 2.9.0
 * Guice 3.0 (for `metrics-guice`)
 * Servlet API 2.5 (for `metrics-servlet`)
 * Jackson 1.7.6 (for `metrics-servlet`)
@@ -24,7 +24,7 @@ How To Use
 
 ```scala
 val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
-val metrics = "com.yammer.metrics" %% "metrics-core" % "2.0.0-BETA12"
+val metrics = "com.yammer.metrics" %% "metrics-core" % "2.0.0-BETA13"
 ```
 
 (Or whatever it takes for you to get Maven or Ivy happy.)
