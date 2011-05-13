@@ -28,7 +28,9 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 public class GraphiteReporter implements Runnable {
     private static final ScheduledExecutorService TICK_THREAD = Utils.newScheduledThreadPool(1, "graphite-reporter");
     private static final Logger log = LoggerFactory.getLogger(GraphiteReporter.class);
-    private final Writer writer;
+    private final String host;
+    private final int port;
+    private Writer writer;
     private final String prefix;
 
     /**
@@ -73,8 +75,8 @@ public class GraphiteReporter implements Runnable {
      * @throws IOException if there is an error connecting to the Graphite server
      */
     public GraphiteReporter(String host, int port, String prefix) throws IOException {
-        Socket socket = new Socket(host, port);
-        this.writer = new OutputStreamWriter(socket.getOutputStream());
+        this.host = host;
+        this.port = port;
         if (prefix != null) {
             // Pre-append the "." so that we don't need to make anything conditional later.
             this.prefix = prefix + ".";
@@ -95,7 +97,10 @@ public class GraphiteReporter implements Runnable {
 
     @Override
     public void run() {
+        Socket socket = null;
         try {
+            socket = new Socket(host, port);
+            writer = new OutputStreamWriter(socket.getOutputStream());
             long epoch = System.currentTimeMillis() / 1000;
             printVmMetrics(epoch);
             printRegularMetrics(epoch);
@@ -107,6 +112,15 @@ public class GraphiteReporter implements Runnable {
             } catch (IOException e1) {
                 log.error("Error while flushing writer:", e1);
             }
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    log.error("Error while closing socket:", e);
+                }
+            }
+            writer = null;
         }
     }
 
