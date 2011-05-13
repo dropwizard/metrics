@@ -13,10 +13,10 @@ class InstrumentedWithGauge {
 
 object GaugeSpec extends Spec {
   class `Annotating a method as Gauge` {
-    val injector = Guice.createInjector(new InstrumentationModule)
-    val instance = injector.getInstance(classOf[InstrumentedWithGauge])
+    private val injector = Guice.createInjector(new InstrumentationModule)
+    private val instance = injector.getInstance(classOf[InstrumentedWithGauge])
 
-    def `should create and call a meter for the class with the given parameters` {
+    def `should create and call a meter for the class with the given parameters` = {
       instance.doAThing()
 
       val gauge = Metrics.allMetrics.get(new MetricName(classOf[InstrumentedWithGauge], "things"))

@@ -7,13 +7,14 @@ Requirements
 ------------
 
 * Java SE 6
-* Scala 2.8.1 or 2.9.0.RC2 or 2.9.0.RC3.
+* Scala 2.8.1 or 2.9.0
 * Guice 3.0 (for `metrics-guice`)
 * Servlet API 2.5 (for `metrics-servlet`)
 * Jackson 1.7.6 (for `metrics-servlet`)
 * Jetty 7.4.0.v20110414 (for `metrics-jetty`)
 * Log4J 1.2.16 (for `metrics-log4j`)
 * Logback 0.9.28 (for `metrics-logback`)
+* Ehcache 2.4.2 (for `metrics-ehcache`)
 
 
 How To Use
@@ -23,7 +24,7 @@ How To Use
 
 ```scala
 val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
-val metrics = "com.yammer.metrics" %% "metrics-core" % "2.0.0-BETA12"
+val metrics = "com.yammer.metrics" %% "metrics-core" % "2.0.0-BETA13"
 ```
 
 (Or whatever it takes for you to get Maven or Ivy happy.)
@@ -147,6 +148,12 @@ application report directly to the server:
 GraphiteReporter.enable(1, TimeUnit.MINUTES, "graphite.example.com", 8080)
 ```
 
+Optionally, you can provide a prefix to prepend to all metric names sent
+to Graphite:
+
+```scala
+GraphiteReporter.enable(1, TimeUnit.MINUTES, "graphite.example.com", 8080, "my.host.name")
+```
 
 License
 -------

@@ -9,7 +9,7 @@ import javax.servlet.ServletContextListener;
  * A servlet context listener which shuts down the various thread pools when
  * the context is destroyed.
  */
-public class MetricServletContextListener implements ServletContextListener {
+public class MetricsServletContextListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         Utils.shutdownThreadPools();

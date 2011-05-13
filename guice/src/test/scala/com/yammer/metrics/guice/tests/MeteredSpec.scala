@@ -16,10 +16,10 @@ class InstrumentedWithMetered {
 
 object MeteredSpec extends Spec {
   class `Annotating a method as Metered` {
-    val injector = Guice.createInjector(new InstrumentationModule)
-    val instance = injector.getInstance(classOf[InstrumentedWithMetered])
+    private val injector = Guice.createInjector(new InstrumentationModule)
+    private val instance = injector.getInstance(classOf[InstrumentedWithMetered])
 
-    def `should create and call a meter for the class with the given parameters` {
+    def `should create and call a meter for the class with the given parameters` = {
       instance.doAThing()
 
       val meter = Metrics.allMetrics.get(new MetricName(classOf[InstrumentedWithMetered], "things"))
