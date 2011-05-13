@@ -353,6 +353,7 @@ public class MetricsServlet extends HttpServlet {
             json.writeNumberField("m1", meter.oneMinuteRate());
             json.writeNumberField("m5", meter.fiveMinuteRate());
             json.writeNumberField("m15", meter.fifteenMinuteRate());
+            json.writeNumberField("perSecond", meter.perSecondRate());
         }
         json.writeEndObject();
     }
@@ -393,6 +394,7 @@ public class MetricsServlet extends HttpServlet {
                 json.writeNumberField("m1", timer.oneMinuteRate());
                 json.writeNumberField("m5", timer.fiveMinuteRate());
                 json.writeNumberField("m15", timer.fifteenMinuteRate());
+                json.writeNumberField("perSecond", timer.perSecondRate());
             }
             json.writeEndObject();
         }

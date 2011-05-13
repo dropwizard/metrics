@@ -167,4 +167,10 @@ public class TimerMetric implements Metered {
         return ns / TimeUnit.NANOSECONDS.convert(1, durationUnit);
     }
 
+	@Override
+	public long perSecondRate()
+	{
+		return meter.perSecondRate();
+	}
+
 }
