@@ -98,7 +98,8 @@ public class MetricsServlet extends HttpServlet {
         if (uri == null || uri.equals("/")) {
             handleHome(path, resp);
         } else if (uri.startsWith(metricsUri)) {
-            handleMetrics(req.getParameter("class"), Boolean.parseBoolean(req.getParameter("full-samples")), resp);
+            handleMetrics(req.getParameter("class"), Boolean.parseBoolean(req.getParameter("full-samples")), 
+                          Boolean.parseBoolean(req.getParameter("pretty")), resp);
         } else if (uri.equals(pingUri)) {
             handlePing(resp);
         } else if (uri.equals(threadsUri)) {
@@ -174,11 +175,15 @@ public class MetricsServlet extends HttpServlet {
         writer.close();
     }
 
-    private void handleMetrics(String classPrefix, boolean showFullSamples, HttpServletResponse resp) throws IOException {
+    private void handleMetrics(String classPrefix, boolean showFullSamples, boolean pretty, HttpServletResponse resp)
+        throws IOException {
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType("application/json");
         final OutputStream output = resp.getOutputStream();
         final JsonGenerator json = factory.createJsonGenerator(output, JsonEncoding.UTF8);
+        if (pretty) {
+            json.useDefaultPrettyPrinter();
+        }
         json.writeStartObject();
         {
             if ("jvm".equals(classPrefix) || classPrefix == null) {
