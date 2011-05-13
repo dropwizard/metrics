@@ -14,6 +14,9 @@ import java.util.Map.Entry;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 
 /**
@@ -24,6 +27,7 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.*;
  */
 public class GraphiteReporter implements Runnable {
     private static final ScheduledExecutorService TICK_THREAD = Utils.newScheduledThreadPool(1, "graphite-reporter");
+    private static final Logger log = LoggerFactory.getLogger(GraphiteReporter.class);
     private final Writer writer;
     private final String prefix;
 
@@ -56,7 +60,7 @@ public class GraphiteReporter implements Runnable {
             final GraphiteReporter reporter = new GraphiteReporter(host, port, prefix);
             reporter.start(period, unit);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error creating/starting Graphite reporter:", e);
         }
     }
 
@@ -97,11 +101,11 @@ public class GraphiteReporter implements Runnable {
             printRegularMetrics(epoch);
             writer.flush();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error:", e);
             try {
                 writer.flush();
             } catch (IOException e1) {
-                e1.printStackTrace();
+                log.error("Error while flushing writer:", e1);
             }
         }
     }
@@ -125,7 +129,7 @@ public class GraphiteReporter implements Runnable {
                             printTimer((TimerMetric) metric, simpleName, epoch);
                         }
                     } catch (Exception ignored) {
-                        ignored.printStackTrace();
+                        log.error("Error printing regular metrics:", ignored);
                     }
                 }
             }
@@ -137,7 +141,7 @@ public class GraphiteReporter implements Runnable {
             writer.write(prefix);
             writer.write(data);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error sending to Graphite:", e);
         }
     }
 
