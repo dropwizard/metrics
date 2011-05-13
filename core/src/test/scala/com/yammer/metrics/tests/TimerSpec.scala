@@ -7,10 +7,10 @@ import java.util.concurrent.TimeUnit
 
 object TimerSpec extends Spec {
   class `A timer` {
-    val metric = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
-    val timer = new Timer(metric)
+    private val metric = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
+    private val timer = new Timer(metric)
 
-    def `should update the underlying metric` {
+    def `should update the underlying metric` = {
       timer.time { Thread.sleep(100); 10 } must beEqualTo(10)
 
       metric.min must beCloseTo(100.0, 10)
