@@ -1,5 +1,21 @@
-v2.0.0-BETA12: TBD
-==================
+v2.0.0-BETA13: May 13 2011
+==========================
+
+* Fixed a bug in the intial startup phase of the `JmxReporter`.
+* Added `metrics-ehcache`, for the instrumentation of `Ehcache` instances.
+* Fixed a typo in `metrics-jetty`'s `InstrumentedHandler`.
+* Added name prefixes to `GraphiteReporter`.
+* Added JVM metrics reporting to `GraphiteReporter`.
+* Actually fixed `MetricsServlet`'s links when the servlet has a non-root
+  context path.
+* Now cross-building for Scala 2.9.0.
+* Added `pretty` query parameter for `MetricsServlet` to format the JSON object
+  for human consumption.
+* Added `no-cache` headers to the `MetricsServlet` responses.
+
+
+v2.0.0-BETA12: May 09 2011
+==========================
 
 * Upgraded to Jackson 1.7.6.
 * Added a new instrumented Log4J appender.
