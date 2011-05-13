@@ -199,7 +199,7 @@ public class GraphiteReporter implements Runnable {
     }
 
     private void printDoubleField(String name, double value, long epoch) {
-        sendToGraphite(String.format("%s%s.%s %2.2f %d\n", prefix, name, value, epoch));
+        sendToGraphite(String.format("%s%s %2.2f %d\n", prefix, name, value, epoch));
     }
 
     private void printVmMetrics(long epoch) throws IOException {
