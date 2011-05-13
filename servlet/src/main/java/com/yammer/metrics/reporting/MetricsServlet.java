@@ -74,8 +74,7 @@ public class MetricsServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
 
-        final String contextPath = config.getServletContext().getContextPath();
-        this.contextPath = contextPath;
+        this.contextPath = config.getServletContext().getContextPath();
         this.metricsUri = getParam(config.getInitParameter("metrics-uri"), this.metricsUri);
         this.pingUri = getParam(config.getInitParameter("ping-uri"), this.pingUri);
         this.threadsUri = getParam(config.getInitParameter("threads-uri"), this.threadsUri);
@@ -93,6 +92,7 @@ public class MetricsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
         final String uri = req.getPathInfo();
         final String path = this.contextPath + req.getServletPath();
         if (uri == null || uri.equals("/")) {
