@@ -2,7 +2,6 @@ package com.yammer.metrics.logback
 
 import ch.qos.logback.classic.{Level, LoggerContext}
 import com.codahale.simplespec.Spec
-import com.yammer.metrics.logback.InstrumentedAppender
 
 object LogbackInstrumentedAppenderSpec extends Spec {
   class `A Logback InstrumentedAppender` {
