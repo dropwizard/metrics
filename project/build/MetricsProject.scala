@@ -53,6 +53,7 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
   }
 
   class GraphiteProject(info: ProjectInfo) extends CoreProject(info) {
+    val slf4j = "org.slf4j" % "slf4j-api" % "1.6.1" % "compile"
   }
 
   class ServletProject(info: ProjectInfo) extends CoreProject(info) {
