@@ -6,32 +6,32 @@ import com.yammer.metrics.stats.UniformSample
 
 object UniformSampleSpec extends Spec {
   class `A sample of 100 out of 1000 elements` {
-    val population = Range(0, 1000)
-    val sample = new UniformSample(100)
-    population.foreach(sample.update(_))
+    private val population = Range(0, 1000).map { _.toLong.asInstanceOf[java.lang.Long] }
+    private val sample = new UniformSample(100)
+    population.foreach { i => sample.update(i.asInstanceOf[Long]) }
 
-    def `should have 100 elements` {
+    def `should have 100 elements` = {
       sample.size must beEqualTo(100)
       sample.values.toList must haveSize(100)
     }
 
-    def `should only have elements from the population` {
-      population must containAll(sample.values)
+    def `should only have elements from the population` = {
+      (sample.values().toSet -- population.toSet) must beEmpty
     }
   }
 
   class `A sample of 100 out of 10 elements` {
-    val population = Range(0, 10)
-    val sample = new UniformSample(100)
-    population.foreach { i => sample.update(i) }
+    private val population = Range(0, 10).map { _.toLong.asInstanceOf[java.lang.Long] }
+    private val sample = new UniformSample(100)
+    population.foreach { i => sample.update(i.asInstanceOf[Long]) }
 
-    def `should have 10 elements` {
+    def `should have 10 elements` = {
       sample.size must beEqualTo(10)
       sample.values.toList must haveSize(10)
     }
 
-    def `should only have elements from the population` {
-      population must containAll(sample.values)
+    def `should only have elements from the population` = {
+      (sample.values().toSet -- population.toSet) must beEmpty
     }
   }
 }

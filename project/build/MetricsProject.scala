@@ -1,5 +1,6 @@
 import sbt._
 import maven._
+import de.element34.sbteclipsify._
 
 class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaProject with MavenDependencies {
   lazy val publishTo = Resolver.sftp("repo.codahale.com", "codahale.com", "/home/codahale/repo.codahale.com/")
@@ -18,7 +19,9 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
 
   lazy val logback = project("logback", "metrics-logback", new LogbackProject(_), core)
 
-  class CoreProject(info: ProjectInfo) extends DefaultProject(info) with MavenDependencies with IdeaProject {
+  lazy val ehcache = project("ehcache", "metrics-ehcache", new EhcacheProject(_), core)
+
+  class CoreProject(info: ProjectInfo) extends DefaultProject(info) with MavenDependencies with IdeaProject with Eclipsify {
     lazy val publishTo = Resolver.sftp("repo.codahale.com", "codahale.com", "/home/codahale/repo.codahale.com/")
 
     /**
@@ -36,8 +39,9 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
     /**
      * Test Dependencies
      */
-    val simplespec = "com.codahale" % "simplespec_2.8.1" % "0.2.0" % "test"
-    val mockito = "org.mockito" % "mockito-all" % "1.8.4" % "test"
+    val simplespec = "com.codahale" %% "simplespec" % "0.3.3" % "test"
+    def specs2Framework = new TestFramework("org.specs2.runner.SpecsFramework")
+    override def testFrameworks = super.testFrameworks ++ Seq(specs2Framework)
   }
 
   class JettyProject(info: ProjectInfo) extends CoreProject(info) {
@@ -49,6 +53,7 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
   }
 
   class GraphiteProject(info: ProjectInfo) extends CoreProject(info) {
+    val slf4j = "org.slf4j" % "slf4j-api" % "1.6.1" % "compile"
   }
 
   class ServletProject(info: ProjectInfo) extends CoreProject(info) {
@@ -67,5 +72,9 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "0.9.28" % "compile"
 
     val slf4j = "org.slf4j" % "slf4j-api" % "1.6.1" % "test"
+  }
+
+  class EhcacheProject(info: ProjectInfo) extends CoreProject(info) {
+    val ehcache = "net.sf.ehcache" % "ehcache-core" % "2.4.2"
   }
 }

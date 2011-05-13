@@ -1,22 +1,22 @@
 package com.yammer.metrics.tests
 
 import com.codahale.simplespec.Spec
-import org.specs.mock.Mockito
 import com.yammer.metrics.Counter
 import com.yammer.metrics.core.CounterMetric
+import org.specs2.mock.Mockito
 
 object CounterSpec extends Spec with Mockito {
   class `A counter` {
-    val metric = mock[CounterMetric]
-    val counter = new Counter(metric)
+    private val metric = mock[CounterMetric]
+    private val counter = new Counter(metric)
     
-    def `should increment the underlying metric by an arbitrary amount` {
+    def `should increment the underlying metric by an arbitrary amount` = {
       counter += 12
 
       there was one(metric).inc(12)
     }
 
-    def `should decrement the underlying metric by an arbitrary amount` {
+    def `should decrement the underlying metric by an arbitrary amount` = {
       counter -= 12
 
       there was one(metric).dec(12)

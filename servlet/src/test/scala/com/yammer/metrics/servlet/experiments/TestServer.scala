@@ -13,6 +13,7 @@ object TestServer extends Instrumented {
     val server = new Server(8080)
 
     val context = new ServletContextHandler
+    context.setContextPath("/initial")
     val holder = new ServletHolder(classOf[MetricsServlet])
     context.addServlet(holder, "/dingo/*")
 

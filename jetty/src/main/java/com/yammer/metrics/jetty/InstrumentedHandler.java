@@ -57,11 +57,11 @@ public class InstrumentedHandler extends HandlerWrapper {
         this.activeDispatches = Metrics.newCounter(underlying.getClass(), "active-dispatches");
 
         this.responses = new MeterMetric[]{
-                Metrics.newMeter(underlying.getClass(), "1xx-reponses", "responses", TimeUnit.SECONDS), // 1xx
-                Metrics.newMeter(underlying.getClass(), "2xx-reponses", "responses", TimeUnit.SECONDS), // 2xx
-                Metrics.newMeter(underlying.getClass(), "3xx-reponses", "responses", TimeUnit.SECONDS), // 3xx
-                Metrics.newMeter(underlying.getClass(), "4xx-reponses", "responses", TimeUnit.SECONDS), // 4xx
-                Metrics.newMeter(underlying.getClass(), "5xx-reponses", "responses", TimeUnit.SECONDS)  // 5xx
+                Metrics.newMeter(underlying.getClass(), "1xx-responses", "responses", TimeUnit.SECONDS), // 1xx
+                Metrics.newMeter(underlying.getClass(), "2xx-responses", "responses", TimeUnit.SECONDS), // 2xx
+                Metrics.newMeter(underlying.getClass(), "3xx-responses", "responses", TimeUnit.SECONDS), // 3xx
+                Metrics.newMeter(underlying.getClass(), "4xx-responses", "responses", TimeUnit.SECONDS), // 4xx
+                Metrics.newMeter(underlying.getClass(), "5xx-responses", "responses", TimeUnit.SECONDS)  // 5xx
         };
 
         Metrics.newGauge(underlying.getClass(), "percent-4xx-1m", new GaugeMetric<Double>() {

@@ -1,20 +1,20 @@
 package com.yammer.metrics.logback
 
-import ch.qos.logback.classic.{Level, Logger, LoggerContext}
+import ch.qos.logback.classic.{Level, LoggerContext}
 import com.codahale.simplespec.Spec
 
 object LogbackInstrumentedAppenderSpec extends Spec {
   class `A Logback InstrumentedAppender` {
-    val lc = new LoggerContext()
-    val logger = lc.getLogger("abc.def")
+    private val lc = new LoggerContext()
+    private val logger = lc.getLogger("abc.def")
 
-    val appender = new InstrumentedAppender()
+    private val appender = new InstrumentedAppender()
     appender.setContext(lc)
     appender.start()
     logger.addAppender(appender)
     logger.setLevel(Level.TRACE)
 
-    def `should maintain accurate counts` {
+    def `should maintain accurate counts` = {
       InstrumentedAppender.ALL_METER.count must beEqualTo(0)
       InstrumentedAppender.TRACE_METER.count must beEqualTo(0)
       InstrumentedAppender.DEBUG_METER.count must beEqualTo(0)
