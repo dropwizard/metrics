@@ -138,7 +138,6 @@ public class GraphiteReporter implements Runnable {
 
     private void sendToGraphite(String data) {
         try {
-            writer.write(prefix);
             writer.write(data);
         } catch (IOException e) {
             log.error("Error sending to Graphite:", e);
@@ -146,36 +145,36 @@ public class GraphiteReporter implements Runnable {
     }
 
     private void printGauge(GaugeMetric<?> gauge, String name, long epoch) {
-        sendToGraphite(String.format("%s.%s %s %d\n", name, "value", gauge.value(), epoch));
+        sendToGraphite(String.format("%s%s.%s %s %d\n", prefix, name, "value", gauge.value(), epoch));
     }
 
     private void printCounter(CounterMetric counter, String name, long epoch) {
-        sendToGraphite(String.format("%s.%s %d %d\n", name, "count", counter.count(), epoch));
+        sendToGraphite(String.format("%s%s.%s %d %d\n", prefix, name, "count", counter.count(), epoch));
     }
 
     private void printMetered(Metered meter, String name, long epoch) {
         StringBuffer lines = new StringBuffer();
-        lines.append(String.format("%s.%s %d %d\n",    name, "count",        meter.count(), epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "meanRate",     meter.meanRate(), epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "1MinuteRate",  meter.oneMinuteRate(), epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "5MinuteRate",  meter.fiveMinuteRate(), epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "15MinuteRate", meter.fifteenMinuteRate(), epoch));
+        lines.append(String.format("%s%s.%s %d %d\n",    prefix, name, "count",        meter.count(), epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "meanRate",     meter.meanRate(), epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "1MinuteRate",  meter.oneMinuteRate(), epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "5MinuteRate",  meter.fiveMinuteRate(), epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "15MinuteRate", meter.fifteenMinuteRate(), epoch));
         sendToGraphite(lines.toString());
     }
 
     private void printHistogram(HistogramMetric histogram, String name, long epoch) {
         final double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
         StringBuffer lines = new StringBuffer();
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "min",           histogram.min(), epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "max",           histogram.max(), epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "mean",          histogram.mean(), epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "stddev",        histogram.stdDev(), epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "median",        percentiles[0], epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "75percentile",  percentiles[1], epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "95percentile",  percentiles[2], epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "98percentile",  percentiles[3], epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "99percentile",  percentiles[4], epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "999percentile", percentiles[5], epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "min",           histogram.min(), epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "max",           histogram.max(), epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "mean",          histogram.mean(), epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "stddev",        histogram.stdDev(), epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "median",        percentiles[0], epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "75percentile",  percentiles[1], epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "95percentile",  percentiles[2], epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "98percentile",  percentiles[3], epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "99percentile",  percentiles[4], epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "999percentile", percentiles[5], epoch));
 
         sendToGraphite(lines.toString());
     }
@@ -186,21 +185,21 @@ public class GraphiteReporter implements Runnable {
         final double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
 
         StringBuffer lines = new StringBuffer();
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "min",           timer.min(), epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "max",           timer.max(), epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "mean",          timer.mean(), epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "stddev",        timer.stdDev(), epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "median",        percentiles[0], epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "75percentile",  percentiles[1], epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "95percentile",  percentiles[2], epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "98percentile",  percentiles[3], epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "99percentile",  percentiles[4], epoch));
-        lines.append(String.format("%s.%s %2.2f %d\n", name, "999percentile", percentiles[5], epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "min",           timer.min(), epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "max",           timer.max(), epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "mean",          timer.mean(), epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "stddev",        timer.stdDev(), epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "median",        percentiles[0], epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "75percentile",  percentiles[1], epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "95percentile",  percentiles[2], epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "98percentile",  percentiles[3], epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "99percentile",  percentiles[4], epoch));
+        lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "999percentile", percentiles[5], epoch));
         sendToGraphite(lines.toString());
     }
 
     private void printDoubleField(String name, double value, long epoch) {
-        sendToGraphite(String.format("%s.%s %2.2f %d\n", name, value, epoch));
+        sendToGraphite(String.format("%s%s.%s %2.2f %d\n", prefix, name, value, epoch));
     }
 
     private void printVmMetrics(long epoch) throws IOException {
