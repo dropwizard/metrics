@@ -16,10 +16,10 @@ class InstrumentedWithTimed {
 
 object TimedSpec extends Spec {
   class `Annotating a method as Timed` {
-    val injector = Guice.createInjector(new InstrumentationModule)
-    val instance = injector.getInstance(classOf[InstrumentedWithTimed])
+    private val injector = Guice.createInjector(new InstrumentationModule)
+    private val instance = injector.getInstance(classOf[InstrumentedWithTimed])
 
-    def `should create and call a meter for the class with the given parameters` {
+    def `should create and call a meter for the class with the given parameters` = {
       instance.doAThing()
 
       val timer = Metrics.allMetrics.get(new MetricName(classOf[InstrumentedWithTimed], "things"))
