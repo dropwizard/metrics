@@ -182,6 +182,8 @@ public class RollingAverageMetric implements Metric {
                         iterator.remove();
                         total.addAndGet(0 - s.getTotal().get());
                         count.addAndGet(0 - s.getCount().get());
+                    } else {
+                        break;
                     }
                 }
 
