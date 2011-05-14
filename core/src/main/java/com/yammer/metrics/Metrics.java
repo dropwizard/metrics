@@ -282,6 +282,54 @@ public class Metrics {
         return (TimerMetric) existingMetric;
     }
 
+
+    /**
+     * Creates a new {@link com.yammer.metrics.core.RollingAverageMetric} and registers it under
+     * the given class and name.
+     *
+     * @param klass      the class which owns the metric
+     * @param name       the name of the metric
+     * @param windowSize the size of the rolling window we keep statistics in
+     * @param windowUnit the unit the rolling window size is given in
+     * @return a new {@link com.yammer.metrics.core.RollingAverageMetric}
+     */
+    public static RollingAverageMetric newRollingAverage(Class<?> klass,
+                                                        String name,
+                                                        long windowSize,
+                                                        TimeUnit windowUnit) {
+        return newRollingAverage(klass, name, null, windowSize, windowUnit);
+    }
+
+
+    /**
+     * Creates a new {@link com.yammer.metrics.core.RollingAverageMetric} and registers it under
+     * the given class and name.
+     *
+     * @param klass      the class which owns the metric
+     * @param name       the name of the metric
+     * @param scope      the scope of the metric
+     * @param windowSize the size of the rolling window we keep statistics in
+     * @param windowUnit the unit the rolling window size is given in
+     * @return a new {@link com.yammer.metrics.core.RollingAverageMetric}
+     */
+    public static RollingAverageMetric newRollingAverage(Class<?> klass,
+                                                        String name,
+                                                        String scope,
+                                                        long windowSize,
+                                                        TimeUnit windowUnit) {
+        MetricName metricName = new MetricName(klass, name, scope);
+        final Metric existingMetric = METRICS.get(metricName);
+        if (existingMetric == null) {
+            final RollingAverageMetric metric = RollingAverageMetric.newRollingAverage(windowSize, windowUnit);
+            final Metric justAddedMetric = METRICS.putIfAbsent(metricName, metric);
+            if (justAddedMetric == null) {
+                return metric;
+            }
+            return (RollingAverageMetric) justAddedMetric;
+        }
+        return (RollingAverageMetric) existingMetric;
+    }
+
     /**
      * Enables the console reporter and causes it to print to STDOUT with the
      * specified period.
