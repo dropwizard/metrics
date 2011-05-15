@@ -145,6 +145,7 @@ public class RollingAverageMetric implements Metric {
             final Second processing = currentSecond.getAndSet(new Second(now));
             totalInWindow.addAndGet(processing.getTotal().get());
             countInWindow.addAndGet(processing.getCount().get());
+            secondsInWindow.addLast(processing);
 
             Iterator<Second> iterator = secondsInWindow.iterator();
             while (iterator.hasNext()) {
