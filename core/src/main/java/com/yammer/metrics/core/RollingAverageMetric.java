@@ -8,8 +8,7 @@ import java.util.LinkedList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A metric which keeps track of the mean value and count of some event in
@@ -18,6 +17,24 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author smanek
  */
 public class RollingAverageMetric implements Metric {
+
+    private static final ScheduledExecutorService TICK_THREAD = Utils.newScheduledThreadPool(2, "rolling-tick");
+    private static final long INTERVAL = 1; // seconds
+
+    // list of seconds for which we have data
+    private final Deque<Second> secondsInWindow;
+
+    // the current second we're collecting data in
+    private final AtomicReference<Second> currentSecond;
+
+    // number of seconds in the window
+    private final long windowSize;
+
+    // the total value in the window
+    private final AtomicLong totalInWindow;
+
+    // the total count in the window
+    private final AtomicLong countInWindow;
 
     /**
      * Creates a new {@link RollingAverageMetric}.
@@ -44,18 +61,7 @@ public class RollingAverageMetric implements Metric {
      * @param val the value of the event
      */
     public void observe(long val) {
-
-        // we're fine with multiple calls to observe() happening simultaneously, but there are races with
-        // mean() and tick() (see their comments), so we need at least a read lock here
-        lock.readLock().lock();
-
-        try {
-            seconds.getLast().add(val);
-            this.total.addAndGet(val);
-            this.count.incrementAndGet();
-        } finally {
-            lock.readLock().unlock();
-        }
+        currentSecond.get().add(val);
     }
 
 
@@ -65,7 +71,7 @@ public class RollingAverageMetric implements Metric {
      * @return the number of observations that have been recorded within the window.
      */
     public long count() {
-        return count.get();
+        return countInWindow.get();
     }
 
 
@@ -74,36 +80,24 @@ public class RollingAverageMetric implements Metric {
      *
      * @return the mean observed value observed within the window
      */
-    public double mean() {
-
-        // we need a writeLock here (instead of just a read lock to avoid the race with tick())
-        // in order to avoid a race with observe() where an observation's value has incremented
-        // the window's total, but not yet the window's count
-        lock.writeLock().lock();
-
-        try {
-            if (count() == 0) {
-                return 0.0;
-            } else {
-                return (double) this.total.get() / count();
-            }
-        } finally {
-            lock.writeLock().unlock();
+    public synchronized double mean() {
+        // synchronized with tick() to prevent getting an updated total but a not-updated count
+        if (count() == 0) {
+            return 0.0;
+        } else {
+            return (double) this.totalInWindow.get() / count();
         }
     }
 
     private RollingAverageMetric(final long windowSize, final TimeUnit windowUnit) {
         this.windowSize = TimeUnit.SECONDS.convert(windowSize, windowUnit);
-        this.total = new AtomicLong(0);
-        this.count = new AtomicLong(0);
-        this.seconds = new LinkedList<Second>();
-        this.last = -1;
 
-        tick();
+        this.totalInWindow = new AtomicLong(0);
+        this.countInWindow = new AtomicLong(0);
+        this.secondsInWindow = new LinkedList<Second>();
+
+        this.currentSecond = new AtomicReference<Second>(new Second(now()));
     }
-
-    private static final ScheduledExecutorService TICK_THREAD = Utils.newScheduledThreadPool(2, "rolling-tick");
-    private static final long INTERVAL = 1; // seconds
 
     /**
      * Inner class representing one second's worth of data.
@@ -138,59 +132,31 @@ public class RollingAverageMetric implements Metric {
         }
     }
 
-    // list of seconds for which we have data
-    private final Deque<Second> seconds;
+    private static long now() {
+        return TimeUnit.SECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+    }
 
-    // number of seconds in the window
-    private final long windowSize;
+    private synchronized void tick() {
+        // synchronized to avoid two ticks running at once (which could concurrently modify
+        // secondsInWindow), and to prevent mean() from seeing inconsistent aggregates
+        final long now = now();
+        if (now > currentSecond.get().getTimestamp()) {
+            final long earliestAllowedTimeStamp = now - windowSize;
+            final Second processing = currentSecond.getAndSet(new Second(now));
+            totalInWindow.addAndGet(processing.getTotal().get());
+            countInWindow.addAndGet(processing.getCount().get());
 
-    // the last timestamp we have data for
-    private long last;
-
-    // the total value in the window
-    private final AtomicLong total;
-
-    // the total count in the window
-    private final AtomicLong count;
-
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
-
-
-    private void tick() {
-
-        // this writeLock is needed for three reasons.
-        // 1. To prevent two tick()s from running simultaneously (which will break many things, not least modifying
-        // the LinkedList 'seconds' concurrently).
-        // 2. To prevent the mean() method from being called at the same time as this - which could result in
-        // a race where we compute the mean while one second's total has been removed from the window's total,
-        // but that second's count hasn't been removed from the window's count
-        // 3. To prevent the observe method from running at the same time as this - which (with very small windows)
-        // could result in a race where a second is removed from the seconds list while only its count has been
-        // incremented (without the corresponding total increment).        
-        lock.writeLock().lock();
-        try {
-            final long now = TimeUnit.SECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
-
-            if (now > last) {
-                seconds.addLast(new Second(now));
-
-                final long earliestAllowedTimeStamp = now - windowSize;
-                Iterator<Second> iterator = seconds.iterator();
-                while (iterator.hasNext()) {
-                    Second s = iterator.next();
-                    if (s.getTimestamp() < earliestAllowedTimeStamp) {
-                        iterator.remove();
-                        total.addAndGet(0 - s.getTotal().get());
-                        count.addAndGet(0 - s.getCount().get());
-                    } else {
-                        break;
-                    }
+            Iterator<Second> iterator = secondsInWindow.iterator();
+            while (iterator.hasNext()) {
+                Second s = iterator.next();
+                if (s.getTimestamp() < earliestAllowedTimeStamp) {
+                    iterator.remove();
+                    totalInWindow.addAndGet(0 - s.getTotal().get());
+                    countInWindow.addAndGet(0 - s.getCount().get());
+                } else {
+                    break;
                 }
-
-                last = now;
             }
-        } finally {
-            lock.writeLock().unlock();
         }
     }
 }
