@@ -218,7 +218,7 @@ public class GraphiteReporter implements Runnable {
 
     private void printVmMetrics(long epoch) throws IOException {
         printDoubleField("jvm.memory.heap_usage", heapUsage(), epoch);
-        printDoubleField("jvm.memory.heap_usage", nonHeapUsage(), epoch);
+        printDoubleField("jvm.memory.non_heap_usage", nonHeapUsage(), epoch);
         for (Entry<String, Double> pool : memoryPoolUsage().entrySet()) {
             printDoubleField("jvm.memory.memory_pool_usages." + pool.getKey(), pool.getValue(), epoch);
         }
