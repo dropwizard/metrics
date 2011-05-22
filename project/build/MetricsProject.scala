@@ -33,7 +33,7 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
 
     /**
      * Always compile with deprecation alerts, full type explanations for errors,
-     * full unchecked errors, and
+     * full unchecked errors, and optimizations.
      */
     override def compileOptions = super.compileOptions ++
       Seq(Deprecation, ExplainTypes, Unchecked, Optimise)
