@@ -32,6 +32,13 @@ class MetricsProject(info: ProjectInfo) extends ParentProject(info) with IdeaPro
     override def packageToPublishActions = super.packageToPublishActions ++ Seq(packageSrc)
 
     /**
+     * Always compile with deprecation alerts, full type explanations for errors,
+     * full unchecked errors, and
+     */
+    override def compileOptions = super.compileOptions ++
+      Seq(Deprecation, ExplainTypes, Unchecked, Optimise)
+
+    /**
      * Repositories
      */
     val dropWizard = "Coda's Repo" at "http://repo.codahale.com"
