@@ -7,11 +7,11 @@ Requirements
 ------------
 
 * Java SE 6
-* Scala 2.8.1 or 2.9.0
+* Scala 2.8.1 or 2.9.0-1
 * Guice 3.0 (for `metrics-guice`)
 * Servlet API 2.5 (for `metrics-servlet`)
-* Jackson 1.7.6 (for `metrics-servlet`)
-* Jetty 7.4.0.v20110414 (for `metrics-jetty`)
+* Jackson 1.7.7 (for `metrics-servlet`)
+* Jetty 7.4.2 (for `metrics-jetty`)
 * Log4J 1.2.16 (for `metrics-log4j`)
 * Logback 0.9.28 (for `metrics-logback`)
 * Ehcache 2.4.2 (for `metrics-ehcache`)
@@ -22,12 +22,31 @@ How To Use
 
 **First**, specify Metrics as a dependency:
 
-```scala
-val codaRepo = "Coda Hale's Repository" at "http://repo.codahale.com/"
-val metrics = "com.yammer.metrics" %% "metrics-core" % "2.0.0-BETA13"
+```xml
+<repositories>
+  <repository>
+    <id>repo.codahale.com</id>
+    <url>http://repo.codahale.com</url>
+  </repository>
+</repositories>
+
+<dependencies>
+  <!-- if you just want the pure Java version -->
+  <dependency>
+    <groupId>com.yammer.metrics</groupId>
+    <artifactId>metrics-core</artifactId>
+    <version>2.0.0-BETA14-SNAPSHOT</version>
+  </dependency>
+  <!-- if you want the Scala façade library -->
+  <dependency>
+    <groupId>com.yammer.metrics</groupId>
+    <artifactId>metrics-scala_${scala.version}</artifactId>
+    <version>2.0.0-BETA14-SNAPSHOT</version>
+  </dependency>
+</dependencies>
 ```
 
-(Or whatever it takes for you to get Maven or Ivy happy.)
+(Or whatever it takes for you to get SBT or Ivy happy.)
 
 **Second**, instrument your classes:
 
