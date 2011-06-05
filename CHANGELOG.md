@@ -1,3 +1,11 @@
+v2.0.0-BETA14: TBD
+==========================
+
+* Moved to Maven for a build system and extracted the Scala façade to a
+  `metrics-scala` module which is now the only cross-built module. All other
+  modules dropped the Scala version suffix in their `artifactId`s.
+
+
 v2.0.0-BETA13: May 13 2011
 ==========================
 
