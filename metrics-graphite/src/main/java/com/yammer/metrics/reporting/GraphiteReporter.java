@@ -107,10 +107,12 @@ public class GraphiteReporter implements Runnable {
             writer.flush();
         } catch (Exception e) {
             log.error("Error:", e);
-            try {
-                writer.flush();
-            } catch (IOException e1) {
-                log.error("Error while flushing writer:", e1);
+            if (writer != null) {
+                try {
+                    writer.flush();
+                } catch (IOException e1) {
+                    log.error("Error while flushing writer:", e1);
+                }
             }
         } finally {
             if (socket != null) {
