@@ -142,7 +142,7 @@ public class JmxReporter implements Runnable {
         public List<?> values();
     }
 
-    public class Histogram implements HistogramMBean {
+    public static class Histogram implements HistogramMBean {
         private final ObjectName objectName;
         private final HistogramMetric metric;
 
@@ -221,7 +221,7 @@ public class JmxReporter implements Runnable {
         public TimeUnit getLatencyUnit();
     }
 
-    public class Timer extends Meter implements TimerMBean {
+    public static class Timer extends Meter implements TimerMBean {
         private final TimerMetric metric;
 
         public Timer(TimerMetric metric, ObjectName objectName) {
