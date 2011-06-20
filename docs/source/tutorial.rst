@@ -36,8 +36,8 @@ And then the Metrics library like this:
     <dependencies>
       <dependency>
         <groupId>com.yammer.metrics</groupId>
-        <artifactId>metrics-core_2.8.1</artifactId>
-        <version>2.0.0-BETA12</version>
+        <artifactId>metrics-core</artifactId>
+        <version>2.0.0-BETA14-SNAPSHOT</version>
       </dependency>
     </dependencies>
 
