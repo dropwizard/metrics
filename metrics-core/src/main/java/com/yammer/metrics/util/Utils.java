@@ -17,7 +17,7 @@ public class Utils {
                 new TreeMap<String, Map<String, Metric>>();
         for (Entry<MetricName, Metric> entry : metrics.entrySet()) {
             final String className = entry.getKey().getKlass()
-                                          .getCanonicalName()
+                                          .getName()
                                           .replace('$', '.')
                                           .replaceAll("\\.$", "");
             final String scopedName;
@@ -26,12 +26,12 @@ public class Utils {
             } else {
                 scopedName = className;
             }
-            Map<String, Metric> submetrics = sortedMetrics.get(scopedName);
-            if (submetrics == null) {
-                submetrics = new TreeMap<String, Metric>();
-                sortedMetrics.put(scopedName, submetrics);
+            Map<String, Metric> subMetrics = sortedMetrics.get(scopedName);
+            if (subMetrics == null) {
+                subMetrics = new TreeMap<String, Metric>();
+                sortedMetrics.put(scopedName, subMetrics);
             }
-            submetrics.put(entry.getKey().getName(), entry.getValue());
+            subMetrics.put(entry.getKey().getName(), entry.getValue());
         }
         return sortedMetrics;
     }
