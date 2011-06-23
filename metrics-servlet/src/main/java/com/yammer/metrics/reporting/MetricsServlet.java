@@ -268,11 +268,11 @@ public class MetricsServlet extends HttpServlet {
         {
             json.writeStringField("type", "gauge");
             json.writeFieldName("value");
-            final Object value = gauge.value();
             try {
+                final Object value = gauge.value();
                 json.writeObject(value);
-            } catch (JsonMappingException e) {
-                json.writeString("unknown value type: " + value.getClass());
+            } catch (Exception e) {
+                json.writeString("error reading gauge: " + e.getMessage());
             }
         }
         json.writeEndObject();

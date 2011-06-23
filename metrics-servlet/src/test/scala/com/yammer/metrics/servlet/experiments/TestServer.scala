@@ -8,6 +8,9 @@ import com.yammer.metrics.reporting.MetricsServlet
 object TestServer extends Instrumented {
   val counter1 = metrics.counter("wah", "doody")
   val counter2 = metrics.counter("woo")
+  val asplodingGauge = metrics.gauge[Int]("boo") {
+    throw new RuntimeException("asplode!")
+  }
 
   def main(args: Array[String]) {
     val server = new Server(8080)
