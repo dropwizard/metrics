@@ -55,7 +55,10 @@ public class VirtualMachineMetrics {
                         final Long timestamp = (Long) bean.getClass().getDeclaredMethod("getCollectionTime").invoke(bean);
                         final Long lastTimestamp = gcTimestamps.get(name);
 
-                        if (lastTimestamp == null || timestamp > lastTimestamp) {
+                        // Ignore any duration > 1hr; getLastGcInfo occasionally
+                        // returns total crap.
+                        if (lastTimestamp == null || timestamp > lastTimestamp &&
+                                TimeUnit.MILLISECONDS.toHours(duration) < 1) {
                             collectGcDuration(name, duration);
                             collectGcThroughput(name, gcInfo);
                             gcTimestamps.put(name, timestamp);
