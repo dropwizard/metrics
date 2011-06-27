@@ -1,17 +1,16 @@
 package com.yammer.metrics.core;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-
-import static java.lang.Double.doubleToLongBits;
-import static java.lang.Double.longBitsToDouble;
-import static java.lang.Math.floor;
-import static java.lang.Math.sqrt;
-
 import com.yammer.metrics.stats.ExponentiallyDecayingSample;
 import com.yammer.metrics.stats.Sample;
 import com.yammer.metrics.stats.UniformSample;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static java.lang.Math.floor;
+import static java.lang.Math.sqrt;
 
 /**
  * A metric which calculates the distribution of a value.
@@ -59,8 +58,8 @@ public class HistogramMetric implements Metric {
     private final AtomicLong _sum = new AtomicLong();
     // These are for the Welford algorithm for calculating running variance
     // without floating-point doom.
-    private final AtomicLong varianceM = new AtomicLong();
-    private final AtomicLong varianceS = new AtomicLong();
+    private final AtomicReference<double[]> variance =
+            new AtomicReference<double[]>(new double[]{-1, 0}); // M, S
     private final AtomicLong count = new AtomicLong();
 
     /**
@@ -91,8 +90,7 @@ public class HistogramMetric implements Metric {
         _max.set(Long.MIN_VALUE);
         _min.set(Long.MAX_VALUE);
         _sum.set(0);
-        varianceM.set(-1);
-        varianceS.set(0);
+        variance.set(new double[] { -1, 0 });
     }
 
     /**
@@ -221,7 +219,7 @@ public class HistogramMetric implements Metric {
         if (count() <= 1) {
             return 0.0;
         }
-        return longBitsToDouble(varianceS.get()) / (count() - 1);
+        return variance.get()[1] / (count() - 1);
     }
 
     private void setMax(long potentialMax) {
@@ -241,21 +239,24 @@ public class HistogramMetric implements Metric {
     }
 
     private void updateVariance(long value) {
-        // initialize varianceM to the first reading if it's still blank
-        if (!varianceM.compareAndSet(-1, doubleToLongBits(value))) {
-            boolean done = false;
-            while (!done) {
-                final long oldMCas = varianceM.get();
-                final double oldM = longBitsToDouble(oldMCas);
-                final double newM = oldM + ((value - oldM) / count());
+        boolean done = false;
+        while (!done) {
+            final double[] oldValues = variance.get();
+            final double[] newValues = new double[2];
+            if (oldValues[0] == -1) {
+                newValues[0] = value;
+                newValues[1] = 0;
+            } else {
+                final double oldM = oldValues[0];
+                final double oldS = oldValues[1];
 
-                final long oldSCas = varianceS.get();
-                final double oldS = longBitsToDouble(oldSCas);
+                final double newM = oldM + ((value - oldM) / count());
                 final double newS = oldS + ((value - oldM) * (value - newM));
 
-                done = varianceM.compareAndSet(oldMCas, doubleToLongBits(newM)) &&
-                        varianceS.compareAndSet(oldSCas, doubleToLongBits(newS));
+                newValues[0] = newM;
+                newValues[1] = newS;
             }
+            done = variance.compareAndSet(oldValues, newValues);
         }
     }
 }
