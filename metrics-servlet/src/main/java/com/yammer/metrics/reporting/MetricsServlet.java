@@ -36,7 +36,7 @@ public class MetricsServlet extends HttpServlet {
                                            "<body>\n" +
                                            "  <h1>Operational Menu</h1>\n" +
                                            "  <ul>\n" +
-                                           "    <li><a href=\"{0}{1}\">Metrics</a></li>\n" +
+                                           "    <li><a href=\"{0}{1}?pretty=true\">Metrics</a></li>\n" +
                                            "    <li><a href=\"{2}{3}\">Ping</a></li>\n" +
                                            "    <li><a href=\"{4}{5}\">Threads</a></li>\n" +
                                            "    <li><a href=\"{6}{7}\">Healthcheck</a></li>\n" +
