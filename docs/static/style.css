@@ -1,10 +1,90 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+    color: #000;
+    background: #a7a09a;
+}
+
+#main {
+    width: 750px;
+    margin: 0 auto;
+    background: #99c;
+}
+
+#header {
+    padding: 5px 10px;
+    background: #ddd;
+}
+
+h1 {
+    margin: 0;
+}
+
+#nav {
+    padding: 5px 10px;
+    background: #c99;
+}
+
+#nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#nav li {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+#content {
+    float: right;
+    width: 480px;
+    padding: 10px;
+    background: #9c9;
+}
+
+h2 {
+    margin: 0 0 1em;
+}
+
+#TOC {
+    float: left;
+    width: 230px;
+    padding: 10px;
+    background: #99c;
+}
+
+#footer {
+    clear: both;
+    padding: 5px 10px;
+    background: #cc9;
+}
+
+#footer p {
+    margin: 0;
+    text-align: center;
+    font-size: small;
+}
+
+* html #footer {
+    height: 1px;
+}
+
+h1, h2, h3, h4, h5, h6, #nav, #TOC, #footer p {
+    font-family: "Helvetica Neue", "Helvetica", sans-serif;
+}
+
+code, pre {
+    font-family: "Panic Sans", "Menlo", "Monaco", "Consolas", monospace;
+}
+
 table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode, table.sourceCode pre {
     margin: 0;
     padding: 0;
     border: 0;
     vertical-align: baseline;
-    border: none;
-    font-family: "Panic Sans", Menlo, Consolas, Monaco, monospace;
 }
 
 td.lineNumbers {
