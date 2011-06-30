@@ -312,7 +312,7 @@ public class InstrumentedEhcache implements Ehcache {
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        return cache.clone();
+        return InstrumentedEhcache.instrument((Ehcache) cache.clone());
     }
 
     @Override
