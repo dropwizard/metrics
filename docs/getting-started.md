@@ -1,5 +1,4 @@
 % Getting Started
-# Getting Started With Metrics
 
 This tutorial will walk you through the basic steps involved in using Metrics
 with your project.
@@ -74,12 +73,12 @@ five different types of metrics:
 * [Timers](#adding-a-timer)
 
 
-### Adding A Gauge
+## Adding A Gauge
 
 A gauge is an instantaneous measurement of a value. For example, we may want to
 measure the number of pending jobs in a queue.
 
-#### Java
+### Java
 
 ~~~~ { .java }
 Metrics.newGauge(QueueManager.class, "pending-jobs", new GaugeMetric<Integer>() {
@@ -90,7 +89,7 @@ Metrics.newGauge(QueueManager.class, "pending-jobs", new GaugeMetric<Integer>() 
 });
 ~~~~
 
-#### Scala
+### Scala
 
 ~~~~ { .scala }
 metrics.gauge("pending-jobs") { queue.size }
@@ -107,13 +106,13 @@ slow.
 [Learn more about gauges](gauges.html).
 
 
-### Adding A Counter
+## Adding A Counter
 
 A counter is just a gauge for an `AtomicLong` instance. You can increment or
 decrement its value. For example, we may want a more efficient way of measuring
 the pending job in a queue:
 
-#### Java
+### Java
 
 
 ~~~~ { .java }
@@ -131,7 +130,7 @@ public Job takeJob() {
 ~~~~
 
 
-#### Scala
+### Scala
 
 ~~~~ { .scala }
 private val pendingJobs = metrics.counter("pending-jobs")
@@ -153,13 +152,13 @@ queue.
 [Learn more about counters](counters.html).
 
 
-### Adding A Meter
+## Adding A Meter
 
 A meter measures the rate of events over time (e.g., "requests per second").
 In addition to the mean rate, meters also track 1-, 5-, and 15-minute moving
 averages.
 
-#### Java
+### Java
 
 ~~~~ { .java }
 private final MeterMetric requests = Metrics.newMeter(RequestHandler.class, "requests", "requests", TimeUnit.SECONDS);
@@ -170,7 +169,7 @@ public void handleRequest(Request request, Response response) {
 }
 ~~~~
 
-#### Scala
+### Scala
 
 ~~~~ { .scala }
 private val requests = metrics.meter("requests", "requests")
@@ -186,13 +185,13 @@ This meter will measure the rate of requests in requests per second.
 [Learn more about meters](meters.html).
 
 
-### Adding A Histogram
+## Adding A Histogram
 
 A histogram measures the statistical distribution of values in a stream of data.
 In addition to minimum, maximum, mean, etc., it also measures median, 75th,
 90th, 95th, 98th, 99th, and 99.9th percentiles.
 
-#### Java
+### Java
 
 ~~~~ { .java }
 private final HistogramMetric responseSizes = Metrics.newHistogram(RequestHandler.class, "response-sizes");
@@ -203,7 +202,7 @@ public void handleRequest(Request request, Response response) {
 }
 ~~~~
 
-#### Scala
+### Scala
 
 ~~~~ { .scala }
 private val responseSizes = metrics.histogram("response-sizes")
@@ -219,12 +218,12 @@ This histogram will measure the size of responses in bytes.
 [Learn more about histograms](histograms.html).
 
 
-### Adding A Timer
+## Adding A Timer
 
 A timer measures both the rate that a particular piece of code is called and the
 distribution of its latency.
 
-#### Java
+### Java
 
 ~~~~ { .java }
 private final TimerMetric responses = Metrics.newTimer(RequestHandler.class, "responses", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
@@ -241,7 +240,7 @@ public String handleRequest(Request request, Response response) {
 ~~~~
 
 
-#### Scala
+### Scala
 
 ~~~~ { .scala }
 private val responses = metrics.timer("responses")
@@ -260,13 +259,13 @@ milliseconds and provide a rate of requests in requests per second.
 [Learn more about timers](timers.html).
 
 
-### Adding A Health Check
+## Adding A Health Check
 
 Metrics also has the ability to centralize your service's health checks. First,
 implement a `HealthCheck` instance:
 
 
-#### Java
+### Java
 
 ~~~~ { .java }
 import com.yammer.metrics.core.HealthCheck.Result;
@@ -326,12 +325,12 @@ deadlocked.
 [Learn more about healthchecks](healthchecks.html).
 
 
-### Exposing Metrics via JMX
+## Exposing Metrics via JMX
 
 **TODO**
 
 
-### Exposing Metrics via HTTP+JSON
+## Exposing Metrics via HTTP+JSON
 
 **TODO**
 

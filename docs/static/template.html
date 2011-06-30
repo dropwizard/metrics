@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>$title$ – Metrics Documentation</title>
-    <link href="/style.css" rel="stylesheet">
+    <title>$if(title)$$title$ | $endif$Metrics</title>
+    <link href="style.css" rel="stylesheet">
 </head>
 <body>
     <div id="main">
-        <div id="header">Metrics</div>
+        <div id="header"><h1>Metrics
+            $if(title)$ - $title$ $endif$
+        </h1></div>
+        <div id="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="overview.html">Overview</a></li>
+                <li><a href="getting-started.html">Getting Started</a></li>
+            </ul>
+        </div>
         $toc$
         <div id="content">
             $body$
         </div>
         <div id="footer">
-            
+            <p>aw yes yes y'all</p>
         </div>
     </div>
 </body>
