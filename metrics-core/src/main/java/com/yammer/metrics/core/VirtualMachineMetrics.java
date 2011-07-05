@@ -155,7 +155,10 @@ public class VirtualMachineMetrics {
     public static Map<String, Double> memoryPoolUsage() {
         final Map<String, Double> pools = new TreeMap<String, Double>();
         for (MemoryPoolMXBean bean : getMemoryPoolMXBeans()) {
-            pools.put(bean.getName(), bean.getUsage().getUsed() / (double) bean.getUsage().getMax());
+            final double max = bean.getUsage().getMax() == -1 ?
+                    bean.getUsage().getCommitted() :
+                    bean.getUsage().getMax();
+            pools.put(bean.getName(), bean.getUsage().getUsed() / max);
         }
         return pools;
     }
