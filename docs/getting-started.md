@@ -29,12 +29,12 @@ And then the Metrics library like this:
   <dependency>
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-core</artifactId>
-    <version>2.0.0-BETA14-SNAPSHOT</version>
+    <version>2.0.0-BETA14</version>
   </dependency>
   <dependency>
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-scala_${scala.version}</artifactId>
-    <version>2.0.0-BETA14-SNAPSHOT</version>
+    <version>2.0.0-BETA14</version>
   </dependency>
 </dependencies>
 ~~~~
