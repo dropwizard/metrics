@@ -1,3 +1,20 @@
+v2.0.0-BETA14: Jul 05 2011
+==========================
+
+* Moved to Maven for a build system and extracted the Scala façade to a
+  `metrics-scala` module which is now the only cross-built module. All other
+  modules dropped the Scala version suffix in their `artifactId`s.
+* Fixed non-heap metric name in `GraphiteReporter`.
+* Fixed stability error in `GraphiteReporter` when dealing with unavilable
+  servers.
+* Fixed error with anonymous, instrumented classes.
+* Fixed error in `MetricsServlet` when a gauge throws an exception.
+* Fixed error with bogus GC run times.
+* Link to the pretty JSON output from the `MetricsServlet` menu page.
+* Fixed potential race condition in histograms' variance calculations.
+* Fixed memory pool reporting for the G1 collector.
+
+
 v2.0.0-BETA13: May 13 2011
 ==========================
 

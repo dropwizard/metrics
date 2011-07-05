@@ -8,3 +8,6 @@ docs/build
 .classpath
 .project
 bin
+*.iml
+*.ipr
+*.iws
