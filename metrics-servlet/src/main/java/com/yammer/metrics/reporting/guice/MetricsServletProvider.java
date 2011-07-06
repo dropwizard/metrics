@@ -14,14 +14,22 @@ import com.yammer.metrics.reporting.MetricsServlet;
 public class MetricsServletProvider implements Provider<MetricsServlet>
 {
     private final Set<HealthCheck> healthChecks;
+    private final String healthcheckUri;
+    private final String metricsUri;
+    private final String pingUri;
+    private final String threadsUri;
     private JsonFactory jsonFactory;
-    private String healthcheckUri;
-    private String metricsUri;
-    private String pingUri;
-    private String threadsUri;
 
     @Inject
-    public MetricsServletProvider(Set<HealthCheck> healthChecks) {
+    public MetricsServletProvider(Set<HealthCheck> healthChecks,
+                                    @Named("MetricsServlet.HEALTHCHECK_URI") String healthcheckUri,
+                                    @Named("MetricsServlet.METRICS_URI") String metricsUri,
+                                    @Named("MetricsServlet.PING_URI") String pingUri,
+                                    @Named("MetricsServlet.THREADS_URI") String threadsUri) {
+        this.healthcheckUri = healthcheckUri;
+        this.metricsUri = metricsUri;
+        this.pingUri = pingUri;
+        this.threadsUri = threadsUri;
         this.healthChecks = healthChecks;
     }
 
@@ -30,41 +38,17 @@ public class MetricsServletProvider implements Provider<MetricsServlet>
         this.jsonFactory = jsonFactory;
     }
 
-    @Inject(optional = true)
-    public void setUris(@Named("MetricsServlet.HEALTHCHECK_URI") String healthcheckUri,
-                         @Named("MetricsServlet.METRICS_URI") String metricsUri,
-                         @Named("MetricsServlet.PING_URI") String pingUri,
-                         @Named("MetricsServlet.THREADS_URI") String threadsUri) {
-        if ((healthcheckUri == null) || (metricsUri == null) || (pingUri == null) | (threadsUri == null)) {
-            throw new IllegalArgumentException("All uris need to be specified");
-        }
-        this.healthcheckUri = healthcheckUri;
-        this.metricsUri = metricsUri;
-        this.pingUri = pingUri;
-        this.threadsUri = threadsUri;
-    }
-
     @Override
     public MetricsServlet get()
     {
         for (HealthCheck healthCheck : healthChecks) {
             HealthChecks.register(healthCheck);
         }
-        if ((healthcheckUri != null) && (metricsUri != null) && (pingUri != null) && (threadsUri != null)) {
-            if (jsonFactory != null) {
-                return new MetricsServlet(jsonFactory, healthcheckUri, metricsUri, pingUri, threadsUri);
-            }
-            else {
-                return new MetricsServlet(healthcheckUri, metricsUri, pingUri, threadsUri);
-            }
+        if (jsonFactory != null) {
+            return new MetricsServlet(jsonFactory, healthcheckUri, metricsUri, pingUri, threadsUri);
         }
         else {
-            if (jsonFactory != null) {
-                return new MetricsServlet(jsonFactory);
-            }
-            else {
-                return new MetricsServlet();
-            }
+            return new MetricsServlet(healthcheckUri, metricsUri, pingUri, threadsUri);
         }
     }
 }

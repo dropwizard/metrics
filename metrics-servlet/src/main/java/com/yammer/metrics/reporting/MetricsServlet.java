@@ -42,10 +42,10 @@ public class MetricsServlet extends HttpServlet {
                                            "  </ul>\n" +
                                            "</body>\n" +
                                            "</html>";
-    private static final String HEALTHCHECK_URI = "/healthcheck";
-    private static final String METRICS_URI = "/metrics";
-    private static final String PING_URI = "/ping";
-    private static final String THREADS_URI = "/threads";
+    public static final String HEALTHCHECK_URI = "/healthcheck";
+    public static final String METRICS_URI = "/metrics";
+    public static final String PING_URI = "/ping";
+    public static final String THREADS_URI = "/threads";
     private JsonFactory factory;
     private String metricsUri, pingUri, threadsUri, healthcheckUri, contextPath;
 

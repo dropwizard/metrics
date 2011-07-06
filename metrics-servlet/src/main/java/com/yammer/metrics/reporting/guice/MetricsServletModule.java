@@ -59,11 +59,11 @@ public class MetricsServletModule extends ServletModule {
     private final String threadsUri;
 
     public MetricsServletModule() {
-        this(null, null, null, null, null);
+        this(null, MetricsServlet.HEALTHCHECK_URI, MetricsServlet.METRICS_URI, MetricsServlet.PING_URI, MetricsServlet.THREADS_URI);
     }
 
     public MetricsServletModule(JsonFactory jsonFactory) {
-        this(jsonFactory, null, null, null, null);
+        this(jsonFactory, MetricsServlet.HEALTHCHECK_URI, MetricsServlet.METRICS_URI, MetricsServlet.PING_URI, MetricsServlet.THREADS_URI);
     }
 
     public MetricsServletModule(String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
@@ -83,12 +83,10 @@ public class MetricsServletModule extends ServletModule {
         if (jsonFactory != null) {
             bind(JsonFactory.class).annotatedWith(Names.named("MetricsServlet.JSON_FACTORY")).toInstance(jsonFactory);
         }
-        if ((healthcheckUri != null) && (metricsUri != null) && (pingUri != null) && (threadsUri != null)) {
-            bind(String.class).annotatedWith(Names.named("MetricsServlet.HEALTHCHECK_URI")).toInstance(healthcheckUri);
-            bind(String.class).annotatedWith(Names.named("MetricsServlet.METRICS_URI")).toInstance(metricsUri);
-            bind(String.class).annotatedWith(Names.named("MetricsServlet.PING_URI")).toInstance(pingUri);
-            bind(String.class).annotatedWith(Names.named("MetricsServlet.THREADS_URI")).toInstance(threadsUri);
-        }
+        bind(String.class).annotatedWith(Names.named("MetricsServlet.HEALTHCHECK_URI")).toInstance(healthcheckUri);
+        bind(String.class).annotatedWith(Names.named("MetricsServlet.METRICS_URI")).toInstance(metricsUri);
+        bind(String.class).annotatedWith(Names.named("MetricsServlet.PING_URI")).toInstance(pingUri);
+        bind(String.class).annotatedWith(Names.named("MetricsServlet.THREADS_URI")).toInstance(threadsUri);
         bind(MetricsServlet.class).toProvider(MetricsServletProvider.class).asEagerSingleton();
 
         serve(healthcheckUri, metricsUri, pingUri, threadsUri).with(MetricsServlet.class);
