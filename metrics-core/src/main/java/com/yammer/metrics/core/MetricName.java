@@ -67,6 +67,26 @@ public class MetricName {
         return scope != null;
     }
 
+    /**
+     * Returns the mbean name for the {@link Metric} identified by this metric name.
+     * @return the mbean name
+     */
+    public String getMBeanName() {
+        final String simpleName = klass.getSimpleName().replaceAll("\\$$", "");
+        if (hasScope()) {
+            return String.format("%s:type=%s,scope=%s,name=%s",
+                    klass.getPackage().getName(),
+                    simpleName,
+                    scope,
+                    name);
+        } else {
+            return String.format("%s:type=%s,name=%s",
+                    klass.getPackage().getName(),
+                    simpleName,
+                    name);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
