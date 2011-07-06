@@ -9,7 +9,7 @@ import com.yammer.metrics.reporting.MetricsServlet;
 /**
  * A guice servlet module that registers the {@link MetricsServlet} via guice and also configures all
  * healthchecks bound via guice to it.
- * 
+ *
  * To use, install this module in your servlet module (or add as a separate module), and bind the health checks
  * via a multi binder:
  * <pre>
@@ -24,7 +24,7 @@ import com.yammer.metrics.reporting.MetricsServlet;
  * </pre>
  * The module offers the same overloaded constructors to specifiy a custom {@link JsonFactory} and the uris
  * for the healthcheck, metrics, etc. E.g.
- * <pre> 
+ * <pre>
  * {@code
  * install(new MetricsServletModule("/1.0/healthcheck", "/1.0/metrics", "/1.0/ping", "/1.0/threads"));
  * }
