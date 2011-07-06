@@ -4,8 +4,10 @@ package com.yammer.metrics.core;
  * A value class encapsulating a metric's owning class and name.
  */
 public class MetricName {
-    private final Class<?> klass;
-    private final String name, scope;
+    private final String group;
+    private final String type;
+    private final String name;
+    private final String scope;
 
     /**
      * Creates a new {@link MetricName} without a scope.
@@ -20,23 +22,63 @@ public class MetricName {
     /**
      * Creates a new {@link MetricName} without a scope.
      *
+     * @param group the group to which the {@link Metric} belongs
+     * @param type the type to which the {@link Metric} belongs
+     * @param name the name of the {@link Metric}
+     */
+    public MetricName(String group, String type, String name) {
+        this(group, type, name, null);
+    }
+
+    /**
+     * Creates a new {@link MetricName} without a scope.
+     *
      * @param klass the {@link Class} to which the {@link Metric} belongs
      * @param name  the name of the {@link Metric}
      * @param scope the scope of the {@link Metric}
      */
     public MetricName(Class<?> klass, String name, String scope) {
-        this.klass = klass;
+        this(klass.getPackage().getName(), klass.getSimpleName().replaceAll("\\$$", ""), name, scope);
+    }
+
+    /**
+     * Creates a new {@link MetricName} without a scope.
+     *
+     * @param group the group to which the {@link Metric} belongs
+     * @param type the type to which the {@link Metric} belongs
+     * @param name the name of the {@link Metric}
+     * @param scope the scope of the {@link Metric}
+     */
+    public MetricName(String group, String type, String name, String scope) {
+        if (group == null || type == null) {
+            throw new IllegalArgumentException("Both group and type need to specified");
+        }
+        this.group = group;
+        this.type = type;
         this.name = name;
         this.scope = scope;
     }
 
     /**
-     * Returns the {@link Class} to which the {@link Metric} belongs.
+     * Returns the group to which the {@link Metric} belongs. For class-based
+     * metrics, this will be the package name of the {@link Class} to which the
+     * {@link Metric} belongs.
      *
-     * @return the {@link Class} to which the {@link Metric} belongs
+     * @return the group to which the {@link Metric} belongs
      */
-    public Class<?> getKlass() {
-        return klass;
+    public String getGroup() {
+        return group;
+    }
+
+    /**
+     * Returns the type to which the {@link Metric} belongs. For class-based
+     * metrics, this will be the simple class name of the {@link Class} to which the
+     * {@link Metric} belongs.
+     *
+     * @return the type to which the {@link Metric} belongs
+     */
+    public String getType() {
+        return type;
     }
 
     /**
@@ -72,17 +114,16 @@ public class MetricName {
      * @return the mbean name
      */
     public String getMBeanName() {
-        final String simpleName = klass.getSimpleName().replaceAll("\\$$", "");
         if (hasScope()) {
             return String.format("%s:type=%s,scope=%s,name=%s",
-                    klass.getPackage().getName(),
-                    simpleName,
+                    group,
+                    type,
                     scope,
                     name);
         } else {
             return String.format("%s:type=%s,name=%s",
-                    klass.getPackage().getName(),
-                    simpleName,
+                    group,
+                    type,
                     name);
         }
     }
@@ -94,7 +135,8 @@ public class MetricName {
 
         MetricName that = (MetricName) o;
 
-        return !(klass != null ? !klass.equals(that.klass) : that.klass != null)
+        return !(group != null ? !group.equals(that.group) : that.group != null)
+                && !(type != null ? !type.equals(that.type) : that.type != null)
                 && !(name != null ? !name.equals(that.name) : that.name != null)
                 && !(scope != null ? !scope.equals(that.scope) : that.scope != null);
 
@@ -102,9 +144,15 @@ public class MetricName {
 
     @Override
     public int hashCode() {
-        int result = klass != null ? klass.hashCode() : 0;
+        int result = group != null ? group.hashCode() : 0;
+        result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (scope != null ? scope.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return getMBeanName();
     }
 }
