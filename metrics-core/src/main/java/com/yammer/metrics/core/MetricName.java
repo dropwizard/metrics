@@ -8,6 +8,7 @@ public class MetricName {
     private final String type;
     private final String name;
     private final String scope;
+    private final String mbeanName;
 
     /**
      * Creates a new {@link MetricName} without a scope.
@@ -51,12 +52,31 @@ public class MetricName {
      */
     public MetricName(String group, String type, String name, String scope) {
         if (group == null || type == null) {
-            throw new IllegalArgumentException("Both group and type need to specified");
+            throw new IllegalArgumentException("Both group and type need to be specified");
+        }
+        if (name == null) {
+            throw new IllegalArgumentException("Name needs to be specified");
         }
         this.group = group;
         this.type = type;
         this.name = name;
         this.scope = scope;
+
+        StringBuilder mbeanNameBuilder = new StringBuilder();
+
+        mbeanNameBuilder.append(group);
+        mbeanNameBuilder.append(":type=");
+        mbeanNameBuilder.append(type);
+        if (scope != null) {
+            mbeanNameBuilder.append(",scope=");
+            mbeanNameBuilder.append(scope);
+        }
+        if (name.length() > 0) {
+            mbeanNameBuilder.append(",name=");
+            mbeanNameBuilder.append(name);
+        }
+
+        this.mbeanName = mbeanNameBuilder.toString();
     }
 
     /**
@@ -114,45 +134,21 @@ public class MetricName {
      * @return the mbean name
      */
     public String getMBeanName() {
-        if (hasScope()) {
-            return String.format("%s:type=%s,scope=%s,name=%s",
-                    group,
-                    type,
-                    scope,
-                    name);
-        } else {
-            return String.format("%s:type=%s,name=%s",
-                    group,
-                    type,
-                    name);
-        }
+        return mbeanName;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        MetricName that = (MetricName) o;
-
-        return !(group != null ? !group.equals(that.group) : that.group != null)
-                && !(type != null ? !type.equals(that.type) : that.type != null)
-                && !(name != null ? !name.equals(that.name) : that.name != null)
-                && !(scope != null ? !scope.equals(that.scope) : that.scope != null);
-
+        return (o != null) && (this == o || this.mbeanName.equals(((MetricName)o).mbeanName));
     }
 
     @Override
     public int hashCode() {
-        int result = group != null ? group.hashCode() : 0;
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (scope != null ? scope.hashCode() : 0);
-        return result;
+        return mbeanName.hashCode();
     }
 
     @Override
     public String toString() {
-        return getMBeanName();
+        return mbeanName;
     }
 }
