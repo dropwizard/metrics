@@ -35,6 +35,7 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
             <version>7.4.2.v20110526</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.yammer.metrics</groupId>
