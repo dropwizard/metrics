@@ -282,6 +282,13 @@ public class MetricsServlet extends HttpServlet {
         json.writeStartObject();
         {
 
+            json.writeFieldName("vm");
+            json.writeStartObject();
+            {
+                json.writeStringField("name", vmName());
+                json.writeStringField("version", vmVersion());
+            }
+            json.writeEndObject();
             json.writeFieldName("memory");
             json.writeStartObject();
             {
