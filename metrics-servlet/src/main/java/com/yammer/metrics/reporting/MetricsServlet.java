@@ -307,6 +307,7 @@ public class MetricsServlet extends HttpServlet {
 
             json.writeNumberField("daemon_thread_count", daemonThreadCount());
             json.writeNumberField("thread_count", threadCount());
+            json.writeNumberField("current_time", System.currentTimeMillis());
             json.writeNumberField("uptime", uptime());
             json.writeNumberField("fd_usage", fileDescriptorUsage());
 
