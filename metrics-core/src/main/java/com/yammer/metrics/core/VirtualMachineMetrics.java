@@ -188,6 +188,26 @@ public class VirtualMachineMetrics {
     }
 
     /**
+     * Returns the version of the currently-running jvm.
+     *
+     * @see <a href="http://java.sun.com/j2se/versioning_naming.html">J2SE SDK/JRE Version String Naming Convention</a>
+     * @return the version of the currently-running jvm, eg "1.6.0_24"
+     */
+    public static String vmVersion() {
+        return System.getProperty("java.runtime.version");
+    }
+
+    /**
+     * Returns the name of the currently-running jvm.
+     *
+     * @see <a href="http://download.oracle.com/javase/6/docs/api/java/lang/System.html#getProperties()">System.getProperties()</a>
+     * @return the name of the currently-running jvm, eg  "Java HotSpot(TM) Client VM"
+     */
+    public static String vmName() {
+        return System.getProperty("java.vm.name");
+    }
+
+    /**
      * Returns the number of seconds the JVM process has been running.
      *
      * @return the number of seconds the JVM process has been running
