@@ -31,11 +31,6 @@
             <version>1.7.7</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-            <version>7.4.2.v20110526</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
             <version>3.0</version>
@@ -54,10 +49,15 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>7.4.2.v20110526</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.yammer.metrics</groupId>
             <artifactId>metrics-scala_${scala.version}</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
