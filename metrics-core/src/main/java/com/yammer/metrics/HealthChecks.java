@@ -18,6 +18,13 @@ public class HealthChecks {
     private HealthChecks() { /* unused */ }
 
     /**
+     * Unregisters all registered health checks.
+     */
+    public static void clear() {
+        HEALTH_CHECKS.clear();
+    }
+
+    /**
      * Registers an application {@link HealthCheck} with a given name.
      *
      * @param healthCheck the {@link HealthCheck} instance

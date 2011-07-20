@@ -41,6 +41,7 @@ public class MetricsServletProvider implements Provider<MetricsServlet>
     @Override
     public MetricsServlet get()
     {
+        HealthChecks.clear();
         for (HealthCheck healthCheck : healthChecks) {
             HealthChecks.register(healthCheck);
         }
