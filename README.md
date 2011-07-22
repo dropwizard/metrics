@@ -56,10 +56,10 @@ import com.yammer.metrics.Instrumented
 
 class ThingFinder extends Instrumented {
   // measure the # of records per second returned
-  private val resultsMeter = metrics.meter("results", "records", TimeUnit.SECONDS)
+  private val resultsMeter = metrics.meter("results", "records")
   // measure the # of milliseconds each query takes and the number of
   // queries per second being performed
-  private val dbTimer = metrics.timer("database", TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
+  private val dbTimer = metrics.timer("database")
 
   def findThings() = {
     val results = dbTimer.time {
