@@ -29,12 +29,12 @@ And then the Metrics library like this:
   <dependency>
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-core</artifactId>
-    <version>2.0.0-BETA15-SNAPSHOT</version>
+    <version>2.0.0-BETA14-SNAPSHOT</version>
   </dependency>
   <dependency>
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-scala_${scala.version}</artifactId>
-    <version>2.0.0-BETA15-SNAPSHOT</version>
+    <version>2.0.0-BETA14-SNAPSHOT</version>
   </dependency>
 </dependencies>
 ~~~~
@@ -43,7 +43,18 @@ The next time you use Maven, it should download the Metrics JAR.
 
 ### Using Simple Build Tool
 
-**TODO**
+If you're using the 0.7.x series of SBT, add the repository to your project file like so:
+
+~~~~ { .scala }
+val codaHaleRepo = "Code Hale Repo" at "http://repo.codahale.com"
+~~~~
+
+Then add the Metric library like this:
+
+~~~~ { .scala }
+lazy val metrics = "com.yammer.metrics" % "metrics-core" % "2.0.0-BETA14-SNAPSHOT"
+lazy val metricsScala = "com.yammer.metrics" %% "metrics-scala" % "2.0.0-BETA14-SNAPSHOT"
+~~~~
 
 
 ### Raw-doggin' It
