@@ -1,5 +1,7 @@
 package com.yammer.metrics.core;
 
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.MetricsRegistry;
 import com.yammer.metrics.stats.EWMA;
 import com.yammer.metrics.util.Utils;
 
@@ -15,7 +17,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * @see <a href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average">EMA</a>
  */
 public class MeterMetric implements Metered {
-    private static final ScheduledExecutorService TICK_THREAD = Utils.newScheduledThreadPool(2, "meter-tick");
     private static final long INTERVAL = 5; // seconds
 
     /**
@@ -25,17 +26,24 @@ public class MeterMetric implements Metered {
      *                  (e.g., {@code "requests"})
      * @param rateUnit the rate unit of the new meter
      * @return a new {@link MeterMetric}
+     * @deprecated use the other {@code newMeter} method or create a new meter via the
+     *              {@link MetricsRegistry} or {@link Metrics}
      */
     public static MeterMetric newMeter(String eventType, TimeUnit rateUnit) {
-        final MeterMetric meter = new MeterMetric(eventType, rateUnit);
-        final Runnable job = new Runnable() {
-            @Override
-            public void run() {
-                meter.tick();
-            }
-        };
-        TICK_THREAD.scheduleAtFixedRate(job, INTERVAL, INTERVAL, TimeUnit.SECONDS);
-        return meter;
+        return newMeter(Utils.newScheduledThreadPool(2, "meter-tick"), eventType, rateUnit);
+    }
+
+    /**
+     * Creates a new {@link MeterMetric}.
+     *
+     * @param tickThread background thread for updating the rates
+     * @param eventType the plural name of the event the meter is measuring
+     *                  (e.g., {@code "requests"})
+     * @param rateUnit the rate unit of the new meter
+     * @return a new {@link MeterMetric}
+     */
+    public static MeterMetric newMeter(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit) {
+        return new MeterMetric(tickThread, eventType, rateUnit);
     }
 
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
@@ -47,9 +55,17 @@ public class MeterMetric implements Metered {
     private final TimeUnit rateUnit;
     private final String eventType;
 
-    private MeterMetric(String eventType, TimeUnit rateUnit) {
+    private MeterMetric(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit) {
         this.rateUnit = rateUnit;
         this.eventType = eventType;
+
+        final Runnable job = new Runnable() {
+            @Override
+            public void run() {
+                tick();
+            }
+        };
+        tickThread.scheduleAtFixedRate(job, INTERVAL, INTERVAL, TimeUnit.SECONDS);
     }
 
     @Override
