@@ -2,6 +2,7 @@ package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.HealthChecks;
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.MetricsRegistry;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HealthCheck.Result;
 import com.yammer.metrics.util.Utils;
@@ -46,22 +47,39 @@ public class MetricsServlet extends HttpServlet {
     private static final String METRICS_URI = "/metrics";
     private static final String PING_URI = "/ping";
     private static final String THREADS_URI = "/threads";
+    private final MetricsRegistry metricsRegistry;
     private JsonFactory factory;
     private String metricsUri, pingUri, threadsUri, healthcheckUri, contextPath;
 
     public MetricsServlet() {
-        this(new JsonFactory(new ObjectMapper()), HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI);
+        this(Metrics.defaultRegistry());
+    }
+
+    public MetricsServlet(MetricsRegistry metricsRegistry) {
+        this(metricsRegistry, new JsonFactory(new ObjectMapper()), HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI);
     }
 
     public MetricsServlet(JsonFactory factory) {
-        this(factory, HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI);
+        this(Metrics.defaultRegistry(), factory);
+    }
+
+    public MetricsServlet(MetricsRegistry metricsRegistry, JsonFactory factory) {
+        this(metricsRegistry, factory, HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI);
     }
 
     public MetricsServlet(String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
-        this(new JsonFactory(new ObjectMapper()), healthcheckUri, metricsUri, pingUri, threadsUri);
+        this(Metrics.defaultRegistry(), healthcheckUri, metricsUri, pingUri, threadsUri);
+    }
+
+    public MetricsServlet(MetricsRegistry metricsRegistry, String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
+        this(metricsRegistry, new JsonFactory(new ObjectMapper()), healthcheckUri, metricsUri, pingUri, threadsUri);
     }
 
     public MetricsServlet(JsonFactory factory, String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
+        this(Metrics.defaultRegistry(), factory, healthcheckUri, metricsUri, pingUri, threadsUri);
+    }
+    public MetricsServlet(MetricsRegistry metricsRegistry, JsonFactory factory, String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
+        this.metricsRegistry = metricsRegistry;
         this.factory = factory;
         this.healthcheckUri = healthcheckUri;
         this.metricsUri = metricsUri;
@@ -196,7 +214,7 @@ public class MetricsServlet extends HttpServlet {
     }
 
     private void writeRegularMetrics(JsonGenerator json, String classPrefix, boolean showFullSamples) throws IOException {
-        for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(Metrics.allMetrics()).entrySet()) {
+        for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(metricsRegistry.allMetrics()).entrySet()) {
             if (classPrefix == null || entry.getKey().startsWith(classPrefix)) {
                 json.writeFieldName(entry.getKey());
                 json.writeStartObject();

@@ -277,4 +277,12 @@ public class Metrics {
     public static Map<MetricName, Metric> allMetrics() {
         return DEFAULT_REGISTRY.allMetrics();
     }
+
+    /**
+     * Returns the (static) default registry.
+     * @return the metrics registry
+     */
+    public static MetricsRegistry defaultRegistry() {
+        return DEFAULT_REGISTRY;
+    }
 }
