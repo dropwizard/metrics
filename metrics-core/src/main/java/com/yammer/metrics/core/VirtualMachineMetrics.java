@@ -109,15 +109,20 @@ public class VirtualMachineMetrics {
     private static final GcMonitor GC_MONITOR = initializeGcMonitor();
     private static GcMonitor initializeGcMonitor() {
         try {
-            final GcMonitor monitor = new GcMonitor();
-            MONITOR_THREAD.scheduleAtFixedRate(monitor, 0, 5, TimeUnit.SECONDS);
-            try {
-                MONITOR_THREAD.scheduleAtFixedRate(new LoggerMemoryLeakFix(), 0, 10, TimeUnit.MINUTES);
-            } catch (Exception ignored) {
-                // well that's just unfortunate now isn't it
-            }
+            final boolean gcMonitorEnabled = System.getProperty("com.yammer.metrics.GcMonitor.enable", "true").equals("true");
+            if (gcMonitorEnabled) {
+                final GcMonitor monitor = new GcMonitor();
+                MONITOR_THREAD.scheduleAtFixedRate(monitor, 0, 5, TimeUnit.SECONDS);
+                try {
+                    MONITOR_THREAD.scheduleAtFixedRate(new LoggerMemoryLeakFix(), 0, 10, TimeUnit.MINUTES);
+                } catch (Exception ignored) {
+                    // well that's just unfortunate now isn't it
+                }
             return monitor;
+            }
         } catch (Exception ignored) {
+        }
+        finally {
             return null;
         }
     }
