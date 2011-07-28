@@ -2,12 +2,14 @@ package com.yammer.metrics;
 
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HistogramMetric.SampleType;
+import com.yammer.metrics.util.ThreadPools;
 
 import javax.management.MalformedObjectNameException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -16,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class MetricsRegistry {
     private final ConcurrentMap<MetricName, Metric> metrics =
             new ConcurrentHashMap<MetricName, Metric>();
+    private final ThreadPools threadPools = new ThreadPools();
 
     /**
      * Given a new {@link com.yammer.metrics.core.GaugeMetric}, registers it
@@ -215,7 +218,7 @@ public class MetricsRegistry {
         MetricName metricName = new MetricName(klass, name, scope);
         final Metric existingMetric = metrics.get(metricName);
         if (existingMetric == null) {
-            final MeterMetric metric = MeterMetric.newMeter(eventType, unit);
+            final MeterMetric metric = MeterMetric.newMeter(newMeterTickThreadPool(), eventType, unit);
             final Metric justAddedMetric = metrics.putIfAbsent(metricName, metric);
             if (justAddedMetric == null) {
                 return metric;
@@ -261,7 +264,7 @@ public class MetricsRegistry {
         MetricName metricName = new MetricName(klass, name, scope);
         final Metric existingMetric = metrics.get(metricName);
         if (existingMetric == null) {
-            final TimerMetric metric = new TimerMetric(durationUnit, rateUnit);
+            final TimerMetric metric = new TimerMetric(newMeterTickThreadPool(), durationUnit, rateUnit);
             final Metric justAddedMetric = metrics.putIfAbsent(metricName, metric);
             if (justAddedMetric == null) {
                 return metric;
@@ -278,6 +281,14 @@ public class MetricsRegistry {
      */
     public Map<MetricName, Metric> allMetrics() {
         return Collections.unmodifiableMap(metrics);
+    }
+
+    public ThreadPools threadPools() {
+        return threadPools;
+    }
+
+    public ScheduledExecutorService newMeterTickThreadPool() {
+        return threadPools.newScheduledThreadPool(2, "meter-tick");
     }
 
     @SuppressWarnings("unchecked")

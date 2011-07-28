@@ -3,7 +3,6 @@ package com.yammer.metrics.reporting;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.MetricsRegistry;
 import com.yammer.metrics.core.*;
-import com.yammer.metrics.util.Utils;
 
 import javax.management.*;
 import java.lang.management.ManagementFactory;
@@ -299,7 +298,7 @@ public class JmxReporter implements Runnable {
     }
 
     public JmxReporter(MetricsRegistry metricsRegistry) {
-        this.tickThread = Utils.newScheduledThreadPool(1, "jmx-reporter" + System.identityHashCode(this));
+        this.tickThread = metricsRegistry.threadPools().newScheduledThreadPool(1, "jmx-reporter");
         this.metricsRegistry = metricsRegistry;
         this.beans = new HashMap<MetricName, MetricMBean>(metricsRegistry.allMetrics().size());
         this.server = ManagementFactory.getPlatformMBeanServer();
