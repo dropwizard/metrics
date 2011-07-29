@@ -1,9 +1,5 @@
 package com.yammer.metrics.core;
 
-import com.yammer.metrics.util.Utils;
-
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -11,8 +7,6 @@ import java.lang.Thread.State;
 import java.lang.management.*;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.management.ManagementFactory.*;
@@ -23,102 +17,20 @@ import static java.lang.management.ManagementFactory.*;
  * @author coda
  */
 public class VirtualMachineMetrics {
-    static class GcMonitor implements Runnable {
-        private final Map<String, Long> gcTimestamps = new ConcurrentHashMap<String, Long>();
-        private final Map<String, TimerMetric> gcTimers = new ConcurrentHashMap<String, TimerMetric>();
-        private final Map<String, MeterMetric> gcMeters = new ConcurrentHashMap<String, MeterMetric>();
-        private final Class<?> gcBeanClass;
-        private final List<Object> beans = new ArrayList<Object>();
+    public static class GarbageCollector {
+        private final long runs, timeMS;
 
-        public GcMonitor() throws Exception {
-            Class.forName("com.sun.management.GcInfo");
-            this.gcBeanClass = Class.forName("com.sun.management.GarbageCollectorMXBean");
-            final ObjectName gcName = new ObjectName(GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",*");
-            final MBeanServer serve = getPlatformMBeanServer();
-            final Set<ObjectName> names = serve.queryNames(gcName, null);
-            for (ObjectName name : names) {
-                beans.add(newPlatformMXBeanProxy(serve, name.getCanonicalName(), gcBeanClass));
-            }
-
+        public GarbageCollector(long runs, long timeMS) {
+            this.runs = runs;
+            this.timeMS = timeMS;
         }
 
-        @Override
-        @SuppressWarnings("unchecked")
-        public void run() {
-            try {
-                for (Object bean : beans) {
-                    final Method getGcInfo = bean.getClass().getDeclaredMethod("getLastGcInfo");
-                    final Object gcInfo = getGcInfo.invoke(bean);
-                    if (gcInfo != null) {
-                        final Long duration = (Long) gcInfo.getClass().getDeclaredMethod("getDuration").invoke(gcInfo);
-                        final String name = (String) bean.getClass().getDeclaredMethod("getName").invoke(bean);
-                        final Long timestamp = (Long) bean.getClass().getDeclaredMethod("getCollectionTime").invoke(bean);
-                        final Long lastTimestamp = gcTimestamps.get(name);
-
-                        // Ignore any duration > 1hr; getLastGcInfo occasionally
-                        // returns total crap.
-                        if (lastTimestamp == null || timestamp > lastTimestamp &&
-                                TimeUnit.MILLISECONDS.toHours(duration) < 1) {
-                            collectGcDuration(name, duration);
-                            collectGcThroughput(name, gcInfo);
-                            gcTimestamps.put(name, timestamp);
-                        }
-                    }
-                }
-            } catch (Exception ignored) {
-
-            }
+        public long getRuns() {
+            return runs;
         }
 
-        @SuppressWarnings("unchecked")
-        private void collectGcThroughput(String name, Object gcInfo) throws Exception {
-            MeterMetric meter = gcMeters.get(name);
-            if (meter == null) {
-                meter = MeterMetric.newMeter("bytes", TimeUnit.SECONDS);
-                gcMeters.put(name, meter);
-            }
-
-            final Map<String, MemoryUsage> beforeUsages = (Map<String, MemoryUsage>)
-                    gcInfo.getClass().getDeclaredMethod("getMemoryUsageBeforeGc").invoke(gcInfo);
-            final Map<String, MemoryUsage> afterUsages = (Map<String, MemoryUsage>)
-                    gcInfo.getClass().getDeclaredMethod("getMemoryUsageAfterGc").invoke(gcInfo);
-
-            long memoryCollected = 0;
-            for (MemoryUsage memoryUsage : beforeUsages.values()) {
-                memoryCollected += memoryUsage.getUsed();
-            }
-            for (MemoryUsage memoryUsage : afterUsages.values()) {
-                memoryCollected -= memoryUsage.getUsed();
-            }
-
-            meter.mark(memoryCollected);
-        }
-
-        private void collectGcDuration(String name, Long duration) {
-            TimerMetric timer = gcTimers.get(name);
-            if (timer == null) {
-                timer = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.HOURS);
-                gcTimers.put(name, timer);
-            }
-
-            timer.update(duration, TimeUnit.MILLISECONDS);
-        }
-    }
-
-    private static final ScheduledExecutorService MONITOR_THREAD = Utils.newScheduledThreadPool(1, "gc-monitor");
-    private static final GcMonitor GC_MONITOR = initializeGcMonitor();
-    private static GcMonitor initializeGcMonitor() {
-        try {
-            final GcMonitor monitor = new GcMonitor();
-            MONITOR_THREAD.scheduleAtFixedRate(monitor, 0, 5, TimeUnit.SECONDS);
-            try {
-                MONITOR_THREAD.scheduleAtFixedRate(new LoggerMemoryLeakFix(), 0, 10, TimeUnit.MINUTES);
-            } catch (Exception ignored) {
-                // well that's just unfortunate now isn't it
-            }
-            return monitor;
-        } catch (Exception ignored) {
-            return null;
+        public long getTime(TimeUnit unit) {
+            return unit.convert(timeMS, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -235,29 +147,16 @@ public class VirtualMachineMetrics {
     }
 
     /**
-     * Returns a map of garbage collector names to {@link TimerMetric} instances
-     * which record GC run duration metrics.
+     * Returns a map of garbage collector names to garbage collector information.
      *
-     * @return a map of garbage collector names to {@link TimerMetric} instances
+     * @return a map of garbage collector names to garbage collector information
      */
-    public static Map<String, TimerMetric> gcDurations() {
-        if (GC_MONITOR == null) {
-            return Collections.emptyMap();
+    public static Map<String, GarbageCollector> garbageCollectors() {
+        final Map<String, GarbageCollector> gcs = new HashMap<String, GarbageCollector>();
+        for (GarbageCollectorMXBean bean : getGarbageCollectorMXBeans()) {
+            gcs.put(bean.getName(), new GarbageCollector(bean.getCollectionCount(), bean.getCollectionCount()));
         }
-        return GC_MONITOR.gcTimers;
-    }
-
-    /**
-     * Returns a map of garbage collector names to {@link MeterMetric} instances
-     * which record the throughput of GC collection in bytes.
-     *
-     * @return a map of garbage collector names to {@link MeterMetric} instances
-     */
-    public static Map<String, MeterMetric> gcThroughputs() {
-        if (GC_MONITOR == null) {
-            return Collections.emptyMap();
-        }
-        return GC_MONITOR.gcMeters;
+        return gcs;
     }
 
     /**
