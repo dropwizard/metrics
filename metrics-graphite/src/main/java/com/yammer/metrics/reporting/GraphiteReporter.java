@@ -218,6 +218,10 @@ public class GraphiteReporter implements Runnable {
         sendToGraphite(String.format("%s%s %2.2f %d\n", prefix, name, value, epoch));
     }
 
+    private void printLongField(String name, long value, long epoch) {
+        sendToGraphite(String.format("%s%s %d %d\n", prefix, name, value, epoch));
+    }
+
     private void printVmMetrics(long epoch) throws IOException {
         printDoubleField("jvm.memory.heap_usage", heapUsage(), epoch);
         printDoubleField("jvm.memory.non_heap_usage", nonHeapUsage(), epoch);
@@ -234,12 +238,9 @@ public class GraphiteReporter implements Runnable {
             printDoubleField("jvm.thread-states." + entry.getKey().toString().toLowerCase(), entry.getValue(), epoch);
         }
 
-        for (Entry<String, TimerMetric> entry : gcDurations().entrySet()) {
-            printTimer(entry.getValue(), "jvm.gc.duration." + entry.getKey(), epoch);
-        }
-
-        for (Entry<String, MeterMetric> entry : gcThroughputs().entrySet()) {
-            printMetered(entry.getValue(), "jvm.gc.throughput." + entry.getKey(), epoch);
+        for (Entry<String, GarbageCollector> entry : garbageCollectors().entrySet()) {
+            printLongField("jvm.gc." + entry.getKey() + ".time", entry.getValue().getTime(TimeUnit.MILLISECONDS), epoch);
+            printLongField("jvm.gc." + entry.getKey() + ".runs", entry.getValue().getRuns(), epoch);
         }
     }
 }
