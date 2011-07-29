@@ -1,6 +1,7 @@
 package com.yammer.metrics.core;
 
-import com.yammer.metrics.util.Utils;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.MetricsRegistry;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -24,14 +25,16 @@ import static java.lang.management.ManagementFactory.*;
  */
 public class VirtualMachineMetrics {
     static class GcMonitor implements Runnable {
+        private final MetricsRegistry metricsRegistry;
         private final Map<String, Long> gcTimestamps = new ConcurrentHashMap<String, Long>();
         private final Map<String, TimerMetric> gcTimers = new ConcurrentHashMap<String, TimerMetric>();
         private final Map<String, MeterMetric> gcMeters = new ConcurrentHashMap<String, MeterMetric>();
         private final Class<?> gcBeanClass;
         private final List<Object> beans = new ArrayList<Object>();
 
-        public GcMonitor() throws Exception {
+        public GcMonitor(MetricsRegistry metricsRegistry) throws Exception {
             Class.forName("com.sun.management.GcInfo");
+            this.metricsRegistry = metricsRegistry;
             this.gcBeanClass = Class.forName("com.sun.management.GarbageCollectorMXBean");
             final ObjectName gcName = new ObjectName(GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",*");
             final MBeanServer serve = getPlatformMBeanServer();
@@ -43,7 +46,6 @@ public class VirtualMachineMetrics {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public void run() {
             try {
                 for (Object bean : beans) {
@@ -74,7 +76,7 @@ public class VirtualMachineMetrics {
         private void collectGcThroughput(String name, Object gcInfo) throws Exception {
             MeterMetric meter = gcMeters.get(name);
             if (meter == null) {
-                meter = MeterMetric.newMeter("bytes", TimeUnit.SECONDS);
+                meter = MeterMetric.newMeter(metricsRegistry.newMeterTickThreadPool(), "bytes", TimeUnit.SECONDS);
                 gcMeters.put(name, meter);
             }
 
@@ -97,7 +99,7 @@ public class VirtualMachineMetrics {
         private void collectGcDuration(String name, Long duration) {
             TimerMetric timer = gcTimers.get(name);
             if (timer == null) {
-                timer = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.HOURS);
+                timer = new TimerMetric(metricsRegistry.newMeterTickThreadPool(), TimeUnit.MILLISECONDS, TimeUnit.HOURS);
                 gcTimers.put(name, timer);
             }
 
@@ -105,14 +107,15 @@ public class VirtualMachineMetrics {
         }
     }
 
-    private static final ScheduledExecutorService MONITOR_THREAD = Utils.newScheduledThreadPool(1, "gc-monitor");
     private static final GcMonitor GC_MONITOR = initializeGcMonitor();
     private static GcMonitor initializeGcMonitor() {
         try {
-            final GcMonitor monitor = new GcMonitor();
-            MONITOR_THREAD.scheduleAtFixedRate(monitor, 0, 5, TimeUnit.SECONDS);
+            final MetricsRegistry metricsRegistry = Metrics.defaultRegistry();
+            final GcMonitor monitor = new GcMonitor(metricsRegistry);
+            final ScheduledExecutorService monitorThread = metricsRegistry.threadPools().newScheduledThreadPool(1, "gc-monitor");
+            monitorThread.scheduleAtFixedRate(monitor, 0, 5, TimeUnit.SECONDS);
             try {
-                MONITOR_THREAD.scheduleAtFixedRate(new LoggerMemoryLeakFix(), 0, 10, TimeUnit.MINUTES);
+                monitorThread.scheduleAtFixedRate(new LoggerMemoryLeakFix(), 0, 10, TimeUnit.MINUTES);
             } catch (Exception ignored) {
                 // well that's just unfortunate now isn't it
             }
@@ -171,7 +174,6 @@ public class VirtualMachineMetrics {
      *         in use, or {@code NaN} if the running JVM does not have access to
      *         this information
      */
-    @SuppressWarnings("unchecked")
     public static double fileDescriptorUsage() {
         try {
             final OperatingSystemMXBean bean = getOperatingSystemMXBean();
