@@ -129,7 +129,7 @@ public class GraphiteReporter implements Runnable {
     private void printRegularMetrics(long epoch) {
         for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(Metrics.allMetrics()).entrySet()) {
             for (Entry<String, Metric> subEntry : entry.getValue().entrySet()) {
-                final String simpleName = entry.getKey() + "." + subEntry.getKey();
+                final String simpleName = (entry.getKey() + "." + subEntry.getKey()).replaceAll(" ", "_");
                 final Metric metric = subEntry.getValue();
                 if (metric != null) {
                     try {
