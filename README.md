@@ -10,8 +10,8 @@ Requirements
 * Scala 2.8.1 or 2.9.0-1
 * Guice 3.0 (for `metrics-guice`)
 * Servlet API 2.5 (for `metrics-servlet`)
-* Jackson 1.7.7 (for `metrics-servlet`)
-* Jetty 7.4.2 (for `metrics-jetty`)
+* Jackson 1.8.4 (for `metrics-servlet`)
+* Jetty 7.4.4 (for `metrics-jetty`)
 * Log4J 1.2.16 (for `metrics-log4j`)
 * Logback 0.9.28 (for `metrics-logback`)
 * Ehcache 2.4.2 (for `metrics-ehcache`)
