@@ -25,6 +25,7 @@ import java.lang.Thread.State;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 
@@ -56,25 +57,35 @@ public class MetricsServlet extends HttpServlet {
     private HealthCheckRegistry healthCheckRegistry;
     private JsonFactory factory;
     private String metricsUri, pingUri, threadsUri, healthcheckUri, contextPath;
+    private boolean showJvmMetrics;
 
     public MetricsServlet() {
-        this(new JsonFactory(new ObjectMapper()), HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI);
+        this(new JsonFactory(new ObjectMapper()), HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI, true);
+    }
+
+    public MetricsServlet(boolean showJvmMetrics) {
+        this(new JsonFactory(new ObjectMapper()), HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI, showJvmMetrics);
     }
 
     public MetricsServlet(JsonFactory factory) {
-        this(factory, HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI);
+        this(factory, HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI, true);
+    }
+
+    public MetricsServlet(JsonFactory factory, boolean showJvmMetrics) {
+        this(factory, HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI, showJvmMetrics);
     }
 
     public MetricsServlet(String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
-        this(new JsonFactory(new ObjectMapper()), healthcheckUri, metricsUri, pingUri, threadsUri);
+        this(new JsonFactory(new ObjectMapper()), healthcheckUri, metricsUri, pingUri, threadsUri, true);
     }
 
-    public MetricsServlet(JsonFactory factory, String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
+    public MetricsServlet(JsonFactory factory, String healthcheckUri, String metricsUri, String pingUri, String threadsUri, boolean showJvmMetrics) {
         this.factory = factory;
         this.healthcheckUri = healthcheckUri;
         this.metricsUri = metricsUri;
         this.pingUri = pingUri;
         this.threadsUri = threadsUri;
+        this.showJvmMetrics = showJvmMetrics;
     }
 
     @Override
@@ -90,6 +101,10 @@ public class MetricsServlet extends HttpServlet {
         this.pingUri = getParam(config.getInitParameter("ping-uri"), this.pingUri);
         this.threadsUri = getParam(config.getInitParameter("threads-uri"), this.threadsUri);
         this.healthcheckUri = getParam(config.getInitParameter("healthcheck-uri"), this.healthcheckUri);
+        final String showJvmMetricsParam = config.getInitParameter("show-jvm-metrics");
+        if (showJvmMetricsParam != null) {
+            this.showJvmMetrics = Boolean.parseBoolean(showJvmMetricsParam);
+        }
 
         final Object factory = config.getServletContext().getAttribute(JsonFactory.class.getCanonicalName());
         if (factory != null && factory instanceof JsonFactory) {
@@ -207,7 +222,7 @@ public class MetricsServlet extends HttpServlet {
         }
         json.writeStartObject();
         {
-            if ("jvm".equals(classPrefix) || classPrefix == null) {
+            if (showJvmMetrics && ("jvm".equals(classPrefix) || classPrefix == null)) {
                 writeVmMetrics(json, showFullSamples);
             }
 
@@ -342,28 +357,19 @@ public class MetricsServlet extends HttpServlet {
             }
             json.writeEndObject();
 
-            json.writeFieldName("gc");
+            json.writeFieldName("garbage-collectors");
             json.writeStartObject();
             {
-                json.writeFieldName("duration");
-                json.writeStartObject();
-                {
-                    for (Entry<String, TimerMetric> entry : gcDurations().entrySet()) {
-                        json.writeFieldName(entry.getKey());
-                        writeTimer(json, entry.getValue(), showFullSamples);
+                for (Entry<String, GarbageCollector> entry : garbageCollectors().entrySet()) {
+                    json.writeFieldName(entry.getKey());
+                    json.writeStartObject();
+                    {
+                        final GarbageCollector gc = entry.getValue();
+                        json.writeNumberField("runs", gc.getRuns());
+                        json.writeNumberField("time", gc.getTime(TimeUnit.MILLISECONDS));
                     }
+                    json.writeEndObject();
                 }
-                json.writeEndObject();
-
-                json.writeFieldName("throughput");
-                json.writeStartObject();
-                {
-                    for (Entry<String, MeterMetric> entry : gcThroughputs().entrySet()) {
-                        json.writeFieldName(entry.getKey());
-                        writeMeter(json, entry.getValue());
-                    }
-                }
-                json.writeEndObject();
             }
             json.writeEndObject();
 

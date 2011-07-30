@@ -6,7 +6,7 @@ import javax.management.*;
 /**
  * A gauge which exposes an attribute of a JMX MBean.
  */
-public class JmxGauge extends GaugeMetric<Object> {
+public class JmxGauge implements GaugeMetric<Object> {
     private static final MBeanServer SERVER = ManagementFactory.getPlatformMBeanServer();
     private ObjectName name;
     private String attribute;
