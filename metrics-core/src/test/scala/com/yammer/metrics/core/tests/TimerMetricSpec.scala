@@ -124,7 +124,7 @@ class TimerMetricSpec extends Spec {
     val timer = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
 
     @test def `records the duration of the Callable#call()` = {
-      time must eventually(beCloseTo(50.0, 1))
+      time must eventually(beCloseTo(50.0, 2))
     }
 
     @test def `returns the result of the callable` = {

@@ -5,7 +5,7 @@ import com.codahale.simplespec.annotation.test
 import java.util.concurrent.TimeUnit
 import com.google.inject.Guice
 import com.yammer.metrics.guice.{InstrumentationModule, Timed}
-import com.yammer.metrics.Metrics
+import com.yammer.metrics.{Metrics, MetricsRegistry}
 import com.yammer.metrics.core.{TimerMetric, MetricName}
 
 class InstrumentedWithTimed {
@@ -19,11 +19,12 @@ class TimedSpec extends Spec {
   class `Annotating a method as Timed` {
     val injector = Guice.createInjector(new InstrumentationModule)
     val instance = injector.getInstance(classOf[InstrumentedWithTimed])
+    val registry = injector.getInstance(classOf[MetricsRegistry])
 
     @test def `creates and calls a meter for the class with the given parameters` = {
       instance.doAThing()
 
-      val timer = Metrics.allMetrics.get(new MetricName(classOf[InstrumentedWithTimed], "things"))
+      val timer = registry.allMetrics.get(new MetricName(classOf[InstrumentedWithTimed], "things"))
 
       timer must not(beNull)
       timer.isInstanceOf[TimerMetric] must beTrue
