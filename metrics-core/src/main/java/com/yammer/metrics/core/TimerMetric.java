@@ -17,7 +17,7 @@ public class TimerMetric implements Metered {
     private final TimeUnit durationUnit, rateUnit;
     private final MeterMetric meter;
     private final HistogramMetric histogram = new HistogramMetric(SampleType.BIASED);
-    private final TimerTicker timerTicker;
+    private final Clock clock;
 
     /**
      * Creates a new {@link TimerMetric}.
@@ -26,14 +26,21 @@ public class TimerMetric implements Metered {
      * @param rateUnit the scale unit for this timer's rate metrics
      */
     public TimerMetric(TimeUnit durationUnit, TimeUnit rateUnit) {
-        this(durationUnit,rateUnit,new TimerTicker.UserTimerTicker());
+        this(durationUnit, rateUnit, Clock.DEFAULT);
     }
-    
-    public TimerMetric(TimeUnit durationUnit, TimeUnit rateUnit, TimerTicker timerTicker) {
+
+    /**
+     * Creates a new {@link TimerMetric} with the specified clock.
+     *
+     * @param durationUnit the scale unit for this timer's duration metrics
+     * @param rateUnit the scale unit for this timer's rate metrics
+     * @param clock the clock used to calculate duration
+     */
+    public TimerMetric(TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
         this.durationUnit = durationUnit;
         this.rateUnit = rateUnit;
         this.meter = MeterMetric.newMeter("calls", rateUnit);
-        this.timerTicker = timerTicker;
+        this.clock = clock;
         clear();
     }
 
@@ -78,11 +85,11 @@ public class TimerMetric implements Metered {
      * @throws Exception if {@code event} throws an {@link Exception}
      */
     public <T> T time(Callable<T> event) throws Exception {
-        final long startTime = timerTicker.tickTime();
+        final long startTime = clock.tick();
         try {
             return event.call();
         } finally {
-            update(timerTicker.tickTime() - startTime);
+            update(clock.tick() - startTime);
         }
     }
 
