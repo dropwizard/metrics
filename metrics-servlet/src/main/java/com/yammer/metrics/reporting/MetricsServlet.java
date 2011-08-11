@@ -25,7 +25,6 @@ import java.lang.Thread.State;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.yammer.metrics.core.VirtualMachineMetrics.*;
@@ -58,25 +57,35 @@ public class MetricsServlet extends HttpServlet {
     private HealthCheckRegistry healthCheckRegistry;
     private JsonFactory factory;
     private String metricsUri, pingUri, threadsUri, healthcheckUri, contextPath;
+    private boolean showJvmMetrics;
 
     public MetricsServlet() {
-        this(new JsonFactory(new ObjectMapper()), HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI);
+        this(new JsonFactory(new ObjectMapper()), HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI, true);
+    }
+
+    public MetricsServlet(boolean showJvmMetrics) {
+        this(new JsonFactory(new ObjectMapper()), HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI, showJvmMetrics);
     }
 
     public MetricsServlet(JsonFactory factory) {
-        this(factory, HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI);
+        this(factory, HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI, true);
+    }
+
+    public MetricsServlet(JsonFactory factory, boolean showJvmMetrics) {
+        this(factory, HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI, showJvmMetrics);
     }
 
     public MetricsServlet(String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
-        this(new JsonFactory(new ObjectMapper()), healthcheckUri, metricsUri, pingUri, threadsUri);
+        this(new JsonFactory(new ObjectMapper()), healthcheckUri, metricsUri, pingUri, threadsUri, true);
     }
 
-    public MetricsServlet(JsonFactory factory, String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
+    public MetricsServlet(JsonFactory factory, String healthcheckUri, String metricsUri, String pingUri, String threadsUri, boolean showJvmMetrics) {
         this.factory = factory;
         this.healthcheckUri = healthcheckUri;
         this.metricsUri = metricsUri;
         this.pingUri = pingUri;
         this.threadsUri = threadsUri;
+        this.showJvmMetrics = showJvmMetrics;
     }
 
     @Override
@@ -92,6 +101,10 @@ public class MetricsServlet extends HttpServlet {
         this.pingUri = getParam(config.getInitParameter("ping-uri"), this.pingUri);
         this.threadsUri = getParam(config.getInitParameter("threads-uri"), this.threadsUri);
         this.healthcheckUri = getParam(config.getInitParameter("healthcheck-uri"), this.healthcheckUri);
+        final String showJvmMetricsParam = config.getInitParameter("show-jvm-metrics");
+        if (showJvmMetricsParam != null) {
+            this.showJvmMetrics = Boolean.parseBoolean(showJvmMetricsParam);
+        }
 
         final Object factory = config.getServletContext().getAttribute(JsonFactory.class.getCanonicalName());
         if (factory != null && factory instanceof JsonFactory) {
@@ -209,7 +222,7 @@ public class MetricsServlet extends HttpServlet {
         }
         json.writeStartObject();
         {
-            if ("jvm".equals(classPrefix) || classPrefix == null) {
+            if (showJvmMetrics && ("jvm".equals(classPrefix) || classPrefix == null)) {
                 writeVmMetrics(json, showFullSamples);
             }
 
