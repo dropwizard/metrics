@@ -17,6 +17,7 @@ public class TimerMetric implements Metered {
     private final TimeUnit durationUnit, rateUnit;
     private final MeterMetric meter;
     private final HistogramMetric histogram = new HistogramMetric(SampleType.BIASED);
+    private final TimerTicker timerTicker;
 
     /**
      * Creates a new {@link TimerMetric}.
@@ -25,9 +26,14 @@ public class TimerMetric implements Metered {
      * @param rateUnit the scale unit for this timer's rate metrics
      */
     public TimerMetric(TimeUnit durationUnit, TimeUnit rateUnit) {
+        this(durationUnit,rateUnit,new TimerTicker.UserTimerTicker());
+    }
+    
+    public TimerMetric(TimeUnit durationUnit, TimeUnit rateUnit, TimerTicker timerTicker) {
         this.durationUnit = durationUnit;
         this.rateUnit = rateUnit;
         this.meter = MeterMetric.newMeter("calls", rateUnit);
+        this.timerTicker = timerTicker;
         clear();
     }
 
@@ -72,11 +78,11 @@ public class TimerMetric implements Metered {
      * @throws Exception if {@code event} throws an {@link Exception}
      */
     public <T> T time(Callable<T> event) throws Exception {
-        final long startTime = System.nanoTime();
+        final long startTime = timerTicker.tickTime();
         try {
             return event.call();
         } finally {
-            update(System.nanoTime() - startTime);
+            update(timerTicker.tickTime() - startTime);
         }
     }
 
