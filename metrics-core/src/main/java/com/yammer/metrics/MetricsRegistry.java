@@ -31,8 +31,8 @@ public class MetricsRegistry {
      * @return {@code metric}
      */
     public <T> GaugeMetric<T> newGauge(Class<?> klass,
-                                        String name,
-                                        GaugeMetric<T> metric) {
+                                       String name,
+                                       GaugeMetric<T> metric) {
         return newGauge(klass, name, null, metric);
     }
 
@@ -48,9 +48,9 @@ public class MetricsRegistry {
      * @return {@code metric}
      */
     public <T> GaugeMetric<T> newGauge(Class<?> klass,
-                                        String name,
-                                        String scope,
-                                        GaugeMetric<T> metric) {
+                                       String name,
+                                       String scope,
+                                       GaugeMetric<T> metric) {
         return newGauge(new MetricName(klass, name, scope), metric);
     }
 
@@ -64,7 +64,7 @@ public class MetricsRegistry {
      * @return {@code metric}
      */
     public <T> GaugeMetric<T> newGauge(MetricName metricName,
-                                        GaugeMetric<T> metric) {
+                                       GaugeMetric<T> metric) {
         return getOrAdd(metricName, metric);
     }
 
@@ -80,9 +80,9 @@ public class MetricsRegistry {
      * @throws MalformedObjectNameException if the object name is malformed
      */
     public JmxGauge newJmxGauge(Class<?> klass,
-                                 String name,
-                                 String objectName,
-                                 String attribute) throws MalformedObjectNameException {
+                                String name,
+                                String objectName,
+                                String attribute) throws MalformedObjectNameException {
         return newJmxGauge(klass, name, null, objectName, attribute);
     }
 
@@ -99,10 +99,10 @@ public class MetricsRegistry {
      * @throws MalformedObjectNameException if the object name is malformed
      */
     public JmxGauge newJmxGauge(Class<?> klass,
-                                 String name,
-                                 String scope,
-                                 String objectName,
-                                 String attribute) throws MalformedObjectNameException {
+                                String name,
+                                String scope,
+                                String objectName,
+                                String attribute) throws MalformedObjectNameException {
         return newJmxGauge(new MetricName(klass, name, scope), objectName, attribute);
     }
 
@@ -117,8 +117,8 @@ public class MetricsRegistry {
      * @throws MalformedObjectNameException if the object name is malformed
      */
     public JmxGauge newJmxGauge(MetricName metricName,
-                                 String objectName,
-                                 String attribute) throws MalformedObjectNameException {
+                                String objectName,
+                                String attribute) throws MalformedObjectNameException {
         return getOrAdd(metricName, new JmxGauge(objectName, attribute));
     }
 
@@ -144,8 +144,8 @@ public class MetricsRegistry {
      * @return a new {@link com.yammer.metrics.core.CounterMetric}
      */
     public CounterMetric newCounter(Class<?> klass,
-                                     String name,
-                                     String scope) {
+                                    String name,
+                                    String scope) {
         return newCounter(new MetricName(klass, name, scope));
     }
 
@@ -170,8 +170,8 @@ public class MetricsRegistry {
      * @return a new {@link HistogramMetric}
      */
     public HistogramMetric newHistogram(Class<?> klass,
-                                         String name,
-                                         boolean biased) {
+                                        String name,
+                                        boolean biased) {
         return newHistogram(klass, name, null, biased);
     }
 
@@ -186,9 +186,9 @@ public class MetricsRegistry {
      * @return a new {@link HistogramMetric}
      */
     public HistogramMetric newHistogram(Class<?> klass,
-                                         String name,
-                                         String scope,
-                                         boolean biased) {
+                                        String name,
+                                        String scope,
+                                        boolean biased) {
         return newHistogram(new MetricName(klass, name, scope), biased);
     }
 
@@ -214,8 +214,8 @@ public class MetricsRegistry {
      * @return a new {@link HistogramMetric}
      */
     public HistogramMetric newHistogram(Class<?> klass,
-                                         String name,
-                                         String scope) {
+                                        String name,
+                                        String scope) {
         return newHistogram(klass, name, scope, false);
     }
 
@@ -228,7 +228,7 @@ public class MetricsRegistry {
      * @return a new {@link HistogramMetric}
      */
     public HistogramMetric newHistogram(MetricName metricName,
-                                         boolean biased) {
+                                        boolean biased) {
         return getOrAdd(metricName,
                 new HistogramMetric(biased ? SampleType.BIASED : SampleType.UNIFORM));
     }
@@ -245,9 +245,9 @@ public class MetricsRegistry {
      * @return a new {@link MeterMetric}
      */
     public MeterMetric newMeter(Class<?> klass,
-                                 String name,
-                                 String eventType,
-                                 TimeUnit unit) {
+                                String name,
+                                String eventType,
+                                TimeUnit unit) {
         return newMeter(klass, name, null, eventType, unit);
     }
 
@@ -264,10 +264,10 @@ public class MetricsRegistry {
      * @return a new {@link MeterMetric}
      */
     public MeterMetric newMeter(Class<?> klass,
-                                 String name,
-                                 String scope,
-                                 String eventType,
-                                 TimeUnit unit) {
+                                String name,
+                                String scope,
+                                String eventType,
+                                TimeUnit unit) {
         return newMeter(new MetricName(klass, name, scope), eventType, unit);
     }
 
@@ -282,8 +282,8 @@ public class MetricsRegistry {
      * @return a new {@link MeterMetric}
      */
     public MeterMetric newMeter(MetricName metricName,
-                                 String eventType,
-                                 TimeUnit unit) {
+                                String eventType,
+                                TimeUnit unit) {
         final Metric existingMetric = metrics.get(metricName);
         if (existingMetric == null) {
             final MeterMetric metric = MeterMetric.newMeter(newMeterTickThreadPool(), eventType, unit);
@@ -307,9 +307,9 @@ public class MetricsRegistry {
      * @return a new {@link TimerMetric}
      */
     public TimerMetric newTimer(Class<?> klass,
-                                 String name,
-                                 TimeUnit durationUnit,
-                                 TimeUnit rateUnit) {
+                                String name,
+                                TimeUnit durationUnit,
+                                TimeUnit rateUnit) {
         return newTimer(klass, name, null, durationUnit, rateUnit);
     }
 
@@ -325,10 +325,10 @@ public class MetricsRegistry {
      * @return a new {@link TimerMetric}
      */
     public TimerMetric newTimer(Class<?> klass,
-                                 String name,
-                                 String scope,
-                                 TimeUnit durationUnit,
-                                 TimeUnit rateUnit) {
+                                String name,
+                                String scope,
+                                TimeUnit durationUnit,
+                                TimeUnit rateUnit) {
         return newTimer(new MetricName(klass, name, scope), durationUnit, rateUnit);
     }
 
@@ -342,8 +342,8 @@ public class MetricsRegistry {
      * @return a new {@link TimerMetric}
      */
     public TimerMetric newTimer(MetricName metricName,
-                                 TimeUnit durationUnit,
-                                 TimeUnit rateUnit) {
+                                TimeUnit durationUnit,
+                                TimeUnit rateUnit) {
         final Metric existingMetric = metrics.get(metricName);
         if (existingMetric == null) {
             final TimerMetric metric = new TimerMetric(newMeterTickThreadPool(), durationUnit, rateUnit);

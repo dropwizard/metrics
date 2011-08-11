@@ -67,7 +67,7 @@ public class Metrics {
      * @return {@code metric}
      */
     public static <T> GaugeMetric<T> newGauge(MetricName metricName,
-                                               GaugeMetric<T> metric) {
+                                              GaugeMetric<T> metric) {
         return DEFAULT_REGISTRY.newGauge(metricName, metric);
     }
 
