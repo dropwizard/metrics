@@ -83,7 +83,6 @@ public class VirtualMachineMetrics {
      *         in use, or {@code NaN} if the running JVM does not have access to
      *         this information
      */
-    @SuppressWarnings("unchecked")
     public static double fileDescriptorUsage() {
         try {
             final OperatingSystemMXBean bean = getOperatingSystemMXBean();
