@@ -16,6 +16,13 @@ public class HealthCheckRegistry {
     private final ConcurrentMap<String, HealthCheck> healthChecks = new ConcurrentHashMap<String, HealthCheck>();
 
     /**
+     * Unregisters all registered health checks.
+     */
+    public void clear() {
+        healthChecks.clear();
+    }
+
+    /**
      * Registers an application {@link HealthCheck} with a given name.
      *
      * @param healthCheck the {@link HealthCheck} instance
