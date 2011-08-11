@@ -1,6 +1,7 @@
 package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.MetricsRegistry;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.util.Utils;
 
@@ -26,16 +27,17 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.*;
  * @author Mahesh Tiyyagura <tmahesh@gmail.com>
  */
 public class GraphiteReporter implements Runnable {
-    private static final ScheduledExecutorService TICK_THREAD = Utils.newScheduledThreadPool(1, "graphite-reporter");
     private static final Logger log = LoggerFactory.getLogger(GraphiteReporter.class);
+    private final ScheduledExecutorService tickThread;
+    private final MetricsRegistry metricsRegistry;
     private final String host;
     private final int port;
     private Writer writer;
     private final String prefix;
 
     /**
-     * Enables the graphite reporter to send data to graphite server with the
-     * specified period.
+     * Enables the graphite reporter to send data for the default metrics registry
+     * to graphite server with the specified period.
      *
      * @param period the period between successive outputs
      * @param unit   the time unit of {@code period}
@@ -43,9 +45,22 @@ public class GraphiteReporter implements Runnable {
      * @param port   the port number on which the graphite server is listening
      */
     public static void enable(long period, TimeUnit unit, String host, int port) {
-        enable(period, unit, host, port, null);
+        enable(Metrics.defaultRegistry(), period, unit, host, port);
     }
 
+    /**
+     * Enables the graphite reporter to send data for the given metrics registry
+     * to graphite server with the specified period.
+     *
+     * @param metricsRegistry the metrics registry
+     * @param period          the period between successive outputs
+     * @param unit            the time unit of {@code period}
+     * @param host            the host name of graphite server (carbon-cache agent)
+     * @param port            the port number on which the graphite server is listening
+     */
+    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port) {
+        enable(metricsRegistry, period, unit, host, port, null);
+    }
 
     /**
      * Enables the graphite reporter to send data to graphite server with the
@@ -58,8 +73,23 @@ public class GraphiteReporter implements Runnable {
      * @param prefix the string which is prepended to all metric names
      */
     public static void enable(long period, TimeUnit unit, String host, int port, String prefix) {
+        enable(Metrics.defaultRegistry(), period, unit, host, port, prefix);
+    }
+
+    /**
+     * Enables the graphite reporter to send data to graphite server with the
+     * specified period.
+     *
+     * @param metricsRegistry the metrics registry
+     * @param period          the period between successive outputs
+     * @param unit            the time unit of {@code period}
+     * @param host            the host name of graphite server (carbon-cache agent)
+     * @param port            the port number on which the graphite server is listening
+     * @param prefix          the string which is prepended to all metric names
+     */
+    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix) {
         try {
-            final GraphiteReporter reporter = new GraphiteReporter(host, port, prefix);
+            final GraphiteReporter reporter = new GraphiteReporter(metricsRegistry, host, port, prefix);
             reporter.start(period, unit);
         } catch (Exception e) {
             log.error("Error creating/starting Graphite reporter:", e);
@@ -75,6 +105,21 @@ public class GraphiteReporter implements Runnable {
      * @throws IOException if there is an error connecting to the Graphite server
      */
     public GraphiteReporter(String host, int port, String prefix) throws IOException {
+        this(Metrics.defaultRegistry(), host, port, prefix);
+    }
+
+    /**
+     * Creates a new {@link GraphiteReporter}.
+     *
+     * @param metricsRegistry the metrics registry
+     * @param host            is graphite server
+     * @param port            is port on which graphite server is running
+     * @param prefix          is prepended to all names reported to graphite
+     * @throws IOException if there is an error connecting to the Graphite server
+     */
+    public GraphiteReporter(MetricsRegistry metricsRegistry, String host, int port, String prefix) throws IOException {
+        this.tickThread = metricsRegistry.threadPools().newScheduledThreadPool(1, "graphite-reporter");
+        this.metricsRegistry = metricsRegistry;
         this.host = host;
         this.port = port;
         if (prefix != null) {
@@ -92,7 +137,7 @@ public class GraphiteReporter implements Runnable {
      * @param unit   the time unit of {@code period}
      */
     public void start(long period, TimeUnit unit) {
-        TICK_THREAD.scheduleAtFixedRate(this, period, period, unit);
+        tickThread.scheduleAtFixedRate(this, period, period, unit);
     }
 
     @Override
@@ -127,7 +172,7 @@ public class GraphiteReporter implements Runnable {
     }
 
     private void printRegularMetrics(long epoch) {
-        for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(Metrics.allMetrics()).entrySet()) {
+        for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(metricsRegistry.allMetrics()).entrySet()) {
             for (Entry<String, Metric> subEntry : entry.getValue().entrySet()) {
                 final String simpleName = (entry.getKey() + "." + subEntry.getKey()).replaceAll(" ", "_");
                 final Metric metric = subEntry.getValue();

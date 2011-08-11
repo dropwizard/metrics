@@ -1,7 +1,9 @@
 package com.yammer.metrics.reporting;
 
+import com.yammer.metrics.HealthCheckRegistry;
 import com.yammer.metrics.HealthChecks;
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.MetricsRegistry;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HealthCheck.Result;
 import com.yammer.metrics.util.Utils;
@@ -11,6 +13,7 @@ import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +31,9 @@ import java.util.concurrent.TimeUnit;
 import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 
 public class MetricsServlet extends HttpServlet {
+    public static final String ATTR_NAME_METRICS_REGISTRY = MetricsServlet.class.getSimpleName() + ":" + MetricsRegistry.class.getSimpleName();
+    public static final String ATTR_NAME_HEALTHCHECK_REGISTRY = MetricsServlet.class.getSimpleName() + ":" + HealthCheckRegistry.class.getSimpleName();
+
     private static final String TEMPLATE = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n" +
                                            "        \"http://www.w3.org/TR/html4/loose.dtd\">\n" +
                                            "<html>\n" +
@@ -48,6 +54,8 @@ public class MetricsServlet extends HttpServlet {
     private static final String METRICS_URI = "/metrics";
     private static final String PING_URI = "/ping";
     private static final String THREADS_URI = "/threads";
+    private MetricsRegistry metricsRegistry;
+    private HealthCheckRegistry healthCheckRegistry;
     private JsonFactory factory;
     private String metricsUri, pingUri, threadsUri, healthcheckUri, contextPath;
 
@@ -75,7 +83,11 @@ public class MetricsServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
 
-        this.contextPath = config.getServletContext().getContextPath();
+        ServletContext context = config.getServletContext();
+
+        this.contextPath = context.getContextPath();
+        this.metricsRegistry = putAttrIfAbsent(context, ATTR_NAME_METRICS_REGISTRY, Metrics.defaultRegistry());
+        this.healthCheckRegistry = putAttrIfAbsent(context, ATTR_NAME_HEALTHCHECK_REGISTRY, HealthChecks.defaultRegistry());
         this.metricsUri = getParam(config.getInitParameter("metrics-uri"), this.metricsUri);
         this.pingUri = getParam(config.getInitParameter("ping-uri"), this.pingUri);
         this.threadsUri = getParam(config.getInitParameter("threads-uri"), this.threadsUri);
@@ -91,6 +103,16 @@ public class MetricsServlet extends HttpServlet {
         return initParam == null ? defaultValue : initParam;
     }
 
+    private <T> T putAttrIfAbsent(ServletContext context, String attrName, T defaultValue) {
+        @SuppressWarnings("unchecked")
+        T attrValue = (T)context.getAttribute(attrName);
+        if (attrValue == null) {
+            attrValue = defaultValue;
+            context.setAttribute(attrName, attrValue);
+        }
+        return attrValue;
+    }
+    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
@@ -123,7 +145,7 @@ public class MetricsServlet extends HttpServlet {
 
     private void handleHealthCheck(HttpServletResponse resp) throws IOException {
         boolean allHealthy = true;
-        final Map<String, Result> results = HealthChecks.runHealthChecks();
+        final Map<String, Result> results = healthCheckRegistry.runHealthChecks();
         for (Result result : results.values()) {
             allHealthy &= result.isHealthy();
         }
@@ -198,7 +220,7 @@ public class MetricsServlet extends HttpServlet {
     }
 
     private void writeRegularMetrics(JsonGenerator json, String classPrefix, boolean showFullSamples) throws IOException {
-        for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(Metrics.allMetrics()).entrySet()) {
+        for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(metricsRegistry.allMetrics()).entrySet()) {
             if (classPrefix == null || entry.getKey().startsWith(classPrefix)) {
                 json.writeFieldName(entry.getKey());
                 json.writeStartObject();
@@ -215,7 +237,7 @@ public class MetricsServlet extends HttpServlet {
     private void writeMetric(JsonGenerator json, String key, Metric metric, boolean showFullSamples) throws IOException {
         if (metric instanceof GaugeMetric<?>) {
             json.writeFieldName(key);
-            writeGauge(json, (GaugeMetric) metric);
+            writeGauge(json, (GaugeMetric<?>) metric);
         } else if (metric instanceof CounterMetric) {
             json.writeFieldName(key);
             writeCounter(json, (CounterMetric) metric);
@@ -264,7 +286,7 @@ public class MetricsServlet extends HttpServlet {
         json.writeEndObject();
     }
 
-    private void writeGauge(JsonGenerator json, GaugeMetric gauge) throws IOException {
+    private void writeGauge(JsonGenerator json, GaugeMetric<?> gauge) throws IOException {
         json.writeStartObject();
         {
             json.writeStringField("type", "gauge");
