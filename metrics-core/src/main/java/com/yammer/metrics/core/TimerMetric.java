@@ -39,6 +39,7 @@ public class TimerMetric implements Metered {
      * @param durationUnit the scale unit for this timer's duration metrics
      * @param rateUnit the scale unit for this timer's rate metrics
      * @param clock the clock used to calculate duration
+     * @deprecated either use the other constructor or create via the {@link MetricsRegistry} or {@link Metrics}
      */
     public TimerMetric(TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
         this.durationUnit = durationUnit;
@@ -56,9 +57,22 @@ public class TimerMetric implements Metered {
      * @param rateUnit the scale unit for this timer's rate metrics
      */
     public TimerMetric(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit) {
+        this(tickThread, durationUnit, rateUnit, Clock.DEFAULT);
+    }
+
+    /**
+     * Creates a new {@link TimerMetric}.
+     *
+     * @param tickThread   background thread for updating the rates
+     * @param durationUnit the scale unit for this timer's duration metrics
+     * @param rateUnit     the scale unit for this timer's rate metrics
+     * @param clock the clock used to calculate duration
+     */
+    public TimerMetric(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
         this.durationUnit = durationUnit;
         this.rateUnit = rateUnit;
         this.meter = MeterMetric.newMeter(tickThread, "calls", rateUnit);
+        this.clock = clock;
         clear();
     }
 
