@@ -7,12 +7,15 @@ import org.codehaus.jackson.JsonFactory;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
-import com.yammer.metrics.HealthChecks;
+import com.yammer.metrics.HealthCheckRegistry;
+import com.yammer.metrics.MetricsRegistry;
 import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.reporting.MetricsServlet;
 
 public class MetricsServletProvider implements Provider<MetricsServlet>
 {
+    private final MetricsRegistry metricsRegistry;
+    private final HealthCheckRegistry healthCheckRegistry;
     private final Set<HealthCheck> healthChecks;
     private final String healthcheckUri;
     private final String metricsUri;
@@ -22,10 +25,14 @@ public class MetricsServletProvider implements Provider<MetricsServlet>
 
     @Inject
     public MetricsServletProvider(Set<HealthCheck> healthChecks,
-                                    @Named("MetricsServlet.HEALTHCHECK_URI") String healthcheckUri,
-                                    @Named("MetricsServlet.METRICS_URI") String metricsUri,
-                                    @Named("MetricsServlet.PING_URI") String pingUri,
-                                    @Named("MetricsServlet.THREADS_URI") String threadsUri) {
+                                  MetricsRegistry metricsRegistry,
+                                  HealthCheckRegistry healthCheckRegistry,
+                                  @Named("MetricsServlet.HEALTHCHECK_URI") String healthcheckUri,
+                                  @Named("MetricsServlet.METRICS_URI") String metricsUri,
+                                  @Named("MetricsServlet.PING_URI") String pingUri,
+                                  @Named("MetricsServlet.THREADS_URI") String threadsUri) {
+        this.metricsRegistry = metricsRegistry;
+        this.healthCheckRegistry = healthCheckRegistry;
         this.healthcheckUri = healthcheckUri;
         this.metricsUri = metricsUri;
         this.pingUri = pingUri;
@@ -41,15 +48,14 @@ public class MetricsServletProvider implements Provider<MetricsServlet>
     @Override
     public MetricsServlet get()
     {
-        HealthChecks.clear();
         for (HealthCheck healthCheck : healthChecks) {
-            HealthChecks.register(healthCheck);
+            healthCheckRegistry.register(healthCheck);
         }
         if (jsonFactory != null) {
-            return new MetricsServlet(jsonFactory, healthcheckUri, metricsUri, pingUri, threadsUri);
+            return new MetricsServlet(metricsRegistry, healthCheckRegistry, jsonFactory, healthcheckUri, metricsUri, pingUri, threadsUri, true);
         }
         else {
-            return new MetricsServlet(healthcheckUri, metricsUri, pingUri, threadsUri);
+            return new MetricsServlet(metricsRegistry, healthCheckRegistry, healthcheckUri, metricsUri, pingUri, threadsUri, true);
         }
     }
 }
