@@ -323,20 +323,7 @@ public class JmxReporter implements Runnable {
             final Metric metric = metricsRegistry.allMetrics().get(name);
             if (metric != null) {
                 try {
-                    final String simpleName = name.getKlass().getSimpleName().replaceAll("\\$$", "");
-                    final ObjectName objectName;
-                    if (name.hasScope()) {
-                        objectName = new ObjectName(String.format("%s:type=%s,scope=%s,name=%s",
-                                name.getKlass().getPackage().getName(),
-                                simpleName,
-                                name.getScope(),
-                                name.getName()));
-                    } else {
-                        objectName = new ObjectName(String.format("%s:type=%s,name=%s",
-                                name.getKlass().getPackage().getName(),
-                                simpleName,
-                                name.getName()));
-                    }
+                    final ObjectName objectName = new ObjectName(name.getMBeanName());
                     if (metric instanceof GaugeMetric) {
                         registerBean(name, new Gauge((GaugeMetric<?>) metric, objectName), objectName);
                     } else if (metric instanceof CounterMetric) {
