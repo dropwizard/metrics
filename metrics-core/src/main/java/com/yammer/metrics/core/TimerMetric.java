@@ -211,4 +211,7 @@ public class TimerMetric implements Metered {
         return ns / TimeUnit.NANOSECONDS.convert(1, durationUnit);
     }
 
+    void stop() {
+        meter.stop();
+    }
 }
