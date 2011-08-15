@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicLongArray;
  * A random sample of a stream of {@code long}s. Uses Vitter's Algorithm R to
  * produce a statistically representative sample.
  *
- * @author coda
  * @see <a href="http://www.cs.umd.edu/~samir/498/vitter.pdf">Random Sampling
  *      with a Reservoir</a>
  */

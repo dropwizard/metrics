@@ -4,8 +4,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * An incrementing and decrementing counter metric.
- *
- * @author coda
  */
 public class CounterMetric implements Metric {
     private final AtomicLong count = new AtomicLong(0);

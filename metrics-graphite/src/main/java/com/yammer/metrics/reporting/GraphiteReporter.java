@@ -23,8 +23,6 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 /**
  * A simple reporter which sends out application metrics to a
  * <a href="http://graphite.wikidot.com/faq">Graphite</a> server periodically.
- *
- * @author Mahesh Tiyyagura <tmahesh@gmail.com>
  */
 public class GraphiteReporter implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(GraphiteReporter.class);

@@ -12,7 +12,6 @@ package com.yammer.metrics.core;
  * };
  *
  * </code></pre>
- * @author coda
  * @param <T> the type of the metric's value
  */
 public interface GaugeMetric<T> extends Metric {

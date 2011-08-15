@@ -12,8 +12,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * A timer metric which aggregates timing durations and provides duration
  * statistics, plus throughput statistics via {@link MeterMetric}.
- *
- * @author coda
  */
 public class TimerMetric implements Metered {
     private final TimeUnit durationUnit, rateUnit;

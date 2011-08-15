@@ -11,8 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A reporter which exposes application metric as JMX MBeans.
- *
- * @author coda
  */
 public class JmxReporter implements Runnable {
     private final ScheduledExecutorService tickThread;

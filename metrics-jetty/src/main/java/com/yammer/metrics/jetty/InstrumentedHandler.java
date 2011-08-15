@@ -21,8 +21,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * A Jetty {@link Handler} which records various metrics about an underlying
  * {@link Handler} instance.
- *
- * @author coda
  */
 public class InstrumentedHandler extends HandlerWrapper {
     private final TimerMetric dispatches;

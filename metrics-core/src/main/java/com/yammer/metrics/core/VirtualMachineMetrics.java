@@ -13,8 +13,6 @@ import static java.lang.management.ManagementFactory.*;
 
 /**
  * A collection of Java Virtual Machine metrics.
- *
- * @author coda
  */
 public class VirtualMachineMetrics {
     public static class GarbageCollector {
