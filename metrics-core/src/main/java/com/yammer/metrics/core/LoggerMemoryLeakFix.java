@@ -46,8 +46,6 @@ import java.util.logging.Logger;
  * ensuring that your heap will not eventually be replaced by </p>
  *
  * <p>This is a thing that a grown-up had to do. Never forget that.</p>
- *
- * @author Coda Hale, Grade 3
  */
 class LoggerMemoryLeakFix implements Runnable {
     private static final Logger LOGGER = Logger.getLogger(LoggerMemoryLeakFix.class.getCanonicalName());

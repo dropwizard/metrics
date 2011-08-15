@@ -10,8 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A set of factory methods for creating centrally registered metric instances.
- *
- * @author coda
  */
 public class Metrics {
     private static final MetricsRegistry DEFAULT_REGISTRY = new MetricsRegistry();

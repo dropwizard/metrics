@@ -17,8 +17,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * A simple reporters which prints out application metrics to a
  * {@link PrintStream} periodically.
- *
- * @author coda
  */
 public class ConsoleReporter implements Runnable {
     private final ScheduledExecutorService tickThread;

@@ -4,8 +4,6 @@ import java.util.List;
 
 /**
  * A statistically representative sample of a data stream.
- *
- * @author coda
  */
 public interface Sample {
     /**

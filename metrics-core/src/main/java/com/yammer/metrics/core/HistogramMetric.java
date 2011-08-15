@@ -15,7 +15,6 @@ import static java.lang.Math.sqrt;
 /**
  * A metric which calculates the distribution of a value.
  *
- * @author coda
  * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately
  * computing running variance</a>
  */
