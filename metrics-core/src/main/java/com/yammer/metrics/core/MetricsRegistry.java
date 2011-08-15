@@ -15,8 +15,8 @@ import java.util.concurrent.TimeUnit;
  * A registry of metric instances.
  */
 public class MetricsRegistry {
-    private final ConcurrentMap<MetricName, Metric> metrics =
-            new ConcurrentHashMap<MetricName, Metric>();
+    private final ConcurrentMap<MetricName, Metric> metrics = newMetricsMap();
+
     private final ThreadPools threadPools = new ThreadPools();
 
     /**
@@ -406,6 +406,16 @@ public class MetricsRegistry {
                 ((TimerMetric) metric).stop();
             }
         }
+    }
+
+    /**
+     * Returns a new {@link ConcurrentMap} implementation. Subclass this to do
+     * weird things with your own {@link MetricsRegistry} implementation.
+     *
+     * @return a new {@link ConcurrentMap}
+     */
+    protected ConcurrentMap<MetricName, Metric> newMetricsMap() {
+        return new ConcurrentHashMap<MetricName, Metric>();
     }
 
     @SuppressWarnings("unchecked")
