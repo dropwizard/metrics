@@ -1,12 +1,11 @@
 package com.yammer.metrics.guice.tests
 
 import com.codahale.simplespec.Spec
+import com.codahale.simplespec.annotation.test
 import java.util.concurrent.TimeUnit
 import com.google.inject.Guice
 import com.yammer.metrics.guice.{InstrumentationModule, Metered}
-import com.yammer.metrics.MetricsRegistry
-import com.yammer.metrics.core.{MeterMetric, MetricName}
-import com.codahale.simplespec.annotation.test
+import com.yammer.metrics.core.{MetricsRegistry, MeterMetric, MetricName}
 
 class InstrumentedWithMetered {
   @Metered(name = "things", eventType = "poops", rateUnit = TimeUnit.MINUTES)

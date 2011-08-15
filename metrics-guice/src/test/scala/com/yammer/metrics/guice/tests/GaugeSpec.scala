@@ -4,8 +4,7 @@ import com.codahale.simplespec.Spec
 import com.codahale.simplespec.annotation.test
 import com.yammer.metrics.guice.{InstrumentationModule, Gauge}
 import com.google.inject.Guice
-import com.yammer.metrics.MetricsRegistry
-import com.yammer.metrics.core.{GaugeMetric, MetricName}
+import com.yammer.metrics.core.{MetricsRegistry, GaugeMetric, MetricName}
 
 class InstrumentedWithGauge {
   @Gauge(name = "things")

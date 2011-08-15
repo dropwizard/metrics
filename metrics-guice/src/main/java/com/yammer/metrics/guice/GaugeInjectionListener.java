@@ -2,7 +2,7 @@ package com.yammer.metrics.guice;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.InjectionListener;
-import com.yammer.metrics.MetricsRegistry;
+import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.GaugeMetric;
 
 import java.lang.reflect.Method;

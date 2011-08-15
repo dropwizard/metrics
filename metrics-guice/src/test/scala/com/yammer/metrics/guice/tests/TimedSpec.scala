@@ -5,8 +5,7 @@ import com.codahale.simplespec.annotation.test
 import java.util.concurrent.TimeUnit
 import com.google.inject.Guice
 import com.yammer.metrics.guice.{InstrumentationModule, Timed}
-import com.yammer.metrics.MetricsRegistry
-import com.yammer.metrics.core.{TimerMetric, MetricName}
+import com.yammer.metrics.core.{MetricsRegistry, TimerMetric, MetricName}
 
 class InstrumentedWithTimed {
   @Timed(name = "things", rateUnit = TimeUnit.MINUTES, durationUnit = TimeUnit.MICROSECONDS)

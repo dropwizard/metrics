@@ -1,6 +1,5 @@
 package com.yammer.metrics.util;
 
-import com.yammer.metrics.MetricsRegistry;
 import com.yammer.metrics.core.Metric;
 import com.yammer.metrics.core.MetricName;
 
@@ -40,7 +39,7 @@ public class Utils {
      * @param poolSize the number of threads to create
      * @param name the name of the pool
      * @return a new {@link ScheduledExecutorService}
-     * @deprecated Get a thread pool via {@link MetricsRegistry#threadPools()} instead
+     * @deprecated Get a thread pool via {@link com.yammer.metrics.core.MetricsRegistry#threadPools()} instead
      */
     public static ScheduledExecutorService newScheduledThreadPool(int poolSize, String name) {
         return THREAD_POOLS.newScheduledThreadPool(poolSize, name);
@@ -48,7 +47,7 @@ public class Utils {
 
     /**
      * Shuts down all thread pools created by this class in an orderly fashion.
-     * @deprecated Shut down the thread pools object of the relevant {@link MetricsRegistry} instead
+     * @deprecated Shut down the thread pools object of the relevant {@link com.yammer.metrics.core.MetricsRegistry} instead
      */
     public static void shutdownThreadPools() {
         THREAD_POOLS.shutdownThreadPools();

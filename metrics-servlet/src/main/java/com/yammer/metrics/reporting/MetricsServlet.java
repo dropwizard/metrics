@@ -1,9 +1,9 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.HealthCheckRegistry;
+import com.yammer.metrics.core.HealthCheckRegistry;
 import com.yammer.metrics.HealthChecks;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.MetricsRegistry;
+import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HealthCheck.Result;
 import com.yammer.metrics.util.Utils;

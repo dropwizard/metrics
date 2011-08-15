@@ -1,7 +1,6 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.MetricsRegistry;
+import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.*;
 
 import javax.management.*;
