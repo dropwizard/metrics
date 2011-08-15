@@ -5,6 +5,7 @@ import com.yammer.metrics.stats.EWMA;
 import com.yammer.metrics.util.Utils;
 
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -53,18 +54,17 @@ public class MeterMetric implements Metered {
     private final long startTime = System.nanoTime();
     private final TimeUnit rateUnit;
     private final String eventType;
+    private final ScheduledFuture<?> future;
 
     private MeterMetric(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit) {
         this.rateUnit = rateUnit;
         this.eventType = eventType;
-
-        final Runnable job = new Runnable() {
+        this.future = tickThread.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 tick();
             }
-        };
-        tickThread.scheduleAtFixedRate(job, INTERVAL, INTERVAL, TimeUnit.SECONDS);
+        }, INTERVAL, INTERVAL, TimeUnit.SECONDS);
     }
 
     @Override
@@ -137,5 +137,9 @@ public class MeterMetric implements Metered {
 
     private double convertNsRate(double ratePerNs) {
         return ratePerNs * (double) rateUnit.toNanos(1);
+    }
+
+    void stop() {
+        future.cancel(false);
     }
 }

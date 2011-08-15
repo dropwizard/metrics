@@ -1,6 +1,5 @@
 package com.yammer.metrics.core;
 
-import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HistogramMetric.SampleType;
 import com.yammer.metrics.util.ThreadPools;
 
@@ -370,6 +369,43 @@ public class MetricsRegistry {
 
     public ScheduledExecutorService newMeterTickThreadPool() {
         return threadPools.newScheduledThreadPool(2, "meter-tick");
+    }
+
+    /**
+     * Removes the metric for the given class with the given name.
+     *
+     * @param klass the klass the metric is associated with
+     * @param name the name of the metric
+     */
+    public void removeMetric(Class<?> klass, String name) {
+        removeMetric(klass, name, null);
+    }
+
+    /**
+     * Removes the metric for the given class with the given name and scope.
+     *
+     * @param klass the klass the metric is associated with
+     * @param name the name of the metric
+     * @param scope the scope of the metric
+     */
+    public void removeMetric(Class<?> klass, String name, String scope) {
+        removeMetric(new MetricName(klass, name, scope));
+    }
+
+    /**
+     * Removes the metric with the given name.
+     *
+     * @param name the name of the metric
+     */
+    public void removeMetric(MetricName name) {
+        final Metric metric = metrics.remove(name);
+        if (metric != null) {
+            if (metric instanceof MeterMetric) {
+                ((MeterMetric) metric).stop();
+            } else if (metric instanceof TimerMetric) {
+                ((TimerMetric) metric).stop();
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")

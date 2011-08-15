@@ -16,12 +16,21 @@ public class HealthCheckRegistry {
     private final ConcurrentMap<String, HealthCheck> healthChecks = new ConcurrentHashMap<String, HealthCheck>();
 
     /**
-     * Registers an application {@link HealthCheck} with a given name.
+     * Registers an application {@link HealthCheck}.
      *
      * @param healthCheck the {@link HealthCheck} instance
      */
     public void register(HealthCheck healthCheck) {
         healthChecks.putIfAbsent(healthCheck.name(), healthCheck);
+    }
+
+    /**
+     * Unregisters the application {@link HealthCheck} with the given name.
+     *
+     * @param name the name of the {@link HealthCheck} instance
+     */
+    public void unregister(String name) {
+        healthChecks.remove(name);
     }
 
     /**
