@@ -71,7 +71,7 @@ public class ExponentiallyDecayingSample implements Sample {
      * @param timestamp the epoch timestamp of {@code value} in seconds
      */
     public void update(long value, long timestamp) {
-        lock.readLock().lock();
+        lockForRegularUsage();
         try {
             final double priority = weight(timestamp - startTime) / random();
             final long newCount = count.incrementAndGet();
@@ -89,7 +89,7 @@ public class ExponentiallyDecayingSample implements Sample {
                 }
             }
         } finally {
-            lock.readLock().unlock();
+            unlockForRegularUsage();
         }
 
         final long now = System.nanoTime();
@@ -101,11 +101,11 @@ public class ExponentiallyDecayingSample implements Sample {
 
     @Override
     public List<Long> values() {
-        lock.readLock().lock();
+        lockForRegularUsage();
         try {
             return new ArrayList<Long>(values.values());
         } finally {
-            lock.readLock().unlock();
+            unlockForRegularUsage();
         }
     }
 
@@ -135,7 +135,7 @@ public class ExponentiallyDecayingSample implements Sample {
      */
     private void rescale(long now, long next) {
         if (nextScaleTime.compareAndSet(next, now + RESCALE_THRESHOLD)) {
-            lock.writeLock().lock();
+            lockForRescale();
             try {
                 final long oldStartTime = startTime;
                 this.startTime = tick();
@@ -145,8 +145,24 @@ public class ExponentiallyDecayingSample implements Sample {
                     values.put(key * exp(-alpha * (startTime - oldStartTime)), value);
                 }
             } finally {
-                lock.writeLock().unlock();
+                unlockForRescale();
             }
         }
+    }
+
+    private void unlockForRescale() {
+        lock.writeLock().unlock();
+    }
+
+    private void lockForRescale() {
+        lock.writeLock().lock();
+    }
+
+    private void lockForRegularUsage() {
+        lock.readLock().lock();
+    }
+
+    private void unlockForRegularUsage() {
+        lock.readLock().unlock();
     }
 }
