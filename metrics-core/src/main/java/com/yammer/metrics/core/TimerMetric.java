@@ -29,6 +29,7 @@ public class TimerMetric implements Metered {
      * @param rateUnit the scale unit for this timer's rate metrics
      * @deprecated either use the other constructor or create via the {@link MetricsRegistry} or {@link Metrics}
      */
+    @SuppressWarnings({"deprecation"})
     public TimerMetric(TimeUnit durationUnit, TimeUnit rateUnit) {
         this(durationUnit, rateUnit, Clock.DEFAULT);
     }
@@ -41,6 +42,7 @@ public class TimerMetric implements Metered {
      * @param clock the clock used to calculate duration
      * @deprecated either use the other constructor or create via the {@link MetricsRegistry} or {@link Metrics}
      */
+    @SuppressWarnings({"deprecation"})
     public TimerMetric(TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
         this.durationUnit = durationUnit;
         this.rateUnit = rateUnit;
