@@ -2,6 +2,7 @@ package com.yammer.metrics;
 
 import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.core.HealthCheck.Result;
+import com.yammer.metrics.core.HealthCheckRegistry;
 
 import java.util.Map;
 

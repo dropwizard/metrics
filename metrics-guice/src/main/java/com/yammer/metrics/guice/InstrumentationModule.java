@@ -2,8 +2,8 @@ package com.yammer.metrics.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
-import com.yammer.metrics.HealthCheckRegistry;
-import com.yammer.metrics.MetricsRegistry;
+import com.yammer.metrics.core.HealthCheckRegistry;
+import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.JmxReporter;
 
 /**

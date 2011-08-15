@@ -1,7 +1,6 @@
 package com.yammer.metrics.core;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.MetricsRegistry;
 import com.yammer.metrics.core.HistogramMetric.SampleType;
 
 import java.util.ArrayList;

@@ -4,7 +4,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
-import com.yammer.metrics.MetricsRegistry;
+import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.TimerMetric;
 
 import java.lang.reflect.Method;

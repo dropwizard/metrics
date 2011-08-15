@@ -1,4 +1,4 @@
-package com.yammer.metrics;
+package com.yammer.metrics.core;
 
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HistogramMetric.SampleType;
