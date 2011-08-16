@@ -3,6 +3,7 @@ package com.yammer.metrics.reporting;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.*;
+import com.yammer.metrics.util.MetricPredicate;
 import com.yammer.metrics.util.Utils;
 
 import java.io.IOException;
@@ -32,6 +33,7 @@ public class GraphiteReporter implements Runnable {
     private final int port;
     private Writer writer;
     private final String prefix;
+    private MetricPredicate predicate;
 
     /**
      * Enables the graphite reporter to send data for the default metrics registry
@@ -86,8 +88,24 @@ public class GraphiteReporter implements Runnable {
      * @param prefix          the string which is prepended to all metric names
      */
     public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix) {
+        enable(metricsRegistry, period, unit, host, port, prefix, Utils.alwaysTruePredicate);
+    }
+
+    /**
+     * Enables the graphite reporter to send data to graphite server with the
+     * specified period.
+     *
+     * @param metricsRegistry the metrics registry
+     * @param period          the period between successive outputs
+     * @param unit            the time unit of {@code period}
+     * @param host            the host name of graphite server (carbon-cache agent)
+     * @param port            the port number on which the graphite server is listening
+     * @param prefix          the string which is prepended to all metric names
+     * @param predicate       filters metrics to be reported
+     */
+    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix, MetricPredicate predicate) {
         try {
-            final GraphiteReporter reporter = new GraphiteReporter(metricsRegistry, host, port, prefix);
+            final GraphiteReporter reporter = new GraphiteReporter(metricsRegistry, host, port, prefix, predicate);
             reporter.start(period, unit);
         } catch (Exception e) {
             log.error("Error creating/starting Graphite reporter:", e);
@@ -116,6 +134,20 @@ public class GraphiteReporter implements Runnable {
      * @throws IOException if there is an error connecting to the Graphite server
      */
     public GraphiteReporter(MetricsRegistry metricsRegistry, String host, int port, String prefix) throws IOException {
+        this(metricsRegistry, host, port, prefix, Utils.alwaysTruePredicate);
+    }
+
+    /**
+     * Creates a new {@link GraphiteReporter}.
+     *
+     * @param metricsRegistry the metrics registry
+     * @param host            is graphite server
+     * @param port            is port on which graphite server is running
+     * @param prefix          is prepended to all names reported to graphite
+     * @param predicate       filters metrics to be reported
+     * @throws IOException if there is an error connecting to the Graphite server
+     */
+    public GraphiteReporter(MetricsRegistry metricsRegistry, String host, int port, String prefix, MetricPredicate predicate) throws IOException {
         this.tickThread = metricsRegistry.threadPools().newScheduledThreadPool(1, "graphite-reporter");
         this.metricsRegistry = metricsRegistry;
         this.host = host;
@@ -126,6 +158,7 @@ public class GraphiteReporter implements Runnable {
         } else {
             this.prefix = "";
         }
+        this.predicate = predicate;
     }
 
     /**
@@ -170,7 +203,7 @@ public class GraphiteReporter implements Runnable {
     }
 
     private void printRegularMetrics(long epoch) {
-        for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(metricsRegistry.allMetrics()).entrySet()) {
+        for (Entry<String, Map<String, Metric>> entry : Utils.sortAndFilterMetrics(metricsRegistry.allMetrics(), this.predicate).entrySet()) {
             for (Entry<String, Metric> subEntry : entry.getValue().entrySet()) {
                 final String simpleName = (entry.getKey() + "." + subEntry.getKey()).replaceAll(" ", "_");
                 final Metric metric = subEntry.getValue();
