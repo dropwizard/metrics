@@ -2,8 +2,6 @@ package com.yammer.metrics.core;
 
 /**
  * A template class for an encapsulated service health check.
- *
- * @author coda
  */
 public abstract class HealthCheck {
     public static class Result {

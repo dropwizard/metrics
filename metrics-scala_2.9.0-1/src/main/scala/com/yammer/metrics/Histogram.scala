@@ -6,7 +6,6 @@ import core.HistogramMetric
 /**
  * A Scala façade class for {@link HistogramMetric}.
  *
- * @author coda
  * @see HistogramMetric
  */
 class Histogram(metric: HistogramMetric) {

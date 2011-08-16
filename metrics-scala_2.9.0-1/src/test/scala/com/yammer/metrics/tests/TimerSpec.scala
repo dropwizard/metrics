@@ -1,16 +1,18 @@
 package com.yammer.metrics.tests
 
 import com.codahale.simplespec.Spec
+import com.codahale.simplespec.annotation.test
 import com.yammer.metrics.core.TimerMetric
 import com.yammer.metrics.Timer
 import java.util.concurrent.TimeUnit
 
+
 class TimerSpec extends Spec {
   class `A timer` {
-    private val metric = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
-    private val timer = new Timer(metric)
+    val metric = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
+    val timer = new Timer(metric)
 
-    def `should update the underlying metric` = {
+    @test def `updates the underlying metric` = {
       timer.time { Thread.sleep(100); 10 } must beEqualTo(10)
 
       metric.min must beCloseTo(100.0, 10)

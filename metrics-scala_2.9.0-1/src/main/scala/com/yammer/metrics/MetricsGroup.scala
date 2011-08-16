@@ -5,8 +5,6 @@ import java.util.concurrent.TimeUnit
 
 /**
  * A helper class for creating and registering metrics.
- *
- * @author coda
  */
 class MetricsGroup(val klass: Class[_]) {
 
