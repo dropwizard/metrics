@@ -10,17 +10,10 @@ import java.util.concurrent.*;
 public class Utils {
     private static final ThreadPools THREAD_POOLS = new ThreadPools();
 
-    public static final MetricPredicate alwaysTruePredicate = new MetricPredicate() {
-        @Override
-        public boolean apply(MetricName name, Metric metric) {
-            return true;
-        }
-    };
-
     private Utils() { /* unused */ }
 
     public static Map<String, Map<String, Metric>> sortMetrics(Map<MetricName, Metric> metrics) {
-        return sortAndFilterMetrics(metrics, alwaysTruePredicate);
+        return sortAndFilterMetrics(metrics, MetricPredicate.ALL);
     }
 
     public static Map<String, Map<String, Metric>> sortAndFilterMetrics(Map<MetricName, Metric> metrics, MetricPredicate predicate) {
@@ -29,7 +22,7 @@ public class Utils {
         for (Entry<MetricName, Metric> entry : metrics.entrySet()) {
             final String qualifiedTypeName = entry.getKey().getGroup() + "." + entry.getKey().getType();
 
-            if (! predicate.apply(entry.getKey(), entry.getValue())) {
+            if (! predicate.matches(entry.getKey(), entry.getValue())) {
                 continue;
             }
 
