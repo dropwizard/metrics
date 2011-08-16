@@ -31,9 +31,9 @@ public class GraphiteReporter implements Runnable {
     private final MetricsRegistry metricsRegistry;
     private final String host;
     private final int port;
-    private Writer writer;
     private final String prefix;
-    private MetricPredicate predicate;
+    private final MetricPredicate predicate;
+    private Writer writer;
 
     /**
      * Enables the graphite reporter to send data for the default metrics registry
@@ -245,7 +245,7 @@ public class GraphiteReporter implements Runnable {
     }
 
     private void printMetered(Metered meter, String name, long epoch) {
-        StringBuffer lines = new StringBuffer();
+        final StringBuilder lines = new StringBuilder();
         lines.append(String.format("%s%s.%s %d %d\n",    prefix, name, "count",        meter.count(), epoch));
         lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "meanRate",     meter.meanRate(), epoch));
         lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "1MinuteRate",  meter.oneMinuteRate(), epoch));
@@ -256,7 +256,7 @@ public class GraphiteReporter implements Runnable {
 
     private void printHistogram(HistogramMetric histogram, String name, long epoch) {
         final double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
-        StringBuffer lines = new StringBuffer();
+        final StringBuilder lines = new StringBuilder();
         lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "min",           histogram.min(), epoch));
         lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "max",           histogram.max(), epoch));
         lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "mean",          histogram.mean(), epoch));
@@ -276,7 +276,7 @@ public class GraphiteReporter implements Runnable {
 
         final double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
 
-        StringBuffer lines = new StringBuffer();
+        final StringBuilder lines = new StringBuilder();
         lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "min",           timer.min(), epoch));
         lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "max",           timer.max(), epoch));
         lines.append(String.format("%s%s.%s %2.2f %d\n", prefix, name, "mean",          timer.mean(), epoch));
