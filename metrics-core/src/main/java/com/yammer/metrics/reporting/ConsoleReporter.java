@@ -45,7 +45,7 @@ public class ConsoleReporter implements Runnable {
      * @param unit            the time unit of {@code period}
      */
     public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit) {
-        final ConsoleReporter reporter = new ConsoleReporter(metricsRegistry, System.out, Utils.alwaysTruePredicate);
+        final ConsoleReporter reporter = new ConsoleReporter(metricsRegistry, System.out, MetricPredicate.ALL);
         reporter.start(period, unit);
     }
 
@@ -55,7 +55,7 @@ public class ConsoleReporter implements Runnable {
      * @param out the {@link java.io.PrintStream} to which output will be written
      */
     public ConsoleReporter(PrintStream out) {
-        this(Metrics.defaultRegistry(), out, Utils.alwaysTruePredicate);
+        this(Metrics.defaultRegistry(), out, MetricPredicate.ALL);
     }
 
     /**

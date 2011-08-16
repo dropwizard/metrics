@@ -88,7 +88,7 @@ public class GraphiteReporter implements Runnable {
      * @param prefix          the string which is prepended to all metric names
      */
     public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix) {
-        enable(metricsRegistry, period, unit, host, port, prefix, Utils.alwaysTruePredicate);
+        enable(metricsRegistry, period, unit, host, port, prefix, MetricPredicate.ALL);
     }
 
     /**
@@ -134,7 +134,7 @@ public class GraphiteReporter implements Runnable {
      * @throws IOException if there is an error connecting to the Graphite server
      */
     public GraphiteReporter(MetricsRegistry metricsRegistry, String host, int port, String prefix) throws IOException {
-        this(metricsRegistry, host, port, prefix, Utils.alwaysTruePredicate);
+        this(metricsRegistry, host, port, prefix, MetricPredicate.ALL);
     }
 
     /**
