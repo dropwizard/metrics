@@ -1,3 +1,27 @@
+v2.0.0-BETA15: Aug 15 2011
+==========================
+
+* Fixed dependency scopes for `metrics-jetty`.
+* Added time and VM version to `vm` output of `MetricsServlet`.
+* Dropped `com.sun.mangement`-based GC instrumentation in favor of a
+  `java.lang.management`-based one. `getLastGcInfo` has a nasty native memory
+  leak in it, plus it often returned incorrect data.
+* Upgraded to Jackson 1.8.5.
+* Upgraded to Jetty 7.4.5.
+* Added sanitization for metric names in `GraphiteReporter`.
+* Extracted out a `Clock` interface for timers for non-wall-clock timing.
+* Extracted out most of the remaining statics into `MetricsRegistry` and
+  `HealthCheckRegistry`.
+* Added an init parameter to `MetricsServlet` for disabling the `jvm` section.
+* Added a Guice module for `MetricsServlet`.
+* Added dynamic metric names.
+* Upgraded to ehcache 2.4.5.
+* Upgraded to logback 0.9.29.
+* Allowed for the removal of metrics.
+* Added the ability to filter metrics exposed by a reporter to those which match
+  a given predicate.
+
+
 v2.0.0-BETA14: Jul 05 2011
 ==========================
 

@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit
 /**
  * A Scala façade class for {@link TimerMetric}.
  *
- * @author coda
  * @see TimerMetric
  */
 class Timer(metric: TimerMetric) {

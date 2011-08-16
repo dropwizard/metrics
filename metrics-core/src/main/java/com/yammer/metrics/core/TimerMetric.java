@@ -1,33 +1,77 @@
 package com.yammer.metrics.core;
 
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.HistogramMetric.SampleType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
  * A timer metric which aggregates timing durations and provides duration
  * statistics, plus throughput statistics via {@link MeterMetric}.
- *
- * @author coda
  */
 public class TimerMetric implements Metered {
     private final TimeUnit durationUnit, rateUnit;
     private final MeterMetric meter;
     private final HistogramMetric histogram = new HistogramMetric(SampleType.BIASED);
+    private final Clock clock;
 
     /**
      * Creates a new {@link TimerMetric}.
      *
      * @param durationUnit the scale unit for this timer's duration metrics
      * @param rateUnit the scale unit for this timer's rate metrics
+     * @deprecated either use the other constructor or create via the {@link MetricsRegistry} or {@link Metrics}
      */
+    @SuppressWarnings({"deprecation"})
     public TimerMetric(TimeUnit durationUnit, TimeUnit rateUnit) {
+        this(durationUnit, rateUnit, Clock.DEFAULT);
+    }
+
+    /**
+     * Creates a new {@link TimerMetric} with the specified clock.
+     *
+     * @param durationUnit the scale unit for this timer's duration metrics
+     * @param rateUnit the scale unit for this timer's rate metrics
+     * @param clock the clock used to calculate duration
+     * @deprecated either use the other constructor or create via the {@link MetricsRegistry} or {@link Metrics}
+     */
+    @SuppressWarnings({"deprecation"})
+    public TimerMetric(TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
         this.durationUnit = durationUnit;
         this.rateUnit = rateUnit;
         this.meter = MeterMetric.newMeter("calls", rateUnit);
+        this.clock = clock;
+        clear();
+    }
+
+    /**
+     * Creates a new {@link TimerMetric}.
+     *
+     * @param tickThread background thread for updating the rates
+     * @param durationUnit the scale unit for this timer's duration metrics
+     * @param rateUnit the scale unit for this timer's rate metrics
+     */
+    public TimerMetric(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit) {
+        this(tickThread, durationUnit, rateUnit, Clock.DEFAULT);
+    }
+
+    /**
+     * Creates a new {@link TimerMetric}.
+     *
+     * @param tickThread   background thread for updating the rates
+     * @param durationUnit the scale unit for this timer's duration metrics
+     * @param rateUnit     the scale unit for this timer's rate metrics
+     * @param clock the clock used to calculate duration
+     */
+    public TimerMetric(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
+        this.durationUnit = durationUnit;
+        this.rateUnit = rateUnit;
+        this.meter = MeterMetric.newMeter(tickThread, "calls", rateUnit);
+        this.clock = clock;
         clear();
     }
 
@@ -72,11 +116,11 @@ public class TimerMetric implements Metered {
      * @throws Exception if {@code event} throws an {@link Exception}
      */
     public <T> T time(Callable<T> event) throws Exception {
-        final long startTime = System.nanoTime();
+        final long startTime = clock.tick();
         try {
             return event.call();
         } finally {
-            update(System.nanoTime() - startTime);
+            update(clock.tick() - startTime);
         }
     }
 
@@ -167,4 +211,7 @@ public class TimerMetric implements Metered {
         return ns / TimeUnit.NANOSECONDS.convert(1, durationUnit);
     }
 
+    void stop() {
+        meter.stop();
+    }
 }

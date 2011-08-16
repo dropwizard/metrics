@@ -5,7 +5,6 @@ import core.MeterMetric
 /**
  * A Scala façade class for {@link MeterMetric}.
  *
- * @author coda
  * @see MeterMetric
  */
 class Meter(metric: MeterMetric) {
