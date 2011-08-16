@@ -20,12 +20,7 @@ public class Utils {
     private Utils() { /* unused */ }
 
     public static Map<String, Map<String, Metric>> sortMetrics(Map<MetricName, Metric> metrics) {
-        return sortAndFilterMetrics(metrics, new MetricPredicate() {
-          @Override
-          public boolean apply(MetricName name, Metric metric) {
-              return true;
-          }
-        });
+        return sortAndFilterMetrics(metrics, alwaysTruePredicate);
     }
 
     public static Map<String, Map<String, Metric>> sortAndFilterMetrics(Map<MetricName, Metric> metrics, MetricPredicate predicate) {
