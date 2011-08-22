@@ -12,7 +12,7 @@ class GaugeMetricSpec extends Spec {
     }
 
     @test def `return a value` = {
-      metric.value() must beEqualTo("woo")
+      metric.value().mustEqual("woo")
     }
   }
 

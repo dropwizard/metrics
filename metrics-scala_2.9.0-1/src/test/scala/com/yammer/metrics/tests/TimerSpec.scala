@@ -13,9 +13,9 @@ class TimerSpec extends Spec {
     val timer = new Timer(metric)
 
     @test def `updates the underlying metric` = {
-      timer.time { Thread.sleep(100); 10 } must beEqualTo(10)
+      timer.time { Thread.sleep(100); 10 }.mustEqual(10)
 
-      metric.min must beCloseTo(100.0, 10)
+      metric.min().mustBeApproximately(100.0, 10)
     }
   }
 }
