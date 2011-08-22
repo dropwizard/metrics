@@ -12,12 +12,12 @@ class UniformSampleSpec extends Spec {
     population.foreach { i => sample.update(i.asInstanceOf[Long]) }
 
     @test def `has 100 elements` = {
-      sample.size must beEqualTo(100)
-      sample.values.toList must haveSize(100)
+      sample.size.mustEqual(100)
+      sample.values.toList.mustHaveSize(100)
     }
 
     @test def `only has elements from the population` = {
-      (sample.values().toSet -- population.toSet) must beEmpty
+      (sample.values().toSet -- population.toSet).mustBeEmpty()
     }
   }
 
@@ -27,12 +27,12 @@ class UniformSampleSpec extends Spec {
     population.foreach { i => sample.update(i.asInstanceOf[Long]) }
 
     @test def `has 10 elements` = {
-      sample.size must beEqualTo(10)
-      sample.values.toList must haveSize(10)
+      sample.size.mustEqual(10)
+      sample.values.toList.mustHaveSize(10)
     }
 
     @test def `only has elements from the population` = {
-      (sample.values().toSet -- population.toSet) must beEmpty
+      (sample.values().toSet -- population.toSet).mustBeEmpty
     }
   }
 }
