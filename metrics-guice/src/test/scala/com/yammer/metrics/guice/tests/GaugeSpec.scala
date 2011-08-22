@@ -22,9 +22,9 @@ class GaugeSpec extends Spec {
 
       val gauge = registry.allMetrics.get(new MetricName(classOf[InstrumentedWithGauge], "things"))
 
-      gauge.mustBeNotNull()
-      gauge.mustBeAnInstanceOf[GaugeMetric[String]]
-      gauge.asInstanceOf[GaugeMetric[String]].value.mustEqual("poop")
+      gauge.must(be(notNull))
+      gauge.must(beA[GaugeMetric[String]])
+      gauge.asInstanceOf[GaugeMetric[String]].value.must(be("poop"))
     }
   }
 }
