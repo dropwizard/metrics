@@ -151,7 +151,7 @@ public class VirtualMachineMetrics {
     public static Map<String, GarbageCollector> garbageCollectors() {
         final Map<String, GarbageCollector> gcs = new HashMap<String, GarbageCollector>();
         for (GarbageCollectorMXBean bean : getGarbageCollectorMXBeans()) {
-            gcs.put(bean.getName(), new GarbageCollector(bean.getCollectionCount(), bean.getCollectionCount()));
+            gcs.put(bean.getName(), new GarbageCollector(bean.getCollectionCount(), bean.getCollectionTime()));
         }
         return gcs;
     }
