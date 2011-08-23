@@ -25,11 +25,11 @@ class MeteredSpec extends Spec {
 
       val meter = registry.allMetrics.get(new MetricName(classOf[InstrumentedWithMetered], "things"))
 
-      meter must not(beNull)
-      meter.isInstanceOf[MeterMetric] must beTrue
-      meter.asInstanceOf[MeterMetric].count must beEqualTo(1)
-      meter.asInstanceOf[MeterMetric].eventType must beEqualTo("poops")
-      meter.asInstanceOf[MeterMetric].rateUnit must beEqualTo(TimeUnit.MINUTES)
+      meter.must(be(notNull))
+      meter.must(beA[MeterMetric])
+      meter.asInstanceOf[MeterMetric].count.must(be(1))
+      meter.asInstanceOf[MeterMetric].eventType.must(be("poops"))
+      meter.asInstanceOf[MeterMetric].rateUnit.must(be(TimeUnit.MINUTES))
     }
   }
 }

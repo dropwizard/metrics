@@ -11,60 +11,60 @@ class TimerMetricSpec extends Spec {
     val timer = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
 
     @test def `has a duration unit` = {
-      timer.durationUnit must be(TimeUnit.MILLISECONDS)
+      timer.durationUnit.must(be(TimeUnit.MILLISECONDS))
     }
 
     @test def `has a rate unit` = {
-      timer.rateUnit must be(TimeUnit.SECONDS)
+      timer.rateUnit.must(be(TimeUnit.SECONDS))
     }
 
     @test def `has a max of zero` = {
-      timer.max must beCloseTo(0.0, 0.001)
+      timer.max.must(be(approximately(0.0, 0.001)))
     }
 
     @test def `has a min of zero` = {
-      timer.min must beCloseTo(0.0, 0.001)
+      timer.min.must(be(approximately(0.0, 0.001)))
     }
 
     @test def `has a mean of zero` = {
-      timer.mean must beCloseTo(0.0, 0.001)
+      timer.mean.must(be(approximately(0.0, 0.001)))
     }
 
     @test def `has a count of zero` = {
-      timer.count must beEqualTo(0)
+      timer.count.must(be(0))
     }
 
     @test def `has a standard deviation of zero` = {
-      timer.stdDev must beCloseTo(0.0, 0.001)
+      timer.stdDev.must(be(approximately(0.0, 0.001)))
     }
 
     @test def `has a median/p95/p98/p99/p999 of zero` = {
       val Array(median, p95, p98, p99, p999) = timer.percentiles(0.5, 0.95, 0.98, 0.99, 0.999)
-      median must beCloseTo(0.0, 0.001)
-      p95 must beCloseTo(0.0, 0.001)
-      p98 must beCloseTo(0.0, 0.001)
-      p99 must beCloseTo(0.0, 0.001)
-      p999 must beCloseTo(0.0, 0.001)
+      median.must(be(approximately(0.0, 0.001)))
+      p95.must(be(approximately(0.0, 0.001)))
+      p98.must(be(approximately(0.0, 0.001)))
+      p99.must(be(approximately(0.0, 0.001)))
+      p999.must(be(approximately(0.0, 0.001)))
     }
 
     @test def `has a mean rate of zero` = {
-      timer.meanRate must beCloseTo(0.0, 0.001)
+      timer.meanRate.must(be(approximately(0.0, 0.001)))
     }
 
     @test def `has a one-minute rate of zero` = {
-      timer.oneMinuteRate must beCloseTo(0.0, 0.001)
+      timer.oneMinuteRate.must(be(approximately(0.0, 0.001)))
     }
 
     @test def `has a five-minute rate of zero` = {
-      timer.fiveMinuteRate must beCloseTo(0.0, 0.001)
+      timer.fiveMinuteRate.must(be(approximately(0.0, 0.001)))
     }
 
     @test def `has a fifteen-minute rate of zero` = {
-      timer.fifteenMinuteRate must beCloseTo(0.0, 0.001)
+      timer.fifteenMinuteRate.must(be(approximately(0.0, 0.001)))
     }
 
     @test def `has no values` = {
-      timer.values.toList must beEmpty
+      timer.values.toList.must(be(empty))
     }
   }
 
@@ -77,36 +77,36 @@ class TimerMetricSpec extends Spec {
     timer.update(40, TimeUnit.MILLISECONDS)
 
     @test def `records the count` = {
-      timer.count must beEqualTo(5)
+      timer.count.must(be(5))
     }
 
     @test def `calculates the minimum duration` = {
-      timer.min must beCloseTo(10.0, 0.001)
+      timer.min.must(be(approximately(10.0, 0.001)))
     }
 
     @test def `calculates the maximum duration` = {
-      timer.max must beCloseTo(40.0, 0.001)
+      timer.max.must(be(approximately(40.0, 0.001)))
     }
 
     @test def `calculates the mean duration` = {
-      timer.mean must beCloseTo(24.0, 0.001)
+      timer.mean.must(be(approximately(24.0, 0.001)))
     }
 
     @test def `calculates the standard deviation` = {
-      timer.stdDev must beCloseTo(11.401, 0.001)
+      timer.stdDev.must(be(approximately(11.401, 0.001)))
     }
 
     @test def `calculates the median/p95/p98/p99/p999` = {
       val Array(median, p95, p98, p99, p999) = timer.percentiles(0.5, 0.95, 0.98, 0.99, 0.999)
-      median must beCloseTo(20.0, 0.001)
-      p95 must beCloseTo(40.0, 0.001)
-      p98 must beCloseTo(40.0, 0.001)
-      p99 must beCloseTo(40.0, 0.001)
-      p999 must beCloseTo(40.0, 0.001)
+      median.must(be(approximately(20.0, 0.001)))
+      p95.must(be(approximately(40.0, 0.001)))
+      p98.must(be(approximately(40.0, 0.001)))
+      p99.must(be(approximately(40.0, 0.001)))
+      p999.must(be(approximately(40.0, 0.001)))
     }
 
     @test def `has a series of values` = {
-      timer.values.toSet must beEqualTo(Set(10, 20, 20, 30, 40))
+      timer.values.toSet.must(be(Set[java.lang.Double](10, 20, 20, 30, 40)))
     }
   }
 
@@ -116,7 +116,7 @@ class TimerMetricSpec extends Spec {
     timer.update(0, TimeUnit.NANOSECONDS)
 
     @test def `calculates the standard deviation without overflowing` = {
-      timer.stdDev must beCloseTo(75485.05, 0.01)
+      timer.stdDev.must(be(approximately(75485.05, 0.01)))
     }
   }
 
@@ -124,7 +124,9 @@ class TimerMetricSpec extends Spec {
     val timer = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
 
     @test def `records the duration of the Callable#call()` = {
-      time must eventually(beCloseTo(50.0, 2))
+      eventually {
+        time
+      }.must(be(approximately(50.0, 2)))
     }
 
     @test def `returns the result of the callable` = {
@@ -132,7 +134,7 @@ class TimerMetricSpec extends Spec {
         def call = {
           "woo"
         }
-      }) must beEqualTo("woo")
+      }).must(be("woo"))
     }
 
     private def time = {

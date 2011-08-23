@@ -25,11 +25,11 @@ class TimedSpec extends Spec {
 
       val timer = registry.allMetrics.get(new MetricName(classOf[InstrumentedWithTimed], "things"))
 
-      timer must not(beNull)
-      timer.isInstanceOf[TimerMetric] must beTrue
-      timer.asInstanceOf[TimerMetric].count must beEqualTo(1)
-      timer.asInstanceOf[TimerMetric].rateUnit must beEqualTo(TimeUnit.MINUTES)
-      timer.asInstanceOf[TimerMetric].durationUnit must beEqualTo(TimeUnit.MICROSECONDS)
+      timer.must(be(notNull))
+      timer.must(beA[TimerMetric])
+      timer.asInstanceOf[TimerMetric].count.must(be(1))
+      timer.asInstanceOf[TimerMetric].rateUnit.must(be(TimeUnit.MINUTES))
+      timer.asInstanceOf[TimerMetric].durationUnit.must(be(TimeUnit.MICROSECONDS))
     }
   }
 }

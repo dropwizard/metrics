@@ -11,12 +11,12 @@ class ExponentiallyDecayingSampleSpec extends Spec {
     population.foreach { i => sample.update(i.asInstanceOf[Long]) }
 
     def `should have 100 elements` = {
-      sample.size must beEqualTo(100)
-      sample.values.toList must haveSize(100)
+      sample.size.must(be(100))
+      sample.values.toList.must(haveSize(100))
     }
 
     def `should only have elements from the population` = {
-      (sample.values().toSet -- population.toSet) must beEmpty
+      (sample.values().toSet -- population.toSet).must(be(empty))
     }
   }
 
@@ -26,12 +26,12 @@ class ExponentiallyDecayingSampleSpec extends Spec {
     population.foreach { i => sample.update(i.asInstanceOf[Long]) }
 
     def `should have 10 elements` = {
-      sample.size must beEqualTo(10)
-      sample.values.toList must haveSize(10)
+      sample.size.must(be(10))
+      sample.values.toList.must(haveSize(100))
     }
 
     def `should only have elements from the population` = {
-      (sample.values().toSet -- population.toSet) must beEmpty
+      (sample.values().toSet -- population.toSet).must(be(empty))
     }
   }
 
@@ -41,12 +41,12 @@ class ExponentiallyDecayingSampleSpec extends Spec {
     population.foreach { i => sample.update(i.asInstanceOf[Long]) }
 
     def `should have 100 elements` = {
-      sample.size must beEqualTo(100)
-      sample.values.toList must haveSize(100)
+      sample.size.must(be(100))
+      sample.values.toList.must(haveSize(100))
     }
 
     def `should only have elements from the population` = {
-      (sample.values().toSet -- population.toSet) must beEmpty
+      (sample.values().toSet -- population.toSet).must(be(empty))
     }
   }
 }
