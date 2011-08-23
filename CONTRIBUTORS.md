@@ -2,8 +2,9 @@ Many Many Thanks To
 ===================
 
 * Bruce Mitchener (@waywardmonkeys)
-* Gerolf Seitz (@seitz)
+* Ciamac Moallemi (@ciamac)
 * Cliff Moon (@cliffmoon)
+* Gerolf Seitz (@seitz)
 * James Casey (@jamesc)
 * JD Maturen (@sku)
 * John Ewart (@johnewart)
