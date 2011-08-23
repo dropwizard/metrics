@@ -259,11 +259,21 @@ public class HistogramMetric implements Metric {
         }
     }
 
+    /**
+     * Cache arrays for the variance calculation, so as to avoid memory allocation.
+     */
+    private final ThreadLocal<double[]> arrayCache =
+        new ThreadLocal<double[]>() {
+            @Override protected double[] initialValue() {
+                return new double [2];
+            }
+        };       
+
     private void updateVariance(long value) {
         boolean done = false;
         while (!done) {
             final double[] oldValues = variance.get();
-            final double[] newValues = new double[2];
+            final double[] newValues = arrayCache.get();
             if (oldValues[0] == -1) {
                 newValues[0] = value;
                 newValues[1] = 0;
@@ -278,6 +288,10 @@ public class HistogramMetric implements Metric {
                 newValues[1] = newS;
             }
             done = variance.compareAndSet(oldValues, newValues);
+            if (done) {
+                // recycle the old array into the cache
+                arrayCache.set(oldValues);
+            }
         }
     }
 }
