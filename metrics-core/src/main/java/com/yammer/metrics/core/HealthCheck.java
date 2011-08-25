@@ -14,6 +14,10 @@ public abstract class HealthCheck {
             return HEALTHY;
         }
 
+        public static Result healthy(String message) {
+            return new Result(true, message, null);
+        }
+
         public static Result unhealthy(String errorMessage) {
             return new Result(false, errorMessage, null);
         }

@@ -192,7 +192,11 @@ public class MetricsServlet extends HttpServlet {
             for (Entry<String, Result> entry : results.entrySet()) {
                 final Result result = entry.getValue();
                 if (result.isHealthy()) {
-                    writer.format("* %s: OK\n", entry.getKey());
+                    if (result.getMessage() != null) {
+                        writer.format("* %s: OK: %s\n", entry.getKey(), result.getMessage());
+                    } else {
+                        writer.format("* %s: OK\n", entry.getKey());
+                    }
                 } else {
                     if (result.getMessage() != null) {
                         writer.format("! %s: ERROR\n!  %s\n", entry.getKey(), result.getMessage());
