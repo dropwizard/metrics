@@ -1,8 +1,8 @@
 package com.yammer.metrics.stats.tests
 
 import scala.collection.JavaConversions._
+import org.junit.Test
 import com.codahale.simplespec.Spec
-import com.codahale.simplespec.annotation.test
 import com.yammer.metrics.stats.UniformSample
 
 class UniformSampleSpec extends Spec {
@@ -11,12 +11,12 @@ class UniformSampleSpec extends Spec {
     val sample = new UniformSample(100)
     population.foreach { i => sample.update(i.asInstanceOf[Long]) }
 
-    @test def `has 100 elements` = {
+    @Test def `has 100 elements` = {
       sample.size.must(be(100))
       sample.values.toList.must(haveSize(100))
     }
 
-    @test def `only has elements from the population` = {
+    @Test def `only has elements from the population` = {
       (sample.values().toSet -- population.toSet).must(be(empty))
     }
   }
@@ -26,12 +26,12 @@ class UniformSampleSpec extends Spec {
     val sample = new UniformSample(100)
     population.foreach { i => sample.update(i.asInstanceOf[Long]) }
 
-    @test def `has 10 elements` = {
+    @Test def `has 10 elements` = {
       sample.size.must(be(10))
       sample.values.toList.must(haveSize(10))
     }
 
-    @test def `only has elements from the population` = {
+    @Test def `only has elements from the population` = {
       (sample.values().toSet -- population.toSet).must(be(empty))
     }
   }

@@ -1,7 +1,7 @@
 package com.yammer.metrics.guice.tests
 
+import org.junit.Test
 import com.codahale.simplespec.Spec
-import com.codahale.simplespec.annotation.test
 import java.util.concurrent.TimeUnit
 import com.google.inject.Guice
 import com.yammer.metrics.guice.{InstrumentationModule, Metered}
@@ -20,7 +20,7 @@ class MeteredSpec extends Spec {
     val instance = injector.getInstance(classOf[InstrumentedWithMetered])
     val registry = injector.getInstance(classOf[MetricsRegistry])
 
-    @test def `creates and calls a meter for the class with the given parameters` = {
+    @Test def `creates and calls a meter for the class with the given parameters` = {
       instance.doAThing()
 
       val meter = registry.allMetrics.get(new MetricName(classOf[InstrumentedWithMetered], "things"))
