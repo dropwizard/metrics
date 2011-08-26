@@ -1,7 +1,7 @@
 package com.yammer.metrics.logback
 
+import org.junit.Test
 import com.codahale.simplespec.Spec
-import com.codahale.simplespec.annotation.test
 import ch.qos.logback.classic.{Level, LoggerContext}
 
 class LogbackInstrumentedAppenderSpec extends Spec {
@@ -15,7 +15,7 @@ class LogbackInstrumentedAppenderSpec extends Spec {
     logger.addAppender(appender)
     logger.setLevel(Level.TRACE)
 
-    @test def `maintains accurate counts` = {
+    @Test def `maintains accurate counts` = {
       InstrumentedAppender.ALL_METER.count.must(be(0))
       InstrumentedAppender.TRACE_METER.count.must(be(0))
       InstrumentedAppender.DEBUG_METER.count.must(be(0))

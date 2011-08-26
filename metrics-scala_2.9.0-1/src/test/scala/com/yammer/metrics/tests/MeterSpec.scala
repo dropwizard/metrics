@@ -1,7 +1,7 @@
 package com.yammer.metrics.tests
 
+import org.junit.Test
 import com.codahale.simplespec.Spec
-import com.codahale.simplespec.annotation.test
 import com.yammer.metrics.core.MeterMetric
 import com.yammer.metrics.Meter
 
@@ -10,13 +10,13 @@ class MeterSpec extends Spec {
     val metric = mock[MeterMetric]
     val meter = new Meter(metric)
 
-    @test def `marks the underlying metric` = {
+    @Test def `marks the underlying metric` = {
       meter.mark()
 
       verify.one(metric).mark()
     }
 
-    @test def `marks the underlying metric by an arbitrary amount` = {
+    @Test def `marks the underlying metric by an arbitrary amount` = {
       meter.mark(12)
 
       verify.one(metric).mark(12)
