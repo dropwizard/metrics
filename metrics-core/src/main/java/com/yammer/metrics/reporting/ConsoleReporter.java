@@ -10,6 +10,7 @@ import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ScheduledExecutorService;
@@ -24,6 +25,7 @@ public class ConsoleReporter implements Runnable {
     private final MetricsRegistry metricsRegistry;
     private final PrintStream out;
     private final MetricPredicate predicate;
+    private final Locale locale = Locale.US;
 
     /**
      * Enables the console reporter for the default metrics registry, and causes it to
@@ -138,25 +140,25 @@ public class ConsoleReporter implements Runnable {
 
     private void printMetered(Metered meter) {
         final String unit = abbrev(meter.rateUnit());
-        out.printf("             count = %d\n", meter.count());
-        out.printf("         mean rate = %2.2f %s/%s\n", meter.meanRate(), meter.eventType(), unit);
-        out.printf("     1-minute rate = %2.2f %s/%s\n", meter.oneMinuteRate(), meter.eventType(), unit);
-        out.printf("     5-minute rate = %2.2f %s/%s\n", meter.fiveMinuteRate(), meter.eventType(), unit);
-        out.printf("    15-minute rate = %2.2f %s/%s\n", meter.fifteenMinuteRate(), meter.eventType(), unit);
+        out.printf(locale, "             count = %d\n", meter.count());
+        out.printf(locale, "         mean rate = %2.2f %s/%s\n", meter.meanRate(), meter.eventType(), unit);
+        out.printf(locale, "     1-minute rate = %2.2f %s/%s\n", meter.oneMinuteRate(), meter.eventType(), unit);
+        out.printf(locale, "     5-minute rate = %2.2f %s/%s\n", meter.fiveMinuteRate(), meter.eventType(), unit);
+        out.printf(locale, "    15-minute rate = %2.2f %s/%s\n", meter.fifteenMinuteRate(), meter.eventType(), unit);
     }
 
     private void printHistogram(HistogramMetric histogram) {
         final double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
-        out.printf("               min = %2.2f\n", histogram.min());
-        out.printf("               max = %2.2f\n", histogram.max());
-        out.printf("              mean = %2.2f\n", histogram.mean());
-        out.printf("            stddev = %2.2f\n", histogram.stdDev());
-        out.printf("            median = %2.2f\n", percentiles[0]);
-        out.printf("              75%% <= %2.2f\n", percentiles[1]);
-        out.printf("              95%% <= %2.2f\n", percentiles[2]);
-        out.printf("              98%% <= %2.2f\n", percentiles[3]);
-        out.printf("              99%% <= %2.2f\n", percentiles[4]);
-        out.printf("            99.9%% <= %2.2f\n", percentiles[5]);
+        out.printf(locale, "               min = %2.2f\n", histogram.min());
+        out.printf(locale, "               max = %2.2f\n", histogram.max());
+        out.printf(locale, "              mean = %2.2f\n", histogram.mean());
+        out.printf(locale, "            stddev = %2.2f\n", histogram.stdDev());
+        out.printf(locale, "            median = %2.2f\n", percentiles[0]);
+        out.printf(locale, "              75%% <= %2.2f\n", percentiles[1]);
+        out.printf(locale, "              95%% <= %2.2f\n", percentiles[2]);
+        out.printf(locale, "              98%% <= %2.2f\n", percentiles[3]);
+        out.printf(locale, "              99%% <= %2.2f\n", percentiles[4]);
+        out.printf(locale, "            99.9%% <= %2.2f\n", percentiles[5]);
     }
 
     private void printTimer(TimerMetric timer) {
@@ -165,16 +167,16 @@ public class ConsoleReporter implements Runnable {
         final String durationUnit = abbrev(timer.durationUnit());
 
         final double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
-        out.printf("               min = %2.2f%s\n", timer.min(), durationUnit);
-        out.printf("               max = %2.2f%s\n", timer.max(), durationUnit);
-        out.printf("              mean = %2.2f%s\n", timer.mean(), durationUnit);
-        out.printf("            stddev = %2.2f%s\n", timer.stdDev(), durationUnit);
-        out.printf("            median = %2.2f%s\n", percentiles[0], durationUnit);
-        out.printf("              75%% <= %2.2f%s\n", percentiles[1], durationUnit);
-        out.printf("              95%% <= %2.2f%s\n", percentiles[2], durationUnit);
-        out.printf("              98%% <= %2.2f%s\n", percentiles[3], durationUnit);
-        out.printf("              99%% <= %2.2f%s\n", percentiles[4], durationUnit);
-        out.printf("            99.9%% <= %2.2f%s\n", percentiles[5], durationUnit);
+        out.printf(locale, "               min = %2.2f%s\n", timer.min(), durationUnit);
+        out.printf(locale, "               max = %2.2f%s\n", timer.max(), durationUnit);
+        out.printf(locale, "              mean = %2.2f%s\n", timer.mean(), durationUnit);
+        out.printf(locale, "            stddev = %2.2f%s\n", timer.stdDev(), durationUnit);
+        out.printf(locale, "            median = %2.2f%s\n", percentiles[0], durationUnit);
+        out.printf(locale, "              75%% <= %2.2f%s\n", percentiles[1], durationUnit);
+        out.printf(locale, "              95%% <= %2.2f%s\n", percentiles[2], durationUnit);
+        out.printf(locale, "              98%% <= %2.2f%s\n", percentiles[3], durationUnit);
+        out.printf(locale, "              99%% <= %2.2f%s\n", percentiles[4], durationUnit);
+        out.printf(locale, "            99.9%% <= %2.2f%s\n", percentiles[5], durationUnit);
     }
 
     private String abbrev(TimeUnit unit) {
