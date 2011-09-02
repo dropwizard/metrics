@@ -29,7 +29,13 @@ public abstract class WebappMetricsFilter implements Filter {
     private final MeterMetric otherMeterMetric;
     private final CounterMetric activeRequests;
     private final TimerMetric requestTimer;
-
+    
+    /**
+     * Creates a new instance of the filter.
+     * 
+     * @param meterNamesByStatusCode A map, keyed by status code, of meter names that we are interested in. 
+     * @param otherMetricName The name used for the catch-all meter.
+     */
     public WebappMetricsFilter(Map<Integer, String> meterNamesByStatusCode, String otherMetricName) {
         
         for (Entry<Integer, String> entry : meterNamesByStatusCode.entrySet()) {
