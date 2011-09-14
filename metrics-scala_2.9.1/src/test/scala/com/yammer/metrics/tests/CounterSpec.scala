@@ -2,10 +2,6 @@ package com.yammer.metrics.tests
 
 import org.junit.Test
 import com.codahale.simplespec.Spec
-<<<<<<< HEAD
-=======
-import org.junit.Test
->>>>>>> hotfix/2.0.0-BETA16-with-2.9.1
 import com.yammer.metrics.Counter
 import com.yammer.metrics.core.CounterMetric
 
