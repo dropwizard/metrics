@@ -17,12 +17,12 @@
         <module>metrics-jetty</module>
         <module>metrics-log4j</module>
         <module>metrics-logback</module>
-        <module>metrics-scala_2.9.0-1</module>
+        <module>metrics-scala_2.9.1</module>
         <module>metrics-servlet</module>
     </modules>
 
     <properties>
-        <scala.version>2.9.0-1</scala.version>
+        <scala.version>2.9.1</scala.version>
     </properties>
 
     <developers>
