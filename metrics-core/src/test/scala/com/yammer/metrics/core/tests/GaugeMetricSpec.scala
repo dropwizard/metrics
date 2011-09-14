@@ -1,7 +1,7 @@
 package com.yammer.metrics.core.tests
 
 import com.codahale.simplespec.Spec
-import com.codahale.simplespec.annotation.test
+import org.junit.Test
 import com.yammer.metrics.core.GaugeMetric
 
 class GaugeMetricSpec extends Spec {
@@ -11,7 +11,7 @@ class GaugeMetricSpec extends Spec {
       def value = "woo"
     }
 
-    @test def `return a value` = {
+    @Test def `return a value` = {
       metric.value().must(be("woo"))
     }
   }
