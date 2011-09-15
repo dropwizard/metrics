@@ -1,7 +1,9 @@
 package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.*;
+import com.yammer.metrics.util.MetricPredicate;
 import com.yammer.metrics.util.Utils;
 
 import java.io.PrintStream;
@@ -16,32 +18,58 @@ import java.util.concurrent.TimeUnit;
 /**
  * A simple reporters which prints out application metrics to a
  * {@link PrintStream} periodically.
- *
- * @author coda
  */
 public class ConsoleReporter implements Runnable {
-    private static final ScheduledExecutorService TICK_THREAD = Utils.newScheduledThreadPool(1, "console-reporter");
+    private final ScheduledExecutorService tickThread;
+    private final MetricsRegistry metricsRegistry;
     private final PrintStream out;
+    private final MetricPredicate predicate;
 
     /**
-     * Enables the console reporter and causes it to print to STDOUT with the
-     * specified period.
+     * Enables the console reporter for the default metrics registry, and causes it to
+     * print to STDOUT with the specified period.
      *
      * @param period the period between successive outputs
      * @param unit   the time unit of {@code period}
      */
     public static void enable(long period, TimeUnit unit) {
-        final ConsoleReporter reporter = new ConsoleReporter(System.out);
+        enable(Metrics.defaultRegistry(), period, unit);
+    }
+
+    /**
+     * Enables the console reporter for the given metrics registry, and causes
+     * it to print to STDOUT with the specified period and unrestricted output.
+     *
+     * @param metricsRegistry the metrics registry
+     * @param period          the period between successive outputs
+     * @param unit            the time unit of {@code period}
+     */
+    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit) {
+        final ConsoleReporter reporter = new ConsoleReporter(metricsRegistry, System.out, MetricPredicate.ALL);
         reporter.start(period, unit);
     }
 
     /**
-     * Creates a new {@link ConsoleReporter}.
+     * Creates a new {@link ConsoleReporter} for the default metrics registry, with unrestricted output.
      *
      * @param out the {@link java.io.PrintStream} to which output will be written
      */
     public ConsoleReporter(PrintStream out) {
+        this(Metrics.defaultRegistry(), out, MetricPredicate.ALL);
+    }
+
+    /**
+     * Creates a new {@link ConsoleReporter} for a given metrics registry.
+     *
+     * @param metricsRegistry the metrics registry
+     * @param out             the {@link java.io.PrintStream} to which output will be written
+     * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be output
+     */
+    public ConsoleReporter(MetricsRegistry metricsRegistry, PrintStream out, MetricPredicate predicate) {
+        this.metricsRegistry = metricsRegistry;
+        this.tickThread = metricsRegistry.threadPools().newScheduledThreadPool(1, "console-reporter");
         this.out = out;
+        this.predicate = predicate;
     }
 
     /**
@@ -51,7 +79,7 @@ public class ConsoleReporter implements Runnable {
      * @param unit the time unit of {@code period}
      */
     public void start(long period, TimeUnit unit) {
-        TICK_THREAD.scheduleAtFixedRate(this, period, period, unit);
+        tickThread.scheduleAtFixedRate(this, period, period, unit);
     }
 
     @Override
@@ -66,7 +94,7 @@ public class ConsoleReporter implements Runnable {
             }
             out.println();
 
-            for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(Metrics.allMetrics()).entrySet()) {
+            for (Entry<String, Map<String, Metric>> entry : Utils.sortAndFilterMetrics(metricsRegistry.allMetrics(), predicate).entrySet()) {
                 out.print(entry.getKey());
                 out.println(':');
 
@@ -77,7 +105,7 @@ public class ConsoleReporter implements Runnable {
 
                     final Metric metric = subEntry.getValue();
                     if (metric instanceof GaugeMetric<?>) {
-                        printGauge((GaugeMetric) metric);
+                        printGauge((GaugeMetric<?>) metric);
                     } else if (metric instanceof CounterMetric) {
                         printCounter((CounterMetric) metric);
                     } else if (metric instanceof HistogramMetric) {
@@ -98,7 +126,7 @@ public class ConsoleReporter implements Runnable {
         }
     }
 
-    private void printGauge(GaugeMetric gauge) {
+    private void printGauge(GaugeMetric<?> gauge) {
         out.print("    value = ");
         out.println(gauge.value());
     }

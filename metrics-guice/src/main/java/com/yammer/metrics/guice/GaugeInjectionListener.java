@@ -2,7 +2,7 @@ package com.yammer.metrics.guice;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.InjectionListener;
-import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.GaugeMetric;
 
 import java.lang.reflect.Method;
@@ -13,11 +13,13 @@ import java.lang.reflect.Method;
  * returned by the annotated method.
  */
 public class GaugeInjectionListener<I> implements InjectionListener<I> {
+    private final MetricsRegistry metricsRegistry;
     private final TypeLiteral<I> literal;
     private final String name;
     private final Method method;
 
-    public GaugeInjectionListener(TypeLiteral<I> literal, String name, Method method) {
+    public GaugeInjectionListener(MetricsRegistry metricsRegistry, TypeLiteral<I> literal, String name, Method method) {
+        this.metricsRegistry = metricsRegistry;
         this.literal = literal;
         this.name = name;
         this.method = method;
@@ -25,7 +27,7 @@ public class GaugeInjectionListener<I> implements InjectionListener<I> {
 
     @Override
     public void afterInjection(final I i) {
-        Metrics.newGauge(literal.getRawType(), name, new GaugeMetric<Object>() {
+        metricsRegistry.newGauge(literal.getRawType(), name, new GaugeMetric<Object>() {
             @Override
             public Object value() {
                 try {

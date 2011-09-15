@@ -5,8 +5,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A simple named thread factory.
- *
- * @author coda
  */
 class NamedThreadFactory implements ThreadFactory {
     private final ThreadGroup group;

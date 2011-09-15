@@ -1,46 +1,46 @@
 package com.yammer.metrics.core.tests
 
+import org.junit.Test
 import com.codahale.simplespec.Spec
 import com.yammer.metrics.core.CounterMetric
 
 class CounterMetricSpec extends Spec {
   class `A counter metric` {
-    private val counter = new CounterMetric
+    val counter = new CounterMetric
 
-    def `should start at zero` = {
-      counter.count must beEqualTo(0)
+    @Test def `starts at zero` = {
+      counter.count.must(be(0))
     }
 
-    def `should increment by one` = {
+    @Test def `increments by one` = {
       counter.inc()
 
-      counter.count must beEqualTo(1)
+      counter.count.must(be(1))
     }
 
-    def `should increment by an arbitrary delta` = {
+    @Test def `increments by an arbitrary delta` = {
       counter.inc(3)
 
-      counter.count must beEqualTo(3)
+      counter.count.must(be(3))
     }
 
-    def `should decrement by one` = {
+    @Test def `decrements by one` = {
       counter.dec()
 
-      counter.count must beEqualTo(-1)
+      counter.count.must(be(-1))
     }
 
-    def `should decrement by an arbitrary delta` = {
+    @Test def `decrements by an arbitrary delta` = {
       counter.dec(3)
 
-      counter.count must beEqualTo(-3)
+      counter.count.must(be(-3))
     }
 
-    def `should be zero after being cleared` = {
+    @Test def `is zero after being cleared` = {
       counter.inc(3)
       counter.clear()
 
-      counter.count must beEqualTo(0)
+      counter.count.must(be(0))
     }
   }
-
 }

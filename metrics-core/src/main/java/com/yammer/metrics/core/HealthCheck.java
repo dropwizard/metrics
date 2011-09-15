@@ -2,8 +2,6 @@ package com.yammer.metrics.core;
 
 /**
  * A template class for an encapsulated service health check.
- *
- * @author coda
  */
 public abstract class HealthCheck {
     public static class Result {
@@ -14,6 +12,10 @@ public abstract class HealthCheck {
 
         public static Result healthy() {
             return HEALTHY;
+        }
+
+        public static Result healthy(String message) {
+            return new Result(true, message, null);
         }
 
         public static Result unhealthy(String errorMessage) {

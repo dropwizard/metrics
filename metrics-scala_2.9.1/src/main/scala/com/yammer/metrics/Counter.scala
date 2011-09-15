@@ -5,7 +5,6 @@ import core.CounterMetric
 /**
  * A Scala façade class for {@link CounterMetric}.
  *
- * @author coda
  * @see CounterMetric
  */
 class Counter(metric: CounterMetric) {

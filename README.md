@@ -10,11 +10,11 @@ Requirements
 * Scala 2.8.1 or 2.9.0-1
 * Guice 3.0 (for `metrics-guice`)
 * Servlet API 2.5 (for `metrics-servlet`)
-* Jackson 1.7.7 (for `metrics-servlet`)
-* Jetty 7.4.2 (for `metrics-jetty`)
+* Jackson 1.8.5 (for `metrics-servlet`)
+* Jetty 7.4.5 (for `metrics-jetty`)
 * Log4J 1.2.16 (for `metrics-log4j`)
-* Logback 0.9.28 (for `metrics-logback`)
-* Ehcache 2.4.2 (for `metrics-ehcache`)
+* Logback 0.9.29 (for `metrics-logback`)
+* Ehcache 2.4.3 (for `metrics-ehcache`)
 
 
 How To Use
@@ -35,13 +35,13 @@ How To Use
   <dependency>
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-core</artifactId>
-    <version>2.0.0-BETA15-SNAPSHOT</version>
+    <version>2.0.0-BETA17-SNAPSHOT</version>
   </dependency>
   <!-- if you want the Scala façade library -->
   <dependency>
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-scala_${scala.version}</artifactId>
-    <version>2.0.0-BETA15-SNAPSHOT</version>
+    <version>2.0.0-BETA17-SNAPSHOT</version>
   </dependency>
 </dependencies>
 ```
@@ -56,10 +56,10 @@ import com.yammer.metrics.Instrumented
 
 class ThingFinder extends Instrumented {
   // measure the # of records per second returned
-  private val resultsMeter = metrics.meter("results", "records", TimeUnit.SECONDS)
+  private val resultsMeter = metrics.meter("results", "records")
   // measure the # of milliseconds each query takes and the number of
   // queries per second being performed
-  private val dbTimer = metrics.timer("database", TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
+  private val dbTimer = metrics.timer("database")
 
   def findThings() = {
     val results = dbTimer.time {

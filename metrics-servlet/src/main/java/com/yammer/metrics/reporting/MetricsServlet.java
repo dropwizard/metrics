@@ -1,17 +1,19 @@
 package com.yammer.metrics.reporting;
 
+import com.yammer.metrics.core.HealthCheckRegistry;
 import com.yammer.metrics.HealthChecks;
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HealthCheck.Result;
 import com.yammer.metrics.util.Utils;
 import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,10 +25,14 @@ import java.lang.Thread.State;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 
 public class MetricsServlet extends HttpServlet {
+    public static final String ATTR_NAME_METRICS_REGISTRY = MetricsServlet.class.getSimpleName() + ":" + MetricsRegistry.class.getSimpleName();
+    public static final String ATTR_NAME_HEALTHCHECK_REGISTRY = MetricsServlet.class.getSimpleName() + ":" + HealthCheckRegistry.class.getSimpleName();
+
     private static final String TEMPLATE = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n" +
                                            "        \"http://www.w3.org/TR/html4/loose.dtd\">\n" +
                                            "<html>\n" +
@@ -43,19 +49,30 @@ public class MetricsServlet extends HttpServlet {
                                            "  </ul>\n" +
                                            "</body>\n" +
                                            "</html>";
-    private static final String HEALTHCHECK_URI = "/healthcheck";
-    private static final String METRICS_URI = "/metrics";
-    private static final String PING_URI = "/ping";
-    private static final String THREADS_URI = "/threads";
+    public static final String HEALTHCHECK_URI = "/healthcheck";
+    public static final String METRICS_URI = "/metrics";
+    public static final String PING_URI = "/ping";
+    public static final String THREADS_URI = "/threads";
+    private MetricsRegistry metricsRegistry;
+    private HealthCheckRegistry healthCheckRegistry;
     private JsonFactory factory;
     private String metricsUri, pingUri, threadsUri, healthcheckUri, contextPath;
+    private boolean showJvmMetrics;
 
     public MetricsServlet() {
-        this(new JsonFactory(new ObjectMapper()), HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI);
+        this(new JsonFactory(new ObjectMapper()), HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI, true);
+    }
+
+    public MetricsServlet(boolean showJvmMetrics) {
+        this(new JsonFactory(new ObjectMapper()), HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI, showJvmMetrics);
     }
 
     public MetricsServlet(JsonFactory factory) {
         this(factory, HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI);
+    }
+
+    public MetricsServlet(JsonFactory factory, boolean showJvmMetrics) {
+        this(factory, HEALTHCHECK_URI, METRICS_URI, PING_URI, THREADS_URI, showJvmMetrics);
     }
 
     public MetricsServlet(String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
@@ -63,22 +80,45 @@ public class MetricsServlet extends HttpServlet {
     }
 
     public MetricsServlet(JsonFactory factory, String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
+        this(factory, healthcheckUri, metricsUri, pingUri, threadsUri, true);
+    }
+
+    public MetricsServlet(JsonFactory factory, String healthcheckUri, String metricsUri, String pingUri, String threadsUri, boolean showJvmMetrics) {
+        this(Metrics.defaultRegistry(), HealthChecks.defaultRegistry(), factory, healthcheckUri, metricsUri, pingUri, threadsUri, showJvmMetrics);
+    }
+
+    public MetricsServlet(MetricsRegistry metricsRegistry, HealthCheckRegistry healthCheckRegistry, String healthcheckUri, String metricsUri, String pingUri, String threadsUri, boolean showJvmMetrics) {
+        this(metricsRegistry, healthCheckRegistry, new JsonFactory(new ObjectMapper()), healthcheckUri, metricsUri, pingUri, threadsUri, showJvmMetrics);
+    }
+
+    public MetricsServlet(MetricsRegistry metricsRegistry, HealthCheckRegistry healthCheckRegistry, JsonFactory factory, String healthcheckUri, String metricsUri, String pingUri, String threadsUri, boolean showJvmMetrics) {
+        this.metricsRegistry = metricsRegistry;
+        this.healthCheckRegistry = healthCheckRegistry;
         this.factory = factory;
         this.healthcheckUri = healthcheckUri;
         this.metricsUri = metricsUri;
         this.pingUri = pingUri;
         this.threadsUri = threadsUri;
+        this.showJvmMetrics = showJvmMetrics;
     }
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
 
-        this.contextPath = config.getServletContext().getContextPath();
+        ServletContext context = config.getServletContext();
+
+        this.contextPath = context.getContextPath();
+        this.metricsRegistry = putAttrIfAbsent(context, ATTR_NAME_METRICS_REGISTRY, this.metricsRegistry);
+        this.healthCheckRegistry = putAttrIfAbsent(context, ATTR_NAME_HEALTHCHECK_REGISTRY, this.healthCheckRegistry);
         this.metricsUri = getParam(config.getInitParameter("metrics-uri"), this.metricsUri);
         this.pingUri = getParam(config.getInitParameter("ping-uri"), this.pingUri);
         this.threadsUri = getParam(config.getInitParameter("threads-uri"), this.threadsUri);
         this.healthcheckUri = getParam(config.getInitParameter("healthcheck-uri"), this.healthcheckUri);
+        final String showJvmMetricsParam = config.getInitParameter("show-jvm-metrics");
+        if (showJvmMetricsParam != null) {
+            this.showJvmMetrics = Boolean.parseBoolean(showJvmMetricsParam);
+        }
 
         final Object factory = config.getServletContext().getAttribute(JsonFactory.class.getCanonicalName());
         if (factory != null && factory instanceof JsonFactory) {
@@ -90,6 +130,16 @@ public class MetricsServlet extends HttpServlet {
         return initParam == null ? defaultValue : initParam;
     }
 
+    private <T> T putAttrIfAbsent(ServletContext context, String attrName, T defaultValue) {
+        @SuppressWarnings("unchecked")
+        T attrValue = (T)context.getAttribute(attrName);
+        if (attrValue == null) {
+            attrValue = defaultValue;
+            context.setAttribute(attrName, attrValue);
+        }
+        return attrValue;
+    }
+    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
@@ -122,7 +172,7 @@ public class MetricsServlet extends HttpServlet {
 
     private void handleHealthCheck(HttpServletResponse resp) throws IOException {
         boolean allHealthy = true;
-        final Map<String, Result> results = HealthChecks.runHealthChecks();
+        final Map<String, Result> results = healthCheckRegistry.runHealthChecks();
         for (Result result : results.values()) {
             allHealthy &= result.isHealthy();
         }
@@ -142,7 +192,11 @@ public class MetricsServlet extends HttpServlet {
             for (Entry<String, Result> entry : results.entrySet()) {
                 final Result result = entry.getValue();
                 if (result.isHealthy()) {
-                    writer.format("* %s: OK\n", entry.getKey());
+                    if (result.getMessage() != null) {
+                        writer.format("* %s: OK: %s\n", entry.getKey(), result.getMessage());
+                    } else {
+                        writer.format("* %s: OK\n", entry.getKey());
+                    }
                 } else {
                     if (result.getMessage() != null) {
                         writer.format("! %s: ERROR\n!  %s\n", entry.getKey(), result.getMessage());
@@ -186,7 +240,7 @@ public class MetricsServlet extends HttpServlet {
         }
         json.writeStartObject();
         {
-            if ("jvm".equals(classPrefix) || classPrefix == null) {
+            if (showJvmMetrics && ("jvm".equals(classPrefix) || classPrefix == null)) {
                 writeVmMetrics(json, showFullSamples);
             }
 
@@ -197,7 +251,7 @@ public class MetricsServlet extends HttpServlet {
     }
 
     private void writeRegularMetrics(JsonGenerator json, String classPrefix, boolean showFullSamples) throws IOException {
-        for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(Metrics.allMetrics()).entrySet()) {
+        for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(metricsRegistry.allMetrics()).entrySet()) {
             if (classPrefix == null || entry.getKey().startsWith(classPrefix)) {
                 json.writeFieldName(entry.getKey());
                 json.writeStartObject();
@@ -214,7 +268,7 @@ public class MetricsServlet extends HttpServlet {
     private void writeMetric(JsonGenerator json, String key, Metric metric, boolean showFullSamples) throws IOException {
         if (metric instanceof GaugeMetric<?>) {
             json.writeFieldName(key);
-            writeGauge(json, (GaugeMetric) metric);
+            writeGauge(json, (GaugeMetric<?>) metric);
         } else if (metric instanceof CounterMetric) {
             json.writeFieldName(key);
             writeCounter(json, (CounterMetric) metric);
@@ -263,7 +317,7 @@ public class MetricsServlet extends HttpServlet {
         json.writeEndObject();
     }
 
-    private void writeGauge(JsonGenerator json, GaugeMetric gauge) throws IOException {
+    private void writeGauge(JsonGenerator json, GaugeMetric<?> gauge) throws IOException {
         json.writeStartObject();
         {
             json.writeStringField("type", "gauge");
@@ -283,6 +337,13 @@ public class MetricsServlet extends HttpServlet {
         json.writeStartObject();
         {
 
+            json.writeFieldName("vm");
+            json.writeStartObject();
+            {
+                json.writeStringField("name", vmName());
+                json.writeStringField("version", vmVersion());
+            }
+            json.writeEndObject();
             json.writeFieldName("memory");
             json.writeStartObject();
             {
@@ -301,6 +362,7 @@ public class MetricsServlet extends HttpServlet {
 
             json.writeNumberField("daemon_thread_count", daemonThreadCount());
             json.writeNumberField("thread_count", threadCount());
+            json.writeNumberField("current_time", System.currentTimeMillis());
             json.writeNumberField("uptime", uptime());
             json.writeNumberField("fd_usage", fileDescriptorUsage());
 
@@ -313,28 +375,19 @@ public class MetricsServlet extends HttpServlet {
             }
             json.writeEndObject();
 
-            json.writeFieldName("gc");
+            json.writeFieldName("garbage-collectors");
             json.writeStartObject();
             {
-                json.writeFieldName("duration");
-                json.writeStartObject();
-                {
-                    for (Entry<String, TimerMetric> entry : gcDurations().entrySet()) {
-                        json.writeFieldName(entry.getKey());
-                        writeTimer(json, entry.getValue(), showFullSamples);
+                for (Entry<String, GarbageCollector> entry : garbageCollectors().entrySet()) {
+                    json.writeFieldName(entry.getKey());
+                    json.writeStartObject();
+                    {
+                        final GarbageCollector gc = entry.getValue();
+                        json.writeNumberField("runs", gc.getRuns());
+                        json.writeNumberField("time", gc.getTime(TimeUnit.MILLISECONDS));
                     }
+                    json.writeEndObject();
                 }
-                json.writeEndObject();
-
-                json.writeFieldName("throughput");
-                json.writeStartObject();
-                {
-                    for (Entry<String, MeterMetric> entry : gcThroughputs().entrySet()) {
-                        json.writeFieldName(entry.getKey());
-                        writeMeter(json, entry.getValue());
-                    }
-                }
-                json.writeEndObject();
             }
             json.writeEndObject();
 

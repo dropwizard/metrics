@@ -2,12 +2,19 @@ Many Many Thanks To
 ===================
 
 * Bruce Mitchener (@waywardmonkeys)
+* Ciamac Moallemi (@ciamac)
 * Cliff Moon (@cliffmoon)
+* Gerolf Seitz (@seitz)
 * James Casey (@jamesc)
 * JD Maturen (@sku)
 * John Ewart (@johnewart)
+* John Wang (@javasoze)
+* Kevin Clark (@kevinclark)
 * Mahesh Tiyyagura (@tmahesh)
-* Mårten Gustafson (@chids)
 * Martin Traverso (@martint)
+* Matt Ryall (@mattryall)
+* Matthew Gilliard (@mjg123)
+* Mårten Gustafson (@chids)
+* Ryan Kennedy (@ryankennedy)
 * Shaneal Manek (@smanek)
-
+* Thomas Dudziak (@tomdz)
