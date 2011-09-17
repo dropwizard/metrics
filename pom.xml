@@ -19,6 +19,7 @@
         <module>metrics-logback</module>
         <module>metrics-scala_2.9.1</module>
         <module>metrics-servlet</module>
+		<module>metrics-ganglia</module>
     </modules>
 
     <properties>
