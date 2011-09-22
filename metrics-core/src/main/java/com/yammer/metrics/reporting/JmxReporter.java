@@ -1,20 +1,33 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.*;
-
-import javax.management.*;
 import java.lang.management.ManagementFactory;
-import java.util.*;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
+
+import com.yammer.metrics.core.CounterMetric;
+import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.HistogramMetric;
+import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.Metered;
+import com.yammer.metrics.core.Metric;
+import com.yammer.metrics.core.MetricName;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.TimerMetric;
 
 /**
  * A reporter which exposes application metric as JMX MBeans.
  */
 public class JmxReporter extends AbstractReporter {
-    private final ScheduledExecutorService tickThread;
-    private final MetricsRegistry metricsRegistry;
     private final Map<MetricName, MetricMBean> beans;
     private final MBeanServer server;
 
@@ -295,8 +308,7 @@ public class JmxReporter extends AbstractReporter {
     }
 
     public JmxReporter(MetricsRegistry metricsRegistry) {
-        this.tickThread = metricsRegistry.threadPools().newScheduledThreadPool(1, "jmx-reporter");
-        this.metricsRegistry = metricsRegistry;
+        super(metricsRegistry, "jmx-reporter");
         this.beans = new HashMap<MetricName, MetricMBean>(metricsRegistry.allMetrics().size());
         this.server = ManagementFactory.getPlatformMBeanServer();
     }
