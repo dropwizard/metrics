@@ -26,7 +26,7 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.*;
  * A simple reporter which sends out application metrics to a
  * <a href="http://graphite.wikidot.com/faq">Graphite</a> server periodically.
  */
-public class GraphiteReporter implements Runnable {
+public class GraphiteReporter extends AbstractReporter {
     private static final Logger log = LoggerFactory.getLogger(GraphiteReporter.class);
     private final ScheduledExecutorService tickThread;
     private final MetricsRegistry metricsRegistry;
