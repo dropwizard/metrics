@@ -1,10 +1,14 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.*;
-import com.yammer.metrics.util.MetricPredicate;
-import com.yammer.metrics.util.Utils;
+import static com.yammer.metrics.core.VirtualMachineMetrics.daemonThreadCount;
+import static com.yammer.metrics.core.VirtualMachineMetrics.fileDescriptorUsage;
+import static com.yammer.metrics.core.VirtualMachineMetrics.garbageCollectors;
+import static com.yammer.metrics.core.VirtualMachineMetrics.heapUsage;
+import static com.yammer.metrics.core.VirtualMachineMetrics.memoryPoolUsage;
+import static com.yammer.metrics.core.VirtualMachineMetrics.nonHeapUsage;
+import static com.yammer.metrics.core.VirtualMachineMetrics.threadCount;
+import static com.yammer.metrics.core.VirtualMachineMetrics.threadStatePercentages;
+import static com.yammer.metrics.core.VirtualMachineMetrics.uptime;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -14,13 +18,23 @@ import java.net.Socket;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.yammer.metrics.core.VirtualMachineMetrics.*;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.CounterMetric;
+import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.HistogramMetric;
+import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.Metered;
+import com.yammer.metrics.core.Metric;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.VirtualMachineMetrics.GarbageCollector;
+import com.yammer.metrics.util.MetricPredicate;
+import com.yammer.metrics.util.Utils;
 
 /**
  * A simple reporter which sends out application metrics to a
@@ -28,8 +42,6 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.*;
  */
 public class GraphiteReporter extends AbstractReporter {
     private static final Logger log = LoggerFactory.getLogger(GraphiteReporter.class);
-    private final ScheduledExecutorService tickThread;
-    private final MetricsRegistry metricsRegistry;
     private final String host;
     private final int port;
     private final String prefix;
@@ -150,8 +162,7 @@ public class GraphiteReporter extends AbstractReporter {
      * @throws IOException if there is an error connecting to the Graphite server
      */
     public GraphiteReporter(MetricsRegistry metricsRegistry, String host, int port, String prefix, MetricPredicate predicate) throws IOException {
-        this.tickThread = metricsRegistry.threadPools().newScheduledThreadPool(1, "graphite-reporter");
-        this.metricsRegistry = metricsRegistry;
+        super(metricsRegistry, "graphite-reporter");
         this.host = host;
         this.port = port;
         if (prefix != null) {

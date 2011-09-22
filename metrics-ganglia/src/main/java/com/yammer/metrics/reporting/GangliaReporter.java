@@ -1,20 +1,40 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.*;
-import com.yammer.metrics.util.MetricPredicate;
-import com.yammer.metrics.util.Utils;
+import static com.yammer.metrics.core.VirtualMachineMetrics.daemonThreadCount;
+import static com.yammer.metrics.core.VirtualMachineMetrics.fileDescriptorUsage;
+import static com.yammer.metrics.core.VirtualMachineMetrics.garbageCollectors;
+import static com.yammer.metrics.core.VirtualMachineMetrics.heapUsage;
+import static com.yammer.metrics.core.VirtualMachineMetrics.memoryPoolUsage;
+import static com.yammer.metrics.core.VirtualMachineMetrics.nonHeapUsage;
+import static com.yammer.metrics.core.VirtualMachineMetrics.threadCount;
+import static com.yammer.metrics.core.VirtualMachineMetrics.threadStatePercentages;
+import static com.yammer.metrics.core.VirtualMachineMetrics.uptime;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.*;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import static com.yammer.metrics.core.VirtualMachineMetrics.*;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.CounterMetric;
+import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.HistogramMetric;
+import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.Metered;
+import com.yammer.metrics.core.Metric;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.VirtualMachineMetrics.GarbageCollector;
+import com.yammer.metrics.util.MetricPredicate;
+import com.yammer.metrics.util.Utils;
 
 /**
  * A simple reporter which sends out application metrics to a
@@ -35,8 +55,6 @@ public class GangliaReporter extends AbstractReporter {
     private static final int GANGLIA_DMAX = 0;
     private static final String GANGLIA_INT_TYPE = "int32";
     private static final String GANGLIA_DOUBLE_TYPE = "double";
-    private final ScheduledExecutorService tickThread;
-    private final MetricsRegistry metricsRegistry;
     private final String gangliaHost;
     private final int port;
     private final MetricPredicate predicate;
@@ -127,8 +145,7 @@ public class GangliaReporter extends AbstractReporter {
      * @throws java.io.IOException if there is an error connecting to the ganglia server
      */
     public GangliaReporter(MetricsRegistry metricsRegistry, String gangliaHost, int port, MetricPredicate predicate) throws IOException {
-        this.tickThread = metricsRegistry.threadPools().newScheduledThreadPool(1, "ganglia-reporter");
-        this.metricsRegistry = metricsRegistry;
+        super(metricsRegistry, "ganglia-reporter");
         this.gangliaHost = gangliaHost;
         this.port = port;
         this.hostLabel = getHostLabel();
