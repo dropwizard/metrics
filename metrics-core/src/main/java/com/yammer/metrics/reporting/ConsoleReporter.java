@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  * A simple reporters which prints out application metrics to a
  * {@link PrintStream} periodically.
  */
-public class ConsoleReporter implements Runnable {
+public class ConsoleReporter extends AbstractReporter {
     private final ScheduledExecutorService tickThread;
     private final MetricsRegistry metricsRegistry;
     private final PrintStream out;
