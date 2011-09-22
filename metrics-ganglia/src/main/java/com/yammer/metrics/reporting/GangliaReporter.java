@@ -28,8 +28,8 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.*;
  * which is based on <a ahref="http://search-hadoop.com/c/Hadoop:/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/metrics/ganglia/GangliaContext31.java">GangliaContext31</a>
  * from Hadoop.
  */
-public class GangliaReporter implements Runnable {
-    private static final Logger LOG = LoggerFactory.getLogger(GangliaReporter.class);
+public class GangliaReporter extends AbstractReporter {
+    private static final Logger log = LoggerFactory.getLogger(GangliaReporter.class);
     private static final int BUFFER_SIZE = 1500;
     private static final int GANGLIA_TMAX = 60;
     private static final int GANGLIA_DMAX = 0;
