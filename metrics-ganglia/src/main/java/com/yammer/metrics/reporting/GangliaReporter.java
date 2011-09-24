@@ -29,7 +29,7 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.*;
  * from Hadoop.
  */
 public class GangliaReporter implements Runnable {
-    private static final Logger log = LoggerFactory.getLogger(GangliaReporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GangliaReporter.class);
     private static final int BUFFER_SIZE = 1500;
     private static final int GANGLIA_TMAX = 60;
     private static final int GANGLIA_DMAX = 0;
@@ -90,7 +90,7 @@ public class GangliaReporter implements Runnable {
             final GangliaReporter reporter = new GangliaReporter(metricsRegistry, gangliaHost, port, predicate);
             reporter.start(period, unit);
         } catch (Exception e) {
-            log.error("Error creating/starting ganglia reporter:", e);
+            LOG.error("Error creating/starting ganglia reporter:", e);
         }
     }
 
@@ -171,7 +171,7 @@ public class GangliaReporter implements Runnable {
                             printTimer((TimerMetric) metric, simpleName);
                         }
                     } catch (Exception ignored) {
-                        log.error("Error printing regular metrics:", ignored);
+                        LOG.error("Error printing regular metrics:", ignored);
                     }
                 }
             }
@@ -182,11 +182,11 @@ public class GangliaReporter implements Runnable {
     private void sendToGanglia(String metricName, String metricType, String metricValue, String groupName, String units) {
         try {
             sendMetricData(metricType, metricName, metricValue, groupName, units);
-            if (log.isDebugEnabled()) {
-                log.debug("Emitting metric " + metricName + ", type " + metricType + ", value " + metricValue + " for gangliaHost: " + gangliaHost + ":" + port);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Emitting metric " + metricName + ", type " + metricType + ", value " + metricValue + " for gangliaHost: " + gangliaHost + ":" + port);
             }
         } catch (IOException e) {
-            log.error("Error sending to ganglia:", e);
+            LOG.error("Error sending to ganglia:", e);
         }
     }
 
@@ -359,7 +359,7 @@ public class GangliaReporter implements Runnable {
             InetAddress addr = InetAddress.getLocalHost();
             return addr.getHostAddress() + ":" + addr.getHostName();
         } catch (UnknownHostException e) {
-            log.error("Unable to get local gangliaHost name: ", e);
+            LOG.error("Unable to get local gangliaHost name: ", e);
             return "unknown";
         }
     }
