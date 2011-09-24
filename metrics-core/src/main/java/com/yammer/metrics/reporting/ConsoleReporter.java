@@ -1,27 +1,30 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.*;
-import com.yammer.metrics.util.MetricPredicate;
-import com.yammer.metrics.util.Utils;
-
 import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.CounterMetric;
+import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.HistogramMetric;
+import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.Metered;
+import com.yammer.metrics.core.Metric;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.util.MetricPredicate;
+import com.yammer.metrics.util.Utils;
 
 /**
  * A simple reporters which prints out application metrics to a
  * {@link PrintStream} periodically.
  */
-public class ConsoleReporter implements Runnable {
-    private final ScheduledExecutorService tickThread;
-    private final MetricsRegistry metricsRegistry;
+public class ConsoleReporter extends AbstractReporter {
     private final PrintStream out;
     private final MetricPredicate predicate;
 
@@ -66,8 +69,7 @@ public class ConsoleReporter implements Runnable {
      * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be output
      */
     public ConsoleReporter(MetricsRegistry metricsRegistry, PrintStream out, MetricPredicate predicate) {
-        this.metricsRegistry = metricsRegistry;
-        this.tickThread = metricsRegistry.threadPools().newScheduledThreadPool(1, "console-reporter");
+        super(metricsRegistry, "console-reporter");
         this.out = out;
         this.predicate = predicate;
     }
