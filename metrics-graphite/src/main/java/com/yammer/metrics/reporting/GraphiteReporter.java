@@ -184,7 +184,7 @@ public class GraphiteReporter implements Runnable {
             printRegularMetrics(epoch);
             writer.flush();
         } catch (Exception e) {
-            log.error("Error:", e);
+            log.error("Error: {}", e.getMessage());
             if (writer != null) {
                 try {
                     writer.flush();
