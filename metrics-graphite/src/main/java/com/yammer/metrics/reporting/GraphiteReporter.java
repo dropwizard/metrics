@@ -25,7 +25,7 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.*;
  * <a href="http://graphite.wikidot.com/faq">Graphite</a> server periodically.
  */
 public class GraphiteReporter implements Runnable {
-    private static final Logger log = LoggerFactory.getLogger(GraphiteReporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GraphiteReporter.class);
     private final ScheduledExecutorService tickThread;
     private final MetricsRegistry metricsRegistry;
     private final String host;
@@ -108,7 +108,7 @@ public class GraphiteReporter implements Runnable {
             final GraphiteReporter reporter = new GraphiteReporter(metricsRegistry, host, port, prefix, predicate);
             reporter.start(period, unit);
         } catch (Exception e) {
-            log.error("Error creating/starting Graphite reporter:", e);
+            LOG.error("Error creating/starting Graphite reporter:", e);
         }
     }
 
@@ -182,16 +182,16 @@ public class GraphiteReporter implements Runnable {
             printRegularMetrics(epoch);
             writer.flush();
         } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error writing to Graphite", e);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Error writing to Graphite", e);
             } else {
-                log.warn("Error writing to Graphite: {}", e.getMessage());
+                LOG.warn("Error writing to Graphite: {}", e.getMessage());
             }
             if (writer != null) {
                 try {
                     writer.flush();
                 } catch (IOException e1) {
-                    log.error("Error while flushing writer:", e1);
+                    LOG.error("Error while flushing writer:", e1);
                 }
             }
         } finally {
@@ -199,7 +199,7 @@ public class GraphiteReporter implements Runnable {
                 try {
                     socket.close();
                 } catch (IOException e) {
-                    log.error("Error while closing socket:", e);
+                    LOG.error("Error while closing socket:", e);
                 }
             }
             writer = null;
@@ -225,7 +225,7 @@ public class GraphiteReporter implements Runnable {
                             printTimer((TimerMetric) metric, simpleName, epoch);
                         }
                     } catch (Exception ignored) {
-                        log.error("Error printing regular metrics:", ignored);
+                        LOG.error("Error printing regular metrics:", ignored);
                     }
                 }
             }
@@ -236,7 +236,7 @@ public class GraphiteReporter implements Runnable {
         try {
             writer.write(data);
         } catch (IOException e) {
-            log.error("Error sending to Graphite:", e);
+            LOG.error("Error sending to Graphite:", e);
         }
     }
 
