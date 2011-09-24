@@ -19,11 +19,20 @@ public class ThreadPools
     public ScheduledExecutorService newScheduledThreadPool(int poolSize, String name) {
         final ScheduledExecutorService existing = threadPools.get(name);
         if (existing == null) {
-            // We lock here because executors are expensive to create.
+            // We lock here because executors are expensive to create. So
+            // instead of just doing the usual putIfAbsent dance, we lock the
+            // damn thing, check to see if anyone else put a thread pool in
+            // there while we weren't watching.
             synchronized (threadPools) {
-                final ScheduledExecutorService service = Executors.newScheduledThreadPool(poolSize, new NamedThreadFactory(name));
-                threadPools.put(name, service);
-                return service;
+                final ScheduledExecutorService lastChance = threadPools.get(name);
+                if (lastChance == null) {
+                    final ScheduledExecutorService service =
+                            Executors.newScheduledThreadPool(poolSize, new NamedThreadFactory(name));
+                    threadPools.put(name, service);
+                    return service;
+                } else {
+                    return lastChance;
+                }
             }
         } else {
             return existing;
