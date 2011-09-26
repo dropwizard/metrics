@@ -304,7 +304,7 @@ public class JmxReporter extends AbstractReporter {
     private static JmxReporter INSTANCE;
     public static final void startDefault(MetricsRegistry defaultMetricsRegistry) {
         INSTANCE = new JmxReporter(defaultMetricsRegistry);
-        INSTANCE.start();
+        INSTANCE.start(1, TimeUnit.MINUTES);
     }
 
     public JmxReporter(MetricsRegistry metricsRegistry) {
@@ -313,8 +313,8 @@ public class JmxReporter extends AbstractReporter {
         this.server = ManagementFactory.getPlatformMBeanServer();
     }
 
-    public void start() {
-        tickThread.scheduleAtFixedRate(this, 0, 1, TimeUnit.MINUTES);
+    public void start(long period, TimeUnit unit) {
+        tickThread.scheduleAtFixedRate(this, 0, period, unit);
         // then schedule the tick thread every 100ms for the next second so
         // as to pick up the initialization of most metrics (in the first 1s of
         // the application lifecycle) w/o incurring a high penalty later on
