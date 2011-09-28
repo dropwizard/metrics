@@ -285,7 +285,7 @@ public class MetricsRegistry {
                                 TimeUnit unit) {
         final Metric existingMetric = metrics.get(metricName);
         if (existingMetric == null) {
-            final MeterMetric metric = MeterMetric.newMeter(newMeterTickThreadPool(), eventType, unit);
+            final MeterMetric metric = MeterMetric.newMeter(newMeterTickThreadPool(metricName), eventType, unit);
             final Metric justAddedMetric = metrics.putIfAbsent(metricName, metric);
             if (justAddedMetric == null) {
                 return metric;
@@ -345,7 +345,7 @@ public class MetricsRegistry {
                                 TimeUnit rateUnit) {
         final Metric existingMetric = metrics.get(metricName);
         if (existingMetric == null) {
-            final TimerMetric metric = new TimerMetric(newMeterTickThreadPool(), durationUnit, rateUnit);
+            final TimerMetric metric = new TimerMetric(newMeterTickThreadPool(metricName), durationUnit, rateUnit);
             final Metric justAddedMetric = metrics.putIfAbsent(metricName, metric);
             if (justAddedMetric == null) {
                 return metric;
@@ -367,8 +367,8 @@ public class MetricsRegistry {
         return threadPools;
     }
 
-    public ScheduledExecutorService newMeterTickThreadPool() {
-        return threadPools.newScheduledThreadPool(2, "meter-tick");
+    public ScheduledExecutorService newMeterTickThreadPool(MetricName metricName) {
+        return threadPools.newScheduledThreadPool(2, "meter-tick-" + metricName.getMBeanName());
     }
 
     /**
