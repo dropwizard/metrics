@@ -3,6 +3,7 @@ package com.yammer.metrics
 import collection.JavaConversions._
 import core.TimerMetric
 import java.util.concurrent.TimeUnit
+import java.io.File
 
 /**
  * A Scala façade class for {@link TimerMetric}.
@@ -103,4 +104,11 @@ class Timer(metric: TimerMetric) {
    * Returns the one-minute rate of timings.
    */
   def oneMinuteRate = metric.oneMinuteRate
+
+  /**
+   * Dumps the recoded values in the timer's sample to the given file.
+   */
+  def dump(output: File) {
+    metric.dump(output)
+  }
 }

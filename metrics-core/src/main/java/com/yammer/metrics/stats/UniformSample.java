@@ -1,5 +1,8 @@
 package com.yammer.metrics.stats;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -67,5 +70,18 @@ public class UniformSample implements Sample {
             copy.add(values.get(i));
         }
         return copy;
+    }
+
+    @Override
+    public void dump(File output) throws IOException {
+        final PrintWriter writer = new PrintWriter(output);
+        try {
+            final List<Long> values = values();
+            for (Long value : values) {
+                writer.printf("%d\n", value);
+            }
+        } finally {
+            writer.close();
+        }
     }
 }
