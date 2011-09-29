@@ -4,6 +4,8 @@ import com.yammer.metrics.stats.ExponentiallyDecayingSample;
 import com.yammer.metrics.stats.Sample;
 import com.yammer.metrics.stats.UniformSample;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -212,6 +214,16 @@ public class HistogramMetric implements Metric {
      */
     public List<Long> values() {
         return sample.values();
+    }
+
+    /**
+     * Writes the values of the histogram's sample to the given file.
+     *
+     * @param output the file to which the values will be written
+     * @throws IOException if there is an error writing the values
+     */
+    public void dump(File output) throws IOException {
+        sample.dump(output);
     }
 
     private double variance() {
