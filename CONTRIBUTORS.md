@@ -1,9 +1,12 @@
 Many Many Thanks To
 ===================
 
+* Brian Roberts (@flicken)
 * Bruce Mitchener (@waywardmonkeys)
 * Ciamac Moallemi (@ciamac)
 * Cliff Moon (@cliffmoon)
+* Drew Stephens (@dinomite)
+* François Beausoleil (@francois)
 * Gerolf Seitz (@seitz)
 * James Casey (@jamesc)
 * JD Maturen (@sku)
@@ -12,6 +15,7 @@ Many Many Thanks To
 * Kevin Clark (@kevinclark)
 * Mahesh Tiyyagura (@tmahesh)
 * Martin Traverso (@martint)
+* Matt Abrams (@abramsm)
 * Matt Ryall (@mattryall)
 * Matthew Gilliard (@mjg123)
 * Mårten Gustafson (@chids)
