@@ -350,6 +350,36 @@ public class Metrics {
     }
 
     /**
+     * Removes the metric with the given name.
+     *
+     * @param name the name of the metric
+     */
+    public static void removeMetric(MetricName name) {
+        DEFAULT_REGISTRY.removeMetric(name);
+    }
+
+    /**
+     * Removes the metric for the given class with the given name.
+     *
+     * @param klass the klass the metric is associated with
+     * @param name the name of the metric
+     */
+    public static void removeMetric(Class<?> klass, String name) {
+        DEFAULT_REGISTRY.removeMetric(klass, name);
+    }
+
+    /**
+     * Removes the metric for the given class with the given name and scope.
+     *
+     * @param klass the klass the metric is associated with
+     * @param name the name of the metric
+     * @param scope the scope of the metric
+     */
+    public static void removeMetric(Class<?> klass, String name, String scope) {
+        DEFAULT_REGISTRY.removeMetric(klass, name, scope);
+    }
+
+    /**
      * Enables the console reporter and causes it to print to STDOUT with the
      * specified period.
      *

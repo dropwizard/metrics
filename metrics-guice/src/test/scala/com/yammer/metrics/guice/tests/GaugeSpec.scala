@@ -1,7 +1,7 @@
 package com.yammer.metrics.guice.tests
 
-import com.codahale.simplespec.Spec
 import org.junit.Test
+import com.codahale.simplespec.Spec
 import com.yammer.metrics.guice.{InstrumentationModule, Gauge}
 import com.google.inject.Guice
 import com.yammer.metrics.core.{MetricsRegistry, GaugeMetric, MetricName}

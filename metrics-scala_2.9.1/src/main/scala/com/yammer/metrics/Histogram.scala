@@ -2,6 +2,7 @@ package com.yammer.metrics
 
 import collection.JavaConversions._
 import core.HistogramMetric
+import java.io.File
 
 /**
  * A Scala façade class for {@link HistogramMetric}.
@@ -63,4 +64,11 @@ class Histogram(metric: HistogramMetric) {
    * Returns an array of values at the given percentiles.
    */
   def percentiles(percentiles: Double*) = metric.percentiles(percentiles:_*)
+
+  /**
+   * Dumps the recoded values in the timer's sample to the given file.
+   */
+  def dump(output: File) {
+    metric.dump(output)
+  }
 }

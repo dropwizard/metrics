@@ -1,7 +1,7 @@
 package com.yammer.metrics.core.tests
 
-import com.codahale.simplespec.Spec
 import org.junit.Test
+import com.codahale.simplespec.Spec
 import com.yammer.metrics.core.GaugeMetric
 
 class GaugeMetricSpec extends Spec {

@@ -1,8 +1,8 @@
 package com.yammer.metrics.stats.tests
 
 import scala.collection.JavaConversions._
-import com.codahale.simplespec.Spec
 import org.junit.Test
+import com.codahale.simplespec.Spec
 import com.yammer.metrics.stats.UniformSample
 
 class UniformSampleSpec extends Spec {

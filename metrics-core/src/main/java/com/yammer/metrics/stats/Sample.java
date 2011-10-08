@@ -1,5 +1,7 @@
 package com.yammer.metrics.stats;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -31,4 +33,12 @@ public interface Sample {
      * @return a copy of the sample's values
      */
     List<Long> values();
+
+    /**
+     * Writes the values of the sample to the given file.
+     *
+     * @param output the file to which the values will be written
+     * @throws IOException if there is an error writing the values
+     */
+    void dump(File output) throws IOException;
 }

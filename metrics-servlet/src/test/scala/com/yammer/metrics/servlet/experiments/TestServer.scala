@@ -4,6 +4,7 @@ import org.eclipse.jetty.server.Server
 import com.yammer.metrics.Instrumented
 import org.eclipse.jetty.servlet.{ServletHolder, ServletContextHandler}
 import com.yammer.metrics.reporting.MetricsServlet
+import com.yammer.metrics.jetty.InstrumentedHandler
 
 object TestServer extends Instrumented {
   val counter1 = metrics.counter("wah", "doody")
@@ -20,7 +21,7 @@ object TestServer extends Instrumented {
     val holder = new ServletHolder(classOf[MetricsServlet])
     context.addServlet(holder, "/dingo/*")
 
-    server.setHandler(context)
+    server.setHandler(new InstrumentedHandler(context))
     server.start()
     server.join()
   }

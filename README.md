@@ -7,14 +7,14 @@ Requirements
 ------------
 
 * Java SE 6
-* Scala 2.8.1 or 2.9.0-1
+* Scala 2.8.1 or 2.9.0-1 or 2.9.1
 * Guice 3.0 (for `metrics-guice`)
 * Servlet API 2.5 (for `metrics-servlet`)
-* Jackson 1.8.5 (for `metrics-servlet`)
-* Jetty 7.4.5 (for `metrics-jetty`)
+* Jackson 1.9.0 (for `metrics-servlet`)
+* Jetty 7.5.2 (for `metrics-jetty`)
 * Log4J 1.2.16 (for `metrics-log4j`)
-* Logback 0.9.29 (for `metrics-logback`)
-* Ehcache 2.4.3 (for `metrics-ehcache`)
+* Logback 0.9.30 (for `metrics-logback`)
+* Ehcache 2.4.5 (for `metrics-ehcache`)
 
 
 How To Use
@@ -35,13 +35,13 @@ How To Use
   <dependency>
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-core</artifactId>
-    <version>2.0.0-BETA16</version>
+    <version>2.0.0-BETA17</version>
   </dependency>
   <!-- if you want the Scala façade library -->
   <dependency>
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-scala_${scala.version}</artifactId>
-    <version>2.0.0-BETA16</version>
+    <version>2.0.0-BETA17</version>
   </dependency>
 </dependencies>
 ```

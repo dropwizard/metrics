@@ -1,20 +1,33 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.*;
-
-import javax.management.*;
 import java.lang.management.ManagementFactory;
-import java.util.*;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
+
+import com.yammer.metrics.core.CounterMetric;
+import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.HistogramMetric;
+import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.Metered;
+import com.yammer.metrics.core.Metric;
+import com.yammer.metrics.core.MetricName;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.TimerMetric;
 
 /**
  * A reporter which exposes application metric as JMX MBeans.
  */
-public class JmxReporter implements Runnable {
-    private final ScheduledExecutorService tickThread;
-    private final MetricsRegistry metricsRegistry;
+public class JmxReporter extends AbstractReporter {
     private final Map<MetricName, MetricMBean> beans;
     private final MBeanServer server;
 
@@ -291,18 +304,17 @@ public class JmxReporter implements Runnable {
     private static JmxReporter INSTANCE;
     public static final void startDefault(MetricsRegistry defaultMetricsRegistry) {
         INSTANCE = new JmxReporter(defaultMetricsRegistry);
-        INSTANCE.start();
+        INSTANCE.start(1, TimeUnit.MINUTES);
     }
 
     public JmxReporter(MetricsRegistry metricsRegistry) {
-        this.tickThread = metricsRegistry.threadPools().newScheduledThreadPool(1, "jmx-reporter");
-        this.metricsRegistry = metricsRegistry;
+        super(metricsRegistry, "jmx-reporter");
         this.beans = new HashMap<MetricName, MetricMBean>(metricsRegistry.allMetrics().size());
         this.server = ManagementFactory.getPlatformMBeanServer();
     }
 
-    public void start() {
-        tickThread.scheduleAtFixedRate(this, 0, 1, TimeUnit.MINUTES);
+    public void start(long period, TimeUnit unit) {
+        tickThread.scheduleAtFixedRate(this, 0, period, unit);
         // then schedule the tick thread every 100ms for the next second so
         // as to pick up the initialization of most metrics (in the first 1s of
         // the application lifecycle) w/o incurring a high penalty later on
