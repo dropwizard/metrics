@@ -1,7 +1,7 @@
 package com.yammer.metrics.tests
 
-import com.codahale.simplespec.Spec
 import org.junit.Test
+import com.codahale.simplespec.Spec
 import com.yammer.metrics.core.TimerMetric
 import com.yammer.metrics.Timer
 import java.util.concurrent.TimeUnit

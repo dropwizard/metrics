@@ -1,8 +1,8 @@
 package com.yammer.metrics.core.tests
 
 import scala.collection.JavaConversions._
-import com.codahale.simplespec.Spec
 import org.junit.Test
+import com.codahale.simplespec.Spec
 import java.util.concurrent.{Callable, TimeUnit}
 import com.yammer.metrics.core.TimerMetric
 
