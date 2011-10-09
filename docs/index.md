@@ -8,8 +8,8 @@ your code is doing, allowing to you identify performance bottlenecks or
 regressions quickly and confidently.
 
 If you're all about the big picture, you can start reading about the
-[philosophy](philosophy.html) behind Metrics or get an [overview](overview.html)
+[philosophy](philosophy.html) behind Metrics or get an [overview](overview.md)
 of the Metrics project.
 
 If you'd rather dive into the code, you should read our
-[guide on getting started](getting-started.html) with Metrics.
+[guide on getting started](getting-started.md) with Metrics.
