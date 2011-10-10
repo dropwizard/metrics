@@ -19,7 +19,7 @@ import com.yammer.metrics.core.CounterMetric;
  * CounterMetric c = Metrics.newCounter(MyRunnable.class, "thread-deaths")
  * Thread.UncaughtExceptionHandler exHandler = new DeathRattleExceptionHandler(c)
  * Thread myThread = new Thread(myRunnable, "MyRunnable")
- * myThread.setExceptionHandler(exHandler)
+ * myThread.setUncaughtExceptionHandler(exHandler)
  * </pre>
  *
  * Setting the global default exception handler should be done first, like so:
@@ -27,7 +27,7 @@ import com.yammer.metrics.core.CounterMetric;
  * <pre>
  * CounterMetric c = Metrics.newCounter(MyMainClass.class, "unhandled-thread-deaths")
  * Thread.UncaughtExceptionHandler ohNoIDidntKnowAboutThis = new DeathRattleExceptionHandler(c)
- * Thread.setDefaultExceptionHandler(ohNoIDidntKnowAboutThis)
+ * Thread.setDefaultUncaughtExceptionHandler(ohNoIDidntKnowAboutThis)
  * </pre>
  */
 public class DeathRattleExceptionHandler implements Thread.UncaughtExceptionHandler {
