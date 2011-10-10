@@ -150,6 +150,7 @@ public class JmxReporter extends AbstractReporter {
         public double get98thPercentile();
         public double get99thPercentile();
         public double get999thPercentile();
+        public double get9999thPercentile();
         public List<?> values();
     }
 
@@ -223,6 +224,11 @@ public class JmxReporter extends AbstractReporter {
         }
 
         @Override
+        public double get9999thPercentile() {
+            return metric.percentiles(0.9999)[0];
+        }
+
+        @Override
         public List<?> values() {
             return metric.values();
         }
@@ -293,6 +299,11 @@ public class JmxReporter extends AbstractReporter {
         @Override
         public double get999thPercentile() {
             return metric.percentiles(0.999)[0];
+        }
+
+        @Override
+        public double get9999thPercentile() {
+            return metric.percentiles(0.9999)[0];
         }
 
         @Override

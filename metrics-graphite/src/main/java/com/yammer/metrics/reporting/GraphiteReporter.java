@@ -278,7 +278,7 @@ public class GraphiteReporter extends AbstractReporter {
 
     private void printHistogram(HistogramMetric histogram, String name, long epoch) {
         final String sanitizedName = sanitizeName(name);
-        final double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
+        final double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999, 0.9999);
         final StringBuilder lines = new StringBuilder();
         lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "min",           histogram.min(), epoch));
         lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "max",           histogram.max(), epoch));
@@ -290,6 +290,7 @@ public class GraphiteReporter extends AbstractReporter {
         lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "98percentile",  percentiles[3], epoch));
         lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "99percentile",  percentiles[4], epoch));
         lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "999percentile", percentiles[5], epoch));
+        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "9999percentile", percentiles[6], epoch));
 
         sendToGraphite(lines.toString());
     }
@@ -311,6 +312,7 @@ public class GraphiteReporter extends AbstractReporter {
         lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "98percentile",  percentiles[3], epoch));
         lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "99percentile",  percentiles[4], epoch));
         lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "999percentile", percentiles[5], epoch));
+        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "9999percentile", percentiles[6], epoch));
         sendToGraphite(lines.toString());
     }
 
