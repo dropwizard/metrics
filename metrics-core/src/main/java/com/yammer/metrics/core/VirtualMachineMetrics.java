@@ -201,12 +201,16 @@ public class VirtualMachineMetrics {
 
         final long[] allThreadIds = getThreadMXBean().getAllThreadIds();
         final ThreadInfo[] allThreads = getThreadMXBean().getThreadInfo(allThreadIds);
+        int liveCount = 0;
         for (ThreadInfo info : allThreads) {
-            final State state = info.getThreadState();
-            conditions.put(state, conditions.get(state) + 1);
+            if (info != null) {
+                final State state = info.getThreadState();
+                conditions.put(state, conditions.get(state) + 1);
+                liveCount++;
+            }
         }
         for (State state : new ArrayList<State>(conditions.keySet())) {
-            conditions.put(state, conditions.get(state) / allThreads.length);
+            conditions.put(state, conditions.get(state) / liveCount);
         }
 
         return conditions;
