@@ -3,6 +3,7 @@ package com.yammer.metrics.reporting;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +30,7 @@ import com.yammer.metrics.core.TimerMetric;
  */
 public class JmxReporter extends AbstractReporter {
     private final Map<MetricName, MetricMBean> beans;
+    private final List<ObjectName> registeredBeans = new LinkedList<ObjectName>();
     private final MBeanServer server;
 
     public static interface MetricMBean {
@@ -306,6 +308,12 @@ public class JmxReporter extends AbstractReporter {
         INSTANCE = new JmxReporter(defaultMetricsRegistry);
         INSTANCE.start(1, TimeUnit.MINUTES);
     }
+    
+    public static final void shutdownDefault(){
+    	if (INSTANCE!=null){
+    		INSTANCE.shutdown();
+    	}
+    }
 
     public JmxReporter(MetricsRegistry metricsRegistry) {
         super(metricsRegistry, "jmx-reporter");
@@ -353,6 +361,20 @@ public class JmxReporter extends AbstractReporter {
     private void registerBean(MetricName name, MetricMBean bean, ObjectName objectName) throws MBeanRegistrationException, InstanceAlreadyExistsException, NotCompliantMBeanException {
         beans.put(name, bean);
         server.registerMBean(bean, objectName);
+        registeredBeans.add(objectName);
+    }
+    
+    @Override
+    public void shutdown(){
+    	for (ObjectName name : registeredBeans){
+    	  try{
+    	    server.unregisterMBean(name);
+    	  }
+    	  catch(Exception ignored){
+    		
+    	  }
+    	}
+    	registeredBeans.clear();
     }
 
 }
