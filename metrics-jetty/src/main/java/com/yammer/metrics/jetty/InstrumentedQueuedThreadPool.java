@@ -6,13 +6,12 @@ import com.yammer.metrics.core.MetricsRegistry;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
-    public InstrumentedQueuedThreadPool(int maxThreads) {
-        this(Metrics.defaultRegistry(), maxThreads);
+    public InstrumentedQueuedThreadPool() {
+        this(Metrics.defaultRegistry());
     }
 
-    public InstrumentedQueuedThreadPool(MetricsRegistry registry,
-                                        int maxThreads) {
-        super(maxThreads);
+    public InstrumentedQueuedThreadPool(MetricsRegistry registry) {
+        super();
         registry.newGauge(QueuedThreadPool.class, "percent-idle", new GaugeMetric<Integer>() {
             @Override
             public Integer value() {
