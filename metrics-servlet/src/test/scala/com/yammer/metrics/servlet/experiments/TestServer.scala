@@ -4,7 +4,7 @@ import org.eclipse.jetty.server.Server
 import com.yammer.metrics.Instrumented
 import org.eclipse.jetty.servlet.{ServletHolder, ServletContextHandler}
 import com.yammer.metrics.reporting.MetricsServlet
-import com.yammer.metrics.jetty.InstrumentedHandler
+import com.yammer.metrics.jetty.{InstrumentedSelectChannelConnector, InstrumentedQueuedThreadPool, InstrumentedSocketConnector, InstrumentedHandler}
 
 object TestServer extends Instrumented {
   val counter1 = metrics.counter("wah", "doody")
@@ -14,7 +14,12 @@ object TestServer extends Instrumented {
   }
 
   def main(args: Array[String]) {
-    val server = new Server(8080)
+    val server = new Server()
+    val connector = new InstrumentedSelectChannelConnector(8080)
+    server.addConnector(connector)
+
+    val threadPool = new InstrumentedQueuedThreadPool(128)
+    server.setThreadPool(threadPool)
 
     val context = new ServletContextHandler
     context.setContextPath("/initial")
