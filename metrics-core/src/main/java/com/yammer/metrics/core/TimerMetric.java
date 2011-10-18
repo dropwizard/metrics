@@ -16,33 +16,6 @@ import java.util.concurrent.TimeUnit;
  * statistics, plus throughput statistics via {@link MeterMetric}.
  */
 public class TimerMetric implements Metered {
-    /**
-     * A timing context.
-     * 
-     * @see TimerMetric#time()
-     */
-    public static class Context {
-        private final TimerMetric timer;
-        private final long startTime;
-
-        /**
-         * Creates a new {@link Context} with the current time as its starting value and with the
-         * given {@link TimerMetric}.
-         *
-         * @param timer the {@link TimerMetric} to report the elapsed time to
-         */
-        protected Context(TimerMetric timer) {
-            this.timer = timer;
-            this.startTime = System.nanoTime();
-        }
-
-        /**
-         * Stops recording the elapsed time and updates the timer.
-         */
-        public void stop() {
-            timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
-        }
-    }
 
     private final TimeUnit durationUnit, rateUnit;
     private final MeterMetric meter;
@@ -155,12 +128,12 @@ public class TimerMetric implements Metered {
     }
 
     /**
-     * Returns a timing {@link Context}, which measures an elapsed time in nanoseconds.
+     * Returns a timing {@link TimerContext}, which measures an elapsed time in nanoseconds.
      *
-     * @return a new {@link Context}
+     * @return a new {@link TimerContext}
      */
-    public Context time() {
-        return new Context(this);
+    public TimerContext time() {
+        return new TimerContext(this);
     }
 
     @Override
