@@ -24,4 +24,11 @@ public abstract class AbstractReporter implements Runnable {
      * @param unit   the time unit of {@code period}
      */
     public abstract void start(long period, TimeUnit unit);
+    
+    /**
+     * Stops and cleans up reporter output
+     */
+    public void shutdown(){
+    	
+    }
 }
