@@ -18,7 +18,7 @@ object TestServer extends Instrumented {
     val connector = new InstrumentedSelectChannelConnector(8080)
     server.addConnector(connector)
 
-    val threadPool = new InstrumentedQueuedThreadPool(128)
+    val threadPool = new InstrumentedQueuedThreadPool()
     server.setThreadPool(threadPool)
 
     val context = new ServletContextHandler
