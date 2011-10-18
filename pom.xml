@@ -14,6 +14,7 @@
         <module>metrics-ehcache</module>
         <module>metrics-graphite</module>
         <module>metrics-guice</module>
+        <module>metrics-java7</module>
         <module>metrics-jetty</module>
         <module>metrics-log4j</module>
         <module>metrics-logback</module>
