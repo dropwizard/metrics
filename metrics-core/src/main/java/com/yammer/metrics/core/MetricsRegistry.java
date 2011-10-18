@@ -129,7 +129,8 @@ public class MetricsRegistry {
      * @param name  the name of the metric
      * @return a new {@link com.yammer.metrics.core.CounterMetric}
      */
-    public CounterMetric newCounter(Class<?> klass, String name) {
+    public CounterMetric newCounter(Class<?> klass,
+                                    String name) {
         return newCounter(klass, name, null);
     }
 
@@ -199,7 +200,8 @@ public class MetricsRegistry {
      * @param name the name of the metric
      * @return a new {@link HistogramMetric}
      */
-    public HistogramMetric newHistogram(Class<?> klass, String name) {
+    public HistogramMetric newHistogram(Class<?> klass,
+                                        String name) {
         return newHistogram(klass, name, false);
     }
 
@@ -377,7 +379,8 @@ public class MetricsRegistry {
      * @param klass the klass the metric is associated with
      * @param name the name of the metric
      */
-    public void removeMetric(Class<?> klass, String name) {
+    public void removeMetric(Class<?> klass,
+                             String name) {
         removeMetric(klass, name, null);
     }
 
@@ -388,7 +391,8 @@ public class MetricsRegistry {
      * @param name the name of the metric
      * @param scope the scope of the metric
      */
-    public void removeMetric(Class<?> klass, String name, String scope) {
+    public void removeMetric(Class<?> klass, String name,
+                             String scope) {
         removeMetric(new MetricName(klass, name, scope));
     }
 
