@@ -298,6 +298,19 @@ public class MetricsRegistry {
     }
 
     /**
+     * Creates a new {@link TimerMetric} and registers it under the given class and name, measuring
+     * elapsed time in milliseconds and invocations per second.
+     *
+     * @param klass        the class which owns the metric
+     * @param name         the name of the metric
+     * @return a new {@link TimerMetric}
+     */
+    public TimerMetric newTimer(Class<?> klass,
+                                String name) {
+        return newTimer(klass, name, null, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+    }
+
+    /**
      * Creates a new {@link TimerMetric} and registers it under the given
      * class and name.
      *
@@ -312,6 +325,21 @@ public class MetricsRegistry {
                                 TimeUnit durationUnit,
                                 TimeUnit rateUnit) {
         return newTimer(klass, name, null, durationUnit, rateUnit);
+    }
+
+    /**
+     * Creates a new {@link TimerMetric} and registers it under the given class, name, and scope,
+     * measuring elapsed time in milliseconds and invocations per second.
+     *
+     * @param klass        the class which owns the metric
+     * @param name         the name of the metric
+     * @param scope        the scope of the metric
+     * @return a new {@link TimerMetric}
+     */
+    public TimerMetric newTimer(Class<?> klass,
+                                String name,
+                                String scope) {
+        return newTimer(klass, name, scope, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
     }
 
     /**
