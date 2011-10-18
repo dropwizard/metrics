@@ -1,29 +1,11 @@
 package com.yammer.metrics.reporting;
 
+import com.yammer.metrics.core.*;
+
+import javax.management.*;
 import java.lang.management.ManagementFactory;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.NotCompliantMBeanException;
-import javax.management.ObjectName;
-
-import com.yammer.metrics.core.CounterMetric;
-import com.yammer.metrics.core.GaugeMetric;
-import com.yammer.metrics.core.HistogramMetric;
-import com.yammer.metrics.core.MeterMetric;
-import com.yammer.metrics.core.Metered;
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.TimerMetric;
 
 /**
  * A reporter which exposes application metric as JMX MBeans.
@@ -304,15 +286,15 @@ public class JmxReporter extends AbstractReporter {
     }
 
     private static JmxReporter INSTANCE;
-    public static final void startDefault(MetricsRegistry defaultMetricsRegistry) {
+    public static void startDefault(MetricsRegistry defaultMetricsRegistry) {
         INSTANCE = new JmxReporter(defaultMetricsRegistry);
         INSTANCE.start(1, TimeUnit.MINUTES);
     }
-    
-    public static final void shutdownDefault(){
-    	if (INSTANCE!=null){
-    		INSTANCE.shutdown();
-    	}
+
+    public static void shutdownDefault() {
+        if (INSTANCE != null) {
+            INSTANCE.shutdown();
+        }
     }
 
     public JmxReporter(MetricsRegistry metricsRegistry) {
@@ -363,18 +345,17 @@ public class JmxReporter extends AbstractReporter {
         server.registerMBean(bean, objectName);
         registeredBeans.add(objectName);
     }
-    
+
     @Override
-    public void shutdown(){
-    	for (ObjectName name : registeredBeans){
-    	  try{
-    	    server.unregisterMBean(name);
-    	  }
-    	  catch(Exception ignored){
-    		
-    	  }
-    	}
-    	registeredBeans.clear();
+    public void shutdown() {
+        for (ObjectName name : registeredBeans) {
+            try {
+                server.unregisterMBean(name);
+            } catch (Exception ignored) {
+
+            }
+        }
+        registeredBeans.clear();
     }
 
 }
