@@ -17,11 +17,10 @@ public class Metrics {
         JmxReporter.startDefault(DEFAULT_REGISTRY);
         // make sure we initialize this so it can monitor GC etc
         VirtualMachineMetrics.daemonThreadCount();
-        
-        Runtime.getRuntime().addShutdownHook(new Thread(){
-        	public void run(){
-        		JmxReporter.shutdownDefault();
-        	}
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                JmxReporter.shutdownDefault();
+            }
         });
     }}
 
