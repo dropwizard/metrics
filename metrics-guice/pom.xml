@@ -24,11 +24,5 @@
             <artifactId>guice</artifactId>
             <version>3.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.yammer.metrics</groupId>
-            <artifactId>metrics-scala_${scala.version}</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 </project>
