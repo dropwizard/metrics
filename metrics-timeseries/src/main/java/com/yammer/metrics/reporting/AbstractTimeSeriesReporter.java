@@ -22,24 +22,17 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.*;
  */
 abstract public class AbstractTimeSeriesReporter extends AbstractReporter {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractTimeSeriesReporter.class);
-    private final Locale locale = Locale.US;
-    protected final String host;
-    protected final int port;
-    protected final MetricPredicate predicate;
-    protected final String prefix;
-    protected Writer writer;
+    protected final Locale locale = Locale.US;
+    private final String host;
+    private final int port;
+    private final MetricPredicate predicate;
+    private Writer writer;
 
-    protected AbstractTimeSeriesReporter(MetricsRegistry metricsRegistry, String name, String host, int port, MetricPredicate predicate, String prefix) {
+    protected AbstractTimeSeriesReporter(MetricsRegistry metricsRegistry, String name, String host, int port, MetricPredicate predicate) {
         super(metricsRegistry, name);
         this.host = host;
         this.port = port;
         this.predicate = predicate;
-        if (prefix != null) {
-            // Pre-append the "." so that we don't need to make anything conditional later.
-            this.prefix = prefix + ".";
-        } else {
-            this.prefix = "";
-        }
     }
 
     /**
@@ -96,94 +89,104 @@ abstract public class AbstractTimeSeriesReporter extends AbstractReporter {
         }
     }
 
-    protected static String sanitizeName(String name) {
-      return name.replace(' ', '-');
+    private static String sanitizeName(String name) {
+        return name.replace(' ', '-');
     }
 
-    protected void printGauge(GaugeMetric<?> gauge, String name, long epoch) {
-        sendToWarehouse(String.format(locale, "%s%s.%s %s %d\n", prefix, sanitizeName(name), "value", gauge.value(), epoch));
+    abstract protected String formatDoubleField(String sanitizedName, long epoch, double value);
+
+    abstract protected String formatLongField(String sanitizedName, long epoch, long value);
+
+    abstract protected String formatGaugeField(String sanitizedName, long epoch, GaugeMetric<?> gauge);
+
+    private void printDoubleField(String unsanitaryName, long epoch, double value) {
+        sendToWarehouse(formatDoubleField(sanitizeName(unsanitaryName), epoch, value));
     }
 
-    protected void printCounter(CounterMetric counter, String name, long epoch) {
-        sendToWarehouse(String.format(locale, "%s%s.%s %d %d\n", prefix, sanitizeName(name), "count", counter.count(), epoch));
+    private void printLongField(String unsanitaryName, long epoch, long value) {
+        sendToWarehouse(formatLongField(sanitizeName(unsanitaryName), epoch, value));
     }
 
-    protected void printMetered(Metered meter, String name, long epoch) {
-        final String sanitizedName = sanitizeName(name);
-        final StringBuilder lines = new StringBuilder();
-        lines.append(String.format(locale, "%s%s.%s %d %d\n",    prefix, sanitizedName, "count",        meter.count(), epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "meanRate",     meter.meanRate(), epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "1MinuteRate",  meter.oneMinuteRate(), epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "5MinuteRate",  meter.fiveMinuteRate(), epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "15MinuteRate", meter.fifteenMinuteRate(), epoch));
-        sendToWarehouse(lines.toString());
+    private void printGauge(GaugeMetric<?> gauge, String sanitizedName, long epoch) {
+        sendToWarehouse(formatGaugeField(sanitizedName + ".value", epoch, gauge));
     }
 
-    protected void printHistogram(HistogramMetric histogram, String name, long epoch) {
-        final String sanitizedName = sanitizeName(name);
+    private void printCounter(CounterMetric counter, String sanitizedName, long epoch) {
+        sendToWarehouse(formatLongField(sanitizedName, epoch, counter.count()));
+    }
+
+    private void printHistogram(HistogramMetric histogram, String simpleName, long epoch) {
+        final String sanitizedName = sanitizeName(simpleName);
         final double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
         final StringBuilder lines = new StringBuilder();
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "min",           histogram.min(), epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "max",           histogram.max(), epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "mean",          histogram.mean(), epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "stddev",        histogram.stdDev(), epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "median",        percentiles[0], epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "75percentile",  percentiles[1], epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "95percentile",  percentiles[2], epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "98percentile",  percentiles[3], epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "99percentile",  percentiles[4], epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "999percentile", percentiles[5], epoch));
+        lines.append(formatDoubleField(sanitizedName + ".min", epoch, histogram.min()));
+        lines.append(formatDoubleField(sanitizedName + ".max", epoch, histogram.max()));
+        lines.append(formatDoubleField(sanitizedName + ".mean", epoch, histogram.mean()));
+        lines.append(formatDoubleField(sanitizedName + ".stddev", epoch, histogram.stdDev()));
+        lines.append(formatDoubleField(sanitizedName + ".median", epoch, percentiles[0]));
+        lines.append(formatDoubleField(sanitizedName + ".75percentile", epoch, percentiles[1]));
+        lines.append(formatDoubleField(sanitizedName + ".95percentile", epoch, percentiles[2]));
+        lines.append(formatDoubleField(sanitizedName + ".98percentile", epoch, percentiles[3]));
+        lines.append(formatDoubleField(sanitizedName + ".99percentile", epoch, percentiles[4]));
+        lines.append(formatDoubleField(sanitizedName + ".999percentile", epoch, percentiles[5]));
 
         sendToWarehouse(lines.toString());
     }
 
-    protected void printTimer(TimerMetric timer, String name, long epoch) {
-        printMetered(timer, name, epoch);
+    private void printTimer(TimerMetric timer, String simpleName, long epoch) {
+        printMetered(timer, simpleName, epoch);
 
-        final String sanitizedName = sanitizeName(name);
+        final String sanitizedName = sanitizeName(simpleName);
         final double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
 
         final StringBuilder lines = new StringBuilder();
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "min",           timer.min(), epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "max",           timer.max(), epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "mean",          timer.mean(), epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "stddev",        timer.stdDev(), epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "median",        percentiles[0], epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "75percentile",  percentiles[1], epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "95percentile",  percentiles[2], epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "98percentile",  percentiles[3], epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "99percentile",  percentiles[4], epoch));
-        lines.append(String.format(locale, "%s%s.%s %2.2f %d\n", prefix, sanitizedName, "999percentile", percentiles[5], epoch));
+        lines.append(formatDoubleField(sanitizedName + ".min", epoch, timer.min()));
+        lines.append(formatDoubleField(sanitizedName + ".max", epoch, timer.max()));
+        lines.append(formatDoubleField(sanitizedName + ".mean", epoch, timer.mean()));
+        lines.append(formatDoubleField(sanitizedName + ".stddev", epoch, timer.stdDev()));
+        lines.append(formatDoubleField(sanitizedName + ".median", epoch, percentiles[0]));
+        lines.append(formatDoubleField(sanitizedName + ".75percentile", epoch, percentiles[1]));
+        lines.append(formatDoubleField(sanitizedName + ".95percentile", epoch, percentiles[2]));
+        lines.append(formatDoubleField(sanitizedName + ".98percentile", epoch, percentiles[3]));
+        lines.append(formatDoubleField(sanitizedName + ".99percentile", epoch, percentiles[4]));
+        lines.append(formatDoubleField(sanitizedName + ".999percentile", epoch, percentiles[5]));
+
         sendToWarehouse(lines.toString());
     }
 
-    private void printDoubleField(String name, double value, long epoch) {
-        sendToWarehouse(String.format(locale, "%s%s %2.2f %d\n", prefix, sanitizeName(name), value, epoch));
+
+    private void printMetered(Metered meter, String simpleName, long epoch) {
+        final String sanitizedName = sanitizeName(simpleName);
+        final StringBuilder lines = new StringBuilder();
+
+        lines.append(formatLongField(sanitizedName + ".count", epoch, meter.count()));
+        lines.append(formatDoubleField(sanitizedName + ".meanRate", epoch, meter.meanRate()));
+        lines.append(formatDoubleField(sanitizedName + ".oneMinuteRate", epoch, meter.oneMinuteRate()));
+        lines.append(formatDoubleField(sanitizedName + ".fiveMinuteRate", epoch, meter.fiveMinuteRate()));
+        lines.append(formatDoubleField(sanitizedName + ".fifteenMinuteRate", epoch, meter.fifteenMinuteRate()));
+
+        sendToWarehouse(lines.toString());
     }
 
-    private void printLongField(String name, long value, long epoch) {
-        sendToWarehouse(String.format(locale, "%s%s %d %d\n", prefix, sanitizeName(name), value, epoch));
-    }
-
-    protected void printVmMetrics(long epoch) throws IOException {
-        printDoubleField("jvm.memory.heap_usage", heapUsage(), epoch);
-        printDoubleField("jvm.memory.non_heap_usage", nonHeapUsage(), epoch);
+    private void printVmMetrics(long epoch) throws IOException {
+        printDoubleField("jvm.memory.heap_usage", epoch, heapUsage());
+        printDoubleField("jvm.memory.non_heap_usage", epoch, nonHeapUsage());
         for (Map.Entry<String, Double> pool : memoryPoolUsage().entrySet()) {
-            printDoubleField("jvm.memory.memory_pool_usages." + pool.getKey(), pool.getValue(), epoch);
+            printDoubleField("jvm.memory.memory_pool_usages." + pool.getKey(), epoch, pool.getValue());
         }
 
-        printDoubleField("jvm.daemon_thread_count", daemonThreadCount(), epoch);
-        printDoubleField("jvm.thread_count", threadCount(), epoch);
-        printDoubleField("jvm.uptime", uptime(), epoch);
-        printDoubleField("jvm.fd_usage", fileDescriptorUsage(), epoch);
+        printDoubleField("jvm.daemon_thread_count", epoch, daemonThreadCount());
+        printDoubleField("jvm.thread_count", epoch, threadCount());
+        printDoubleField("jvm.uptime", epoch, uptime());
+        printDoubleField("jvm.fd_usage", epoch, fileDescriptorUsage());
 
         for (Map.Entry<Thread.State, Double> entry : threadStatePercentages().entrySet()) {
-            printDoubleField("jvm.thread-states." + entry.getKey().toString().toLowerCase(), entry.getValue(), epoch);
+            printDoubleField("jvm.thread-states." + entry.getKey().toString().toLowerCase(), epoch, entry.getValue());
         }
 
         for (Map.Entry<String, GarbageCollector> entry : garbageCollectors().entrySet()) {
-            printLongField("jvm.gc." + entry.getKey() + ".time", entry.getValue().getTime(TimeUnit.MILLISECONDS), epoch);
-            printLongField("jvm.gc." + entry.getKey() + ".runs", entry.getValue().getRuns(), epoch);
+            printLongField("jvm.gc." + entry.getKey() + ".time", epoch, entry.getValue().getTime(TimeUnit.MILLISECONDS));
+            printLongField("jvm.gc." + entry.getKey() + ".runs", epoch, entry.getValue().getRuns());
         }
     }
 

@@ -1,21 +1,24 @@
 package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.*;
+import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.util.MetricPredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
  * A simple reporter which sends out application metrics to a
- * <a href="http://graphite.wikidot.com/faq">Graphite</a> server periodically.
+ * <a href="http://opentsdb.net/overview.html">OpenTSDB</a> server periodically.
  */
-public class GraphiteReporter extends AbstractTimeSeriesReporter {
-    private static final Logger LOG = LoggerFactory.getLogger(GraphiteReporter.class);
-    protected final String prefix;
+public class OpenTSDBReporter extends AbstractTimeSeriesReporter {
+    private static final Logger LOG = LoggerFactory.getLogger(OpenTSDBReporter.class);
+    private final String tags;
 
     /**
      * Enables the graphite reporter to send data for the default metrics registry
@@ -41,7 +44,7 @@ public class GraphiteReporter extends AbstractTimeSeriesReporter {
      * @param port            the port number on which the graphite server is listening
      */
     public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port) {
-        enable(metricsRegistry, period, unit, host, port, null);
+        enable(metricsRegistry, period, unit, host, port, new ArrayList<String>());
     }
 
     /**
@@ -52,10 +55,10 @@ public class GraphiteReporter extends AbstractTimeSeriesReporter {
      * @param unit   the time unit of {@code period}
      * @param host   the host name of graphite server (carbon-cache agent)
      * @param port   the port number on which the graphite server is listening
-     * @param prefix the string which is prepended to all metric names
+     * @param tags   the list of key=value tags to associate with each TSD point
      */
-    public static void enable(long period, TimeUnit unit, String host, int port, String prefix) {
-        enable(Metrics.defaultRegistry(), period, unit, host, port, prefix);
+    public static void enable(long period, TimeUnit unit, String host, int port, List<String> tags) {
+        enable(Metrics.defaultRegistry(), period, unit, host, port, tags);
     }
 
     /**
@@ -67,10 +70,10 @@ public class GraphiteReporter extends AbstractTimeSeriesReporter {
      * @param unit            the time unit of {@code period}
      * @param host            the host name of graphite server (carbon-cache agent)
      * @param port            the port number on which the graphite server is listening
-     * @param prefix          the string which is prepended to all metric names
+     * @param tags            the list of key=value tags to associate with each TSD point
      */
-    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix) {
-        enable(metricsRegistry, period, unit, host, port, prefix, MetricPredicate.ALL);
+    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, List<String> tags) {
+        enable(metricsRegistry, period, unit, host, port, tags, MetricPredicate.ALL);
     }
 
     /**
@@ -82,79 +85,80 @@ public class GraphiteReporter extends AbstractTimeSeriesReporter {
      * @param unit            the time unit of {@code period}
      * @param host            the host name of graphite server (carbon-cache agent)
      * @param port            the port number on which the graphite server is listening
-     * @param prefix          the string which is prepended to all metric names
+     * @param tags            the list of key=value tags to associate with each TSD point
      * @param predicate       filters metrics to be reported
      */
-    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix, MetricPredicate predicate) {
+    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, List<String> tags, MetricPredicate predicate) {
         try {
-            final GraphiteReporter reporter = new GraphiteReporter(metricsRegistry, host, port, prefix, predicate);
+            final OpenTSDBReporter reporter = new OpenTSDBReporter(metricsRegistry, host, port, tags, predicate);
             reporter.start(period, unit);
         } catch (Exception e) {
-            LOG.error("Error creating/starting Graphite reporter:", e);
+            LOG.error("Error creating/starting OpenTSDBReporter reporter:", e);
         }
     }
 
     /**
-     * Creates a new {@link GraphiteReporter}.
+     * Creates a new {@link OpenTSDBReporter}.
      *
-     * @param host   is graphite server
-     * @param port   is port on which graphite server is running
-     * @param prefix is prepended to all names reported to graphite
+     * @param host is graphite server
+     * @param port is port on which graphite server is running
      *
-     * @throws IOException if there is an error connecting to the Graphite server
+     * @throws IOException if there is an error connecting to the OpenTSDBReporter server
      */
-    public GraphiteReporter(String host, int port, String prefix) throws IOException {
-        this(Metrics.defaultRegistry(), host, port, prefix);
+    public OpenTSDBReporter(String host, int port) throws IOException {
+        this(Metrics.defaultRegistry(), host, port, new ArrayList<String>());
     }
 
     /**
-     * Creates a new {@link GraphiteReporter}.
+     * Creates a new {@link OpenTSDBReporter}.
+     *
+     * @param host is graphite server
+     * @param port is port on which graphite server is running
+     * @param tags the list of key=value tags to associate with each TSD point
+     *
+     * @throws IOException if there is an error connecting to the OpenTSDBReporter server
+     */
+    public OpenTSDBReporter(String host, int port, List<String> tags) throws IOException {
+        this(Metrics.defaultRegistry(), host, port, tags);
+    }
+
+    /**
+     * Creates a new {@link OpenTSDBReporter}.
      *
      * @param metricsRegistry the metrics registry
      * @param host            is graphite server
      * @param port            is port on which graphite server is running
-     * @param prefix          is prepended to all names reported to graphite
+     * @param tags            the list of key=value tags to associate with each TSD point
      *
-     * @throws IOException if there is an error connecting to the Graphite server
+     * @throws IOException if there is an error connecting to the OpenTSDBReporter server
      */
-    public GraphiteReporter(MetricsRegistry metricsRegistry, String host, int port, String prefix) throws IOException {
-        this(metricsRegistry, host, port, prefix, MetricPredicate.ALL);
+    public OpenTSDBReporter(MetricsRegistry metricsRegistry, String host, int port, List<String> tags) throws IOException {
+        this(metricsRegistry, host, port, tags, MetricPredicate.ALL);
     }
 
-    /**
-     * Creates a new {@link GraphiteReporter}.
-     *
-     * @param metricsRegistry the metrics registry
-     * @param host            is graphite server
-     * @param port            is port on which graphite server is running
-     * @param prefix          is prepended to all names reported to graphite
-     * @param predicate       filters metrics to be reported
-     *
-     * @throws IOException if there is an error connecting to the Graphite server
-     */
-    public GraphiteReporter(MetricsRegistry metricsRegistry, String host, int port, String prefix, MetricPredicate predicate) throws IOException {
-        super(metricsRegistry, "graphite-reporter", host, port, predicate);
+    protected OpenTSDBReporter(MetricsRegistry metricsRegistry, String host, int port, List<String> tags, MetricPredicate predicate) {
+        super(metricsRegistry, "opentsdb-reporter", host, port, predicate);
 
-        if (prefix != null) {
-            // Pre-append the "." so that we don't need to make anything conditional later.
-            this.prefix = prefix + ".";
-        } else {
-            this.prefix = "";
+        final StringBuilder builder = new StringBuilder(tags.size());
+        for (String tagAndValue : tags) {
+            builder.append(tagAndValue);
         }
+
+        this.tags = builder.toString();
     }
 
     @Override
     protected String formatDoubleField(String sanitizedName, long epoch, double value) {
-        return String.format(locale, "%s%s %2.2f %d\n", prefix, sanitizedName, value, epoch);
+        return String.format(locale, "put %s %d %2.2f %s\n", sanitizedName, epoch, value, tags);
     }
 
     @Override
     protected String formatLongField(String sanitizedName, long epoch, long value) {
-        return String.format(locale, "%s%s %d %d\n", prefix, sanitizedName, value, epoch);
+        return String.format(locale, "put %s %d %d %s\n", sanitizedName, epoch, value, tags);
     }
 
     @Override
     protected String formatGaugeField(String sanitizedName, long epoch, GaugeMetric<?> gauge) {
-        return String.format(locale, "%s%s %s %d\n", prefix, sanitizedName, gauge.value(), epoch);
+        return String.format(locale, "put %s %d %s %s\n", sanitizedName, epoch, gauge.value(), tags);
     }
 }
