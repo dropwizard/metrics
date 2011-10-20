@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>com.yammer.metrics</groupId>
-    <artifactId>metrics-graphite</artifactId>
+    <artifactId>metrics-timeseries</artifactId>
 
     <dependencies>
         <dependency>

@@ -12,7 +12,7 @@
     <modules>
         <module>metrics-core</module>
         <module>metrics-ehcache</module>
-        <module>metrics-graphite</module>
+        <module>metrics-timeseries</module>
         <module>metrics-guice</module>
         <module>metrics-jetty</module>
         <module>metrics-log4j</module>
