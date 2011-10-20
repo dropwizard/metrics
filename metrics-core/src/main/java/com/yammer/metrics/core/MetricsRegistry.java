@@ -4,7 +4,9 @@ import com.yammer.metrics.core.HistogramMetric.SampleType;
 import com.yammer.metrics.util.ThreadPools;
 
 import javax.management.MalformedObjectNameException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -15,9 +17,21 @@ import java.util.concurrent.TimeUnit;
  * A registry of metric instances.
  */
 public class MetricsRegistry {
-    private final ConcurrentMap<MetricName, Metric> metrics = newMetricsMap();
 
+    private final ConcurrentMap<MetricName, Metric> metrics = newMetricsMap();
     private final ThreadPools threadPools = new ThreadPools();
+    private final List<MetricsRegistryListener> listeners = Collections.synchronizedList(new ArrayList<MetricsRegistryListener>());
+
+
+   /**
+    * Adds a {@link MetricsRegistryListener} to a collection of listeners that will be notified on
+    * metric creation.  Listeners will be notified in the order in which they are added.
+    *
+    * @param listener the listener that will be notified
+    */
+    public void addListener(MetricsRegistryListener listener) {
+      listeners.add(listener);
+    }
 
     /**
      * Given a new {@link com.yammer.metrics.core.GaugeMetric}, registers it
@@ -290,6 +304,7 @@ public class MetricsRegistry {
             final MeterMetric metric = MeterMetric.newMeter(newMeterTickThreadPool(), eventType, unit);
             final Metric justAddedMetric = metrics.putIfAbsent(metricName, metric);
             if (justAddedMetric == null) {
+                notify(metricName, metric);
                 return metric;
             }
             return (MeterMetric) justAddedMetric;
@@ -378,6 +393,7 @@ public class MetricsRegistry {
             final TimerMetric metric = new TimerMetric(newMeterTickThreadPool(), durationUnit, rateUnit);
             final Metric justAddedMetric = metrics.putIfAbsent(metricName, metric);
             if (justAddedMetric == null) {
+                notify(metricName, metric);
                 return metric;
             }
             return (TimerMetric) justAddedMetric;
@@ -456,10 +472,19 @@ public class MetricsRegistry {
         if (existingMetric == null) {
             final Metric justAddedMetric = metrics.putIfAbsent(name, metric);
             if (justAddedMetric == null) {
+                notify(name, metric);
                 return metric;
             }
             return (T) justAddedMetric;
         }
         return (T) existingMetric;
     }
+
+    private void notify(MetricName name, Metric metric) {
+      // clone the listeners for thread safety
+      for (MetricsRegistryListener listener : listeners.toArray(new MetricsRegistryListener[] {})) {
+        listener.newMetric(name, metric);
+      }
+    }
+
 }

@@ -19,7 +19,7 @@ public class JmxReporterProvider implements Provider<JmxReporter>
     @Override
     public JmxReporter get() {
         JmxReporter reporter = new JmxReporter(metricsRegistry);
-        reporter.start(1, TimeUnit.MINUTES);
+        reporter.start();
         return reporter;
     }
 }
