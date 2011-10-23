@@ -12,14 +12,15 @@
     <modules>
         <module>metrics-core</module>
         <module>metrics-ehcache</module>
+        <module>metrics-ganglia</module>
         <module>metrics-graphite</module>
         <module>metrics-guice</module>
+        <module>metrics-httpclient</module>
         <module>metrics-jetty</module>
         <module>metrics-log4j</module>
         <module>metrics-logback</module>
         <module>metrics-scala_2.9.1</module>
         <module>metrics-servlet</module>
-        <module>metrics-ganglia</module>
     </modules>
 
     <developers>
