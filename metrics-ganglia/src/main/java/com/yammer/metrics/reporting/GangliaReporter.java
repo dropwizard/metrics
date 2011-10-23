@@ -199,8 +199,8 @@ public class GangliaReporter extends AbstractReporter {
     private void sendToGanglia(String metricName, String metricType, String metricValue, String groupName, String units) {
         try {
             sendMetricData(metricType, metricName, metricValue, groupName, units);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Emitting metric " + metricName + ", type " + metricType + ", value " + metricValue + " for gangliaHost: " + gangliaHost + ":" + port);
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Emitting metric " + metricName + ", type " + metricType + ", value " + metricValue + " for gangliaHost: " + gangliaHost + ":" + port);
             }
         } catch (IOException e) {
             LOG.error("Error sending to ganglia:", e);
