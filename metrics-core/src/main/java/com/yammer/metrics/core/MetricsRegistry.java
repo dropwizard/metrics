@@ -4,10 +4,7 @@ import com.yammer.metrics.core.HistogramMetric.SampleType;
 import com.yammer.metrics.util.ThreadPools;
 
 import javax.management.MalformedObjectNameException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -20,7 +17,7 @@ public class MetricsRegistry {
 
     private final ConcurrentMap<MetricName, Metric> metrics = newMetricsMap();
     private final ThreadPools threadPools = new ThreadPools();
-    private final List<MetricsRegistryListener> listeners = Collections.synchronizedList(new ArrayList<MetricsRegistryListener>());
+    private final List<MetricsRegistryListener> listeners = new ArrayList<MetricsRegistryListener>();
 
 
    /**
@@ -30,7 +27,17 @@ public class MetricsRegistry {
     * @param listener the listener that will be notified
     */
     public void addListener(MetricsRegistryListener listener) {
-      listeners.add(listener);
+      /*
+       * If a listener is notified of an event immediately after it has been added to the list of listeners,
+       * there is the possibility it will be notified twice.  Synchronizing here prevents that, along with
+       * synchronization during listener notification.  This lock should be mostly uncontended.
+       */
+      synchronized(listeners) {
+        listeners.add(listener);
+        for (Map.Entry<MetricName, Metric> entry : metrics.entrySet()) {
+          listener.newMetric(entry.getKey(), entry.getValue());
+        }
+      }
     }
 
     /**
@@ -481,9 +488,10 @@ public class MetricsRegistry {
     }
 
     private void notify(MetricName name, Metric metric) {
-      // clone the listeners for thread safety
-      for (MetricsRegistryListener listener : listeners.toArray(new MetricsRegistryListener[] {})) {
-        listener.newMetric(name, metric);
+      synchronized(listeners) {
+        for (MetricsRegistryListener listener : listeners) {
+          listener.newMetric(name, metric);
+        }
       }
     }
 
