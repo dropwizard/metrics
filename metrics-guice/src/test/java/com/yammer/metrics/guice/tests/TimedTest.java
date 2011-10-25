@@ -4,6 +4,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.guice.InstrumentationModule;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -14,24 +16,26 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 public class TimedTest {
+
+	InstrumentedWithTimed instance;
+    MetricsRegistry registry;
+	
+	@Before
+	public void setup() {
+		Injector injector = Guice.createInjector(new InstrumentationModule());
+        instance = injector.getInstance(InstrumentedWithTimed.class);
+        registry = injector.getInstance(MetricsRegistry.class);
+	}
+	
     @Test
     public void aTimedAnnotatedMethod() throws Exception {
-        final Injector injector = Guice.createInjector(new InstrumentationModule());
-        final InstrumentedWithTimed instance = injector.getInstance(InstrumentedWithTimed.class);
-        final MetricsRegistry registry = injector.getInstance(MetricsRegistry.class);
-
+    	
         instance.doAThing();
 
         final Metric metric = registry.allMetrics().get(new MetricName(InstrumentedWithTimed.class,
                                                                        "things"));
 
-        assertThat("Guice creates a metric",
-                   metric,
-                   is(notNullValue()));
-
-        assertThat("Guice creates a timer",
-                   metric,
-                   is(instanceOf(TimerMetric.class)));
+        assertMetricSetup(metric);
 
         assertThat("Guice creates a timer which records invocation length",
                    ((TimerMetric) metric).count(),
@@ -45,4 +49,36 @@ public class TimedTest {
                    ((TimerMetric) metric).durationUnit(),
                    is(TimeUnit.MICROSECONDS));
     }
+
+    @Test
+    public void aTimedAnnotatedMethodWithDefaultScope() throws Exception {
+    	
+        instance.doAThing();
+
+        final Metric metric = registry.allMetrics().get(new MetricName(InstrumentedWithTimed.class,
+                                                                       "doAThingWithDefaultScope"));
+
+        assertMetricSetup(metric);
+    }
+
+    @Test
+    public void aTimedAnnotatedMethodWithProtectedScope() throws Exception {
+    	
+        instance.doAThing();
+
+        final Metric metric = registry.allMetrics().get(new MetricName(InstrumentedWithTimed.class,
+                                                                       "doAThingWithProtectedScope"));
+
+        assertMetricSetup(metric);
+    }
+
+	private void assertMetricSetup(final Metric metric) {
+		assertThat("Guice creates a metric",
+                   metric,
+                   is(notNullValue()));
+
+        assertThat("Guice creates a timer",
+                   metric,
+                   is(instanceOf(TimerMetric.class)));
+	}
 }
