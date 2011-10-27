@@ -27,5 +27,6 @@ public class InstrumentationModule extends AbstractModule {
         bindListener(Matchers.any(), new MeteredListener(metricsRegistry));
         bindListener(Matchers.any(), new TimedListener(metricsRegistry));
         bindListener(Matchers.any(), new GaugeListener(metricsRegistry));
+        bindListener(Matchers.any(), new ExceptionMeteredListener(metricsRegistry));
     }
 }
