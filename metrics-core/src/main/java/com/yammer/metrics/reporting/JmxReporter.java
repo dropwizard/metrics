@@ -366,15 +366,20 @@ public class JmxReporter extends AbstractReporter {
     
     @Override
     public void shutdown(){
-    	for (ObjectName name : registeredBeans){
-    	  try{
-    	    server.unregisterMBean(name);
-    	  }
-    	  catch(Exception ignored){
-    		
-    	  }
+    	try{
+    		super.shutdown();
     	}
-    	registeredBeans.clear();
+    	finally{
+    	  for (ObjectName name : registeredBeans){
+    	    try{
+    	      server.unregisterMBean(name);
+    	    }
+    	    catch(Exception ignored){
+    		
+    	    }
+    	  }
+    	  registeredBeans.clear();
+    	}
     }
 
 }

@@ -197,5 +197,5 @@ public class ConsoleReporter extends AbstractReporter {
                 return "d";
         }
         throw new IllegalArgumentException("Unrecognized TimeUnit: " + unit);
-    }
+    }    
 }

@@ -29,6 +29,11 @@ public abstract class AbstractReporter implements Runnable {
      * Stops and cleans up reporter output
      */
     public void shutdown(){
-    	
+    	this.tickThread.shutdown();
+    	try {
+			this.tickThread.awaitTermination(10, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			// ignored
+		}
     }
 }
