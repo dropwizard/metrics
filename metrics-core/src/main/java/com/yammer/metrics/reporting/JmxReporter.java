@@ -298,7 +298,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
 
     public JmxReporter(MetricsRegistry metricsRegistry) {
-        super(metricsRegistry, "jmx-reporter");
+        super(metricsRegistry);
         this.registeredBeans = new HashMap<MetricName, ObjectName>();
         this.server = ManagementFactory.getPlatformMBeanServer();
     }

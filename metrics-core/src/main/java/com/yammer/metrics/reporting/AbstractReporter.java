@@ -6,8 +6,8 @@ public abstract class AbstractReporter {
 
     protected final MetricsRegistry metricsRegistry;
 
-    protected AbstractReporter(MetricsRegistry metricsRegistry, String name) {
-        this.metricsRegistry = metricsRegistry;
+    protected AbstractReporter(MetricsRegistry registry) {
+        this.metricsRegistry = registry;
     }
 
     /**
