@@ -10,9 +10,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * A reporter which exposes application metric as JMX MBeans.
  */
-public class JmxReporter extends AbstractReporter {
-    private final Map<MetricName, MetricMBean> beans;
-    private final List<ObjectName> registeredBeans = new LinkedList<ObjectName>();
+public class JmxReporter extends AbstractReporter implements MetricsRegistryListener {
+
+    private final Map<MetricName, ObjectName> registeredBeans;
     private final MBeanServer server;
 
     public static interface MetricMBean {
@@ -288,7 +288,7 @@ public class JmxReporter extends AbstractReporter {
     private static JmxReporter INSTANCE;
     public static void startDefault(MetricsRegistry defaultMetricsRegistry) {
         INSTANCE = new JmxReporter(defaultMetricsRegistry);
-        INSTANCE.start(1, TimeUnit.MINUTES);
+        INSTANCE.start();
     }
 
     public static void shutdownDefault() {
@@ -299,56 +299,55 @@ public class JmxReporter extends AbstractReporter {
 
     public JmxReporter(MetricsRegistry metricsRegistry) {
         super(metricsRegistry, "jmx-reporter");
-        this.beans = new HashMap<MetricName, MetricMBean>(metricsRegistry.allMetrics().size());
+        this.registeredBeans = new HashMap<MetricName, ObjectName>();
         this.server = ManagementFactory.getPlatformMBeanServer();
     }
 
-    public void start(long period, TimeUnit unit) {
-        tickThread.scheduleAtFixedRate(this, 0, period, unit);
-        // then schedule the tick thread every 100ms for the next second so
-        // as to pick up the initialization of most metrics (in the first 1s of
-        // the application lifecycle) w/o incurring a high penalty later on
-        for (int i = 1; i <= 9; i++) {
-            tickThread.schedule(this, i * 100, TimeUnit.MILLISECONDS);
-        }
-    }
-
     @Override
-    public void run() {
-        final Set<MetricName> newMetrics = new HashSet<MetricName>(metricsRegistry.allMetrics().keySet());
-        newMetrics.removeAll(beans.keySet());
-
-        for (MetricName name : newMetrics) {
-            final Metric metric = metricsRegistry.allMetrics().get(name);
-            if (metric != null) {
-                try {
-                    final ObjectName objectName = new ObjectName(name.getMBeanName());
-                    if (metric instanceof GaugeMetric) {
-                        registerBean(name, new Gauge((GaugeMetric<?>) metric, objectName), objectName);
-                    } else if (metric instanceof CounterMetric) {
-                        registerBean(name, new Counter((CounterMetric) metric, objectName), objectName);
-                    } else if (metric instanceof HistogramMetric) {
-                        registerBean(name, new Histogram((HistogramMetric) metric, objectName), objectName);
-                    } else if (metric instanceof MeterMetric) {
-                        registerBean(name, new Meter((MeterMetric) metric, objectName), objectName);
-                    } else if (metric instanceof TimerMetric) {
-                        registerBean(name, new Timer((TimerMetric) metric, objectName), objectName);
-                    }
-                } catch (Exception ignored) {
+    public void metricAdded(MetricName name, Metric metric) {
+        if (metric != null) {
+            try {
+                final ObjectName objectName = new ObjectName(name.getMBeanName());
+                if (metric instanceof GaugeMetric) {
+                    registerBean(name, new Gauge((GaugeMetric<?>) metric, objectName), objectName);
+                } else if (metric instanceof CounterMetric) {
+                    registerBean(name, new Counter((CounterMetric) metric, objectName), objectName);
+                } else if (metric instanceof HistogramMetric) {
+                    registerBean(name, new Histogram((HistogramMetric) metric, objectName), objectName);
+                } else if (metric instanceof MeterMetric) {
+                    registerBean(name, new Meter((MeterMetric) metric, objectName), objectName);
+                } else if (metric instanceof TimerMetric) {
+                    registerBean(name, new Timer((TimerMetric) metric, objectName), objectName);
                 }
+            } catch (Exception ignored) {
             }
         }
     }
 
+    @Override
+    public void metricRemoved(MetricName name, Metric metric) {
+        ObjectName objectName = registeredBeans.remove(name);
+        if (objectName != null) {
+            try {
+                server.unregisterMBean(objectName);
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    public final void start() {
+        metricsRegistry.addListener(this);
+    }
+
     private void registerBean(MetricName name, MetricMBean bean, ObjectName objectName) throws MBeanRegistrationException, InstanceAlreadyExistsException, NotCompliantMBeanException {
-        beans.put(name, bean);
         server.registerMBean(bean, objectName);
-        registeredBeans.add(objectName);
+        registeredBeans.put(name, objectName);
     }
 
     @Override
     public void shutdown() {
-        for (ObjectName name : registeredBeans) {
+        metricsRegistry.removeListener(this);
+        for (ObjectName name : registeredBeans.values()) {
             try {
                 server.unregisterMBean(name);
             } catch (Exception ignored) {

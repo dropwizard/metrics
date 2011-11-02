@@ -4,20 +4,17 @@ import com.yammer.metrics.core.HistogramMetric.SampleType;
 import com.yammer.metrics.util.ThreadPools;
 
 import javax.management.MalformedObjectNameException;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * A registry of metric instances.
  */
 public class MetricsRegistry {
-    private final ConcurrentMap<MetricName, Metric> metrics = newMetricsMap();
 
+    private final ConcurrentMap<MetricName, Metric> metrics = newMetricsMap();
     private final ThreadPools threadPools = new ThreadPools();
+    private final List<MetricsRegistryListener> listeners = new CopyOnWriteArrayList<MetricsRegistryListener>();
 
     /**
      * Given a new {@link com.yammer.metrics.core.GaugeMetric}, registers it
@@ -231,7 +228,7 @@ public class MetricsRegistry {
     public HistogramMetric newHistogram(MetricName metricName,
                                         boolean biased) {
         return getOrAdd(metricName,
-                new HistogramMetric(biased ? SampleType.BIASED : SampleType.UNIFORM));
+            new HistogramMetric(biased ? SampleType.BIASED : SampleType.UNIFORM));
     }
 
     /**
@@ -290,6 +287,7 @@ public class MetricsRegistry {
             final MeterMetric metric = MeterMetric.newMeter(newMeterTickThreadPool(), eventType, unit);
             final Metric justAddedMetric = metrics.putIfAbsent(metricName, metric);
             if (justAddedMetric == null) {
+                notifyMetricAdded(metricName, metric);
                 return metric;
             }
             return (MeterMetric) justAddedMetric;
@@ -378,6 +376,7 @@ public class MetricsRegistry {
             final TimerMetric metric = new TimerMetric(newMeterTickThreadPool(), durationUnit, rateUnit);
             final Metric justAddedMetric = metrics.putIfAbsent(metricName, metric);
             if (justAddedMetric == null) {
+                notifyMetricAdded(metricName, metric);
                 return metric;
             }
             return (TimerMetric) justAddedMetric;
@@ -437,6 +436,7 @@ public class MetricsRegistry {
             } else if (metric instanceof TimerMetric) {
                 ((TimerMetric) metric).stop();
             }
+            notifyMetricRemoved(name, metric);
         }
     }
 
@@ -456,10 +456,43 @@ public class MetricsRegistry {
         if (existingMetric == null) {
             final Metric justAddedMetric = metrics.putIfAbsent(name, metric);
             if (justAddedMetric == null) {
+                notifyMetricAdded(name, metric);
                 return metric;
             }
             return (T) justAddedMetric;
         }
         return (T) existingMetric;
     }
+
+    /**
+     * Adds a {@link MetricsRegistryListener} to a collection of listeners that will be notified on
+     * metric creation.  Listeners will be notified in the order in which they are added.
+     *
+     * @param listener the listener that will be notified
+     */
+    public void addListener(MetricsRegistryListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * Removes a {@link MetricsRegistryListener} from this registry's collection of listeners.
+     *
+     * @param listener the listener that will be removed
+     */
+    public void removeListener(MetricsRegistryListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void notifyMetricRemoved(MetricName name, Metric metric) {
+        for (MetricsRegistryListener listener : listeners) {
+            listener.metricRemoved(name, metric);
+        }
+    }
+
+    private void notifyMetricAdded(MetricName name, Metric metric) {
+        for (MetricsRegistryListener listener : listeners) {
+            listener.metricAdded(name, metric);
+        }
+    }
+
 }
