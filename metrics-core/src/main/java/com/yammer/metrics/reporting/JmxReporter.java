@@ -304,7 +304,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
 
     @Override
-    public void metricAdded(MetricName name, Metric metric) {
+    public void onMetricAdded(MetricName name, Metric metric) {
         if (metric != null) {
             try {
                 final ObjectName objectName = new ObjectName(name.getMBeanName());
@@ -325,7 +325,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
 
     @Override
-    public void metricRemoved(MetricName name, Metric metric) {
+    public void onMetricRemoved(MetricName name) {
         ObjectName objectName = registeredBeans.remove(name);
         if (objectName != null) {
             try {
