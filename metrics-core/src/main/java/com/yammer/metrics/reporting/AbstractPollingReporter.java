@@ -8,8 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractPollingReporter extends AbstractReporter implements Runnable {
   private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-  private long pollingTime;
-  private TimeUnit pollingTimeUnit;
 
   protected AbstractPollingReporter(MetricsRegistry metricsRegistry, String name) {
     super(metricsRegistry, name);

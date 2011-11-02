@@ -14,22 +14,7 @@ public class MetricsRegistry {
 
     private final ConcurrentMap<MetricName, Metric> metrics = newMetricsMap();
     private final ThreadPools threadPools = new ThreadPools();
-    private final List<MetricsRegistryListener> listeners = Collections.synchronizedList(new ArrayList<MetricsRegistryListener>());
-    private final ConcurrentMap<MetricsRegistryListener, ConcurrentMap<Metric, Boolean>> registeredMetrics = new ConcurrentHashMap<MetricsRegistryListener, ConcurrentMap<Metric, Boolean>>();
-
-
-   /**
-    * Adds a {@link MetricsRegistryListener} to a collection of listeners that will be notified on
-    * metric creation.  Listeners will be notified in the order in which they are added.
-    *
-    * @param listener the listener that will be notified
-    */
-    public void addListener(MetricsRegistryListener listener) {
-      listeners.add(listener);
-      for (Map.Entry<MetricName, Metric> entry : metrics.entrySet()) {
-        notify(entry.getKey(), entry.getValue());
-      }
-    }
+    private final List<MetricsRegistryListener> listeners = new CopyOnWriteArrayList<MetricsRegistryListener>();
 
     /**
      * Given a new {@link com.yammer.metrics.core.GaugeMetric}, registers it
@@ -243,7 +228,7 @@ public class MetricsRegistry {
     public HistogramMetric newHistogram(MetricName metricName,
                                         boolean biased) {
         return getOrAdd(metricName,
-                new HistogramMetric(biased ? SampleType.BIASED : SampleType.UNIFORM));
+            new HistogramMetric(biased ? SampleType.BIASED : SampleType.UNIFORM));
     }
 
     /**
@@ -302,7 +287,7 @@ public class MetricsRegistry {
             final MeterMetric metric = MeterMetric.newMeter(newMeterTickThreadPool(), eventType, unit);
             final Metric justAddedMetric = metrics.putIfAbsent(metricName, metric);
             if (justAddedMetric == null) {
-                notify(metricName, metric);
+                notifyMetricAdded(metricName, metric);
                 return metric;
             }
             return (MeterMetric) justAddedMetric;
@@ -391,7 +376,7 @@ public class MetricsRegistry {
             final TimerMetric metric = new TimerMetric(newMeterTickThreadPool(), durationUnit, rateUnit);
             final Metric justAddedMetric = metrics.putIfAbsent(metricName, metric);
             if (justAddedMetric == null) {
-                notify(metricName, metric);
+                notifyMetricAdded(metricName, metric);
                 return metric;
             }
             return (TimerMetric) justAddedMetric;
@@ -451,6 +436,7 @@ public class MetricsRegistry {
             } else if (metric instanceof TimerMetric) {
                 ((TimerMetric) metric).stop();
             }
+            notifyMetricRemoved(name, metric);
         }
     }
 
@@ -470,7 +456,7 @@ public class MetricsRegistry {
         if (existingMetric == null) {
             final Metric justAddedMetric = metrics.putIfAbsent(name, metric);
             if (justAddedMetric == null) {
-                notify(name, metric);
+                notifyMetricAdded(name, metric);
                 return metric;
             }
             return (T) justAddedMetric;
@@ -478,27 +464,35 @@ public class MetricsRegistry {
         return (T) existingMetric;
     }
 
-    private void notify(MetricName name, Metric metric) {
-      boolean dummyValue = true;
-      for (MetricsRegistryListener listener : listeners.toArray(new MetricsRegistryListener[]{})) {
-        ConcurrentMap<Metric, Boolean> listenerMetrics = getRegisteredMetricsForListener(listener);
-        if (listenerMetrics.putIfAbsent(metric, dummyValue) == null) {
-          // it did not exist before
-          listener.newMetric(name, metric);
-        }
-      }
+    /**
+     * Adds a {@link MetricsRegistryListener} to a collection of listeners that will be notified on
+     * metric creation.  Listeners will be notified in the order in which they are added.
+     *
+     * @param listener the listener that will be notified
+     */
+    public void addListener(MetricsRegistryListener listener) {
+        listeners.add(listener);
     }
 
-    private ConcurrentMap<Metric, Boolean> getRegisteredMetricsForListener(MetricsRegistryListener listener) {
-      ConcurrentMap<Metric, Boolean> listenerMetrics = registeredMetrics.get(listener);
-      if (listenerMetrics == null) {
-        listenerMetrics = new ConcurrentHashMap<Metric, Boolean>();
-        ConcurrentMap<Metric, Boolean> previousMetrics = registeredMetrics.putIfAbsent(listener, listenerMetrics);
-        if (previousMetrics != null) {
-          listenerMetrics = previousMetrics;
+    /**
+     * Removes a {@link MetricsRegistryListener} from this registry's collection of listeners.
+     *
+     * @param listener the listener that will be removed
+     */
+    public void removeListener(MetricsRegistryListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void notifyMetricRemoved(MetricName name, Metric metric) {
+        for (MetricsRegistryListener listener : listeners) {
+            listener.metricRemoved(name, metric);
         }
-      }
-      return listenerMetrics;
+    }
+
+    private void notifyMetricAdded(MetricName name, Metric metric) {
+        for (MetricsRegistryListener listener : listeners) {
+            listener.metricAdded(name, metric);
+        }
     }
 
 }
