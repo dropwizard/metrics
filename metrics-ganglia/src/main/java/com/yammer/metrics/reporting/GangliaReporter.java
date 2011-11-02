@@ -51,6 +51,7 @@ public class GangliaReporter extends AbstractPollingReporter {
     private int offset;
     private DatagramSocket socket;
     private String hostLabel;
+    private String groupPrefix = "";
 
 
     /**
@@ -63,8 +64,23 @@ public class GangliaReporter extends AbstractPollingReporter {
      * @param port        the port number on which the ganglia server is listening
      */
     public static void enable(long period, TimeUnit unit, String gangliaHost, int port) {
-        enable(Metrics.defaultRegistry(), period, unit, gangliaHost, port);
+        enable(Metrics.defaultRegistry(), period, unit, gangliaHost, port, "");
     }
+
+    /**
+     * Enables the ganglia reporter to send data for the default metrics registry
+     * to ganglia server with the specified period.
+     *
+     * @param period      the period between successive outputs
+     * @param unit        the time unit of {@code period}
+     * @param gangliaHost the gangliaHost name of ganglia server (carbon-cache agent)
+     * @param port        the port number on which the ganglia server is listening
+     * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
+     */
+    public static void enable(long period, TimeUnit unit, String gangliaHost, int port, String groupPrefix) {
+        enable(Metrics.defaultRegistry(), period, unit, gangliaHost, port, groupPrefix);
+    }
+
 
     /**
      * Enables the ganglia reporter to send data for the given metrics registry
@@ -75,9 +91,10 @@ public class GangliaReporter extends AbstractPollingReporter {
      * @param unit            the time unit of {@code period}
      * @param gangliaHost     the gangliaHost name of ganglia server (carbon-cache agent)
      * @param port            the port number on which the ganglia server is listening
+     * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
      */
-    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String gangliaHost, int port) {
-        enable(metricsRegistry, period, unit, gangliaHost, port, MetricPredicate.ALL);
+    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String gangliaHost, int port, String groupPrefix) {
+        enable(metricsRegistry, period, unit, gangliaHost, port, groupPrefix, MetricPredicate.ALL);
     }
 
     /**
@@ -89,11 +106,12 @@ public class GangliaReporter extends AbstractPollingReporter {
      * @param unit            the time unit of {@code period}
      * @param gangliaHost     the gangliaHost name of ganglia server (carbon-cache agent)
      * @param port            the port number on which the ganglia server is listening
+     * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
      * @param predicate       filters metrics to be reported
      */
-    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String gangliaHost, int port, MetricPredicate predicate) {
+    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String gangliaHost, int port, String groupPrefix, MetricPredicate predicate) {
         try {
-            final GangliaReporter reporter = new GangliaReporter(metricsRegistry, gangliaHost, port, predicate);
+            final GangliaReporter reporter = new GangliaReporter(metricsRegistry, gangliaHost, port, groupPrefix, predicate);
             reporter.start(period, unit);
         } catch (Exception e) {
             LOG.error("Error creating/starting ganglia reporter:", e);
@@ -108,7 +126,7 @@ public class GangliaReporter extends AbstractPollingReporter {
      * @throws java.io.IOException if there is an error connecting to the ganglia server
      */
     public GangliaReporter(String gangliaHost, int port) throws IOException {
-        this(Metrics.defaultRegistry(), gangliaHost, port);
+        this(Metrics.defaultRegistry(), gangliaHost, port, "");
     }
 
     /**
@@ -117,10 +135,11 @@ public class GangliaReporter extends AbstractPollingReporter {
      * @param metricsRegistry the metrics registry
      * @param gangliaHost     is ganglia server
      * @param port            is port on which ganglia server is running
+     * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
      * @throws java.io.IOException if there is an error connecting to the ganglia server
      */
-    public GangliaReporter(MetricsRegistry metricsRegistry, String gangliaHost, int port) throws IOException {
-        this(metricsRegistry, gangliaHost, port, MetricPredicate.ALL);
+    public GangliaReporter(MetricsRegistry metricsRegistry, String gangliaHost, int port, String groupPrefix) throws IOException {
+        this(metricsRegistry, gangliaHost, port, groupPrefix, MetricPredicate.ALL);
     }
 
     /**
@@ -129,13 +148,15 @@ public class GangliaReporter extends AbstractPollingReporter {
      * @param metricsRegistry the metrics registry
      * @param gangliaHost     is ganglia server
      * @param port            is port on which ganglia server is running
+     * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
      * @param predicate       filters metrics to be reported
      * @throws java.io.IOException if there is an error connecting to the ganglia server
      */
-    public GangliaReporter(MetricsRegistry metricsRegistry, String gangliaHost, int port, MetricPredicate predicate) throws IOException {
+    public GangliaReporter(MetricsRegistry metricsRegistry, String gangliaHost, int port, String groupPrefix, MetricPredicate predicate) throws IOException {
         super(metricsRegistry, "ganglia-reporter");
         this.gangliaHost = gangliaHost;
         this.port = port;
+        this.groupPrefix = groupPrefix + "_";
         this.hostLabel = getHostLabel();
         this.predicate = predicate;
         socket = new DatagramSocket();
@@ -176,7 +197,7 @@ public class GangliaReporter extends AbstractPollingReporter {
 
     private void sendToGanglia(String metricName, String metricType, String metricValue, String groupName, String units) {
         try {
-            sendMetricData(metricType, metricName, metricValue, groupName, units);
+            sendMetricData(metricType, metricName, metricValue, groupPrefix + groupName, units);
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Emitting metric " + metricName + ", type " + metricType + ", value " + metricValue + " for gangliaHost: " + gangliaHost + ":" + port);
             }
