@@ -11,10 +11,10 @@ import java.util.concurrent.*;
  * A registry of metric instances.
  */
 public class MetricsRegistry {
-
     private final ConcurrentMap<MetricName, Metric> metrics = newMetricsMap();
     private final ThreadPools threadPools = new ThreadPools();
-    private final List<MetricsRegistryListener> listeners = new CopyOnWriteArrayList<MetricsRegistryListener>();
+    private final List<MetricsRegistryListener> listeners =
+            new CopyOnWriteArrayList<MetricsRegistryListener>();
 
     /**
      * Given a new {@link com.yammer.metrics.core.GaugeMetric}, registers it
@@ -228,7 +228,7 @@ public class MetricsRegistry {
     public HistogramMetric newHistogram(MetricName metricName,
                                         boolean biased) {
         return getOrAdd(metricName,
-            new HistogramMetric(biased ? SampleType.BIASED : SampleType.UNIFORM));
+                        new HistogramMetric(biased ? SampleType.BIASED : SampleType.UNIFORM));
     }
 
     /**
