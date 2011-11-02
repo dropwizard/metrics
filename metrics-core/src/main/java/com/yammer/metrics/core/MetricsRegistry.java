@@ -436,7 +436,7 @@ public class MetricsRegistry {
             } else if (metric instanceof TimerMetric) {
                 ((TimerMetric) metric).stop();
             }
-            notifyMetricRemoved(name, metric);
+            notifyMetricRemoved(name);
         }
     }
 
@@ -483,16 +483,15 @@ public class MetricsRegistry {
         listeners.remove(listener);
     }
 
-    private void notifyMetricRemoved(MetricName name, Metric metric) {
+    private void notifyMetricRemoved(MetricName name) {
         for (MetricsRegistryListener listener : listeners) {
-            listener.metricRemoved(name, metric);
+            listener.onMetricRemoved(name);
         }
     }
 
     private void notifyMetricAdded(MetricName name, Metric metric) {
         for (MetricsRegistryListener listener : listeners) {
-            listener.metricAdded(name, metric);
+            listener.onMetricAdded(name, metric);
         }
     }
-
 }
