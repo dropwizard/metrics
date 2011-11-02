@@ -52,18 +52,15 @@ public class CsvReporter extends AbstractReporter {
 				stream = new PrintStream(new FileOutputStream(newFile));
 				_streamMap.put(metricName, stream);
 				if (metric instanceof GaugeMetric<?>) {
-					stream.println("# GaugeMetric");
+					stream.println("# time,value");
 				} else if (metric instanceof CounterMetric) {
-					stream.println("# CounterMetric");
+					stream.println("# time,count");
 				} else if (metric instanceof HistogramMetric) {
-					stream.println("# HistogramMetric");
-					stream.println("# min,max,mean,median,stddev,90%,95%,99%");
+					stream.println("# time,min,max,mean,median,stddev,90%,95%,99%");
 				} else if (metric instanceof MeterMetric) {
-					stream.println("# MeterMetric");
-					stream.println("# count,1 min rate,mean rate,5 min rate,15 min rate");
+					stream.println("# time,count,1 min rate,mean rate,5 min rate,15 min rate");
 				} else if (metric instanceof TimerMetric) {
-					stream.println("# TimerMetric");
-					stream.println("# min,max,mean,median,stddev,90%,95%,99%");
+					stream.println("# time,min,max,mean,median,stddev,90%,95%,99%");
 				}
 			}
 		}
