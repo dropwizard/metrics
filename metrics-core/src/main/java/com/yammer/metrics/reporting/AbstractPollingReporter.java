@@ -15,7 +15,7 @@ public abstract class AbstractPollingReporter extends AbstractReporter implement
         this.executor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name));
     }
 
-    public final void start(long pollingTime, TimeUnit pollingTimeUnit) {
+    public void start(long pollingTime, TimeUnit pollingTimeUnit) {
         executor.scheduleWithFixedDelay(this, pollingTime, pollingTime, pollingTimeUnit);
     }
 
