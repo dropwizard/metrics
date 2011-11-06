@@ -1,5 +1,8 @@
 package com.yammer.metrics.stats;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -52,12 +55,27 @@ public class UniformSample implements Sample {
         if (c <= values.length()) {
             values.set((int) c - 1, value);
         } else {
-            final long r = Math.abs(RANDOM.nextLong()) % c;
+            final long r = nextLong(c);
             if (r < values.length()) {
                 values.set((int) r, value);
             }
         }
     }
+
+    /**
+     * Get a pseurandom long uniformally between 0 and n-1.
+     * Stolen from {@code Random.nextInt(int n)}
+     * @param n the bound
+     */
+    private static long nextLong(long n) {
+        long bits,val;
+        do {
+            bits = RANDOM.nextLong() & (~(1L<<63));
+            val = bits % n;
+        } while(bits - val + (n-1) < 0L);
+        return val;
+    }
+
 
     @Override
     public List<Long> values() {
@@ -67,5 +85,18 @@ public class UniformSample implements Sample {
             copy.add(values.get(i));
         }
         return copy;
+    }
+
+    @Override
+    public void dump(File output) throws IOException {
+        final PrintWriter writer = new PrintWriter(output);
+        try {
+            final List<Long> values = values();
+            for (Long value : values) {
+                writer.printf("%d\n", value);
+            }
+        } finally {
+            writer.close();
+        }
     }
 }
