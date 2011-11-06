@@ -18,11 +18,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import static org.eclipse.jetty.http.HttpMethods.*;
+
 /**
  * A Jetty {@link Handler} which records various metrics about an underlying
  * {@link Handler} instance.
  */
 public class InstrumentedHandler extends HandlerWrapper {
+    private static final String PATCH = "PATCH";
+
     private final TimerMetric dispatches;
     private final MeterMetric requests;
     private final MeterMetric resumes;
@@ -34,6 +38,10 @@ public class InstrumentedHandler extends HandlerWrapper {
     private final CounterMetric activeDispatches;
 
     private final MeterMetric[] responses;
+
+    private final TimerMetric getRequests, postRequests, headRequests,
+            putRequests, deleteRequests, optionsRequests, traceRequests,
+            connectRequests, patchRequests, otherRequests;
 
     private final ContinuationListener listener;
 
@@ -138,6 +146,17 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         };
 
+        this.getRequests = Metrics.newTimer(underlying.getClass(), "get-requests", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        this.postRequests = Metrics.newTimer(underlying.getClass(), "post-requests", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        this.headRequests = Metrics.newTimer(underlying.getClass(), "head-requests", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        this.putRequests = Metrics.newTimer(underlying.getClass(), "put-requests", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        this.deleteRequests = Metrics.newTimer(underlying.getClass(), "delete-requests", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        this.optionsRequests = Metrics.newTimer(underlying.getClass(), "options-requests", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        this.traceRequests = Metrics.newTimer(underlying.getClass(), "trace-requests", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        this.connectRequests = Metrics.newTimer(underlying.getClass(), "connect-requests", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        this.patchRequests = Metrics.newTimer(underlying.getClass(), "patch-requests", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        this.otherRequests = Metrics.newTimer(underlying.getClass(), "other-requests", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+
         setHandler(underlying);
     }
 
@@ -169,9 +188,13 @@ public class InstrumentedHandler extends HandlerWrapper {
             super.handle(target, request, httpRequest, httpResponse);
         } finally {
             if (isMilliseconds) {
-                dispatches.update(System.currentTimeMillis() - start, TimeUnit.MILLISECONDS);
+                final long duration = System.currentTimeMillis() - start;
+                dispatches.update(duration, TimeUnit.MILLISECONDS);
+                requestTimer(request.getMethod()).update(duration, TimeUnit.MILLISECONDS);
             } else {
-                dispatches.update(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+                final long duration = System.nanoTime() - start;
+                dispatches.update(duration, TimeUnit.NANOSECONDS);
+                requestTimer(request.getMethod()).update(duration, TimeUnit.NANOSECONDS);
             }
 
             activeDispatches.dec();
@@ -185,6 +208,29 @@ public class InstrumentedHandler extends HandlerWrapper {
                 updateResponses(request);
             }
         }
+    }
+
+    private TimerMetric requestTimer(String method) {
+        if (GET.equalsIgnoreCase(method)) {
+            return getRequests;
+        } else if (POST.equalsIgnoreCase(method)) {
+            return postRequests;
+        } else if (PUT.equalsIgnoreCase(method)) {
+            return putRequests;
+        } else if (HEAD.equalsIgnoreCase(method)) {
+            return headRequests;
+        } else if (DELETE.equalsIgnoreCase(method)) {
+            return deleteRequests;
+        } else if (OPTIONS.equalsIgnoreCase(method)) {
+            return optionsRequests;
+        } else if (TRACE.equalsIgnoreCase(method)) {
+            return traceRequests;
+        } else if (CONNECT.equalsIgnoreCase(method)) {
+            return connectRequests;
+        } else if (PATCH.equalsIgnoreCase(method)) {
+            return patchRequests;
+        }
+        return otherRequests;
     }
 
     private void updateResponses(Request request) {

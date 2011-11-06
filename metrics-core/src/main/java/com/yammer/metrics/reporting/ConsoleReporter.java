@@ -1,7 +1,6 @@
 package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.util.MetricPredicate;
 import com.yammer.metrics.util.Utils;
@@ -12,16 +11,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
  * A simple reporters which prints out application metrics to a
  * {@link PrintStream} periodically.
  */
-public class ConsoleReporter implements Runnable {
-    private final ScheduledExecutorService tickThread;
-    private final MetricsRegistry metricsRegistry;
+public class ConsoleReporter extends AbstractPollingReporter {
     private final PrintStream out;
     private final MetricPredicate predicate;
 
@@ -66,20 +62,9 @@ public class ConsoleReporter implements Runnable {
      * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be output
      */
     public ConsoleReporter(MetricsRegistry metricsRegistry, PrintStream out, MetricPredicate predicate) {
-        this.metricsRegistry = metricsRegistry;
-        this.tickThread = metricsRegistry.threadPools().newScheduledThreadPool(1, "console-reporter");
+        super(metricsRegistry, "console-reporter");
         this.out = out;
         this.predicate = predicate;
-    }
-
-    /**
-     * Starts printing output to the specified {@link PrintStream}.
-     *
-     * @param period the period between successive displays
-     * @param unit the time unit of {@code period}
-     */
-    public void start(long period, TimeUnit unit) {
-        tickThread.scheduleAtFixedRate(this, period, period, unit);
     }
 
     @Override
