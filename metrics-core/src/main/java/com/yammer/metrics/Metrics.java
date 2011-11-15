@@ -3,6 +3,7 @@ package com.yammer.metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.reporting.ConsoleReporter;
 import com.yammer.metrics.reporting.JmxReporter;
+import com.yammer.metrics.util.Utils;
 
 import javax.management.MalformedObjectNameException;
 import java.util.Map;
@@ -13,15 +14,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class Metrics {
     private static final MetricsRegistry DEFAULT_REGISTRY = new MetricsRegistry();
+    private static final Thread SHUTDOWN_HOOK = new Thread() {
+        public void run() {
+            JmxReporter.shutdownDefault();
+        }
+    };
     static {{
         JmxReporter.startDefault(DEFAULT_REGISTRY);
         // make sure we initialize this so it can monitor GC etc
         VirtualMachineMetrics.daemonThreadCount();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                JmxReporter.shutdownDefault();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
     }}
 
     private Metrics() { /* unused */ }
@@ -440,5 +442,12 @@ public class Metrics {
      */
     public static MetricsRegistry defaultRegistry() {
         return DEFAULT_REGISTRY;
+    }
+
+    public static void shutdown() {
+        Utils.shutdownThreadPools();
+        DEFAULT_REGISTRY.threadPools().shutdownThreadPools();
+        JmxReporter.shutdownDefault();
+        Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
     }
 }
