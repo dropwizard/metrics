@@ -1,9 +1,7 @@
 package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.util.NamedThreadFactory;
 
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -12,7 +10,7 @@ public abstract class AbstractPollingReporter extends AbstractReporter implement
 
     protected AbstractPollingReporter(MetricsRegistry registry, String name) {
         super(registry);
-        this.executor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name));
+        this.executor = registry.threadPools().newScheduledThreadPool(1, name);
     }
 
     public void start(long pollingTime, TimeUnit pollingTimeUnit) {
