@@ -1,9 +1,10 @@
 package com.yammer.metrics.jetty;
 
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.GaugeMetric;
 import com.yammer.metrics.core.MetricsRegistry;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
     public InstrumentedQueuedThreadPool() {
