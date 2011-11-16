@@ -9,8 +9,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A Logback {@link Appender} which has six meters, one for each logging
- * level and one for the total number of statements being logged.
+ * A Logback {@link AppenderBase} which has six meters, one for each logging level and one for the
+ * total number of statements being logged.
  */
 public class InstrumentedAppender extends AppenderBase<ILoggingEvent> {
     static final MeterMetric ALL_METER = Metrics.newMeter(InstrumentedAppender.class, "all", "statements", TimeUnit.SECONDS);

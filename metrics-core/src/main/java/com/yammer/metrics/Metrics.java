@@ -3,6 +3,7 @@ package com.yammer.metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.reporting.ConsoleReporter;
 import com.yammer.metrics.reporting.JmxReporter;
+import com.yammer.metrics.util.Utils;
 
 import javax.management.MalformedObjectNameException;
 import java.util.Map;
@@ -13,10 +14,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class Metrics {
     private static final MetricsRegistry DEFAULT_REGISTRY = new MetricsRegistry();
+    private static final Thread SHUTDOWN_HOOK = new Thread() {
+        public void run() {
+            JmxReporter.shutdownDefault();
+        }
+    };
     static {{
         JmxReporter.startDefault(DEFAULT_REGISTRY);
         // make sure we initialize this so it can monitor GC etc
         VirtualMachineMetrics.daemonThreadCount();
+        Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
     }}
 
     private Metrics() { /* unused */ }
@@ -316,6 +323,19 @@ public class Metrics {
     }
 
     /**
+     * Creates a new {@link TimerMetric} and registers it under the given class and name, measuring
+     * elapsed time in milliseconds and invocations per second.
+     *
+     * @param klass        the class which owns the metric
+     * @param name         the name of the metric
+     * @return a new {@link TimerMetric}
+     */
+    public static TimerMetric newTimer(Class<?> klass,
+                                       String name) {
+        return DEFAULT_REGISTRY.newTimer(klass, name);
+    }
+
+    /**
      * Creates a new {@link TimerMetric} and registers it under the given
      * class, name, and scope.
      *
@@ -335,6 +355,21 @@ public class Metrics {
     }
 
     /**
+     * Creates a new {@link TimerMetric} and registers it under the given class, name, and scope,
+     * measuring elapsed time in milliseconds and invocations per second.
+     *
+     * @param klass        the class which owns the metric
+     * @param name         the name of the metric
+     * @param scope        the scope of the metric
+     * @return a new {@link TimerMetric}
+     */
+    public static TimerMetric newTimer(Class<?> klass,
+                                       String name,
+                                       String scope) {
+        return DEFAULT_REGISTRY.newTimer(klass, name, scope);
+    }
+
+    /**
      * Creates a new {@link TimerMetric} and registers it under the given
      * metric name.
      *
@@ -347,6 +382,36 @@ public class Metrics {
                                        TimeUnit durationUnit,
                                        TimeUnit rateUnit) {
         return DEFAULT_REGISTRY.newTimer(metricName, durationUnit, rateUnit);
+    }
+
+    /**
+     * Removes the metric with the given name.
+     *
+     * @param name the name of the metric
+     */
+    public static void removeMetric(MetricName name) {
+        DEFAULT_REGISTRY.removeMetric(name);
+    }
+
+    /**
+     * Removes the metric for the given class with the given name.
+     *
+     * @param klass the klass the metric is associated with
+     * @param name the name of the metric
+     */
+    public static void removeMetric(Class<?> klass, String name) {
+        DEFAULT_REGISTRY.removeMetric(klass, name);
+    }
+
+    /**
+     * Removes the metric for the given class with the given name and scope.
+     *
+     * @param klass the klass the metric is associated with
+     * @param name the name of the metric
+     * @param scope the scope of the metric
+     */
+    public static void removeMetric(Class<?> klass, String name, String scope) {
+        DEFAULT_REGISTRY.removeMetric(klass, name, scope);
     }
 
     /**
@@ -377,5 +442,12 @@ public class Metrics {
      */
     public static MetricsRegistry defaultRegistry() {
         return DEFAULT_REGISTRY;
+    }
+
+    public static void shutdown() {
+        Utils.shutdownThreadPools();
+        DEFAULT_REGISTRY.threadPools().shutdownThreadPools();
+        JmxReporter.shutdownDefault();
+        Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
     }
 }

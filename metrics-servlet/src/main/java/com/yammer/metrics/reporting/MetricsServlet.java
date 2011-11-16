@@ -1,9 +1,7 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.core.HealthCheckRegistry;
 import com.yammer.metrics.HealthChecks;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HealthCheck.Result;
 import com.yammer.metrics.util.Utils;
@@ -11,6 +9,8 @@ import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 
 public class MetricsServlet extends HttpServlet {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetricsServlet.class);
     public static final String ATTR_NAME_METRICS_REGISTRY = MetricsServlet.class.getSimpleName() + ":" + MetricsRegistry.class.getSimpleName();
     public static final String ATTR_NAME_HEALTHCHECK_REGISTRY = MetricsServlet.class.getSimpleName() + ":" + HealthCheckRegistry.class.getSimpleName();
 
@@ -106,7 +107,7 @@ public class MetricsServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
 
-        ServletContext context = config.getServletContext();
+        final ServletContext context = config.getServletContext();
 
         this.contextPath = context.getContextPath();
         this.metricsRegistry = putAttrIfAbsent(context, ATTR_NAME_METRICS_REGISTRY, this.metricsRegistry);
@@ -170,6 +171,7 @@ public class MetricsServlet extends HttpServlet {
         writer.close();
     }
 
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     private void handleHealthCheck(HttpServletResponse resp) throws IOException {
         boolean allHealthy = true;
         final Map<String, Result> results = healthCheckRegistry.runHealthChecks();
@@ -202,9 +204,10 @@ public class MetricsServlet extends HttpServlet {
                         writer.format("! %s: ERROR\n!  %s\n", entry.getKey(), result.getMessage());
                     }
 
-                    if (result.getError() != null) {
+                    final Throwable error = result.getError();
+                    if (error != null) {
                         writer.println();
-                        result.getError().printStackTrace(writer);
+                        error.printStackTrace(writer);
                         writer.println();
                     }
                 }
@@ -241,7 +244,7 @@ public class MetricsServlet extends HttpServlet {
         json.writeStartObject();
         {
             if (showJvmMetrics && ("jvm".equals(classPrefix) || classPrefix == null)) {
-                writeVmMetrics(json, showFullSamples);
+                writeVmMetrics(json);
             }
 
             writeRegularMetrics(json, classPrefix, showFullSamples);
@@ -321,18 +324,21 @@ public class MetricsServlet extends HttpServlet {
         json.writeStartObject();
         {
             json.writeStringField("type", "gauge");
-            json.writeFieldName("value");
-            try {
-                final Object value = gauge.value();
-                json.writeObject(value);
-            } catch (Exception e) {
-                json.writeString("error reading gauge: " + e.getMessage());
-            }
+            json.writeObjectField("value", evaluateGauge(gauge));
         }
         json.writeEndObject();
     }
 
-    private void writeVmMetrics(JsonGenerator json, boolean showFullSamples) throws IOException {
+    private Object evaluateGauge(GaugeMetric<?> gauge) {
+        try {
+            return gauge.value();
+        } catch (RuntimeException e) {
+            LOGGER.warn("Error evaluating gauge", e);
+            return "error reading gauge: " + e.getMessage();
+        }
+    }
+
+    private void writeVmMetrics(JsonGenerator json) throws IOException {
         json.writeFieldName("jvm");
         json.writeStartObject();
         {

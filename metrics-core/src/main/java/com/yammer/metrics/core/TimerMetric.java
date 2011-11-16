@@ -3,6 +3,8 @@ package com.yammer.metrics.core;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.HistogramMetric.SampleType;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -14,6 +16,7 @@ import java.util.concurrent.TimeUnit;
  * statistics, plus throughput statistics via {@link MeterMetric}.
  */
 public class TimerMetric implements Metered {
+
     private final TimeUnit durationUnit, rateUnit;
     private final MeterMetric meter;
     private final HistogramMetric histogram = new HistogramMetric(SampleType.BIASED);
@@ -124,6 +127,15 @@ public class TimerMetric implements Metered {
         }
     }
 
+    /**
+     * Returns a timing {@link TimerContext}, which measures an elapsed time in nanoseconds.
+     *
+     * @return a new {@link TimerContext}
+     */
+    public TimerContext time() {
+        return new TimerContext(this);
+    }
+
     @Override
     public long count() { return histogram.count(); }
 
@@ -198,6 +210,16 @@ public class TimerMetric implements Metered {
             values.add(convertFromNS(value));
         }
         return values;
+    }
+
+    /**
+     * Writes the values of the timer's sample to the given file.
+     *
+     * @param output the file to which the values will be written
+     * @throws java.io.IOException if there is an error writing the values
+     */
+    public void dump(File output) throws IOException {
+        histogram.dump(output);
     }
 
     private void update(long duration) {

@@ -628,6 +628,51 @@ public class InstrumentedEhcache implements Ehcache {
     }
 
     @Override
+    public void unpinAll() {
+        cache.unpinAll();
+    }
+
+    @Override
+    public boolean isPinned(Object o) {
+        return cache.isPinned(o);
+    }
+
+    @Override
+    public void setPinned(Object o, boolean b) {
+        cache.setPinned(o, b);
+    }
+
+    @Override
+    public void putAll(Collection<Element> elements) throws IllegalArgumentException, IllegalStateException, CacheException {
+        cache.putAll(elements);
+    }
+
+    @Override
+    public Map<Object, Element> getAll(Collection<?> objects) throws IllegalStateException, CacheException, NullPointerException {
+        return cache.getAll(objects);
+    }
+
+    @Override
+    public void removeAll(Collection<?> objects) throws IllegalStateException, NullPointerException {
+        cache.removeAll(objects);
+    }
+
+    @Override
+    public void removeAll(Collection<?> objects, boolean b) throws IllegalStateException, NullPointerException {
+        cache.removeAll(objects,  b);
+    }
+
+    @Override
+    public long calculateOnDiskSize() throws IllegalStateException, CacheException {
+        return cache.calculateOnDiskSize();
+    }
+
+    @Override
+    public boolean hasAbortedSizeOf() {
+        return cache.hasAbortedSizeOf();
+    }
+
+    @Override
     public void put(Element element) throws IllegalArgumentException, IllegalStateException, CacheException {
         final long start = System.nanoTime();
         try {
