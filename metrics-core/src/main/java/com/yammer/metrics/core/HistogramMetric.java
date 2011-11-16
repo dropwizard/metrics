@@ -173,6 +173,16 @@ public class HistogramMetric implements Metric {
     }
 
     /**
+     * Returns the value at the given percentile.
+     *
+     * @param percentile    a percentile ({@code 0..1})
+     * @return the value at the given percentile
+     */
+    public double percentile(double percentile) {
+        return percentiles(percentile)[0];
+    }
+
+    /**
      * Returns an array of values at the given percentiles.
      *
      * @param percentiles one or more percentiles ({@code 0..1})

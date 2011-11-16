@@ -180,6 +180,16 @@ public class TimerMetric implements Metered {
     public double stdDev() { return convertFromNS(histogram.stdDev()); }
 
     /**
+     * Returns the duration at the given percentile.
+     *
+     * @param percentile    a percentile ({@code 0..1})
+     * @return the duration at the given percentile
+     */
+    public double percentile(double percentile) {
+        return percentiles(percentile)[0];
+    }
+
+    /**
      * Returns an array of durations at the given percentiles.
      *
      * @param percentiles one or more percentiles ({@code 0..1})
