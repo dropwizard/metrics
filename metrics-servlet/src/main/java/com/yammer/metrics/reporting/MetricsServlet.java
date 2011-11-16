@@ -106,7 +106,7 @@ public class MetricsServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
 
-        ServletContext context = config.getServletContext();
+        final ServletContext context = config.getServletContext();
 
         this.contextPath = context.getContextPath();
         this.metricsRegistry = putAttrIfAbsent(context, ATTR_NAME_METRICS_REGISTRY, this.metricsRegistry);
@@ -170,6 +170,7 @@ public class MetricsServlet extends HttpServlet {
         writer.close();
     }
 
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     private void handleHealthCheck(HttpServletResponse resp) throws IOException {
         boolean allHealthy = true;
         final Map<String, Result> results = healthCheckRegistry.runHealthChecks();
@@ -202,9 +203,10 @@ public class MetricsServlet extends HttpServlet {
                         writer.format("! %s: ERROR\n!  %s\n", entry.getKey(), result.getMessage());
                     }
 
-                    if (result.getError() != null) {
+                    final Throwable error = result.getError();
+                    if (error != null) {
                         writer.println();
-                        result.getError().printStackTrace(writer);
+                        error.printStackTrace(writer);
                         writer.println();
                     }
                 }
@@ -241,7 +243,7 @@ public class MetricsServlet extends HttpServlet {
         json.writeStartObject();
         {
             if (showJvmMetrics && ("jvm".equals(classPrefix) || classPrefix == null)) {
-                writeVmMetrics(json, showFullSamples);
+                writeVmMetrics(json);
             }
 
             writeRegularMetrics(json, classPrefix, showFullSamples);
@@ -334,7 +336,7 @@ public class MetricsServlet extends HttpServlet {
         }
     }
 
-    private void writeVmMetrics(JsonGenerator json, boolean showFullSamples) throws IOException {
+    private void writeVmMetrics(JsonGenerator json) throws IOException {
         json.writeFieldName("jvm");
         json.writeStartObject();
         {
