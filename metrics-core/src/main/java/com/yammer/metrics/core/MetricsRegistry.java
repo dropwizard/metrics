@@ -446,10 +446,8 @@ public class MetricsRegistry {
     public void removeMetric(MetricName name) {
         final Metric metric = metrics.remove(name);
         if (metric != null) {
-            if (metric instanceof MeterMetric) {
-                ((MeterMetric) metric).stop();
-            } else if (metric instanceof TimerMetric) {
-                ((TimerMetric) metric).stop();
+            if (metric instanceof Stoppable) {
+                ((Stoppable) metric).stop();
             }
             notifyMetricRemoved(name);
         }
