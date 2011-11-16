@@ -31,6 +31,10 @@ public class InstrumentedHttpClient extends DefaultHttpClient {
     private static final TimerMetric PATCH_TIMER = Metrics.newTimer(HttpClient.class, "patch-requests");
     private static final TimerMetric OTHER_TIMER = Metrics.newTimer(HttpClient.class, "other-requests");
 
+    public InstrumentedHttpClient(InstrumentedClientConnManager manager, HttpParams params) {
+        super(manager, params);
+    }
+
     public InstrumentedHttpClient(HttpParams params) {
         super(new InstrumentedClientConnManager(), params);
     }
