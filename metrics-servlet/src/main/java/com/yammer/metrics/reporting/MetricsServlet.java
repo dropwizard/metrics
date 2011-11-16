@@ -1,9 +1,7 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.core.HealthCheckRegistry;
 import com.yammer.metrics.HealthChecks;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HealthCheck.Result;
 import com.yammer.metrics.util.Utils;
@@ -11,6 +9,8 @@ import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 
 public class MetricsServlet extends HttpServlet {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetricsServlet.class);
     public static final String ATTR_NAME_METRICS_REGISTRY = MetricsServlet.class.getSimpleName() + ":" + MetricsRegistry.class.getSimpleName();
     public static final String ATTR_NAME_HEALTHCHECK_REGISTRY = MetricsServlet.class.getSimpleName() + ":" + HealthCheckRegistry.class.getSimpleName();
 
@@ -332,6 +333,7 @@ public class MetricsServlet extends HttpServlet {
         try {
             return gauge.value();
         } catch (RuntimeException e) {
+            LOGGER.warn("Error evaluating gauge", e);
             return "error reading gauge: " + e.getMessage();
         }
     }
