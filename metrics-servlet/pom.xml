@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.yammer.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>2.0.0-BETA17-SNAPSHOT</version>
+        <version>2.0.0-BETA18-SNAPSHOT</version>
     </parent>
 
     <groupId>com.yammer.metrics</groupId>
@@ -22,41 +22,41 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
+            <version>${servlet.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.8.5</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <version>3.0</version>
+            <version>${guice.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-servlet</artifactId>
-            <version>3.0</version>
+            <version>${guice.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-multibindings</artifactId>
-            <version>3.0</version>
+            <version>${guice.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>7.4.5.v20110725</version>
+            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.yammer.metrics</groupId>
-            <artifactId>metrics-scala_${scala.version}</artifactId>
+            <artifactId>metrics-jetty</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

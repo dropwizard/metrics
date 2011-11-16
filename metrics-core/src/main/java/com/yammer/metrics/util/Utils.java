@@ -21,23 +21,20 @@ public class Utils {
                 new TreeMap<String, Map<String, Metric>>();
         for (Entry<MetricName, Metric> entry : metrics.entrySet()) {
             final String qualifiedTypeName = entry.getKey().getGroup() + "." + entry.getKey().getType();
-
-            if (! predicate.matches(entry.getKey(), entry.getValue())) {
-                continue;
+            if (predicate.matches(entry.getKey(), entry.getValue())) {
+                final String scopedName;
+                if (entry.getKey().hasScope()) {
+                    scopedName = qualifiedTypeName + "." + entry.getKey().getScope();
+                } else {
+                    scopedName = qualifiedTypeName;
+                }
+                Map<String, Metric> subMetrics = sortedMetrics.get(scopedName);
+                if (subMetrics == null) {
+                    subMetrics = new TreeMap<String, Metric>();
+                    sortedMetrics.put(scopedName, subMetrics);
+                }
+                subMetrics.put(entry.getKey().getName(), entry.getValue());
             }
-
-            final String scopedName;
-            if (entry.getKey().hasScope()) {
-                scopedName = qualifiedTypeName + "." + entry.getKey().getScope();
-            } else {
-                scopedName = qualifiedTypeName;
-            }
-            Map<String, Metric> subMetrics = sortedMetrics.get(scopedName);
-            if (subMetrics == null) {
-                subMetrics = new TreeMap<String, Metric>();
-                sortedMetrics.put(scopedName, subMetrics);
-            }
-            subMetrics.put(entry.getKey().getName(), entry.getValue());
         }
         return sortedMetrics;
     }

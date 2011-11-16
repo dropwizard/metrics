@@ -6,23 +6,30 @@
 
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>2.0.0-BETA17-SNAPSHOT</version>
+    <version>2.0.0-BETA18-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
         <module>metrics-core</module>
         <module>metrics-ehcache</module>
+        <module>metrics-ganglia</module>
         <module>metrics-graphite</module>
         <module>metrics-guice</module>
+        <module>metrics-httpclient</module>
         <module>metrics-jetty</module>
         <module>metrics-log4j</module>
         <module>metrics-logback</module>
         <module>metrics-scala_2.9.1</module>
         <module>metrics-servlet</module>
+        <module>metrics-web</module>
     </modules>
 
     <properties>
-        <scala.version>2.9.1</scala.version>
+        <jetty.version>7.5.4.v20111024</jetty.version>
+        <servlet.version>2.5</servlet.version>
+        <jackson.version>1.9.2</jackson.version>
+        <guice.version>3.0</guice.version>
+        <slf4j.version>1.6.4</slf4j.version>
     </properties>
 
     <developers>
@@ -54,21 +61,10 @@
 
     <repositories>
         <repository>
-            <id>scala-tools-releases</id>
-            <url>http://scala-tools.org/repo-releases/</url>
-        </repository>
-        <repository>
             <id>repo.codahale.com</id>
             <url>http://repo.codahale.com</url>
         </repository>
     </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>scala-tools-releases</id>
-            <url>http://scala-tools.org/repo-releases/</url>
-        </pluginRepository>
-    </pluginRepositories>
 
     <distributionManagement>
         <repository>
@@ -79,9 +75,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.codahale</groupId>
-            <artifactId>simplespec_${scala.version}</artifactId>
-            <version>0.5.1</version>
+            <groupId>junit</groupId>
+            <artifactId>junit-dep</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -113,27 +115,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
-                <version>2.15.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <args>
-                        <arg>-optimise</arg>
-                        <arg>-unchecked</arg>
-                        <arg>-deprecation</arg>
-                    </args>
-                    <charset>UTF-8</charset>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
@@ -161,22 +142,8 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.5</version>
                 <configuration>
+                    <outputDirectory/>
                     <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.8.1</version>
-                <configuration>
-                    <useSystemClassLoader>false</useSystemClassLoader>
-                    <argLine>-Xmx1024m</argLine>
-                    <includes>
-                        <include>**/*Spec.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/*Test.java</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
         </plugins>
@@ -188,14 +155,4 @@
             </extension>
         </extensions>
     </build>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
-                <version>2.15.2</version>
-            </plugin>
-        </plugins>
-    </reporting>
 </project>

@@ -1,3 +1,19 @@
+v2.0.0-BETA17: Oct 07 2011
+==========================
+
+* Added an option message to successful health check results.
+* Fixed locale issues in `GraphiteReporter`.
+* Added `GangliaReporter`.
+* Added per-HTTP method timers to `InstrumentedHandler` in `metrics-jetty`.
+* Fixed a thread pool leak for meters.
+* Added `#dump(File)` to `HistogramMetric` and `TimerMetric`.
+* Upgraded to Jackson 1.9.x.
+* Upgraded to slf4j 1.6.2.
+* Upgraded to logback 0.9.30.
+* Upgraded to ehcache 2.4.5.
+* Surfaced `Metrics.removeMetric()`.
+
+
 v2.0.0-BETA16: Aug 23 2011
 ==========================
 
