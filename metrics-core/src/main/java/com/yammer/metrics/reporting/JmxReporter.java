@@ -1,16 +1,32 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.core.*;
-
-import javax.management.*;
 import java.lang.management.ManagementFactory;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
+
+import com.yammer.metrics.core.CounterMetric;
+import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.HistogramMetric;
+import com.yammer.metrics.core.Metered;
+import com.yammer.metrics.core.Metric;
+import com.yammer.metrics.core.MetricName;
+import com.yammer.metrics.core.MetricsProcessor;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.MetricsRegistryListener;
+import com.yammer.metrics.core.TimerMetric;
 
 /**
  * A reporter which exposes application metric as JMX MBeans.
  */
-public class JmxReporter extends AbstractReporter implements MetricsRegistryListener {
+public class JmxReporter extends AbstractReporter implements MetricsRegistryListener, MetricsProcessor<JmxReporter.Context> {
 
     private final Map<MetricName, ObjectName> registeredBeans;
     private final MBeanServer server;
@@ -307,20 +323,44 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     public void onMetricAdded(MetricName name, Metric metric) {
         if (metric != null) {
             try {
-                final ObjectName objectName = new ObjectName(name.getMBeanName());
-                if (metric instanceof GaugeMetric) {
-                    registerBean(name, new Gauge((GaugeMetric<?>) metric, objectName), objectName);
-                } else if (metric instanceof CounterMetric) {
-                    registerBean(name, new Counter((CounterMetric) metric, objectName), objectName);
-                } else if (metric instanceof HistogramMetric) {
-                    registerBean(name, new Histogram((HistogramMetric) metric, objectName), objectName);
-                } else if (metric instanceof MeterMetric) {
-                    registerBean(name, new Meter((MeterMetric) metric, objectName), objectName);
-                } else if (metric instanceof TimerMetric) {
-                    registerBean(name, new Timer((TimerMetric) metric, objectName), objectName);
-                }
+                metric.processWith(this, name, new Context(name, new ObjectName(name.getMBeanName())));
             } catch (Exception ignored) {
             }
+        }
+    }
+
+    @Override
+    public void processMeter(MetricName name, Metered meter, Context context) throws Exception {
+        registerBean(context.metricName, new Meter(meter, context.objectName), context.objectName);
+    }
+
+    @Override
+    public void processCounter(MetricName name, CounterMetric counter, Context context) throws Exception {
+        registerBean(context.metricName, new Counter(counter, context.objectName), context.objectName);
+    }
+
+    @Override
+    public void processHistogram(MetricName name, HistogramMetric histogram, Context context) throws Exception {
+        registerBean(context.metricName, new Histogram(histogram, context.objectName), context.objectName);
+    }
+
+    @Override
+    public void processTimer(MetricName name, TimerMetric timer, Context context) throws Exception {
+        registerBean(context.metricName, new Timer(timer, context.objectName), context.objectName);
+    }
+
+    @Override
+    public void processGauge(MetricName name, GaugeMetric<?> gauge, Context context) throws Exception {
+        registerBean(context.metricName, new Gauge(gauge, context.objectName), context.objectName);
+    }
+    
+    public static final class Context {
+        public final MetricName metricName;
+        public final ObjectName objectName;
+        
+        public Context(final MetricName metricName, final ObjectName objectName) {
+            this.metricName = metricName;
+            this.objectName = objectName;
         }
     }
 
@@ -356,5 +396,4 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
         registeredBeans.clear();
     }
-
 }

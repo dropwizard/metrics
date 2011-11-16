@@ -1,15 +1,16 @@
 package com.yammer.metrics.jetty;
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import org.eclipse.jetty.io.Connection;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.CounterMetric;
 import com.yammer.metrics.core.MeterMetric;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.TimerMetric;
-import org.eclipse.jetty.io.Connection;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 public class InstrumentedSelectChannelConnector extends SelectChannelConnector {
     private final TimerMetric duration;

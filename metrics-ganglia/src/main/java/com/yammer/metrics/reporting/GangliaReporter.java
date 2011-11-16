@@ -1,19 +1,5 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.*;
-import com.yammer.metrics.core.VirtualMachineMetrics.*;
-import com.yammer.metrics.util.MetricPredicate;
-import com.yammer.metrics.util.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.*;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import static com.yammer.metrics.core.VirtualMachineMetrics.daemonThreadCount;
 import static com.yammer.metrics.core.VirtualMachineMetrics.fileDescriptorUsage;
 import static com.yammer.metrics.core.VirtualMachineMetrics.garbageCollectors;
@@ -23,6 +9,33 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.nonHeapUsage;
 import static com.yammer.metrics.core.VirtualMachineMetrics.threadCount;
 import static com.yammer.metrics.core.VirtualMachineMetrics.threadStatePercentages;
 import static com.yammer.metrics.core.VirtualMachineMetrics.uptime;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.CounterMetric;
+import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.HistogramMetric;
+import com.yammer.metrics.core.Metered;
+import com.yammer.metrics.core.Metric;
+import com.yammer.metrics.core.MetricName;
+import com.yammer.metrics.core.MetricsProcessor;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.VirtualMachineMetrics.GarbageCollector;
+import com.yammer.metrics.util.MetricPredicate;
+import com.yammer.metrics.util.Utils;
 
 /**
  * A simple reporter which sends out application metrics to a
@@ -36,7 +49,7 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.uptime;
  * which is based on <a ahref="http://search-hadoop.com/c/Hadoop:/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/metrics/ganglia/GangliaContext31.java">GangliaContext31</a>
  * from Hadoop.
  */
-public class GangliaReporter extends AbstractPollingReporter {
+public class GangliaReporter extends AbstractPollingReporter implements MetricsProcessor<String> {
     private static final Logger LOG = LoggerFactory.getLogger(GangliaReporter.class);
     private static final int GANGLIA_TMAX = 60;
     private static final int GANGLIA_DMAX = 0;
@@ -199,6 +212,7 @@ public class GangliaReporter extends AbstractPollingReporter {
                            MetricPredicate predicate, boolean useShortNames) throws IOException {
         this(metricsRegistry, groupPrefix, predicate, useShortNames, new GangliaMessageBuilder(gangliaHost, port));
     }
+
      /**
      * Creates a new {@link GangliaReporter}.
      *
@@ -230,32 +244,20 @@ public class GangliaReporter extends AbstractPollingReporter {
     }
 
     private void printRegularMetrics() {
-        for (Map.Entry<String, Map<String, Metric>> entry : Utils.sortAndFilterMetrics(metricsRegistry.allMetrics(), this.predicate).entrySet()) {
-            for (Map.Entry<String, Metric> subEntry : entry.getValue().entrySet()) {
-                final String simpleName = sanitizeName(entry.getKey() + "." + subEntry.getKey());
+        for (Map.Entry<String, Map<MetricName, Metric>> entry : Utils.sortAndFilterMetrics(metricsRegistry.allMetrics(), this.predicate).entrySet()) {
+            for (Map.Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
                 final Metric metric = subEntry.getValue();
                 if (metric != null) {
                     try {
-                        if (metric instanceof GaugeMetric<?>) {
-                            printGauge((GaugeMetric<?>) metric, simpleName);
-                        } else if (metric instanceof CounterMetric) {
-                            printCounter((CounterMetric) metric, simpleName);
-                        } else if (metric instanceof HistogramMetric) {
-                            printHistogram((HistogramMetric) metric, simpleName);
-                        } else if (metric instanceof MeterMetric) {
-                            printMetered((MeterMetric) metric, simpleName);
-                        } else if (metric instanceof TimerMetric) {
-                            printTimer((TimerMetric) metric, simpleName);
-                        }
+                        metric.processWith(this, subEntry.getKey(), null);
                     } catch (Exception ignored) {
                         LOG.error("Error printing regular metrics:", ignored);
                     }
                 }
             }
         }
-
     }
-
+    
     private void sendToGanglia(String metricName, String metricType, String metricValue, String groupName, String units) {
         try {
             sendMetricData(metricType, metricName, metricValue, groupPrefix + groupName, units);
@@ -299,17 +301,18 @@ public class GangliaReporter extends AbstractPollingReporter {
                 .send();
     }
 
-
-
-    private void printGauge(GaugeMetric<?> gauge, String name) {
+    @Override
+    public void processGauge(MetricName name, GaugeMetric<?> gauge, String x) throws IOException {
         sendToGanglia(sanitizeName(name), GANGLIA_INT_TYPE, String.format(locale, "%s", gauge.value()), "gauge");
     }
 
-    private void printCounter(CounterMetric counter, String name) {
+    @Override
+    public void processCounter(MetricName name, CounterMetric counter, String x) throws IOException {
         sendToGanglia(sanitizeName(name), GANGLIA_INT_TYPE, String.format(locale, "%d", counter.count()), "counter");
     }
 
-    private void printMetered(Metered meter, String name) {
+    @Override
+    public void processMeter(MetricName name, Metered meter, String x) throws IOException {
         final String sanitizedName = sanitizeName(name);
         final String units = meter.rateUnit().name();
         printLongField(sanitizedName + ".count", meter.count(), "metered", units);
@@ -319,10 +322,10 @@ public class GangliaReporter extends AbstractPollingReporter {
         printDoubleField(sanitizedName + ".15MinuteRate", meter.fifteenMinuteRate(), "metered", units);
     }
 
-    private void printHistogram(HistogramMetric histogram, String name) {
+    @Override
+    public void processHistogram(MetricName name, HistogramMetric histogram, String x) throws IOException {
         final String sanitizedName = sanitizeName(name);
-        final double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
-
+        final Double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
         // TODO:  what units make sense for histograms?  should we add event type to the Histogram metric?
         printDoubleField(sanitizedName + ".min", histogram.min(), "histo");
         printDoubleField(sanitizedName + ".max", histogram.max(), "histo");
@@ -336,10 +339,11 @@ public class GangliaReporter extends AbstractPollingReporter {
         printDoubleField(sanitizedName + ".999percentile", percentiles[5], "histo");
     }
 
-    private void printTimer(TimerMetric timer, String name) {
-        printMetered(timer, name);
+    @Override
+    public void processTimer(MetricName name, TimerMetric timer, String x) throws IOException {
+        processMeter(name, timer, x);
         final String sanitizedName = sanitizeName(name);
-        final double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
+        final Double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
         final String durationUnit = timer.durationUnit().name();
         printDoubleField(sanitizedName + ".min", timer.min(), "timer", durationUnit);
         printDoubleField(sanitizedName + ".max", timer.max(), "timer", durationUnit);
@@ -354,7 +358,7 @@ public class GangliaReporter extends AbstractPollingReporter {
     }
 
     private void printDoubleField(String name, double value, String groupName, String units) {
-        sendToGanglia(sanitizeName(name), GANGLIA_DOUBLE_TYPE, String.format(locale, "%2.2f", value), groupName, units);
+        sendToGanglia(name, GANGLIA_DOUBLE_TYPE, String.format(locale, "%2.2f", value), groupName, units);
     }
 
     private void printDoubleField(String name, double value, String groupName) {
@@ -367,7 +371,7 @@ public class GangliaReporter extends AbstractPollingReporter {
 
     private void printLongField(String name, long value, String groupName, String units) {
         // TODO:  ganglia does not support int64, what should we do here?
-        sendToGanglia(sanitizeName(name), GANGLIA_INT_TYPE, String.format(locale, "%d", value), groupName, units);
+        sendToGanglia(name, GANGLIA_INT_TYPE, String.format(locale, "%d", value), groupName, units);
     }
 
     private void printVmMetrics() {
@@ -402,10 +406,12 @@ public class GangliaReporter extends AbstractPollingReporter {
         }
     }
 
-    protected String sanitizeName(String metricName) {
-        if (metricName == null || metricName.equals("")) {
-            return metricName;
+    protected String sanitizeName(MetricName name) {
+        if (name == null) {
+            return "";
         }
+        final String qualifiedTypeName = name.getGroup() + "." + name.getType() + "." + name.getName();
+        final String metricName = name.hasScope() ? qualifiedTypeName + '.' + name.getScope() : qualifiedTypeName;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < metricName.length(); i++) {
             char p = metricName.charAt(i);
