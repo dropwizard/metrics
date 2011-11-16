@@ -47,7 +47,7 @@ public class MetricsRegistry {
                                        String name,
                                        String scope,
                                        GaugeMetric<T> metric) {
-        return newGauge(new MetricName(klass, name, scope), metric);
+        return newGauge(createName(klass, name, scope), metric);
     }
 
     /**
@@ -99,7 +99,7 @@ public class MetricsRegistry {
                                 String scope,
                                 String objectName,
                                 String attribute) throws MalformedObjectNameException {
-        return newJmxGauge(new MetricName(klass, name, scope), objectName, attribute);
+        return newJmxGauge(createName(klass, name, scope), objectName, attribute);
     }
 
     /**
@@ -143,7 +143,7 @@ public class MetricsRegistry {
     public CounterMetric newCounter(Class<?> klass,
                                     String name,
                                     String scope) {
-        return newCounter(new MetricName(klass, name, scope));
+        return newCounter(createName(klass, name, scope));
     }
 
     /**
@@ -186,7 +186,7 @@ public class MetricsRegistry {
                                         String name,
                                         String scope,
                                         boolean biased) {
-        return newHistogram(new MetricName(klass, name, scope), biased);
+        return newHistogram(createName(klass, name, scope), biased);
     }
 
     /**
@@ -266,7 +266,7 @@ public class MetricsRegistry {
                                 String scope,
                                 String eventType,
                                 TimeUnit unit) {
-        return newMeter(new MetricName(klass, name, scope), eventType, unit);
+        return newMeter(createName(klass, name, scope), eventType, unit);
     }
 
     /**
@@ -356,7 +356,7 @@ public class MetricsRegistry {
                                 String scope,
                                 TimeUnit durationUnit,
                                 TimeUnit rateUnit) {
-        return newTimer(new MetricName(klass, name, scope), durationUnit, rateUnit);
+        return newTimer(createName(klass, name, scope), durationUnit, rateUnit);
     }
 
     /**
@@ -383,6 +383,20 @@ public class MetricsRegistry {
         }
         return (TimerMetric) existingMetric;
     }
+    
+    /**
+     * Override to customize how {@link MetricName}s are created.
+     * 
+     * @param klass
+     * @param name
+     * @param scope
+     * @return
+     */
+    public MetricName createName(Class<?> klass, String name, String scope)
+    {
+        return new MetricName(klass, name, scope);
+    }
+
     /**
      * Returns an unmodifiable map of all metrics and their names.
      *

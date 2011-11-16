@@ -20,13 +20,33 @@ import com.yammer.metrics.reporting.JmxReporter;
 public class InstrumentationModule extends AbstractModule {
     @Override
     protected void configure() {
-        MetricsRegistry metricsRegistry = new MetricsRegistry();
+        MetricsRegistry metricsRegistry = createMetricsRegistry();
         bind(MetricsRegistry.class).toInstance(metricsRegistry);
-        bind(HealthCheckRegistry.class).asEagerSingleton();
+        bind(HealthCheckRegistry.class).toInstance(createHealthCheckRegistry());
         bind(JmxReporter.class).toProvider(JmxReporterProvider.class).asEagerSingleton();
         bindListener(Matchers.any(), new MeteredListener(metricsRegistry));
         bindListener(Matchers.any(), new TimedListener(metricsRegistry));
         bindListener(Matchers.any(), new GaugeListener(metricsRegistry));
         bindListener(Matchers.any(), new ExceptionMeteredListener(metricsRegistry));
+    }
+
+    /**
+     * Override to provide a custom {@link HealthCheckRegistry}
+     * 
+     * @return
+     */
+    protected HealthCheckRegistry createHealthCheckRegistry()
+    {
+        return new HealthCheckRegistry();
+    }
+
+    /**
+     * Override to provide a custom {@link MetricsRegistry}
+     * 
+     * @return
+     */
+    protected MetricsRegistry createMetricsRegistry()
+    {
+        return new MetricsRegistry();
     }
 }
