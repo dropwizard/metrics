@@ -321,15 +321,17 @@ public class MetricsServlet extends HttpServlet {
         json.writeStartObject();
         {
             json.writeStringField("type", "gauge");
-            json.writeFieldName("value");
-            try {
-                final Object value = gauge.value();
-                json.writeObject(value);
-            } catch (Exception e) {
-                json.writeString("error reading gauge: " + e.getMessage());
-            }
+            json.writeObjectField("value", evaluateGauge(gauge));
         }
         json.writeEndObject();
+    }
+
+    private Object evaluateGauge(GaugeMetric<?> gauge) {
+        try {
+            return gauge.value();
+        } catch (RuntimeException e) {
+            return "error reading gauge: " + e.getMessage();
+        }
     }
 
     private void writeVmMetrics(JsonGenerator json, boolean showFullSamples) throws IOException {
