@@ -24,6 +24,14 @@
         <module>metrics-web</module>
     </modules>
 
+    <properties>
+        <jetty.version>7.5.4.v20111024</jetty.version>
+        <servlet.version>2.5</servlet.version>
+        <jackson.version>1.9.2</jackson.version>
+        <guice.version>3.0</guice.version>
+        <slf4j.version>1.6.4</slf4j.version>
+    </properties>
+
     <developers>
         <developer>
             <name>Coda Hale</name>
