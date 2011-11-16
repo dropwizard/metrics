@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * A timer metric which aggregates timing durations and provides duration
  * statistics, plus throughput statistics via {@link MeterMetric}.
  */
-public class TimerMetric implements Metered {
+public class TimerMetric implements Metered, Stoppable {
 
     private final TimeUnit durationUnit, rateUnit;
     private final MeterMetric meter;
@@ -243,7 +243,8 @@ public class TimerMetric implements Metered {
         return ns / TimeUnit.NANOSECONDS.convert(1, durationUnit);
     }
 
-    void stop() {
+    @Override
+    public void stop() {
         meter.stop();
     }
 }
