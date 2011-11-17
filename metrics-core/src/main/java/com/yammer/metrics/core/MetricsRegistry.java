@@ -447,7 +447,7 @@ public class MetricsRegistry {
      * @return a new {@link ConcurrentMap}
      */
     protected ConcurrentMap<MetricName, Metric> newMetricsMap() {
-        return new ConcurrentHashMap<MetricName, Metric>();
+        return new ConcurrentHashMap<MetricName, Metric>(1024);
     }
 
     @SuppressWarnings("unchecked")
