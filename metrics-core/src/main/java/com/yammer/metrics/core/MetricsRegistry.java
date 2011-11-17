@@ -285,12 +285,7 @@ public class MetricsRegistry {
         final Metric existingMetric = metrics.get(metricName);
         if (existingMetric == null) {
             final MeterMetric metric = MeterMetric.newMeter(newMeterTickThreadPool(), eventType, unit);
-            final Metric justAddedMetric = metrics.putIfAbsent(metricName, metric);
-            if (justAddedMetric == null) {
-                notifyMetricAdded(metricName, metric);
-                return metric;
-            }
-            return (MeterMetric) justAddedMetric;
+            return getOrAdd(metricName, metric);
         }
         return (MeterMetric) existingMetric;
     }
@@ -374,12 +369,7 @@ public class MetricsRegistry {
         final Metric existingMetric = metrics.get(metricName);
         if (existingMetric == null) {
             final TimerMetric metric = new TimerMetric(newMeterTickThreadPool(), durationUnit, rateUnit);
-            final Metric justAddedMetric = metrics.putIfAbsent(metricName, metric);
-            if (justAddedMetric == null) {
-                notifyMetricAdded(metricName, metric);
-                return metric;
-            }
-            return (TimerMetric) justAddedMetric;
+            return getOrAdd(metricName, metric);
         }
         return (TimerMetric) existingMetric;
     }
@@ -464,7 +454,7 @@ public class MetricsRegistry {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Metric> T getOrAdd(MetricName name, T metric) {
+    protected final <T extends Metric> T getOrAdd(MetricName name, T metric) {
         final Metric existingMetric = metrics.get(name);
         if (existingMetric == null) {
             final Metric justAddedMetric = metrics.putIfAbsent(name, metric);
