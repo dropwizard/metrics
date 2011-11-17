@@ -282,6 +282,10 @@ public class MetricsRegistry {
     public MeterMetric newMeter(MetricName metricName,
                                 String eventType,
                                 TimeUnit unit) {
+        final Metric existingMetric = metrics.get(metricName);
+        if (existingMetric != null) {
+            return (MeterMetric) existingMetric;
+        }
         return getOrAdd(metricName, MeterMetric.newMeter(newMeterTickThreadPool(), eventType, unit));
     }
 
@@ -361,6 +365,10 @@ public class MetricsRegistry {
     public TimerMetric newTimer(MetricName metricName,
                                 TimeUnit durationUnit,
                                 TimeUnit rateUnit) {
+        final Metric existingMetric = metrics.get(metricName);
+        if (existingMetric != null) {
+            return (TimerMetric) existingMetric;
+        }
         return getOrAdd(metricName, new TimerMetric(newMeterTickThreadPool(), durationUnit, rateUnit));
     }
     
