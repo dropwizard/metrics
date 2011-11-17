@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class MeterMetric implements Metered {
     private static final long INTERVAL = 5; // seconds
+    private final Clock clock;
 
     /**
      * Creates a new {@link MeterMetric}.
@@ -43,7 +44,7 @@ public class MeterMetric implements Metered {
      * @return a new {@link MeterMetric}
      */
     public static MeterMetric newMeter(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit) {
-        return new MeterMetric(tickThread, eventType, rateUnit);
+        return new MeterMetric(tickThread, eventType, rateUnit, Clock.DEFAULT);
     }
 
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
@@ -51,12 +52,12 @@ public class MeterMetric implements Metered {
     private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
 
     private final AtomicLong count = new AtomicLong();
-    private final long startTime = System.nanoTime();
+    private final long startTime;
     private final TimeUnit rateUnit;
     private final String eventType;
     private final ScheduledFuture<?> future;
 
-    private MeterMetric(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit) {
+    public MeterMetric(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit, Clock clock) {
         this.rateUnit = rateUnit;
         this.eventType = eventType;
         this.future = tickThread.scheduleAtFixedRate(new Runnable() {
@@ -65,6 +66,8 @@ public class MeterMetric implements Metered {
                 tick();
             }
         }, INTERVAL, INTERVAL, TimeUnit.SECONDS);
+        this.clock = clock;
+        this.startTime = this.clock.tick();
     }
 
     @Override
@@ -125,7 +128,7 @@ public class MeterMetric implements Metered {
         if (count() == 0) {
             return 0.0;
         } else {
-            final long elapsed = (System.nanoTime() - startTime);
+            final long elapsed = (clock.tick() - startTime);
             return convertNsRate(count() / (double) elapsed);
         }
     }
