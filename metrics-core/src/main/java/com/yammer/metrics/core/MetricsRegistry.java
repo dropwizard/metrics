@@ -464,7 +464,7 @@ public class MetricsRegistry {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Metric> T getOrAdd(MetricName name, T metric) {
+    protected final <T extends Metric> T getOrAdd(MetricName name, T metric) {
         final Metric existingMetric = metrics.get(name);
         if (existingMetric == null) {
             final Metric justAddedMetric = metrics.putIfAbsent(name, metric);
