@@ -183,7 +183,7 @@ public class MetricsServlet extends HttpServlet {
 
         final PrintWriter writer = resp.getWriter();
         if (results.isEmpty()) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
             writer.println("! No health checks registered.");
         } else {
             if (allHealthy) {
