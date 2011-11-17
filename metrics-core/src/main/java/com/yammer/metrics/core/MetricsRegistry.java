@@ -367,13 +367,12 @@ public class MetricsRegistry {
     /**
      * Override to customize how {@link MetricName}s are created.
      * 
-     * @param klass
-     * @param name
-     * @param scope
-     * @return
+     * @param klass    the class which owns the metric
+     * @param name     the name of the metric
+     * @param scope    the metric's scope
+     * @return the metric's full name
      */
-    public MetricName createName(Class<?> klass, String name, String scope)
-    {
+    public MetricName createName(Class<?> klass, String name, String scope) {
         return new MetricName(klass, name, scope);
     }
 
