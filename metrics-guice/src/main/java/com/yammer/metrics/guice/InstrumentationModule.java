@@ -23,11 +23,19 @@ public class InstrumentationModule extends AbstractModule {
         MetricsRegistry metricsRegistry = createMetricsRegistry();
         bind(MetricsRegistry.class).toInstance(metricsRegistry);
         bind(HealthCheckRegistry.class).toInstance(createHealthCheckRegistry());
-        bind(JmxReporter.class).toProvider(JmxReporterProvider.class).asEagerSingleton();
+        bindJmxReporter();
         bindListener(Matchers.any(), new MeteredListener(metricsRegistry));
         bindListener(Matchers.any(), new TimedListener(metricsRegistry));
         bindListener(Matchers.any(), new GaugeListener(metricsRegistry));
         bindListener(Matchers.any(), new ExceptionMeteredListener(metricsRegistry));
+    }
+
+    /**
+     * Override to provide a custom binding for {@link JmxReporter}
+     */
+    protected void bindJmxReporter()
+    {
+        bind(JmxReporter.class).toProvider(JmxReporterProvider.class).asEagerSingleton();
     }
 
     /**
