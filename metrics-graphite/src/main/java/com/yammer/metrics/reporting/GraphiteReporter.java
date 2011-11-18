@@ -1,12 +1,14 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.*;
-import com.yammer.metrics.core.VirtualMachineMetrics.*;
-import com.yammer.metrics.util.MetricPredicate;
-import com.yammer.metrics.util.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.yammer.metrics.core.VirtualMachineMetrics.daemonThreadCount;
+import static com.yammer.metrics.core.VirtualMachineMetrics.fileDescriptorUsage;
+import static com.yammer.metrics.core.VirtualMachineMetrics.garbageCollectors;
+import static com.yammer.metrics.core.VirtualMachineMetrics.heapUsage;
+import static com.yammer.metrics.core.VirtualMachineMetrics.memoryPoolUsage;
+import static com.yammer.metrics.core.VirtualMachineMetrics.nonHeapUsage;
+import static com.yammer.metrics.core.VirtualMachineMetrics.threadCount;
+import static com.yammer.metrics.core.VirtualMachineMetrics.threadStatePercentages;
+import static com.yammer.metrics.core.VirtualMachineMetrics.uptime;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -18,15 +20,22 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
-import static com.yammer.metrics.core.VirtualMachineMetrics.daemonThreadCount;
-import static com.yammer.metrics.core.VirtualMachineMetrics.fileDescriptorUsage;
-import static com.yammer.metrics.core.VirtualMachineMetrics.garbageCollectors;
-import static com.yammer.metrics.core.VirtualMachineMetrics.heapUsage;
-import static com.yammer.metrics.core.VirtualMachineMetrics.memoryPoolUsage;
-import static com.yammer.metrics.core.VirtualMachineMetrics.nonHeapUsage;
-import static com.yammer.metrics.core.VirtualMachineMetrics.threadCount;
-import static com.yammer.metrics.core.VirtualMachineMetrics.threadStatePercentages;
-import static com.yammer.metrics.core.VirtualMachineMetrics.uptime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Clock;
+import com.yammer.metrics.core.CounterMetric;
+import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.HistogramMetric;
+import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.Metered;
+import com.yammer.metrics.core.Metric;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.VirtualMachineMetrics.GarbageCollector;
+import com.yammer.metrics.util.MetricPredicate;
+import com.yammer.metrics.util.Utils;
 
 
 /**
@@ -35,13 +44,14 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.uptime;
  */
 public class GraphiteReporter extends AbstractPollingReporter {
     private static final Logger LOG = LoggerFactory.getLogger(GraphiteReporter.class);
-    private final String host;
-    private final int port;
     private final String prefix;
     private final MetricPredicate predicate;
     private final Locale locale = Locale.US;
     private Writer writer;
-
+    private Clock clock;
+    private final SocketProvider socketProvider;
+    public boolean printVMMetrics = true;
+    
     /**
      * Enables the graphite reporter to send data for the default metrics registry
      * to graphite server with the specified period.
@@ -112,7 +122,7 @@ public class GraphiteReporter extends AbstractPollingReporter {
      */
     public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix, MetricPredicate predicate) {
         try {
-            final GraphiteReporter reporter = new GraphiteReporter(metricsRegistry, host, port, prefix, predicate);
+            final GraphiteReporter reporter = new GraphiteReporter(metricsRegistry, prefix, predicate, new DefaultSocketProvider(host, port), new SystemTimeMillis());
             reporter.start(period, unit);
         } catch (Exception e) {
             LOG.error("Error creating/starting Graphite reporter:", e);
@@ -141,7 +151,7 @@ public class GraphiteReporter extends AbstractPollingReporter {
      * @throws IOException if there is an error connecting to the Graphite server
      */
     public GraphiteReporter(MetricsRegistry metricsRegistry, String host, int port, String prefix) throws IOException {
-        this(metricsRegistry, host, port, prefix, MetricPredicate.ALL);
+        this(metricsRegistry, prefix, MetricPredicate.ALL, new DefaultSocketProvider(host, port), new SystemTimeMillis());
     }
 
     /**
@@ -154,10 +164,12 @@ public class GraphiteReporter extends AbstractPollingReporter {
      * @param predicate       filters metrics to be reported
      * @throws IOException if there is an error connecting to the Graphite server
      */
-    public GraphiteReporter(MetricsRegistry metricsRegistry, String host, int port, String prefix, MetricPredicate predicate) throws IOException {
+    public GraphiteReporter(MetricsRegistry metricsRegistry, String prefix, MetricPredicate predicate, SocketProvider socketProvider, Clock clock) throws IOException {
         super(metricsRegistry, "graphite-reporter");
-        this.host = host;
-        this.port = port;
+        this.socketProvider = socketProvider;
+        
+        this.clock = clock;
+        
         if (prefix != null) {
             // Pre-append the "." so that we don't need to make anything conditional later.
             this.prefix = prefix + ".";
@@ -171,10 +183,14 @@ public class GraphiteReporter extends AbstractPollingReporter {
     public void run() {
         Socket socket = null;
         try {
-            socket = new Socket(host, port);
+            socket = this.socketProvider.get();
             writer = new OutputStreamWriter(socket.getOutputStream());
-            long epoch = System.currentTimeMillis() / 1000;
-            printVmMetrics(epoch);
+            
+            long epoch = clock.tick() / 1000;
+            if(this.printVMMetrics )
+            {
+                printVmMetrics(epoch);                
+            }
             printRegularMetrics(epoch);
             writer.flush();
         } catch (Exception e) {
@@ -305,7 +321,7 @@ public class GraphiteReporter extends AbstractPollingReporter {
         sendToGraphite(String.format(locale, "%s%s %d %d\n", prefix, sanitizeName(name), value, epoch));
     }
 
-    private void printVmMetrics(long epoch) throws IOException {
+    private void printVmMetrics(long epoch) {
         printDoubleField("jvm.memory.heap_usage", heapUsage(), epoch);
         printDoubleField("jvm.memory.non_heap_usage", nonHeapUsage(), epoch);
         for (Entry<String, Double> pool : memoryPoolUsage().entrySet()) {
@@ -325,5 +341,40 @@ public class GraphiteReporter extends AbstractPollingReporter {
             printLongField("jvm.gc." + entry.getKey() + ".time", entry.getValue().getTime(TimeUnit.MILLISECONDS), epoch);
             printLongField("jvm.gc." + entry.getKey() + ".runs", entry.getValue().getRuns(), epoch);
         }
+    }
+    
+    private static class SystemTimeMillis implements Clock
+    {
+
+        public SystemTimeMillis()
+        {
+        }
+
+        @Override
+        public long tick()
+        {
+            return System.currentTimeMillis();
+        }
+        
+    }
+    
+    private static class DefaultSocketProvider implements SocketProvider
+    {
+        
+        private final String host;
+        private final int port;
+        
+        public DefaultSocketProvider(String host, int port)
+        {
+            this.host = host;
+            this.port = port;
+            
+        }
+        @Override
+        public Socket get() throws Exception
+        {
+            return new Socket(this.host, this.port);
+        }
+        
     }
 }
