@@ -38,22 +38,16 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.uptime;
  */
 public class GangliaReporter extends AbstractPollingReporter {
     private static final Logger LOG = LoggerFactory.getLogger(GangliaReporter.class);
-    private static final int BUFFER_SIZE = 1500;
     private static final int GANGLIA_TMAX = 60;
     private static final int GANGLIA_DMAX = 0;
     private static final String GANGLIA_INT_TYPE = "int32";
     private static final String GANGLIA_DOUBLE_TYPE = "double";
-    private final String gangliaHost;
-    private final int port;
     private final MetricPredicate predicate;
     private final Locale locale = Locale.US;
-    private byte[] buffer = new byte[BUFFER_SIZE];
-    private int offset;
-    private DatagramSocket socket;
     private String hostLabel;
     private String groupPrefix = "";
     private boolean useShortNames;
-
+    private final GangliaMessageBuilder gangliaMessageBuilder;
 
     /**
      * Enables the ganglia reporter to send data for the default metrics registry
@@ -189,7 +183,7 @@ public class GangliaReporter extends AbstractPollingReporter {
         this(metricsRegistry, gangliaHost, port, groupPrefix, predicate, false);
     }
 
-     /**
+    /**
      * Creates a new {@link GangliaReporter}.
      *
      * @param metricsRegistry the metrics registry
@@ -202,14 +196,27 @@ public class GangliaReporter extends AbstractPollingReporter {
      */
     public GangliaReporter(MetricsRegistry metricsRegistry, String gangliaHost, int port, String groupPrefix,
                            MetricPredicate predicate, boolean useShortNames) throws IOException {
+        this(metricsRegistry, groupPrefix, predicate, useShortNames, new GangliaMessageBuilder(gangliaHost, port, new DatagramSocket()));
+    }
+     /**
+     * Creates a new {@link GangliaReporter}.
+     *
+     * @param metricsRegistry the metrics registry
+     * @param gangliaHost     is ganglia server
+     * @param port            is port on which ganglia server is running
+     * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
+     * @param predicate       filters metrics to be reported
+     * @param useShotNames    if true reporter will compress package names e.g. com.foo.MetricName becomes c.f.MetricName
+     * @throws java.io.IOException if there is an error connecting to the ganglia server
+     */
+    public GangliaReporter(MetricsRegistry metricsRegistry, String groupPrefix,
+                           MetricPredicate predicate, boolean useShortNames, GangliaMessageBuilder gangliaMessageBuilder) throws IOException {
         super(metricsRegistry, "ganglia-reporter");
-        this.gangliaHost = gangliaHost;
-        this.port = port;
+        this.gangliaMessageBuilder = gangliaMessageBuilder;
         this.groupPrefix = groupPrefix + "_";
         this.hostLabel = getHostLabel();
         this.predicate = predicate;
         this.useShortNames = useShortNames;
-        socket = new DatagramSocket();
     }
 
     @Override
@@ -261,69 +268,34 @@ public class GangliaReporter extends AbstractPollingReporter {
     }
 
     private void sendMetricData(String metricType, String metricName, String metricValue, String groupName, String units) throws IOException {
-        offset = 0;
-        xdrInt(128); // metric_id = metadata_msg
-        xdrString(hostLabel); // hostname
-        xdrString(metricName); // metric name
-        xdrInt(0); // spoof = True
-        xdrString(metricType); // metric type
-        xdrString(metricName); // metric name
-        xdrString(units); // units
-        xdrInt(3); // slope see gmetric.c
-        xdrInt(GANGLIA_TMAX); // tmax, the maximum time between metrics
-        xdrInt(GANGLIA_DMAX); // dmax, the maximum data value
-        xdrInt(1);
-        xdrString("GROUP");    /*Group attribute*/
-        xdrString(groupName);  /*Group value*/
-        socket.send(new DatagramPacket(buffer, offset, new InetSocketAddress(gangliaHost, port)));
-
-        offset = 0;
-        xdrInt(133); // we are sending a string value
-        xdrString(hostLabel); // hostLabel
-        xdrString(metricName); // metric name
-        xdrInt(0); // spoof = True
-        xdrString("%s"); // format field
-        xdrString(metricValue); // metric value
-        socket.send(new DatagramPacket(buffer, offset, new InetSocketAddress(gangliaHost, port)));
+        
+        this.gangliaMessageBuilder.newMessage()
+                .addInt(128)// metric_id = metadata_msg
+                .addString(this.hostLabel)// hostname
+                .addString(metricName)// metric name
+                .addInt(0)// spoof = True
+                .addString(metricType)// metric type
+                .addString(metricName)// metric name
+                .addString(units)// units
+                .addInt(3)// slope see gmetric.c
+                .addInt(GANGLIA_TMAX)// tmax, the maximum time between metrics
+                .addInt(GANGLIA_DMAX)// dmax, the maximum data value
+                .addInt(1)
+                .addString("GROUP")// Group attribute
+                .addString(groupName)// Group value
+                .send();
+                
+        this.gangliaMessageBuilder.newMessage()
+                .addInt(133)// we are sending a string value
+                .addString(hostLabel)// hostLabel
+                .addString(metricName)// metric name
+                .addInt(0)// spoof = True
+                .addString("%s")// format field
+                .addString(metricValue) // metric value
+                .send();
     }
 
-    /**
-     * Puts an integer into the buffer as 4 bytes, big-endian.
-     *
-     * @param i -  the integer to write to the buffer
-     */
-    private void xdrInt(int i) {
-        buffer[offset++] = (byte) ((i >> 24) & 0xff);
-        buffer[offset++] = (byte) ((i >> 16) & 0xff);
-        buffer[offset++] = (byte) ((i >> 8) & 0xff);
-        buffer[offset++] = (byte) (i & 0xff);
-    }
 
-    /**
-     * Puts a string into the buffer by first writing the size of the string
-     * as an int, followed by the bytes of the string, padded if necessary to
-     * a multiple of 4.
-     *
-     * @param message - the message to write to the buffer
-     */
-    private void xdrString(String message) {
-        byte[] bytes = message.getBytes();
-        int len = bytes.length;
-        xdrInt(len);
-        System.arraycopy(bytes, 0, buffer, offset, len);
-        offset += len;
-        pad();
-    }
-
-    /**
-     * Pads the buffer with zero bytes up to the nearest multiple of 4.
-     */
-    private void pad() {
-        int newOffset = ((offset + 3) / 4) * 4;
-        while (offset < newOffset) {
-            buffer[offset++] = 0;
-        }
-    }
 
     private void printGauge(GaugeMetric<?> gauge, String name) {
         sendToGanglia(sanitizeName(name), GANGLIA_INT_TYPE, String.format(locale, "%s", gauge.value()), "gauge");
