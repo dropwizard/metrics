@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ReturnValues;
 
 import com.yammer.metrics.core.Clock;
 import com.yammer.metrics.core.CounterMetric;
@@ -30,16 +31,15 @@ public abstract class AbstractPollingReporterTest {
     protected final Clock clock = mock(Clock.class);
     private AbstractPollingReporter reporter;
     private ByteArrayOutputStream out;
-    private TestMetricsRegistry internalRegistry;
-    protected MetricsRegistry registry;
+    private TestMetricsRegistry registry;
 
     @Before
     public void init() throws Exception {
         when(clock.tick()).thenReturn(1234L);
         when(clock.time()).thenReturn(5678L);
-        registry = internalRegistry = new TestMetricsRegistry();
+        registry = new TestMetricsRegistry();
         out = new ByteArrayOutputStream();
-        reporter = createReporter(internalRegistry, out, clock);
+        reporter = createReporter(registry, out, clock);
     }
 
     private static class TestMetricsRegistry extends MetricsRegistry {
@@ -53,7 +53,7 @@ public abstract class AbstractPollingReporterTest {
         final T metric = action.call();
         try{
             // Add the metric to the registry, run the reporter and flush the result
-            internalRegistry.add(new MetricName(getClass(), metric.getClass().getSimpleName()), metric);
+            registry.add(new MetricName(getClass(), metric.getClass().getSimpleName()), metric);
             reporter.run();
             out.flush();
             final String[] lines = out.toString().split("\n");
