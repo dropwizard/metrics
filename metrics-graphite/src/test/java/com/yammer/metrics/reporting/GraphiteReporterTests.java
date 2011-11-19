@@ -23,6 +23,8 @@ public class GraphiteReporterTests
 {
     private static GraphiteReporter getMockGraphiteReporter(final OutputStream outputStream, MetricsRegistry metricsRegistry) throws IOException
     {
+        final Clock clock = mock(Clock.class);
+        when(clock.time()).thenReturn(123456L);
         GraphiteReporter graphiteReporter = new GraphiteReporter(metricsRegistry, "prefix", MetricPredicate.ALL, new SocketProvider()
         {
             @Override
@@ -34,14 +36,7 @@ public class GraphiteReporterTests
 
                 return socket;
             }
-        }, new Clock()
-        {
-            @Override
-            public long tick()
-            {
-                return 123000;
-            }
-        });
+        }, clock);
 
         graphiteReporter.printVMMetrics = false;
 
