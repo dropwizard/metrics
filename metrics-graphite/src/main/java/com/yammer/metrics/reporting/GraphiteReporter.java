@@ -186,7 +186,7 @@ public class GraphiteReporter extends AbstractPollingReporter {
             socket = this.socketProvider.get();
             writer = new OutputStreamWriter(socket.getOutputStream());
             
-            long epoch = clock.tick() / 1000;
+            long epoch = clock.time() / 1000;
             if(this.printVMMetrics )
             {
                 printVmMetrics(epoch);                
