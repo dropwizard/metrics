@@ -150,7 +150,7 @@ public class CsvReporter extends AbstractPollingReporter {
 
     @Override
     public void start(long period, TimeUnit unit) {
-        this.startTime = TimeUnit.NANOSECONDS.toMillis(clock.tick());
+        this.startTime = clock.time();
         super.start(period, unit);
     }
 
