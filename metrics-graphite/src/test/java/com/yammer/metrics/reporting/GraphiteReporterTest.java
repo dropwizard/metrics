@@ -19,7 +19,7 @@ import com.yammer.metrics.core.HistogramMetric;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.util.MetricPredicate;
 
-public class GraphiteReporterTests
+public class GraphiteReporterTest
 {
     private MetricsRegistry registry;
     private GraphiteReporter reporter;
