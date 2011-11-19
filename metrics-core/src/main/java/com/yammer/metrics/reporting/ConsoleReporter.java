@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class ConsoleReporter extends AbstractPollingReporter {
     private final PrintStream out;
     private final MetricPredicate predicate;
+    private final Clock clock;
 
     /**
      * Enables the console reporter for the default metrics registry, and causes it to
@@ -62,16 +63,29 @@ public class ConsoleReporter extends AbstractPollingReporter {
      * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be output
      */
     public ConsoleReporter(MetricsRegistry metricsRegistry, PrintStream out, MetricPredicate predicate) {
+        this(metricsRegistry, out, predicate, Clock.DEFAULT);
+    }
+
+    /**
+     * Creates a new {@link ConsoleReporter} for a given metrics registry.
+     *
+     * @param metricsRegistry the metrics registry
+     * @param out             the {@link java.io.PrintStream} to which output will be written
+     * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be output
+     * @param clock           the {@link Clock} used to print time
+     */
+    public ConsoleReporter(MetricsRegistry metricsRegistry, PrintStream out, MetricPredicate predicate, Clock clock) {
         super(metricsRegistry, "console-reporter");
         this.out = out;
         this.predicate = predicate;
+        this.clock = clock;
     }
 
     @Override
     public void run() {
         try {
-            final DateFormat format = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
-            final String dateTime = format.format(new Date());
+            final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+            final String dateTime = format.format(new Date(clock.time()));
             out.print(dateTime);
             out.print(' ');
             for (int i = 0; i < (80 - dateTime.length() - 1); i++) {

@@ -1,8 +1,5 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.core.*;
-import com.yammer.metrics.util.MetricPredicate;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,20 +10,40 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import com.yammer.metrics.core.Clock;
+import com.yammer.metrics.core.CounterMetric;
+import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.HistogramMetric;
+import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.Metric;
+import com.yammer.metrics.core.MetricName;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.util.MetricPredicate;
+
 public class CsvReporter extends AbstractPollingReporter {
     private final MetricPredicate predicate;
     private final File outputDir;
     private final Map<MetricName, PrintStream> streamMap;
+    private final Clock clock;
     private long startTime;
 
     public CsvReporter(File outputDir,
+            MetricsRegistry metricsRegistry,
+            MetricPredicate predicate) throws Exception {
+        this(outputDir, metricsRegistry, predicate, Clock.DEFAULT);
+    }
+    
+    public CsvReporter(File outputDir,
                        MetricsRegistry metricsRegistry,
-                       MetricPredicate predicate) throws Exception {
+                       MetricPredicate predicate,
+                       Clock clock) throws Exception {
         super(metricsRegistry, "csv-reporter");
         this.outputDir = outputDir;
         this.predicate = predicate;
         this.streamMap = new HashMap<MetricName, PrintStream>();
         this.startTime = 0L;
+        this.clock = clock;
     }
 
     public CsvReporter(File outputDir, MetricsRegistry metricsRegistry)
@@ -40,32 +57,38 @@ public class CsvReporter extends AbstractPollingReporter {
         synchronized (streamMap) {
             stream = streamMap.get(metricName);
             if (stream == null) {
-                final File newFile = new File(outputDir, metricName.getName() + ".csv");
-                if (newFile.createNewFile()) {
-                    stream = new PrintStream(new FileOutputStream(newFile));
-                    streamMap.put(metricName, stream);
-                    if (metric instanceof GaugeMetric<?>) {
-                        stream.println("# time,value");
-                    } else if (metric instanceof CounterMetric) {
-                        stream.println("# time,count");
-                    } else if (metric instanceof HistogramMetric) {
-                        stream.println("# time,min,max,mean,median,stddev,90%,95%,99%");
-                    } else if (metric instanceof MeterMetric) {
-                        stream.println("# time,count,1 min rate,mean rate,5 min rate,15 min rate");
-                    } else if (metric instanceof TimerMetric) {
-                        stream.println("# time,min,max,mean,median,stddev,90%,95%,99%");
-                    }
-                } else {
-                    throw new IOException("Unable to create " + newFile);
+                stream = createStreamForMetric(metricName);
+                streamMap.put(metricName, stream);
+                if (metric instanceof GaugeMetric<?>) {
+                    stream.println("# time,value");
+                } else if (metric instanceof CounterMetric) {
+                    stream.println("# time,count");
+                } else if (metric instanceof HistogramMetric) {
+                    stream.println("# time,min,max,mean,median,stddev,90%,95%,99%");
+                } else if (metric instanceof MeterMetric) {
+                    stream.println("# time,count,1 min rate,mean rate,5 min rate,15 min rate");
+                } else if (metric instanceof TimerMetric) {
+                    stream.println("# time,min,max,mean,median,stddev,90%,95%,99%");
                 }
             }
         }
         return stream;
     }
+    
+    /**
+     * Override to do tricks (such as testing).
+     */
+    protected PrintStream createStreamForMetric(MetricName metricName) throws IOException {
+        final File newFile = new File(outputDir, metricName.getName() + ".csv");
+        if (newFile.createNewFile()) {
+            return new PrintStream(new FileOutputStream(newFile));
+        }
+        throw new IOException("Unable to create " + newFile);
+    }
 
     @Override
     public void run() {
-        final long time = (System.currentTimeMillis() - startTime) / 1000;
+        final long time = (clock.time() - startTime) / 1000;
         final Set<Entry<MetricName, Metric>> metrics = metricsRegistry.allMetrics().entrySet();
         try {
             for (Entry<MetricName, Metric> entry : metrics) {
@@ -127,7 +150,7 @@ public class CsvReporter extends AbstractPollingReporter {
 
     @Override
     public void start(long period, TimeUnit unit) {
-        this.startTime = System.currentTimeMillis();
+        this.startTime = TimeUnit.NANOSECONDS.toMillis(clock.tick());
         super.start(period, unit);
     }
 
