@@ -122,7 +122,7 @@ public class GraphiteReporter extends AbstractPollingReporter {
      */
     public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix, MetricPredicate predicate) {
         try {
-            final GraphiteReporter reporter = new GraphiteReporter(metricsRegistry, prefix, predicate, new DefaultSocketProvider(host, port), new SystemTimeMillis());
+            final GraphiteReporter reporter = new GraphiteReporter(metricsRegistry, prefix, predicate, new DefaultSocketProvider(host, port), Clock.DEFAULT);
             reporter.start(period, unit);
         } catch (Exception e) {
             LOG.error("Error creating/starting Graphite reporter:", e);
@@ -151,7 +151,7 @@ public class GraphiteReporter extends AbstractPollingReporter {
      * @throws IOException if there is an error connecting to the Graphite server
      */
     public GraphiteReporter(MetricsRegistry metricsRegistry, String host, int port, String prefix) throws IOException {
-        this(metricsRegistry, prefix, MetricPredicate.ALL, new DefaultSocketProvider(host, port), new SystemTimeMillis());
+        this(metricsRegistry, prefix, MetricPredicate.ALL, new DefaultSocketProvider(host, port), Clock.DEFAULT);
     }
 
     /**
@@ -186,7 +186,7 @@ public class GraphiteReporter extends AbstractPollingReporter {
             socket = this.socketProvider.get();
             writer = new OutputStreamWriter(socket.getOutputStream());
             
-            long epoch = clock.tick() / 1000;
+            long epoch = clock.time() / 1000;
             if(this.printVMMetrics )
             {
                 printVmMetrics(epoch);                
@@ -341,21 +341,6 @@ public class GraphiteReporter extends AbstractPollingReporter {
             printLongField("jvm.gc." + entry.getKey() + ".time", entry.getValue().getTime(TimeUnit.MILLISECONDS), epoch);
             printLongField("jvm.gc." + entry.getKey() + ".runs", entry.getValue().getRuns(), epoch);
         }
-    }
-    
-    private static class SystemTimeMillis implements Clock
-    {
-
-        public SystemTimeMillis()
-        {
-        }
-
-        @Override
-        public long tick()
-        {
-            return System.currentTimeMillis();
-        }
-        
     }
     
     private static class DefaultSocketProvider implements SocketProvider
