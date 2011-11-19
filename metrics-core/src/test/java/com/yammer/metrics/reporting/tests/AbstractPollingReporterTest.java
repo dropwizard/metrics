@@ -1,6 +1,7 @@
 package com.yammer.metrics.reporting.tests;
-
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -24,20 +25,9 @@ import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Stoppable;
 import com.yammer.metrics.core.TimerMetric;
 import com.yammer.metrics.reporting.AbstractPollingReporter;
-
 public abstract class AbstractPollingReporterTest {
 
-    protected final Clock clock = new Clock() {
-        @Override
-        public long tick() {
-            return 1234;
-        }
-
-        @Override
-        public long time() {
-            return 5678;
-        };
-    };
+    protected final Clock clock = mock(Clock.class);
     private AbstractPollingReporter reporter;
     private ByteArrayOutputStream out;
     private TestMetricsRegistry internalRegistry;
@@ -45,6 +35,8 @@ public abstract class AbstractPollingReporterTest {
 
     @Before
     public void init() throws Exception {
+        when(clock.tick()).thenReturn(1234L);
+        when(clock.time()).thenReturn(5678L);
         registry = internalRegistry = new TestMetricsRegistry();
         out = new ByteArrayOutputStream();
         reporter = createReporter(internalRegistry, out, clock);
