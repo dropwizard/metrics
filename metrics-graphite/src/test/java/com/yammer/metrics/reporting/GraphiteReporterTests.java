@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.yammer.metrics.core.Clock;
@@ -20,38 +21,39 @@ import com.yammer.metrics.util.MetricPredicate;
 
 public class GraphiteReporterTests
 {
-    private static GraphiteReporter getMockGraphiteReporter(final OutputStream outputStream, MetricsRegistry metricsRegistry) throws Exception
+    private MetricsRegistry registry;
+    private GraphiteReporter reporter;
+    private OutputStream out;
+    
+    @Before
+    public void init() throws Exception
     {
+        registry = new MetricsRegistry();
+        out = new ByteArrayOutputStream();
+        
         final Clock clock = mock(Clock.class);
         when(clock.time()).thenReturn(123456L);
 
         final Socket socket = mock(Socket.class);
-        when(socket.getOutputStream()).thenReturn(outputStream);
-        
+        when(socket.getOutputStream()).thenReturn(out);
+
         final SocketProvider provider = mock(SocketProvider.class);
         when(provider.get()).thenReturn(socket);
-        
-        GraphiteReporter graphiteReporter = new GraphiteReporter(metricsRegistry, "prefix", MetricPredicate.ALL, provider, clock);
+
+        GraphiteReporter graphiteReporter = new GraphiteReporter(registry, "prefix", MetricPredicate.ALL, provider, clock);
         graphiteReporter.printVMMetrics = false;
-        return graphiteReporter;
+        reporter = graphiteReporter;
     }
 
     @Test
     public void canRenderCounter() throws Exception
     {
-        StringBuilder expected = new StringBuilder();
+        String expected = "prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.count 11 123\n";
 
-        expected.append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.count 11 123\n");
-
-        MetricsRegistry metricsRegistry = new MetricsRegistry();
-        CounterMetric metric = metricsRegistry.newCounter(getClass(), "test");
+        CounterMetric metric = registry.newCounter(getClass(), "test");
         metric.inc(11);
-
-        OutputStream outputStream = new ByteArrayOutputStream();
-
-        getMockGraphiteReporter(outputStream, metricsRegistry).run();
-
-        assertEquals(expected.toString(), outputStream.toString());
+        reporter.run();
+        assertEquals(expected, out.toString());
     }
 
     @Test
@@ -70,15 +72,12 @@ public class GraphiteReporterTests
         expected.append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.99percentile 10.00 123\n");
         expected.append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.999percentile 10.00 123\n");
 
-        MetricsRegistry metricsRegistry = new MetricsRegistry();
-        HistogramMetric metric = metricsRegistry.newHistogram(getClass(), "test");
+        HistogramMetric metric = registry.newHistogram(getClass(), "test");
         metric.update(10);
 
-        OutputStream outputStream = new ByteArrayOutputStream();
+        reporter.run();
 
-        getMockGraphiteReporter(outputStream, metricsRegistry).run();
-
-        assertEquals(expected.toString(), outputStream.toString());
+        assertEquals(expected.toString(), out.toString());
     }
 
     @Test
@@ -102,14 +101,11 @@ public class GraphiteReporterTests
         expected.append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.99percentile 0.00 123\n");
         expected.append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.999percentile 0.00 123\n");
 
-        MetricsRegistry metricsRegistry = new MetricsRegistry();
-        metricsRegistry.newTimer(getClass(), "test", "testevent");
+        registry.newTimer(getClass(), "test", "testevent");
 
-        OutputStream outputStream = new ByteArrayOutputStream();
+        reporter.run();
 
-        getMockGraphiteReporter(outputStream, metricsRegistry).run();
-
-        assertEquals(expected.toString(), outputStream.toString());
+        assertEquals(expected.toString(), out.toString());
     }
 
     @Test
@@ -123,14 +119,11 @@ public class GraphiteReporterTests
         expected.append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.5MinuteRate 0.00 123\n");
         expected.append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.15MinuteRate 0.00 123\n");
 
-        MetricsRegistry metricsRegistry = new MetricsRegistry();
-        metricsRegistry.newMeter(getClass(), "test", "testevent", TimeUnit.SECONDS);
+        registry.newMeter(getClass(), "test", "testevent", TimeUnit.SECONDS);
 
-        OutputStream outputStream = new ByteArrayOutputStream();
+        reporter.run();
 
-        getMockGraphiteReporter(outputStream, metricsRegistry).run();
-
-        assertEquals(expected.toString(), outputStream.toString());
+        assertEquals(expected.toString(), out.toString());
     }
 
     @Test
@@ -138,9 +131,7 @@ public class GraphiteReporterTests
     {
         String expected = "prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.value 5 123\n";
 
-        MetricsRegistry metricsRegistry = new MetricsRegistry();
-
-        metricsRegistry.newGauge(getClass(), "test", new GaugeMetric<Long>()
+        registry.newGauge(getClass(), "test", new GaugeMetric<Long>()
         {
             @Override
             public Long value()
@@ -149,10 +140,8 @@ public class GraphiteReporterTests
             }
         });
 
-        OutputStream outputStream = new ByteArrayOutputStream();
+        reporter.run();
 
-        getMockGraphiteReporter(outputStream, metricsRegistry).run();
-
-        assertEquals(expected, outputStream.toString());
+        assertEquals(expected, out.toString());
     }
 }
