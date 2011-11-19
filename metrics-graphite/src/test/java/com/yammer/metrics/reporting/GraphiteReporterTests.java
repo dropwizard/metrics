@@ -47,9 +47,9 @@ public class GraphiteReporterTests
     @Test
     public void canRenderCounter() throws Exception
     {
-        final String expected = "prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.count 11 123\n";
+        final String expected = "prefix.java.lang.Object.test.count 11 123\n";
 
-        CounterMetric metric = registry.newCounter(getClass(), "test");
+        CounterMetric metric = registry.newCounter(Object.class, "test");
         metric.inc(11);
         assertOutput(expected);
     }
@@ -58,19 +58,19 @@ public class GraphiteReporterTests
     public void canRenderHistogram() throws Exception
     {
         final String expected = new StringBuilder()
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.min 10.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.max 10.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.mean 10.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.stddev 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.median 10.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.75percentile 10.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.95percentile 10.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.98percentile 10.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.99percentile 10.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.999percentile 10.00 123\n")
+                .append("prefix.java.lang.Object.test.min 10.00 123\n")
+                .append("prefix.java.lang.Object.test.max 10.00 123\n")
+                .append("prefix.java.lang.Object.test.mean 10.00 123\n")
+                .append("prefix.java.lang.Object.test.stddev 0.00 123\n")
+                .append("prefix.java.lang.Object.test.median 10.00 123\n")
+                .append("prefix.java.lang.Object.test.75percentile 10.00 123\n")
+                .append("prefix.java.lang.Object.test.95percentile 10.00 123\n")
+                .append("prefix.java.lang.Object.test.98percentile 10.00 123\n")
+                .append("prefix.java.lang.Object.test.99percentile 10.00 123\n")
+                .append("prefix.java.lang.Object.test.999percentile 10.00 123\n")
                 .toString();
 
-        HistogramMetric metric = registry.newHistogram(getClass(), "test");
+        HistogramMetric metric = registry.newHistogram(Object.class, "test");
         metric.update(10);
 
         assertOutput(expected);
@@ -80,24 +80,24 @@ public class GraphiteReporterTests
     public void canRendererTimed() throws Exception
     {
         final String expected = new StringBuilder()
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.count 0 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.meanRate 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.1MinuteRate 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.5MinuteRate 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.15MinuteRate 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.min 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.max 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.mean 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.stddev 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.median 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.75percentile 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.95percentile 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.98percentile 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.99percentile 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.testevent.test.999percentile 0.00 123\n")
+                .append("prefix.java.lang.Object.testevent.test.count 0 123\n")
+                .append("prefix.java.lang.Object.testevent.test.meanRate 0.00 123\n")
+                .append("prefix.java.lang.Object.testevent.test.1MinuteRate 0.00 123\n")
+                .append("prefix.java.lang.Object.testevent.test.5MinuteRate 0.00 123\n")
+                .append("prefix.java.lang.Object.testevent.test.15MinuteRate 0.00 123\n")
+                .append("prefix.java.lang.Object.testevent.test.min 0.00 123\n")
+                .append("prefix.java.lang.Object.testevent.test.max 0.00 123\n")
+                .append("prefix.java.lang.Object.testevent.test.mean 0.00 123\n")
+                .append("prefix.java.lang.Object.testevent.test.stddev 0.00 123\n")
+                .append("prefix.java.lang.Object.testevent.test.median 0.00 123\n")
+                .append("prefix.java.lang.Object.testevent.test.75percentile 0.00 123\n")
+                .append("prefix.java.lang.Object.testevent.test.95percentile 0.00 123\n")
+                .append("prefix.java.lang.Object.testevent.test.98percentile 0.00 123\n")
+                .append("prefix.java.lang.Object.testevent.test.99percentile 0.00 123\n")
+                .append("prefix.java.lang.Object.testevent.test.999percentile 0.00 123\n")
                 .toString();
 
-        registry.newTimer(getClass(), "test", "testevent");
+        registry.newTimer(Object.class, "test", "testevent");
 
         assertOutput(expected);
     }
@@ -106,14 +106,14 @@ public class GraphiteReporterTests
     public void canRendererMetered() throws Exception
     {
         final String expected = new StringBuilder()
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.count 0 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.meanRate 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.1MinuteRate 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.5MinuteRate 0.00 123\n")
-                .append("prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.15MinuteRate 0.00 123\n")
+                .append("prefix.java.lang.Object.test.count 0 123\n")
+                .append("prefix.java.lang.Object.test.meanRate 0.00 123\n")
+                .append("prefix.java.lang.Object.test.1MinuteRate 0.00 123\n")
+                .append("prefix.java.lang.Object.test.5MinuteRate 0.00 123\n")
+                .append("prefix.java.lang.Object.test.15MinuteRate 0.00 123\n")
                 .toString();
 
-        registry.newMeter(getClass(), "test", "testevent", TimeUnit.SECONDS);
+        registry.newMeter(Object.class, "test", "testevent", TimeUnit.SECONDS);
 
         assertOutput(expected);
     }
@@ -121,9 +121,9 @@ public class GraphiteReporterTests
     @Test
     public void canRendererGauge() throws Exception
     {
-        final String expected = "prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.value 5 123\n";
+        final String expected = "prefix.java.lang.Object.test.value 5 123\n";
 
-        registry.newGauge(getClass(), "test", new GaugeMetric<Long>()
+        registry.newGauge(Object.class, "test", new GaugeMetric<Long>()
         {
             @Override
             public Long value()
