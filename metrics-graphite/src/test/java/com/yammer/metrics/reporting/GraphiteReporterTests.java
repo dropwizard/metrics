@@ -5,7 +5,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
@@ -21,30 +20,24 @@ import com.yammer.metrics.util.MetricPredicate;
 
 public class GraphiteReporterTests
 {
-    private static GraphiteReporter getMockGraphiteReporter(final OutputStream outputStream, MetricsRegistry metricsRegistry) throws IOException
+    private static GraphiteReporter getMockGraphiteReporter(final OutputStream outputStream, MetricsRegistry metricsRegistry) throws Exception
     {
         final Clock clock = mock(Clock.class);
         when(clock.time()).thenReturn(123456L);
-        GraphiteReporter graphiteReporter = new GraphiteReporter(metricsRegistry, "prefix", MetricPredicate.ALL, new SocketProvider()
-        {
-            @Override
-            public Socket get() throws Exception
-            {
-                Socket socket = mock(Socket.class);
 
-                when(socket.getOutputStream()).thenReturn(outputStream);
-
-                return socket;
-            }
-        }, clock);
-
+        final Socket socket = mock(Socket.class);
+        when(socket.getOutputStream()).thenReturn(outputStream);
+        
+        final SocketProvider provider = mock(SocketProvider.class);
+        when(provider.get()).thenReturn(socket);
+        
+        GraphiteReporter graphiteReporter = new GraphiteReporter(metricsRegistry, "prefix", MetricPredicate.ALL, provider, clock);
         graphiteReporter.printVMMetrics = false;
-
         return graphiteReporter;
     }
 
     @Test
-    public void canRenderCounter() throws IOException
+    public void canRenderCounter() throws Exception
     {
         StringBuilder expected = new StringBuilder();
 
@@ -62,7 +55,7 @@ public class GraphiteReporterTests
     }
 
     @Test
-    public void canRenderHistogram() throws IOException
+    public void canRenderHistogram() throws Exception
     {
         StringBuilder expected = new StringBuilder();
 
@@ -89,7 +82,7 @@ public class GraphiteReporterTests
     }
 
     @Test
-    public void canRendererTimed() throws IOException
+    public void canRendererTimed() throws Exception
     {
         StringBuilder expected = new StringBuilder();
 
@@ -120,7 +113,7 @@ public class GraphiteReporterTests
     }
 
     @Test
-    public void canRendererMetered() throws IOException
+    public void canRendererMetered() throws Exception
     {
         StringBuilder expected = new StringBuilder();
 
@@ -141,7 +134,7 @@ public class GraphiteReporterTests
     }
 
     @Test
-    public void canRendererGauge() throws IOException
+    public void canRendererGauge() throws Exception
     {
         String expected = "prefix.com.yammer.metrics.reporting.GraphiteReporterTests.test.value 5 123\n";
 
