@@ -30,7 +30,6 @@
         <jackson.version>1.9.2</jackson.version>
         <guice.version>3.0</guice.version>
         <slf4j.version>1.6.4</slf4j.version>
-        <mockito.version>1.8.5</mockito.version>
     </properties>
 
     <developers>
@@ -85,6 +84,12 @@
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
             <version>1.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.8.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
