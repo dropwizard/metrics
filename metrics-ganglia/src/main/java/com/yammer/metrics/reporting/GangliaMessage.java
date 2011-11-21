@@ -7,7 +7,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 
 /**
- * @author jebl01
  * Encapsulates logic for creating and sending a Ganglia message
  */
 public class GangliaMessage
