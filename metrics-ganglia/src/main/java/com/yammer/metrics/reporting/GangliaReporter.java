@@ -48,7 +48,8 @@ public class GangliaReporter extends AbstractPollingReporter {
     private String groupPrefix = "";
     private boolean useShortNames;
     private final GangliaMessageBuilder gangliaMessageBuilder;
-
+    public boolean printVMMetrics = true;
+    
     /**
      * Enables the ganglia reporter to send data for the default metrics registry
      * to ganglia server with the specified period.
@@ -196,7 +197,7 @@ public class GangliaReporter extends AbstractPollingReporter {
      */
     public GangliaReporter(MetricsRegistry metricsRegistry, String gangliaHost, int port, String groupPrefix,
                            MetricPredicate predicate, boolean useShortNames) throws IOException {
-        this(metricsRegistry, groupPrefix, predicate, useShortNames, new GangliaMessageBuilder(gangliaHost, port, new DatagramSocket()));
+        this(metricsRegistry, groupPrefix, predicate, useShortNames, new GangliaMessageBuilder(gangliaHost, port));
     }
      /**
      * Creates a new {@link GangliaReporter}.
@@ -221,7 +222,10 @@ public class GangliaReporter extends AbstractPollingReporter {
 
     @Override
     public void run() {
-        printVmMetrics();
+        if(this.printVMMetrics)
+        {
+            printVmMetrics();
+        }
         printRegularMetrics();
     }
 
@@ -256,7 +260,7 @@ public class GangliaReporter extends AbstractPollingReporter {
         try {
             sendMetricData(metricType, metricName, metricValue, groupPrefix + groupName, units);
             if (LOG.isTraceEnabled()) {
-                LOG.trace("Emitting metric " + metricName + ", type " + metricType + ", value " + metricValue + " for gangliaHost: " + gangliaHost + ":" + port);
+                LOG.trace("Emitting metric " + metricName + ", type " + metricType + ", value " + metricValue + " for gangliaHost: " + this.gangliaMessageBuilder.getHostName() + ":" + this.gangliaMessageBuilder.getPort());
             }
         } catch (IOException e) {
             LOG.error("Error sending to ganglia:", e);
@@ -287,7 +291,7 @@ public class GangliaReporter extends AbstractPollingReporter {
                 
         this.gangliaMessageBuilder.newMessage()
                 .addInt(133)// we are sending a string value
-                .addString(hostLabel)// hostLabel
+                .addString(this.hostLabel)// hostLabel
                 .addString(metricName)// metric name
                 .addInt(0)// spoof = True
                 .addString("%s")// format field
@@ -388,7 +392,7 @@ public class GangliaReporter extends AbstractPollingReporter {
         }
     }
 
-    private String getHostLabel() {
+    String getHostLabel() {
         try {
             InetAddress addr = InetAddress.getLocalHost();
             return addr.getHostAddress() + ":" + addr.getHostName();
