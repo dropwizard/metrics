@@ -411,6 +411,7 @@ public class GangliaReporter extends AbstractPollingReporter {
             char p = metricName.charAt(i);
             if (!(p >= 'A' && p <= 'Z')
                     && !(p >= 'a' && p <= 'z')
+                    && !(p >= '0' && p <= '9')
                     && (p != '_')
                     && (p != '-')
                     && (p != '.')
