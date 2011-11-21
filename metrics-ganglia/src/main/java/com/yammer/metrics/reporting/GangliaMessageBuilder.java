@@ -5,7 +5,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 
 /**
- * @author Jesper Blomquist
  *Builder for creating Ganglia messages. Note, this builder is not thread safe (the message buffer is reused between messages)
  */
 public class GangliaMessageBuilder
