@@ -46,7 +46,7 @@ public class GangliaReporter extends AbstractPollingReporter {
     private final Locale locale = Locale.US;
     private String hostLabel;
     private String groupPrefix = "";
-    private boolean useShortNames;
+    private boolean compressPackageNames;
     private final GangliaMessageBuilder gangliaMessageBuilder;
     public boolean printVMMetrics = true;
     
@@ -81,14 +81,14 @@ public class GangliaReporter extends AbstractPollingReporter {
      * Enables the ganglia reporter to send data for the default metrics registry
      * to ganglia server with the specified period.
      *
-     * @param period      the period between successive outputs
-     * @param unit        the time unit of {@code period}
-     * @param gangliaHost the gangliaHost name of ganglia server (carbon-cache agent)
-     * @param port        the port number on which the ganglia server is listening
-     * @param useShotNames    if true reporter will compress package names e.g. com.foo.MetricName becomes c.f.MetricName
+      * @param period      the period between successive outputs
+      * @param unit        the time unit of {@code period}
+      * @param gangliaHost the gangliaHost name of ganglia server (carbon-cache agent)
+      * @param port        the port number on which the ganglia server is listening
+      * @param compressPackageNames    if true reporter will compress package names e.g. com.foo.MetricName becomes c.f.MetricName
      */
-    public static void enable(long period, TimeUnit unit, String gangliaHost, int port, boolean useShortNames) {
-        enable(Metrics.defaultRegistry(), period, unit, gangliaHost, port, "", MetricPredicate.ALL, useShortNames);
+    public static void enable(long period, TimeUnit unit, String gangliaHost, int port, boolean compressPackageNames) {
+        enable(Metrics.defaultRegistry(), period, unit, gangliaHost, port, "", MetricPredicate.ALL, compressPackageNames);
     }
 
 
@@ -134,12 +134,12 @@ public class GangliaReporter extends AbstractPollingReporter {
      * @param port            the port number on which the ganglia server is listening
      * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
      * @param predicate       filters metrics to be reported
-     * @param useShotNames    if true reporter will compress package names e.g. com.foo.MetricName becomes c.f.MetricName
+     * @param compressPackageNames    if true reporter will compress package names e.g. com.foo.MetricName becomes c.f.MetricName
      */
     public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String gangliaHost,
-                              int port, String groupPrefix, MetricPredicate predicate, boolean useShortNames) {
+                              int port, String groupPrefix, MetricPredicate predicate, boolean compressPackageNames) {
         try {
-            final GangliaReporter reporter = new GangliaReporter(metricsRegistry, gangliaHost, port, groupPrefix, predicate, useShortNames);
+            final GangliaReporter reporter = new GangliaReporter(metricsRegistry, gangliaHost, port, groupPrefix, predicate, compressPackageNames);
             reporter.start(period, unit);
         } catch (Exception e) {
             LOG.error("Error creating/starting ganglia reporter:", e);
@@ -155,6 +155,18 @@ public class GangliaReporter extends AbstractPollingReporter {
      */
     public GangliaReporter(String gangliaHost, int port) throws IOException {
         this(Metrics.defaultRegistry(), gangliaHost, port, "");
+    }
+
+    /**
+     * Creates a new {@link GangliaReporter}.
+     *
+     * @param gangliaHost is ganglia server
+     * @param port        is port on which ganglia server is running
+     * @param compressPackageNames
+     * @throws java.io.IOException if there is an error connecting to the ganglia server
+     */
+    public GangliaReporter(String gangliaHost, int port, boolean compressPackageNames) throws IOException {
+        this(Metrics.defaultRegistry(), gangliaHost, port, "", MetricPredicate.ALL, compressPackageNames);
     }
 
     /**
@@ -192,32 +204,30 @@ public class GangliaReporter extends AbstractPollingReporter {
      * @param port            is port on which ganglia server is running
      * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
      * @param predicate       filters metrics to be reported
-     * @param useShotNames    if true reporter will compress package names e.g. com.foo.MetricName becomes c.f.MetricName
+     * @param compressPackageNames    if true reporter will compress package names e.g. com.foo.MetricName becomes c.f.MetricName
      * @throws java.io.IOException if there is an error connecting to the ganglia server
      */
     public GangliaReporter(MetricsRegistry metricsRegistry, String gangliaHost, int port, String groupPrefix,
-                           MetricPredicate predicate, boolean useShortNames) throws IOException {
-        this(metricsRegistry, groupPrefix, predicate, useShortNames, new GangliaMessageBuilder(gangliaHost, port));
+                           MetricPredicate predicate, boolean compressPackageNames) throws IOException {
+        this(metricsRegistry, groupPrefix, predicate, compressPackageNames, new GangliaMessageBuilder(gangliaHost, port));
     }
      /**
      * Creates a new {@link GangliaReporter}.
      *
      * @param metricsRegistry the metrics registry
-     * @param gangliaHost     is ganglia server
-     * @param port            is port on which ganglia server is running
      * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
      * @param predicate       filters metrics to be reported
-     * @param useShotNames    if true reporter will compress package names e.g. com.foo.MetricName becomes c.f.MetricName
+     * @param compressPackageNames    if true reporter will compress package names e.g. com.foo.MetricName becomes c.f.MetricName
      * @throws java.io.IOException if there is an error connecting to the ganglia server
      */
     public GangliaReporter(MetricsRegistry metricsRegistry, String groupPrefix,
-                           MetricPredicate predicate, boolean useShortNames, GangliaMessageBuilder gangliaMessageBuilder) throws IOException {
+                           MetricPredicate predicate, boolean compressPackageNames, GangliaMessageBuilder gangliaMessageBuilder) throws IOException {
         super(metricsRegistry, "ganglia-reporter");
         this.gangliaMessageBuilder = gangliaMessageBuilder;
         this.groupPrefix = groupPrefix + "_";
         this.hostLabel = getHostLabel();
         this.predicate = predicate;
-        this.useShortNames = useShortNames;
+        this.compressPackageNames = compressPackageNames;
     }
 
     @Override
@@ -421,27 +431,24 @@ public class GangliaReporter extends AbstractPollingReporter {
                 sb.append(p);
             }
         }
-        return shortedMetricName(sb.toString());
+        return compressPackageName(sb.toString());
     }
 
-    private String shortedMetricName(String name)
-    {
-        if (useShortNames && name.indexOf(".") > 0)
-        {
+    private String compressPackageName(String name) {
+        if (compressPackageNames && name.indexOf(".") > 0) {
             String[] nameParts = name.split("\\.");
             StringBuilder sb = new StringBuilder();
             int numParts = nameParts.length;
             int count = 0;
-            for (String namePart : nameParts)
-            {
-                if (++count < numParts)
-                {
+            for (String namePart : nameParts) {
+                if (++count < numParts - 1) {
                     sb.append(namePart.charAt(0));
                     sb.append(".");
-                }
-                else
-                {
+                } else {
                     sb.append(namePart);
+                    if (count == numParts - 1) {
+                        sb.append(".");
+                    }
                 }
             }
             name = sb.toString();
