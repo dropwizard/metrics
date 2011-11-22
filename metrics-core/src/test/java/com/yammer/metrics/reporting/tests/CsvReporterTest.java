@@ -45,7 +45,7 @@ public class CsvReporterTest extends AbstractPollingReporterTest {
     }
 
     @Override
-    public String[] expectedGaugeResult() {
-        return new String[] { "# time,value", "5,GaugeMetric\n" };
+    public String[] expectedGaugeResult(String value) {
+        return new String[] { "# time,value", String.format("5,%s\n", value) };
     }
 }
