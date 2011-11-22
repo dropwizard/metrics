@@ -434,26 +434,19 @@ public class GangliaReporter extends AbstractPollingReporter {
         return compressPackageName(sb.toString());
     }
 
-    private String compressPackageName(String name)
-    {
-        if (compressPackageNames && name.indexOf(".") > 0)
-        {
+    private String compressPackageName(String name) {
+        if (compressPackageNames && name.indexOf(".") > 0) {
             String[] nameParts = name.split("\\.");
             StringBuilder sb = new StringBuilder();
             int numParts = nameParts.length;
             int count = 0;
-            for (String namePart : nameParts)
-            {
-                if (++count < numParts - 1)
-                {
+            for (String namePart : nameParts) {
+                if (++count < numParts - 1) {
                     sb.append(namePart.charAt(0));
                     sb.append(".");
-                }
-                else
-                {
+                } else {
                     sb.append(namePart);
-                    if (count == numParts - 1)
-                    {
+                    if (count == numParts - 1) {
                         sb.append(".");
                     }
                 }
