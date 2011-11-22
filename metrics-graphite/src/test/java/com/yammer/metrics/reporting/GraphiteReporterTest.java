@@ -1,142 +1,94 @@
 package com.yammer.metrics.reporting;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import com.yammer.metrics.core.Clock;
-import com.yammer.metrics.core.CounterMetric;
-import com.yammer.metrics.core.GaugeMetric;
-import com.yammer.metrics.core.HistogramMetric;
 import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.reporting.tests.AbstractPollingReporterTest;
 import com.yammer.metrics.util.MetricPredicate;
 
-public class GraphiteReporterTest
+public class GraphiteReporterTest extends AbstractPollingReporterTest
 {
-    private MetricsRegistry registry;
-    private GraphiteReporter reporter;
-    private OutputStream out;
-
-    @Before
-    public void init() throws Exception
+    @Override
+    protected AbstractPollingReporter createReporter(MetricsRegistry registry, OutputStream out, Clock clock) throws Exception
     {
-        registry = new MetricsRegistry();
-        out = new ByteArrayOutputStream();
-
-        final Clock clock = mock(Clock.class);
-        when(clock.time()).thenReturn(123456L);
-
         final Socket socket = mock(Socket.class);
         when(socket.getOutputStream()).thenReturn(out);
 
         final SocketProvider provider = mock(SocketProvider.class);
         when(provider.get()).thenReturn(socket);
 
-        reporter = new GraphiteReporter(registry, "prefix", MetricPredicate.ALL, provider, clock);
+        final GraphiteReporter reporter = new GraphiteReporter(registry, "prefix", MetricPredicate.ALL, provider, clock);
         reporter.printVMMetrics = false;
+        return reporter;
     }
 
-    @Test
-    public void canRenderCounter() throws Exception
+    @Override
+    public String[] expectedGaugeResult(String value)
     {
-        final String expected = "prefix.java.lang.Object.test.count 11 123\n";
-
-        CounterMetric metric = registry.newCounter(Object.class, "test");
-        metric.inc(11);
-        assertOutput(expected);
+        return new String[] { String.format("prefix.java.lang.Object.metric.value %s 5", value) };
     }
 
-    @Test
-    public void canRenderHistogram() throws Exception
+    @Override
+    public String[] expectedTimerResult()
     {
-        final String expected = new StringBuilder()
-                .append("prefix.java.lang.Object.test.min 10.00 123\n")
-                .append("prefix.java.lang.Object.test.max 10.00 123\n")
-                .append("prefix.java.lang.Object.test.mean 10.00 123\n")
-                .append("prefix.java.lang.Object.test.stddev 0.00 123\n")
-                .append("prefix.java.lang.Object.test.median 10.00 123\n")
-                .append("prefix.java.lang.Object.test.75percentile 10.00 123\n")
-                .append("prefix.java.lang.Object.test.95percentile 10.00 123\n")
-                .append("prefix.java.lang.Object.test.98percentile 10.00 123\n")
-                .append("prefix.java.lang.Object.test.99percentile 10.00 123\n")
-                .append("prefix.java.lang.Object.test.999percentile 10.00 123\n")
-                .toString();
-
-        HistogramMetric metric = registry.newHistogram(Object.class, "test");
-        metric.update(10);
-
-        assertOutput(expected);
+        return new String[] {
+                "prefix.java.lang.Object.metric.count 0 5",
+                "prefix.java.lang.Object.metric.meanRate 0.00 5",
+                "prefix.java.lang.Object.metric.1MinuteRate 0.00 5",
+                "prefix.java.lang.Object.metric.5MinuteRate 0.00 5",
+                "prefix.java.lang.Object.metric.15MinuteRate 0.00 5",
+                "prefix.java.lang.Object.metric.min 0.00 5",
+                "prefix.java.lang.Object.metric.max 0.00 5",
+                "prefix.java.lang.Object.metric.mean 0.00 5",
+                "prefix.java.lang.Object.metric.stddev 0.00 5",
+                "prefix.java.lang.Object.metric.median 0.00 5",
+                "prefix.java.lang.Object.metric.75percentile 0.00 5",
+                "prefix.java.lang.Object.metric.95percentile 0.00 5",
+                "prefix.java.lang.Object.metric.98percentile 0.00 5",
+                "prefix.java.lang.Object.metric.99percentile 0.00 5",
+                "prefix.java.lang.Object.metric.999percentile 0.00 5"
+        };
     }
 
-    @Test
-    public void canRendererTimed() throws Exception
+    @Override
+    public String[] expectedMeterResult()
     {
-        final String expected = new StringBuilder()
-                .append("prefix.java.lang.Object.testevent.test.count 0 123\n")
-                .append("prefix.java.lang.Object.testevent.test.meanRate 0.00 123\n")
-                .append("prefix.java.lang.Object.testevent.test.1MinuteRate 0.00 123\n")
-                .append("prefix.java.lang.Object.testevent.test.5MinuteRate 0.00 123\n")
-                .append("prefix.java.lang.Object.testevent.test.15MinuteRate 0.00 123\n")
-                .append("prefix.java.lang.Object.testevent.test.min 0.00 123\n")
-                .append("prefix.java.lang.Object.testevent.test.max 0.00 123\n")
-                .append("prefix.java.lang.Object.testevent.test.mean 0.00 123\n")
-                .append("prefix.java.lang.Object.testevent.test.stddev 0.00 123\n")
-                .append("prefix.java.lang.Object.testevent.test.median 0.00 123\n")
-                .append("prefix.java.lang.Object.testevent.test.75percentile 0.00 123\n")
-                .append("prefix.java.lang.Object.testevent.test.95percentile 0.00 123\n")
-                .append("prefix.java.lang.Object.testevent.test.98percentile 0.00 123\n")
-                .append("prefix.java.lang.Object.testevent.test.99percentile 0.00 123\n")
-                .append("prefix.java.lang.Object.testevent.test.999percentile 0.00 123\n")
-                .toString();
-
-        registry.newTimer(Object.class, "test", "testevent");
-
-        assertOutput(expected);
+        return new String[] {
+                "prefix.java.lang.Object.metric.count 1 5",
+                "prefix.java.lang.Object.metric.meanRate Infinity 5",
+                "prefix.java.lang.Object.metric.1MinuteRate 0.00 5",
+                "prefix.java.lang.Object.metric.5MinuteRate 0.00 5",
+                "prefix.java.lang.Object.metric.15MinuteRate 0.00 5",
+        };
     }
 
-    @Test
-    public void canRendererMetered() throws Exception
+    @Override
+    public String[] expectedHistogramResult()
     {
-        final String expected = new StringBuilder()
-                .append("prefix.java.lang.Object.test.count 0 123\n")
-                .append("prefix.java.lang.Object.test.meanRate 0.00 123\n")
-                .append("prefix.java.lang.Object.test.1MinuteRate 0.00 123\n")
-                .append("prefix.java.lang.Object.test.5MinuteRate 0.00 123\n")
-                .append("prefix.java.lang.Object.test.15MinuteRate 0.00 123\n")
-                .toString();
-
-        registry.newMeter(Object.class, "test", "testevent", TimeUnit.SECONDS);
-
-        assertOutput(expected);
+        return new String[] {
+                "prefix.java.lang.Object.metric.min 1.00 5",
+                "prefix.java.lang.Object.metric.max 1.00 5",
+                "prefix.java.lang.Object.metric.mean 1.00 5",
+                "prefix.java.lang.Object.metric.stddev 0.00 5",
+                "prefix.java.lang.Object.metric.median 1.00 5",
+                "prefix.java.lang.Object.metric.75percentile 1.00 5",
+                "prefix.java.lang.Object.metric.95percentile 1.00 5",
+                "prefix.java.lang.Object.metric.98percentile 1.00 5",
+                "prefix.java.lang.Object.metric.99percentile 1.00 5",
+                "prefix.java.lang.Object.metric.999percentile 1.00 5"
+        };
     }
 
-    @Test
-    public void canRendererGauge() throws Exception
+    @Override
+    public String[] expectedCounterResult(int count)
     {
-        final String expected = "prefix.java.lang.Object.test.value 5 123\n";
-
-        registry.newGauge(Object.class, "test", new GaugeMetric<Long>()
-        {
-            @Override
-            public Long value()
-            {
-                return 5l;
-            }
-        });
-
-        assertOutput(expected);
-    }
-    
-    private void assertOutput(String expected) {
-        reporter.run();
-        assertEquals(expected, out.toString());
+        return new String[] {
+                String.format("prefix.java.lang.Object.metric.count %d 5", count)
+        };
     }
 }

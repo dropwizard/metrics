@@ -20,8 +20,8 @@ public class ConsoleReporterTest extends AbstractPollingReporterTest {
     public String[] expectedCounterResult(int count) {
         return new String[] {
             "1/1/70 1:00:05 AM ==============================================================",
-            "com.yammer.metrics.reporting.tests.ConsoleReporterTest:",
-            "CounterMetric:",
+            "java.lang.Object:",
+            "metric:",
             "count = " + count
         };
     }
@@ -30,8 +30,8 @@ public class ConsoleReporterTest extends AbstractPollingReporterTest {
     public String[] expectedHistogramResult() {
         return new String[] {
             "1/1/70 1:00:05 AM ==============================================================",
-            "com.yammer.metrics.reporting.tests.ConsoleReporterTest:",
-            "HistogramMetric:",
+            "java.lang.Object:",
+            "metric:",
             "min = 1.00",
             "max = 1.00",
             "mean = 1.00",
@@ -49,8 +49,8 @@ public class ConsoleReporterTest extends AbstractPollingReporterTest {
     public String[] expectedMeterResult() {
         return new String[] {
             "1/1/70 1:00:05 AM ==============================================================",
-            "com.yammer.metrics.reporting.tests.ConsoleReporterTest:",
-            "MeterMetric:",
+            "java.lang.Object:",
+            "metric:",
             "count = 1",
             "mean rate = Infinity mock/ms",
             "1-minute rate = 0.00 mock/ms", 
@@ -63,8 +63,8 @@ public class ConsoleReporterTest extends AbstractPollingReporterTest {
     public String[] expectedTimerResult() {
         return new String[] {
             "1/1/70 1:00:05 AM ==============================================================",
-            "com.yammer.metrics.reporting.tests.ConsoleReporterTest:","" +
-            "TimerMetric:",
+            "java.lang.Object:","" +
+            "metric:",
             "count = 0",
             "mean rate = 0.00 calls/s",
             "1-minute rate = 0.00 calls/s",
@@ -84,12 +84,12 @@ public class ConsoleReporterTest extends AbstractPollingReporterTest {
     }
 
     @Override
-    public String[] expectedGaugeResult() {
+    public String[] expectedGaugeResult(String value) {
         return new String[] {
                 "1/1/70 1:00:05 AM ==============================================================",
-                "com.yammer.metrics.reporting.tests.ConsoleReporterTest:",
-                ":",
-                "value = GaugeMetric"
+                "java.lang.Object:",
+                "metric:",
+                String.format("value = %s", value)
         };
     }
 }
