@@ -7,10 +7,10 @@ import com.yammer.metrics.util.Utils;
 
 import java.io.PrintStream;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -18,10 +18,6 @@ import java.util.concurrent.TimeUnit;
  * {@link PrintStream} periodically.
  */
 public class ConsoleReporter extends AbstractPollingReporter {
-    private final PrintStream out;
-    private final MetricPredicate predicate;
-    private final Clock clock;
-
     /**
      * Enables the console reporter for the default metrics registry, and causes it to
      * print to STDOUT with the specified period.
@@ -46,6 +42,11 @@ public class ConsoleReporter extends AbstractPollingReporter {
         reporter.start(period, unit);
     }
 
+    private final PrintStream out;
+    private final MetricPredicate predicate;
+    private final Clock clock;
+    private final TimeZone timeZone;
+
     /**
      * Creates a new {@link ConsoleReporter} for the default metrics registry, with unrestricted output.
      *
@@ -63,7 +64,7 @@ public class ConsoleReporter extends AbstractPollingReporter {
      * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be output
      */
     public ConsoleReporter(MetricsRegistry metricsRegistry, PrintStream out, MetricPredicate predicate) {
-        this(metricsRegistry, out, predicate, Clock.DEFAULT);
+        this(metricsRegistry, out, predicate, Clock.DEFAULT, TimeZone.getDefault());
     }
 
     /**
@@ -73,18 +74,25 @@ public class ConsoleReporter extends AbstractPollingReporter {
      * @param out             the {@link java.io.PrintStream} to which output will be written
      * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be output
      * @param clock           the {@link Clock} used to print time
+     * @param timeZone        the {@link TimeZone} used to print time
      */
-    public ConsoleReporter(MetricsRegistry metricsRegistry, PrintStream out, MetricPredicate predicate, Clock clock) {
+    public ConsoleReporter(MetricsRegistry metricsRegistry,
+                           PrintStream out,
+                           MetricPredicate predicate,
+                           Clock clock,
+                           TimeZone timeZone) {
         super(metricsRegistry, "console-reporter");
         this.out = out;
         this.predicate = predicate;
         this.clock = clock;
+        this.timeZone = timeZone;
     }
 
     @Override
     public void run() {
         try {
             final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+            format.setTimeZone(timeZone);
             final String dateTime = format.format(new Date(clock.time()));
             out.print(dateTime);
             out.print(' ');
