@@ -444,7 +444,7 @@ public class GangliaReporter extends AbstractPollingReporter {
             int count = 0;
             for (String namePart : nameParts)
             {
-                if (++count < numParts)
+                if (++count < numParts - 1)
                 {
                     sb.append(namePart.charAt(0));
                     sb.append(".");
@@ -452,6 +452,10 @@ public class GangliaReporter extends AbstractPollingReporter {
                 else
                 {
                     sb.append(namePart);
+                    if (count == numParts - 1)
+                    {
+                        sb.append(".");
+                    }
                 }
             }
             name = sb.toString();
