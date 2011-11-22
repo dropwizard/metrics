@@ -1,25 +1,26 @@
 package com.yammer.metrics.reporting.tests;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-
 import com.yammer.metrics.core.Clock;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.AbstractPollingReporter;
 import com.yammer.metrics.reporting.ConsoleReporter;
 import com.yammer.metrics.util.MetricPredicate;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.TimeZone;
+
 public class ConsoleReporterTest extends AbstractPollingReporterTest {
 
     @Override
     protected AbstractPollingReporter createReporter(MetricsRegistry registry, OutputStream out, Clock clock) {
-        return new ConsoleReporter(registry, new PrintStream(out), MetricPredicate.ALL, clock);
+        return new ConsoleReporter(registry, new PrintStream(out), MetricPredicate.ALL, clock, TimeZone.getTimeZone("UTC"));
     }
     
     @Override
     public String[] expectedCounterResult(int count) {
         return new String[] {
-            "1/1/70 1:00:05 AM ==============================================================",
+            "1/1/70 12:00:05 AM =============================================================",
             "java.lang.Object:",
             "metric:",
             "count = " + count
@@ -29,7 +30,7 @@ public class ConsoleReporterTest extends AbstractPollingReporterTest {
     @Override
     public String[] expectedHistogramResult() {
         return new String[] {
-            "1/1/70 1:00:05 AM ==============================================================",
+            "1/1/70 12:00:05 AM =============================================================",
             "java.lang.Object:",
             "metric:",
             "min = 1.00",
@@ -48,7 +49,7 @@ public class ConsoleReporterTest extends AbstractPollingReporterTest {
     @Override
     public String[] expectedMeterResult() {
         return new String[] {
-            "1/1/70 1:00:05 AM ==============================================================",
+            "1/1/70 12:00:05 AM =============================================================",
             "java.lang.Object:",
             "metric:",
             "count = 1",
@@ -62,7 +63,7 @@ public class ConsoleReporterTest extends AbstractPollingReporterTest {
     @Override
     public String[] expectedTimerResult() {
         return new String[] {
-            "1/1/70 1:00:05 AM ==============================================================",
+            "1/1/70 12:00:05 AM =============================================================",
             "java.lang.Object:","" +
             "metric:",
             "count = 0",
@@ -86,7 +87,7 @@ public class ConsoleReporterTest extends AbstractPollingReporterTest {
     @Override
     public String[] expectedGaugeResult(String value) {
         return new String[] {
-                "1/1/70 1:00:05 AM ==============================================================",
+                "1/1/70 12:00:05 AM =============================================================",
                 "java.lang.Object:",
                 "metric:",
                 String.format("value = %s", value)
