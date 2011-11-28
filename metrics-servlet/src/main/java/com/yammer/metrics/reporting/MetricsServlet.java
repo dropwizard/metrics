@@ -253,7 +253,7 @@ public class MetricsServlet extends HttpServlet {
         json.close();
     }
 
-    private void writeRegularMetrics(JsonGenerator json, String classPrefix, boolean showFullSamples) throws IOException {
+    public void writeRegularMetrics(JsonGenerator json, String classPrefix, boolean showFullSamples) throws IOException {
         for (Entry<String, Map<String, Metric>> entry : Utils.sortMetrics(metricsRegistry.allMetrics()).entrySet()) {
             if (classPrefix == null || entry.getKey().startsWith(classPrefix)) {
                 json.writeFieldName(entry.getKey());
