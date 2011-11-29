@@ -26,7 +26,7 @@ import static com.yammer.metrics.core.VirtualMachineMetrics.uptime;
 
 /**
  * A simple reporter which sends out application metrics to a
- * <a href="hhttp://ganglia.sourceforge.net/">Ganglia</a> server periodically.
+ * <a href="http://ganglia.sourceforge.net/">Ganglia</a> server periodically.
  * <p/>
  * NOTE: this reporter only works with Ganglia 3.1 and greater.  The message protocol
  * for earlier versions of Ganglia is different.
