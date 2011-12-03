@@ -13,8 +13,7 @@ public interface MetricsRegistryListener extends EventListener {
      * @param name the name of the {@link Metric}
      * @param metric the {@link Metric}
      */
-    public void onMetricAdded(MetricName name,
-                              Metric metric);
+    public void onMetricAdded(MetricName name, Metric metric);
 
     /**
      * Called when a metric has been removed from the {@link MetricsRegistry}.
