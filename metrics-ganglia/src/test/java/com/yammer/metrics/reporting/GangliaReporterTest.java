@@ -19,54 +19,41 @@ import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.tests.AbstractPollingReporterTest;
 import com.yammer.metrics.util.MetricPredicate;
 
-public class GangliaReporterTest extends AbstractPollingReporterTest
-{
+public class GangliaReporterTest extends AbstractPollingReporterTest {
     private GangliaMessage testMessage;
 
     @Override
-    protected AbstractPollingReporter createReporter(MetricsRegistry registry, OutputStream out, Clock clock) throws Exception
-    {
+    protected AbstractPollingReporter createReporter(MetricsRegistry registry, OutputStream out, Clock clock) throws Exception {
         final OutputStreamWriter output = new OutputStreamWriter(out);
-        this.testMessage = new GangliaMessage(null, null, null)
-        {
+        this.testMessage = new GangliaMessage(null, null, null) {
 
             @Override
-            public GangliaMessage addInt(int value)
-            {
-                try
-                {
+            public GangliaMessage addInt(int value) {
+                try {
                     output.append("addInt(" + value + ")\n").flush();
-                }
-                catch(IOException e)
-                {
+                } catch (IOException e) {
                     throw new RuntimeException(e.getMessage(), e);
                 }
                 return this;
             }
 
             @Override
-            public GangliaMessage addString(String value)
-            {
-                try
-                {
+            public GangliaMessage addString(String value) {
+                try {
                     output.append("addString(" + value + ")\n").flush();
-                }
-                catch(IOException e)
-                {
+                } catch (IOException e) {
                     throw new RuntimeException(e.getMessage(), e);
                 }
                 return this;
             }
 
             @Override
-            public void send() throws SocketException, IOException
-            {
+            public void send() throws SocketException, IOException {
                 output.append("send()\n").flush();
             }
 
             @Override
-            public String toString()
-            {
+            public String toString() {
                 return output.toString();
             }
         };
@@ -74,17 +61,18 @@ public class GangliaReporterTest extends AbstractPollingReporterTest
         GangliaMessageBuilder messageBuilder = mock(GangliaMessageBuilder.class);
         when(messageBuilder.newMessage()).thenReturn(this.testMessage);
 
-        final GangliaReporter reporter = new GangliaReporter(registry, "group-prefix", MetricPredicate.ALL, false, messageBuilder)
-        {
+        final GangliaReporter reporter = new GangliaReporter(registry,
+                                                             "group-prefix",
+                                                             MetricPredicate.ALL,
+                                                             false,
+                                                             messageBuilder) {
             @Override
-            String getHostLabel()
-            {
+            String getHostLabel() {
                 return "localhost";
             }
-            
+
             @Override
-            public void run()
-            {
+            public void run() {
                 super.run();
             }
         };
@@ -93,74 +81,70 @@ public class GangliaReporterTest extends AbstractPollingReporterTest
     }
 
     @Test
-    public void testSanitizeName_noBadCharacters() throws IOException
-    {
+    public void testSanitizeName_noBadCharacters() throws IOException {
         MetricName metricName = new MetricName("thisIs", "AClean", "MetricName");
         GangliaReporter gangliaReporter = new GangliaReporter("localhost", 5555);
         String cleanMetricName = gangliaReporter.sanitizeName(metricName);
-        assertEquals("clean metric name was changed unexpectedly", "thisIs.AClean.MetricName", cleanMetricName);
+        assertEquals("clean metric name was changed unexpectedly",
+                     "thisIs.AClean.MetricName",
+                     cleanMetricName);
     }
 
     @Test
-    public void testSanitizeName_badCharacters() throws IOException
-    {
+    public void testSanitizeName_badCharacters() throws IOException {
         MetricName metricName = new MetricName("thisIs", "AC>&!>lean", "Metric Name");
         String expectedMetricName = "thisIs.AC____lean.Metric_Name";
         GangliaReporter gangliaReporter = new GangliaReporter("localhost", 5555);
         String cleanMetricName = gangliaReporter.sanitizeName(metricName);
-        assertEquals("clean metric name did not match expected value", expectedMetricName, cleanMetricName);
+        assertEquals("clean metric name did not match expected value",
+                     expectedMetricName,
+                     cleanMetricName);
     }
 
     @Test
-    public void testCompressPackageName() throws IOException
-    {
+    public void testCompressPackageName() throws IOException {
         String metricName = "some.long.package.name.thisIsAC>&!>leanMetric Name";
         String expectedMetricName = "s.l.p.name.thisIsAC____leanMetric_Name";
         GangliaReporter gangliaReporter = new GangliaReporter("localhost", 5555, true);
         String cleanMetricName = gangliaReporter.sanitizeName(metricName);
-        assertEquals("clean metric name did not match expected value", expectedMetricName, cleanMetricName);
+        assertEquals("clean metric name did not match expected value",
+                     expectedMetricName,
+                     cleanMetricName);
     }
 
 
-    protected String getFromFile(String fileName)
-    {
-        try
-        {
-            return IOUtils.toString(new FileInputStream(getClass().getClassLoader().getResource(fileName).getFile()));
-        }
-        catch(Exception e)
-        {
+    protected String getFromFile(String fileName) {
+        try {
+            return IOUtils.toString(new FileInputStream(getClass().getClassLoader()
+                                                                .getResource(fileName)
+                                                                .getFile()));
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     @Override
-    public String[] expectedGaugeResult(String value)
-    {
+    public String[] expectedGaugeResult(String value) {
         return String.format(getFromFile("gauge.io"), value).split("\\n");
     }
 
     @Override
-    public String[] expectedTimerResult()
-    {
+    public String[] expectedTimerResult() {
         return getFromFile("timed.io").split("\\n");
     }
 
     @Override
-    public String[] expectedMeterResult()
-    {
+    public String[] expectedMeterResult() {
         return getFromFile("metered.io").split("\\n");
     }
 
     @Override
-    public String[] expectedHistogramResult()
-    {
+    public String[] expectedHistogramResult() {
         return getFromFile("histogram.io").split("\\n");
     }
 
     @Override
-    public String[] expectedCounterResult(long count)
-    {
+    public String[] expectedCounterResult(long count) {
         return String.format(getFromFile("counter.io"), count).split("\\n");
     }
 }

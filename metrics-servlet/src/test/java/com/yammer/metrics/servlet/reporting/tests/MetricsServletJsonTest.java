@@ -1,10 +1,9 @@
 package com.yammer.metrics.servlet.reporting.tests;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-import java.io.StringWriter;
-
+import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.HealthCheckRegistry;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.reporting.MetricsServlet;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -12,10 +11,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.yammer.metrics.core.GaugeMetric;
-import com.yammer.metrics.core.HealthCheckRegistry;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.reporting.MetricsServlet;
+import java.io.IOException;
+import java.io.StringWriter;
+
+import static org.junit.Assert.assertEquals;
 
 public class MetricsServletJsonTest {
 
@@ -41,7 +40,8 @@ public class MetricsServletJsonTest {
         servlet.writeRegularMetrics(json, null, false);
         json.writeEndObject();
         json.close();
-        assertEquals(new ObjectMapper().readTree(expected), new ObjectMapper().readTree(result.toString()));
+        assertEquals(new ObjectMapper().readTree(expected),
+                     new ObjectMapper().readTree(result.toString()));
     }
 
     @Before
@@ -51,7 +51,7 @@ public class MetricsServletJsonTest {
         json = new JsonFactory(new ObjectMapper()).createJsonGenerator(result);
         servlet = new MetricsServlet(registry, new HealthCheckRegistry(), "", "", "", "", false);
     }
-    
+
     @After
     public void tearDown() {
         registry.threadPools().shutdownThreadPools();

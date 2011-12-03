@@ -15,7 +15,7 @@ public class MetricName {
      * Creates a new {@link MetricName} without a scope.
      *
      * @param klass the {@link Class} to which the {@link Metric} belongs
-     * @param name the name of the {@link Metric}
+     * @param name  the name of the {@link Metric}
      */
     public MetricName(Class<?> klass, String name) {
         this(klass, name, null);
@@ -25,8 +25,8 @@ public class MetricName {
      * Creates a new {@link MetricName} without a scope.
      *
      * @param group the group to which the {@link Metric} belongs
-     * @param type the type to which the {@link Metric} belongs
-     * @param name the name of the {@link Metric}
+     * @param type  the type to which the {@link Metric} belongs
+     * @param name  the name of the {@link Metric}
      */
     public MetricName(String group, String type, String name) {
         this(group, type, name, null);
@@ -40,15 +40,18 @@ public class MetricName {
      * @param scope the scope of the {@link Metric}
      */
     public MetricName(Class<?> klass, String name, String scope) {
-        this(klass.getPackage().getName(), klass.getSimpleName().replaceAll("\\$$", ""), name, scope);
+        this(klass.getPackage().getName(),
+             klass.getSimpleName().replaceAll("\\$$", ""),
+             name,
+             scope);
     }
 
     /**
      * Creates a new {@link MetricName} without a scope.
      *
      * @param group the group to which the {@link Metric} belongs
-     * @param type the type to which the {@link Metric} belongs
-     * @param name the name of the {@link Metric}
+     * @param type  the type to which the {@link Metric} belongs
+     * @param name  the name of the {@link Metric}
      * @param scope the scope of the {@link Metric}
      */
     public MetricName(String group, String type, String name, String scope) {
@@ -58,11 +61,12 @@ public class MetricName {
     /**
      * Creates a new {@link MetricName} without a scope.
      *
-     * @param group the group to which the {@link Metric} belongs
-     * @param type the type to which the {@link Metric} belongs
-     * @param name the name of the {@link Metric}
-     * @param scope the scope of the {@link Metric}
-     * @param mbeanName the 'ObjectName', represented as a string, to use when registering the mbean.
+     * @param group     the group to which the {@link Metric} belongs
+     * @param type      the type to which the {@link Metric} belongs
+     * @param name      the name of the {@link Metric}
+     * @param scope     the scope of the {@link Metric}
+     * @param mbeanName the 'ObjectName', represented as a string, to use when registering the
+     *                  mbean.
      */
     public MetricName(String group, String type, String name, String scope, String mbeanName) {
         if (group == null || type == null) {
@@ -77,11 +81,10 @@ public class MetricName {
         this.scope = scope;
         this.mbeanName = mbeanName;
     }
-    
+
     /**
-     * Returns the group to which the {@link Metric} belongs. For class-based
-     * metrics, this will be the package name of the {@link Class} to which the
-     * {@link Metric} belongs.
+     * Returns the group to which the {@link Metric} belongs. For class-based metrics, this will be
+     * the package name of the {@link Class} to which the {@link Metric} belongs.
      *
      * @return the group to which the {@link Metric} belongs
      */
@@ -90,9 +93,8 @@ public class MetricName {
     }
 
     /**
-     * Returns the type to which the {@link Metric} belongs. For class-based
-     * metrics, this will be the simple class name of the {@link Class} to which the
-     * {@link Metric} belongs.
+     * Returns the type to which the {@link Metric} belongs. For class-based metrics, this will be
+     * the simple class name of the {@link Class} to which the {@link Metric} belongs.
      *
      * @return the type to which the {@link Metric} belongs
      */
@@ -119,8 +121,7 @@ public class MetricName {
     }
 
     /**
-     * Returns {@code true} if the {@link Metric} has a scope, {@code false}
-     * otherwise.
+     * Returns {@code true} if the {@link Metric} has a scope, {@code false} otherwise.
      *
      * @return {@code true} if the {@link Metric} has a scope
      */
@@ -130,6 +131,7 @@ public class MetricName {
 
     /**
      * Returns the mbean name for the {@link Metric} identified by this metric name.
+     *
      * @return the mbean name
      */
     public String getMBeanName() {
@@ -138,7 +140,10 @@ public class MetricName {
 
     @Override
     public boolean equals(Object o) {
-        return (o != null) && (this == o || this.mbeanName.equals(((MetricName)o).mbeanName));
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        final MetricName that = (MetricName) o;
+        return mbeanName.equals(that.mbeanName);
     }
 
     @Override
@@ -150,10 +155,9 @@ public class MetricName {
     public String toString() {
         return mbeanName;
     }
-    
-    private static String createMBeanName(String group, String type, String name, String scope){
-        StringBuilder mbeanNameBuilder = new StringBuilder();
 
+    private static String createMBeanName(String group, String type, String name, String scope) {
+        final StringBuilder mbeanNameBuilder = new StringBuilder();
         mbeanNameBuilder.append(group);
         mbeanNameBuilder.append(":type=");
         mbeanNameBuilder.append(type);
@@ -165,7 +169,6 @@ public class MetricName {
             mbeanNameBuilder.append(",name=");
             mbeanNameBuilder.append(name);
         }
-
         return mbeanNameBuilder.toString();
     }
 }

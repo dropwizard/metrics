@@ -45,8 +45,8 @@ public class VirtualMachineMetrics {
     }
 
     /**
-     * Returns the percentage of the JVM's non-heap memory (e.g., direct
-     * buffers) which is being used.
+     * Returns the percentage of the JVM's non-heap memory (e.g., direct buffers) which is being
+     * used.
      *
      * @return the percentage of the JVM's non-heap memory which is being used
      */
@@ -56,11 +56,9 @@ public class VirtualMachineMetrics {
     }
 
     /**
-     * Returns a map of memory pool names to the percentage of that pool which
-     * is being used.
+     * Returns a map of memory pool names to the percentage of that pool which is being used.
      *
-     * @return a map of memory pool names to the percentage of that pool which
-     *         is being used
+     * @return a map of memory pool names to the percentage of that pool which is being used
      */
     public static Map<String, Double> memoryPoolUsage() {
         final Map<String, Double> pools = new TreeMap<String, Double>();
@@ -74,20 +72,22 @@ public class VirtualMachineMetrics {
     }
 
     /**
-     * Returns the percentage of available file descriptors which are currently
-     * in use.
+     * Returns the percentage of available file descriptors which are currently in use.
      *
-     * @return the percentage of available file descriptors which are currently
-     *         in use, or {@code NaN} if the running JVM does not have access to
-     *         this information
+     * @return the percentage of available file descriptors which are currently in use, or {@code
+     *         NaN} if the running JVM does not have access to this information
      */
     public static double fileDescriptorUsage() {
         try {
             final OperatingSystemMXBean bean = getOperatingSystemMXBean();
-            final Method getOpenFileDescriptorCount = bean.getClass().getDeclaredMethod("getOpenFileDescriptorCount");
+            final Method getOpenFileDescriptorCount = bean.getClass()
+                                                          .getDeclaredMethod(
+                                                                  "getOpenFileDescriptorCount");
             getOpenFileDescriptorCount.setAccessible(true);
             final Long openFds = (Long) getOpenFileDescriptorCount.invoke(bean);
-            final Method getMaxFileDescriptorCount = bean.getClass().getDeclaredMethod("getMaxFileDescriptorCount");
+            final Method getMaxFileDescriptorCount = bean.getClass()
+                                                         .getDeclaredMethod(
+                                                                 "getMaxFileDescriptorCount");
             getMaxFileDescriptorCount.setAccessible(true);
             final Long maxFds = (Long) getMaxFileDescriptorCount.invoke(bean);
             return openFds.doubleValue() / maxFds.doubleValue();
@@ -99,8 +99,9 @@ public class VirtualMachineMetrics {
     /**
      * Returns the version of the currently-running jvm.
      *
-     * @see <a href="http://java.sun.com/j2se/versioning_naming.html">J2SE SDK/JRE Version String Naming Convention</a>
      * @return the version of the currently-running jvm, eg "1.6.0_24"
+     * @see <a href="http://java.sun.com/j2se/versioning_naming.html">J2SE SDK/JRE Version String
+     *      Naming Convention</a>
      */
     public static String vmVersion() {
         return System.getProperty("java.runtime.version");
@@ -109,8 +110,8 @@ public class VirtualMachineMetrics {
     /**
      * Returns the name of the currently-running jvm.
      *
-     * @see <a href="http://download.oracle.com/javase/6/docs/api/java/lang/System.html#getProperties()">System.getProperties()</a>
      * @return the name of the currently-running jvm, eg  "Java HotSpot(TM) Client VM"
+     * @see <a href="http://download.oracle.com/javase/6/docs/api/java/lang/System.html#getProperties()">System.getProperties()</a>
      */
     public static String vmName() {
         return System.getProperty("java.vm.name");
@@ -151,14 +152,14 @@ public class VirtualMachineMetrics {
     public static Map<String, GarbageCollector> garbageCollectors() {
         final Map<String, GarbageCollector> gcs = new HashMap<String, GarbageCollector>();
         for (GarbageCollectorMXBean bean : getGarbageCollectorMXBeans()) {
-            gcs.put(bean.getName(), new GarbageCollector(bean.getCollectionCount(), bean.getCollectionTime()));
+            gcs.put(bean.getName(),
+                    new GarbageCollector(bean.getCollectionCount(), bean.getCollectionTime()));
         }
         return gcs;
     }
 
     /**
-     * Returns a set of strings describing deadlocked threads, if any are
-     * deadlocked.
+     * Returns a set of strings describing deadlocked threads, if any are deadlocked.
      *
      * @return a set of any deadlocked threads
      */
@@ -174,12 +175,12 @@ public class VirtualMachineMetrics {
                 }
 
                 threads.add(
-                    String.format(
-                            "%s locked on %s (owned by %s):\n%s",
-                            info.getThreadName(), info.getLockName(),
-                            info.getLockOwnerName(),
-                            stackTrace.toString()
-                    )
+                        String.format(
+                                "%s locked on %s (owned by %s):\n%s",
+                                info.getThreadName(), info.getLockName(),
+                                info.getLockOwnerName(),
+                                stackTrace.toString()
+                        )
                 );
             }
             return threads;
@@ -188,8 +189,7 @@ public class VirtualMachineMetrics {
     }
 
     /**
-     * Returns a map of thread states to the percentage of all threads which
-     * are in that state.
+     * Returns a map of thread states to the percentage of all threads which are in that state.
      *
      * @return a map of thread states to percentages
      */
@@ -228,13 +228,22 @@ public class VirtualMachineMetrics {
 
         for (int ti = threads.length - 1; ti > 0; ti--) {
             final ThreadInfo t = threads[ti];
-            writer.printf("%s id=%d state=%s", t.getThreadName(), t.getThreadId(), t.getThreadState());
+            writer.printf("%s id=%d state=%s",
+                          t.getThreadName(),
+                          t.getThreadId(),
+                          t.getThreadState());
             final LockInfo lock = t.getLockInfo();
             if (lock != null && t.getThreadState() != Thread.State.BLOCKED) {
-                writer.printf("\n    - waiting on <0x%08x> (a %s)", lock.getIdentityHashCode(), lock.getClassName());
-                writer.printf("\n    - locked <0x%08x> (a %s)", lock.getIdentityHashCode(), lock.getClassName());
+                writer.printf("\n    - waiting on <0x%08x> (a %s)",
+                              lock.getIdentityHashCode(),
+                              lock.getClassName());
+                writer.printf("\n    - locked <0x%08x> (a %s)",
+                              lock.getIdentityHashCode(),
+                              lock.getClassName());
             } else if (lock != null && t.getThreadState() == Thread.State.BLOCKED) {
-                writer.printf("\n    - waiting to lock <0x%08x> (a %s)", lock.getIdentityHashCode(), lock.getClassName());
+                writer.printf("\n    - waiting to lock <0x%08x> (a %s)",
+                              lock.getIdentityHashCode(),
+                              lock.getClassName());
             }
 
             if (t.isSuspended()) {
@@ -274,7 +283,7 @@ public class VirtualMachineMetrics {
                 writer.println();
             }
         }
-        
+
         writer.println();
         writer.flush();
     }

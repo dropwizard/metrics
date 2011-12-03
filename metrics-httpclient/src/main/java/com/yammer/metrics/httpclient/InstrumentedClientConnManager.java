@@ -1,14 +1,13 @@
 package com.yammer.metrics.httpclient;
 
-import java.util.concurrent.TimeUnit;
-
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.GaugeMetric;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.impl.conn.SchemeRegistryFactory;
 import org.apache.http.impl.conn.tsccm.ConnPoolByRoute;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.GaugeMetric;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A {@link org.apache.http.conn.ClientConnectionManager} which monitors the number of open
@@ -41,6 +40,10 @@ public class InstrumentedClientConnManager extends ThreadSafeClientConnManager {
     @Override
     protected ConnPoolByRoute createConnectionPool(long connTTL,
                                                    TimeUnit connTTLTimeUnit) {
-        return new InstrumentedConnByRoute(connOperator, connPerRoute, 20, connTTL, connTTLTimeUnit);
+        return new InstrumentedConnByRoute(connOperator,
+                                           connPerRoute,
+                                           20,
+                                           connTTL,
+                                           connTTLTimeUnit);
     }
 }

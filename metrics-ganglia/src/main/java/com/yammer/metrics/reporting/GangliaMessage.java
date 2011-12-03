@@ -9,62 +9,60 @@ import java.net.SocketException;
 /**
  * Encapsulates logic for creating and sending a Ganglia message
  */
-public class GangliaMessage
-{
+public class GangliaMessage {
 
     private final byte[] buffer;
     private int offset = 0;
     private final DatagramSocket datagramSocket;
     private final InetSocketAddress inetSocketAddress;
 
-    GangliaMessage(InetSocketAddress inetSocketAddress, byte[] buffer, DatagramSocket datagramSocket)
-    {
+    GangliaMessage(InetSocketAddress inetSocketAddress, byte[] buffer, DatagramSocket datagramSocket) {
         this.inetSocketAddress = inetSocketAddress;
         this.buffer = buffer;
         this.datagramSocket = datagramSocket;
     }
-    
+
     /**
      * Creates and sends a new {@link DatagramPacket}
+     *
      * @throws SocketException
      * @throws IOException
      */
-    public void send() throws SocketException, IOException
-    {
-        this.datagramSocket.send(new DatagramPacket(this.buffer, this.offset, this.inetSocketAddress));
+    public void send() throws SocketException, IOException {
+        this.datagramSocket
+                .send(new DatagramPacket(this.buffer, this.offset, this.inetSocketAddress));
     }
-    
+
     /**
      * Puts an integer into the buffer as 4 bytes, big-endian.
      *
-     * @param i -  the integer to write to the buffer
+     * @param value the integer to write to the buffer
+     * @return
      */
-    public GangliaMessage addInt(int value)
-    {
-        this.buffer[this.offset++] = (byte)((value >> 24) & 0xff);
-        this.buffer[this.offset++] = (byte)((value >> 16) & 0xff);
-        this.buffer[this.offset++] = (byte)((value >> 8) & 0xff);
-        this.buffer[this.offset++] = (byte)(value & 0xff);
-        
+    public GangliaMessage addInt(int value) {
+        this.buffer[this.offset++] = (byte) ((value >> 24) & 0xff);
+        this.buffer[this.offset++] = (byte) ((value >> 16) & 0xff);
+        this.buffer[this.offset++] = (byte) ((value >> 8) & 0xff);
+        this.buffer[this.offset++] = (byte) (value & 0xff);
+
         return this;
     }
-    
+
     /**
-     * Puts a string into the buffer by first writing the size of the string
-     * as an int, followed by the bytes of the string, padded if necessary to
-     * a multiple of 4.
+     * Puts a string into the buffer by first writing the size of the string as an int, followed by
+     * the bytes of the string, padded if necessary to a multiple of 4.
      *
-     * @param message - the message to write to the buffer
+     * @param value the message to write to the buffer
+     * @return
      */
-    public GangliaMessage addString(String value)
-    {
+    public GangliaMessage addString(String value) {
         byte[] bytes = value.getBytes();
         int len = bytes.length;
         addInt(len);
         System.arraycopy(bytes, 0, this.buffer, this.offset, len);
         this.offset += len;
         pad();
-        
+
         return this;
     }
 
@@ -77,9 +75,8 @@ public class GangliaMessage
             this.buffer[this.offset++] = 0;
         }
     }
-    
-    int getOffset()
-    {
+
+    int getOffset() {
         return this.offset;
     }
 }

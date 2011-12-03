@@ -7,8 +7,8 @@ import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.JmxReporter;
 
 /**
- * A Guice module which instruments methods annotated with the {@link Metered}
- * and {@link Timed} annotations.
+ * A Guice module which instruments methods annotated with the {@link Metered} and {@link Timed}
+ * annotations.
  *
  * @see Gauge
  * @see Metered
@@ -33,28 +33,21 @@ public class InstrumentationModule extends AbstractModule {
     /**
      * Override to provide a custom binding for {@link JmxReporter}
      */
-    protected void bindJmxReporter()
-    {
+    protected void bindJmxReporter() {
         bind(JmxReporter.class).toProvider(JmxReporterProvider.class).asEagerSingleton();
     }
 
     /**
      * Override to provide a custom {@link HealthCheckRegistry}
-     * 
-     * @return
      */
-    protected HealthCheckRegistry createHealthCheckRegistry()
-    {
+    protected HealthCheckRegistry createHealthCheckRegistry() {
         return new HealthCheckRegistry();
     }
 
     /**
      * Override to provide a custom {@link MetricsRegistry}
-     * 
-     * @return
      */
-    protected MetricsRegistry createMetricsRegistry()
-    {
+    protected MetricsRegistry createMetricsRegistry() {
         return new MetricsRegistry();
     }
 }

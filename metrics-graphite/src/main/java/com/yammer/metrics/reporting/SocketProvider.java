@@ -2,7 +2,6 @@ package com.yammer.metrics.reporting;
 
 import java.net.Socket;
 
-public interface SocketProvider
-{
+public interface SocketProvider {
     Socket get() throws Exception;
 }

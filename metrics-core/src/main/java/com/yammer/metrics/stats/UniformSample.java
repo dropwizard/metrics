@@ -10,11 +10,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicLongArray;
 
 /**
- * A random sample of a stream of {@code long}s. Uses Vitter's Algorithm R to
- * produce a statistically representative sample.
+ * A random sample of a stream of {@code long}s. Uses Vitter's Algorithm R to produce a
+ * statistically representative sample.
  *
- * @see <a href="http://www.cs.umd.edu/~samir/498/vitter.pdf">Random Sampling
- *      with a Reservoir</a>
+ * @see <a href="http://www.cs.umd.edu/~samir/498/vitter.pdf">Random Sampling with a Reservoir</a>
  */
 public class UniformSample implements Sample {
     private static final Random RANDOM = new Random();
@@ -24,8 +23,7 @@ public class UniformSample implements Sample {
     /**
      * Creates a new {@link UniformSample}.
      *
-     * @param reservoirSize the number of samples to keep in the sampling
-     *                      reservoir
+     * @param reservoirSize the number of samples to keep in the sampling reservoir
      */
     public UniformSample(int reservoirSize) {
         this.values = new AtomicLongArray(reservoirSize);
@@ -63,16 +61,18 @@ public class UniformSample implements Sample {
     }
 
     /**
-     * Get a pseurandom long uniformally between 0 and n-1.
-     * Stolen from {@code Random.nextInt(int n)}
+     * Get a pseudo-random long uniformly between 0 and n-1. Stolen from
+     * {@link java.util.Random#nextInt()}.
+     *
      * @param n the bound
+     * @return a value select randomly from the range {@code [0..n)}.
      */
     private static long nextLong(long n) {
-        long bits,val;
+        long bits, val;
         do {
-            bits = RANDOM.nextLong() & (~(1L<<63));
+            bits = RANDOM.nextLong() & (~(1L << 63));
             val = bits % n;
-        } while(bits - val + (n-1) < 0L);
+        } while (bits - val + (n - 1) < 0L);
         return val;
     }
 

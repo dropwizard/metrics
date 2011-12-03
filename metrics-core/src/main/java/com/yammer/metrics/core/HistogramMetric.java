@@ -1,7 +1,8 @@
 package com.yammer.metrics.core;
 
-import static java.lang.Math.floor;
-import static java.lang.Math.sqrt;
+import com.yammer.metrics.stats.ExponentiallyDecayingSample;
+import com.yammer.metrics.stats.Sample;
+import com.yammer.metrics.stats.UniformSample;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,15 +11,14 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.yammer.metrics.stats.ExponentiallyDecayingSample;
-import com.yammer.metrics.stats.Sample;
-import com.yammer.metrics.stats.UniformSample;
+import static java.lang.Math.floor;
+import static java.lang.Math.sqrt;
 
 /**
  * A metric which calculates the distribution of a value.
  *
- * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately
- * computing running variance</a>
+ * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately computing running
+ *      variance</a>
  */
 public class HistogramMetric implements Metric, Percentiled, Summarized {
     /**
@@ -26,9 +26,8 @@ public class HistogramMetric implements Metric, Percentiled, Summarized {
      */
     public enum SampleType {
         /**
-         * Uses a uniform sample of 1028 elements, which offers a 99.9%
-         * confidence level with a 5% margin of error assuming a normal
-         * distribution.
+         * Uses a uniform sample of 1028 elements, which offers a 99.9% confidence level with a 5%
+         * margin of error assuming a normal distribution.
          */
         UNIFORM {
             @Override
@@ -38,10 +37,9 @@ public class HistogramMetric implements Metric, Percentiled, Summarized {
         },
 
         /**
-         * Uses an exponentially decaying sample of 1028 elements, which offers
-         * a 99.9% confidence level with a 5% margin of error assuming a normal
-         * distribution, and an alpha factor of 0.015, which heavily biases
-         * the sample to the past 5 minutes of measurements.
+         * Uses an exponentially decaying sample of 1028 elements, which offers a 99.9% confidence
+         * level with a 5% margin of error assuming a normal distribution, and an alpha factor of
+         * 0.015, which heavily biases the sample to the past 5 minutes of measurements.
          */
         BIASED {
             @Override
@@ -91,7 +89,7 @@ public class HistogramMetric implements Metric, Percentiled, Summarized {
         _max.set(Long.MIN_VALUE);
         _min.set(Long.MAX_VALUE);
         _sum.set(0);
-        variance.set(new double[] { -1, 0 });
+        variance.set(new double[]{-1, 0});
     }
 
     /**
@@ -122,7 +120,9 @@ public class HistogramMetric implements Metric, Percentiled, Summarized {
      *
      * @return the number of values recorded
      */
-    public long count() { return count.get(); }
+    public long count() {
+        return count.get();
+    }
 
     /* (non-Javadoc)
      * @see com.yammer.metrics.core.Summarized#max()
@@ -171,7 +171,7 @@ public class HistogramMetric implements Metric, Percentiled, Summarized {
     /**
      * Returns the value at the given percentile.
      *
-     * @param percentile    a percentile ({@code 0..1})
+     * @param percentile a percentile ({@code 0..1})
      * @return the value at the given percentile
      */
     @Override
@@ -261,11 +261,12 @@ public class HistogramMetric implements Metric, Percentiled, Summarized {
      * Cache arrays for the variance calculation, so as to avoid memory allocation.
      */
     private final ThreadLocal<double[]> arrayCache =
-        new ThreadLocal<double[]>() {
-            @Override protected double[] initialValue() {
-                return new double [2];
-            }
-        };       
+            new ThreadLocal<double[]>() {
+                @Override
+                protected double[] initialValue() {
+                    return new double[2];
+                }
+            };
 
     private void updateVariance(long value) {
         boolean done = false;

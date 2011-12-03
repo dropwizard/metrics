@@ -56,7 +56,7 @@ public class CounterMetricTest {
     public void isZeroAfterBeingCleared() throws Exception {
         counter.inc(3);
         counter.clear();
-        
+
         assertThat("the counter's value after being cleared is zero",
                    counter.count(),
                    is(0L));

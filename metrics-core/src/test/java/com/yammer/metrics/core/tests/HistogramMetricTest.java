@@ -46,7 +46,7 @@ public class HistogramMetricTest {
         assertThat("the histogram has a 99th percentile of zero",
                    percentiles[2],
                    is(closeTo(0.0, 0.0001)));
-        
+
         assertThat("the histogram is empty",
                    histogram.values().isEmpty(),
                    is(true));

@@ -9,10 +9,12 @@ public class InstrumentedWithMetered {
     public String doAThing() {
         return "poop";
     }
+
     @Metered
     String doAThingWithDefaultScope() {
         return "defaultResult";
     }
+
     @Metered
     protected String doAThingWithProtectedScope() {
         return "defaultProtected";

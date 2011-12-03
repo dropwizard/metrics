@@ -1,5 +1,8 @@
 package com.yammer.metrics.reporting;
 
+import com.yammer.metrics.core.*;
+import com.yammer.metrics.util.MetricPredicate;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,19 +13,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import com.yammer.metrics.core.Clock;
-import com.yammer.metrics.core.CounterMetric;
-import com.yammer.metrics.core.GaugeMetric;
-import com.yammer.metrics.core.HistogramMetric;
-import com.yammer.metrics.core.Metered;
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricsProcessor;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.TimerMetric;
-import com.yammer.metrics.util.MetricPredicate;
-
-public class CsvReporter extends AbstractPollingReporter implements MetricsProcessor<CsvReporter.Context> {
+public class CsvReporter extends AbstractPollingReporter implements
+                                                         MetricsProcessor<CsvReporter.Context> {
     private final MetricPredicate predicate;
     private final File outputDir;
     private final Map<MetricName, PrintStream> streamMap;
@@ -30,11 +22,11 @@ public class CsvReporter extends AbstractPollingReporter implements MetricsProce
     private long startTime;
 
     public CsvReporter(File outputDir,
-            MetricsRegistry metricsRegistry,
-            MetricPredicate predicate) throws Exception {
+                       MetricsRegistry metricsRegistry,
+                       MetricPredicate predicate) throws Exception {
         this(outputDir, metricsRegistry, predicate, Clock.DEFAULT);
     }
-    
+
     public CsvReporter(File outputDir,
                        MetricsRegistry metricsRegistry,
                        MetricPredicate predicate,
@@ -65,7 +57,7 @@ public class CsvReporter extends AbstractPollingReporter implements MetricsProce
         }
         return stream;
     }
-    
+
     /**
      * Override to do tricks (such as testing).
      */
@@ -94,7 +86,7 @@ public class CsvReporter extends AbstractPollingReporter implements MetricsProce
                             stream.print(',');
                             return stream;
                         }
-                        
+
                     };
                     metric.processWith(this, entry.getKey(), context);
                 }
@@ -103,21 +95,22 @@ public class CsvReporter extends AbstractPollingReporter implements MetricsProce
             e.printStackTrace();
         }
     }
-    
+
     public static interface Context {
         public PrintStream getStream(String header) throws IOException;
     }
-    
+
     @Override
-    public void processMeter(MetricName name, Metered meter, Context context)  throws IOException {
-        final PrintStream stream = context.getStream("# time,count,1 min rate,mean rate,5 min rate,15 min rate");
+    public void processMeter(MetricName name, Metered meter, Context context) throws IOException {
+        final PrintStream stream = context.getStream(
+                "# time,count,1 min rate,mean rate,5 min rate,15 min rate");
         stream.append(new StringBuilder()
-            .append(meter.count()).append(',')
-            .append(meter.oneMinuteRate()).append(',')
-            .append(meter.meanRate()).append(',')
-            .append(meter.fiveMinuteRate()).append(',')
-            .append(meter.fifteenMinuteRate()).toString())
-            .println();
+                              .append(meter.count()).append(',')
+                              .append(meter.oneMinuteRate()).append(',')
+                              .append(meter.meanRate()).append(',')
+                              .append(meter.fiveMinuteRate()).append(',')
+                              .append(meter.fifteenMinuteRate()).toString())
+              .println();
         stream.flush();
     }
 
@@ -133,15 +126,15 @@ public class CsvReporter extends AbstractPollingReporter implements MetricsProce
         final PrintStream stream = context.getStream("# time,min,max,mean,median,stddev,90%,95%,99%");
         final Double[] percentiles = histogram.percentiles(0.5, 0.90, 0.95, 0.99);
         stream.append(new StringBuilder()
-            .append(histogram.min()).append(',')
-            .append(histogram.max()).append(',')
-            .append(histogram.mean()).append(',')
-            .append(percentiles[0]).append(',')     // median
-            .append(histogram.stdDev()).append(',')
-            .append(percentiles[1]).append(',')     // 90%
-            .append(percentiles[2]).append(',')     // 95%
-            .append(percentiles[3]).toString())     // 99 %
-            .println();
+                              .append(histogram.min()).append(',')
+                              .append(histogram.max()).append(',')
+                              .append(histogram.mean()).append(',')
+                              .append(percentiles[0]).append(',')     // median
+                              .append(histogram.stdDev()).append(',')
+                              .append(percentiles[1]).append(',')     // 90%
+                              .append(percentiles[2]).append(',')     // 95%
+                              .append(percentiles[3]).toString())     // 99 %
+                .println();
         stream.println();
         stream.flush();
     }
@@ -151,15 +144,15 @@ public class CsvReporter extends AbstractPollingReporter implements MetricsProce
         final PrintStream stream = context.getStream("# time,min,max,mean,median,stddev,90%,95%,99%");
         final Double[] percentiles = timer.percentiles(0.5, 0.90, 0.95, 0.99);
         stream.append(new StringBuilder()
-            .append(timer.min()).append(',')
-            .append(timer.max()).append(',')
-            .append(timer.mean()).append(',')
-            .append(percentiles[0]).append(',')     // median
-            .append(timer.stdDev()).append(',')
-            .append(percentiles[1]).append(',')     // 90%
-            .append(percentiles[2]).append(',')     // 95%
-            .append(percentiles[3]).toString())     // 99 %
-            .println();
+                              .append(timer.min()).append(',')
+                              .append(timer.max()).append(',')
+                              .append(timer.mean()).append(',')
+                              .append(percentiles[0]).append(',')     // median
+                              .append(timer.stdDev()).append(',')
+                              .append(percentiles[1]).append(',')     // 90%
+                              .append(percentiles[2]).append(',')     // 95%
+                              .append(percentiles[3]).toString())     // 99 %
+                .println();
         stream.flush();
     }
 

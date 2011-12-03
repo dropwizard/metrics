@@ -1,52 +1,30 @@
 package com.yammer.metrics.reporting;
 
-import static com.yammer.metrics.core.VirtualMachineMetrics.daemonThreadCount;
-import static com.yammer.metrics.core.VirtualMachineMetrics.fileDescriptorUsage;
-import static com.yammer.metrics.core.VirtualMachineMetrics.garbageCollectors;
-import static com.yammer.metrics.core.VirtualMachineMetrics.heapUsage;
-import static com.yammer.metrics.core.VirtualMachineMetrics.memoryPoolUsage;
-import static com.yammer.metrics.core.VirtualMachineMetrics.nonHeapUsage;
-import static com.yammer.metrics.core.VirtualMachineMetrics.threadCount;
-import static com.yammer.metrics.core.VirtualMachineMetrics.threadStatePercentages;
-import static com.yammer.metrics.core.VirtualMachineMetrics.uptime;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.*;
+import com.yammer.metrics.util.MetricPredicate;
+import com.yammer.metrics.util.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.CounterMetric;
-import com.yammer.metrics.core.GaugeMetric;
-import com.yammer.metrics.core.HistogramMetric;
-import com.yammer.metrics.core.Metered;
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricsProcessor;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.TimerMetric;
-import com.yammer.metrics.core.VirtualMachineMetrics.GarbageCollector;
-import com.yammer.metrics.util.MetricPredicate;
-import com.yammer.metrics.util.Utils;
+import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 
 /**
- * A simple reporter which sends out application metrics to a
- * <a href="http://ganglia.sourceforge.net/">Ganglia</a> server periodically.
+ * A simple reporter which sends out application metrics to a <a href="http://ganglia.sourceforge.net/">Ganglia</a>
+ * server periodically.
  * <p/>
- * NOTE: this reporter only works with Ganglia 3.1 and greater.  The message protocol
- * for earlier versions of Ganglia is different.
+ * NOTE: this reporter only works with Ganglia 3.1 and greater.  The message protocol for earlier
+ * versions of Ganglia is different.
  * <p/>
- * This code heavily borrows from GangliaWriter in
- * <a href="http://code.google.com/p/jmxtrans/source/browse/trunk/src/com/googlecode/jmxtrans/model/output/GangliaWriter.java">JMXTrans</a>
- * which is based on <a ahref="http://search-hadoop.com/c/Hadoop:/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/metrics/ganglia/GangliaContext31.java">GangliaContext31</a>
+ * This code heavily borrows from GangliaWriter in <a href="http://code.google.com/p/jmxtrans/source/browse/trunk/src/com/googlecode/jmxtrans/model/output/GangliaWriter.java">JMXTrans</a>
+ * which is based on <a href="http://search-hadoop.com/c/Hadoop:/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/metrics/ganglia/GangliaContext31.java">GangliaContext31</a>
  * from Hadoop.
  */
 public class GangliaReporter extends AbstractPollingReporter implements MetricsProcessor<String> {
@@ -62,10 +40,10 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     private boolean compressPackageNames;
     private final GangliaMessageBuilder gangliaMessageBuilder;
     public boolean printVMMetrics = true;
-    
+
     /**
-     * Enables the ganglia reporter to send data for the default metrics registry
-     * to ganglia server with the specified period.
+     * Enables the ganglia reporter to send data for the default metrics registry to ganglia server
+     * with the specified period.
      *
      * @param period      the period between successive outputs
      * @param unit        the time unit of {@code period}
@@ -77,8 +55,8 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     }
 
     /**
-     * Enables the ganglia reporter to send data for the default metrics registry
-     * to ganglia server with the specified period.
+     * Enables the ganglia reporter to send data for the default metrics registry to ganglia server
+     * with the specified period.
      *
      * @param period      the period between successive outputs
      * @param unit        the time unit of {@code period}
@@ -90,46 +68,53 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
         enable(Metrics.defaultRegistry(), period, unit, gangliaHost, port, groupPrefix);
     }
 
-     /**
-     * Enables the ganglia reporter to send data for the default metrics registry
-     * to ganglia server with the specified period.
+    /**
+     * Enables the ganglia reporter to send data for the default metrics registry to ganglia server
+     * with the specified period.
      *
-      * @param period      the period between successive outputs
-      * @param unit        the time unit of {@code period}
-      * @param gangliaHost the gangliaHost name of ganglia server (carbon-cache agent)
-      * @param port        the port number on which the ganglia server is listening
-      * @param compressPackageNames    if true reporter will compress package names e.g. com.foo.MetricName becomes c.f.MetricName
+     * @param period               the period between successive outputs
+     * @param unit                 the time unit of {@code period}
+     * @param gangliaHost          the gangliaHost name of ganglia server (carbon-cache agent)
+     * @param port                 the port number on which the ganglia server is listening
+     * @param compressPackageNames if true reporter will compress package names e.g.
+     *                             com.foo.MetricName becomes c.f.MetricName
      */
     public static void enable(long period, TimeUnit unit, String gangliaHost, int port, boolean compressPackageNames) {
-        enable(Metrics.defaultRegistry(), period, unit, gangliaHost, port, "", MetricPredicate.ALL, compressPackageNames);
+        enable(Metrics.defaultRegistry(),
+               period,
+               unit,
+               gangliaHost,
+               port,
+               "",
+               MetricPredicate.ALL,
+               compressPackageNames);
     }
 
 
     /**
-     * Enables the ganglia reporter to send data for the given metrics registry
-     * to ganglia server with the specified period.
+     * Enables the ganglia reporter to send data for the given metrics registry to ganglia server
+     * with the specified period.
      *
      * @param metricsRegistry the metrics registry
      * @param period          the period between successive outputs
      * @param unit            the time unit of {@code period}
      * @param gangliaHost     the gangliaHost name of ganglia server (carbon-cache agent)
      * @param port            the port number on which the ganglia server is listening
-     * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
+     * @param groupPrefix     prefix to the ganglia group name (such as myapp_counter)
      */
     public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String gangliaHost, int port, String groupPrefix) {
         enable(metricsRegistry, period, unit, gangliaHost, port, groupPrefix, MetricPredicate.ALL);
     }
 
     /**
-     * Enables the ganglia reporter to send data to ganglia server with the
-     * specified period.
+     * Enables the ganglia reporter to send data to ganglia server with the specified period.
      *
      * @param metricsRegistry the metrics registry
      * @param period          the period between successive outputs
      * @param unit            the time unit of {@code period}
      * @param gangliaHost     the gangliaHost name of ganglia server (carbon-cache agent)
      * @param port            the port number on which the ganglia server is listening
-     * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
+     * @param groupPrefix     prefix to the ganglia group name (such as myapp_counter)
      * @param predicate       filters metrics to be reported
      */
     public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String gangliaHost, int port, String groupPrefix, MetricPredicate predicate) {
@@ -137,22 +122,27 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     }
 
     /**
-     * Enables the ganglia reporter to send data to ganglia server with the
-     * specified period.
+     * Enables the ganglia reporter to send data to ganglia server with the specified period.
      *
-     * @param metricsRegistry the metrics registry
-     * @param period          the period between successive outputs
-     * @param unit            the time unit of {@code period}
-     * @param gangliaHost     the gangliaHost name of ganglia server (carbon-cache agent)
-     * @param port            the port number on which the ganglia server is listening
-     * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
-     * @param predicate       filters metrics to be reported
-     * @param compressPackageNames    if true reporter will compress package names e.g. com.foo.MetricName becomes c.f.MetricName
+     * @param metricsRegistry      the metrics registry
+     * @param period               the period between successive outputs
+     * @param unit                 the time unit of {@code period}
+     * @param gangliaHost          the gangliaHost name of ganglia server (carbon-cache agent)
+     * @param port                 the port number on which the ganglia server is listening
+     * @param groupPrefix          prefix to the ganglia group name (such as myapp_counter)
+     * @param predicate            filters metrics to be reported
+     * @param compressPackageNames if true reporter will compress package names e.g.
+     *                             com.foo.MetricName becomes c.f.MetricName
      */
     public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String gangliaHost,
                               int port, String groupPrefix, MetricPredicate predicate, boolean compressPackageNames) {
         try {
-            final GangliaReporter reporter = new GangliaReporter(metricsRegistry, gangliaHost, port, groupPrefix, predicate, compressPackageNames);
+            final GangliaReporter reporter = new GangliaReporter(metricsRegistry,
+                                                                 gangliaHost,
+                                                                 port,
+                                                                 groupPrefix,
+                                                                 predicate,
+                                                                 compressPackageNames);
             reporter.start(period, unit);
         } catch (Exception e) {
             LOG.error("Error creating/starting ganglia reporter:", e);
@@ -173,13 +163,18 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     /**
      * Creates a new {@link GangliaReporter}.
      *
-     * @param gangliaHost is ganglia server
-     * @param port        is port on which ganglia server is running
+     * @param gangliaHost          is ganglia server
+     * @param port                 is port on which ganglia server is running
      * @param compressPackageNames
      * @throws java.io.IOException if there is an error connecting to the ganglia server
      */
     public GangliaReporter(String gangliaHost, int port, boolean compressPackageNames) throws IOException {
-        this(Metrics.defaultRegistry(), gangliaHost, port, "", MetricPredicate.ALL, compressPackageNames);
+        this(Metrics.defaultRegistry(),
+             gangliaHost,
+             port,
+             "",
+             MetricPredicate.ALL,
+             compressPackageNames);
     }
 
     /**
@@ -188,7 +183,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
      * @param metricsRegistry the metrics registry
      * @param gangliaHost     is ganglia server
      * @param port            is port on which ganglia server is running
-     * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
+     * @param groupPrefix     prefix to the ganglia group name (such as myapp_counter)
      * @throws java.io.IOException if there is an error connecting to the ganglia server
      */
     public GangliaReporter(MetricsRegistry metricsRegistry, String gangliaHost, int port, String groupPrefix) throws IOException {
@@ -201,7 +196,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
      * @param metricsRegistry the metrics registry
      * @param gangliaHost     is ganglia server
      * @param port            is port on which ganglia server is running
-     * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
+     * @param groupPrefix     prefix to the ganglia group name (such as myapp_counter)
      * @param predicate       filters metrics to be reported
      * @throws java.io.IOException if there is an error connecting to the ganglia server
      */
@@ -212,26 +207,32 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     /**
      * Creates a new {@link GangliaReporter}.
      *
-     * @param metricsRegistry the metrics registry
-     * @param gangliaHost     is ganglia server
-     * @param port            is port on which ganglia server is running
-     * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
-     * @param predicate       filters metrics to be reported
-     * @param compressPackageNames    if true reporter will compress package names e.g. com.foo.MetricName becomes c.f.MetricName
+     * @param metricsRegistry      the metrics registry
+     * @param gangliaHost          is ganglia server
+     * @param port                 is port on which ganglia server is running
+     * @param groupPrefix          prefix to the ganglia group name (such as myapp_counter)
+     * @param predicate            filters metrics to be reported
+     * @param compressPackageNames if true reporter will compress package names e.g.
+     *                             com.foo.MetricName becomes c.f.MetricName
      * @throws java.io.IOException if there is an error connecting to the ganglia server
      */
     public GangliaReporter(MetricsRegistry metricsRegistry, String gangliaHost, int port, String groupPrefix,
                            MetricPredicate predicate, boolean compressPackageNames) throws IOException {
-        this(metricsRegistry, groupPrefix, predicate, compressPackageNames, new GangliaMessageBuilder(gangliaHost, port));
+        this(metricsRegistry,
+             groupPrefix,
+             predicate,
+             compressPackageNames,
+             new GangliaMessageBuilder(gangliaHost, port));
     }
 
-     /**
+    /**
      * Creates a new {@link GangliaReporter}.
      *
-     * @param metricsRegistry the metrics registry
-     * @param groupPrefix prefix to the ganglia group name (such as myapp_counter)
-     * @param predicate       filters metrics to be reported
-     * @param compressPackageNames    if true reporter will compress package names e.g. com.foo.MetricName becomes c.f.MetricName
+     * @param metricsRegistry      the metrics registry
+     * @param groupPrefix          prefix to the ganglia group name (such as myapp_counter)
+     * @param predicate            filters metrics to be reported
+     * @param compressPackageNames if true reporter will compress package names e.g.
+     *                             com.foo.MetricName becomes c.f.MetricName
      * @throws java.io.IOException if there is an error connecting to the ganglia server
      */
     public GangliaReporter(MetricsRegistry metricsRegistry, String groupPrefix,
@@ -246,15 +247,16 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
 
     @Override
     public void run() {
-        if(this.printVMMetrics)
-        {
+        if (this.printVMMetrics) {
             printVmMetrics();
         }
         printRegularMetrics();
     }
 
     private void printRegularMetrics() {
-        for (Map.Entry<String, Map<MetricName, Metric>> entry : Utils.sortAndFilterMetrics(metricsRegistry.allMetrics(), this.predicate).entrySet()) {
+        for (Map.Entry<String, Map<MetricName, Metric>> entry : Utils.sortAndFilterMetrics(
+                metricsRegistry.allMetrics(),
+                this.predicate).entrySet()) {
             for (Map.Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
                 final Metric metric = subEntry.getValue();
                 if (metric != null) {
@@ -267,12 +269,14 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
             }
         }
     }
-    
+
     private void sendToGanglia(String metricName, String metricType, String metricValue, String groupName, String units) {
         try {
             sendMetricData(metricType, metricName, metricValue, groupPrefix + groupName, units);
             if (LOG.isTraceEnabled()) {
-                LOG.trace("Emitting metric " + metricName + ", type " + metricType + ", value " + metricValue + " for gangliaHost: " + this.gangliaMessageBuilder.getHostName() + ":" + this.gangliaMessageBuilder.getPort());
+                LOG.trace("Emitting metric " + metricName + ", type " + metricType + ", value " + metricValue + " for gangliaHost: " + this
+                        .gangliaMessageBuilder
+                        .getHostName() + ":" + this.gangliaMessageBuilder.getPort());
             }
         } catch (IOException e) {
             LOG.error("Error sending to ganglia:", e);
@@ -284,7 +288,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     }
 
     private void sendMetricData(String metricType, String metricName, String metricValue, String groupName, String units) throws IOException {
-        
+
         this.gangliaMessageBuilder.newMessage()
                 .addInt(128)// metric_id = metadata_msg
                 .addString(this.hostLabel)// hostname
@@ -300,7 +304,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
                 .addString("GROUP")// Group attribute
                 .addString(groupName)// Group value
                 .send();
-                
+
         this.gangliaMessageBuilder.newMessage()
                 .addInt(133)// we are sending a string value
                 .addString(this.hostLabel)// hostLabel
@@ -313,12 +317,18 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
 
     @Override
     public void processGauge(MetricName name, GaugeMetric<?> gauge, String x) throws IOException {
-        sendToGanglia(sanitizeName(name), GANGLIA_INT_TYPE, String.format(locale, "%s", gauge.value()), "gauge");
+        sendToGanglia(sanitizeName(name),
+                      GANGLIA_INT_TYPE,
+                      String.format(locale, "%s", gauge.value()),
+                      "gauge");
     }
 
     @Override
     public void processCounter(MetricName name, CounterMetric counter, String x) throws IOException {
-        sendToGanglia(sanitizeName(name), GANGLIA_INT_TYPE, String.format(locale, "%d", counter.count()), "counter");
+        sendToGanglia(sanitizeName(name),
+                      GANGLIA_INT_TYPE,
+                      String.format(locale, "%d", counter.count()),
+                      "counter");
     }
 
     @Override
@@ -329,7 +339,10 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
         printDoubleField(sanitizedName + ".meanRate", meter.meanRate(), "metered", units);
         printDoubleField(sanitizedName + ".1MinuteRate", meter.oneMinuteRate(), "metered", units);
         printDoubleField(sanitizedName + ".5MinuteRate", meter.fiveMinuteRate(), "metered", units);
-        printDoubleField(sanitizedName + ".15MinuteRate", meter.fifteenMinuteRate(), "metered", units);
+        printDoubleField(sanitizedName + ".15MinuteRate",
+                         meter.fifteenMinuteRate(),
+                         "metered",
+                         units);
     }
 
     @Override
@@ -368,7 +381,11 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     }
 
     private void printDoubleField(String name, double value, String groupName, String units) {
-        sendToGanglia(name, GANGLIA_DOUBLE_TYPE, String.format(locale, "%2.2f", value), groupName, units);
+        sendToGanglia(name,
+                      GANGLIA_DOUBLE_TYPE,
+                      String.format(locale, "%2.2f", value),
+                      groupName,
+                      units);
     }
 
     private void printDoubleField(String name, double value, String groupName) {
@@ -388,7 +405,9 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
         printDoubleField("jvm.memory.heap_usage", heapUsage(), "jvm");
         printDoubleField("jvm.memory.non_heap_usage", nonHeapUsage(), "jvm");
         for (Map.Entry<String, Double> pool : memoryPoolUsage().entrySet()) {
-            printDoubleField("jvm.memory.memory_pool_usages." + pool.getKey(), pool.getValue(), "jvm");
+            printDoubleField("jvm.memory.memory_pool_usages." + pool.getKey(),
+                             pool.getValue(),
+                             "jvm");
         }
 
         printDoubleField("jvm.daemon_thread_count", daemonThreadCount(), "jvm");
@@ -397,11 +416,15 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
         printDoubleField("jvm.fd_usage", fileDescriptorUsage(), "jvm");
 
         for (Map.Entry<Thread.State, Double> entry : threadStatePercentages().entrySet()) {
-            printDoubleField("jvm.thread-states." + entry.getKey().toString().toLowerCase(), entry.getValue(), "jvm");
+            printDoubleField("jvm.thread-states." + entry.getKey().toString().toLowerCase(),
+                             entry.getValue(),
+                             "jvm");
         }
 
-        for (Map.Entry<String, GarbageCollector> entry : garbageCollectors().entrySet()) {
-            printLongField("jvm.gc." + entry.getKey() + ".time", entry.getValue().getTime(TimeUnit.MILLISECONDS), "jvm");
+        for (Map.Entry<String, VirtualMachineMetrics.GarbageCollector> entry : garbageCollectors().entrySet()) {
+            printLongField("jvm.gc." + entry.getKey() + ".time",
+                           entry.getValue().getTime(TimeUnit.MILLISECONDS),
+                           "jvm");
             printLongField("jvm.gc." + entry.getKey() + ".runs", entry.getValue().getRuns(), "jvm");
         }
     }

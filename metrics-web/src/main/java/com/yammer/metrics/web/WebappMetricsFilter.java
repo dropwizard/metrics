@@ -34,7 +34,8 @@ public abstract class WebappMetricsFilter implements Filter {
      */
     public WebappMetricsFilter(Map<Integer, String> meterNamesByStatusCode,
                                String otherMetricName) {
-        this.metersByStatusCode = new ConcurrentHashMap<Integer, MeterMetric>(meterNamesByStatusCode.size());
+        this.metersByStatusCode = new ConcurrentHashMap<Integer, MeterMetric>(meterNamesByStatusCode
+                                                                                      .size());
         for (Entry<Integer, String> entry : meterNamesByStatusCode.entrySet()) {
             metersByStatusCode.put(entry.getKey(),
                                    Metrics.newMeter(WebappMetricsFilter.class,

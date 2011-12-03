@@ -1,42 +1,42 @@
 package com.yammer.metrics.reporting;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.OutputStream;
-import java.net.Socket;
-
 import com.yammer.metrics.core.Clock;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.tests.AbstractPollingReporterTest;
 import com.yammer.metrics.util.MetricPredicate;
 
-public class GraphiteReporterTest extends AbstractPollingReporterTest
-{
+import java.io.OutputStream;
+import java.net.Socket;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+public class GraphiteReporterTest extends AbstractPollingReporterTest {
     @Override
-    protected AbstractPollingReporter createReporter(MetricsRegistry registry, OutputStream out, Clock clock) throws Exception
-    {
+    protected AbstractPollingReporter createReporter(MetricsRegistry registry, OutputStream out, Clock clock) throws Exception {
         final Socket socket = mock(Socket.class);
         when(socket.getOutputStream()).thenReturn(out);
 
         final SocketProvider provider = mock(SocketProvider.class);
         when(provider.get()).thenReturn(socket);
 
-        final GraphiteReporter reporter = new GraphiteReporter(registry, "prefix", MetricPredicate.ALL, provider, clock);
+        final GraphiteReporter reporter = new GraphiteReporter(registry,
+                                                               "prefix",
+                                                               MetricPredicate.ALL,
+                                                               provider,
+                                                               clock);
         reporter.printVMMetrics = false;
         return reporter;
     }
 
     @Override
-    public String[] expectedGaugeResult(String value)
-    {
-        return new String[] { String.format("prefix.java.lang.Object.metric.value %s 5", value) };
+    public String[] expectedGaugeResult(String value) {
+        return new String[]{String.format("prefix.java.lang.Object.metric.value %s 5", value)};
     }
 
     @Override
-    public String[] expectedTimerResult()
-    {
-        return new String[] {
+    public String[] expectedTimerResult() {
+        return new String[]{
                 "prefix.java.lang.Object.metric.count 1 5",
                 "prefix.java.lang.Object.metric.meanRate 2.00 5",
                 "prefix.java.lang.Object.metric.1MinuteRate 1.00 5",
@@ -56,9 +56,8 @@ public class GraphiteReporterTest extends AbstractPollingReporterTest
     }
 
     @Override
-    public String[] expectedMeterResult()
-    {
-        return new String[] {
+    public String[] expectedMeterResult() {
+        return new String[]{
                 "prefix.java.lang.Object.metric.count 1 5",
                 "prefix.java.lang.Object.metric.meanRate 2.00 5",
                 "prefix.java.lang.Object.metric.1MinuteRate 1.00 5",
@@ -68,9 +67,8 @@ public class GraphiteReporterTest extends AbstractPollingReporterTest
     }
 
     @Override
-    public String[] expectedHistogramResult()
-    {
-        return new String[] {
+    public String[] expectedHistogramResult() {
+        return new String[]{
                 "prefix.java.lang.Object.metric.min 1.00 5",
                 "prefix.java.lang.Object.metric.max 3.00 5",
                 "prefix.java.lang.Object.metric.mean 2.00 5",
@@ -85,9 +83,8 @@ public class GraphiteReporterTest extends AbstractPollingReporterTest
     }
 
     @Override
-    public String[] expectedCounterResult(long count)
-    {
-        return new String[] {
+    public String[] expectedCounterResult(long count) {
+        return new String[]{
                 String.format("prefix.java.lang.Object.metric.count %d 5", count)
         };
     }

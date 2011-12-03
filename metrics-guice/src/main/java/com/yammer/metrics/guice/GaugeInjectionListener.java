@@ -1,16 +1,15 @@
 package com.yammer.metrics.guice;
 
-import java.lang.reflect.Method;
-
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.InjectionListener;
 import com.yammer.metrics.core.GaugeMetric;
 import com.yammer.metrics.core.MetricsRegistry;
 
+import java.lang.reflect.Method;
+
 /**
- * An injection listener which creates a gauge for the declaring class with the
- * given name (or the method's name, if none was provided) which returns the value
- * returned by the annotated method.
+ * An injection listener which creates a gauge for the declaring class with the given name (or the
+ * method's name, if none was provided) which returns the value returned by the annotated method.
  */
 public class GaugeInjectionListener<I> implements InjectionListener<I> {
     private final MetricsRegistry metricsRegistry;

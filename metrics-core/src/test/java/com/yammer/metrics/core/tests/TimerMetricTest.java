@@ -47,7 +47,7 @@ public class TimerMetricTest {
         assertThat("the timer has a max duration of zero",
                    timer.max(),
                    is(closeTo(0.0, 0.001)));
-        
+
         assertThat("the timer has a min duration of zero",
                    timer.min(),
                    is(closeTo(0.0, 0.001)));
@@ -165,7 +165,7 @@ public class TimerMetricTest {
         assertThat("returns the result of the callable",
                    value,
                    is("one"));
-        
+
         assertThat("records the duration of the Callable#call()",
                    timer.max(),
                    is(closeTo(50, 5)));

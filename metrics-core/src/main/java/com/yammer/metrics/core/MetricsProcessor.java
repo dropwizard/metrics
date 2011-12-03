@@ -1,7 +1,7 @@
 package com.yammer.metrics.core;
 
 public interface MetricsProcessor<T> {
-    
+
     public void processMeter(MetricName name, Metered meter, T context) throws Exception;
 
     public void processCounter(MetricName name, CounterMetric counter, T context) throws Exception;

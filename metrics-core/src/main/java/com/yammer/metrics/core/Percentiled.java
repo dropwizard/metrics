@@ -5,7 +5,7 @@ public interface Percentiled {
     /**
      * Returns the duration at the given percentile.
      *
-     * @param percentile    a percentile ({@code 0..1})
+     * @param percentile a percentile ({@code 0..1})
      * @return the duration at the given percentile
      */
     public double percentile(double percentile);

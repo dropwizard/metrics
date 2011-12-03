@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 public class GaugeTest {
-	
+
     @Test
     @SuppressWarnings("unchecked")
     public void aGaugeAnnotatedMethod() throws Exception {
@@ -41,7 +41,7 @@ public class GaugeTest {
                    ((GaugeMetric<String>) metric).value(),
                    is("poop"));
     }
-    
+
 
     @Test
     @SuppressWarnings("unchecked")
@@ -49,7 +49,7 @@ public class GaugeTest {
         final Injector injector = Guice.createInjector(new InstrumentationModule());
         final InstrumentedWithGauge instance = injector.getInstance(InstrumentedWithGauge.class);
         final MetricsRegistry registry = injector.getInstance(MetricsRegistry.class);
-        
+
         instance.doAnotherThing();
 
         final Metric metric = registry.allMetrics().get(new MetricName(InstrumentedWithGauge.class,
