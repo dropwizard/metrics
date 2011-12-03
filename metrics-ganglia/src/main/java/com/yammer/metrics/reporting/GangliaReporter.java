@@ -321,7 +321,7 @@ public class GangliaReporter extends AbstractPollingReporter {
 
     private void printHistogram(HistogramMetric histogram, String name) {
         final String sanitizedName = sanitizeName(name);
-        final double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
+        final double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999, 0.9999);
 
         // TODO:  what units make sense for histograms?  should we add event type to the Histogram metric?
         printDoubleField(sanitizedName + ".min", histogram.min(), "histo");
@@ -334,12 +334,13 @@ public class GangliaReporter extends AbstractPollingReporter {
         printDoubleField(sanitizedName + ".98percentile", percentiles[3], "histo");
         printDoubleField(sanitizedName + ".99percentile", percentiles[4], "histo");
         printDoubleField(sanitizedName + ".999percentile", percentiles[5], "histo");
+        printDoubleField(sanitizedName + ".9999percentile", percentiles[6], "histo");
     }
 
     private void printTimer(TimerMetric timer, String name) {
         printMetered(timer, name);
         final String sanitizedName = sanitizeName(name);
-        final double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
+        final double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999, 0.9999);
         final String durationUnit = timer.durationUnit().name();
         printDoubleField(sanitizedName + ".min", timer.min(), "timer", durationUnit);
         printDoubleField(sanitizedName + ".max", timer.max(), "timer", durationUnit);
@@ -351,6 +352,7 @@ public class GangliaReporter extends AbstractPollingReporter {
         printDoubleField(sanitizedName + ".98percentile", percentiles[3], "timer", durationUnit);
         printDoubleField(sanitizedName + ".99percentile", percentiles[4], "timer", durationUnit);
         printDoubleField(sanitizedName + ".999percentile", percentiles[5], "timer", durationUnit);
+        printDoubleField(sanitizedName + ".9999percentile", percentiles[6], "timer", durationUnit);
     }
 
     private void printDoubleField(String name, double value, String groupName, String units) {

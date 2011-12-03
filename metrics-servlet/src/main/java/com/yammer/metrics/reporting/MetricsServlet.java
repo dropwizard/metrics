@@ -297,13 +297,14 @@ public class MetricsServlet extends HttpServlet {
             json.writeNumberField("mean", histogram.mean());
             json.writeNumberField("std_dev", histogram.stdDev());
 
-            final double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
+            final double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999, 0.9999);
             json.writeNumberField("median", percentiles[0]);
             json.writeNumberField("p75", percentiles[1]);
             json.writeNumberField("p95", percentiles[2]);
             json.writeNumberField("p98", percentiles[3]);
             json.writeNumberField("p99", percentiles[4]);
             json.writeNumberField("p999", percentiles[5]);
+            json.writeNumberField("p9999", percentiles[6]);
 
             if (showFullSamples) {
                 json.writeObjectField("values", histogram.values());

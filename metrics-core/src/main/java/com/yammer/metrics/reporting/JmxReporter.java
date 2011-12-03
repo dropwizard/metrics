@@ -134,12 +134,17 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         public double get98thPercentile();
         public double get99thPercentile();
         public double get999thPercentile();
+        public double get9999thPercentile();
+        public void setCustomPercentile(double customPercentile);
+        public double getCustomPercentile();
+        public double getCustomPercentileValue();
         public List<?> values();
     }
 
     public static class Histogram implements HistogramMBean {
         private final ObjectName objectName;
         private final HistogramMetric metric;
+        private double customPercentile = 0.5;
 
         public Histogram(HistogramMetric metric, ObjectName objectName) {
             this.metric = metric;
@@ -207,6 +212,26 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
 
         @Override
+        public double get9999thPercentile() {
+            return metric.percentiles(0.9999)[0];
+        }
+
+        @Override
+        public void setCustomPercentile(double customPercentile) {
+            this.customPercentile = customPercentile;
+        }
+
+        @Override
+        public double getCustomPercentile() {
+            return customPercentile;
+        }
+
+        @Override
+        public double getCustomPercentileValue() {
+            return metric.percentiles(customPercentile)[0];
+        }
+
+        @Override
         public List<?> values() {
             return metric.values();
         }
@@ -218,6 +243,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     public static class Timer extends Meter implements TimerMBean {
         private final TimerMetric metric;
+        private double customPercentile = 0.5;
 
         public Timer(TimerMetric metric, ObjectName objectName) {
             super(metric, objectName);
@@ -277,6 +303,26 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         @Override
         public double get999thPercentile() {
             return metric.percentiles(0.999)[0];
+        }
+
+        @Override
+        public double get9999thPercentile() {
+            return metric.percentiles(0.9999)[0];
+        }
+
+        @Override
+        public void setCustomPercentile(double customPercentile) {
+            this.customPercentile = customPercentile;
+        }
+
+        @Override
+        public double getCustomPercentile() {
+            return customPercentile;
+        }
+
+        @Override
+        public double getCustomPercentileValue() {
+            return metric.percentiles(customPercentile)[0];
         }
 
         @Override
