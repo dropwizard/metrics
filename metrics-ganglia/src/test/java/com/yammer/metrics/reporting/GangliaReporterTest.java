@@ -111,6 +111,17 @@ public class GangliaReporterTest extends AbstractPollingReporterTest
         assertEquals("clean metric name did not match expected value", expectedMetricName, cleanMetricName);
     }
 
+    @Test
+    public void testCompressPackageName() throws IOException
+    {
+        String metricName = "some.long.package.name.thisIsAC>&!>leanMetric Name";
+        String expectedMetricName = "s.l.p.name.thisIsAC____leanMetric_Name";
+        GangliaReporter gangliaReporter = new GangliaReporter("localhost", 5555, true);
+        String cleanMetricName = gangliaReporter.sanitizeName(metricName);
+        assertEquals("clean metric name did not match expected value", expectedMetricName, cleanMetricName);
+    }
+
+
     protected String getFromFile(String fileName)
     {
         try
