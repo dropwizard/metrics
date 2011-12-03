@@ -12,13 +12,22 @@ public class Utils {
 
     private Utils() { /* unused */ }
 
-    public static Map<String, Map<String, Metric>> sortMetrics(Map<MetricName, Metric> metrics) {
+    public static Map<String, Map<MetricName, Metric>> sortMetrics(Map<MetricName, Metric> metrics) {
         return sortAndFilterMetrics(metrics, MetricPredicate.ALL);
     }
 
-    public static Map<String, Map<String, Metric>> sortAndFilterMetrics(Map<MetricName, Metric> metrics, MetricPredicate predicate) {
-        final Map<String, Map<String, Metric>> sortedMetrics =
-                new TreeMap<String, Map<String, Metric>>();
+    public static Map<MetricName, Metric> filterMetrics(Map<MetricName, Metric> metrics, MetricPredicate predicate) {
+        final Map<MetricName, Metric> result = new HashMap<MetricName, Metric>();
+        for (Entry<MetricName, Metric> entry : metrics.entrySet()) {
+            if(predicate.matches(entry.getKey(), entry.getValue())) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return result;
+    }
+
+    public static Map<String, Map<MetricName, Metric>> sortAndFilterMetrics(Map<MetricName, Metric> metrics, MetricPredicate predicate) {
+        final Map<String, Map<MetricName, Metric>> sortedMetrics = new TreeMap<String, Map<MetricName, Metric>>();
         for (Entry<MetricName, Metric> entry : metrics.entrySet()) {
             final String qualifiedTypeName = entry.getKey().getGroup() + "." + entry.getKey().getType();
             if (predicate.matches(entry.getKey(), entry.getValue())) {
@@ -28,12 +37,12 @@ public class Utils {
                 } else {
                     scopedName = qualifiedTypeName;
                 }
-                Map<String, Metric> subMetrics = sortedMetrics.get(scopedName);
+                Map<MetricName, Metric> subMetrics = sortedMetrics.get(scopedName);
                 if (subMetrics == null) {
-                    subMetrics = new TreeMap<String, Metric>();
+                    subMetrics = new TreeMap<MetricName, Metric>();
                     sortedMetrics.put(scopedName, subMetrics);
                 }
-                subMetrics.put(entry.getKey().getName(), entry.getValue());
+                subMetrics.put(entry.getKey(), entry.getValue());
             }
         }
         return sortedMetrics;

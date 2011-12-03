@@ -2,6 +2,7 @@ package com.yammer.metrics.core;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+
 /**
  * An incrementing and decrementing counter metric.
  */
@@ -54,5 +55,10 @@ public class CounterMetric implements Metric {
      */
     public void clear() {
         count.set(0);
+    }
+
+    @Override
+    public <T> void processWith(MetricsProcessor<T> processor, MetricName name, T context) throws Exception {
+        processor.processCounter(name, this, context);
     }
 }

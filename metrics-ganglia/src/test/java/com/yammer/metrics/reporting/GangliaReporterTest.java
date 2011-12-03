@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import com.yammer.metrics.core.Clock;
+import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.tests.AbstractPollingReporterTest;
 import com.yammer.metrics.util.MetricPredicate;
@@ -94,17 +95,17 @@ public class GangliaReporterTest extends AbstractPollingReporterTest
     @Test
     public void testSanitizeName_noBadCharacters() throws IOException
     {
-        String metricName = "thisIsACleanMetricName";
+        MetricName metricName = new MetricName("thisIs", "AClean", "MetricName");
         GangliaReporter gangliaReporter = new GangliaReporter("localhost", 5555);
         String cleanMetricName = gangliaReporter.sanitizeName(metricName);
-        assertEquals("clean metric name was changed unexpectedly", metricName, cleanMetricName);
+        assertEquals("clean metric name was changed unexpectedly", "thisIs.AClean.MetricName", cleanMetricName);
     }
 
     @Test
     public void testSanitizeName_badCharacters() throws IOException
     {
-        String metricName = "thisIsAC>&!>leanMetric Name";
-        String expectedMetricName = "thisIsAC____leanMetric_Name";
+        MetricName metricName = new MetricName("thisIs", "AC>&!>lean", "Metric Name");
+        String expectedMetricName = "thisIs.AC____lean.Metric_Name";
         GangliaReporter gangliaReporter = new GangliaReporter("localhost", 5555);
         String cleanMetricName = gangliaReporter.sanitizeName(metricName);
         assertEquals("clean metric name did not match expected value", expectedMetricName, cleanMetricName);
@@ -147,7 +148,7 @@ public class GangliaReporterTest extends AbstractPollingReporterTest
     }
 
     @Override
-    public String[] expectedCounterResult(int count)
+    public String[] expectedCounterResult(long count)
     {
         return String.format(getFromFile("counter.io"), count).split("\\n");
     }

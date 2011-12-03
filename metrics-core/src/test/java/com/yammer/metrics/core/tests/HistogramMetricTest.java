@@ -33,7 +33,7 @@ public class HistogramMetricTest {
                    histogram.stdDev(),
                    is(closeTo(0.0, 0.0001)));
 
-        final double[] percentiles = histogram.percentiles(0.5, 0.75, 0.99);
+        final Double[] percentiles = histogram.percentiles(0.5, 0.75, 0.99);
 
         assertThat("the histogram has a median of zero",
                    percentiles[0],
@@ -79,7 +79,7 @@ public class HistogramMetricTest {
                    histogram.stdDev(),
                    is(closeTo(2886.8956799071675, 0.0001)));
 
-        final double[] percentiles = histogram.percentiles(0.5, 0.75, 0.99);
+        final Double[] percentiles = histogram.percentiles(0.5, 0.75, 0.99);
 
         assertThat("the histogram has a median of 5000.5",
                    percentiles[0],

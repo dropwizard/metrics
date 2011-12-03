@@ -1,5 +1,11 @@
 package com.yammer.metrics.servlet.experiments;
 
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.thread.ThreadPool;
+
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.CounterMetric;
 import com.yammer.metrics.core.GaugeMetric;
@@ -7,11 +13,6 @@ import com.yammer.metrics.jetty.InstrumentedHandler;
 import com.yammer.metrics.jetty.InstrumentedQueuedThreadPool;
 import com.yammer.metrics.jetty.InstrumentedSelectChannelConnector;
 import com.yammer.metrics.reporting.MetricsServlet;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.thread.ThreadPool;
 
 public class TestServer {
     private static final CounterMetric COUNTER1 = Metrics.newCounter(TestServer.class, "wah", "doody");

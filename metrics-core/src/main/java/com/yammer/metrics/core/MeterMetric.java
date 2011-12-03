@@ -1,13 +1,13 @@
 package com.yammer.metrics.core;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.stats.EWMA;
-import com.yammer.metrics.util.Utils;
-
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.stats.EWMA;
+import com.yammer.metrics.util.Utils;
 
 /**
  * A meter metric which measures mean throughput and one-, five-, and
@@ -145,5 +145,10 @@ public class MeterMetric implements Metered, Stoppable {
     @Override
     public void stop() {
         future.cancel(false);
+    }
+
+    @Override
+    public <T> void processWith(MetricsProcessor<T> processor, MetricName name, T context) throws Exception {
+        processor.processMeter(name, this, context);
     }
 }
