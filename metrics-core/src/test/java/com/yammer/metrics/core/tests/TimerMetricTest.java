@@ -60,7 +60,7 @@ public class TimerMetricTest {
                    timer.stdDev(),
                    is(closeTo(0.0, 0.001)));
 
-        final double[] percentiles = timer.percentiles(0.5, 0.75, 0.99);
+        final Double[] percentiles = timer.percentiles(0.5, 0.75, 0.99);
 
         assertThat("the timer has a median duration of zero",
                    percentiles[0],
@@ -123,7 +123,7 @@ public class TimerMetricTest {
                    timer.stdDev(),
                    is(closeTo(11.401, 0.001)));
 
-        final double[] percentiles = timer.percentiles(0.5, 0.75, 0.99);
+        final Double[] percentiles = timer.percentiles(0.5, 0.75, 0.99);
 
         assertThat("the timer has a median duration of 20",
                    percentiles[0],

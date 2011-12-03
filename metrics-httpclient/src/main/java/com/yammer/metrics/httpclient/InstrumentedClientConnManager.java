@@ -1,13 +1,14 @@
 package com.yammer.metrics.httpclient;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.GaugeMetric;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.impl.conn.SchemeRegistryFactory;
 import org.apache.http.impl.conn.tsccm.ConnPoolByRoute;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 
-import java.util.concurrent.TimeUnit;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.GaugeMetric;
 
 /**
  * A {@link org.apache.http.conn.ClientConnectionManager} which monitors the number of open

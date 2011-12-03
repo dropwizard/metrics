@@ -63,7 +63,7 @@ class Histogram(metric: HistogramMetric) {
   /**
    * Returns an array of values at the given percentiles.
    */
-  def percentiles(percentiles: Double*) = metric.percentiles(percentiles:_*)
+  def percentiles(percentiles: Seq[java.lang.Double]) = metric.percentiles(percentiles:_*)
 
   /**
    * Returns the value at the given percentile.

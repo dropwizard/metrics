@@ -1,8 +1,7 @@
 package com.yammer.metrics.core;
 
-import com.yammer.metrics.stats.ExponentiallyDecayingSample;
-import com.yammer.metrics.stats.Sample;
-import com.yammer.metrics.stats.UniformSample;
+import static java.lang.Math.floor;
+import static java.lang.Math.sqrt;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +10,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static java.lang.Math.floor;
-import static java.lang.Math.sqrt;
+import com.yammer.metrics.stats.ExponentiallyDecayingSample;
+import com.yammer.metrics.stats.Sample;
+import com.yammer.metrics.stats.UniformSample;
 
 /**
  * A metric which calculates the distribution of a value.
@@ -20,7 +20,7 @@ import static java.lang.Math.sqrt;
  * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately
  * computing running variance</a>
  */
-public class HistogramMetric implements Metric {
+public class HistogramMetric implements Metric, Percentiled, Summarized {
     /**
      * The type of sampling the histogram should be performing.
      */
@@ -124,11 +124,10 @@ public class HistogramMetric implements Metric {
      */
     public long count() { return count.get(); }
 
-    /**
-     * Returns the largest recorded value.
-     *
-     * @return the largest recorded value
+    /* (non-Javadoc)
+     * @see com.yammer.metrics.core.Summarized#max()
      */
+    @Override
     public double max() {
         if (count() > 0) {
             return _max.get();
@@ -136,11 +135,10 @@ public class HistogramMetric implements Metric {
         return 0.0;
     }
 
-    /**
-     * Returns the smallest recorded value.
-     *
-     * @return the smallest recorded value
+    /* (non-Javadoc)
+     * @see com.yammer.metrics.core.Summarized#min()
      */
+    @Override
     public double min() {
         if (count() > 0) {
             return _min.get();
@@ -148,11 +146,10 @@ public class HistogramMetric implements Metric {
         return 0.0;
     }
 
-    /**
-     * Returns the arithmetic mean of all recorded values.
-     *
-     * @return the arithmetic mean of all recorded values
+    /* (non-Javadoc)
+     * @see com.yammer.metrics.core.Summarized#mean()
      */
+    @Override
     public double mean() {
         if (count() > 0) {
             return _sum.get() / (double) count();
@@ -160,11 +157,10 @@ public class HistogramMetric implements Metric {
         return 0.0;
     }
 
-    /**
-     * Returns the standard deviation of all recorded values.
-     *
-     * @return the standard deviation of all recorded values
+    /* (non-Javadoc)
+     * @see com.yammer.metrics.core.Summarized#stdDev()
      */
+    @Override
     public double stdDev() {
         if (count() > 0) {
             return sqrt(variance());
@@ -178,6 +174,7 @@ public class HistogramMetric implements Metric {
      * @param percentile    a percentile ({@code 0..1})
      * @return the value at the given percentile
      */
+    @Override
     public double percentile(double percentile) {
         return percentiles(percentile)[0];
     }
@@ -188,8 +185,9 @@ public class HistogramMetric implements Metric {
      * @param percentiles one or more percentiles ({@code 0..1})
      * @return an array of values at the given percentiles
      */
-    public double[] percentiles(double... percentiles) {
-        final double[] scores = new double[percentiles.length];
+    @Override
+    public Double[] percentiles(Double... percentiles) {
+        final Double[] scores = new Double[percentiles.length];
         for (int i = 0; i < scores.length; i++) {
             scores[i] = 0.0;
 
@@ -203,9 +201,9 @@ public class HistogramMetric implements Metric {
                 final double p = percentiles[i];
                 final double pos = p * (values.size() + 1);
                 if (pos < 1) {
-                    scores[i] = values.get(0);
+                    scores[i] = Double.valueOf(values.get(0));
                 } else if (pos >= values.size()) {
-                    scores[i] = values.get(values.size() - 1);
+                    scores[i] = Double.valueOf(values.get(values.size() - 1));
                 } else {
                     final double lower = values.get((int) pos - 1);
                     final double upper = values.get((int) pos);
@@ -293,5 +291,10 @@ public class HistogramMetric implements Metric {
                 arrayCache.set(oldValues);
             }
         }
+    }
+
+    @Override
+    public <T> void processWith(MetricsProcessor<T> processor, MetricName name, T context) throws Exception {
+        processor.processHistogram(name, this, context);
     }
 }
