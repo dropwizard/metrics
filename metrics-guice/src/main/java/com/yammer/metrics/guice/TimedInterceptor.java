@@ -7,9 +7,8 @@ import org.aopalliance.intercept.MethodInvocation;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A method interceptor which creates a timer for the declaring class with the
- * given name (or the method's name, if none was provided), and which times
- * the execution of the annotated method.
+ * A method interceptor which creates a timer for the declaring class with the given name (or the
+ * method's name, if none was provided), and which times the execution of the annotated method.
  */
 public class TimedInterceptor implements MethodInterceptor {
     private final TimerMetric timer;

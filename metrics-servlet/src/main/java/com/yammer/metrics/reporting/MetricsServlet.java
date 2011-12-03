@@ -1,18 +1,24 @@
 package com.yammer.metrics.reporting;
 
-import static com.yammer.metrics.core.VirtualMachineMetrics.daemonThreadCount;
-import static com.yammer.metrics.core.VirtualMachineMetrics.fileDescriptorUsage;
-import static com.yammer.metrics.core.VirtualMachineMetrics.garbageCollectors;
-import static com.yammer.metrics.core.VirtualMachineMetrics.heapUsage;
-import static com.yammer.metrics.core.VirtualMachineMetrics.memoryPoolUsage;
-import static com.yammer.metrics.core.VirtualMachineMetrics.nonHeapUsage;
-import static com.yammer.metrics.core.VirtualMachineMetrics.threadCount;
-import static com.yammer.metrics.core.VirtualMachineMetrics.threadDump;
-import static com.yammer.metrics.core.VirtualMachineMetrics.threadStatePercentages;
-import static com.yammer.metrics.core.VirtualMachineMetrics.uptime;
-import static com.yammer.metrics.core.VirtualMachineMetrics.vmName;
-import static com.yammer.metrics.core.VirtualMachineMetrics.vmVersion;
+import com.yammer.metrics.HealthChecks;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.*;
+import com.yammer.metrics.core.HealthCheck.Result;
+import com.yammer.metrics.core.VirtualMachineMetrics.*;
+import com.yammer.metrics.util.Utils;
+import org.codehaus.jackson.JsonEncoding;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -22,38 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.codehaus.jackson.JsonEncoding;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.yammer.metrics.HealthChecks;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.CounterMetric;
-import com.yammer.metrics.core.GaugeMetric;
-import com.yammer.metrics.core.HealthCheck.Result;
-import com.yammer.metrics.core.HealthCheckRegistry;
-import com.yammer.metrics.core.HistogramMetric;
-import com.yammer.metrics.core.Metered;
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricsProcessor;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Percentiled;
-import com.yammer.metrics.core.Summarized;
-import com.yammer.metrics.core.TimerMetric;
-import com.yammer.metrics.core.VirtualMachineMetrics.GarbageCollector;
-import com.yammer.metrics.util.Utils;
+import static com.yammer.metrics.core.VirtualMachineMetrics.*;
 
 public class MetricsServlet extends HttpServlet implements MetricsProcessor<MetricsServlet.Context> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetricsServlet.class);
@@ -459,14 +434,14 @@ public class MetricsServlet extends HttpServlet implements MetricsProcessor<Metr
         json.writeEndObject();
     }
 
-    private static void writeSummarized(Summarized metric, JsonGenerator json) throws IOException, JsonGenerationException {
+    private static void writeSummarized(Summarized metric, JsonGenerator json) throws IOException {
         json.writeNumberField("min", metric.min());
         json.writeNumberField("max", metric.max());
         json.writeNumberField("mean", metric.mean());
         json.writeNumberField("std_dev", metric.stdDev());
     }
     
-    private static void writePercentiles(Percentiled metric, JsonGenerator json) throws IOException, JsonGenerationException {
+    private static void writePercentiles(Percentiled metric, JsonGenerator json) throws IOException {
         final Double[] percentiles = metric.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
         json.writeNumberField("median", percentiles[0]);
         json.writeNumberField("p75", percentiles[1]);

@@ -1,11 +1,13 @@
 package com.yammer.metrics.reporting.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyDouble;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.yammer.metrics.core.*;
+import com.yammer.metrics.reporting.AbstractPollingReporter;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.mockito.stubbing.Stubber;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -14,27 +16,10 @@ import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.mockito.stubbing.Stubber;
-
-import com.yammer.metrics.core.Clock;
-import com.yammer.metrics.core.CounterMetric;
-import com.yammer.metrics.core.GaugeMetric;
-import com.yammer.metrics.core.HistogramMetric;
-import com.yammer.metrics.core.MeterMetric;
-import com.yammer.metrics.core.Metered;
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricsProcessor;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Percentiled;
-import com.yammer.metrics.core.Summarized;
-import com.yammer.metrics.core.TimerMetric;
-import com.yammer.metrics.reporting.AbstractPollingReporter;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyDouble;
+import static org.mockito.Mockito.*;
 
 public abstract class AbstractPollingReporterTest {
 
@@ -68,18 +53,18 @@ public abstract class AbstractPollingReporterTest {
             out.flush();
             final String[] lines = out.toString().split("\n");
             // Assertions: first check that the line count matches then compare line by line ignoring leading and trailing whitespace
-            assertEquals("Line count mismatch, was:\n" + Arrays.toString(lines) + "\nexpected:\n" + Arrays.toString(expected) + "\n", expected.length,
-                    lines.length);
-            for(int i = 0; i < lines.length; i++) {
-                if(!expected[i].trim().equals(lines[i].trim())) {
+            assertEquals("Line count mismatch, was:\n" + Arrays.toString(lines) + "\nexpected:\n" + Arrays
+                    .toString(expected) + "\n", expected.length,
+                         lines.length);
+            for (int i = 0; i < lines.length; i++) {
+                if (!expected[i].trim().equals(lines[i].trim())) {
                     System.err.println("Failure comparing line " + (1 + i));
                     System.err.println("Was:      '" + lines[i] + "'");
                     System.err.println("Expected: '" + expected[i] + "'\n");
                 }
                 assertEquals(expected[i].trim(), lines[i].trim());
             }
-        }
-        finally {
+        } finally {
             reporter.shutdown();
         }
     }
@@ -221,8 +206,8 @@ public abstract class AbstractPollingReporterTest {
     static abstract class MetricsProcessorAction implements Answer<Object> {
         @Override
         public Object answer(InvocationOnMock invocation) throws Throwable {
-            final MetricsProcessor<?> processor = (MetricsProcessor<?>)invocation.getArguments()[0];
-            final MetricName name = (MetricName)invocation.getArguments()[1];
+            final MetricsProcessor<?> processor = (MetricsProcessor<?>) invocation.getArguments()[0];
+            final MetricName name = (MetricName) invocation.getArguments()[1];
             final Object context = invocation.getArguments()[2];
             delegateToProcessor(processor, name, context);
             return null;
@@ -237,7 +222,7 @@ public abstract class AbstractPollingReporterTest {
         when(summarized.mean()).thenReturn(2d);
         when(summarized.stdDev()).thenReturn(1.5d);
     }
-    
+
     static void setupMeteredMock(Metered metered) {
         when(metered.count()).thenReturn(1L);
         when(metered.oneMinuteRate()).thenReturn(1d);
@@ -252,7 +237,7 @@ public abstract class AbstractPollingReporterTest {
         when(percentiled.percentile(anyDouble())).thenAnswer(new Answer<Double>() {
             @Override
             public Double answer(InvocationOnMock invocation) throws Throwable {
-                return (Double)invocation.getArguments()[0];
+                return (Double) invocation.getArguments()[0];
             }
         });
         doAnswer(new Answer<Double[]>() {

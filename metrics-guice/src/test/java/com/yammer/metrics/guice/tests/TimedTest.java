@@ -17,19 +17,19 @@ import static org.junit.Assert.assertThat;
 
 public class TimedTest {
 
-	InstrumentedWithTimed instance;
+    InstrumentedWithTimed instance;
     MetricsRegistry registry;
-	
-	@Before
-	public void setup() {
-		Injector injector = Guice.createInjector(new InstrumentationModule());
+
+    @Before
+    public void setup() {
+        Injector injector = Guice.createInjector(new InstrumentationModule());
         instance = injector.getInstance(InstrumentedWithTimed.class);
         registry = injector.getInstance(MetricsRegistry.class);
-	}
-	
+    }
+
     @Test
     public void aTimedAnnotatedMethod() throws Exception {
-    	
+
         instance.doAThing();
 
         final Metric metric = registry.allMetrics().get(new MetricName(InstrumentedWithTimed.class,
@@ -52,7 +52,7 @@ public class TimedTest {
 
     @Test
     public void aTimedAnnotatedMethodWithDefaultScope() throws Exception {
-    	
+
         instance.doAThing();
 
         final Metric metric = registry.allMetrics().get(new MetricName(InstrumentedWithTimed.class,
@@ -63,7 +63,7 @@ public class TimedTest {
 
     @Test
     public void aTimedAnnotatedMethodWithProtectedScope() throws Exception {
-    	
+
         instance.doAThing();
 
         final Metric metric = registry.allMetrics().get(new MetricName(InstrumentedWithTimed.class,
@@ -72,13 +72,13 @@ public class TimedTest {
         assertMetricSetup(metric);
     }
 
-	private void assertMetricSetup(final Metric metric) {
-		assertThat("Guice creates a metric",
+    private void assertMetricSetup(final Metric metric) {
+        assertThat("Guice creates a metric",
                    metric,
                    is(notNullValue()));
 
         assertThat("Guice creates a timer",
                    metric,
                    is(instanceOf(TimerMetric.class)));
-	}
+    }
 }

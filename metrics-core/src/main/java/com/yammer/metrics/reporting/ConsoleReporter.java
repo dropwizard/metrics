@@ -14,14 +14,14 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A simple reporters which prints out application metrics to a
- * {@link PrintStream} periodically.
+ * A simple reporters which prints out application metrics to a {@link PrintStream} periodically.
  */
-public class ConsoleReporter extends AbstractPollingReporter implements MetricsProcessor<PrintStream> {
+public class ConsoleReporter extends AbstractPollingReporter implements
+                                                             MetricsProcessor<PrintStream> {
 
     /**
-     * Enables the console reporter for the default metrics registry, and causes it to
-     * print to STDOUT with the specified period.
+     * Enables the console reporter for the default metrics registry, and causes it to print to
+     * STDOUT with the specified period.
      *
      * @param period the period between successive outputs
      * @param unit   the time unit of {@code period}
@@ -31,15 +31,17 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricsP
     }
 
     /**
-     * Enables the console reporter for the given metrics registry, and causes
-     * it to print to STDOUT with the specified period and unrestricted output.
+     * Enables the console reporter for the given metrics registry, and causes it to print to STDOUT
+     * with the specified period and unrestricted output.
      *
      * @param metricsRegistry the metrics registry
      * @param period          the period between successive outputs
      * @param unit            the time unit of {@code period}
      */
     public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit) {
-        final ConsoleReporter reporter = new ConsoleReporter(metricsRegistry, System.out, MetricPredicate.ALL);
+        final ConsoleReporter reporter = new ConsoleReporter(metricsRegistry,
+                                                             System.out,
+                                                             MetricPredicate.ALL);
         reporter.start(period, unit);
     }
 
@@ -49,7 +51,8 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricsP
     private final TimeZone timeZone;
 
     /**
-     * Creates a new {@link ConsoleReporter} for the default metrics registry, with unrestricted output.
+     * Creates a new {@link ConsoleReporter} for the default metrics registry, with unrestricted
+     * output.
      *
      * @param out the {@link java.io.PrintStream} to which output will be written
      */
@@ -62,7 +65,8 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricsP
      *
      * @param metricsRegistry the metrics registry
      * @param out             the {@link java.io.PrintStream} to which output will be written
-     * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be output
+     * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be
+     *                        output
      */
     public ConsoleReporter(MetricsRegistry metricsRegistry, PrintStream out, MetricPredicate predicate) {
         this(metricsRegistry, out, predicate, Clock.DEFAULT, TimeZone.getDefault());
@@ -73,7 +77,8 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricsP
      *
      * @param metricsRegistry the metrics registry
      * @param out             the {@link java.io.PrintStream} to which output will be written
-     * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be output
+     * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be
+     *                        output
      * @param clock           the {@link Clock} used to print time
      * @param timeZone        the {@link TimeZone} used to print time
      */
@@ -92,7 +97,8 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricsP
     @Override
     public void run() {
         try {
-            final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+            final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT,
+                                                                     DateFormat.MEDIUM);
             format.setTimeZone(timeZone);
             final String dateTime = format.format(new Date(clock.time()));
             out.print(dateTime);
@@ -101,7 +107,9 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricsP
                 out.print('=');
             }
             out.println();
-            for (Entry<String, Map<MetricName, Metric>> entry : Utils.sortAndFilterMetrics(metricsRegistry.allMetrics(), predicate).entrySet()) {
+            for (Entry<String, Map<MetricName, Metric>> entry : Utils.sortAndFilterMetrics(
+                    metricsRegistry.allMetrics(),
+                    predicate).entrySet()) {
                 out.print(entry.getKey());
                 out.println(':');
                 for (Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
@@ -119,7 +127,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricsP
             e.printStackTrace(out);
         }
     }
-    
+
     @Override
     public void processGauge(MetricName name, GaugeMetric<?> gauge, PrintStream stream) {
         stream.print("    value = ");
@@ -136,10 +144,22 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricsP
     public void processMeter(MetricName name, Metered meter, PrintStream stream) {
         final String unit = abbrev(meter.rateUnit());
         stream.printf("             count = %d\n", meter.count());
-        stream.printf("         mean rate = %2.2f %s/%s\n", meter.meanRate(), meter.eventType(), unit);
-        stream.printf("     1-minute rate = %2.2f %s/%s\n", meter.oneMinuteRate(), meter.eventType(), unit);
-        stream.printf("     5-minute rate = %2.2f %s/%s\n", meter.fiveMinuteRate(), meter.eventType(), unit);
-        stream.printf("    15-minute rate = %2.2f %s/%s\n", meter.fifteenMinuteRate(), meter.eventType(), unit);
+        stream.printf("         mean rate = %2.2f %s/%s\n",
+                      meter.meanRate(),
+                      meter.eventType(),
+                      unit);
+        stream.printf("     1-minute rate = %2.2f %s/%s\n",
+                      meter.oneMinuteRate(),
+                      meter.eventType(),
+                      unit);
+        stream.printf("     5-minute rate = %2.2f %s/%s\n",
+                      meter.fiveMinuteRate(),
+                      meter.eventType(),
+                      unit);
+        stream.printf("    15-minute rate = %2.2f %s/%s\n",
+                      meter.fifteenMinuteRate(),
+                      meter.eventType(),
+                      unit);
     }
 
     @Override
@@ -173,7 +193,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricsP
         stream.printf("              99%% <= %2.2f%s\n", percentiles[4], durationUnit);
         stream.printf("            99.9%% <= %2.2f%s\n", percentiles[5], durationUnit);
     }
-    
+
     private String abbrev(TimeUnit unit) {
         switch (unit) {
             case NANOSECONDS:

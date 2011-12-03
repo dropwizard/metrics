@@ -8,12 +8,14 @@ import static java.lang.Math.exp;
 /**
  * An exponentially-weighted moving average.
  *
- * @see <a href="http://www.teamquest.com/pdfs/whitepaper/ldavg1.pdf">UNIX Load Average Part 1: How It Works</a>
- * @see <a href="http://www.teamquest.com/pdfs/whitepaper/ldavg2.pdf">UNIX Load Average Part 2: Not Your Average Average</a>
+ * @see <a href="http://www.teamquest.com/pdfs/whitepaper/ldavg1.pdf">UNIX Load Average Part 1: How
+ *      It Works</a>
+ * @see <a href="http://www.teamquest.com/pdfs/whitepaper/ldavg2.pdf">UNIX Load Average Part 2: Not
+ *      Your Average Average</a>
  */
 public class EWMA {
-    private static final double M1_ALPHA  = 1 - exp(-5 / 60.0);
-    private static final double M5_ALPHA  = 1 - exp(-5 / 60.0 / 5);
+    private static final double M1_ALPHA = 1 - exp(-5 / 60.0);
+    private static final double M5_ALPHA = 1 - exp(-5 / 60.0 / 5);
     private static final double M15_ALPHA = 1 - exp(-5 / 60.0 / 15);
 
     private volatile boolean initialized = false;
@@ -23,8 +25,8 @@ public class EWMA {
     private final double alpha, interval;
 
     /**
-     * Creates a new EWMA which is equivalent to the UNIX one minute load average and which expects to be ticked every
-     * 5 seconds.
+     * Creates a new EWMA which is equivalent to the UNIX one minute load average and which expects
+     * to be ticked every 5 seconds.
      *
      * @return a one-minute EWMA
      */
@@ -33,8 +35,8 @@ public class EWMA {
     }
 
     /**
-     * Creates a new EWMA which is equivalent to the UNIX five minute load average and which expects to be ticked every
-     * 5 seconds.
+     * Creates a new EWMA which is equivalent to the UNIX five minute load average and which expects
+     * to be ticked every 5 seconds.
      *
      * @return a five-minute EWMA
      */
@@ -43,8 +45,8 @@ public class EWMA {
     }
 
     /**
-     * Creates a new EWMA which is equivalent to the UNIX fifteen minute load average and which expects to be ticked
-     * every 5 seconds.
+     * Creates a new EWMA which is equivalent to the UNIX fifteen minute load average and which
+     * expects to be ticked every 5 seconds.
      *
      * @return a fifteen-minute EWMA
      */
@@ -55,8 +57,8 @@ public class EWMA {
     /**
      * Create a new EWMA with a specific smoothing constant.
      *
-     * @param alpha the smoothing constant
-     * @param interval the expected tick interval
+     * @param alpha        the smoothing constant
+     * @param interval     the expected tick interval
      * @param intervalUnit the time unit of the tick interval
      */
     public EWMA(double alpha, long interval, TimeUnit intervalUnit) {

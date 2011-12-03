@@ -26,18 +26,23 @@ public class ExceptionMeteredListener implements TypeListener {
             final ExceptionMetered annotation = method.getAnnotation(ExceptionMetered.class);
             if (annotation != null) {
                 final String name = determineName(annotation, method);
-                final MeterMetric meter = metricsRegistry.newMeter(literal.getRawType(), name, annotation.eventType(), annotation.rateUnit());
-                ExceptionMeteredInterceptor interceptor = new ExceptionMeteredInterceptor(meter, annotation.cause());
-				encounter.bindInterceptor(Matchers.only(method), interceptor);
+                final MeterMetric meter = metricsRegistry.newMeter(literal.getRawType(),
+                                                                   name,
+                                                                   annotation.eventType(),
+                                                                   annotation.rateUnit());
+                ExceptionMeteredInterceptor interceptor = new ExceptionMeteredInterceptor(meter,
+                                                                                          annotation
+                                                                                                  .cause());
+                encounter.bindInterceptor(Matchers.only(method), interceptor);
             }
         }
     }
-    
+
     private String determineName(final ExceptionMetered annotation, final Method method) {
-    	if (annotation.name().isEmpty()) {
-    		return method.getName() + ExceptionMetered.DEFAULT_NAME_SUFFIX;
-    	} else {
-    		return annotation.name();
-    	}
+        if (annotation.name().isEmpty()) {
+            return method.getName() + ExceptionMetered.DEFAULT_NAME_SUFFIX;
+        } else {
+            return annotation.name();
+        }
     }
 }

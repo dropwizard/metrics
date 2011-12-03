@@ -16,8 +16,8 @@ import java.lang.annotation.Target;
  *     }
  * </code></pre>
  * <p/>
- * A gauge for the defining class with the name {@code queueSize} will be
- * created which uses the annotated method's return value as its value.
+ * A gauge for the defining class with the name {@code queueSize} will be created which uses the
+ * annotated method's return value as its value.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

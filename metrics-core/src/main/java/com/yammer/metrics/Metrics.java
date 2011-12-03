@@ -19,18 +19,20 @@ public class Metrics {
             JmxReporter.shutdownDefault();
         }
     };
-    static {{
-        JmxReporter.startDefault(DEFAULT_REGISTRY);
-        // make sure we initialize this so it can monitor GC etc
-        VirtualMachineMetrics.daemonThreadCount();
-        Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
-    }}
+
+    static {
+        {
+            JmxReporter.startDefault(DEFAULT_REGISTRY);
+            // make sure we initialize this so it can monitor GC etc
+            VirtualMachineMetrics.daemonThreadCount();
+            Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
+        }
+    }
 
     private Metrics() { /* unused */ }
 
     /**
-     * Given a new {@link com.yammer.metrics.core.GaugeMetric}, registers it
-     * under the given class and name.
+     * Given a new {@link GaugeMetric}, registers it under the given class and name.
      *
      * @param klass  the class which owns the metric
      * @param name   the name of the metric
@@ -45,8 +47,7 @@ public class Metrics {
     }
 
     /**
-     * Given a new {@link com.yammer.metrics.core.GaugeMetric}, registers it
-     * under the given class and name.
+     * Given a new {@link GaugeMetric}, registers it under the given class and name.
      *
      * @param klass  the class which owns the metric
      * @param name   the name of the metric
@@ -63,8 +64,7 @@ public class Metrics {
     }
 
     /**
-     * Given a new {@link com.yammer.metrics.core.GaugeMetric}, registers it
-     * under the given metric name.
+     * Given a new {@link GaugeMetric}, registers it under the given metric name.
      *
      * @param metricName the name of the metric
      * @param metric     the metric
@@ -77,8 +77,8 @@ public class Metrics {
     }
 
     /**
-     * Given a JMX MBean's object name and an attribute name, registers a gauge
-     * for that attribute under the given class and name.
+     * Given a JMX MBean's object name and an attribute name, registers a gauge for that attribute
+     * under the given class and name.
      *
      * @param klass      the class which owns the metric
      * @param name       the name of the metric
@@ -95,8 +95,8 @@ public class Metrics {
     }
 
     /**
-     * Given a JMX MBean's object name and an attribute name, registers a gauge
-     * for that attribute under the given class, name, and scope.
+     * Given a JMX MBean's object name and an attribute name, registers a gauge for that attribute
+     * under the given class, name, and scope.
      *
      * @param klass      the class which owns the metric
      * @param name       the name of the metric
@@ -115,8 +115,8 @@ public class Metrics {
     }
 
     /**
-     * Given a JMX MBean's object name and an attribute name, registers a gauge
-     * for that attribute under the given metric name.
+     * Given a JMX MBean's object name and an attribute name, registers a gauge for that attribute
+     * under the given metric name.
      *
      * @param metricName the name of the metric
      * @param objectName the object name of the MBean
@@ -131,25 +131,23 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link com.yammer.metrics.core.CounterMetric} and registers
-     * it under the given class and name.
+     * Creates a new {@link CounterMetric} and registers it under the given class and name.
      *
      * @param klass the class which owns the metric
      * @param name  the name of the metric
-     * @return a new {@link com.yammer.metrics.core.CounterMetric}
+     * @return a new {@link CounterMetric}
      */
     public static CounterMetric newCounter(Class<?> klass, String name) {
         return DEFAULT_REGISTRY.newCounter(klass, name);
     }
 
     /**
-     * Creates a new {@link com.yammer.metrics.core.CounterMetric} and registers
-     * it under the given class and name.
+     * Creates a new {@link CounterMetric} and registers it under the given class and name.
      *
      * @param klass the class which owns the metric
      * @param name  the name of the metric
      * @param scope the scope of the metric
-     * @return a new {@link com.yammer.metrics.core.CounterMetric}
+     * @return a new {@link CounterMetric}
      */
     public static CounterMetric newCounter(Class<?> klass,
                                            String name,
@@ -158,22 +156,20 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link com.yammer.metrics.core.CounterMetric} and registers
-     * it under the given metric name.
+     * Creates a new {@link CounterMetric} and registers it under the given metric name.
      *
      * @param metricName the name of the metric
-     * @return a new {@link com.yammer.metrics.core.CounterMetric}
+     * @return a new {@link CounterMetric}
      */
     public static CounterMetric newCounter(MetricName metricName) {
         return DEFAULT_REGISTRY.newCounter(metricName);
     }
 
     /**
-     * Creates a new {@link HistogramMetric} and registers it under the given
-     * class and name.
+     * Creates a new {@link HistogramMetric} and registers it under the given class and name.
      *
-     * @param klass the class which owns the metric
-     * @param name the name of the metric
+     * @param klass  the class which owns the metric
+     * @param name   the name of the metric
      * @param biased whether or not the histogram should be biased
      * @return a new {@link HistogramMetric}
      */
@@ -184,8 +180,8 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link HistogramMetric} and registers it under the given
-     * class, name, and scope.
+     * Creates a new {@link HistogramMetric} and registers it under the given class, name, and
+     * scope.
      *
      * @param klass  the class which owns the metric
      * @param name   the name of the metric
@@ -201,11 +197,10 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link HistogramMetric} and registers it under the given
-     * metric name.
+     * Creates a new {@link HistogramMetric} and registers it under the given metric name.
      *
      * @param metricName the name of the metric
-     * @param biased whether or not the histogram should be biased
+     * @param biased     whether or not the histogram should be biased
      * @return a new {@link HistogramMetric}
      */
     public static HistogramMetric newHistogram(MetricName metricName,
@@ -214,11 +209,11 @@ public class Metrics {
     }
 
     /**
-     * Creates a new non-biased {@link HistogramMetric} and registers it under
-     * the given class and name.
+     * Creates a new non-biased {@link HistogramMetric} and registers it under the given class and
+     * name.
      *
      * @param klass the class which owns the metric
-     * @param name the name of the metric
+     * @param name  the name of the metric
      * @return a new {@link HistogramMetric}
      */
     public static HistogramMetric newHistogram(Class<?> klass, String name) {
@@ -226,8 +221,8 @@ public class Metrics {
     }
 
     /**
-     * Creates a new non-biased {@link HistogramMetric} and registers it under
-     * the given class, name, and scope.
+     * Creates a new non-biased {@link HistogramMetric} and registers it under the given class,
+     * name, and scope.
      *
      * @param klass the class which owns the metric
      * @param name  the name of the metric
@@ -241,8 +236,8 @@ public class Metrics {
     }
 
     /**
-     * Creates a new non-biased {@link HistogramMetric} and registers it under
-     * the given metric name.
+     * Creates a new non-biased {@link HistogramMetric} and registers it under the given metric
+     * name.
      *
      * @param metricName the name of the metric
      * @return a new {@link HistogramMetric}
@@ -252,14 +247,13 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link MeterMetric} and registers it under the given
-     * class and name.
+     * Creates a new {@link MeterMetric} and registers it under the given class and name.
      *
-     * @param klass the class which owns the metric
-     * @param name the name of the metric
-     * @param eventType the plural name of the type of events the meter is
-     *                     measuring (e.g., {@code "requests"})
-     * @param unit the rate unit of the new meter
+     * @param klass     the class which owns the metric
+     * @param name      the name of the metric
+     * @param eventType the plural name of the type of events the meter is measuring (e.g., {@code
+     *                  "requests"})
+     * @param unit      the rate unit of the new meter
      * @return a new {@link MeterMetric}
      */
     public static MeterMetric newMeter(Class<?> klass,
@@ -270,14 +264,13 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link MeterMetric} and registers it under the given
-     * class, name, and scope.
+     * Creates a new {@link MeterMetric} and registers it under the given class, name, and scope.
      *
      * @param klass     the class which owns the metric
      * @param name      the name of the metric
      * @param scope     the scope of the metric
-     * @param eventType the plural name of the type of events the meter is
-     *                  measuring (e.g., {@code "requests"})
+     * @param eventType the plural name of the type of events the meter is measuring (e.g., {@code
+     *                  "requests"})
      * @param unit      the rate unit of the new meter
      * @return a new {@link MeterMetric}
      */
@@ -290,12 +283,11 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link MeterMetric} and registers it under the given
-     * metric name.
+     * Creates a new {@link MeterMetric} and registers it under the given metric name.
      *
      * @param metricName the name of the metric
-     * @param eventType  the plural name of the type of events the meter is
-     *                    measuring (e.g., {@code "requests"})
+     * @param eventType  the plural name of the type of events the meter is measuring (e.g., {@code
+     *                   "requests"})
      * @param unit       the rate unit of the new meter
      * @return a new {@link MeterMetric}
      */
@@ -306,13 +298,12 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link TimerMetric} and registers it under the given
-     * class and name.
+     * Creates a new {@link TimerMetric} and registers it under the given class and name.
      *
-     * @param klass the class which owns the metric
-     * @param name the name of the metric
+     * @param klass        the class which owns the metric
+     * @param name         the name of the metric
      * @param durationUnit the duration scale unit of the new timer
-     * @param rateUnit the rate scale unit of the new timer
+     * @param rateUnit     the rate scale unit of the new timer
      * @return a new {@link TimerMetric}
      */
     public static TimerMetric newTimer(Class<?> klass,
@@ -326,8 +317,8 @@ public class Metrics {
      * Creates a new {@link TimerMetric} and registers it under the given class and name, measuring
      * elapsed time in milliseconds and invocations per second.
      *
-     * @param klass        the class which owns the metric
-     * @param name         the name of the metric
+     * @param klass the class which owns the metric
+     * @param name  the name of the metric
      * @return a new {@link TimerMetric}
      */
     public static TimerMetric newTimer(Class<?> klass,
@@ -336,8 +327,7 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link TimerMetric} and registers it under the given
-     * class, name, and scope.
+     * Creates a new {@link TimerMetric} and registers it under the given class, name, and scope.
      *
      * @param klass        the class which owns the metric
      * @param name         the name of the metric
@@ -358,9 +348,9 @@ public class Metrics {
      * Creates a new {@link TimerMetric} and registers it under the given class, name, and scope,
      * measuring elapsed time in milliseconds and invocations per second.
      *
-     * @param klass        the class which owns the metric
-     * @param name         the name of the metric
-     * @param scope        the scope of the metric
+     * @param klass the class which owns the metric
+     * @param name  the name of the metric
+     * @param scope the scope of the metric
      * @return a new {@link TimerMetric}
      */
     public static TimerMetric newTimer(Class<?> klass,
@@ -370,8 +360,7 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link TimerMetric} and registers it under the given
-     * metric name.
+     * Creates a new {@link TimerMetric} and registers it under the given metric name.
      *
      * @param metricName   the name of the metric
      * @param durationUnit the duration scale unit of the new timer
@@ -397,7 +386,7 @@ public class Metrics {
      * Removes the metric for the given class with the given name.
      *
      * @param klass the klass the metric is associated with
-     * @param name the name of the metric
+     * @param name  the name of the metric
      */
     public static void removeMetric(Class<?> klass, String name) {
         DEFAULT_REGISTRY.removeMetric(klass, name);
@@ -407,7 +396,7 @@ public class Metrics {
      * Removes the metric for the given class with the given name and scope.
      *
      * @param klass the klass the metric is associated with
-     * @param name the name of the metric
+     * @param name  the name of the metric
      * @param scope the scope of the metric
      */
     public static void removeMetric(Class<?> klass, String name, String scope) {
@@ -415,11 +404,10 @@ public class Metrics {
     }
 
     /**
-     * Enables the console reporter and causes it to print to STDOUT with the
-     * specified period.
+     * Enables the console reporter and causes it to print to STDOUT with the specified period.
      *
      * @param period the period between successive outputs
-     * @param unit the time unit of {@code period}
+     * @param unit   the time unit of {@code period}
      * @deprecated use {@link ConsoleReporter#enable(long, java.util.concurrent.TimeUnit)} instead
      */
     @Deprecated
@@ -438,6 +426,7 @@ public class Metrics {
 
     /**
      * Returns the (static) default registry.
+     *
      * @return the metrics registry
      */
     public static MetricsRegistry defaultRegistry() {

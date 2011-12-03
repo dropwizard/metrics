@@ -1,17 +1,17 @@
 package com.yammer.metrics.core;
 
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.stats.EWMA;
+import com.yammer.metrics.util.Utils;
+
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.stats.EWMA;
-import com.yammer.metrics.util.Utils;
-
 /**
- * A meter metric which measures mean throughput and one-, five-, and
- * fifteen-minute exponentially-weighted moving average throughputs.
+ * A meter metric which measures mean throughput and one-, five-, and fifteen-minute
+ * exponentially-weighted moving average throughputs.
  *
  * @see <a href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average">EMA</a>
  */
@@ -22,12 +22,12 @@ public class MeterMetric implements Metered, Stoppable {
     /**
      * Creates a new {@link MeterMetric}.
      *
-     * @param eventType the plural name of the event the meter is measuring
-     *                  (e.g., {@code "requests"})
-     * @param rateUnit the rate unit of the new meter
+     * @param eventType the plural name of the event the meter is measuring (e.g., {@code
+     *                  "requests"})
+     * @param rateUnit  the rate unit of the new meter
      * @return a new {@link MeterMetric}
-     * @deprecated use the other {@code newMeter} method or create a new meter via the
-     *              {@link MetricsRegistry} or {@link Metrics}
+     * @deprecated use the other {@code newMeter} method or create a new meter via the {@link
+     *             MetricsRegistry} or {@link Metrics}
      */
     @SuppressWarnings({"deprecation"})
     public static MeterMetric newMeter(String eventType, TimeUnit rateUnit) {
@@ -38,9 +38,9 @@ public class MeterMetric implements Metered, Stoppable {
      * Creates a new {@link MeterMetric}.
      *
      * @param tickThread background thread for updating the rates
-     * @param eventType the plural name of the event the meter is measuring
-     *                  (e.g., {@code "requests"})
-     * @param rateUnit the rate unit of the new meter
+     * @param eventType  the plural name of the event the meter is measuring (e.g., {@code
+     *                   "requests"})
+     * @param rateUnit   the rate unit of the new meter
      * @return a new {@link MeterMetric}
      */
     public static MeterMetric newMeter(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit) {
