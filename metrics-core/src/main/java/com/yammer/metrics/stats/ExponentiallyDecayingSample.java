@@ -55,7 +55,7 @@ public class ExponentiallyDecayingSample implements Sample {
             this.startTime = tick();
             nextScaleTime.set(System.nanoTime() + RESCALE_THRESHOLD);
         } finally {
-            lockForRescale();
+            unlockForRescale();
         }
     }
 
