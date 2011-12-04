@@ -25,7 +25,7 @@ public abstract class GaugeMetric<T> implements Metric {
     public abstract T value();
 
     @Override
-    public final <U> void processWith(MetricsProcessor<U> processor, MetricName name, U context) throws Exception {
+    public <U> void processWith(MetricsProcessor<U> processor, MetricName name, U context) throws Exception {
         processor.processGauge(name, this, context);
     }
 }
