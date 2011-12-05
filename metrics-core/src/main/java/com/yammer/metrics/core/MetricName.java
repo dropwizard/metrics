@@ -4,7 +4,7 @@ package com.yammer.metrics.core;
 /**
  * A value class encapsulating a metric's owning class and name.
  */
-public class MetricName {
+public class MetricName implements Comparable<MetricName> {
     private final String group;
     private final String type;
     private final String name;
@@ -170,5 +170,10 @@ public class MetricName {
             mbeanNameBuilder.append(name);
         }
         return mbeanNameBuilder.toString();
+    }
+
+    @Override
+    public int compareTo(MetricName o) {
+        return mbeanName.compareTo(o.mbeanName);
     }
 }
