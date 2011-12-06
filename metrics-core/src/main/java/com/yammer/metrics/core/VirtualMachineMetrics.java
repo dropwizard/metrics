@@ -10,12 +10,11 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.management.ManagementFactory.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * A collection of Java Virtual Machine metrics.
  */
-public class VirtualMachineMetrics implements Metric {
+public class VirtualMachineMetrics {
     public static class GarbageCollector {
         private final long runs, timeMS;
 
@@ -287,10 +286,5 @@ public class VirtualMachineMetrics implements Metric {
 
         writer.println();
         writer.flush();
-    }
-
-    @Override
-    public <T> void processWith(MetricsProcessor<T> reporter, MetricName name, T context) throws Exception{
-        throw new NotImplementedException();
     }
 }

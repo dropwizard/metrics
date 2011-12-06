@@ -250,9 +250,9 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
             }
         });
 
-        this.renderers.put(VirtualMachineMetrics.class, new GraphiteMetricRenderer<VirtualMachineMetrics>() {
+        this.renderers.put(VMDummyMetric.class, new GraphiteMetricRenderer<VMDummyMetric>() {
             @Override
-            public void renderMetric(MetricName metricName, VirtualMachineMetrics metric, GraphiteRendererContext context) {
+            public void renderMetric(MetricName metricName, VMDummyMetric metric, GraphiteRendererContext context) {
                 printDoubleField("jvm.memory.heap_usage", heapUsage(), context);
                 printDoubleField("jvm.memory.non_heap_usage", nonHeapUsage(), context);
                 for (Entry<String, Double> pool : memoryPoolUsage().entrySet()) {
@@ -330,7 +330,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
     @SuppressWarnings("unchecked")
     private void printVmMetrics(GraphiteRendererContext context) {
         if (this.printVMMetrics) {
-            GraphiteMetricRenderer<VirtualMachineMetrics> renderer = (GraphiteMetricRenderer<VirtualMachineMetrics>) this.renderers.get(VirtualMachineMetrics.class);
+            GraphiteMetricRenderer<VMDummyMetric> renderer = (GraphiteMetricRenderer<VMDummyMetric>) this.renderers.get(VMDummyMetric.class);
             renderer.renderMetric(null, null, context);
         }
     }
