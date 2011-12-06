@@ -1,9 +1,18 @@
 package com.yammer.metrics.ehcache;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.GaugeMetric;
-import com.yammer.metrics.core.TimerMetric;
-import net.sf.ehcache.*;
+import java.beans.PropertyChangeListener;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
+import net.sf.ehcache.Statistics;
+import net.sf.ehcache.Status;
 import net.sf.ehcache.bootstrap.BootstrapCacheLoader;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.event.RegisteredEventListeners;
@@ -20,12 +29,9 @@ import net.sf.ehcache.transaction.manager.TransactionManagerLookup;
 import net.sf.ehcache.writer.CacheWriter;
 import net.sf.ehcache.writer.CacheWriterManager;
 
-import java.beans.PropertyChangeListener;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.TimerMetric;
 
 /**
  * An instrumented {@link Ehcache} instance.
@@ -260,7 +266,7 @@ public class InstrumentedEhcache implements Ehcache {
 
         return new InstrumentedEhcache(cache);
     }
-
+    
     private final TimerMetric getTimer, putTimer;
     private final Ehcache cache;
 
@@ -625,6 +631,51 @@ public class InstrumentedEhcache implements Ehcache {
     @Override
     public void loadAll(Collection keys, Object argument) throws CacheException {
         cache.loadAll(keys, argument);
+    }
+
+    @Override
+    public void unpinAll() {
+        cache.unpinAll();
+    }
+
+    @Override
+    public boolean isPinned(Object o) {
+        return cache.isPinned(o);
+    }
+
+    @Override
+    public void setPinned(Object o, boolean b) {
+        cache.setPinned(o, b);
+    }
+
+    @Override
+    public void putAll(Collection<Element> elements) throws IllegalArgumentException, IllegalStateException, CacheException {
+        cache.putAll(elements);
+    }
+
+    @Override
+    public Map<Object, Element> getAll(Collection<?> objects) throws IllegalStateException, CacheException, NullPointerException {
+        return cache.getAll(objects);
+    }
+
+    @Override
+    public void removeAll(Collection<?> objects) throws IllegalStateException, NullPointerException {
+        cache.removeAll(objects);
+    }
+
+    @Override
+    public void removeAll(Collection<?> objects, boolean b) throws IllegalStateException, NullPointerException {
+        cache.removeAll(objects,  b);
+    }
+
+    @Override
+    public long calculateOnDiskSize() throws IllegalStateException, CacheException {
+        return cache.calculateOnDiskSize();
+    }
+
+    @Override
+    public boolean hasAbortedSizeOf() {
+        return cache.hasAbortedSizeOf();
     }
 
     @Override

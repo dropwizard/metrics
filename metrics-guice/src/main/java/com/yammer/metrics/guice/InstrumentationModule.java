@@ -7,8 +7,8 @@ import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.JmxReporter;
 
 /**
- * A Guice module which instruments methods annotated with the {@link Metered}
- * and {@link Timed} annotations.
+ * A Guice module which instruments methods annotated with the {@link Metered} and {@link Timed}
+ * annotations.
  *
  * @see Gauge
  * @see Metered
@@ -20,12 +20,34 @@ import com.yammer.metrics.reporting.JmxReporter;
 public class InstrumentationModule extends AbstractModule {
     @Override
     protected void configure() {
-        MetricsRegistry metricsRegistry = new MetricsRegistry();
+        MetricsRegistry metricsRegistry = createMetricsRegistry();
         bind(MetricsRegistry.class).toInstance(metricsRegistry);
-        bind(HealthCheckRegistry.class).asEagerSingleton();
-        bind(JmxReporter.class).toProvider(JmxReporterProvider.class).asEagerSingleton();
+        bind(HealthCheckRegistry.class).toInstance(createHealthCheckRegistry());
+        bindJmxReporter();
         bindListener(Matchers.any(), new MeteredListener(metricsRegistry));
         bindListener(Matchers.any(), new TimedListener(metricsRegistry));
         bindListener(Matchers.any(), new GaugeListener(metricsRegistry));
+        bindListener(Matchers.any(), new ExceptionMeteredListener(metricsRegistry));
+    }
+
+    /**
+     * Override to provide a custom binding for {@link JmxReporter}
+     */
+    protected void bindJmxReporter() {
+        bind(JmxReporter.class).toProvider(JmxReporterProvider.class).asEagerSingleton();
+    }
+
+    /**
+     * Override to provide a custom {@link HealthCheckRegistry}
+     */
+    protected HealthCheckRegistry createHealthCheckRegistry() {
+        return new HealthCheckRegistry();
+    }
+
+    /**
+     * Override to provide a custom {@link MetricsRegistry}
+     */
+    protected MetricsRegistry createMetricsRegistry() {
+        return new MetricsRegistry();
     }
 }

@@ -10,23 +10,24 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * A meter metric which measures mean throughput and one-, five-, and
- * fifteen-minute exponentially-weighted moving average throughputs.
+ * A meter metric which measures mean throughput and one-, five-, and fifteen-minute
+ * exponentially-weighted moving average throughputs.
  *
  * @see <a href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average">EMA</a>
  */
-public class MeterMetric implements Metered {
+public class MeterMetric implements Metered, Stoppable {
     private static final long INTERVAL = 5; // seconds
+    private final Clock clock;
 
     /**
      * Creates a new {@link MeterMetric}.
      *
-     * @param eventType the plural name of the event the meter is measuring
-     *                  (e.g., {@code "requests"})
-     * @param rateUnit the rate unit of the new meter
+     * @param eventType the plural name of the event the meter is measuring (e.g., {@code
+     *                  "requests"})
+     * @param rateUnit  the rate unit of the new meter
      * @return a new {@link MeterMetric}
-     * @deprecated use the other {@code newMeter} method or create a new meter via the
-     *              {@link MetricsRegistry} or {@link Metrics}
+     * @deprecated use the other {@code newMeter} method or create a new meter via the {@link
+     *             MetricsRegistry} or {@link Metrics}
      */
     @SuppressWarnings({"deprecation"})
     public static MeterMetric newMeter(String eventType, TimeUnit rateUnit) {
@@ -37,13 +38,13 @@ public class MeterMetric implements Metered {
      * Creates a new {@link MeterMetric}.
      *
      * @param tickThread background thread for updating the rates
-     * @param eventType the plural name of the event the meter is measuring
-     *                  (e.g., {@code "requests"})
-     * @param rateUnit the rate unit of the new meter
+     * @param eventType  the plural name of the event the meter is measuring (e.g., {@code
+     *                   "requests"})
+     * @param rateUnit   the rate unit of the new meter
      * @return a new {@link MeterMetric}
      */
     public static MeterMetric newMeter(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit) {
-        return new MeterMetric(tickThread, eventType, rateUnit);
+        return new MeterMetric(tickThread, eventType, rateUnit, Clock.DEFAULT);
     }
 
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
@@ -51,12 +52,12 @@ public class MeterMetric implements Metered {
     private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
 
     private final AtomicLong count = new AtomicLong();
-    private final long startTime = System.nanoTime();
+    private final long startTime;
     private final TimeUnit rateUnit;
     private final String eventType;
     private final ScheduledFuture<?> future;
 
-    private MeterMetric(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit) {
+    public MeterMetric(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit, Clock clock) {
         this.rateUnit = rateUnit;
         this.eventType = eventType;
         this.future = tickThread.scheduleAtFixedRate(new Runnable() {
@@ -65,6 +66,8 @@ public class MeterMetric implements Metered {
                 tick();
             }
         }, INTERVAL, INTERVAL, TimeUnit.SECONDS);
+        this.clock = clock;
+        this.startTime = this.clock.tick();
     }
 
     @Override
@@ -125,7 +128,7 @@ public class MeterMetric implements Metered {
         if (count() == 0) {
             return 0.0;
         } else {
-            final long elapsed = (System.nanoTime() - startTime);
+            final long elapsed = (clock.tick() - startTime);
             return convertNsRate(count() / (double) elapsed);
         }
     }
@@ -139,7 +142,13 @@ public class MeterMetric implements Metered {
         return ratePerNs * (double) rateUnit.toNanos(1);
     }
 
-    void stop() {
+    @Override
+    public void stop() {
         future.cancel(false);
+    }
+
+    @Override
+    public <T> void processWith(MetricsProcessor<T> processor, MetricName name, T context) throws Exception {
+        processor.processMeter(name, this, context);
     }
 }

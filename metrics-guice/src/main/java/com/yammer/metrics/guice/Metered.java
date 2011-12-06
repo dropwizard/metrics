@@ -8,18 +8,17 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * An annotation for marking a method of a Guice-provided object as metered.
- *
+ * <p/>
  * Given a method like this:
  * <pre><code>
- *     @Metered(name = "fancyName", eventType = "namings", rateUnit = TimeUnit.SECONDS)
+ *     \@Metered(name = "fancyName", eventType = "namings", rateUnit = TimeUnit.SECONDS)
  *     public String fancyName(String name) {
  *         return "Sir Captain " + name;
  *     }
  * </code></pre>
- *
- * A meter for the defining class with the name {@code fancyName} will be
- * created and each time the {@code #fancyName(String)} method is invoked, the
- * meter will be marked.
+ * <p/>
+ * A meter for the defining class with the name {@code fancyName} will be created and each time the
+ * {@code #fancyName(String)} method is invoked, the meter will be marked.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

@@ -68,7 +68,12 @@ class Timer(metric: TimerMetric) {
   /**
    * Returns an array of durations at the given percentiles.
    */
-  def percentiles(percentiles: Double*) = metric.percentiles(percentiles: _*)
+  def percentiles(percentiles: Seq[java.lang.Double]) = metric.percentiles(percentiles: _*)
+
+  /**
+   * Returns the duration at the given percentile.
+   */
+  def percentile(percentile: Double) = metric.percentile(percentile)
 
   /**
    * Returns the timer's rate unit.

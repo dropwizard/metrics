@@ -7,11 +7,15 @@
     <parent>
         <groupId>com.yammer.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>2.0.0-BETA17</version>
+        <version>2.0.0-BETA18-SNAPSHOT</version>
     </parent>
 
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-logback</artifactId>
+
+    <properties>
+        <logback.version>1.0.0</logback.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -22,12 +26,12 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>0.9.30</version>
+            <version>${logback.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>0.9.30</version>
+            <version>${logback.version}</version>
         </dependency>
     </dependencies>
 </project>

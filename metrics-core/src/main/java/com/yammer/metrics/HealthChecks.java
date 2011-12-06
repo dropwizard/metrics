@@ -34,6 +34,7 @@ public class HealthChecks {
 
     /**
      * Returns the (static) default registry.
+     *
      * @return the registry
      */
     public static HealthCheckRegistry defaultRegistry() {
