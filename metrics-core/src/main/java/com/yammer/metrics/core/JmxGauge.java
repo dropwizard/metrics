@@ -1,12 +1,15 @@
 package com.yammer.metrics.core;
 
 import java.lang.management.ManagementFactory;
-import javax.management.*;
+
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 
 /**
  * A gauge which exposes an attribute of a JMX MBean.
  */
-public class JmxGauge implements GaugeMetric<Object> {
+public class JmxGauge extends GaugeMetric<Object> {
     private static final MBeanServer SERVER = ManagementFactory.getPlatformMBeanServer();
     private ObjectName name;
     private String attribute;

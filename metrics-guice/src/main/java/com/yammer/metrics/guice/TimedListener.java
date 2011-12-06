@@ -22,11 +22,15 @@ public class TimedListener implements TypeListener {
     @Override
     public <T> void hear(TypeLiteral<T> literal,
                          TypeEncounter<T> encounter) {
-        for (Method method : literal.getRawType().getMethods()) {
+        for (Method method : literal.getRawType().getDeclaredMethods()) {
             final Timed annotation = method.getAnnotation(Timed.class);
             if (annotation != null) {
-                final String name = annotation.name().isEmpty() ? method.getName() : annotation.name();
-                final TimerMetric timer = metricsRegistry.newTimer(literal.getRawType(), name, annotation.durationUnit(), annotation.rateUnit());
+                final String name = annotation.name()
+                                              .isEmpty() ? method.getName() : annotation.name();
+                final TimerMetric timer = metricsRegistry.newTimer(literal.getRawType(),
+                                                                   name,
+                                                                   annotation.durationUnit(),
+                                                                   annotation.rateUnit());
                 encounter.bindInterceptor(Matchers.only(method), new TimedInterceptor(timer));
             }
         }

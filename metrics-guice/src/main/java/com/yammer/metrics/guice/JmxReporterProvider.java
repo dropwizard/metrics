@@ -5,10 +5,7 @@ import com.google.inject.Provider;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.JmxReporter;
 
-import java.util.concurrent.TimeUnit;
-
-public class JmxReporterProvider implements Provider<JmxReporter>
-{
+public class JmxReporterProvider implements Provider<JmxReporter> {
     private final MetricsRegistry metricsRegistry;
 
     @Inject
@@ -19,7 +16,7 @@ public class JmxReporterProvider implements Provider<JmxReporter>
     @Override
     public JmxReporter get() {
         JmxReporter reporter = new JmxReporter(metricsRegistry);
-        reporter.start(1, TimeUnit.MINUTES);
+        reporter.start();
         return reporter;
     }
 }
