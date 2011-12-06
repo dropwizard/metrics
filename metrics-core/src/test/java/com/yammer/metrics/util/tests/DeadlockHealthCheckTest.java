@@ -1,17 +1,20 @@
 package com.yammer.metrics.util.tests;
 
-import com.yammer.metrics.util.DeadlockHealthCheck;
-import com.yammer.metrics.core.HealthCheck;
-import com.yammer.metrics.core.VirtualMachineMetrics;
-import org.junit.Test;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.Test;
+
+import com.yammer.metrics.core.HealthCheck;
+import com.yammer.metrics.core.MetricName;
+import com.yammer.metrics.core.VirtualMachineMetrics;
+import com.yammer.metrics.util.DeadlockHealthCheck;
 
 public class DeadlockHealthCheckTest {
     private final VirtualMachineMetrics vm = mock(VirtualMachineMetrics.class);
@@ -19,8 +22,9 @@ public class DeadlockHealthCheckTest {
 
     @Test
     public void hasAName() throws Exception {
-        assertThat(healthCheck.getName(),
-                   is("deadlocks"));
+        assertThat(healthCheck.name(),
+                equalTo(new MetricName(DeadlockHealthCheck.class, "deadlocks")));
+                   //is("deadlocks"));
     }
 
     @Test

@@ -1,27 +1,39 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.core.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.management.ManagementFactory;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-import javax.management.OperationsException;
-import java.lang.management.ManagementFactory;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import com.yammer.metrics.core.HealthCheck;
+import com.yammer.metrics.core.HealthCheck.Result;
+import com.yammer.metrics.core.HealthCheckRegistry;
+import com.yammer.metrics.core.HealthCheckRegistryListener;
+import com.yammer.metrics.core.Metered;
+import com.yammer.metrics.core.Metric;
+import com.yammer.metrics.core.MetricName;
+import com.yammer.metrics.core.MetricProcessor;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.MetricsRegistryListener;
 
 /**
  * A reporter which exposes application metric as JMX MBeans.
  */
-public class JmxReporter extends AbstractReporter implements MetricsRegistryListener,
-                                                             MetricProcessor<JmxReporter.Context> {
+public class JmxReporter extends AbstractReporter implements MetricsRegistryListener, HealthCheckRegistryListener, MetricProcessor<Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JmxReporter.class);
-
-    private final Map<MetricName, ObjectName> registeredBeans;
+    private final Set<ObjectName> registeredBeans;
     private final MBeanServer server;
 
     // CHECKSTYLE:OFF
@@ -29,8 +41,8 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     public interface MetricMBean {
         ObjectName objectName();
     }
-    // CHECKSTYLE:ON
 
+    // CHECKSTYLE:ON
 
     private abstract static class AbstractBean implements MetricMBean {
         private final ObjectName objectName;
@@ -50,8 +62,8 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     public interface GaugeMBean extends MetricMBean {
         Object getValue();
     }
-    // CHECKSTYLE:ON
 
+    // CHECKSTYLE:ON
 
     private static class Gauge extends AbstractBean implements GaugeMBean {
         private final com.yammer.metrics.core.Gauge<?> metric;
@@ -72,8 +84,8 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     public interface CounterMBean extends MetricMBean {
         long getCount();
     }
-    // CHECKSTYLE:ON
 
+    // CHECKSTYLE:ON
 
     private static class Counter extends AbstractBean implements CounterMBean {
         private final com.yammer.metrics.core.Counter metric;
@@ -106,6 +118,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         double getFifteenMinuteRate();
     }
+
     //CHECKSTYLE:ON
 
     private static class Meter extends AbstractBean implements MeterMBean {
@@ -179,6 +192,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         double[] values();
     }
+
     // CHECKSTYLE:ON
 
     private static class Histogram implements HistogramMBean {
@@ -261,6 +275,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     public interface TimerMBean extends MeterMBean, HistogramMBean {
         TimeUnit getLatencyUnit();
     }
+
     // CHECKSTYLE:ON
 
     static class Timer extends Meter implements TimerMBean {
@@ -331,16 +346,54 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
             return metric.getSnapshot().getValues();
         }
     }
+    
+    public static interface CheckMBean extends MetricMBean {
+        public boolean isHealthy();
+        public String runCheck();
+    }
+
+    public static class Check extends AbstractBean implements CheckMBean {
+
+        private final HealthCheck check;
+
+        public Check(HealthCheck check) {
+            super(check.name().getMBeanName());
+            this.check = check;
+        }
+
+        @Override
+        public boolean isHealthy() {
+            return check.execute().isHealthy();
+        }
+
+        @Override
+        public String runCheck() {
+            final Result result = check.execute();
+            if(result.isHealthy()) {
+                return "ok";
+            }
+            final StringBuilder message = new StringBuilder(result.getMessage());
+            final Throwable error = result.getError();
+            if(error != null) {
+                final StringWriter stack = new StringWriter();
+                error.printStackTrace(new PrintWriter(stack, true));
+                message.append('\n').append(stack.toString());
+            }
+            return message.toString();
+        }
+    }
 
     private static JmxReporter INSTANCE;
+    private final HealthCheckRegistry healthCheckRegistry;
 
     /**
      * Starts the default instance of {@link JmxReporter}.
-     *
-     * @param registry    the {@link MetricsRegistry} to report from
+     * 
+     * @param metricsRegistry the {@link MetricsRegistry} to report {@link Metric}s from
+     * @param healthCheckRegistry the {@link HealthCheckRegistry} to report {@link HealthCheck}s from
      */
-    public static void startDefault(MetricsRegistry registry) {
-        INSTANCE = new JmxReporter(registry);
+    public static void startDefault(MetricsRegistry metricsRegistry, HealthCheckRegistry healthCheckRegistry) {
+        INSTANCE = new JmxReporter(metricsRegistry, healthCheckRegistry);
         INSTANCE.start();
     }
 
@@ -348,96 +401,93 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
      * Stops the default instance of {@link JmxReporter}.
      */
     public static void shutdownDefault() {
-        if (INSTANCE != null) {
+        if(INSTANCE != null) {
             INSTANCE.shutdown();
-        }
-    }
-
-    static final class Context {
-        private final MetricName metricName;
-        private final ObjectName objectName;
-
-        public Context(final MetricName metricName, final ObjectName objectName) {
-            this.metricName = metricName;
-            this.objectName = objectName;
-        }
-
-        MetricName getMetricName() {
-            return metricName;
-        }
-
-        ObjectName getObjectName() {
-            return objectName;
         }
     }
 
     /**
      * Creates a new {@link JmxReporter} for the given registry.
-     *
-     * @param registry    a {@link MetricsRegistry}
+     * 
+     * @param metricsRegistry a {@link MetricsRegistry}
+     * @param checkRegistry
      */
-    public JmxReporter(MetricsRegistry registry) {
-        super(registry);
-        this.registeredBeans = new HashMap<MetricName, ObjectName>();
+    public JmxReporter(MetricsRegistry metricsRegistry, HealthCheckRegistry checkRegistry) {
+        super(metricsRegistry);
+        this.healthCheckRegistry = checkRegistry;
+        this.registeredBeans = new HashSet<ObjectName>();
         this.server = ManagementFactory.getPlatformMBeanServer();
     }
 
     @Override
-    public void onMetricAdded(MetricName name, Metric metric) {
-        if (metric != null) {
+    public void onHealthCheckAdded(HealthCheck check) {
+        if(check != null) {
             try {
-                metric.processWith(this, name, new Context(name, new ObjectName(name.getMBeanName())));
-            } catch (Exception e) {
+                registerBean(check.name(), new Check(check));
+            }
+            catch(Exception e) {
+                LOGGER.warn("Error processing " + check, e);
+            }
+        }
+    }
+
+    @Override
+    public void onMetricAdded(MetricName name, Metric metric) {
+        if(metric != null) {
+            try {
+                metric.processWith(this, name, null);
+            }
+            catch(Exception e) {
                 LOGGER.warn("Error processing " + name, e);
             }
         }
     }
 
     @Override
+    public void processMeter(MetricName name, Metered meter, Object unused) throws Exception {
+        registerBean(name, new Meter(meter, name.getMBeanName()));
+    }
+
+    @Override
+    public void processCounter(MetricName name, com.yammer.metrics.core.Counter counter, Object unused) throws Exception {
+        registerBean(name, new Counter(counter, name.getMBeanName()));
+    }
+
+    @Override
+    public void processHistogram(MetricName name, com.yammer.metrics.core.Histogram histogram, Object unused) throws Exception {
+        registerBean(name, new Histogram(histogram, name.getMBeanName()));
+    }
+
+    @Override
+    public void processTimer(MetricName name, com.yammer.metrics.core.Timer timer, Object unused) throws Exception {
+        registerBean(name, new Timer(timer, name.getMBeanName()));
+    }
+
+    @Override
+    public void processGauge(MetricName name, com.yammer.metrics.core.Gauge<?> gauge, Object unused) throws Exception {
+        registerBean(name, new Gauge(gauge, name.getMBeanName()));
+    }
+
+    @Override
     public void onMetricRemoved(MetricName name) {
-        final ObjectName objectName = registeredBeans.remove(name);
-        if (objectName != null) {
-            unregisterBean(objectName);
+        if(registeredBeans.remove(name)) {
+            unregisterBean(name.getMBeanName());
         }
     }
 
     @Override
-    public void processMeter(MetricName name, Metered meter, Context context) throws Exception {
-        registerBean(context.getMetricName(), new Meter(meter, context.getObjectName()),
-                     context.getObjectName());
+    public void onHealthCheckRemoved(MetricName name) {
+        if(registeredBeans.remove(name)) {
+            unregisterBean(name.getMBeanName());
+        }
     }
 
-    @Override
-    public void processCounter(MetricName name, com.yammer.metrics.core.Counter counter, Context context) throws Exception {
-        registerBean(context.getMetricName(),
-                     new Counter(counter, context.getObjectName()),
-                     context.getObjectName());
-    }
-
-    @Override
-    public void processHistogram(MetricName name, com.yammer.metrics.core.Histogram histogram, Context context) throws Exception {
-        registerBean(context.getMetricName(),
-                     new Histogram(histogram, context.getObjectName()),
-                     context.getObjectName());
-    }
-
-    @Override
-    public void processTimer(MetricName name, com.yammer.metrics.core.Timer timer, Context context) throws Exception {
-        registerBean(context.getMetricName(), new Timer(timer, context.getObjectName()),
-                     context.getObjectName());
-    }
-
-    @Override
-    public void processGauge(MetricName name, com.yammer.metrics.core.Gauge<?> gauge, Context context) throws Exception {
-        registerBean(context.getMetricName(), new Gauge(gauge, context.getObjectName()),
-                     context.getObjectName());
-    }
-
-    @Override
-    public void shutdown() {
-        getMetricsRegistry().removeListener(this);
-        for (ObjectName name : registeredBeans.values()) {
-            unregisterBean(name);
+    private void unregisterBean(ObjectName objectName) {
+        if(objectName != null) {
+            try {
+                server.unregisterMBean(objectName);
+            }
+            catch(Exception ignored) {}
         }
         registeredBeans.clear();
     }
@@ -447,19 +497,23 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
      */
     public final void start() {
         getMetricsRegistry().addListener(this);
+        healthCheckRegistry.addListener(this);
     }
 
-    private void registerBean(MetricName name, MetricMBean bean, ObjectName objectName)
-            throws MBeanRegistrationException, OperationsException {
-        server.registerMBean(bean, objectName);
-        registeredBeans.put(name, objectName);
+    private void registerBean(MetricName name, MetricMBean bean) throws MBeanRegistrationException, InstanceAlreadyExistsException, NotCompliantMBeanException {
+        server.registerMBean(bean, name.getMBeanName());
+        registeredBeans.add(name.getMBeanName());
     }
 
-    private void unregisterBean(ObjectName name) {
-        try {
-            server.unregisterMBean(name);
-        } catch (Exception e) {
-            LOGGER.warn("Error unregistering " + name, e);
+    @Override
+    public void shutdown() {
+        healthCheckRegistry.removeListener(this);
+        getMetricsRegistry().removeListener(this);
+        for(ObjectName name : registeredBeans) {
+            try {
+                server.unregisterMBean(name);
+            }
+            catch(Exception ignored) {}
         }
     }
 }

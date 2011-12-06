@@ -1,5 +1,7 @@
 package com.yammer.metrics.core;
 
+import javax.management.ObjectName;
+
 /**
  * A health check for a component of your application.
  */
@@ -122,27 +124,6 @@ public abstract class HealthCheck {
         }
     }
 
-    private final String name;
-
-    /**
-     * Create a new {@link HealthCheck} instance with the given name.
-     *
-     * @param name    the name of the health check (and, ideally, the name of the underlying
-     *                component the health check tests)
-     */
-    protected HealthCheck(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Returns the health check's name.
-     *
-     * @return the health check's name
-     */
-    public String getName() {
-        return name;
-    }
-
     /**
      * Perform a check of the application component.
      *
@@ -153,6 +134,25 @@ public abstract class HealthCheck {
      *                   a failed health check
      */
     protected abstract Result check() throws Exception;
+    protected final MetricName name;
+
+    public MetricName name() {
+        return name;
+    }
+    
+    @Override
+    public String toString() {
+        return name.toString();
+    } 
+
+    /**
+     * Create a new {@link HealthCheck} named on 
+     * @param klass the {@link Class} to which the {@link HealthCheck} belongs
+     * @param name  the name of the {@link HealthCheck}
+     */
+    public HealthCheck(Class<?> klass, String name) {
+        this.name = new MetricName(klass, name);
+    }
 
     /**
      * Executes the health check, catching and handling any exceptions raised by {@link #check()}.
@@ -168,5 +168,9 @@ public abstract class HealthCheck {
         } catch (Throwable e) {
             return Result.unhealthy(e);
         }
+    }
+
+    public ObjectName getMBeanName() {
+        return name().getMBeanName();
     }
 }

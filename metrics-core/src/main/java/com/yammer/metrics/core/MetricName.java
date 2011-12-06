@@ -1,5 +1,7 @@
 package com.yammer.metrics.core;
 
+import javax.management.ObjectName;
+
 
 /**
  * A value class encapsulating a metric's owning class and name.
@@ -9,7 +11,8 @@ public class MetricName implements Comparable<MetricName> {
     private final String type;
     private final String name;
     private final String scope;
-    private final String mBeanName;
+    private final String fqn;
+    private final ObjectName mBeanName;
 
     /**
      * Creates a new {@link MetricName} without a scope.
@@ -68,18 +71,19 @@ public class MetricName implements Comparable<MetricName> {
      * @param mBeanName the 'ObjectName', represented as a string, to use when registering the
      *                  MBean.
      */
-    public MetricName(String group, String type, String name, String scope, String mBeanName) {
+    public MetricName(String group, String type, String name, String scope, ObjectName mBeanName) {
         if (group == null || type == null) {
             throw new IllegalArgumentException("Both group and type need to be specified");
         }
         if (name == null) {
             throw new IllegalArgumentException("Name needs to be specified");
         }
+        this.mBeanName = ObjectName.getInstance(mBeanName);
         this.group = group;
         this.type = type;
         this.name = name;
         this.scope = scope;
-        this.mBeanName = mBeanName;
+        this.fqn = mBeanName.toString();
     }
 
     /**
@@ -134,7 +138,7 @@ public class MetricName implements Comparable<MetricName> {
      *
      * @return the MBean name
      */
-    public String getMBeanName() {
+    public ObjectName getMBeanName() {
         return mBeanName;
     }
 
@@ -143,25 +147,20 @@ public class MetricName implements Comparable<MetricName> {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         final MetricName that = (MetricName) o;
-        return mBeanName.equals(that.mBeanName);
+        return fqn.equals(that.fqn);
     }
 
     @Override
     public int hashCode() {
-        return mBeanName.hashCode();
+        return fqn.hashCode();
     }
 
     @Override
     public String toString() {
-        return mBeanName;
+        return fqn;
     }
 
-    @Override
-    public int compareTo(MetricName o) {
-        return mBeanName.compareTo(o.mBeanName);
-    }
-
-    private static String createMBeanName(String group, String type, String name, String scope) {
+    private static ObjectName createMBeanName(String group, String type, String name, String scope) {
         final StringBuilder nameBuilder = new StringBuilder();
         nameBuilder.append(group);
         nameBuilder.append(":type=");
@@ -174,6 +173,16 @@ public class MetricName implements Comparable<MetricName> {
             nameBuilder.append(",name=");
             nameBuilder.append(name);
         }
-        return nameBuilder.toString();
+        try {
+            return ObjectName.getInstance(nameBuilder.toString());
+        }
+        catch(Exception e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public int compareTo(MetricName o) {
+        return fqn.compareTo(o.fqn);
     }
 }

@@ -2,6 +2,8 @@ package com.yammer.metrics.core.tests;
 
 import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.core.HealthCheckRegistry;
+import com.yammer.metrics.core.MetricName;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,10 +27,10 @@ public class HealthCheckRegistryTest {
 
     @Before
     public void setUp() throws Exception {
-        when(hc1.getName()).thenReturn("hc1");
+        when(hc1.name()).thenReturn(new MetricName(HealthCheck.class, "hc1"));
         when(hc1.execute()).thenReturn(r1);
         
-        when(hc2.getName()).thenReturn("hc2");
+        when(hc2.name()).thenReturn(new MetricName(HealthCheck.class, "hc2"));
         when(hc2.execute()).thenReturn(r2);
 
         registry.register(hc1);
@@ -37,25 +39,25 @@ public class HealthCheckRegistryTest {
 
     @Test
     public void runsRegisteredHealthChecks() throws Exception {
-        final Map<String,HealthCheck.Result> results = registry.runHealthChecks();
+        final Map<MetricName,HealthCheck.Result> results = registry.runHealthChecks();
 
         assertThat(results,
-                   hasEntry("hc1", r1));
+                   hasEntry(new MetricName(HealthCheck.class, "hc1"), r1));
 
         assertThat(results,
-                   hasEntry("hc2", r2));
+                   hasEntry(new MetricName(HealthCheck.class, "hc2"), r2));
     }
 
     @Test
     public void removesRegisteredHealthChecks() throws Exception {
         registry.unregister(hc1);
 
-        final Map<String, HealthCheck.Result> results = registry.runHealthChecks();
+        final Map<MetricName, HealthCheck.Result> results = registry.runHealthChecks();
 
         assertThat(results,
-                   not(hasEntry("hc1", r1)));
+                   not(hasEntry(new MetricName(HealthCheck.class, "hc1"), r1)));
 
         assertThat(results,
-                   hasEntry("hc2", r2));
+                   hasEntry(new MetricName(HealthCheck.class, "hc2"), r2));
     }
 }

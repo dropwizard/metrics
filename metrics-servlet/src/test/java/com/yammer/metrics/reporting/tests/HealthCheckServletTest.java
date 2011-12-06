@@ -2,6 +2,7 @@ package com.yammer.metrics.reporting.tests;
 
 import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.core.HealthCheckRegistry;
+import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.reporting.HealthCheckServlet;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.*;
 public class HealthCheckServletTest {
     private final HealthCheckRegistry registry = mock(HealthCheckRegistry.class);
     private final HealthCheckServlet servlet = new HealthCheckServlet(registry);
-    private final SortedMap<String, HealthCheck.Result> results = new TreeMap<String, HealthCheck.Result>();
+    private final SortedMap<MetricName, HealthCheck.Result> results = new TreeMap<MetricName, HealthCheck.Result>();
 
     private final HttpServletRequest request = mock(HttpServletRequest.class);
     private final HttpServletResponse response = mock(HttpServletResponse.class);
@@ -56,15 +57,17 @@ public class HealthCheckServletTest {
 
     @Test
     public void returnsOkIfAllHealthChecksAreHealthy() throws Exception {
-        results.put("one", HealthCheck.Result.healthy());
-        results.put("two", HealthCheck.Result.healthy("msg"));
+        final MetricName one = new MetricName(HealthCheckServletTest.class, "one");
+        final MetricName two = new MetricName(HealthCheckServletTest.class, "two");
+        results.put(one, HealthCheck.Result.healthy());
+        results.put(two, HealthCheck.Result.healthy("msg"));
 
         servlet.service(request, response);
 
         assertThat(output.toString(),
                    is(
-                           "* one: OK\n" +
-                           "* two: OK\n" +
+                           "* " + one + ": OK\n" +
+                           "* " + two + ": OK\n" +
                            "  msg\n"));
 
         verify(response).setStatus(200);
@@ -84,16 +87,18 @@ public class HealthCheckServletTest {
             }
         }).when(ex).printStackTrace(any(PrintWriter.class));
 
-        results.put("one", HealthCheck.Result.unhealthy("msg"));
-        results.put("two", HealthCheck.Result.unhealthy(ex));
+        final MetricName one = new MetricName(HealthCheckServletTest.class, "one");
+        final MetricName two = new MetricName(HealthCheckServletTest.class, "two");
+        results.put(one, HealthCheck.Result.unhealthy("msg"));
+        results.put(two, HealthCheck.Result.unhealthy(ex));
 
         servlet.service(request, response);
 
         assertThat(output.toString(),
                    is(
-                           "! one: ERROR\n" +
+                           "! " + one + ": ERROR\n" +
                                    "!  msg\n" +
-                                   "! two: ERROR\n" +
+                                   "! " + two + ": ERROR\n" +
                                    "!  ex msg\n" +
                                    "\n" +
                                    "stack trace\n\n"));
@@ -104,8 +109,9 @@ public class HealthCheckServletTest {
 
     @Test
     public void picksUpTheHealthCheckRegistryFromTheConfig() throws Exception {
-        final SortedMap<String, HealthCheck.Result> otherResults = new TreeMap<String, HealthCheck.Result>();
-        otherResults.put("one", HealthCheck.Result.healthy());
+        final SortedMap<MetricName, HealthCheck.Result> otherResults = new TreeMap<MetricName, HealthCheck.Result>();
+        final MetricName one = new MetricName(HealthCheckServletTest.class, "one");
+        otherResults.put(one, HealthCheck.Result.healthy());
 
         final HealthCheckRegistry reg = mock(HealthCheckRegistry.class);
         when(reg.runHealthChecks()).thenReturn(otherResults);
@@ -120,7 +126,7 @@ public class HealthCheckServletTest {
         servlet.service(request, response);
 
         assertThat(output.toString(),
-                   is("* one: OK\n"));
+                   is("* " + one + ": OK\n"));
 
         verify(response).setStatus(200);
         verify(response).setContentType("text/plain");

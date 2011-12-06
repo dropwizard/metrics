@@ -1,21 +1,24 @@
 package com.yammer.metrics.core.tests;
 
-import com.yammer.metrics.core.HealthCheck;
-import org.junit.Test;
-
-import static com.yammer.metrics.core.HealthCheck.Result;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.junit.Test;
+
+import com.yammer.metrics.core.HealthCheck;
+import com.yammer.metrics.core.HealthCheck.Result;
+import com.yammer.metrics.core.MetricName;
+
 public class HealthCheckTest {
     private static class ExampleHealthCheck extends HealthCheck {
         private final HealthCheck underlying;
 
         private ExampleHealthCheck(HealthCheck underlying) {
-            super("example");
+            super(ExampleHealthCheck.class, "example");
             this.underlying = underlying;
         }
 
@@ -30,8 +33,9 @@ public class HealthCheckTest {
 
     @Test
     public void hasAName() throws Exception {
-        assertThat(healthCheck.getName(),
-                   is("example"));
+        assertThat(healthCheck.name(),
+                   equalTo(new MetricName(ExampleHealthCheck.class, "example")));
+                   //is("example"));
     }
 
     @Test

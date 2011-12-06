@@ -1,10 +1,11 @@
 package com.yammer.metrics;
 
+import java.util.Map;
+
 import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.core.HealthCheck.Result;
 import com.yammer.metrics.core.HealthCheckRegistry;
-
-import java.util.Map;
+import com.yammer.metrics.core.MetricName;
 
 /**
  * A manager class for health checks.
@@ -28,7 +29,7 @@ public class HealthChecks {
      *
      * @return a map of the health check results
      */
-    public static Map<String, Result> runHealthChecks() {
+    public static Map<MetricName, Result> runHealthChecks() {
         return DEFAULT_REGISTRY.runHealthChecks();
     }
 
