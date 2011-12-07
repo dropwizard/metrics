@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Getting Started | Metrics</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+    <![endif]-->
+
+    <script src="js/prettify.js"></script>
+    <script src="js/lang-yaml.js"></script>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/additional.css">
+    <link rel="stylesheet" href="css/prettify.css">
+</head>
+
+<body onload="prettyPrint();">
+
+<div class="topbar">
+    <div class="topbar-inner">
+        <div class="container-fluid">
+            <a class="brand" href="index.html">Metrics</a>
+            <ul class="nav">
+                <li><a href="index.html">Home</a></li>
+                <li class="active"><a href="getting-started.html">Getting Started</a></li>
+                <li><a href="manual.html">Manual</a></li>
+                <li><a href="https://github.com/codahale/metrics">Code</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="sidebar">
+        <div class="well">
+            <h5>Getting Started</h5>
+            <ul>
+                <li><a href="#maven">Setting Up Maven</a></li>
+                <li><a href="#gauges">Gauges</a></li>
+                <li><a href="#counters">Counters</a></li>
+                <li><a href="#meters">Meters</a></li>
+                <li><a href="#histograms">Histograms</a></li>
+                <li><a href="#timers">Timers</a></li>
+                <li><a href="#healthchecks">Health Checks</a></li>
+                <li><a href="#reporting-jmx">Reporting Via JMX</a></li>
+                <li><a href="#reporting-http">Reporting Via HTTP</a></li>
+                <li><a href="#reporting-other">Other Reporting</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="content">
+        <h1>Getting Started</h1>
+        
+        <p>
+            The goal of this document is to guide you through the process of adding Metrics to an
+            existing application. We’ll go through the various measuring instruments that Metrics
+            provides, how to use them, and when they’ll come in handy.
+        </p>
+
+        <hr>
+
+        <h2 id="maven">Setting Up Maven</h2>
+
+        <p>
+            <strong>First off</strong>, add the repository where the Metrics <code>SNAPSHOT</code>
+            JARs are hosted:
+        </p>
+
+        <pre class="prettyprint lang-xml">
+&lt;repositories&gt;
+    &lt;repository&gt;
+        &lt;id&gt;sonatype-nexus-snapshots&lt;/id&gt;
+        &lt;name&gt;Sonatype Nexus Snapshots&lt;/name&gt;
+        &lt;url&gt;http://oss.sonatype.org/content/repositories/snapshots&lt;/url&gt;
+    &lt;/repository&gt;
+&lt;/repositories&gt;</pre>
+
+        <p>
+            <strong>Second</strong>, add the <code>metrics-core</code> library as a dependency:
+        </p>
+
+        <pre class="prettyprint lang-xml">
+&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;com.yammer.metrics&lt;/groupId&gt;
+        &lt;artifactId&gt;metrics-core&lt;/artifactId&gt;
+        &lt;version&gt;2.0.0-BETA18-SNAPSHOT&lt;/version&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;</pre>
+        
+        <p>
+            Now it’s time to add some metrics to your application!
+        </p>
+
+        <hr>
+
+        <h2 id="gauges">Gauges</h2>
+
+        <p>
+            A gauge is an instantaneous measurement of a value. For example, we may want to measure
+            the number of pending jobs in a queue.
+        </p>
+
+        <pre class="prettyprint lang-java">
+Metrics.newGauge(QueueManager.class, "pending-jobs", new GaugeMetric&lt;Integer&gt;() {
+    @Override
+    public Integer value() {
+        return queue.size();
+    }
+});</pre>
+        
+        <p>
+            Every time this gauge is measured, it will return the number of jobs in the queue.
+        </p>
+        <p>
+            For most queue and queue-like structures, you won't want to simply return
+            <code>queue.size()</code>. Most of <code>java.util</code> and
+            <code>java.util.concurrent</code>’s implementations of <code>#size()</code> are
+            <code>O(n)</code>, which means your gauge will be slow (potentially while holding a
+            lock).
+        </p>
+
+        <hr>
+
+        <h2 id="counters">Counters</h2>
+
+        <p>
+            A counter is just a gauge for an <code>AtomicLong</code> instance. You can increment or
+            decrement its value. For example, we may want a more efficient way of measuring
+            the pending job in a queue:
+        </p>
+
+        <pre class="prettyprint lang-java">
+private final CounterMetric pendingJobs = Metrics.newCounter(QueueManager.class, "pending-jobs");
+
+public void addJob(Job job) {
+    pendingJobs.inc();
+    queue.offer(job);
+}
+
+public Job takeJob() {
+    pendingJobs.dec();
+    return queue.take();
+}</pre>
+        
+        <p>
+            Every time this counter is measured, it will return the number of jobs in the queue.
+        </p>
+
+        <hr>
+
+        <h2 id="meters">Meters</h2>
+
+        <p>
+            A meter measures the rate of events over time (e.g., “requests per second”).
+            In addition to the mean rate, meters also track 1-, 5-, and 15-minute moving
+            averages.
+        </p>
+
+        <pre class="prettyprint lang-java">
+private final MeterMetric requests = Metrics.newMeter(RequestHandler.class, "requests", "requests", TimeUnit.SECONDS);
+
+public void handleRequest(Request request, Response response) {
+    requests.mark();
+    // etc
+}</pre>
+
+        <p>
+            This meter will measure the rate of requests in requests per second.
+        </p>
+
+        <hr>
+
+        <h2 id="histograms">Histograms</h2>
+
+        <p>
+            A histogram measures the statistical distribution of values in a stream of data. In
+            addition to minimum, maximum, mean, etc., it also measures median, 75th, 90th, 95th,
+            98th, 99th, and 99.9th percentiles.
+        </p>
+
+        <pre class="prettyprint lang-java">
+private final HistogramMetric responseSizes = Metrics.newHistogram(RequestHandler.class, "response-sizes");
+
+public void handleRequest(Request request, Response response) {
+    // etc
+    responseSizes.update(response.getContent().length);
+}</pre>
+        
+        <p>This histogram will measure the size of responses in bytes.</p>
+
+        <hr>
+
+        <h2 id="timers">Timers</h2>
+
+        <p>
+            A timer measures both the rate that a particular piece of code is called and the
+            distribution of its duration.
+        </p>
+
+        <pre class="prettyprint lang-java">
+private final TimerMetric responses = Metrics.newTimer(RequestHandler.class, "responses", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+
+public String handleRequest(Request request, Response response) {
+    final TimerContext context = responses.time();
+    try {
+        // etc;
+        return "OK";
+    } finally {
+        context.stop();
+    }
+}</pre>
+
+        <p>
+            This timer will measure the amount of time it takes to process each request in
+            milliseconds and provide a rate of requests in requests per second.
+        </p>
+
+        <hr>
+
+        <h2 id="healthchecks">Health Checks</h2>
+
+        <p>
+            Metrics also has the ability to centralize your service's health checks. First,
+            implement a <code>HealthCheck</code> instance:
+        </p>
+
+        <pre class="prettyprint lang-java">
+import com.yammer.metrics.core.HealthCheck.Result;
+
+public class DatabaseHealthCheck extends HealthCheck {
+    private final Database database;
+
+    public DatabaseHealthCheck(Database database) {
+        this.database = database;
+    }
+
+    @Override
+    public String name() {
+        return "database";
+    }
+
+    @Override
+    public Result check() throws Exception {
+        if (database.isConnected()) {
+            return Result.healthy();
+        } else {
+            return Result.unhealthy("Cannot connect to " + database.getUrl());
+        }
+    }
+}</pre>
+
+        <p>
+            Then register an instance of it with Metrics:
+        </p>
+
+        <pre class="prettyprint lang-java">
+HealthChecks.register(new DatabaseHealthCheck(database));</pre>
+        
+        <p>To run all of the registered health checks:</p>
+
+        <pre class="prettyprint lang-java">
+final Map&lt;String, Result&gt; results = HealthChecks.runHealthChecks();
+for (Entry&lt;String, Result&gt; entry : results.entrySet()) {
+    if (entry.getValue().isHealthy()) {
+        System.out.println(entry.getKey() + " is healthy");
+    } else {
+        System.err.println(entry.getKey() + " is UNHEALTHY: " + entry.getValue().getMessage());
+        final Throwable e = entry.getValue().getError();
+        if (e != null) {
+            e.printStackTrace();
+        }
+    }
+}</pre>
+        
+        <p>
+            Metrics comes with a pre-built health check: <code>DeadlockHealthCheck</code>, which
+            uses Java 1.6's built-in thread deadlock detection to determine if any threads are
+            deadlocked.
+        </p>
+
+        <hr>
+
+        <h2 id="reporting-jmx">Reporting Via JMX</h2>
+
+        <p>
+            All metrics are visible via <strong>JConsole</strong> or <strong>VisualVM</strong> (if
+            you install the JConsole plugin):
+        </p>
+
+        <p><img src="images/metrics-visualvm.png" alt="JConsole values"></p>
+
+        <p>
+            <strong>Bonus points</strong>: If you double-click any of the metric properties,
+            VisualVM will start graphing the data for that property.
+        </p>
+
+        <hr>
+
+        <h2 id="reporting-http">Reporting Via HTTP</h2>
+
+        <p>
+            Metrics also ships with a servlet which will serve a JSON representation of all
+            registered metrics. It will also run health checks, print out a thread dump, and provide
+            a simple “ping” response for load-balancers.
+        </p>
+
+        <p>
+            To use this servlet, include the <code>metrics-servlet</code> module as a dependency:
+        </p>
+
+                <pre class="prettyprint lang-xml">
+&lt;dependency&gt;
+    &lt;groupId&gt;com.yammer.metrics&lt;/groupId&gt;
+    &lt;artifactId&gt;metrics-servlet&lt;/artifactId&gt;
+    &lt;version&gt;2.0.0-BETA18-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</pre>
+
+        <p>
+            From there on, you can map the servlet to whatever path you see fit.
+        </p>
+
+        <hr>
+
+        <h2 id="reporting-other">Other Reporting</h2>
+
+        <p>
+            In addition to JMX and HTTP, Metrics also has reporters for the following outputs:
+        </p>
+
+        <ul>
+            <li><code>STDOUT</code>, using <code>ConsoleReporter</code> from <code>metrics-core</code></li>
+            <li><code>CSV</code> files, using <code>CsvReporter</code> from <code>metrics-core</code></li>
+            <li>Ganglia, using <code>GangliaReporter</code> from <code>metrics-ganglia</code></li>
+            <li>Graphite, using <code>GraphiteReporter</code> from <code>metrics-graphite</code></li>
+        </ul>
+
+        <footer>
+            <p>&copy; Yammer 2011</p>
+        </footer>
+    </div>
+</div>
+
+</body>
+</html>
