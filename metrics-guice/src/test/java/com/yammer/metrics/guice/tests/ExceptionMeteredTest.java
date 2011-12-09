@@ -2,18 +2,15 @@ package com.yammer.metrics.guice.tests;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.yammer.metrics.aop.annotation.ExceptionMetered;
 import com.yammer.metrics.core.*;
-import com.yammer.metrics.guice.ExceptionMetered;
 import com.yammer.metrics.guice.InstrumentationModule;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -101,7 +98,7 @@ public class ExceptionMeteredTest {
 
         final Metric metric = registry.allMetrics()
                                       .get(new MetricName(InstrumentedWithExceptionMetered.class,
-                                                          "explodeWithDefaultScopeExceptionMetric"));
+                                                          "explodeWithDefaultScopeExceptions"));
         assertMetricIsSetup(metric);
 
         assertThat("Metric intialises to zero",
@@ -124,7 +121,7 @@ public class ExceptionMeteredTest {
 
         final Metric metric = registry.allMetrics()
                                       .get(new MetricName(InstrumentedWithExceptionMetered.class,
-                                                          "explodeWithProtectedScopeExceptionMetric"));
+                                                          "explodeWithProtectedScopeExceptions"));
 
         assertMetricIsSetup(metric);
 
@@ -248,7 +245,7 @@ public class ExceptionMeteredTest {
 
         final Metric errorMetric = registry.allMetrics()
                                            .get(new MetricName(InstrumentedWithExceptionMetered.class,
-                                                               "timedAndExceptionExceptionMetric"));
+                                                               "timedAndExceptionExceptions"));
 
         assertThat("Guice creates a metric",
                    timedMetric,
@@ -312,7 +309,7 @@ public class ExceptionMeteredTest {
 
         final Metric errorMetric = registry.allMetrics()
                                            .get(new MetricName(InstrumentedWithExceptionMetered.class,
-                                                               "meteredAndExceptionExceptionMetric"));
+                                                               "meteredAndExceptionExceptions"));
 
         assertThat("Guice creates a metric",
                    meteredMetric,

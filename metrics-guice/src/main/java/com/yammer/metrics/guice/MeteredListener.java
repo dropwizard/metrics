@@ -4,8 +4,9 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
+import com.yammer.metrics.aop.MeteredInterceptor;
 import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.MeterMetric;
+import org.aopalliance.intercept.MethodInterceptor;
 
 import java.lang.reflect.Method;
 
@@ -22,16 +23,13 @@ public class MeteredListener implements TypeListener {
     @Override
     public <T> void hear(TypeLiteral<T> literal,
                          TypeEncounter<T> encounter) {
-        for (Method method : literal.getRawType().getDeclaredMethods()) {
-            final Metered annotation = method.getAnnotation(Metered.class);
-            if (annotation != null) {
-                final String name = annotation.name()
-                                              .isEmpty() ? method.getName() : annotation.name();
-                final MeterMetric meter = metricsRegistry.newMeter(literal.getRawType(),
-                                                                   name,
-                                                                   annotation.eventType(),
-                                                                   annotation.rateUnit());
-                encounter.bindInterceptor(Matchers.only(method), new MeteredInterceptor(meter));
+        final Class<? super T> klass = literal.getRawType();
+        for (Method method : klass.getDeclaredMethods()) {
+            final MethodInterceptor interceptor = MeteredInterceptor.forMethod(metricsRegistry,
+                                                                               klass,
+                                                                               method);
+            if (interceptor != null) {
+                encounter.bindInterceptor(Matchers.only(method), interceptor);
             }
         }
     }

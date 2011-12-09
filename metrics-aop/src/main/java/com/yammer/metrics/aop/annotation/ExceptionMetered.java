@@ -1,4 +1,4 @@
-package com.yammer.metrics.guice;
+package com.yammer.metrics.aop.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -43,11 +43,11 @@ import java.util.concurrent.TimeUnit;
 @Target(ElementType.METHOD)
 public @interface ExceptionMetered {
 
-    String DEFAULT_NAME_SUFFIX = "ExceptionMetric";
+    String DEFAULT_NAME_SUFFIX = "Exceptions";
 
     /**
      * The name of the meter. If not specified, the meter will be given a name based on the method
-     * it decorates and the suffice "_ExceptionMetric"
+     * it decorates and the suffix "Exceptions".
      */
     String name() default "";
 

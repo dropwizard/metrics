@@ -4,8 +4,9 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
+import com.yammer.metrics.aop.TimedInterceptor;
 import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.TimerMetric;
+import org.aopalliance.intercept.MethodInterceptor;
 
 import java.lang.reflect.Method;
 
@@ -22,16 +23,12 @@ public class TimedListener implements TypeListener {
     @Override
     public <T> void hear(TypeLiteral<T> literal,
                          TypeEncounter<T> encounter) {
-        for (Method method : literal.getRawType().getDeclaredMethods()) {
-            final Timed annotation = method.getAnnotation(Timed.class);
-            if (annotation != null) {
-                final String name = annotation.name()
-                                              .isEmpty() ? method.getName() : annotation.name();
-                final TimerMetric timer = metricsRegistry.newTimer(literal.getRawType(),
-                                                                   name,
-                                                                   annotation.durationUnit(),
-                                                                   annotation.rateUnit());
-                encounter.bindInterceptor(Matchers.only(method), new TimedInterceptor(timer));
+        final Class<? super T> klass = literal.getRawType();
+        for (Method method : klass.getDeclaredMethods()) {
+            final MethodInterceptor interceptor = TimedInterceptor.forMethod(metricsRegistry,
+                                                                             klass, method);
+            if (interceptor != null) {
+                encounter.bindInterceptor(Matchers.only(method), interceptor);
             }
         }
     }
