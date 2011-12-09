@@ -12,6 +12,7 @@
 
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-ganglia</artifactId>
+    <name>Metrics Ganglia Support</name>
 
     <dependencies>
         <dependency>

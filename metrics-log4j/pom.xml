@@ -12,6 +12,7 @@
 
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-log4j</artifactId>
+    <name>Metrics Log4j Support</name>
 
     <dependencies>
         <dependency>

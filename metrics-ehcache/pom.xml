@@ -12,6 +12,7 @@
 
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-ehcache</artifactId>
+    <name>Metrics Ehcache Support</name>
 
     <dependencies>
         <dependency>

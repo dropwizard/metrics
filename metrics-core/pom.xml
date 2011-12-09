@@ -12,6 +12,7 @@
 
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-core</artifactId>
+    <name>Metrics Core Library</name>
 
     <dependencies>
         <dependency>
