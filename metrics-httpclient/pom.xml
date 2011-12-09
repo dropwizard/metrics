@@ -12,6 +12,7 @@
 
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-httpclient</artifactId>
+    <name>Metrics HttpClient Support</name>
 
     <dependencies>
         <dependency>

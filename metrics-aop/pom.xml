@@ -12,7 +12,7 @@
 
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-aop</artifactId>
-
+    <name>Metrics AOP Support</name>
 
     <dependencies>
         <dependency>

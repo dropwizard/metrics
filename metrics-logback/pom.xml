@@ -12,6 +12,7 @@
 
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-logback</artifactId>
+    <name>Metrics Logback Support</name>
 
     <properties>
         <logback.version>1.0.0</logback.version>

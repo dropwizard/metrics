@@ -12,6 +12,7 @@
 
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-servlet</artifactId>
+    <name>Metrics Servlet</name>
 
     <dependencies>
         <dependency>

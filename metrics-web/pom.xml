@@ -12,6 +12,7 @@
 
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-web</artifactId>
+    <name>Metrics Web Application Support</name>
 
     <dependencies>
         <dependency>

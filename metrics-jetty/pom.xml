@@ -12,6 +12,7 @@
 
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-jetty</artifactId>
+    <name>Metrics Jetty Support</name>
 
     <dependencies>
         <dependency>

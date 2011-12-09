@@ -12,6 +12,7 @@
 
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-graphite</artifactId>
+    <name>Metrics Graphite Support</name>
 
     <dependencies>
         <dependency>
