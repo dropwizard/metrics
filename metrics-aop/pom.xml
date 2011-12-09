@@ -11,7 +11,8 @@
     </parent>
 
     <groupId>com.yammer.metrics</groupId>
-    <artifactId>metrics-guice</artifactId>
+    <artifactId>metrics-aop</artifactId>
+
 
     <dependencies>
         <dependency>
@@ -20,20 +21,14 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.yammer.metrics</groupId>
-            <artifactId>metrics-aop</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.javassist</groupId>
-                    <artifactId>javassist</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>aopalliance</groupId>
+            <artifactId>aopalliance</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>${guice.version}</version>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.15.0-GA</version>
         </dependency>
     </dependencies>
 </project>

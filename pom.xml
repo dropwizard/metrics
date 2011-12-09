@@ -10,6 +10,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>metrics-aop</module>
         <module>metrics-core</module>
         <module>metrics-ehcache</module>
         <module>metrics-ganglia</module>
