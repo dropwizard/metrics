@@ -4,9 +4,7 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.aop.annotation.Gauge;
 import com.yammer.metrics.core.GaugeMetric;
 import com.yammer.metrics.core.MetricsRegistry;
-import javassist.util.proxy.MethodHandler;
-import javassist.util.proxy.ProxyFactory;
-import javassist.util.proxy.ProxyObject;
+import net.sf.cglib.proxy.MethodProxy;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
@@ -50,18 +48,11 @@ public class Instrumentation {
     public static <T> T instrument(MetricsRegistry metricsRegistry, T instance) {
         try {
             addGauges(metricsRegistry, instance);
-
-            final ProxyFactory factory = new ProxyFactory();
-            final Class<?> klass = instance.getClass();
-            factory.setSuperclass(klass);
-            factory.setFilter(new AnnotatedMethodFilter());
-
-            final Class instrumentedKlass = factory.createClass();
-            final MethodHandler handler = MethodHandlerImpl.forClass(metricsRegistry, klass);
-
-            final T o = (T) instrumentedKlass.newInstance();
-            ((ProxyObject) o).setHandler(handler);
-            return o;
+            final Object proxy = ClassImposterizer.INSTANCE
+                    .imposterise(MethodHandlerImpl.forClass(metricsRegistry, instance),
+                                 instance.getClass());
+            new LenientCopyTool().copyToMock(instance, proxy);
+            return (T) proxy;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -87,13 +78,15 @@ public class Instrumentation {
     }
 
     private static class MethodInvocationImpl implements MethodInvocation {
-        private final Object self;
+        private final Object proxy;
         private final Method method;
+        private final MethodProxy methodProxy;
         private final Object[] args;
 
-        public MethodInvocationImpl(Object self, Method method, Object[] args) {
-            this.self = self;
+        public MethodInvocationImpl(Object proxy, Method method, MethodProxy methodProxy, Object[] args) {
+            this.proxy = proxy;
             this.method = method;
+            this.methodProxy = methodProxy;
             this.args = args;
         }
 
@@ -110,7 +103,7 @@ public class Instrumentation {
         @Override
         public Object proceed() throws Throwable {
             try {
-                return method.invoke(self, args);
+                return methodProxy.invokeSuper(proxy, args);
             } catch (InvocationTargetException e) {
                 throw e.getCause();
             }
@@ -118,7 +111,7 @@ public class Instrumentation {
 
         @Override
         public Object getThis() {
-            return self;
+            return proxy;
         }
 
         @Override
@@ -127,12 +120,13 @@ public class Instrumentation {
         }
     }
 
-    private static class MethodHandlerImpl implements MethodHandler {
-        private static MethodHandler forClass(MetricsRegistry metricsRegistry, Class<?> klass) {
+    private static class MethodHandlerImpl implements net.sf.cglib.proxy.MethodInterceptor {
+        private static net.sf.cglib.proxy.MethodInterceptor forClass(MetricsRegistry metricsRegistry, Object instance) {
             final Map<Method, List<MethodInterceptor>> interceptors = new HashMap<Method, List<MethodInterceptor>>();
-            for (Method method : klass.getMethods()) {
+            for (Method method : instance.getClass().getMethods()) {
+                method.setAccessible(true);
                 final MethodInterceptor emI = ExceptionMeteredInterceptor.forMethod(metricsRegistry,
-                                                                                    klass,
+                                                                                    instance.getClass(),
                                                                                     method);
                 if (emI != null) {
                     List<MethodInterceptor> list = interceptors.get(method);
@@ -144,7 +138,7 @@ public class Instrumentation {
                 }
 
                 final MethodInterceptor mI = MeteredInterceptor.forMethod(metricsRegistry,
-                                                                          klass,
+                                                                          instance.getClass(),
                                                                           method);
                 if (mI != null) {
                     List<MethodInterceptor> list = interceptors.get(method);
@@ -156,7 +150,7 @@ public class Instrumentation {
                 }
 
                 final MethodInterceptor tI = TimedInterceptor.forMethod(metricsRegistry,
-                                                                        klass,
+                                                                        instance.getClass(),
                                                                         method);
 
                 if (tI != null) {
@@ -178,19 +172,17 @@ public class Instrumentation {
         }
 
         @Override
-        public Object invoke(final Object self, final Method m, final Method method, final Object[] args) throws Throwable {
-            final List<MethodInterceptor> list = interceptors.get(m);
+        public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
+            final List<MethodInterceptor> list = interceptors.get(method);
             if (list != null) {
-                final MethodInvocation invocation = new MethodInvocationImpl(self,
-                                                                             method,
-                                                                             args);
+                final MethodInvocation invocation = new MethodInvocationImpl(proxy, method, methodProxy, args);
                 Object result = null;
                 for (MethodInterceptor interceptor : list) {
                     result = interceptor.invoke(invocation);
                 }
                 return result;
             } else {
-                return method.invoke(self, args);
+                return methodProxy.invokeSuper(proxy, args);
             }
         }
     }
