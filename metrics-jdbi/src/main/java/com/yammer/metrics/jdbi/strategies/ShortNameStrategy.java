@@ -1,25 +1,22 @@
 package com.yammer.metrics.jdbi.strategies;
 
+import com.yammer.metrics.core.MetricName;
+import org.skife.jdbi.v2.StatementContext;
+
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.skife.jdbi.v2.StatementContext;
-
-import com.yammer.metrics.core.MetricName;
-
 /**
- * Assembles all JDBI stats under a common prefix (passed in at c'tor time). Stats are grouped by class name and method; a shortening strategy is applied
- * to make the JMX output nicer.
+ * Assembles all JDBI stats under a common prefix (passed in at constructor time). Stats are grouped
+ * by class name and method; a shortening strategy is applied to make the JMX output nicer.
  */
-public final class ShortNameStrategy extends DelegatingStatementNameStrategy
-{
+public final class ShortNameStrategy extends DelegatingStatementNameStrategy {
     private final ConcurrentMap<String, String> shortClassNames = new ConcurrentHashMap<String, String>();
 
     private final String baseJmxName;
 
-    public ShortNameStrategy(final String baseJmxName)
-    {
+    public ShortNameStrategy(String baseJmxName) {
         this.baseJmxName = baseJmxName;
 
         // Java does not allow super (..., new ShortContextClassStrategy(), new ShortSqlObjectStrategy(), ...);
@@ -31,11 +28,9 @@ public final class ShortNameStrategy extends DelegatingStatementNameStrategy
                            NameStrategies.NAIVE_NAME);
     }
 
-    private final class ShortContextClassStrategy implements StatementNameStrategy
-    {
+    private final class ShortContextClassStrategy implements StatementNameStrategy {
         @Override
-        public MetricName getStatementName(final StatementContext statementContext)
-        {
+        public MetricName getStatementName(StatementContext statementContext) {
             final Object classObj = statementContext.getAttribute(NameStrategies.STATEMENT_CLASS);
             final Object nameObj = statementContext.getAttribute(NameStrategies.STATEMENT_NAME);
 
@@ -51,23 +46,20 @@ public final class ShortNameStrategy extends DelegatingStatementNameStrategy
                 return null;
             }
 
-            final String shortName = className.substring(dotPos+1);
+            final String shortName = className.substring(dotPos + 1);
 
             final String oldClassName = shortClassNames.putIfAbsent(shortName, className);
             if (oldClassName == null || oldClassName.equals(className)) {
                 return StatementName.getJmxSafeName(baseJmxName, shortName, statementName);
-            }
-            else {
+            } else {
                 return StatementName.getJmxSafeName(baseJmxName, className, statementName);
             }
         }
     }
 
-    private final class ShortSqlObjectStrategy implements StatementNameStrategy
-    {
+    private final class ShortSqlObjectStrategy implements StatementNameStrategy {
         @Override
-        public MetricName getStatementName(final StatementContext statementContext)
-        {
+        public MetricName getStatementName(StatementContext statementContext) {
             final Class<?> clazz = statementContext.getSqlObjectType();
             final Method method = statementContext.getSqlObjectMethod();
             if (clazz != null && method != null) {
@@ -79,13 +71,12 @@ public final class ShortNameStrategy extends DelegatingStatementNameStrategy
                     return null;
                 }
 
-                final String shortName = className.substring(dotPos+1);
+                final String shortName = className.substring(dotPos + 1);
 
                 final String oldClassName = shortClassNames.putIfAbsent(shortName, className);
                 if (oldClassName == null || oldClassName.equals(className)) {
                     return StatementName.getJmxSafeName(baseJmxName, shortName, statementName);
-                }
-                else {
+                } else {
                     return StatementName.getJmxSafeName(baseJmxName, className, statementName);
                 }
             }

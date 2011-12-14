@@ -7,7 +7,6 @@ import com.yammer.metrics.core.MetricName;
 /**
  * Interface for strategies to statement contexts to metric names.
  */
-public interface StatementNameStrategy
-{
+public interface StatementNameStrategy {
     MetricName getStatementName(StatementContext statementContext);
 }

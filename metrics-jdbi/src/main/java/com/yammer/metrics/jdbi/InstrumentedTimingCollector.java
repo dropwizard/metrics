@@ -20,19 +20,19 @@ public class InstrumentedTimingCollector implements TimingCollector {
     private final TimeUnit durationUnit;
     private final TimeUnit rateUnit;
 
-    public InstrumentedTimingCollector(final MetricsRegistry registry) {
+    public InstrumentedTimingCollector(MetricsRegistry registry) {
         this(registry, new SmartNameStrategy(), TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
     }
 
-    public InstrumentedTimingCollector(final MetricsRegistry registry,
-                                       final StatementNameStrategy statementNameStrategy) {
+    public InstrumentedTimingCollector(MetricsRegistry registry,
+                                       StatementNameStrategy statementNameStrategy) {
         this(registry, statementNameStrategy, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
     }
 
-    public InstrumentedTimingCollector(final MetricsRegistry registry,
-                                       final StatementNameStrategy statementNameStrategy,
-                                       final TimeUnit durationUnit,
-                                       final TimeUnit rateUnit) {
+    public InstrumentedTimingCollector(MetricsRegistry registry,
+                                       StatementNameStrategy statementNameStrategy,
+                                       TimeUnit durationUnit,
+                                       TimeUnit rateUnit) {
         this.registry = registry;
         this.statementNameStrategy = statementNameStrategy;
         this.durationUnit = durationUnit;
