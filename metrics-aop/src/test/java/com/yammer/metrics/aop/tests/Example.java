@@ -6,7 +6,7 @@ import com.yammer.metrics.aop.annotation.Timed;
 
 import java.io.IOException;
 
-public class Example {
+class Example {
     @Metered
     public String meteredMethod() {
         return "metered";
