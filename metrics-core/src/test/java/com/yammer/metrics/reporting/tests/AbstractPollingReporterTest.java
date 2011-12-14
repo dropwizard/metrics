@@ -51,7 +51,7 @@ public abstract class AbstractPollingReporterTest {
             registry.add(new MetricName(Object.class, "metric"), metric);
             reporter.run();
             out.flush();
-            final String[] lines = out.toString().split("\n");
+            final String[] lines = out.toString().split("\r?\n|\r");
             // Assertions: first check that the line count matches then compare line by line ignoring leading and trailing whitespace
             assertEquals("Line count mismatch, was:\n" + Arrays.toString(lines) + "\nexpected:\n" + Arrays
                     .toString(expected) + "\n", expected.length,
