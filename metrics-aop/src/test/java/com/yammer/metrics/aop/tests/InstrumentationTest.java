@@ -61,4 +61,12 @@ public class InstrumentationTest {
         assertThat(meter.count(),
                    is(1L));
     }
+
+    @Test
+    public void worksWithClassesThatHaveConstructorParams() throws Exception {
+        final ParameterizedExample parameterizedExample = instrument(new ParameterizedExample(new Example()));
+
+        assertThat(parameterizedExample.doubleMeteredMethod(),
+                   is("metered"));
+    }
 }

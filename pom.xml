@@ -62,13 +62,6 @@
         <url>http://github.com/codahale/metrics/issues#issue/</url>
     </issueManagement>
 
-    <repositories>
-        <repository>
-            <id>repo.codahale.com</id>
-            <url>http://repo.codahale.com</url>
-        </repository>
-    </repositories>
-
     <distributionManagement>
         <snapshotRepository>
             <id>sonatype-nexus-snapshots</id>
