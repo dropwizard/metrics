@@ -8,6 +8,7 @@ import com.yammer.metrics.util.Utils;
 import java.io.PrintStream;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
@@ -49,12 +50,13 @@ public class ConsoleReporter extends AbstractPollingReporter implements
     private final MetricPredicate predicate;
     private final Clock clock;
     private final TimeZone timeZone;
+    private final Locale locale;
 
     /**
      * Creates a new {@link ConsoleReporter} for the default metrics registry, with unrestricted
      * output.
      *
-     * @param out the {@link java.io.PrintStream} to which output will be written
+     * @param out the {@link PrintStream} to which output will be written
      */
     public ConsoleReporter(PrintStream out) {
         this(Metrics.defaultRegistry(), out, MetricPredicate.ALL);
@@ -64,7 +66,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements
      * Creates a new {@link ConsoleReporter} for a given metrics registry.
      *
      * @param metricsRegistry the metrics registry
-     * @param out             the {@link java.io.PrintStream} to which output will be written
+     * @param out             the {@link PrintStream} to which output will be written
      * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be
      *                        output
      */
@@ -76,7 +78,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements
      * Creates a new {@link ConsoleReporter} for a given metrics registry.
      *
      * @param metricsRegistry the metrics registry
-     * @param out             the {@link java.io.PrintStream} to which output will be written
+     * @param out             the {@link PrintStream} to which output will be written
      * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be
      *                        output
      * @param clock           the {@link Clock} used to print time
@@ -87,18 +89,39 @@ public class ConsoleReporter extends AbstractPollingReporter implements
                            MetricPredicate predicate,
                            Clock clock,
                            TimeZone timeZone) {
+        this(metricsRegistry, out, predicate, clock, timeZone, Locale.getDefault());
+    }
+
+    /**
+     * Creates a new {@link ConsoleReporter} for a given metrics registry.
+     *
+     * @param metricsRegistry the metrics registry
+     * @param out             the {@link PrintStream} to which output will be written
+     * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be
+     *                        output
+     * @param clock           the {@link com.yammer.metrics.core.Clock} used to print time
+     * @param timeZone        the {@link TimeZone} used to print time
+     * @param locale          the {@link Locale} used to print values
+     */
+    public ConsoleReporter(MetricsRegistry metricsRegistry,
+                           PrintStream out,
+                           MetricPredicate predicate,
+                           Clock clock,
+                           TimeZone timeZone, Locale locale) {
         super(metricsRegistry, "console-reporter");
         this.out = out;
         this.predicate = predicate;
         this.clock = clock;
         this.timeZone = timeZone;
+        this.locale = locale;
     }
 
     @Override
     public void run() {
         try {
             final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT,
-                                                                     DateFormat.MEDIUM);
+                                                                     DateFormat.MEDIUM,
+                                                                     locale);
             format.setTimeZone(timeZone);
             final String dateTime = format.format(new Date(clock.time()));
             out.print(dateTime);
@@ -130,33 +153,31 @@ public class ConsoleReporter extends AbstractPollingReporter implements
 
     @Override
     public void processGauge(MetricName name, GaugeMetric<?> gauge, PrintStream stream) {
-        stream.print("    value = ");
-        stream.println(gauge.value());
+        stream.printf(locale, "    value = %s\n", gauge.value());
     }
 
     @Override
     public void processCounter(MetricName name, CounterMetric counter, PrintStream stream) {
-        stream.print("    count = ");
-        stream.println(counter.count());
+        stream.printf(locale, "    count = %d\n", counter.count());
     }
 
     @Override
     public void processMeter(MetricName name, Metered meter, PrintStream stream) {
         final String unit = abbrev(meter.rateUnit());
-        stream.printf("             count = %d\n", meter.count());
-        stream.printf("         mean rate = %2.2f %s/%s\n",
+        stream.printf(locale, "             count = %d\n", meter.count());
+        stream.printf(locale, "         mean rate = %2.2f %s/%s\n",
                       meter.meanRate(),
                       meter.eventType(),
                       unit);
-        stream.printf("     1-minute rate = %2.2f %s/%s\n",
+        stream.printf(locale, "     1-minute rate = %2.2f %s/%s\n",
                       meter.oneMinuteRate(),
                       meter.eventType(),
                       unit);
-        stream.printf("     5-minute rate = %2.2f %s/%s\n",
+        stream.printf(locale, "     5-minute rate = %2.2f %s/%s\n",
                       meter.fiveMinuteRate(),
                       meter.eventType(),
                       unit);
-        stream.printf("    15-minute rate = %2.2f %s/%s\n",
+        stream.printf(locale, "    15-minute rate = %2.2f %s/%s\n",
                       meter.fifteenMinuteRate(),
                       meter.eventType(),
                       unit);
@@ -165,16 +186,16 @@ public class ConsoleReporter extends AbstractPollingReporter implements
     @Override
     public void processHistogram(MetricName name, HistogramMetric histogram, PrintStream stream) {
         final Double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
-        stream.printf("               min = %2.2f\n", histogram.min());
-        stream.printf("               max = %2.2f\n", histogram.max());
-        stream.printf("              mean = %2.2f\n", histogram.mean());
-        stream.printf("            stddev = %2.2f\n", histogram.stdDev());
-        stream.printf("            median = %2.2f\n", percentiles[0]);
-        stream.printf("              75%% <= %2.2f\n", percentiles[1]);
-        stream.printf("              95%% <= %2.2f\n", percentiles[2]);
-        stream.printf("              98%% <= %2.2f\n", percentiles[3]);
-        stream.printf("              99%% <= %2.2f\n", percentiles[4]);
-        stream.printf("            99.9%% <= %2.2f\n", percentiles[5]);
+        stream.printf(locale, "               min = %2.2f\n", histogram.min());
+        stream.printf(locale, "               max = %2.2f\n", histogram.max());
+        stream.printf(locale, "              mean = %2.2f\n", histogram.mean());
+        stream.printf(locale, "            stddev = %2.2f\n", histogram.stdDev());
+        stream.printf(locale, "            median = %2.2f\n", percentiles[0]);
+        stream.printf(locale, "              75%% <= %2.2f\n", percentiles[1]);
+        stream.printf(locale, "              95%% <= %2.2f\n", percentiles[2]);
+        stream.printf(locale, "              98%% <= %2.2f\n", percentiles[3]);
+        stream.printf(locale, "              99%% <= %2.2f\n", percentiles[4]);
+        stream.printf(locale, "            99.9%% <= %2.2f\n", percentiles[5]);
     }
 
     @Override
@@ -182,16 +203,16 @@ public class ConsoleReporter extends AbstractPollingReporter implements
         processMeter(name, timer, stream);
         final String durationUnit = abbrev(timer.durationUnit());
         final Double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
-        stream.printf("               min = %2.2f%s\n", timer.min(), durationUnit);
-        stream.printf("               max = %2.2f%s\n", timer.max(), durationUnit);
-        stream.printf("              mean = %2.2f%s\n", timer.mean(), durationUnit);
-        stream.printf("            stddev = %2.2f%s\n", timer.stdDev(), durationUnit);
-        stream.printf("            median = %2.2f%s\n", percentiles[0], durationUnit);
-        stream.printf("              75%% <= %2.2f%s\n", percentiles[1], durationUnit);
-        stream.printf("              95%% <= %2.2f%s\n", percentiles[2], durationUnit);
-        stream.printf("              98%% <= %2.2f%s\n", percentiles[3], durationUnit);
-        stream.printf("              99%% <= %2.2f%s\n", percentiles[4], durationUnit);
-        stream.printf("            99.9%% <= %2.2f%s\n", percentiles[5], durationUnit);
+        stream.printf(locale, "               min = %2.2f%s\n", timer.min(), durationUnit);
+        stream.printf(locale, "               max = %2.2f%s\n", timer.max(), durationUnit);
+        stream.printf(locale, "              mean = %2.2f%s\n", timer.mean(), durationUnit);
+        stream.printf(locale, "            stddev = %2.2f%s\n", timer.stdDev(), durationUnit);
+        stream.printf(locale, "            median = %2.2f%s\n", percentiles[0], durationUnit);
+        stream.printf(locale, "              75%% <= %2.2f%s\n", percentiles[1], durationUnit);
+        stream.printf(locale, "              95%% <= %2.2f%s\n", percentiles[2], durationUnit);
+        stream.printf(locale, "              98%% <= %2.2f%s\n", percentiles[3], durationUnit);
+        stream.printf(locale, "              99%% <= %2.2f%s\n", percentiles[4], durationUnit);
+        stream.printf(locale, "            99.9%% <= %2.2f%s\n", percentiles[5], durationUnit);
     }
 
     private String abbrev(TimeUnit unit) {
