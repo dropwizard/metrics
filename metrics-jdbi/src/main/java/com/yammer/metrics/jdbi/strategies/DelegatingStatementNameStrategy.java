@@ -26,8 +26,7 @@ public abstract class DelegatingStatementNameStrategy implements StatementNameSt
     public MetricName getStatementName(final StatementContext statementContext)
     {
         if (strategies != null) {
-            for (StatementNameStrategy strategy : strategies)
-            {
+            for (StatementNameStrategy strategy : strategies) {
                 MetricName statementName = strategy.getStatementName(statementContext);
                 if (statementName != null) {
                     return statementName;

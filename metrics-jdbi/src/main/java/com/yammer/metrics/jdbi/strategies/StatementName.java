@@ -21,7 +21,7 @@ public class StatementName
         final String result = JMX_SAFE_CHARS.matcher(name).replaceAll("_");
 
         if (result == null || result.length() == 0) {
-            return "_";
+            return "";
         }
 
         return (Character.isDigit(result.charAt(0))) ? "_" + result : result;
