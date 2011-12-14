@@ -34,6 +34,34 @@ public class VirtualMachineMetrics {
 
     private VirtualMachineMetrics() { /* unused */ }
 
+	public static double totalInit() {
+		return getMemoryMXBean().getHeapMemoryUsage().getInit() + getMemoryMXBean().getNonHeapMemoryUsage().getInit();
+	}
+	public static double totalUsed() {
+		return getMemoryMXBean().getHeapMemoryUsage().getUsed() + getMemoryMXBean().getNonHeapMemoryUsage().getUsed();
+	}
+	public static double totalMax() {
+		return getMemoryMXBean().getHeapMemoryUsage().getMax() + getMemoryMXBean().getNonHeapMemoryUsage().getMax();
+	}
+	public static double totalCommited() {
+		return getMemoryMXBean().getHeapMemoryUsage().getCommitted() +
+				getMemoryMXBean().getNonHeapMemoryUsage().getCommitted();
+	}
+
+	public static double heapInit() {
+		return getMemoryMXBean().getHeapMemoryUsage().getInit() + getMemoryMXBean().getNonHeapMemoryUsage().getInit();
+	}
+	public static double heapUsed() {
+		return getMemoryMXBean().getHeapMemoryUsage().getUsed() + getMemoryMXBean().getNonHeapMemoryUsage().getUsed();
+	}
+	public static double heapMax() {
+		return getMemoryMXBean().getHeapMemoryUsage().getMax() + getMemoryMXBean().getNonHeapMemoryUsage().getMax();
+	}
+	public static double heapCommited() {
+		return getMemoryMXBean().getHeapMemoryUsage().getCommitted() +
+				getMemoryMXBean().getNonHeapMemoryUsage().getCommitted();
+	}
+
     /**
      * Returns the percentage of the JVM's heap which is being used.
      *
