@@ -2,6 +2,9 @@ package com.yammer.metrics.jdbi;
 
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.jdbi.strategies.SmartNameStrategy;
+import com.yammer.metrics.jdbi.strategies.StatementNameStrategy;
+
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.TimingCollector;
 
@@ -13,11 +16,27 @@ import java.util.concurrent.TimeUnit;
  */
 public class InstrumentedTimingCollector implements TimingCollector {
     private final MetricsRegistry registry;
-    private final TimerMetric defaultTimer;
+    private final StatementNameStrategy statementNameStrategy;
+    private final TimeUnit durationUnit;
+    private final TimeUnit rateUnit;
 
-    public InstrumentedTimingCollector(MetricsRegistry registry, Class<?> klass) {
+    public InstrumentedTimingCollector(final MetricsRegistry registry) {
+        this(registry, new SmartNameStrategy(), TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+    }
+
+    public InstrumentedTimingCollector(final MetricsRegistry registry,
+                                       final StatementNameStrategy statementNameStrategy) {
+        this(registry, statementNameStrategy, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+    }
+
+    public InstrumentedTimingCollector(final MetricsRegistry registry,
+                                       final StatementNameStrategy statementNameStrategy,
+                                       final TimeUnit durationUnit,
+                                       final TimeUnit rateUnit) {
         this.registry = registry;
-        this.defaultTimer = registry.newTimer(klass, "raw-sql");
+        this.statementNameStrategy = statementNameStrategy;
+        this.durationUnit = durationUnit;
+        this.rateUnit = rateUnit;
     }
 
     @Override
@@ -27,9 +46,8 @@ public class InstrumentedTimingCollector implements TimingCollector {
     }
 
     private TimerMetric getTimer(StatementContext ctx) {
-        if ((ctx.getSqlObjectType() == null) || (ctx.getSqlObjectMethod() == null)) {
-            return defaultTimer;
-        }
-        return registry.newTimer(ctx.getSqlObjectType(), ctx.getSqlObjectMethod().getName());
+        return registry.newTimer(statementNameStrategy.getStatementName(ctx),
+                                 durationUnit,
+                                 rateUnit);
     }
 }
