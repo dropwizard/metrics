@@ -27,7 +27,7 @@ v2.0.0-BETA18: TBD
 * Fixed a race condition in `ExponentiallyDecayingSample`.
 * Added timezone and locale support to `ConsoleReporter`.
 * Added `metrics-aop` for Guiceless support of method annotations.
-* Added `metrics-jdbi` which adds instrumentation tp [JDBI](http://www.jdbi.org).
+* Added `metrics-jdbi` which adds instrumentation to [JDBI](http://www.jdbi.org).
 * Fixed NPE for metrics which belong to classes in the default package.
 * Now deploying artifacts to Maven Central.
 
