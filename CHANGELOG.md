@@ -1,3 +1,37 @@
+v2.0.0-BETA18: TBD
+==========================
+
+* Added `DeathRattleExceptionHandler`.
+* Fixed NPE in `VirtualMachineMetrics`.
+* Added decorators for connectors and thread pools in `metrics-jetty`.
+* Added `TimerMetric#time()` and `TimerContext`.
+* Added a shorter factory method for millisecond/second timers.
+* Switched tests to JUnit.
+* Improved logging in `GangliaReporter`.
+* Improved random number generation for `UniformSample`.
+* Added `metrics-httpclient` for instrumenting Apache HttpClient 4.1.
+* Massively overhauled the reporting code.
+* Added support for instrumented, non-`public` methods in `metrics-guice`.
+* Added `@ExceptionMetered` to `metrics-guice`.
+* Added group prefixes to `GangliaReporter`.
+* Added `CvsReporter`, which outputs metric values to `.csv` files.
+* Improved metric name sanitization in `GangliaReporter`.
+* Added `Metrics.shutdown()` and improved metrics lifecycle behavior.
+* Added `metrics-web`.
+* Upgraded to ehcache 2.5.0.
+* Many, many refactorings.
+* `metrics-servlet` now responds with `501 Not Implememented` when no health checks have been
+  registered.
+* Many internal refactorings for testability.
+* Added histogram counts to `metrics-servlet`.
+* Fixed a race condition in `ExponentiallyDecayingSample`.
+* Added timezone and locale support to `ConsoleReporter`.
+* Added `metrics-aop` for Guiceless support of method annotations.
+* Added `metrics-jdbi` which adds instrumentation tp [JDBI](http://www.jdbi.org).
+* Fixed NPE for metrics which belong to classes in the default package.
+* Now deploying artifacts to Maven Central.
+
+
 v2.0.0-BETA17: Oct 07 2011
 ==========================
 
