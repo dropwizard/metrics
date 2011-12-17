@@ -7,6 +7,10 @@
     <version>2.0.0-BETA18</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
+    <description>
+        Yammer's Metrics library.
+    </description>
+    <url>http://dropwizard.codahale.com/</url>
 
     <modules>
         <module>metrics-aop</module>
