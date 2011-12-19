@@ -180,6 +180,7 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <mavenExecutorId>forked-path</mavenExecutorId>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <preparationGoals>clean verify gpg:sign</preparationGoals>
                 </configuration>
             </plugin>
         </plugins>
