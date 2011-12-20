@@ -35,6 +35,71 @@ public class VirtualMachineMetrics {
     private VirtualMachineMetrics() { /* unused */ }
 
     /**
+     * Returns the total initial memory of the current JVM.
+     *
+     * @return total Heap and non-heap initial JVM memory in bytes.
+     */
+    public static double totalInit() {
+        return getMemoryMXBean().getHeapMemoryUsage().getInit() + getMemoryMXBean().getNonHeapMemoryUsage().getInit();
+    }
+    /**
+     * Returns the total memory currently used by the current JVM.
+     *
+     * @return total Heap and non-heap memory currently used by JVM in bytes.
+     */
+    public static double totalUsed() {
+        return getMemoryMXBean().getHeapMemoryUsage().getUsed() + getMemoryMXBean().getNonHeapMemoryUsage().getUsed();
+  	}
+    /**
+     * Returns the total memory currently used by the current JVM.
+     *
+     * @return total Heap and non-heap memory currently used by JVM in bytes.
+     */
+    public static double totalMax() {
+        return getMemoryMXBean().getHeapMemoryUsage().getMax() + getMemoryMXBean().getNonHeapMemoryUsage().getMax();
+    }
+    /**
+     * Returns the total memory committed to the JVM.
+     *
+     * @return total Heap and non-heap memory currently committed to the JVM in bytes.
+     */
+    public static double totalCommited() {
+        return getMemoryMXBean().getHeapMemoryUsage().getCommitted() + getMemoryMXBean().getNonHeapMemoryUsage().getCommitted();
+    }
+    /**
+     * Returns the heap initial memory of the current JVM.
+     *
+     * @return Heap initial JVM memory in bytes.
+     */
+    public static double heapInit() {
+        return getMemoryMXBean().getHeapMemoryUsage().getInit() + getMemoryMXBean().getNonHeapMemoryUsage().getInit();
+    }
+    /**
+     * Returns the heap memory currently used by the current JVM.
+     *
+     * @return Heap memory currently used by JVM in bytes.
+     */
+    public static double heapUsed() {
+        return getMemoryMXBean().getHeapMemoryUsage().getUsed() + getMemoryMXBean().getNonHeapMemoryUsage().getUsed();
+    }
+    /**
+     * Returns the heap memory currently used by the current JVM.
+     *
+     * @return Heap memory currently used by JVM in bytes.
+     */
+    public static double heapMax() {
+        return getMemoryMXBean().getHeapMemoryUsage().getMax() + getMemoryMXBean().getNonHeapMemoryUsage().getMax();
+    }
+    /**
+     * Returns the heap memory committed to the JVM.
+     *
+     * @return Heap memory currently committed to the JVM in bytes.
+     */
+    public static double heapCommited() {
+        return getMemoryMXBean().getHeapMemoryUsage().getCommitted() + getMemoryMXBean().getNonHeapMemoryUsage().getCommitted();
+    }
+
+    /**
      * Returns the percentage of the JVM's heap which is being used.
      *
      * @return the percentage of the JVM's heap which is being used
