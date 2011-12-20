@@ -1,4 +1,10 @@
-v2.0.0-BETA18: TBD
+v2.0.0-BETA19: TBD
+==========================
+
+* Added absolute memory usage to `MetricsServlet`.
+
+
+v2.0.0-BETA18: Dec 16 2011
 ==========================
 
 * Added `DeathRattleExceptionHandler`.

@@ -10,6 +10,7 @@ Many Many Thanks To
 * Collin VanDyck (@collinvandyck)
 * Dag Liodden (@daggerrz)
 * Drew Stephens (@dinomite)
+* Eric Daigneault (@Newtopian)
 * François Beausoleil (@francois)
 * Gerolf Seitz (@seitz)
 * Jackson Davis (@jcdavis)
