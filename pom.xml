@@ -10,7 +10,7 @@
     <description>
         Yammer's Metrics library.
     </description>
-    <url>http://dropwizard.codahale.com/</url>
+    <url>http://metrics.codahale.com/</url>
 
     <modules>
         <module>metrics-aop</module>
