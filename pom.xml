@@ -100,7 +100,13 @@
 
     <profiles>
         <profile>
-            <id>sign</id>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
@@ -180,7 +186,7 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <mavenExecutorId>forked-path</mavenExecutorId>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
-                    <preparationGoals>clean verify gpg:sign</preparationGoals>
+                    <preparationGoals>clean test</preparationGoals>
                 </configuration>
             </plugin>
         </plugins>
