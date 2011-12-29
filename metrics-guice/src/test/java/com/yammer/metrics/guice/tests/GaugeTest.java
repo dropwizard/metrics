@@ -2,7 +2,7 @@ package com.yammer.metrics.guice.tests;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.Gauge;
 import com.yammer.metrics.core.Metric;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
@@ -35,10 +35,10 @@ public class GaugeTest {
 
         assertThat("Guice creates a gauge",
                    metric,
-                   is(instanceOf(GaugeMetric.class)));
+                   is(instanceOf(Gauge.class)));
 
         assertThat("Guice creates a gauge with the given value",
-                   ((GaugeMetric<String>) metric).value(),
+                   ((Gauge<String>) metric).value(),
                    is("poop"));
     }
 
@@ -61,10 +61,10 @@ public class GaugeTest {
 
         assertThat("Guice creates a gauge",
                    metric,
-                   is(instanceOf(GaugeMetric.class)));
+                   is(instanceOf(Gauge.class)));
 
         assertThat("Guice creates a gauge with the given value",
-                   ((GaugeMetric<String>) metric).value(),
+                   ((Gauge<String>) metric).value(),
                    is("anotherThing"));
     }
 }

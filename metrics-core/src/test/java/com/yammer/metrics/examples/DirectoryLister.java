@@ -8,14 +8,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.CounterMetric;
-import com.yammer.metrics.core.MeterMetric;
-import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.Counter;
+import com.yammer.metrics.core.Meter;
+import com.yammer.metrics.core.Timer;
 
 public class DirectoryLister {
-    private final CounterMetric counter = Metrics.newCounter(getClass(), "directories");
-    private final MeterMetric meter = Metrics.newMeter(getClass(), "files", "files", TimeUnit.SECONDS);
-    private final TimerMetric timer = Metrics.newTimer(getClass(),
+    private final Counter counter = Metrics.newCounter(getClass(), "directories");
+    private final Meter meter = Metrics.newMeter(getClass(), "files", "files", TimeUnit.SECONDS);
+    private final Timer timer = Metrics.newTimer(getClass(),
                                                        "directory-listing",
                                                        TimeUnit.MILLISECONDS,
                                                        TimeUnit.SECONDS);

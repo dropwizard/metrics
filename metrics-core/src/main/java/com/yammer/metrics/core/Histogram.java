@@ -20,7 +20,7 @@ import static java.lang.Math.sqrt;
  * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately computing running
  *      variance</a>
  */
-public class HistogramMetric implements Metric, Percentiled, Summarized {
+public class Histogram implements Metric, Percentiled, Summarized {
     /**
      * The type of sampling the histogram should be performing.
      */
@@ -62,20 +62,20 @@ public class HistogramMetric implements Metric, Percentiled, Summarized {
     private final AtomicLong count = new AtomicLong();
 
     /**
-     * Creates a new {@link HistogramMetric} with the given sample type.
+     * Creates a new {@link Histogram} with the given sample type.
      *
      * @param type the type of sample to use
      */
-    public HistogramMetric(SampleType type) {
+    public Histogram(SampleType type) {
         this(type.newSample());
     }
 
     /**
-     * Creates a new {@link HistogramMetric} with the given sample.
+     * Creates a new {@link Histogram} with the given sample.
      *
      * @param sample the sample to create a histogram from
      */
-    public HistogramMetric(Sample sample) {
+    public Histogram(Sample sample) {
         this.sample = sample;
         clear();
     }

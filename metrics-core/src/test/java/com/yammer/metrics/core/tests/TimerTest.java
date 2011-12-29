@@ -1,7 +1,7 @@
 package com.yammer.metrics.core.tests;
 
 import com.yammer.metrics.core.TimerContext;
-import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.Timer;
 import org.junit.After;
 import org.junit.Test;
 
@@ -15,9 +15,9 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class TimerMetricTest {
+public class TimerTest {
     final ScheduledExecutorService pool = Executors.newSingleThreadScheduledExecutor();
-    final TimerMetric timer = new TimerMetric(pool, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+    final Timer timer = new Timer(pool, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
     @After
     public void tearDown() throws Exception {

@@ -5,7 +5,7 @@ package com.yammer.metrics.scala
  *
  * @see CounterMetric
  */
-class Counter(metric: com.yammer.metrics.core.CounterMetric) {
+class Counter(metric: com.yammer.metrics.core.Counter) {
 
   /**
    * Increments the counter by delta.

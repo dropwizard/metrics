@@ -152,12 +152,12 @@ public class ConsoleReporter extends AbstractPollingReporter implements
     }
 
     @Override
-    public void processGauge(MetricName name, GaugeMetric<?> gauge, PrintStream stream) {
+    public void processGauge(MetricName name, Gauge<?> gauge, PrintStream stream) {
         stream.printf(locale, "    value = %s\n", gauge.value());
     }
 
     @Override
-    public void processCounter(MetricName name, CounterMetric counter, PrintStream stream) {
+    public void processCounter(MetricName name, Counter counter, PrintStream stream) {
         stream.printf(locale, "    count = %d\n", counter.count());
     }
 
@@ -184,7 +184,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements
     }
 
     @Override
-    public void processHistogram(MetricName name, HistogramMetric histogram, PrintStream stream) {
+    public void processHistogram(MetricName name, Histogram histogram, PrintStream stream) {
         final Double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
         stream.printf(locale, "               min = %2.2f\n", histogram.min());
         stream.printf(locale, "               max = %2.2f\n", histogram.max());
@@ -199,7 +199,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements
     }
 
     @Override
-    public void processTimer(MetricName name, TimerMetric timer, PrintStream stream) {
+    public void processTimer(MetricName name, Timer timer, PrintStream stream) {
         processMeter(name, timer, stream);
         final String durationUnit = abbrev(timer.durationUnit());
         final Double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);

@@ -1,13 +1,13 @@
 package com.yammer.metrics.core.tests;
 
-import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.Gauge;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class GaugeMetricTest {
-    final GaugeMetric<String> gauge = new GaugeMetric<String>() {
+public class GaugeTest {
+    final Gauge<String> gauge = new Gauge<String>() {
         @Override
         public String value() {
             return "woo";

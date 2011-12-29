@@ -2,7 +2,7 @@ package com.yammer.metrics.scala
 
 import java.util.concurrent.TimeUnit
 import com.yammer.metrics.Metrics
-import com.yammer.metrics.core.{MetricsRegistry, GaugeMetric}
+import com.yammer.metrics.core.{MetricsRegistry, Gauge}
 
 /**
  * A helper class for creating and registering metrics.
@@ -17,7 +17,7 @@ class MetricsGroup(val klass: Class[_], val metricsRegistry: MetricsRegistry = M
    * @param registry the registry for the gauge
    */
   def gauge[A](name: String, scope: String = null, registry: MetricsRegistry = metricsRegistry)(f: => A) = {
-    registry.newGauge(klass, name, scope, new GaugeMetric[A] {
+    registry.newGauge(klass, name, scope, new Gauge[A] {
       def value = f
     })
   }

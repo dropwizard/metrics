@@ -3,7 +3,7 @@ package com.yammer.metrics.aop.benchmarks;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.annotation.Timed;
 import com.yammer.metrics.core.TimerContext;
-import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.reporting.ConsoleReporter;
 
 import java.util.concurrent.TimeUnit;
@@ -12,7 +12,7 @@ import static com.yammer.metrics.aop.Instrumentation.instrument;
 
 public class BasicBenchmark {
     public static class Fixture {
-        private static final TimerMetric TIMER = Metrics.newTimer(Fixture.class, "regular");
+        private static final Timer TIMER = Metrics.newTimer(Fixture.class, "regular");
         
         public String regular() {
             final TimerContext context = TIMER.time();

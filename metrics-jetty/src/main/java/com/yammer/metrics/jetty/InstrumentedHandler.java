@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.yammer.metrics.core.Gauge;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationListener;
 import org.eclipse.jetty.server.AsyncContinuation;
@@ -24,10 +25,9 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.CounterMetric;
-import com.yammer.metrics.core.GaugeMetric;
-import com.yammer.metrics.core.MeterMetric;
-import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.Counter;
+import com.yammer.metrics.core.Meter;
+import com.yammer.metrics.core.Timer;
 
 /**
  * A Jetty {@link Handler} which records various metrics about an underlying
@@ -36,19 +36,19 @@ import com.yammer.metrics.core.TimerMetric;
 public class InstrumentedHandler extends HandlerWrapper {
     private static final String PATCH = "PATCH";
 
-    private final TimerMetric dispatches;
-    private final MeterMetric requests;
-    private final MeterMetric resumes;
-    private final MeterMetric suspends;
-    private final MeterMetric expires;
+    private final Timer dispatches;
+    private final Meter requests;
+    private final Meter resumes;
+    private final Meter suspends;
+    private final Meter expires;
 
-    private final CounterMetric activeRequests;
-    private final CounterMetric activeSuspendedRequests;
-    private final CounterMetric activeDispatches;
+    private final Counter activeRequests;
+    private final Counter activeSuspendedRequests;
+    private final Counter activeDispatches;
 
-    private final MeterMetric[] responses;
+    private final Meter[] responses;
 
-    private final TimerMetric getRequests, postRequests, headRequests,
+    private final Timer getRequests, postRequests, headRequests,
             putRequests, deleteRequests, optionsRequests, traceRequests,
             connectRequests, patchRequests, otherRequests;
 
@@ -71,7 +71,7 @@ public class InstrumentedHandler extends HandlerWrapper {
         this.activeSuspendedRequests = Metrics.newCounter(underlying.getClass(), "active-suspended-requests");
         this.activeDispatches = Metrics.newCounter(underlying.getClass(), "active-dispatches");
 
-        this.responses = new MeterMetric[]{
+        this.responses = new Meter[]{
                 Metrics.newMeter(underlying.getClass(), "1xx-responses", "responses", TimeUnit.SECONDS), // 1xx
                 Metrics.newMeter(underlying.getClass(), "2xx-responses", "responses", TimeUnit.SECONDS), // 2xx
                 Metrics.newMeter(underlying.getClass(), "3xx-responses", "responses", TimeUnit.SECONDS), // 3xx
@@ -79,7 +79,7 @@ public class InstrumentedHandler extends HandlerWrapper {
                 Metrics.newMeter(underlying.getClass(), "5xx-responses", "responses", TimeUnit.SECONDS)  // 5xx
         };
 
-        Metrics.newGauge(underlying.getClass(), "percent-4xx-1m", new GaugeMetric<Double>() {
+        Metrics.newGauge(underlying.getClass(), "percent-4xx-1m", new Gauge<Double>() {
             @Override
             public Double value() {
                 if (requests.count() > 0) {
@@ -89,7 +89,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        Metrics.newGauge(underlying.getClass(), "percent-4xx-5m", new GaugeMetric<Double>() {
+        Metrics.newGauge(underlying.getClass(), "percent-4xx-5m", new Gauge<Double>() {
             @Override
             public Double value() {
                 if (requests.count() > 0) {
@@ -99,7 +99,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        Metrics.newGauge(underlying.getClass(), "percent-4xx-15m", new GaugeMetric<Double>() {
+        Metrics.newGauge(underlying.getClass(), "percent-4xx-15m", new Gauge<Double>() {
             @Override
             public Double value() {
                 if (requests.count() > 0) {
@@ -109,7 +109,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        Metrics.newGauge(underlying.getClass(), "percent-5xx-1m", new GaugeMetric<Double>() {
+        Metrics.newGauge(underlying.getClass(), "percent-5xx-1m", new Gauge<Double>() {
             @Override
             public Double value() {
                 if (requests.count() > 0) {
@@ -119,7 +119,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        Metrics.newGauge(underlying.getClass(), "percent-5xx-5m", new GaugeMetric<Double>() {
+        Metrics.newGauge(underlying.getClass(), "percent-5xx-5m", new Gauge<Double>() {
             @Override
             public Double value() {
                 if (requests.count() > 0) {
@@ -129,7 +129,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        Metrics.newGauge(underlying.getClass(), "percent-5xx-15m", new GaugeMetric<Double>() {
+        Metrics.newGauge(underlying.getClass(), "percent-5xx-15m", new Gauge<Double>() {
             @Override
             public Double value() {
                 if (requests.count() > 0) {
@@ -219,7 +219,7 @@ public class InstrumentedHandler extends HandlerWrapper {
         }
     }
 
-    private TimerMetric requestTimer(String method) {
+    private Timer requestTimer(String method) {
         if (GET.equalsIgnoreCase(method)) {
             return getRequests;
         } else if (POST.equalsIgnoreCase(method)) {

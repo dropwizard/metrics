@@ -32,7 +32,7 @@ public class Metrics {
     private Metrics() { /* unused */ }
 
     /**
-     * Given a new {@link GaugeMetric}, registers it under the given class and name.
+     * Given a new {@link com.yammer.metrics.core.Gauge}, registers it under the given class and name.
      *
      * @param klass  the class which owns the metric
      * @param name   the name of the metric
@@ -40,14 +40,14 @@ public class Metrics {
      * @param <T>    the type of the value returned by the metric
      * @return {@code metric}
      */
-    public static <T> GaugeMetric<T> newGauge(Class<?> klass,
+    public static <T> Gauge<T> newGauge(Class<?> klass,
                                               String name,
-                                              GaugeMetric<T> metric) {
+                                              Gauge<T> metric) {
         return DEFAULT_REGISTRY.newGauge(klass, name, metric);
     }
 
     /**
-     * Given a new {@link GaugeMetric}, registers it under the given class and name.
+     * Given a new {@link com.yammer.metrics.core.Gauge}, registers it under the given class and name.
      *
      * @param klass  the class which owns the metric
      * @param name   the name of the metric
@@ -56,23 +56,23 @@ public class Metrics {
      * @param <T>    the type of the value returned by the metric
      * @return {@code metric}
      */
-    public static <T> GaugeMetric<T> newGauge(Class<?> klass,
+    public static <T> Gauge<T> newGauge(Class<?> klass,
                                               String name,
                                               String scope,
-                                              GaugeMetric<T> metric) {
+                                              Gauge<T> metric) {
         return DEFAULT_REGISTRY.newGauge(klass, name, scope, metric);
     }
 
     /**
-     * Given a new {@link GaugeMetric}, registers it under the given metric name.
+     * Given a new {@link com.yammer.metrics.core.Gauge}, registers it under the given metric name.
      *
      * @param metricName the name of the metric
      * @param metric     the metric
      * @param <T>        the type of the value returned by the metric
      * @return {@code metric}
      */
-    public static <T> GaugeMetric<T> newGauge(MetricName metricName,
-                                              GaugeMetric<T> metric) {
+    public static <T> Gauge<T> newGauge(MetricName metricName,
+                                              Gauge<T> metric) {
         return DEFAULT_REGISTRY.newGauge(metricName, metric);
     }
 
@@ -131,65 +131,65 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link CounterMetric} and registers it under the given class and name.
+     * Creates a new {@link com.yammer.metrics.core.Counter} and registers it under the given class and name.
      *
      * @param klass the class which owns the metric
      * @param name  the name of the metric
-     * @return a new {@link CounterMetric}
+     * @return a new {@link com.yammer.metrics.core.Counter}
      */
-    public static CounterMetric newCounter(Class<?> klass, String name) {
+    public static Counter newCounter(Class<?> klass, String name) {
         return DEFAULT_REGISTRY.newCounter(klass, name);
     }
 
     /**
-     * Creates a new {@link CounterMetric} and registers it under the given class and name.
+     * Creates a new {@link com.yammer.metrics.core.Counter} and registers it under the given class and name.
      *
      * @param klass the class which owns the metric
      * @param name  the name of the metric
      * @param scope the scope of the metric
-     * @return a new {@link CounterMetric}
+     * @return a new {@link com.yammer.metrics.core.Counter}
      */
-    public static CounterMetric newCounter(Class<?> klass,
+    public static Counter newCounter(Class<?> klass,
                                            String name,
                                            String scope) {
         return DEFAULT_REGISTRY.newCounter(klass, name, scope);
     }
 
     /**
-     * Creates a new {@link CounterMetric} and registers it under the given metric name.
+     * Creates a new {@link com.yammer.metrics.core.Counter} and registers it under the given metric name.
      *
      * @param metricName the name of the metric
-     * @return a new {@link CounterMetric}
+     * @return a new {@link com.yammer.metrics.core.Counter}
      */
-    public static CounterMetric newCounter(MetricName metricName) {
+    public static Counter newCounter(MetricName metricName) {
         return DEFAULT_REGISTRY.newCounter(metricName);
     }
 
     /**
-     * Creates a new {@link HistogramMetric} and registers it under the given class and name.
+     * Creates a new {@link com.yammer.metrics.core.Histogram} and registers it under the given class and name.
      *
      * @param klass  the class which owns the metric
      * @param name   the name of the metric
      * @param biased whether or not the histogram should be biased
-     * @return a new {@link HistogramMetric}
+     * @return a new {@link com.yammer.metrics.core.Histogram}
      */
-    public static HistogramMetric newHistogram(Class<?> klass,
+    public static Histogram newHistogram(Class<?> klass,
                                                String name,
                                                boolean biased) {
         return DEFAULT_REGISTRY.newHistogram(klass, name, biased);
     }
 
     /**
-     * Creates a new {@link HistogramMetric} and registers it under the given class, name, and
+     * Creates a new {@link com.yammer.metrics.core.Histogram} and registers it under the given class, name, and
      * scope.
      *
      * @param klass  the class which owns the metric
      * @param name   the name of the metric
      * @param scope  the scope of the metric
      * @param biased whether or not the histogram should be biased
-     * @return a new {@link HistogramMetric}
+     * @return a new {@link com.yammer.metrics.core.Histogram}
      */
-    public static HistogramMetric newHistogram(Class<?> klass,
+    public static Histogram newHistogram(Class<?> klass,
                                                String name,
                                                String scope,
                                                boolean biased) {
@@ -197,66 +197,66 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link HistogramMetric} and registers it under the given metric name.
+     * Creates a new {@link com.yammer.metrics.core.Histogram} and registers it under the given metric name.
      *
      * @param metricName the name of the metric
      * @param biased     whether or not the histogram should be biased
-     * @return a new {@link HistogramMetric}
+     * @return a new {@link com.yammer.metrics.core.Histogram}
      */
-    public static HistogramMetric newHistogram(MetricName metricName,
+    public static Histogram newHistogram(MetricName metricName,
                                                boolean biased) {
         return DEFAULT_REGISTRY.newHistogram(metricName, biased);
     }
 
     /**
-     * Creates a new non-biased {@link HistogramMetric} and registers it under the given class and
+     * Creates a new non-biased {@link com.yammer.metrics.core.Histogram} and registers it under the given class and
      * name.
      *
      * @param klass the class which owns the metric
      * @param name  the name of the metric
-     * @return a new {@link HistogramMetric}
+     * @return a new {@link com.yammer.metrics.core.Histogram}
      */
-    public static HistogramMetric newHistogram(Class<?> klass, String name) {
+    public static Histogram newHistogram(Class<?> klass, String name) {
         return DEFAULT_REGISTRY.newHistogram(klass, name);
     }
 
     /**
-     * Creates a new non-biased {@link HistogramMetric} and registers it under the given class,
+     * Creates a new non-biased {@link com.yammer.metrics.core.Histogram} and registers it under the given class,
      * name, and scope.
      *
      * @param klass the class which owns the metric
      * @param name  the name of the metric
      * @param scope the scope of the metric
-     * @return a new {@link HistogramMetric}
+     * @return a new {@link com.yammer.metrics.core.Histogram}
      */
-    public static HistogramMetric newHistogram(Class<?> klass,
+    public static Histogram newHistogram(Class<?> klass,
                                                String name,
                                                String scope) {
         return DEFAULT_REGISTRY.newHistogram(klass, name, scope);
     }
 
     /**
-     * Creates a new non-biased {@link HistogramMetric} and registers it under the given metric
+     * Creates a new non-biased {@link com.yammer.metrics.core.Histogram} and registers it under the given metric
      * name.
      *
      * @param metricName the name of the metric
-     * @return a new {@link HistogramMetric}
+     * @return a new {@link com.yammer.metrics.core.Histogram}
      */
-    public static HistogramMetric newHistogram(MetricName metricName) {
+    public static Histogram newHistogram(MetricName metricName) {
         return newHistogram(metricName, false);
     }
 
     /**
-     * Creates a new {@link MeterMetric} and registers it under the given class and name.
+     * Creates a new {@link com.yammer.metrics.core.Meter} and registers it under the given class and name.
      *
      * @param klass     the class which owns the metric
      * @param name      the name of the metric
      * @param eventType the plural name of the type of events the meter is measuring (e.g., {@code
      *                  "requests"})
      * @param unit      the rate unit of the new meter
-     * @return a new {@link MeterMetric}
+     * @return a new {@link com.yammer.metrics.core.Meter}
      */
-    public static MeterMetric newMeter(Class<?> klass,
+    public static Meter newMeter(Class<?> klass,
                                        String name,
                                        String eventType,
                                        TimeUnit unit) {
@@ -264,7 +264,7 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link MeterMetric} and registers it under the given class, name, and scope.
+     * Creates a new {@link com.yammer.metrics.core.Meter} and registers it under the given class, name, and scope.
      *
      * @param klass     the class which owns the metric
      * @param name      the name of the metric
@@ -272,9 +272,9 @@ public class Metrics {
      * @param eventType the plural name of the type of events the meter is measuring (e.g., {@code
      *                  "requests"})
      * @param unit      the rate unit of the new meter
-     * @return a new {@link MeterMetric}
+     * @return a new {@link com.yammer.metrics.core.Meter}
      */
-    public static MeterMetric newMeter(Class<?> klass,
+    public static Meter newMeter(Class<?> klass,
                                        String name,
                                        String scope,
                                        String eventType,
@@ -283,30 +283,30 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link MeterMetric} and registers it under the given metric name.
+     * Creates a new {@link com.yammer.metrics.core.Meter} and registers it under the given metric name.
      *
      * @param metricName the name of the metric
      * @param eventType  the plural name of the type of events the meter is measuring (e.g., {@code
      *                   "requests"})
      * @param unit       the rate unit of the new meter
-     * @return a new {@link MeterMetric}
+     * @return a new {@link com.yammer.metrics.core.Meter}
      */
-    public static MeterMetric newMeter(MetricName metricName,
+    public static Meter newMeter(MetricName metricName,
                                        String eventType,
                                        TimeUnit unit) {
         return DEFAULT_REGISTRY.newMeter(metricName, eventType, unit);
     }
 
     /**
-     * Creates a new {@link TimerMetric} and registers it under the given class and name.
+     * Creates a new {@link com.yammer.metrics.core.Timer} and registers it under the given class and name.
      *
      * @param klass        the class which owns the metric
      * @param name         the name of the metric
      * @param durationUnit the duration scale unit of the new timer
      * @param rateUnit     the rate scale unit of the new timer
-     * @return a new {@link TimerMetric}
+     * @return a new {@link com.yammer.metrics.core.Timer}
      */
-    public static TimerMetric newTimer(Class<?> klass,
+    public static Timer newTimer(Class<?> klass,
                                        String name,
                                        TimeUnit durationUnit,
                                        TimeUnit rateUnit) {
@@ -314,29 +314,29 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link TimerMetric} and registers it under the given class and name, measuring
+     * Creates a new {@link com.yammer.metrics.core.Timer} and registers it under the given class and name, measuring
      * elapsed time in milliseconds and invocations per second.
      *
      * @param klass the class which owns the metric
      * @param name  the name of the metric
-     * @return a new {@link TimerMetric}
+     * @return a new {@link com.yammer.metrics.core.Timer}
      */
-    public static TimerMetric newTimer(Class<?> klass,
+    public static Timer newTimer(Class<?> klass,
                                        String name) {
         return DEFAULT_REGISTRY.newTimer(klass, name);
     }
 
     /**
-     * Creates a new {@link TimerMetric} and registers it under the given class, name, and scope.
+     * Creates a new {@link com.yammer.metrics.core.Timer} and registers it under the given class, name, and scope.
      *
      * @param klass        the class which owns the metric
      * @param name         the name of the metric
      * @param scope        the scope of the metric
      * @param durationUnit the duration scale unit of the new timer
      * @param rateUnit     the rate scale unit of the new timer
-     * @return a new {@link TimerMetric}
+     * @return a new {@link com.yammer.metrics.core.Timer}
      */
-    public static TimerMetric newTimer(Class<?> klass,
+    public static Timer newTimer(Class<?> klass,
                                        String name,
                                        String scope,
                                        TimeUnit durationUnit,
@@ -345,29 +345,29 @@ public class Metrics {
     }
 
     /**
-     * Creates a new {@link TimerMetric} and registers it under the given class, name, and scope,
+     * Creates a new {@link com.yammer.metrics.core.Timer} and registers it under the given class, name, and scope,
      * measuring elapsed time in milliseconds and invocations per second.
      *
      * @param klass the class which owns the metric
      * @param name  the name of the metric
      * @param scope the scope of the metric
-     * @return a new {@link TimerMetric}
+     * @return a new {@link com.yammer.metrics.core.Timer}
      */
-    public static TimerMetric newTimer(Class<?> klass,
+    public static Timer newTimer(Class<?> klass,
                                        String name,
                                        String scope) {
         return DEFAULT_REGISTRY.newTimer(klass, name, scope);
     }
 
     /**
-     * Creates a new {@link TimerMetric} and registers it under the given metric name.
+     * Creates a new {@link com.yammer.metrics.core.Timer} and registers it under the given metric name.
      *
      * @param metricName   the name of the metric
      * @param durationUnit the duration scale unit of the new timer
      * @param rateUnit     the rate scale unit of the new timer
-     * @return a new {@link TimerMetric}
+     * @return a new {@link com.yammer.metrics.core.Timer}
      */
-    public static TimerMetric newTimer(MetricName metricName,
+    public static Timer newTimer(MetricName metricName,
                                        TimeUnit durationUnit,
                                        TimeUnit rateUnit) {
         return DEFAULT_REGISTRY.newTimer(metricName, durationUnit, rateUnit);

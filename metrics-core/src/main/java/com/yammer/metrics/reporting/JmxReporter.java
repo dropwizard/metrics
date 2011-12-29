@@ -40,9 +40,9 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
 
     public static class Gauge extends AbstractBean implements GaugeMBean {
-        private final GaugeMetric<?> metric;
+        private final com.yammer.metrics.core.Gauge<?> metric;
 
-        public Gauge(GaugeMetric<?> metric, ObjectName objectName) {
+        public Gauge(com.yammer.metrics.core.Gauge<?> metric, ObjectName objectName) {
             super(objectName);
             this.metric = metric;
         }
@@ -58,9 +58,9 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
 
     public static class Counter extends AbstractBean implements CounterMBean {
-        private final CounterMetric metric;
+        private final com.yammer.metrics.core.Counter metric;
 
-        public Counter(CounterMetric metric, ObjectName objectName) {
+        public Counter(com.yammer.metrics.core.Counter metric, ObjectName objectName) {
             super(objectName);
             this.metric = metric;
         }
@@ -159,9 +159,9 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     public static class Histogram implements HistogramMBean {
         private final ObjectName objectName;
-        private final HistogramMetric metric;
+        private final com.yammer.metrics.core.Histogram metric;
 
-        public Histogram(HistogramMetric metric, ObjectName objectName) {
+        public Histogram(com.yammer.metrics.core.Histogram metric, ObjectName objectName) {
             this.metric = metric;
             this.objectName = objectName;
         }
@@ -237,9 +237,9 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
 
     public static class Timer extends Meter implements TimerMBean {
-        private final TimerMetric metric;
+        private final com.yammer.metrics.core.Timer metric;
 
-        public Timer(TimerMetric metric, ObjectName objectName) {
+        public Timer(com.yammer.metrics.core.Timer metric, ObjectName objectName) {
             super(metric, objectName);
             this.metric = metric;
         }
@@ -342,26 +342,26 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
 
     @Override
-    public void processCounter(MetricName name, CounterMetric counter, Context context) throws Exception {
+    public void processCounter(MetricName name, com.yammer.metrics.core.Counter counter, Context context) throws Exception {
         registerBean(context.metricName,
                      new Counter(counter, context.objectName),
                      context.objectName);
     }
 
     @Override
-    public void processHistogram(MetricName name, HistogramMetric histogram, Context context) throws Exception {
+    public void processHistogram(MetricName name, com.yammer.metrics.core.Histogram histogram, Context context) throws Exception {
         registerBean(context.metricName,
                      new Histogram(histogram, context.objectName),
                      context.objectName);
     }
 
     @Override
-    public void processTimer(MetricName name, TimerMetric timer, Context context) throws Exception {
+    public void processTimer(MetricName name, com.yammer.metrics.core.Timer timer, Context context) throws Exception {
         registerBean(context.metricName, new Timer(timer, context.objectName), context.objectName);
     }
 
     @Override
-    public void processGauge(MetricName name, GaugeMetric<?> gauge, Context context) throws Exception {
+    public void processGauge(MetricName name, com.yammer.metrics.core.Gauge<?> gauge, Context context) throws Exception {
         registerBean(context.metricName, new Gauge(gauge, context.objectName), context.objectName);
     }
 

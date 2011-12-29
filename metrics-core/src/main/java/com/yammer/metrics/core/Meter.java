@@ -15,36 +15,36 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @see <a href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average">EMA</a>
  */
-public class MeterMetric implements Metered, Stoppable {
+public class Meter implements Metered, Stoppable {
     private static final long INTERVAL = 5; // seconds
     private final Clock clock;
 
     /**
-     * Creates a new {@link MeterMetric}.
+     * Creates a new {@link Meter}.
      *
      * @param eventType the plural name of the event the meter is measuring (e.g., {@code
      *                  "requests"})
      * @param rateUnit  the rate unit of the new meter
-     * @return a new {@link MeterMetric}
+     * @return a new {@link Meter}
      * @deprecated use the other {@code newMeter} method or create a new meter via the {@link
      *             MetricsRegistry} or {@link Metrics}
      */
     @SuppressWarnings({"deprecation"})
-    public static MeterMetric newMeter(String eventType, TimeUnit rateUnit) {
+    public static Meter newMeter(String eventType, TimeUnit rateUnit) {
         return newMeter(Utils.newScheduledThreadPool(2, "meter-tick"), eventType, rateUnit);
     }
 
     /**
-     * Creates a new {@link MeterMetric}.
+     * Creates a new {@link Meter}.
      *
      * @param tickThread background thread for updating the rates
      * @param eventType  the plural name of the event the meter is measuring (e.g., {@code
      *                   "requests"})
      * @param rateUnit   the rate unit of the new meter
-     * @return a new {@link MeterMetric}
+     * @return a new {@link Meter}
      */
-    public static MeterMetric newMeter(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit) {
-        return new MeterMetric(tickThread, eventType, rateUnit, Clock.DEFAULT);
+    public static Meter newMeter(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit) {
+        return new Meter(tickThread, eventType, rateUnit, Clock.DEFAULT);
     }
 
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
@@ -57,7 +57,7 @@ public class MeterMetric implements Metered, Stoppable {
     private final String eventType;
     private final ScheduledFuture<?> future;
 
-    public MeterMetric(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit, Clock clock) {
+    public Meter(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit, Clock clock) {
         this.rateUnit = rateUnit;
         this.eventType = eventType;
         this.future = tickThread.scheduleAtFixedRate(new Runnable() {

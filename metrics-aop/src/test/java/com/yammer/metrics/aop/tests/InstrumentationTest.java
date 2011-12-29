@@ -1,8 +1,8 @@
 package com.yammer.metrics.aop.tests;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MeterMetric;
-import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.Meter;
+import com.yammer.metrics.core.Timer;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class InstrumentationTest {
         assertThat(instrumented.meteredMethod(),
                    is("metered"));
 
-        final MeterMetric meter = Metrics.newMeter(Example.class,
+        final Meter meter = Metrics.newMeter(Example.class,
                                                          "meteredMethod",
                                                          "calls",
                                                          TimeUnit.SECONDS);
@@ -35,7 +35,7 @@ public class InstrumentationTest {
         assertThat(instrumented.timedMethod(),
                    is("timed"));
 
-        final TimerMetric timer = Metrics.newTimer(Example.class, "timedMethod");
+        final Timer timer = Metrics.newTimer(Example.class, "timedMethod");
         assertThat(timer.count(),
                    is(1L));
         
@@ -53,7 +53,7 @@ public class InstrumentationTest {
             fail("should have thrown an IOException");
         } catch (IOException ignored) {}
 
-        final MeterMetric meter = Metrics.newMeter(Example.class,
+        final Meter meter = Metrics.newMeter(Example.class,
                                                    "exceptionMethodExceptions",
                                                    "exceptions",
                                                    TimeUnit.SECONDS);

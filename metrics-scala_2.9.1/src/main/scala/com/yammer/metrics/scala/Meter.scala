@@ -5,7 +5,7 @@ package com.yammer.metrics.scala
  *
  * @see MeterMetric
  */
-class Meter(metric: com.yammer.metrics.core.MeterMetric) {
+class Meter(metric: com.yammer.metrics.core.Meter) {
 
   /**
    * Marks the occurrence of an event.

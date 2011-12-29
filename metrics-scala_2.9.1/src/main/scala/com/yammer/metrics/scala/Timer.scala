@@ -9,7 +9,7 @@ import java.io.File
  *
  * @see TimerMetric
  */
-class Timer(metric: com.yammer.metrics.core.TimerMetric) {
+class Timer(metric: com.yammer.metrics.core.Timer) {
   /**
    * Runs f, recording its duration, and returns the result of f.
    */

@@ -1,8 +1,8 @@
 package com.yammer.metrics.examples;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.CounterMetric;
-import com.yammer.metrics.core.HistogramMetric;
+import com.yammer.metrics.core.Counter;
+import com.yammer.metrics.core.Histogram;
 import com.yammer.metrics.reporting.ConsoleReporter;
 
 import java.io.File;
@@ -13,8 +13,8 @@ public class ExampleRunner {
     private static final int WORKER_COUNT = 10;
     private static final BlockingQueue<File> JOBS = new LinkedBlockingQueue<File>();
     private static final ExecutorService POOL = Executors.newFixedThreadPool(WORKER_COUNT);
-    private static final CounterMetric QUEUE_DEPTH = Metrics.newCounter(ExampleRunner.class, "queue-depth");
-    private static final HistogramMetric DIRECTORY_SIZE = Metrics.newHistogram(ExampleRunner.class, "directory-size", false);
+    private static final Counter QUEUE_DEPTH = Metrics.newCounter(ExampleRunner.class, "queue-depth");
+    private static final Histogram DIRECTORY_SIZE = Metrics.newHistogram(ExampleRunner.class, "directory-size", false);
 
     public static class Job implements Runnable {
         @Override

@@ -245,7 +245,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
     }
 
     @Override
-    public void processGauge(MetricName name, GaugeMetric<?> gauge, Long epoch) throws IOException {
+    public void processGauge(MetricName name, Gauge<?> gauge, Long epoch) throws IOException {
         sendToGraphite(String.format(locale,
                                      "%s%s.%s %s %d\n",
                                      prefix,
@@ -256,7 +256,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
     }
 
     @Override
-    public void processCounter(MetricName name, CounterMetric counter, Long epoch) throws IOException {
+    public void processCounter(MetricName name, Counter counter, Long epoch) throws IOException {
         sendToGraphite(String.format(locale,
                                      "%s%s.%s %d %d\n",
                                      prefix,
@@ -309,7 +309,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
     }
 
     @Override
-    public void processHistogram(MetricName name, HistogramMetric histogram, Long epoch) throws IOException {
+    public void processHistogram(MetricName name, Histogram histogram, Long epoch) throws IOException {
         final String sanitizedName = sanitizeName(name);
         final StringBuilder lines = new StringBuilder();
         printSummarized(histogram, sanitizedName, epoch, lines);
@@ -318,7 +318,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
     }
 
     @Override
-    public void processTimer(MetricName name, TimerMetric timer, Long epoch) throws IOException {
+    public void processTimer(MetricName name, Timer timer, Long epoch) throws IOException {
         processMeter(name, timer, epoch);
         final String sanitizedName = sanitizeName(name);
         final Double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);

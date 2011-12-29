@@ -1,7 +1,7 @@
 package com.yammer.metrics.logback;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.Meter;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -13,12 +13,12 @@ import java.util.concurrent.TimeUnit;
  * total number of statements being logged.
  */
 public class InstrumentedAppender extends AppenderBase<ILoggingEvent> {
-    static final MeterMetric ALL_METER = Metrics.newMeter(InstrumentedAppender.class, "all", "statements", TimeUnit.SECONDS);
-    static final MeterMetric TRACE_METER = Metrics.newMeter(InstrumentedAppender.class, "trace", "statements", TimeUnit.SECONDS);
-    static final MeterMetric DEBUG_METER = Metrics.newMeter(InstrumentedAppender.class, "debug", "statements", TimeUnit.SECONDS);
-    static final MeterMetric INFO_METER = Metrics.newMeter(InstrumentedAppender.class, "info", "statements", TimeUnit.SECONDS);
-    static final MeterMetric WARN_METER = Metrics.newMeter(InstrumentedAppender.class, "warn", "statements", TimeUnit.SECONDS);
-    static final MeterMetric ERROR_METER = Metrics.newMeter(InstrumentedAppender.class, "error", "statements", TimeUnit.SECONDS);
+    static final Meter ALL_METER = Metrics.newMeter(InstrumentedAppender.class, "all", "statements", TimeUnit.SECONDS);
+    static final Meter TRACE_METER = Metrics.newMeter(InstrumentedAppender.class, "trace", "statements", TimeUnit.SECONDS);
+    static final Meter DEBUG_METER = Metrics.newMeter(InstrumentedAppender.class, "debug", "statements", TimeUnit.SECONDS);
+    static final Meter INFO_METER = Metrics.newMeter(InstrumentedAppender.class, "info", "statements", TimeUnit.SECONDS);
+    static final Meter WARN_METER = Metrics.newMeter(InstrumentedAppender.class, "warn", "statements", TimeUnit.SECONDS);
+    static final Meter ERROR_METER = Metrics.newMeter(InstrumentedAppender.class, "error", "statements", TimeUnit.SECONDS);
 
     @Override
     protected void append(ILoggingEvent event) {

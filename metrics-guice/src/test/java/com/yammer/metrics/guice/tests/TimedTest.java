@@ -38,15 +38,15 @@ public class TimedTest {
         assertMetricSetup(metric);
 
         assertThat("Guice creates a timer which records invocation length",
-                   ((TimerMetric) metric).count(),
+                   ((Timer) metric).count(),
                    is(1L));
 
         assertThat("Guice creates a timer with the given rate unit",
-                   ((TimerMetric) metric).rateUnit(),
+                   ((Timer) metric).rateUnit(),
                    is(TimeUnit.MINUTES));
 
         assertThat("Guice creates a timer with the given duration unit",
-                   ((TimerMetric) metric).durationUnit(),
+                   ((Timer) metric).durationUnit(),
                    is(TimeUnit.MICROSECONDS));
     }
 
@@ -79,6 +79,6 @@ public class TimedTest {
 
         assertThat("Guice creates a timer",
                    metric,
-                   is(instanceOf(TimerMetric.class)));
+                   is(instanceOf(Timer.class)));
     }
 }
