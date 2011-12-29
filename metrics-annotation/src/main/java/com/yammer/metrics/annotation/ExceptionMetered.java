@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Given a method like this:
  * <pre><code>
- *     ExceptionMetered(name = "fancyName", eventType = "namings", rateUnit = TimeUnit.SECONDS,
+ *     \@ExceptionMetered(name = "fancyName", eventType = "namings", rateUnit = TimeUnit.SECONDS,
  * cause=IllegalArgumentException.class)
  *     public String fancyName(String name) {
  *         return "Sir Captain " + name;
@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * For instance, given a declaration of
  * <pre><code>
- *     ExceptionMetered
+ *     \@ExceptionMetered
  *     public String fancyName(String name) {
  *         return "Sir Captain " + name;
  *     }
