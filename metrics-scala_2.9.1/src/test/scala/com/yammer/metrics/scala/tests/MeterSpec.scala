@@ -1,9 +1,9 @@
-package com.yammer.metrics.tests
+package com.yammer.metrics.scala.tests
 
 import org.junit.Test
 import com.codahale.simplespec.Spec
 import com.yammer.metrics.core.MeterMetric
-import com.yammer.metrics.Meter
+import com.yammer.metrics.scala.Meter
 
 class MeterSpec extends Spec {
   class `A meter` {
@@ -23,3 +23,4 @@ class MeterSpec extends Spec {
     }
   }
 }
+

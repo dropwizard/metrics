@@ -1,6 +1,6 @@
 package com.yammer.metrics.experiments
 
-import com.yammer.metrics.Instrumented
+import com.yammer.metrics.scala.Instrumented
 import java.util.concurrent.TimeUnit
 import com.yammer.metrics.reporting.ConsoleReporter
 

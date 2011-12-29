@@ -1,7 +1,8 @@
-package com.yammer.metrics
+package com.yammer.metrics.scala
 
-import core.{MetricsRegistry, GaugeMetric}
 import java.util.concurrent.TimeUnit
+import com.yammer.metrics.Metrics
+import com.yammer.metrics.core.{MetricsRegistry, GaugeMetric}
 
 /**
  * A helper class for creating and registering metrics.
@@ -50,7 +51,7 @@ class MetricsGroup(val klass: Class[_], val metricsRegistry: MetricsRegistry = M
    *
    * @param name the name of the meter
    * @param eventType the plural name of the type of events the meter is
-   *                  measuring (e.g., {@code "requests"})
+   *                  measuring (e.g., "requests")
    * @param scope the scope of the meter
    * @param unit the time unit of the meter
    * @param registry the registry for the gauge
@@ -78,3 +79,4 @@ class MetricsGroup(val klass: Class[_], val metricsRegistry: MetricsRegistry = M
             registry: MetricsRegistry = metricsRegistry) =
     new Timer(registry.newTimer(klass, name, scope, durationUnit, rateUnit))
 }
+

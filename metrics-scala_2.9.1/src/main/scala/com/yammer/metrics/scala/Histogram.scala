@@ -1,15 +1,14 @@
-package com.yammer.metrics
+package com.yammer.metrics.scala
 
 import collection.JavaConversions._
-import core.HistogramMetric
 import java.io.File
 
 /**
- * A Scala façade class for {@link HistogramMetric}.
+ * A Scala façade class for HistogramMetric.
  *
  * @see HistogramMetric
  */
-class Histogram(metric: HistogramMetric) {
+class Histogram(metric: com.yammer.metrics.core.HistogramMetric) {
 
   /**
    * Adds the recorded value to the histogram sample.
@@ -77,3 +76,4 @@ class Histogram(metric: HistogramMetric) {
     metric.dump(output)
   }
 }
+

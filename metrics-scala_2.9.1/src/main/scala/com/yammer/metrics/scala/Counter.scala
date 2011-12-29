@@ -1,13 +1,11 @@
-package com.yammer.metrics
-
-import core.CounterMetric
+package com.yammer.metrics.scala
 
 /**
- * A Scala façade class for {@link CounterMetric}.
+ * A Scala façade class for CounterMetric.
  *
  * @see CounterMetric
  */
-class Counter(metric: CounterMetric) {
+class Counter(metric: com.yammer.metrics.core.CounterMetric) {
 
   /**
    * Increments the counter by delta.
