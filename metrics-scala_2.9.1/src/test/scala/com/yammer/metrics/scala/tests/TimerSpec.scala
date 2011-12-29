@@ -1,15 +1,13 @@
-package com.yammer.metrics.tests
+package com.yammer.metrics.scala.tests
 
 import org.junit.Test
 import com.codahale.simplespec.Spec
-import com.yammer.metrics.core.TimerMetric
-import com.yammer.metrics.Timer
-import java.util.concurrent.TimeUnit
-
+import com.yammer.metrics.scala.Timer
+import com.yammer.metrics.Metrics
 
 class TimerSpec extends Spec {
   class `A timer` {
-    val metric = new TimerMetric(TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
+    val metric = Metrics.newTimer(classOf[TimerSpec], "timer")
     val timer = new Timer(metric)
 
     @Test def `updates the underlying metric` = {
@@ -19,3 +17,4 @@ class TimerSpec extends Spec {
     }
   }
 }
+

@@ -1,13 +1,11 @@
-package com.yammer.metrics
-
-import core.MeterMetric
+package com.yammer.metrics.scala
 
 /**
- * A Scala façade class for {@link MeterMetric}.
+ * A Scala façade class for MeterMetric.
  *
  * @see MeterMetric
  */
-class Meter(metric: MeterMetric) {
+class Meter(metric: com.yammer.metrics.core.MeterMetric) {
 
   /**
    * Marks the occurrence of an event.
@@ -43,7 +41,7 @@ class Meter(metric: MeterMetric) {
    * which events have occurred since the meter was created.
    * <p>
    * This rate has the same exponential decay factor as the fifteen-minute load
-   * average in the {@code top} Unix command.
+   * average in the top Unix command.
    */
   def fifteenMinuteRate = metric.fifteenMinuteRate
 
@@ -52,7 +50,7 @@ class Meter(metric: MeterMetric) {
    * which events have occurred since the meter was created.
    * <p>
    * This rate has the same exponential decay factor as the five-minute load
-   * average in the {@code top} Unix command.
+   * average in the top Unix command.
    */
   def fiveMinuteRate = metric.fiveMinuteRate
 
@@ -67,7 +65,8 @@ class Meter(metric: MeterMetric) {
    * which events have occurred since the meter was created.
    * <p>
    * This rate has the same exponential decay factor as the one-minute load
-   * average in the {@code top} Unix command.
+   * average in the top Unix command.
    */
   def oneMinuteRate = metric.oneMinuteRate
 }
+

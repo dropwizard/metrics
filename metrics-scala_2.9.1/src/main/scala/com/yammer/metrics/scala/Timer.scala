@@ -1,16 +1,15 @@
-package com.yammer.metrics
+package com.yammer.metrics.scala
 
 import collection.JavaConversions._
-import core.TimerMetric
 import java.util.concurrent.TimeUnit
 import java.io.File
 
 /**
- * A Scala façade class for {@link TimerMetric}.
+ * A Scala façade class for TimerMetric.
  *
  * @see TimerMetric
  */
-class Timer(metric: TimerMetric) {
+class Timer(metric: com.yammer.metrics.core.TimerMetric) {
   /**
    * Runs f, recording its duration, and returns the result of f.
    */
@@ -38,7 +37,7 @@ class Timer(metric: TimerMetric) {
   /**
    * Clears all recorded durations.
    */
-  def clear() {metric.clear()}
+  def clear() { metric.clear() }
 
   /**
    * Returns the longest recorded duration.
@@ -117,3 +116,4 @@ class Timer(metric: TimerMetric) {
     metric.dump(output)
   }
 }
+

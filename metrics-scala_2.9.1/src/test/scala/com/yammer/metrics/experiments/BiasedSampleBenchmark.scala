@@ -2,7 +2,7 @@ package com.yammer.metrics.experiments
 
 import com.yammer.metrics.stats.ExponentiallyDecayingSample
 import java.util.concurrent.{CountDownLatch, TimeUnit, Executors}
-import com.yammer.metrics.Instrumented
+import com.yammer.metrics.scala.Instrumented
 import com.yammer.metrics.reporting.ConsoleReporter
 
 object BiasedSampleBenchmark extends Instrumented {
