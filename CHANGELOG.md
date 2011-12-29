@@ -12,6 +12,7 @@ v2.0.0-BETA19: TBD
 * Renamed `MeterMetric` to `Meter`.
 * Renamed `TimerMetric` to `Timer`.
 * Added `ToggleGauge`, which returns `1` the first time it's called and `0` every time after that.
+* Now licensed under Apache License 2.0.
 
 
 v2.0.0-BETA18: Dec 16 2011
