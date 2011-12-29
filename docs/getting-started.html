@@ -94,7 +94,7 @@
         </p>
 
         <pre class="prettyprint lang-java">
-Metrics.newGauge(QueueManager.class, "pending-jobs", new GaugeMetric&lt;Integer&gt;() {
+Metrics.newGauge(QueueManager.class, "pending-jobs", new Gauge&lt;Integer&gt;() {
     @Override
     public Integer value() {
         return queue.size();
@@ -123,7 +123,7 @@ Metrics.newGauge(QueueManager.class, "pending-jobs", new GaugeMetric&lt;Integer&
         </p>
 
         <pre class="prettyprint lang-java">
-private final CounterMetric pendingJobs = Metrics.newCounter(QueueManager.class, "pending-jobs");
+private final Counter pendingJobs = Metrics.newCounter(QueueManager.class, "pending-jobs");
 
 public void addJob(Job job) {
     pendingJobs.inc();
@@ -172,7 +172,7 @@ public void handleRequest(Request request, Response response) {
         </p>
 
         <pre class="prettyprint lang-java">
-private final HistogramMetric responseSizes = Metrics.newHistogram(RequestHandler.class, "response-sizes");
+private final Histogram responseSizes = Metrics.newHistogram(RequestHandler.class, "response-sizes");
 
 public void handleRequest(Request request, Response response) {
     // etc
@@ -191,7 +191,7 @@ public void handleRequest(Request request, Response response) {
         </p>
 
         <pre class="prettyprint lang-java">
-private final TimerMetric responses = Metrics.newTimer(RequestHandler.class, "responses", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+private final Timer responses = Metrics.newTimer(RequestHandler.class, "responses", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
 public String handleRequest(Request request, Response response) {
     final TimerContext context = responses.time();
