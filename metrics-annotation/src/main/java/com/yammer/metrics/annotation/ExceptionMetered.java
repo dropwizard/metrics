@@ -1,4 +1,4 @@
-package com.yammer.metrics.aop.annotation;
+package com.yammer.metrics.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

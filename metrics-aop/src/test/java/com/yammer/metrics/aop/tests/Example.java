@@ -1,8 +1,8 @@
 package com.yammer.metrics.aop.tests;
 
-import com.yammer.metrics.aop.annotation.ExceptionMetered;
-import com.yammer.metrics.aop.annotation.Metered;
-import com.yammer.metrics.aop.annotation.Timed;
+import com.yammer.metrics.annotation.ExceptionMetered;
+import com.yammer.metrics.annotation.Metered;
+import com.yammer.metrics.annotation.Timed;
 
 import java.io.IOException;
 

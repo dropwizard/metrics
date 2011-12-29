@@ -1,7 +1,7 @@
 package com.yammer.metrics.aop.benchmarks;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.aop.annotation.Timed;
+import com.yammer.metrics.annotation.Timed;
 import com.yammer.metrics.core.TimerContext;
 import com.yammer.metrics.core.TimerMetric;
 import com.yammer.metrics.reporting.ConsoleReporter;

@@ -3,7 +3,7 @@ package com.yammer.metrics.guice;
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
-import com.yammer.metrics.aop.annotation.Gauge;
+import com.yammer.metrics.annotation.Gauge;
 import com.yammer.metrics.core.MetricsRegistry;
 
 import java.lang.reflect.Method;

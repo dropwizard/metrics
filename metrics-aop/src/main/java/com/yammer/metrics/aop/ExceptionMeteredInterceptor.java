@@ -1,6 +1,6 @@
 package com.yammer.metrics.aop;
 
-import com.yammer.metrics.aop.annotation.ExceptionMetered;
+import com.yammer.metrics.annotation.ExceptionMetered;
 import com.yammer.metrics.core.MeterMetric;
 import com.yammer.metrics.core.MetricsRegistry;
 import org.aopalliance.intercept.MethodInterceptor;

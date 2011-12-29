@@ -1,7 +1,7 @@
 package com.yammer.metrics.aop;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.aop.annotation.Gauge;
+import com.yammer.metrics.annotation.Gauge;
 import com.yammer.metrics.core.GaugeMetric;
 import com.yammer.metrics.core.MetricsRegistry;
 import net.sf.cglib.proxy.MethodProxy;
@@ -18,9 +18,9 @@ import java.util.Map;
 
 /**
  * A utility class which instruments {@link Gauge}-,
- * {@link com.yammer.metrics.aop.annotation.Metered}-,
- * {@link com.yammer.metrics.aop.annotation.Timed}-, and
- * {@link com.yammer.metrics.aop.annotation.ExceptionMetered}-annotated classes.
+ * {@link com.yammer.metrics.annotation.Metered}-,
+ * {@link com.yammer.metrics.annotation.Timed}-, and
+ * {@link com.yammer.metrics.annotation.ExceptionMetered}-annotated classes.
  */
 public class Instrumentation {
     private Instrumentation() { /* singleton */ }
