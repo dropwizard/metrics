@@ -1,9 +1,7 @@
 package com.yammer.metrics.scala
 
 /**
- * A Scala façade class for MeterMetric.
- *
- * @see MeterMetric
+ * A Scala façade class for Meter.
  */
 class Meter(metric: com.yammer.metrics.core.Meter) {
 

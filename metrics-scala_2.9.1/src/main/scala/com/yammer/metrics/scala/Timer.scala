@@ -5,9 +5,7 @@ import java.util.concurrent.TimeUnit
 import java.io.File
 
 /**
- * A Scala façade class for TimerMetric.
- *
- * @see TimerMetric
+ * A Scala façade class for Timer.
  */
 class Timer(metric: com.yammer.metrics.core.Timer) {
   /**

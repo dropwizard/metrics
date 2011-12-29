@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * in the way it handles references to logger instances in Java 1.6.0_24 which get garbage collected. Come and gather
  * all around me and listen to my tale of woe.</p>
  *
- * <p>The {@link VirtualMachineMetrics.GcMonitor} class does rather a lot of JMX-bothering on a regular basis. Every five
+ * <p>The {@link VirtualMachineMetrics} class does rather a lot of JMX-bothering on a regular basis. Every five
  * seconds, it gets GC information via JMX and calculates information about it. That is good. We like that. But as it
  * does so, JMX does all sorts of tracing behind the scenes from
  * {@link com.sun.jmx.mbeanserver.JmxMBeanServer#getAttribute(javax.management.ObjectName, String)}
