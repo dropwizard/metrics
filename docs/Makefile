@@ -1,2 +1,2 @@
 upload:
-	rsync -avz --delete ./ codahale.com:/home/codahale/metrics.codahale.com/
+	rsync -avz ./ codahale.com:/home/codahale/metrics.codahale.com/
