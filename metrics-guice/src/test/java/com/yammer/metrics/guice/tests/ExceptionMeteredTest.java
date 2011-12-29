@@ -2,7 +2,7 @@ package com.yammer.metrics.guice.tests;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.yammer.metrics.aop.annotation.ExceptionMetered;
+import com.yammer.metrics.annotation.ExceptionMetered;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.guice.InstrumentationModule;
 import org.junit.Before;

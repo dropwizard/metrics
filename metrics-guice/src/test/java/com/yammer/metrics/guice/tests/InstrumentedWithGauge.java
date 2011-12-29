@@ -1,6 +1,6 @@
 package com.yammer.metrics.guice.tests;
 
-import com.yammer.metrics.aop.annotation.Gauge;
+import com.yammer.metrics.annotation.Gauge;
 
 public class InstrumentedWithGauge {
     @Gauge(name = "things")

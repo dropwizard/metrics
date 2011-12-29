@@ -14,6 +14,7 @@
 
     <modules>
         <module>metrics-aop</module>
+        <module>metrics-annotation</module>
         <module>metrics-core</module>
         <module>metrics-ehcache</module>
         <module>metrics-ganglia</module>

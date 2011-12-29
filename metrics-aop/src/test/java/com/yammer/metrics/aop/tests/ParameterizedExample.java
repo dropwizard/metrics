@@ -1,6 +1,6 @@
 package com.yammer.metrics.aop.tests;
 
-import com.yammer.metrics.aop.annotation.Metered;
+import com.yammer.metrics.annotation.Metered;
 
 class ParameterizedExample {
     private final Example example;

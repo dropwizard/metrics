@@ -1,6 +1,6 @@
 package com.yammer.metrics.aop;
 
-import com.yammer.metrics.aop.annotation.Timed;
+import com.yammer.metrics.annotation.Timed;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.TimerMetric;
 import org.aopalliance.intercept.MethodInterceptor;
