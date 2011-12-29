@@ -433,6 +433,7 @@ public class Metrics {
         return DEFAULT_REGISTRY;
     }
 
+    @SuppressWarnings("deprecation")
     public static void shutdown() {
         Utils.shutdownThreadPools();
         DEFAULT_REGISTRY.threadPools().shutdownThreadPools();
