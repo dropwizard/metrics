@@ -1,9 +1,7 @@
 package com.yammer.metrics.scala
 
 /**
- * A Scala façade class for CounterMetric.
- *
- * @see CounterMetric
+ * A Scala façade class for Counter.
  */
 class Counter(metric: com.yammer.metrics.core.Counter) {
 

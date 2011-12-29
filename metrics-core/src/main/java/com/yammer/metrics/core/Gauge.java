@@ -6,7 +6,7 @@ package com.yammer.metrics.core;
  * for example:<br>
  * <pre><code>
  * Queue<String> queue = new ConcurrentLinkedQueue<String>();
- * GaugeMetric<Integer> queueDepth = new GaugeMetric<Integer>() {
+ * Gauge<Integer> queueDepth = new Gauge<Integer>() {
  *     public Integer value() {
  *         return queue.size();
  *     }

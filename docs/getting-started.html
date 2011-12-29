@@ -150,7 +150,7 @@ public Job takeJob() {
         </p>
 
         <pre class="prettyprint lang-java">
-private final MeterMetric requests = Metrics.newMeter(RequestHandler.class, "requests", "requests", TimeUnit.SECONDS);
+private final Meter requests = Metrics.newMeter(RequestHandler.class, "requests", "requests", TimeUnit.SECONDS);
 
 public void handleRequest(Request request, Response response) {
     requests.mark();
