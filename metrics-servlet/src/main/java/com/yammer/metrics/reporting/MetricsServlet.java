@@ -285,7 +285,7 @@ public class MetricsServlet extends HttpServlet implements MetricsProcessor<Metr
     }
 
     @Override
-    public void processHistogram(MetricName name, HistogramMetric histogram, Context context) throws Exception {
+    public void processHistogram(MetricName name, Histogram histogram, Context context) throws Exception {
         JsonGenerator json = context.json;
         json.writeStartObject();
         {
@@ -302,7 +302,7 @@ public class MetricsServlet extends HttpServlet implements MetricsProcessor<Metr
     }
 
     @Override
-    public void processCounter(MetricName name, CounterMetric counter, Context context) throws Exception {
+    public void processCounter(MetricName name, Counter counter, Context context) throws Exception {
         JsonGenerator json = context.json;
         json.writeStartObject();
         {
@@ -313,7 +313,7 @@ public class MetricsServlet extends HttpServlet implements MetricsProcessor<Metr
     }
 
     @Override
-    public void processGauge(MetricName name, GaugeMetric<?> gauge, Context context) throws Exception {
+    public void processGauge(MetricName name, Gauge<?> gauge, Context context) throws Exception {
         JsonGenerator json = context.json;
         json.writeStartObject();
         {
@@ -323,7 +323,7 @@ public class MetricsServlet extends HttpServlet implements MetricsProcessor<Metr
         json.writeEndObject();
     }
 
-    private static Object evaluateGauge(GaugeMetric<?> gauge) {
+    private static Object evaluateGauge(Gauge<?> gauge) {
         try {
             return gauge.value();
         } catch (RuntimeException e) {
@@ -417,7 +417,7 @@ public class MetricsServlet extends HttpServlet implements MetricsProcessor<Metr
     }
 
     @Override
-    public void processTimer(MetricName name, TimerMetric timer, Context context) throws Exception {
+    public void processTimer(MetricName name, Timer timer, Context context) throws Exception {
         JsonGenerator json = context.json;
         json.writeStartObject();
         {

@@ -1,7 +1,7 @@
 package com.yammer.metrics.httpclient;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.Meter;
 import org.apache.http.conn.ClientConnectionOperator;
 import org.apache.http.conn.params.ConnPerRoute;
 import org.apache.http.impl.conn.tsccm.BasicPoolEntry;
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * A route-specific connection pool which monitors the rate at which connections are created.
  */
 public class InstrumentedConnByRoute extends ConnPoolByRoute {
-    private static final MeterMetric NEW_CONNECTIONS = Metrics.newMeter(InstrumentedConnByRoute.class,
+    private static final Meter NEW_CONNECTIONS = Metrics.newMeter(InstrumentedConnByRoute.class,
                                                                         "new-connections",
                                                                         "connections",
                                                                         TimeUnit.SECONDS);

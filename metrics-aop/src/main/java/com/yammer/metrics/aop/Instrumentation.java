@@ -1,8 +1,7 @@
 package com.yammer.metrics.aop;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.annotation.Gauge;
-import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.Gauge;
 import com.yammer.metrics.core.MetricsRegistry;
 import net.sf.cglib.proxy.MethodProxy;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -17,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A utility class which instruments {@link Gauge}-,
+ * A utility class which instruments {@link com.yammer.metrics.annotation.Gauge}-,
  * {@link com.yammer.metrics.annotation.Metered}-,
  * {@link com.yammer.metrics.annotation.Timed}-, and
  * {@link com.yammer.metrics.annotation.ExceptionMetered}-annotated classes.
@@ -60,10 +59,10 @@ public class Instrumentation {
 
     private static void addGauges(MetricsRegistry registry, final Object obj) {
         for (final Method method : obj.getClass().getMethods()) {
-            if (method.isAnnotationPresent(Gauge.class)) {
-                final Gauge gauge = method.getAnnotation(Gauge.class);
+            if (method.isAnnotationPresent(com.yammer.metrics.annotation.Gauge.class)) {
+                final com.yammer.metrics.annotation.Gauge gauge = method.getAnnotation(com.yammer.metrics.annotation.Gauge.class);
                 final String name = gauge.name().isEmpty() ? method.getName() : gauge.name();
-                registry.newGauge(obj.getClass(), name, new GaugeMetric<Object>() {
+                registry.newGauge(obj.getClass(), name, new Gauge<Object>() {
                     @Override
                     public Object value() {
                         try {

@@ -39,15 +39,15 @@ public class MeteredTest {
         assertMetricIsSetup(metric);
 
         assertThat("Guice creates a meter which gets marked",
-                   ((MeterMetric) metric).count(),
+                   ((Meter) metric).count(),
                    is(1L));
 
         assertThat("Guice creates a meter with the given event type",
-                   ((MeterMetric) metric).eventType(),
+                   ((Meter) metric).eventType(),
                    is("poops"));
 
         assertThat("Guice creates a meter with the given rate unit",
-                   ((MeterMetric) metric).rateUnit(),
+                   ((Meter) metric).rateUnit(),
                    is(TimeUnit.MINUTES));
     }
 
@@ -60,13 +60,13 @@ public class MeteredTest {
         assertMetricIsSetup(metric);
 
         assertThat("Metric intialises to zero",
-                   ((MeterMetric) metric).count(),
+                   ((Meter) metric).count(),
                    is(0L));
 
         instance.doAThingWithDefaultScope();
 
         assertThat("Metric is marked",
-                   ((MeterMetric) metric).count(),
+                   ((Meter) metric).count(),
                    is(1L));
     }
 
@@ -80,13 +80,13 @@ public class MeteredTest {
         assertMetricIsSetup(metric);
 
         assertThat("Metric intialises to zero",
-                   ((MeterMetric) metric).count(),
+                   ((Meter) metric).count(),
                    is(0L));
 
         instance.doAThingWithProtectedScope();
 
         assertThat("Metric is marked",
-                   ((MeterMetric) metric).count(),
+                   ((Meter) metric).count(),
                    is(1L));
     }
 
@@ -97,6 +97,6 @@ public class MeteredTest {
 
         assertThat("Guice creates a meter",
                    metric,
-                   is(instanceOf(MeterMetric.class)));
+                   is(instanceOf(Meter.class)));
     }
 }

@@ -75,9 +75,9 @@ public abstract class AbstractPollingReporterTest {
     public final void counter() throws Exception {
         final long count = new Random().nextInt(Integer.MAX_VALUE);
         assertReporterOutput(
-                new Callable<CounterMetric>() {
+                new Callable<Counter>() {
                     @Override
-                    public CounterMetric call() throws Exception {
+                    public Counter call() throws Exception {
                         return createCounter(count);
                     }
                 },
@@ -87,9 +87,9 @@ public abstract class AbstractPollingReporterTest {
     @Test
     public final void histogram() throws Exception {
         assertReporterOutput(
-                new Callable<HistogramMetric>() {
+                new Callable<Histogram>() {
                     @Override
-                    public HistogramMetric call() throws Exception {
+                    public Histogram call() throws Exception {
                         return createHistogram();
                     }
                 },
@@ -99,9 +99,9 @@ public abstract class AbstractPollingReporterTest {
     @Test
     public final void meter() throws Exception {
         assertReporterOutput(
-                new Callable<MeterMetric>() {
+                new Callable<Meter>() {
                     @Override
-                    public MeterMetric call() throws Exception {
+                    public Meter call() throws Exception {
                         return createMeter();
                     }
                 },
@@ -111,9 +111,9 @@ public abstract class AbstractPollingReporterTest {
     @Test
     public final void timer() throws Exception {
         assertReporterOutput(
-                new Callable<TimerMetric>() {
+                new Callable<Timer>() {
                     @Override
-                    public TimerMetric call() throws Exception {
+                    public Timer call() throws Exception {
                         return createTimer();
                     }
                 },
@@ -124,9 +124,9 @@ public abstract class AbstractPollingReporterTest {
     public final void gauge() throws Exception {
         final String value = "gaugeValue";
         assertReporterOutput(
-                new Callable<GaugeMetric<String>>() {
+                new Callable<Gauge<String>>() {
                     @Override
-                    public GaugeMetric<String> call() throws Exception {
+                    public Gauge<String> call() throws Exception {
                         return createGauge();
                     }
                 },
@@ -134,8 +134,8 @@ public abstract class AbstractPollingReporterTest {
     }
 
     @SuppressWarnings("unchecked")
-    static CounterMetric createCounter(long count) throws Exception {
-        final CounterMetric mock = mock(CounterMetric.class);
+    static Counter createCounter(long count) throws Exception {
+        final Counter mock = mock(Counter.class);
         when(mock.count()).thenReturn(count);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
@@ -146,8 +146,8 @@ public abstract class AbstractPollingReporterTest {
     }
 
     @SuppressWarnings("unchecked")
-    static HistogramMetric createHistogram() throws Exception {
-        final HistogramMetric mock = mock(HistogramMetric.class);
+    static Histogram createHistogram() throws Exception {
+        final Histogram mock = mock(Histogram.class);
         setupSummarizedMock(mock);
         setupPercentiledMock(mock);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
@@ -159,8 +159,8 @@ public abstract class AbstractPollingReporterTest {
     }
 
     @SuppressWarnings("unchecked")
-    static GaugeMetric<String> createGauge() throws Exception {
-        final GaugeMetric<String> mock = mock(GaugeMetric.class);
+    static Gauge<String> createGauge() throws Exception {
+        final Gauge<String> mock = mock(Gauge.class);
         when(mock.value()).thenReturn("gaugeValue");
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
@@ -171,8 +171,8 @@ public abstract class AbstractPollingReporterTest {
     }
 
     @SuppressWarnings("unchecked")
-    static TimerMetric createTimer() throws Exception {
-        final TimerMetric mock = mock(TimerMetric.class);
+    static Timer createTimer() throws Exception {
+        final Timer mock = mock(Timer.class);
         when(mock.durationUnit()).thenReturn(TimeUnit.MILLISECONDS);
         setupSummarizedMock(mock);
         setupMeteredMock(mock);
@@ -186,8 +186,8 @@ public abstract class AbstractPollingReporterTest {
     }
 
     @SuppressWarnings("unchecked")
-    static MeterMetric createMeter() throws Exception {
-        final MeterMetric mock = mock(MeterMetric.class);
+    static Meter createMeter() throws Exception {
+        final Meter mock = mock(Meter.class);
         setupMeteredMock(mock);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override

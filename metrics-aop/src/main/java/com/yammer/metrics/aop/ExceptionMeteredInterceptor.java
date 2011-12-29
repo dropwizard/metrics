@@ -1,7 +1,7 @@
 package com.yammer.metrics.aop;
 
 import com.yammer.metrics.annotation.ExceptionMetered;
-import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.MetricsRegistry;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -18,7 +18,7 @@ public class ExceptionMeteredInterceptor implements MethodInterceptor {
         final ExceptionMetered annotation = method.getAnnotation(ExceptionMetered.class);
         if (annotation != null) {
             final String name = determineName(annotation, method);
-            final MeterMetric meter = metricsRegistry.newMeter(klass,
+            final Meter meter = metricsRegistry.newMeter(klass,
                                                                name,
                                                                annotation.eventType(),
                                                                annotation.rateUnit());
@@ -35,10 +35,10 @@ public class ExceptionMeteredInterceptor implements MethodInterceptor {
         }
     }
 
-    private final MeterMetric meter;
+    private final Meter meter;
     private final Class<? extends Throwable> klass;
 
-    private ExceptionMeteredInterceptor(MeterMetric meter, Class<? extends Throwable> klass) {
+    private ExceptionMeteredInterceptor(Meter meter, Class<? extends Throwable> klass) {
         this.meter = meter;
         this.klass = klass;
     }

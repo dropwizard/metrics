@@ -2,12 +2,11 @@ package com.yammer.metrics.scala.tests
 
 import org.junit.Test
 import com.codahale.simplespec.Spec
-import com.yammer.metrics.core.CounterMetric
 import com.yammer.metrics.scala.Counter
 
 class CounterSpec extends Spec {
   class `A counter` {
-    val metric = mock[CounterMetric]
+    val metric = mock[com.yammer.metrics.core.Counter]
     val counter = new Counter(metric)
 
     @Test def `increments the underlying metric by an arbitrary amount` = {

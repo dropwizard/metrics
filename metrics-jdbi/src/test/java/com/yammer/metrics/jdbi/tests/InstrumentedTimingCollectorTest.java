@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.skife.jdbi.v2.StatementContext;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.jdbi.InstrumentedTimingCollector;
 import com.yammer.metrics.jdbi.strategies.NameStrategies;
 import com.yammer.metrics.jdbi.strategies.ShortNameStrategy;
@@ -30,7 +30,7 @@ public class InstrumentedTimingCollectorTest {
         collector.collect(TimeUnit.SECONDS.toNanos(1), ctx);
 
         final MetricName name = strategy.getStatementName(ctx);
-        final TimerMetric timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final Timer timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
         assertThat(name,
                    is(new MetricName(getClass(), "updatesTimerForSqlObjects")));
@@ -49,7 +49,7 @@ public class InstrumentedTimingCollectorTest {
         collector.collect(TimeUnit.SECONDS.toNanos(1), ctx);
 
         final MetricName name = strategy.getStatementName(ctx);
-        final TimerMetric timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final Timer timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
         assertThat(name,
                    is(new MetricName(getClass(), "SELECT_1")));
@@ -67,7 +67,7 @@ public class InstrumentedTimingCollectorTest {
         collector.collect(TimeUnit.SECONDS.toNanos(2), ctx);
 
         final MetricName name = strategy.getStatementName(ctx);
-        final TimerMetric timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final Timer timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
         assertThat(name,
                    is(new MetricName("sql", "raw", "SELECT_1")));
@@ -84,7 +84,7 @@ public class InstrumentedTimingCollectorTest {
         collector.collect(TimeUnit.SECONDS.toNanos(2), ctx);
 
         final MetricName name = strategy.getStatementName(ctx);
-        final TimerMetric timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final Timer timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
         assertThat(name,
                    is(new MetricName("sql", "empty", "")));
@@ -102,7 +102,7 @@ public class InstrumentedTimingCollectorTest {
         collector.collect(TimeUnit.SECONDS.toNanos(3), ctx);
 
         final MetricName name = strategy.getStatementName(ctx);
-        final TimerMetric timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final Timer timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
         assertThat(name,
                    is(new MetricName("sql", "raw", "don_t_know_what_it_is_but_it_s_not_SQL")));
@@ -122,7 +122,7 @@ public class InstrumentedTimingCollectorTest {
         collector.collect(TimeUnit.SECONDS.toNanos(3), ctx);
 
         final MetricName name = strategy.getStatementName(ctx);
-        final TimerMetric timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final Timer timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
         assertThat(name,
                    is(new MetricName(getClass(), "updatesTimerForContextClass")));
@@ -142,7 +142,7 @@ public class InstrumentedTimingCollectorTest {
         collector.collect(TimeUnit.SECONDS.toNanos(4), ctx);
 
         final MetricName name = strategy.getStatementName(ctx);
-        final TimerMetric timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final Timer timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
         assertThat(name,
                    is(new MetricName("foo", "bar", "updatesTimerForTemplateFile")));
@@ -162,7 +162,7 @@ public class InstrumentedTimingCollectorTest {
         collector.collect(TimeUnit.SECONDS.toNanos(4), ctx);
 
         final MetricName name = strategy.getStatementName(ctx);
-        final TimerMetric timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final Timer timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
         assertThat(name,
                    is(new MetricName("my-group", "updatesTimerForContextGroupAndName", "")));
@@ -183,7 +183,7 @@ public class InstrumentedTimingCollectorTest {
         collector.collect(TimeUnit.SECONDS.toNanos(5), ctx);
 
         final MetricName name = strategy.getStatementName(ctx);
-        final TimerMetric timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final Timer timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
         assertThat(name,
                    is(new MetricName("my-group", "my-type", "updatesTimerForContextGroupTypeAndName")));
@@ -203,7 +203,7 @@ public class InstrumentedTimingCollectorTest {
         collector.collect(TimeUnit.SECONDS.toNanos(1), ctx);
 
         final MetricName name = strategy.getStatementName(ctx);
-        final TimerMetric timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final Timer timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
         assertThat(name,
                    is(new MetricName("jdbi", getClass().getSimpleName(), "updatesTimerForShortSqlObjectStrategy")));
@@ -223,7 +223,7 @@ public class InstrumentedTimingCollectorTest {
         collector.collect(TimeUnit.SECONDS.toNanos(3), ctx);
 
         final MetricName name = strategy.getStatementName(ctx);
-        final TimerMetric timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+        final Timer timer = Metrics.newTimer(name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
         assertThat(name,
                    is(new MetricName("jdbi", getClass().getSimpleName(), "updatesTimerForShortContextClassStrategy")));

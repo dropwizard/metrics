@@ -316,7 +316,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     }
 
     @Override
-    public void processGauge(MetricName name, GaugeMetric<?> gauge, String x) throws IOException {
+    public void processGauge(MetricName name, Gauge<?> gauge, String x) throws IOException {
         sendToGanglia(sanitizeName(name),
                       GANGLIA_INT_TYPE,
                       String.format(locale, "%s", gauge.value()),
@@ -324,7 +324,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     }
 
     @Override
-    public void processCounter(MetricName name, CounterMetric counter, String x) throws IOException {
+    public void processCounter(MetricName name, Counter counter, String x) throws IOException {
         sendToGanglia(sanitizeName(name),
                       GANGLIA_INT_TYPE,
                       String.format(locale, "%d", counter.count()),
@@ -346,7 +346,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     }
 
     @Override
-    public void processHistogram(MetricName name, HistogramMetric histogram, String x) throws IOException {
+    public void processHistogram(MetricName name, Histogram histogram, String x) throws IOException {
         final String sanitizedName = sanitizeName(name);
         final Double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
         // TODO:  what units make sense for histograms?  should we add event type to the Histogram metric?
@@ -363,7 +363,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     }
 
     @Override
-    public void processTimer(MetricName name, TimerMetric timer, String x) throws IOException {
+    public void processTimer(MetricName name, Timer timer, String x) throws IOException {
         processMeter(name, timer, x);
         final String sanitizedName = sanitizeName(name);
         final Double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);

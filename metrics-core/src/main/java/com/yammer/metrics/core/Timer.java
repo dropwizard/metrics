@@ -1,7 +1,7 @@
 package com.yammer.metrics.core;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.HistogramMetric.SampleType;
+import com.yammer.metrics.core.Histogram.SampleType;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,17 +13,17 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A timer metric which aggregates timing durations and provides duration statistics, plus
- * throughput statistics via {@link MeterMetric}.
+ * throughput statistics via {@link Meter}.
  */
-public class TimerMetric implements Metered, Stoppable, Percentiled, Summarized {
+public class Timer implements Metered, Stoppable, Percentiled, Summarized {
 
     private final TimeUnit durationUnit, rateUnit;
-    private final MeterMetric meter;
-    private final HistogramMetric histogram = new HistogramMetric(SampleType.BIASED);
+    private final Meter meter;
+    private final Histogram histogram = new Histogram(SampleType.BIASED);
     private final Clock clock;
 
     /**
-     * Creates a new {@link TimerMetric}.
+     * Creates a new {@link Timer}.
      *
      * @param durationUnit the scale unit for this timer's duration metrics
      * @param rateUnit     the scale unit for this timer's rate metrics
@@ -31,12 +31,12 @@ public class TimerMetric implements Metered, Stoppable, Percentiled, Summarized 
      *             {@link Metrics}
      */
     @SuppressWarnings({"deprecation"})
-    public TimerMetric(TimeUnit durationUnit, TimeUnit rateUnit) {
+    public Timer(TimeUnit durationUnit, TimeUnit rateUnit) {
         this(durationUnit, rateUnit, Clock.DEFAULT);
     }
 
     /**
-     * Creates a new {@link TimerMetric} with the specified clock.
+     * Creates a new {@link Timer} with the specified clock.
      *
      * @param durationUnit the scale unit for this timer's duration metrics
      * @param rateUnit     the scale unit for this timer's rate metrics
@@ -45,37 +45,37 @@ public class TimerMetric implements Metered, Stoppable, Percentiled, Summarized 
      *             {@link Metrics}
      */
     @SuppressWarnings({"deprecation"})
-    public TimerMetric(TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
+    public Timer(TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
         this.durationUnit = durationUnit;
         this.rateUnit = rateUnit;
-        this.meter = MeterMetric.newMeter("calls", rateUnit);
+        this.meter = Meter.newMeter("calls", rateUnit);
         this.clock = clock;
         clear();
     }
 
     /**
-     * Creates a new {@link TimerMetric}.
+     * Creates a new {@link Timer}.
      *
      * @param tickThread   background thread for updating the rates
      * @param durationUnit the scale unit for this timer's duration metrics
      * @param rateUnit     the scale unit for this timer's rate metrics
      */
-    public TimerMetric(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit) {
+    public Timer(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit) {
         this(tickThread, durationUnit, rateUnit, Clock.DEFAULT);
     }
 
     /**
-     * Creates a new {@link TimerMetric}.
+     * Creates a new {@link Timer}.
      *
      * @param tickThread   background thread for updating the rates
      * @param durationUnit the scale unit for this timer's duration metrics
      * @param rateUnit     the scale unit for this timer's rate metrics
      * @param clock        the clock used to calculate duration
      */
-    public TimerMetric(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
+    public Timer(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
         this.durationUnit = durationUnit;
         this.rateUnit = rateUnit;
-        this.meter = MeterMetric.newMeter(tickThread, "calls", rateUnit);
+        this.meter = Meter.newMeter(tickThread, "calls", rateUnit);
         this.clock = clock;
         clear();
     }

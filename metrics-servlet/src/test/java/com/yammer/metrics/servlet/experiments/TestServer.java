@@ -1,5 +1,6 @@
 package com.yammer.metrics.servlet.experiments;
 
+import com.yammer.metrics.core.Gauge;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -7,18 +8,17 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.thread.ThreadPool;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.CounterMetric;
-import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.jetty.InstrumentedHandler;
 import com.yammer.metrics.jetty.InstrumentedQueuedThreadPool;
 import com.yammer.metrics.jetty.InstrumentedSelectChannelConnector;
 import com.yammer.metrics.reporting.MetricsServlet;
 
 public class TestServer {
-    private static final CounterMetric COUNTER1 = Metrics.newCounter(TestServer.class, "wah", "doody");
-    private static final CounterMetric COUNTER2 = Metrics.newCounter(TestServer.class, "woo");
+    private static final Counter COUNTER_1 = Metrics.newCounter(TestServer.class, "wah", "doody");
+    private static final Counter COUNTER_2 = Metrics.newCounter(TestServer.class, "woo");
     static {
-        Metrics.newGauge(TestServer.class, "boo", new GaugeMetric<Integer>() {
+        Metrics.newGauge(TestServer.class, "boo", new Gauge<Integer>() {
             @Override
             public Integer value() {
                 throw new RuntimeException("asplode!");
@@ -27,8 +27,8 @@ public class TestServer {
     }
 
     public static void main(String[] args) throws Exception {
-        COUNTER1.inc();
-        COUNTER2.inc();
+        COUNTER_1.inc();
+        COUNTER_2.inc();
 
         final Server server = new Server();
 

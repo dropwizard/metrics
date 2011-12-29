@@ -1,6 +1,6 @@
 package com.yammer.metrics.core.tests;
 
-import com.yammer.metrics.core.HistogramMetric;
+import com.yammer.metrics.core.Histogram;
 import com.yammer.metrics.stats.UniformSample;
 import org.junit.Test;
 
@@ -8,10 +8,10 @@ import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class HistogramMetricTest {
+public class HistogramTest {
     @Test
     public void anEmptyHistogram() throws Exception {
-        final HistogramMetric histogram = new HistogramMetric(new UniformSample(100));
+        final Histogram histogram = new Histogram(new UniformSample(100));
 
         assertThat("the histogram has a count of zero",
                    histogram.count(),
@@ -54,7 +54,7 @@ public class HistogramMetricTest {
 
     @Test
     public void aHistogramWith10000Elements() throws Exception {
-        final HistogramMetric histogram = new HistogramMetric(new UniformSample(100000));
+        final Histogram histogram = new Histogram(new UniformSample(100000));
         for (int i = 1; i <= 10000; i++) {
             histogram.update(i);
         }

@@ -8,7 +8,7 @@ import java.io.File
  *
  * @see HistogramMetric
  */
-class Histogram(metric: com.yammer.metrics.core.HistogramMetric) {
+class Histogram(metric: com.yammer.metrics.core.Histogram) {
 
   /**
    * Adds the recorded value to the histogram sample.

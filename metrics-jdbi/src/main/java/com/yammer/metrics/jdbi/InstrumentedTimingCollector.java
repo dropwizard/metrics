@@ -1,7 +1,7 @@
 package com.yammer.metrics.jdbi;
 
 import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.jdbi.strategies.SmartNameStrategy;
 import com.yammer.metrics.jdbi.strategies.StatementNameStrategy;
 
@@ -41,11 +41,11 @@ public class InstrumentedTimingCollector implements TimingCollector {
 
     @Override
     public void collect(long elapsedTime, StatementContext ctx) {
-        final TimerMetric timer = getTimer(ctx);
+        final Timer timer = getTimer(ctx);
         timer.update(elapsedTime, TimeUnit.NANOSECONDS);
     }
 
-    private TimerMetric getTimer(StatementContext ctx) {
+    private Timer getTimer(StatementContext ctx) {
         return registry.newTimer(statementNameStrategy.getStatementName(ctx),
                                  durationUnit,
                                  rateUnit);

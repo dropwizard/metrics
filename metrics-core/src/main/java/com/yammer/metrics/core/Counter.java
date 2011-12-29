@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * An incrementing and decrementing counter metric.
  */
-public class CounterMetric implements Metric {
+public class Counter implements Metric {
     private final AtomicLong count = new AtomicLong(0);
 
     /**

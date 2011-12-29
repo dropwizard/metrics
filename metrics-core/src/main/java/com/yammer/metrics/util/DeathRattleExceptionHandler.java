@@ -1,6 +1,6 @@
 package com.yammer.metrics.util;
 
-import com.yammer.metrics.core.CounterMetric;
+import com.yammer.metrics.core.Counter;
 
 /**
  * When a thread throws an Exception that was not caught, a DeathRattleExceptionHandler will
@@ -31,9 +31,9 @@ import com.yammer.metrics.core.CounterMetric;
  * </pre>
  */
 public class DeathRattleExceptionHandler implements Thread.UncaughtExceptionHandler {
-    final private CounterMetric deathRattle;
+    final private Counter deathRattle;
 
-    public DeathRattleExceptionHandler(CounterMetric deathRattle) {
+    public DeathRattleExceptionHandler(Counter deathRattle) {
         this.deathRattle = deathRattle;
     }
 

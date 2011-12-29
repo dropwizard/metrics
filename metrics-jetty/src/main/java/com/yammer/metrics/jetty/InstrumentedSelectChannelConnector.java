@@ -7,15 +7,15 @@ import org.eclipse.jetty.io.Connection;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.CounterMetric;
-import com.yammer.metrics.core.MeterMetric;
+import com.yammer.metrics.core.Counter;
+import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.Timer;
 
 public class InstrumentedSelectChannelConnector extends SelectChannelConnector {
-    private final TimerMetric duration;
-    private final MeterMetric accepts, connects, disconnects;
-    private final CounterMetric connections;
+    private final Timer duration;
+    private final Meter accepts, connects, disconnects;
+    private final Counter connections;
 
     public InstrumentedSelectChannelConnector(int port) {
         this(Metrics.defaultRegistry(), port);

@@ -16,7 +16,7 @@ package com.yammer.metrics.core;
  *
  * @param <T> the type of the metric's value
  */
-public abstract class GaugeMetric<T> implements Metric {
+public abstract class Gauge<T> implements Metric {
     /**
      * Returns the metric's current value.
      *

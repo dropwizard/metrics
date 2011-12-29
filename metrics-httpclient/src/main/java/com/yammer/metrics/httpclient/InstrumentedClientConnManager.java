@@ -1,7 +1,7 @@
 package com.yammer.metrics.httpclient;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.Gauge;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.impl.conn.SchemeRegistryFactory;
 import org.apache.http.impl.conn.tsccm.ConnPoolByRoute;
@@ -28,7 +28,7 @@ public class InstrumentedClientConnManager extends ThreadSafeClientConnManager {
         super(registry, connTTL, connTTLTimeUnit);
         Metrics.newGauge(InstrumentedClientConnManager.class,
                          "connections",
-                         new GaugeMetric<Integer>() {
+                         new Gauge<Integer>() {
                              @Override
                              public Integer value() {
                                  // this acquires a lock on the connection pool; remove if contention sucks

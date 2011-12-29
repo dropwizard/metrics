@@ -2,7 +2,7 @@ package com.yammer.metrics.guice;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.InjectionListener;
-import com.yammer.metrics.core.GaugeMetric;
+import com.yammer.metrics.core.Gauge;
 import com.yammer.metrics.core.MetricsRegistry;
 
 import java.lang.reflect.Method;
@@ -26,7 +26,7 @@ public class GaugeInjectionListener<I> implements InjectionListener<I> {
 
     @Override
     public void afterInjection(final I i) {
-        metricsRegistry.newGauge(literal.getRawType(), name, new GaugeMetric<Object>() {
+        metricsRegistry.newGauge(literal.getRawType(), name, new Gauge<Object>() {
             @Override
             public Object value() {
                 try {

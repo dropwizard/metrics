@@ -2,7 +2,7 @@ package com.yammer.metrics.httpclient;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.TimerContext;
-import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.Timer;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.HttpClient;
@@ -19,17 +19,17 @@ public class InstrumentedHttpClient extends DefaultHttpClient {
                                 OPTIONS = "OPTIONS", DELETE = "DELETE", TRACE = "TRACE",
                                 CONNECT = "CONNECT", MOVE = "MOVE", PATCH = "PATCH";
 
-    private static final TimerMetric GET_TIMER = Metrics.newTimer(HttpClient.class, "get-requests");
-    private static final TimerMetric POST_TIMER = Metrics.newTimer(HttpClient.class, "post-requests");
-    private static final TimerMetric HEAD_TIMER = Metrics.newTimer(HttpClient.class, "head-requests");
-    private static final TimerMetric PUT_TIMER = Metrics.newTimer(HttpClient.class, "put-requests");
-    private static final TimerMetric DELETE_TIMER = Metrics.newTimer(HttpClient.class, "delete-requests");
-    private static final TimerMetric OPTIONS_TIMER = Metrics.newTimer(HttpClient.class, "options-requests");
-    private static final TimerMetric TRACE_TIMER = Metrics.newTimer(HttpClient.class, "trace-requests");
-    private static final TimerMetric CONNECT_TIMER = Metrics.newTimer(HttpClient.class, "connect-requests");
-    private static final TimerMetric MOVE_TIMER = Metrics.newTimer(HttpClient.class, "move-requests");
-    private static final TimerMetric PATCH_TIMER = Metrics.newTimer(HttpClient.class, "patch-requests");
-    private static final TimerMetric OTHER_TIMER = Metrics.newTimer(HttpClient.class, "other-requests");
+    private static final Timer GET_TIMER = Metrics.newTimer(HttpClient.class, "get-requests");
+    private static final Timer POST_TIMER = Metrics.newTimer(HttpClient.class, "post-requests");
+    private static final Timer HEAD_TIMER = Metrics.newTimer(HttpClient.class, "head-requests");
+    private static final Timer PUT_TIMER = Metrics.newTimer(HttpClient.class, "put-requests");
+    private static final Timer DELETE_TIMER = Metrics.newTimer(HttpClient.class, "delete-requests");
+    private static final Timer OPTIONS_TIMER = Metrics.newTimer(HttpClient.class, "options-requests");
+    private static final Timer TRACE_TIMER = Metrics.newTimer(HttpClient.class, "trace-requests");
+    private static final Timer CONNECT_TIMER = Metrics.newTimer(HttpClient.class, "connect-requests");
+    private static final Timer MOVE_TIMER = Metrics.newTimer(HttpClient.class, "move-requests");
+    private static final Timer PATCH_TIMER = Metrics.newTimer(HttpClient.class, "patch-requests");
+    private static final Timer OTHER_TIMER = Metrics.newTimer(HttpClient.class, "other-requests");
 
     public InstrumentedHttpClient(InstrumentedClientConnManager manager, HttpParams params) {
         super(manager, params);
@@ -92,7 +92,7 @@ public class InstrumentedHttpClient extends DefaultHttpClient {
 
     }
 
-    private TimerMetric timer(HttpRequest request) {
+    private Timer timer(HttpRequest request) {
         final String method = request.getRequestLine().getMethod();
         if (GET.equalsIgnoreCase(method)) {
             return GET_TIMER;

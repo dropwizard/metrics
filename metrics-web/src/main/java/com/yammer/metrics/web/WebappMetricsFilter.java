@@ -1,9 +1,9 @@
 package com.yammer.metrics.web;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.CounterMetric;
-import com.yammer.metrics.core.MeterMetric;
-import com.yammer.metrics.core.TimerMetric;
+import com.yammer.metrics.core.Counter;
+import com.yammer.metrics.core.Meter;
+import com.yammer.metrics.core.Timer;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
@@ -20,10 +20,10 @@ import java.util.concurrent.TimeUnit;
  * codes being returned.
  */
 public abstract class WebappMetricsFilter implements Filter {
-    private final ConcurrentMap<Integer, MeterMetric> metersByStatusCode;
-    private final MeterMetric otherMeterMetric;
-    private final CounterMetric activeRequests;
-    private final TimerMetric requestTimer;
+    private final ConcurrentMap<Integer, Meter> metersByStatusCode;
+    private final Meter otherMeter;
+    private final Counter activeRequests;
+    private final Timer requestTimer;
 
     /**
      * Creates a new instance of the filter.
@@ -34,7 +34,7 @@ public abstract class WebappMetricsFilter implements Filter {
      */
     public WebappMetricsFilter(Map<Integer, String> meterNamesByStatusCode,
                                String otherMetricName) {
-        this.metersByStatusCode = new ConcurrentHashMap<Integer, MeterMetric>(meterNamesByStatusCode
+        this.metersByStatusCode = new ConcurrentHashMap<Integer, Meter>(meterNamesByStatusCode
                                                                                       .size());
         for (Entry<Integer, String> entry : meterNamesByStatusCode.entrySet()) {
             metersByStatusCode.put(entry.getKey(),
@@ -43,7 +43,7 @@ public abstract class WebappMetricsFilter implements Filter {
                                                     "responses",
                                                     TimeUnit.SECONDS));
         }
-        this.otherMeterMetric = Metrics.newMeter(WebappMetricsFilter.class,
+        this.otherMeter = Metrics.newMeter(WebappMetricsFilter.class,
                                                  otherMetricName,
                                                  "responses",
                                                  TimeUnit.SECONDS);
@@ -81,11 +81,11 @@ public abstract class WebappMetricsFilter implements Filter {
     }
 
     private void markMeterForStatusCode(int status) {
-        final MeterMetric metric = metersByStatusCode.get(status);
+        final Meter metric = metersByStatusCode.get(status);
         if (metric != null) {
             metric.mark();
         } else {
-            otherMeterMetric.mark();
+            otherMeter.mark();
         }
     }
 
