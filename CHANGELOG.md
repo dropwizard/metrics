@@ -2,6 +2,9 @@ v2.0.0-BETA19: TBD
 ==========================
 
 * Added absolute memory usage to `MetricsServlet`.
+* Extracted `@Timed` etc. to `metrics-annotations`.
+* Added `metrics-jersey`, which provides a class allowing you to automatically instrument all
+  `@Timed`, `@Metered`, and `@ExceptionMetered`-annotated resource methods.
 
 
 v2.0.0-BETA18: Dec 16 2011
