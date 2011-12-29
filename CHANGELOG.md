@@ -5,6 +5,13 @@ v2.0.0-BETA19: TBD
 * Extracted `@Timed` etc. to `metrics-annotations`.
 * Added `metrics-jersey`, which provides a class allowing you to automatically instrument all
   `@Timed`, `@Metered`, and `@ExceptionMetered`-annotated resource methods.
+* Moved all classes in `metrics-scala` from `com.yammer.metrics` to `com.yammer.metrics.scala`.
+* Renamed `CounterMetric` to `Counter`.
+* Renamed `GaugeMetric` to `Gauge`.
+* Renamed `HistogramMetric` to `Histogram`.
+* Renamed `MeterMetric` to `Meter`.
+* Renamed `TimerMetric` to `Timer`.
+* Added `ToggleGauge`, which returns `1` the first time it's called and `0` every time after that.
 
 
 v2.0.0-BETA18: Dec 16 2011
