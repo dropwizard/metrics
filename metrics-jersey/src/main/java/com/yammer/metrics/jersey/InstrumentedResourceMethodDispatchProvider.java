@@ -2,23 +2,20 @@ package com.yammer.metrics.jersey;
 
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
-import com.sun.jersey.server.impl.model.method.dispatch.EntityParamDispatchProvider;
-import com.sun.jersey.spi.container.JavaMethodInvoker;
+import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.annotation.ExceptionMetered;
 import com.yammer.metrics.annotation.Metered;
 import com.yammer.metrics.annotation.Timed;
 import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.TimerContext;
 import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 import sun.misc.Unsafe;
 
-import javax.ws.rs.ext.Provider;
 import java.util.concurrent.TimeUnit;
 
-@Provider
-public class InstrumentedResourceMethodDispatchProvider extends EntityParamDispatchProvider {
+class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispatchProvider {
     private static class TimedRequestDispatcher implements RequestDispatcher {
         private final RequestDispatcher underlying;
         private final Timer timer;
@@ -81,10 +78,15 @@ public class InstrumentedResourceMethodDispatchProvider extends EntityParamDispa
         }
     }
 
+    private final ResourceMethodDispatchProvider provider;
+
+    public InstrumentedResourceMethodDispatchProvider(ResourceMethodDispatchProvider provider) {
+        this.provider = provider;
+    }
 
     @Override
-    public RequestDispatcher create(AbstractResourceMethod method, JavaMethodInvoker invoker) {
-        RequestDispatcher dispatcher = super.create(method, invoker);
+    public RequestDispatcher create(AbstractResourceMethod method) {
+        RequestDispatcher dispatcher = provider.create(method);
         if (dispatcher == null) {
             return null;
         }
