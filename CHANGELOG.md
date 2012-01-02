@@ -1,6 +1,8 @@
 v2.0.0-BETA19: TBD
 ==========================
 
+**This release contains breaking changes.**
+
 * Added absolute memory usage to `MetricsServlet`.
 * Extracted `@Timed` etc. to `metrics-annotations`.
 * Added `metrics-jersey`, which provides a class allowing you to automatically instrument all
@@ -13,6 +15,20 @@ v2.0.0-BETA19: TBD
 * Renamed `TimerMetric` to `Timer`.
 * Added `ToggleGauge`, which returns `1` the first time it's called and `0` every time after that.
 * Now licensed under Apache License 2.0.
+* Converted `VirtualMachineMetrics` to a non-singleton class.
+* Removed `Utils`.
+* Removed deprecated constructors from `Meter` and `Timer`.
+* Removed `LoggerMemoryLeakFix`.
+* `DeathRattleExceptionHandler` now logs to SLF4J, not syserr.
+* Added `MetricsRegistry#groupedMetrics()`.
+* Removed `Metrics#allMetrics()`.
+* Removed `Metrics#remove(MetricName)`.
+* Removed `MetricsRegistry#threadPools()` and `#newMeterTickThreadPool()` and added
+  `#newScheduledThreadPool`.
+* Added `MetricsRegistry#shutdown()`.
+* Renamed `ThreadPools#shutdownThreadPools()` to `#shutdown()`.
+* Renamed `Percentiled` to `Quantized`, and `#percentile(double)` and `#percentiles(Double[])` to
+  `#quantile` and `#quantiles`. This affects both `Histogram` and `Timer`.
 
 
 v2.0.0-BETA18: Dec 16 2011
