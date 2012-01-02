@@ -2,7 +2,6 @@ package com.yammer.metrics.core;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-
 /**
  * An incrementing and decrementing counter metric.
  */

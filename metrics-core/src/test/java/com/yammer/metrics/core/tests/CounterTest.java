@@ -1,10 +1,14 @@
 package com.yammer.metrics.core.tests;
 
 import com.yammer.metrics.core.Counter;
+import com.yammer.metrics.core.MetricName;
+import com.yammer.metrics.core.MetricsProcessor;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class CounterTest {
     final Counter counter = new Counter();
@@ -60,5 +64,17 @@ public class CounterTest {
         assertThat("the counter's value after being cleared is zero",
                    counter.count(),
                    is(0L));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void isProcessedAsACounter() throws Exception {
+        final MetricName name = new MetricName(CounterTest.class, "counter");
+        final Object context = new Object();
+        final MetricsProcessor<Object> processor = mock(MetricsProcessor.class);
+
+        counter.processWith(processor, name, context);
+
+        verify(processor).processCounter(name, counter, context);
     }
 }
