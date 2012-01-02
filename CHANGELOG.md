@@ -32,6 +32,7 @@ v2.0.0-BETA19: TBD
 * Replaced `HealthCheck`'s abstract `name` method with a required constructor parameter.
 * `HealthCheck#check()` is now `protected`.
 * Moved `DeadlockHealthCheck` from `com.yammer.metrics.core` to `com.yammer.metrics.utils`.
+* Added `HealthCheckRegistry#unregister(HealthCheck)`.
 
 
 v2.0.0-BETA18: Dec 16 2011
