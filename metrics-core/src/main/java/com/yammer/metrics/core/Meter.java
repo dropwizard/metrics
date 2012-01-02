@@ -2,7 +2,6 @@ package com.yammer.metrics.core;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.stats.EWMA;
-import com.yammer.metrics.util.Utils;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -29,9 +28,8 @@ public class Meter implements Metered, Stoppable {
      * @deprecated use the other {@code newMeter} method or create a new meter via the {@link
      *             MetricsRegistry} or {@link Metrics}
      */
-    @SuppressWarnings({"deprecation"})
     public static Meter newMeter(String eventType, TimeUnit rateUnit) {
-        return newMeter(Utils.newScheduledThreadPool(2, "meter-tick"), eventType, rateUnit);
+        return newMeter(Metrics.defaultRegistry().newMeterTickThreadPool(), eventType, rateUnit);
     }
 
     /**

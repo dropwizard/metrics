@@ -3,13 +3,12 @@ package com.yammer.metrics.util;
 import com.yammer.metrics.core.Metric;
 import com.yammer.metrics.core.MetricName;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.*;
+import java.util.TreeMap;
 
 public class Utils {
-    private static final ThreadPools THREAD_POOLS = new ThreadPools();
-
     private Utils() { /* unused */ }
 
     public static Map<String, Map<MetricName, Metric>> sortMetrics(Map<MetricName, Metric> metrics) {
@@ -47,29 +46,5 @@ public class Utils {
             }
         }
         return sortedMetrics;
-    }
-
-
-    /**
-     * Creates a new scheduled thread pool of a given size with the given name.
-     *
-     * @param poolSize the number of threads to create
-     * @param name     the name of the pool
-     * @return a new {@link ScheduledExecutorService}
-     * @deprecated Get a thread pool via {@link com.yammer.metrics.core.MetricsRegistry#threadPools()}
-     *             instead
-     */
-    public static ScheduledExecutorService newScheduledThreadPool(int poolSize, String name) {
-        return THREAD_POOLS.newScheduledThreadPool(poolSize, name);
-    }
-
-    /**
-     * Shuts down all thread pools created by this class in an orderly fashion.
-     *
-     * @deprecated Shut down the thread pools object of the relevant {@link
-     *             com.yammer.metrics.core.MetricsRegistry} instead
-     */
-    public static void shutdownThreadPools() {
-        THREAD_POOLS.shutdownThreadPools();
     }
 }

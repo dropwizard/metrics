@@ -1,7 +1,7 @@
 package com.yammer.metrics.reporting;
 
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.util.Utils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -15,12 +15,12 @@ public class MetricsServletContextListener implements ServletContextListener {
     @SuppressWarnings("deprecation")
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        // for backwards compatibility
-        Utils.shutdownThreadPools();
-        ServletContext context = sce.getServletContext();
-        MetricsRegistry metricsRegistry = (MetricsRegistry) context.getAttribute(MetricsServlet.ATTR_NAME_METRICS_REGISTRY);
+        final ServletContext context = sce.getServletContext();
+        final MetricsRegistry metricsRegistry = (MetricsRegistry) context.getAttribute(MetricsServlet.ATTR_NAME_METRICS_REGISTRY);
         if (metricsRegistry != null) {
             metricsRegistry.threadPools().shutdownThreadPools();
+        } else {
+            Metrics.shutdown();
         }
     }
 
