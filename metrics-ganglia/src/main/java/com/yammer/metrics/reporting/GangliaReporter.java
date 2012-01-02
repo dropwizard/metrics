@@ -14,8 +14,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.yammer.metrics.core.VirtualMachineMetrics.*;
-
 /**
  * A simple reporter which sends out application metrics to a <a href="http://ganglia.sourceforge.net/">Ganglia</a>
  * server periodically.
@@ -34,6 +32,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     private static final String GANGLIA_INT_TYPE = "int32";
     private static final String GANGLIA_DOUBLE_TYPE = "double";
     private final MetricPredicate predicate;
+    private final VirtualMachineMetrics vm;
     private final Locale locale = Locale.US;
     private String hostLabel;
     private String groupPrefix = "";
@@ -222,27 +221,31 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
              groupPrefix,
              predicate,
              compressPackageNames,
-             new GangliaMessageBuilder(gangliaHost, port));
+             new GangliaMessageBuilder(gangliaHost, port), VirtualMachineMetrics.INSTANCE);
     }
 
     /**
      * Creates a new {@link GangliaReporter}.
      *
-     * @param metricsRegistry      the metrics registry
-     * @param groupPrefix          prefix to the ganglia group name (such as myapp_counter)
-     * @param predicate            filters metrics to be reported
-     * @param compressPackageNames if true reporter will compress package names e.g.
-     *                             com.foo.MetricName becomes c.f.MetricName
+     * @param metricsRegistry          the metrics registry
+     * @param groupPrefix              prefix to the ganglia group name (such as myapp_counter)
+     * @param predicate                filters metrics to be reported
+     * @param compressPackageNames     if true reporter will compress package names e.g.
+     *                                 com.foo.MetricName becomes c.f.MetricName
+     * @param gangliaMessageBuilder    a {@link GangliaMessageBuilder} instance
+     * @param vm                       a {@link VirtualMachineMetrics} isntance
      * @throws java.io.IOException if there is an error connecting to the ganglia server
      */
     public GangliaReporter(MetricsRegistry metricsRegistry, String groupPrefix,
-                           MetricPredicate predicate, boolean compressPackageNames, GangliaMessageBuilder gangliaMessageBuilder) throws IOException {
+                           MetricPredicate predicate, boolean compressPackageNames,
+                           GangliaMessageBuilder gangliaMessageBuilder, VirtualMachineMetrics vm) throws IOException {
         super(metricsRegistry, "ganglia-reporter");
         this.gangliaMessageBuilder = gangliaMessageBuilder;
         this.groupPrefix = groupPrefix + "_";
         this.hostLabel = getHostLabel();
         this.predicate = predicate;
         this.compressPackageNames = compressPackageNames;
+        this.vm = vm;
     }
 
     @Override
@@ -402,26 +405,26 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     }
 
     private void printVmMetrics() {
-        printDoubleField("jvm.memory.heap_usage", heapUsage(), "jvm");
-        printDoubleField("jvm.memory.non_heap_usage", nonHeapUsage(), "jvm");
-        for (Map.Entry<String, Double> pool : memoryPoolUsage().entrySet()) {
+        printDoubleField("jvm.memory.heap_usage", vm.heapUsage(), "jvm");
+        printDoubleField("jvm.memory.non_heap_usage", vm.nonHeapUsage(), "jvm");
+        for (Map.Entry<String, Double> pool : vm.memoryPoolUsage().entrySet()) {
             printDoubleField("jvm.memory.memory_pool_usages." + pool.getKey(),
                              pool.getValue(),
                              "jvm");
         }
 
-        printDoubleField("jvm.daemon_thread_count", daemonThreadCount(), "jvm");
-        printDoubleField("jvm.thread_count", threadCount(), "jvm");
-        printDoubleField("jvm.uptime", uptime(), "jvm");
-        printDoubleField("jvm.fd_usage", fileDescriptorUsage(), "jvm");
+        printDoubleField("jvm.daemon_thread_count", vm.daemonThreadCount(), "jvm");
+        printDoubleField("jvm.thread_count", vm.threadCount(), "jvm");
+        printDoubleField("jvm.uptime", vm.uptime(), "jvm");
+        printDoubleField("jvm.fd_usage", vm.fileDescriptorUsage(), "jvm");
 
-        for (Map.Entry<Thread.State, Double> entry : threadStatePercentages().entrySet()) {
+        for (Map.Entry<Thread.State, Double> entry : vm.threadStatePercentages().entrySet()) {
             printDoubleField("jvm.thread-states." + entry.getKey().toString().toLowerCase(),
                              entry.getValue(),
                              "jvm");
         }
 
-        for (Map.Entry<String, VirtualMachineMetrics.GarbageCollector> entry : garbageCollectors().entrySet()) {
+        for (Map.Entry<String, VirtualMachineMetrics.GarbageCollector> entry : vm.garbageCollectors().entrySet()) {
             printLongField("jvm.gc." + entry.getKey() + ".time",
                            entry.getValue().getTime(TimeUnit.MILLISECONDS),
                            "jvm");
