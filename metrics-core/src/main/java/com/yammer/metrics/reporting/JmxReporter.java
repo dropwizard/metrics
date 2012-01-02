@@ -18,6 +18,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     private final Map<MetricName, ObjectName> registeredBeans;
     private final MBeanServer server;
 
+    @SuppressWarnings("UnusedDeclaration")
     public static interface MetricMBean {
         public ObjectName objectName();
     }
@@ -35,6 +36,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public static interface GaugeMBean extends MetricMBean {
         public Object getValue();
     }
@@ -53,6 +55,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public static interface CounterMBean extends MetricMBean {
         public long getCount();
     }
@@ -71,6 +74,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public static interface MeterMBean extends MetricMBean {
         public long getCount();
 
@@ -131,6 +135,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public static interface HistogramMBean extends MetricMBean {
         public long getCount();
 
@@ -232,6 +237,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public static interface TimerMBean extends MeterMBean, HistogramMBean {
         public TimeUnit getLatencyUnit();
     }
@@ -377,7 +383,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     @Override
     public void onMetricRemoved(MetricName name) {
-        ObjectName objectName = registeredBeans.remove(name);
+        final ObjectName objectName = registeredBeans.remove(name);
         if (objectName != null) {
             try {
                 server.unregisterMBean(objectName);
