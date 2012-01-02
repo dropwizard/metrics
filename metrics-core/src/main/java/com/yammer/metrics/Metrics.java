@@ -4,7 +4,6 @@ import com.yammer.metrics.core.*;
 import com.yammer.metrics.reporting.JmxReporter;
 
 import javax.management.MalformedObjectNameException;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -408,15 +407,6 @@ public class Metrics {
      */
     public static void removeMetric(Class<?> klass, String name, String scope) {
         DEFAULT_REGISTRY.removeMetric(klass, name, scope);
-    }
-
-    /**
-     * Returns an unmodifiable map of all metrics and their names.
-     *
-     * @return an unmodifiable map of all metrics and their names
-     */
-    public static Map<MetricName, Metric> allMetrics() {
-        return DEFAULT_REGISTRY.allMetrics();
     }
 
     /**
