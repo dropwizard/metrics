@@ -6,23 +6,29 @@ import java.util.Set;
  * A {@link HealthCheck} implementation which returns a list of deadlocked threads, if any.
  */
 public class DeadlockHealthCheck extends HealthCheck {
-    private final VirtualMachineMetrics vm = VirtualMachineMetrics.INSTANCE;
+    private final VirtualMachineMetrics vm;
 
-    @Override
-    public Result check() throws Exception {
-        final Set<String> threads = vm.deadlockedThreads();
-        if (!threads.isEmpty()) {
-            final StringBuilder builder = new StringBuilder("Deadlocked threads detected:\n");
-            for (String thread : threads) {
-                builder.append(thread).append('\n');
-            }
-            return Result.unhealthy(builder.toString());
-        }
-        return Result.healthy();
+    public DeadlockHealthCheck(VirtualMachineMetrics vm) {
+        super("deadlocks");
+        this.vm = vm;
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public DeadlockHealthCheck() {
+        this(VirtualMachineMetrics.INSTANCE);
     }
 
     @Override
-    public String name() {
-        return "deadlocks";
+    protected Result check() throws Exception {
+        final Set<String> threads = vm.deadlockedThreads();
+        if (threads.isEmpty()) {
+            return Result.healthy();
+        }
+
+        final StringBuilder builder = new StringBuilder("Deadlocked threads detected:\n");
+        for (String thread : threads) {
+            builder.append(thread).append('\n');
+        }
+        return Result.unhealthy(builder.toString());
     }
 }

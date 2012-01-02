@@ -1,6 +1,5 @@
 package com.yammer.metrics.core;
 
-import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.core.HealthCheck.Result;
 
 import java.util.Map;
@@ -21,7 +20,7 @@ public class HealthCheckRegistry {
      * @param healthCheck the {@link HealthCheck} instance
      */
     public void register(HealthCheck healthCheck) {
-        healthChecks.putIfAbsent(healthCheck.name(), healthCheck);
+        healthChecks.putIfAbsent(healthCheck.getName(), healthCheck);
     }
 
     /**

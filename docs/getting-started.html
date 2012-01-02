@@ -224,12 +224,8 @@ public class DatabaseHealthCheck extends HealthCheck {
     private final Database database;
 
     public DatabaseHealthCheck(Database database) {
+        super("database");
         this.database = database;
-    }
-
-    @Override
-    public String name() {
-        return "database";
     }
 
     @Override

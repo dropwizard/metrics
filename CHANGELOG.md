@@ -29,6 +29,8 @@ v2.0.0-BETA19: TBD
 * Renamed `ThreadPools#shutdownThreadPools()` to `#shutdown()`.
 * Renamed `Percentiled` to `Quantized`, and `#percentile(double)` and `#percentiles(Double[])` to
   `#quantile` and `#quantiles`. This affects both `Histogram` and `Timer`.
+* Replaced `HealthCheck`'s abstract `name` method with a required constructor parameter.
+* `HealthCheck#check()` is now `protected`.
 
 
 v2.0.0-BETA18: Dec 16 2011
