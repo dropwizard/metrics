@@ -1,6 +1,5 @@
 package com.yammer.metrics.core;
 
-import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Histogram.SampleType;
 
 import java.io.File;
@@ -21,37 +20,6 @@ public class Timer implements Metered, Stoppable, Percentiled, Summarized {
     private final Meter meter;
     private final Histogram histogram = new Histogram(SampleType.BIASED);
     private final Clock clock;
-
-    /**
-     * Creates a new {@link Timer}.
-     *
-     * @param durationUnit the scale unit for this timer's duration metrics
-     * @param rateUnit     the scale unit for this timer's rate metrics
-     * @deprecated either use the other constructor or create via the {@link MetricsRegistry} or
-     *             {@link Metrics}
-     */
-    @SuppressWarnings({"deprecation"})
-    public Timer(TimeUnit durationUnit, TimeUnit rateUnit) {
-        this(durationUnit, rateUnit, Clock.DEFAULT);
-    }
-
-    /**
-     * Creates a new {@link Timer} with the specified clock.
-     *
-     * @param durationUnit the scale unit for this timer's duration metrics
-     * @param rateUnit     the scale unit for this timer's rate metrics
-     * @param clock        the clock used to calculate duration
-     * @deprecated either use the other constructor or create via the {@link MetricsRegistry} or
-     *             {@link Metrics}
-     */
-    @SuppressWarnings({"deprecation"})
-    public Timer(TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
-        this.durationUnit = durationUnit;
-        this.rateUnit = rateUnit;
-        this.meter = Meter.newMeter("calls", rateUnit);
-        this.clock = clock;
-        clear();
-    }
 
     /**
      * Creates a new {@link Timer}.
