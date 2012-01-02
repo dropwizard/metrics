@@ -3,7 +3,6 @@ package com.yammer.metrics.util;
 import com.yammer.metrics.core.Metric;
 import com.yammer.metrics.core.MetricName;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -13,16 +12,6 @@ public class Utils {
 
     public static Map<String, Map<MetricName, Metric>> sortMetrics(Map<MetricName, Metric> metrics) {
         return sortAndFilterMetrics(metrics, MetricPredicate.ALL);
-    }
-
-    public static Map<MetricName, Metric> filterMetrics(Map<MetricName, Metric> metrics, MetricPredicate predicate) {
-        final Map<MetricName, Metric> result = new HashMap<MetricName, Metric>();
-        for (Entry<MetricName, Metric> entry : metrics.entrySet()) {
-            if (predicate.matches(entry.getKey(), entry.getValue())) {
-                result.put(entry.getKey(), entry.getValue());
-            }
-        }
-        return result;
     }
 
     public static Map<String, Map<MetricName, Metric>> sortAndFilterMetrics(Map<MetricName, Metric> metrics, MetricPredicate predicate) {
