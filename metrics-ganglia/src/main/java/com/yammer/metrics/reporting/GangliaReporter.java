@@ -349,36 +349,36 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     @Override
     public void processHistogram(MetricName name, Histogram histogram, String x) throws IOException {
         final String sanitizedName = sanitizeName(name);
-        final Double[] percentiles = histogram.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
+        final Double[] quantiles = histogram.quantiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
         // TODO:  what units make sense for histograms?  should we add event type to the Histogram metric?
         printDoubleField(sanitizedName + ".min", histogram.min(), "histo");
         printDoubleField(sanitizedName + ".max", histogram.max(), "histo");
         printDoubleField(sanitizedName + ".mean", histogram.mean(), "histo");
         printDoubleField(sanitizedName + ".stddev", histogram.stdDev(), "histo");
-        printDoubleField(sanitizedName + ".median", percentiles[0], "histo");
-        printDoubleField(sanitizedName + ".75percentile", percentiles[1], "histo");
-        printDoubleField(sanitizedName + ".95percentile", percentiles[2], "histo");
-        printDoubleField(sanitizedName + ".98percentile", percentiles[3], "histo");
-        printDoubleField(sanitizedName + ".99percentile", percentiles[4], "histo");
-        printDoubleField(sanitizedName + ".999percentile", percentiles[5], "histo");
+        printDoubleField(sanitizedName + ".median", quantiles[0], "histo");
+        printDoubleField(sanitizedName + ".75percentile", quantiles[1], "histo");
+        printDoubleField(sanitizedName + ".95percentile", quantiles[2], "histo");
+        printDoubleField(sanitizedName + ".98percentile", quantiles[3], "histo");
+        printDoubleField(sanitizedName + ".99percentile", quantiles[4], "histo");
+        printDoubleField(sanitizedName + ".999percentile", quantiles[5], "histo");
     }
 
     @Override
     public void processTimer(MetricName name, Timer timer, String x) throws IOException {
         processMeter(name, timer, x);
         final String sanitizedName = sanitizeName(name);
-        final Double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
+        final Double[] quantiles = timer.quantiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
         final String durationUnit = timer.durationUnit().name();
         printDoubleField(sanitizedName + ".min", timer.min(), "timer", durationUnit);
         printDoubleField(sanitizedName + ".max", timer.max(), "timer", durationUnit);
         printDoubleField(sanitizedName + ".mean", timer.mean(), "timer", durationUnit);
         printDoubleField(sanitizedName + ".stddev", timer.stdDev(), "timer", durationUnit);
-        printDoubleField(sanitizedName + ".median", percentiles[0], "timer", durationUnit);
-        printDoubleField(sanitizedName + ".75percentile", percentiles[1], "timer", durationUnit);
-        printDoubleField(sanitizedName + ".95percentile", percentiles[2], "timer", durationUnit);
-        printDoubleField(sanitizedName + ".98percentile", percentiles[3], "timer", durationUnit);
-        printDoubleField(sanitizedName + ".99percentile", percentiles[4], "timer", durationUnit);
-        printDoubleField(sanitizedName + ".999percentile", percentiles[5], "timer", durationUnit);
+        printDoubleField(sanitizedName + ".median", quantiles[0], "timer", durationUnit);
+        printDoubleField(sanitizedName + ".75percentile", quantiles[1], "timer", durationUnit);
+        printDoubleField(sanitizedName + ".95percentile", quantiles[2], "timer", durationUnit);
+        printDoubleField(sanitizedName + ".98percentile", quantiles[3], "timer", durationUnit);
+        printDoubleField(sanitizedName + ".99percentile", quantiles[4], "timer", durationUnit);
+        printDoubleField(sanitizedName + ".999percentile", quantiles[5], "timer", durationUnit);
     }
 
     private void printDoubleField(String name, double value, String groupName, String units) {

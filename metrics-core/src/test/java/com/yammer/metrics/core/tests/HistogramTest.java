@@ -33,18 +33,18 @@ public class HistogramTest {
                    histogram.stdDev(),
                    is(closeTo(0.0, 0.0001)));
 
-        final Double[] percentiles = histogram.percentiles(0.5, 0.75, 0.99);
+        final Double[] quantiles = histogram.quantiles(0.5, 0.75, 0.99);
 
         assertThat("the histogram has a median of zero",
-                   percentiles[0],
+                   quantiles[0],
                    is(closeTo(0.0, 0.0001)));
 
         assertThat("the histogram has a 75th percentile of zero",
-                   percentiles[1],
+                   quantiles[1],
                    is(closeTo(0.0, 0.0001)));
 
         assertThat("the histogram has a 99th percentile of zero",
-                   percentiles[2],
+                   quantiles[2],
                    is(closeTo(0.0, 0.0001)));
 
         assertThat("the histogram is empty",
@@ -79,18 +79,18 @@ public class HistogramTest {
                    histogram.stdDev(),
                    is(closeTo(2886.8956799071675, 0.0001)));
 
-        final Double[] percentiles = histogram.percentiles(0.5, 0.75, 0.99);
+        final Double[] quantiles = histogram.quantiles(0.5, 0.75, 0.99);
 
         assertThat("the histogram has a median of 5000.5",
-                   percentiles[0],
+                   quantiles[0],
                    is(closeTo(5000.5, 0.0001)));
 
         assertThat("the histogram has a 75th percentile of 7500.75",
-                   percentiles[1],
+                   quantiles[1],
                    is(closeTo(7500.75, 0.0001)));
 
         assertThat("the histogram has a 99th percentile of 9900.99",
-                   percentiles[2],
+                   quantiles[2],
                    is(closeTo(9900.99, 0.0001)));
 
         assertThat("the histogram is has 10000 values",

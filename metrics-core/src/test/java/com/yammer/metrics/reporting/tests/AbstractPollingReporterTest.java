@@ -149,7 +149,7 @@ public abstract class AbstractPollingReporterTest {
     static Histogram createHistogram() throws Exception {
         final Histogram mock = mock(Histogram.class);
         setupSummarizedMock(mock);
-        setupPercentiledMock(mock);
+        setupQuantizedMock(mock);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
             void delegateToProcessor(MetricsProcessor processor, MetricName name, Object context) throws Exception {
@@ -176,7 +176,7 @@ public abstract class AbstractPollingReporterTest {
         when(mock.durationUnit()).thenReturn(TimeUnit.MILLISECONDS);
         setupSummarizedMock(mock);
         setupMeteredMock(mock);
-        setupPercentiledMock(mock);
+        setupQuantizedMock(mock);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
             void delegateToProcessor(MetricsProcessor processor, MetricName name, Object context) throws Exception {
@@ -233,8 +233,8 @@ public abstract class AbstractPollingReporterTest {
         when(metered.rateUnit()).thenReturn(TimeUnit.SECONDS);
     }
 
-    static void setupPercentiledMock(Percentiled percentiled) {
-        when(percentiled.percentile(anyDouble())).thenAnswer(new Answer<Double>() {
+    static void setupQuantizedMock(Quantized quantized) {
+        when(quantized.quantile(anyDouble())).thenAnswer(new Answer<Double>() {
             @Override
             public Double answer(InvocationOnMock invocation) throws Throwable {
                 return (Double) invocation.getArguments()[0];
@@ -246,7 +246,7 @@ public abstract class AbstractPollingReporterTest {
                 final Object[] arguments = invocation.getArguments();
                 return Arrays.copyOf(arguments, arguments.length, Double[].class);
             }
-        }).when(percentiled).percentiles(Mockito.<Double>anyVararg());
+        }).when(quantized).quantiles(Mockito.<Double>anyVararg());
     }
 
     public abstract String[] expectedGaugeResult(String value);

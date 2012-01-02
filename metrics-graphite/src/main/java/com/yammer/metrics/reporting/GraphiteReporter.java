@@ -306,7 +306,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
     public void processHistogram(MetricName name, Histogram histogram, Long epoch) throws IOException {
         final String sanitizedName = sanitizeName(name);
         sendSummarized(epoch, sanitizedName, histogram);
-        sendPercentiled(epoch, sanitizedName, histogram);
+        sendQuantized(epoch, sanitizedName, histogram);
     }
 
     @Override
@@ -314,7 +314,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
         processMeter(name, timer, epoch);
         final String sanitizedName = sanitizeName(name);
         sendSummarized(epoch, sanitizedName, timer);
-        sendPercentiled(epoch, sanitizedName, timer);
+        sendQuantized(epoch, sanitizedName, timer);
     }
 
     private void sendSummarized(long epoch, String sanitizedName, Summarized metric) throws IOException {
@@ -324,14 +324,14 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
         sendFloat(epoch, sanitizedName, "stddev", metric.stdDev());
     }
 
-    private void sendPercentiled(long epoch, String sanitizedName, Percentiled metric) throws IOException {
-        final Double[] percentiles = metric.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
-        sendFloat(epoch, sanitizedName, "median", percentiles[0]);
-        sendFloat(epoch, sanitizedName, "75percentile", percentiles[1]);
-        sendFloat(epoch, sanitizedName, "95percentile", percentiles[2]);
-        sendFloat(epoch, sanitizedName, "98percentile", percentiles[3]);
-        sendFloat(epoch, sanitizedName, "99percentile", percentiles[4]);
-        sendFloat(epoch, sanitizedName, "999percentile", percentiles[5]);
+    private void sendQuantized(long epoch, String sanitizedName, Quantized metric) throws IOException {
+        final Double[] quantiles = metric.quantiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
+        sendFloat(epoch, sanitizedName, "median", quantiles[0]);
+        sendFloat(epoch, sanitizedName, "75percentile", quantiles[1]);
+        sendFloat(epoch, sanitizedName, "95percentile", quantiles[2]);
+        sendFloat(epoch, sanitizedName, "98percentile", quantiles[3]);
+        sendFloat(epoch, sanitizedName, "99percentile", quantiles[4]);
+        sendFloat(epoch, sanitizedName, "999percentile", quantiles[5]);
     }
 
     private void printVmMetrics(long epoch) {

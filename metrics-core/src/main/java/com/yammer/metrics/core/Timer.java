@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * A timer metric which aggregates timing durations and provides duration statistics, plus
  * throughput statistics via {@link Meter}.
  */
-public class Timer implements Metered, Stoppable, Percentiled, Summarized {
+public class Timer implements Metered, Stoppable, Quantized, Summarized {
 
     private final TimeUnit durationUnit, rateUnit;
     private final Meter meter;
@@ -172,19 +172,19 @@ public class Timer implements Metered, Stoppable, Percentiled, Summarized {
     }
 
     /* (non-Javadoc)
-     * @see com.yammer.metrics.core.Percentiled#percentile(double)
+     * @see com.yammer.metrics.core.Quantized#quantile(double)
      */
     @Override
-    public double percentile(double percentile) {
-        return percentiles(percentile)[0];
+    public double quantile(double quantile) {
+        return quantiles(quantile)[0];
     }
 
     /* (non-Javadoc)
-     * @see com.yammer.metrics.core.Percentiled#percentiles(double)
+     * @see com.yammer.metrics.core.Quantized#quantiles(double)
      */
     @Override
-    public Double[] percentiles(Double... percentiles) {
-        final Double[] scores = histogram.percentiles(percentiles);
+    public Double[] quantiles(Double... quantiles) {
+        final Double[] scores = histogram.quantiles(quantiles);
         for (int i = 0; i < scores.length; i++) {
             scores[i] = convertFromNS(scores[i]);
         }

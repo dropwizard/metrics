@@ -60,18 +60,18 @@ public class TimerTest {
                    timer.stdDev(),
                    is(closeTo(0.0, 0.001)));
 
-        final Double[] percentiles = timer.percentiles(0.5, 0.75, 0.99);
+        final Double[] quantiles = timer.quantiles(0.5, 0.75, 0.99);
 
         assertThat("the timer has a median duration of zero",
-                   percentiles[0],
+                   quantiles[0],
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has a 75th percentile duration of zero",
-                   percentiles[1],
+                   quantiles[1],
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has a 99th percentile duration of zero",
-                   percentiles[2],
+                   quantiles[2],
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has a mean rate of zero",
@@ -123,18 +123,18 @@ public class TimerTest {
                    timer.stdDev(),
                    is(closeTo(11.401, 0.001)));
 
-        final Double[] percentiles = timer.percentiles(0.5, 0.75, 0.99);
+        final Double[] quantiles = timer.quantiles(0.5, 0.75, 0.99);
 
         assertThat("the timer has a median duration of 20",
-                   percentiles[0],
+                   quantiles[0],
                    is(closeTo(20.0, 0.001)));
 
         assertThat("the timer has a 75th percentile duration of 35",
-                   percentiles[1],
+                   quantiles[1],
                    is(closeTo(35.0, 0.001)));
 
         assertThat("the timer has a 99th percentile duration of 40",
-                   percentiles[2],
+                   quantiles[2],
                    is(closeTo(40.0, 0.001)));
 
         assertThat("the timer has no values",

@@ -20,7 +20,7 @@ import static java.lang.Math.sqrt;
  * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately computing running
  *      variance</a>
  */
-public class Histogram implements Metric, Percentiled, Summarized {
+public class Histogram implements Metric, Quantized, Summarized {
     /**
      * The type of sampling the histogram should be performing.
      */
@@ -169,25 +169,25 @@ public class Histogram implements Metric, Percentiled, Summarized {
     }
 
     /**
-     * Returns the value at the given percentile.
+     * Returns the value at the given quantile.
      *
-     * @param percentile a percentile ({@code 0..1})
-     * @return the value at the given percentile
+     * @param quantile a quantile ({@code 0..1})
+     * @return the value at the given quantile
      */
     @Override
-    public double percentile(double percentile) {
-        return percentiles(percentile)[0];
+    public double quantile(double quantile) {
+        return quantiles(quantile)[0];
     }
 
     /**
-     * Returns an array of values at the given percentiles.
+     * Returns an array of values at the given quantiles.
      *
-     * @param percentiles one or more percentiles ({@code 0..1})
-     * @return an array of values at the given percentiles
+     * @param quantiles one or more quantiles ({@code 0..1})
+     * @return an array of values at the given quantiles
      */
     @Override
-    public Double[] percentiles(Double... percentiles) {
-        final Double[] scores = new Double[percentiles.length];
+    public Double[] quantiles(Double... quantiles) {
+        final Double[] scores = new Double[quantiles.length];
         for (int i = 0; i < scores.length; i++) {
             scores[i] = 0.0;
 
@@ -197,8 +197,8 @@ public class Histogram implements Metric, Percentiled, Summarized {
             final List<Long> values = sample.values();
             Collections.sort(values);
 
-            for (int i = 0; i < percentiles.length; i++) {
-                final double p = percentiles[i];
+            for (int i = 0; i < quantiles.length; i++) {
+                final double p = quantiles[i];
                 final double pos = p * (values.size() + 1);
                 if (pos < 1) {
                     scores[i] = Double.valueOf(values.get(0));
