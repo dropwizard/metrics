@@ -30,9 +30,9 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
     private final String prefix;
     private final MetricPredicate predicate;
     private final Locale locale = Locale.US;
-    private Writer writer;
-    private Clock clock;
+    private final Clock clock;
     private final SocketProvider socketProvider;
+    private Writer writer;
     public boolean printVMMetrics = true;
 
     /**
@@ -149,6 +149,8 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
      * @param metricsRegistry the metrics registry
      * @param prefix          is prepended to all names reported to graphite
      * @param predicate       filters metrics to be reported
+     * @param socketProvider  a {@link SocketProvider} instance
+     * @param clock           a {@link Clock} instance
      * @throws IOException if there is an error connecting to the Graphite server
      */
     public GraphiteReporter(MetricsRegistry metricsRegistry, String prefix, MetricPredicate predicate, SocketProvider socketProvider, Clock clock) throws IOException {
@@ -173,7 +175,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
             socket = this.socketProvider.get();
             writer = new OutputStreamWriter(socket.getOutputStream());
 
-            long epoch = clock.time() / 1000;
+            final long epoch = clock.time() / 1000;
             if (this.printVMMetrics) {
                 printVmMetrics(epoch);
             }
@@ -321,7 +323,6 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
     public void processTimer(MetricName name, Timer timer, Long epoch) throws IOException {
         processMeter(name, timer, epoch);
         final String sanitizedName = sanitizeName(name);
-        final Double[] percentiles = timer.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
         final StringBuilder lines = new StringBuilder();
         printSummarized(timer, sanitizedName, epoch, lines);
         printPercentiled(timer, sanitizedName, epoch, lines);
