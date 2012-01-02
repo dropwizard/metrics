@@ -10,7 +10,7 @@ public abstract class AbstractPollingReporter extends AbstractReporter implement
 
     protected AbstractPollingReporter(MetricsRegistry registry, String name) {
         super(registry);
-        this.executor = registry.threadPools().newScheduledThreadPool(1, name);
+        this.executor = registry.newScheduledThreadPool(1, name);
     }
 
     public void start(long pollingTime, TimeUnit pollingTimeUnit) {

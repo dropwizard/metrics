@@ -54,7 +54,7 @@ public class MetricsServletJsonTest {
 
     @After
     public void tearDown() {
-        registry.threadPools().shutdownThreadPools();
+        registry.shutdown();
     }
 
     private MetricsRegistry registry;

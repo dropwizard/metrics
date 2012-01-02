@@ -428,12 +428,23 @@ public class MetricsRegistry {
         return groups;
     }
 
-    public ThreadPools threadPools() {
-        return threadPools;
+    /**
+     * Shut down this registry's thread pools.
+     */
+    public void shutdown() {
+        threadPools.shutdown();
     }
 
-    public ScheduledExecutorService newMeterTickThreadPool() {
-        return threadPools.newScheduledThreadPool(2, "meter-tick");
+    /**
+     * Creates a new scheduled thread pool of a given size with the given name, or returns an
+     * existing thread pool if one was already created with the same name.
+     *
+     * @param poolSize the number of threads to create
+     * @param name     the name of the pool
+     * @return a new {@link ScheduledExecutorService}
+     */
+    public ScheduledExecutorService newScheduledThreadPool(int poolSize, String name) {
+        return threadPools.newScheduledThreadPool(poolSize, name);
     }
 
     /**
@@ -485,25 +496,6 @@ public class MetricsRegistry {
         return new ConcurrentHashMap<MetricName, Metric>(1024);
     }
 
-    @SuppressWarnings("unchecked")
-    protected final <T extends Metric> T getOrAdd(MetricName name, T metric) {
-        final Metric existingMetric = metrics.get(name);
-        if (existingMetric == null) {
-            final Metric justAddedMetric = metrics.putIfAbsent(name, metric);
-            if (justAddedMetric == null) {
-                notifyMetricAdded(name, metric);
-                return metric;
-            }
-
-            if (metric instanceof Stoppable) {
-                ((Stoppable) metric).stop();
-            }
-
-            return (T) justAddedMetric;
-        }
-        return (T) existingMetric;
-    }
-
     /**
      * Adds a {@link MetricsRegistryListener} to a collection of listeners that will be notified on
      * metric creation.  Listeners will be notified in the order in which they are added.
@@ -528,6 +520,10 @@ public class MetricsRegistry {
         listeners.remove(listener);
     }
 
+    private ScheduledExecutorService newMeterTickThreadPool() {
+        return threadPools.newScheduledThreadPool(2, "meter-tick");
+    }
+
     private void notifyMetricRemoved(MetricName name) {
         for (MetricsRegistryListener listener : listeners) {
             listener.onMetricRemoved(name);
@@ -538,5 +534,24 @@ public class MetricsRegistry {
         for (MetricsRegistryListener listener : listeners) {
             listener.onMetricAdded(name, metric);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected final <T extends Metric> T getOrAdd(MetricName name, T metric) {
+        final Metric existingMetric = metrics.get(name);
+        if (existingMetric == null) {
+            final Metric justAddedMetric = metrics.putIfAbsent(name, metric);
+            if (justAddedMetric == null) {
+                notifyMetricAdded(name, metric);
+                return metric;
+            }
+
+            if (metric instanceof Stoppable) {
+                ((Stoppable) metric).stop();
+            }
+
+            return (T) justAddedMetric;
+        }
+        return (T) existingMetric;
     }
 }

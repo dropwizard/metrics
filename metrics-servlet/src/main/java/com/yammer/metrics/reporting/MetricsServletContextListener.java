@@ -18,7 +18,7 @@ public class MetricsServletContextListener implements ServletContextListener {
         final ServletContext context = sce.getServletContext();
         final MetricsRegistry metricsRegistry = (MetricsRegistry) context.getAttribute(MetricsServlet.ATTR_NAME_METRICS_REGISTRY);
         if (metricsRegistry != null) {
-            metricsRegistry.threadPools().shutdownThreadPools();
+            metricsRegistry.shutdown();
         } else {
             Metrics.shutdown();
         }
