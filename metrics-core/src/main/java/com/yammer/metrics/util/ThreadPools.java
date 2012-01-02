@@ -41,7 +41,7 @@ public class ThreadPools {
     /**
      * Shuts down all thread pools created by this class in an orderly fashion.
      */
-    public void shutdownThreadPools() {
+    public void shutdown() {
         synchronized (threadPools) {
             for (ExecutorService executor : threadPools.values()) {
                 executor.shutdown();
