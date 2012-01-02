@@ -1,6 +1,8 @@
 package com.yammer.metrics.util;
 
 import com.yammer.metrics.core.Counter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * When a thread throws an Exception that was not caught, a DeathRattleExceptionHandler will
@@ -25,13 +27,15 @@ import com.yammer.metrics.core.Counter;
  * Setting the global default exception handler should be done first, like so:
  * <p/>
  * <pre><code>
- * final Counter c = Metrics.newCounter(MyMainClass.class, "unhandled-thread-deaths")
- * Thread.UncaughtExceptionHandler ohNoIDidntKnowAboutThis = new DeathRattleExceptionHandler(c)
- * Thread.setDefaultUncaughtExceptionHandler(ohNoIDidntKnowAboutThis)
+ * final Counter c = Metrics.newCounter(MyMainClass.class, "unhandled-thread-deaths");
+ * Thread.UncaughtExceptionHandler ohNoIDidntKnowAboutThis = new DeathRattleExceptionHandler(c);
+ * Thread.setDefaultUncaughtExceptionHandler(ohNoIDidntKnowAboutThis);
  * </code></pre>
  */
 public class DeathRattleExceptionHandler implements Thread.UncaughtExceptionHandler {
-    final private Counter deathRattle;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeathRattleExceptionHandler.class);
+
+    private final Counter deathRattle;
 
     public DeathRattleExceptionHandler(Counter deathRattle) {
         this.deathRattle = deathRattle;
@@ -40,7 +44,6 @@ public class DeathRattleExceptionHandler implements Thread.UncaughtExceptionHand
     @Override
     public void uncaughtException(Thread t, Throwable e) {
         deathRattle.inc();
-        System.err.println("Uncaught exception on thread " + t);
-        e.printStackTrace();
+        LOGGER.error("Uncaught exception on thread " + t, e);
     }
 }
