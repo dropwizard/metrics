@@ -43,11 +43,11 @@ public abstract class Clock {
      * Another implementation, uses {@link ThreadMXBean#getCurrentThreadCpuTime()}
      */
     public static class CpuTime extends Clock {
-        private static final ThreadMXBean threadMxBean = ManagementFactory.getThreadMXBean();
+        private static final ThreadMXBean THREAD_MX_BEAN = ManagementFactory.getThreadMXBean();
 
         @Override
         public long tick() {
-            return threadMxBean.getCurrentThreadCpuTime();
+            return THREAD_MX_BEAN.getCurrentThreadCpuTime();
         }
     }
 }
