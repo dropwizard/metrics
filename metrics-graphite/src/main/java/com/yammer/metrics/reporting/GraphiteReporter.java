@@ -417,7 +417,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
         printDoubleField("jvm.memory.heap_usage", heapUsage(), epoch);
         printDoubleField("jvm.memory.non_heap_usage", nonHeapUsage(), epoch);
         for (Entry<String, Double> pool : memoryPoolUsage().entrySet()) {
-            printDoubleField("jvm.memory.memory_pool_usages." + pool.getKey(),
+            printDoubleField("jvm.memory.memory_pool_usages." + pool.getKey().replaceAll(" ", "-"),
                              pool.getValue(),
                              epoch);
         }
