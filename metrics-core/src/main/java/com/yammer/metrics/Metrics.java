@@ -1,7 +1,6 @@
 package com.yammer.metrics;
 
 import com.yammer.metrics.core.*;
-import com.yammer.metrics.reporting.ConsoleReporter;
 import com.yammer.metrics.reporting.JmxReporter;
 
 import javax.management.MalformedObjectNameException;
@@ -413,18 +412,6 @@ public class Metrics {
      */
     public static void removeMetric(Class<?> klass, String name, String scope) {
         DEFAULT_REGISTRY.removeMetric(klass, name, scope);
-    }
-
-    /**
-     * Enables the console reporter and causes it to print to STDOUT with the specified period.
-     *
-     * @param period the period between successive outputs
-     * @param unit   the time unit of {@code period}
-     * @deprecated use {@link ConsoleReporter#enable(long, java.util.concurrent.TimeUnit)} instead
-     */
-    @Deprecated
-    public static void enableConsoleReporting(long period, TimeUnit unit) {
-        ConsoleReporter.enable(DEFAULT_REGISTRY, period, unit);
     }
 
     /**
