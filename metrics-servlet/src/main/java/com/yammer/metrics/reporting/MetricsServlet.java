@@ -5,7 +5,6 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HealthCheck.Result;
 import com.yammer.metrics.core.VirtualMachineMetrics.GarbageCollector;
-import com.yammer.metrics.util.Utils;
 import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
@@ -26,6 +25,7 @@ import java.lang.Thread.State;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
 
 public class MetricsServlet extends HttpServlet implements MetricsProcessor<MetricsServlet.Context> {
@@ -271,7 +271,7 @@ public class MetricsServlet extends HttpServlet implements MetricsProcessor<Metr
     }
 
     public void writeRegularMetrics(JsonGenerator json, String classPrefix, boolean showFullSamples) throws IOException {
-        for (Entry<String, Map<MetricName, Metric>> entry : Utils.sortMetrics(metricsRegistry.allMetrics()).entrySet()) {
+        for (Entry<String,SortedMap<MetricName,Metric>> entry : metricsRegistry.groupedMetrics().entrySet()) {
             if (classPrefix == null || entry.getKey().startsWith(classPrefix)) {
                 json.writeFieldName(entry.getKey());
                 json.writeStartObject();

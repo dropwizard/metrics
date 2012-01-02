@@ -1,35 +1,30 @@
-package com.yammer.metrics.util.tests;
+package com.yammer.metrics.core.tests;
 
+import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Metric;
 import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.util.Utils;
+import com.yammer.metrics.core.MetricsRegistry;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
 
-public class UtilsTest {
+public class MetricsRegistryTest {
     @Test
     public void sortingMetricNamesSortsThemByClassThenScopeThenName() throws Exception {
-        final Map<MetricName, Metric> metrics = new HashMap<MetricName, Metric>();
-
         final MetricName one = new MetricName(Object.class, "one");
         final MetricName two = new MetricName(Object.class, "two");
         final MetricName three = new MetricName(String.class, "three");
 
-        final Metric mOne = mock(Metric.class);
-        final Metric mTwo = mock(Metric.class);
-        final Metric mThree = mock(Metric.class);
-        metrics.put(one, mOne);
-        metrics.put(two, mTwo);
-        metrics.put(three, mThree);
+        final MetricsRegistry registry = new MetricsRegistry();
+        final Counter mOne = registry.newCounter(Object.class, "one");
+        final Counter mTwo = registry.newCounter(Object.class, "two");
+        final Counter mThree = registry.newCounter(String.class, "three");
 
-        final Map<String, Map<MetricName, Metric>> sortedMetrics = new TreeMap<String, Map<MetricName, Metric>>();
+        final SortedMap<String, SortedMap<MetricName, Metric>> sortedMetrics = new TreeMap<String, SortedMap<MetricName, Metric>>();
         final TreeMap<MetricName, Metric> objectMetrics = new TreeMap<MetricName, Metric>();
         objectMetrics.put(one, mOne);
         objectMetrics.put(two, mTwo);
@@ -39,7 +34,8 @@ public class UtilsTest {
         stringMetrics.put(three, mThree);
         sortedMetrics.put(String.class.getCanonicalName(), stringMetrics);
 
-        assertThat(Utils.sortMetrics(metrics),
+        assertThat(registry.groupedMetrics(),
                    is(sortedMetrics));
     }
+
 }

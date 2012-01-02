@@ -3,7 +3,6 @@ package com.yammer.metrics.reporting;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.util.MetricPredicate;
-import com.yammer.metrics.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +11,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -257,9 +257,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricsP
     }
 
     private void printRegularMetrics() {
-        for (Map.Entry<String, Map<MetricName, Metric>> entry : Utils.sortAndFilterMetrics(
-                metricsRegistry.allMetrics(),
-                this.predicate).entrySet()) {
+        for (Map.Entry<String, SortedMap<MetricName, Metric>> entry : metricsRegistry.groupedMetrics(predicate).entrySet()) {
             for (Map.Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
                 final Metric metric = subEntry.getValue();
                 if (metric != null) {

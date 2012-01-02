@@ -1,6 +1,7 @@
 package com.yammer.metrics.core;
 
 import com.yammer.metrics.core.Histogram.SampleType;
+import com.yammer.metrics.util.MetricPredicate;
 import com.yammer.metrics.util.ThreadPools;
 
 import javax.management.MalformedObjectNameException;
@@ -385,6 +386,46 @@ public class MetricsRegistry {
      */
     public Map<MetricName, Metric> allMetrics() {
         return Collections.unmodifiableMap(metrics);
+    }
+
+    /**
+     * Returns a grouped and sorted map of all registered metrics.
+     *
+     * @return all registered metrics, grouped by name and sorted
+     */
+    public SortedMap<String, SortedMap<MetricName, Metric>> groupedMetrics() {
+        return groupedMetrics(MetricPredicate.ALL);
+    }
+
+    /**
+     * Returns a grouped and sorted map of all registered metrics which match then given
+     * {@link MetricPredicate}.
+     *
+     *
+     * @param predicate    a predicate which metrics have to match to be in the results
+     * @return all registered metrics which match {@code predicate}, sorted by name
+     */
+    public SortedMap<String, SortedMap<MetricName, Metric>> groupedMetrics(MetricPredicate predicate) {
+        final SortedMap<String, SortedMap<MetricName, Metric>> groups =
+                new TreeMap<String, SortedMap<MetricName, Metric>>();
+        for (Map.Entry<MetricName, Metric> entry : metrics.entrySet()) {
+            final String qualifiedTypeName = entry.getKey().getGroup() + "." + entry.getKey().getType();
+            if (predicate.matches(entry.getKey(), entry.getValue())) {
+                final String scopedName;
+                if (entry.getKey().hasScope()) {
+                    scopedName = qualifiedTypeName + "." + entry.getKey().getScope();
+                } else {
+                    scopedName = qualifiedTypeName;
+                }
+                SortedMap<MetricName, Metric> group = groups.get(scopedName);
+                if (group == null) {
+                    group = new TreeMap<MetricName, Metric>();
+                    groups.put(scopedName, group);
+                }
+                group.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return groups;
     }
 
     public ThreadPools threadPools() {

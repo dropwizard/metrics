@@ -3,14 +3,13 @@ package com.yammer.metrics.reporting;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.util.MetricPredicate;
-import com.yammer.metrics.util.Utils;
 
 import java.io.PrintStream;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -130,9 +129,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements
                 out.print('=');
             }
             out.println();
-            for (Entry<String, Map<MetricName, Metric>> entry : Utils.sortAndFilterMetrics(
-                    metricsRegistry.allMetrics(),
-                    predicate).entrySet()) {
+            for (Entry<String, SortedMap<MetricName, Metric>> entry : metricsRegistry.groupedMetrics(predicate).entrySet()) {
                 out.print(entry.getKey());
                 out.println(':');
                 for (Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {

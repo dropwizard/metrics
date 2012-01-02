@@ -4,7 +4,6 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.VirtualMachineMetrics.GarbageCollector;
 import com.yammer.metrics.util.MetricPredicate;
-import com.yammer.metrics.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +14,8 @@ import java.io.Writer;
 import java.lang.Thread.State;
 import java.net.Socket;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
 
 
@@ -223,9 +222,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
     }
 
     private void printRegularMetrics(final Long epoch) {
-        for (Entry<String, Map<MetricName, Metric>> entry : Utils.sortAndFilterMetrics(
-                metricsRegistry.allMetrics(),
-                this.predicate).entrySet()) {
+        for (Entry<String,SortedMap<MetricName,Metric>> entry : metricsRegistry.groupedMetrics(predicate).entrySet()) {
             for (Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
                 final Metric metric = subEntry.getValue();
                 if (metric != null) {
