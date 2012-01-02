@@ -94,7 +94,7 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
         if (method.getMethod().isAnnotationPresent(Timed.class)) {
             final Timed annotation = method.getMethod().getAnnotation(Timed.class);
             final Timer timer = Metrics.newTimer(method.getDeclaringResource().getResourceClass(),
-                                                       annotation.name() == null ?
+                                                       annotation.name() == null || annotation.name().equals("")  ?
                                                                method.getMethod().getName() : annotation.name(),
                                                        annotation.durationUnit() == null ?
                                                                TimeUnit.MILLISECONDS : annotation.durationUnit(),
@@ -106,7 +106,7 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
         if (method.getMethod().isAnnotationPresent(Metered.class)) {
             final Metered annotation = method.getMethod().getAnnotation(Metered.class);
             final Meter meter = Metrics.newMeter(method.getDeclaringResource().getResourceClass(),
-                                                       annotation.name() == null ?
+                                                       annotation.name() == null || annotation.name().equals("") ?
                                                                method.getMethod().getName() : annotation.name(),
                                                        annotation.eventType() == null ?
                                                                "requests" : annotation.eventType(),
@@ -118,7 +118,7 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
         if (method.getMethod().isAnnotationPresent(ExceptionMetered.class)) {
             final ExceptionMetered annotation = method.getMethod().getAnnotation(ExceptionMetered.class);
             final Meter meter = Metrics.newMeter(method.getDeclaringResource().getResourceClass(),
-                                                       annotation.name() == null ?
+                                                       annotation.name() == null || annotation.name().equals("") ?
                                                                method.getMethod().getName() + ExceptionMetered.DEFAULT_NAME_SUFFIX : annotation.name(),
                                                        annotation.eventType() == null ?
                                                                "requests" : annotation.eventType(),
