@@ -63,14 +63,14 @@ class Timer(metric: com.yammer.metrics.core.Timer) {
   def values = metric.values.toSeq
 
   /**
-   * Returns an array of durations at the given percentiles.
+   * Returns an array of durations at the given quantiles.
    */
-  def percentiles(percentiles: Seq[java.lang.Double]) = metric.percentiles(percentiles: _*)
+  def quantiles(quantiles: Seq[java.lang.Double]) = metric.quantiles(quantiles: _*)
 
   /**
-   * Returns the duration at the given percentile.
+   * Returns the duration at the given quantile.
    */
-  def percentile(percentile: Double) = metric.percentile(percentile)
+  def quantile(quantile: Double) = metric.quantile(quantile)
 
   /**
    * Returns the timer's rate unit.

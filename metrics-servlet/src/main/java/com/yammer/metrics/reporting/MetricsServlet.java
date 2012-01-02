@@ -298,7 +298,7 @@ public class MetricsServlet extends HttpServlet implements MetricsProcessor<Metr
             json.writeStringField("type", "histogram");
             json.writeNumberField("count", histogram.count());
             writeSummarized(histogram, json);
-            writePercentiles(histogram, json);
+            writeQuantized(histogram, json);
 
             if (context.showFullSamples) {
                 json.writeObjectField("values", histogram.values());
@@ -433,7 +433,7 @@ public class MetricsServlet extends HttpServlet implements MetricsProcessor<Metr
             {
                 json.writeStringField("unit", timer.durationUnit().toString().toLowerCase());
                 writeSummarized(timer,json);
-                writePercentiles(timer, json);
+                writeQuantized(timer, json);
                 if (context.showFullSamples) {
                     json.writeObjectField("values", timer.values());
                 }
@@ -457,14 +457,14 @@ public class MetricsServlet extends HttpServlet implements MetricsProcessor<Metr
         json.writeNumberField("std_dev", metric.stdDev());
     }
     
-    private static void writePercentiles(Percentiled metric, JsonGenerator json) throws IOException {
-        final Double[] percentiles = metric.percentiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
-        json.writeNumberField("median", percentiles[0]);
-        json.writeNumberField("p75", percentiles[1]);
-        json.writeNumberField("p95", percentiles[2]);
-        json.writeNumberField("p98", percentiles[3]);
-        json.writeNumberField("p99", percentiles[4]);
-        json.writeNumberField("p999", percentiles[5]);
+    private static void writeQuantized(Quantized metric, JsonGenerator json) throws IOException {
+        final Double[] quantiles = metric.quantiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
+        json.writeNumberField("median", quantiles[0]);
+        json.writeNumberField("p75", quantiles[1]);
+        json.writeNumberField("p95", quantiles[2]);
+        json.writeNumberField("p98", quantiles[3]);
+        json.writeNumberField("p99", quantiles[4]);
+        json.writeNumberField("p999", quantiles[5]);
     }
     
     private static void writeMeteredFields(Metered metered, JsonGenerator json) throws IOException {
