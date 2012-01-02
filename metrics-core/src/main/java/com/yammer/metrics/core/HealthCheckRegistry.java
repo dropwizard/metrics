@@ -33,6 +33,15 @@ public class HealthCheckRegistry {
     }
 
     /**
+     * Unregisters the given {@link HealthCheck}.
+     *
+     * @param healthCheck    a {@link HealthCheck}
+     */
+    public void unregister(HealthCheck healthCheck) {
+        unregister(healthCheck.getName());
+    }
+
+    /**
      * Runs the registered health checks and returns a map of the results.
      *
      * @return a map of the health check results
