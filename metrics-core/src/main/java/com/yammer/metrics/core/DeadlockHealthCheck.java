@@ -6,9 +6,11 @@ import java.util.Set;
  * A {@link HealthCheck} implementation which returns a list of deadlocked threads, if any.
  */
 public class DeadlockHealthCheck extends HealthCheck {
+    private final VirtualMachineMetrics vm = VirtualMachineMetrics.INSTANCE;
+
     @Override
     public Result check() throws Exception {
-        final Set<String> threads = VirtualMachineMetrics.deadlockedThreads();
+        final Set<String> threads = vm.deadlockedThreads();
         if (!threads.isEmpty()) {
             final StringBuilder builder = new StringBuilder("Deadlocked threads detected:\n");
             for (String thread : threads) {

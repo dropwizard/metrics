@@ -2,7 +2,7 @@ package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
-import com.yammer.metrics.core.VirtualMachineMetrics.*;
+import com.yammer.metrics.core.VirtualMachineMetrics.GarbageCollector;
 import com.yammer.metrics.util.MetricPredicate;
 import com.yammer.metrics.util.Utils;
 import org.slf4j.Logger;
@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
-import static com.yammer.metrics.core.VirtualMachineMetrics.*;
-
 
 /**
  * A simple reporter which sends out application metrics to a <a href="http://graphite.wikidot.com/faq">Graphite</a>
@@ -33,6 +31,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
     private final Locale locale = Locale.US;
     private final Clock clock;
     private final SocketProvider socketProvider;
+    private final VirtualMachineMetrics vm;
     private Writer writer;
     public boolean printVMMetrics = true;
 
@@ -155,8 +154,24 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
      * @throws IOException if there is an error connecting to the Graphite server
      */
     public GraphiteReporter(MetricsRegistry metricsRegistry, String prefix, MetricPredicate predicate, SocketProvider socketProvider, Clock clock) throws IOException {
+        this(metricsRegistry, prefix, predicate, socketProvider, clock, VirtualMachineMetrics.INSTANCE);
+    }
+
+    /**
+     * Creates a new {@link GraphiteReporter}.
+     *
+     * @param metricsRegistry the metrics registry
+     * @param prefix          is prepended to all names reported to graphite
+     * @param predicate       filters metrics to be reported
+     * @param socketProvider  a {@link SocketProvider} instance
+     * @param clock           a {@link Clock} instance
+     * @param vm              a {@link VirtualMachineMetrics} instance
+     * @throws IOException if there is an error connecting to the Graphite server
+     */
+    public GraphiteReporter(MetricsRegistry metricsRegistry, String prefix, MetricPredicate predicate, SocketProvider socketProvider, Clock clock, VirtualMachineMetrics vm) throws IOException {
         super(metricsRegistry, "graphite-reporter");
         this.socketProvider = socketProvider;
+        this.vm = vm;
 
         this.clock = clock;
 
@@ -323,22 +338,22 @@ public class GraphiteReporter extends AbstractPollingReporter implements Metrics
     }
 
     private void printVmMetrics(long epoch) {
-        sendFloat(epoch, "jvm.memory", "heap_usage", heapUsage());
-        sendFloat(epoch, "jvm.memory", "non_heap_usage", nonHeapUsage());
-        for (Entry<String, Double> pool : memoryPoolUsage().entrySet()) {
+        sendFloat(epoch, "jvm.memory", "heap_usage", vm.heapUsage());
+        sendFloat(epoch, "jvm.memory", "non_heap_usage", vm.nonHeapUsage());
+        for (Entry<String, Double> pool : vm.memoryPoolUsage().entrySet()) {
             sendFloat(epoch, "jvm.memory.memory_pool_usages", pool.getKey(), pool.getValue());
         }
 
-        sendInt(epoch, "jvm", "daemon_thread_count", daemonThreadCount());
-        sendInt(epoch, "jvm", "thread_count", threadCount());
-        sendInt(epoch, "jvm", "uptime", uptime());
-        sendFloat(epoch, "jvm", "fd_usage", fileDescriptorUsage());
+        sendInt(epoch, "jvm", "daemon_thread_count", vm.daemonThreadCount());
+        sendInt(epoch, "jvm", "thread_count", vm.threadCount());
+        sendInt(epoch, "jvm", "uptime", vm.uptime());
+        sendFloat(epoch, "jvm", "fd_usage", vm.fileDescriptorUsage());
 
-        for (Entry<State, Double> entry : threadStatePercentages().entrySet()) {
+        for (Entry<State, Double> entry : vm.threadStatePercentages().entrySet()) {
             sendFloat(epoch, "jvm.thread-states", entry.getKey().toString().toLowerCase(), entry.getValue());
         }
 
-        for (Entry<String, GarbageCollector> entry : garbageCollectors().entrySet()) {
+        for (Entry<String, GarbageCollector> entry : vm.garbageCollectors().entrySet()) {
             final String name = "jvm.gc." + entry.getKey();
             sendInt(epoch, name, "time", entry.getValue().getTime(TimeUnit.MILLISECONDS));
             sendInt(epoch, name, "runs", entry.getValue().getRuns());

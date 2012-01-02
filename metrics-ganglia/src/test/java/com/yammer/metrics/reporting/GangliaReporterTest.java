@@ -1,8 +1,13 @@
 package com.yammer.metrics.reporting;
 
-import static junit.framework.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.yammer.metrics.core.Clock;
+import com.yammer.metrics.core.MetricName;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.VirtualMachineMetrics;
+import com.yammer.metrics.reporting.tests.AbstractPollingReporterTest;
+import com.yammer.metrics.util.MetricPredicate;
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,14 +15,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.SocketException;
 
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-
-import com.yammer.metrics.core.Clock;
-import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.reporting.tests.AbstractPollingReporterTest;
-import com.yammer.metrics.util.MetricPredicate;
+import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class GangliaReporterTest extends AbstractPollingReporterTest {
     private GangliaMessage testMessage;
@@ -65,7 +65,8 @@ public class GangliaReporterTest extends AbstractPollingReporterTest {
                                                              "group-prefix",
                                                              MetricPredicate.ALL,
                                                              false,
-                                                             messageBuilder) {
+                                                             messageBuilder,
+                                                             VirtualMachineMetrics.INSTANCE) {
             @Override
             String getHostLabel() {
                 return "localhost";
