@@ -1,6 +1,5 @@
 package com.yammer.metrics.core;
 
-import com.yammer.metrics.Metrics;
 import com.yammer.metrics.stats.EWMA;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -17,20 +16,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Meter implements Metered, Stoppable {
     private static final long INTERVAL = 5; // seconds
     private final Clock clock;
-
-    /**
-     * Creates a new {@link Meter}.
-     *
-     * @param eventType the plural name of the event the meter is measuring (e.g., {@code
-     *                  "requests"})
-     * @param rateUnit  the rate unit of the new meter
-     * @return a new {@link Meter}
-     * @deprecated use the other {@code newMeter} method or create a new meter via the {@link
-     *             MetricsRegistry} or {@link Metrics}
-     */
-    public static Meter newMeter(String eventType, TimeUnit rateUnit) {
-        return newMeter(Metrics.defaultRegistry().newMeterTickThreadPool(), eventType, rateUnit);
-    }
 
     /**
      * Creates a new {@link Meter}.
