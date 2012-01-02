@@ -19,12 +19,8 @@ public class Metrics {
     };
 
     static {
-        {
-            JmxReporter.startDefault(DEFAULT_REGISTRY);
-            // make sure we initialize this so it can monitor GC etc
-            VirtualMachineMetrics.INSTANCE.daemonThreadCount();
-            Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
-        }
+        JmxReporter.startDefault(DEFAULT_REGISTRY);
+        Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
     }
 
     private Metrics() { /* unused */ }
