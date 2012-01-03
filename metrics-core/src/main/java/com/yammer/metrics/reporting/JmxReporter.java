@@ -325,12 +325,20 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
 
     public static final class Context {
-        final MetricName metricName;
-        final ObjectName objectName;
+        private final MetricName metricName;
+        private final ObjectName objectName;
 
         public Context(final MetricName metricName, final ObjectName objectName) {
             this.metricName = metricName;
             this.objectName = objectName;
+        }
+
+        MetricName getMetricName() {
+            return metricName;
+        }
+
+        ObjectName getObjectName() {
+            return objectName;
         }
     }
 
@@ -354,31 +362,34 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     @Override
     public void processMeter(MetricName name, Metered meter, Context context) throws Exception {
-        registerBean(context.metricName, new Meter(meter, context.objectName), context.objectName);
+        registerBean(context.getMetricName(), new Meter(meter, context.getObjectName()),
+                     context.getObjectName());
     }
 
     @Override
     public void processCounter(MetricName name, com.yammer.metrics.core.Counter counter, Context context) throws Exception {
-        registerBean(context.metricName,
-                     new Counter(counter, context.objectName),
-                     context.objectName);
+        registerBean(context.getMetricName(),
+                     new Counter(counter, context.getObjectName()),
+                     context.getObjectName());
     }
 
     @Override
     public void processHistogram(MetricName name, com.yammer.metrics.core.Histogram histogram, Context context) throws Exception {
-        registerBean(context.metricName,
-                     new Histogram(histogram, context.objectName),
-                     context.objectName);
+        registerBean(context.getMetricName(),
+                     new Histogram(histogram, context.getObjectName()),
+                     context.getObjectName());
     }
 
     @Override
     public void processTimer(MetricName name, com.yammer.metrics.core.Timer timer, Context context) throws Exception {
-        registerBean(context.metricName, new Timer(timer, context.objectName), context.objectName);
+        registerBean(context.getMetricName(), new Timer(timer, context.getObjectName()),
+                     context.getObjectName());
     }
 
     @Override
     public void processGauge(MetricName name, com.yammer.metrics.core.Gauge<?> gauge, Context context) throws Exception {
-        registerBean(context.metricName, new Gauge(gauge, context.objectName), context.objectName);
+        registerBean(context.getMetricName(), new Gauge(gauge, context.getObjectName()),
+                     context.getObjectName());
     }
 
     @Override
