@@ -28,6 +28,13 @@ public interface Sample {
     void update(long value);
 
     /**
+     * Returns a snapshot of the sample's values.
+     *
+     * @return a snapshot of the sample's values
+     */
+    Snapshot getSnapshot();
+
+    /**
      * Returns a copy of the sample's values.
      *
      * @return a copy of the sample's values

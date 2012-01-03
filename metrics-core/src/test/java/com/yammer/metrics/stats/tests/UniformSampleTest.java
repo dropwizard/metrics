@@ -1,5 +1,6 @@
 package com.yammer.metrics.stats.tests;
 
+import com.yammer.metrics.stats.Snapshot;
 import com.yammer.metrics.stats.UniformSample;
 import org.junit.Test;
 
@@ -15,20 +16,22 @@ public class UniformSampleTest {
             sample.update(i);
         }
 
+        final Snapshot snapshot = sample.getSnapshot();
+
         assertThat("the sample has a size of 100",
                    sample.size(),
                    is(100));
 
         assertThat("the sample has 100 elements",
-                   sample.values().size(),
+                   snapshot.size(),
                    is(100));
 
-        for (Long i : sample.values()) {
+        for (double i : snapshot.getValues()) {
             assertThat("the sample only contains elements from the population",
                        i,
                        is(allOf(
-                               lessThan(1000L),
-                               greaterThanOrEqualTo(0L)
+                               lessThan(1000.0),
+                               greaterThanOrEqualTo(0.0)
                        )));
         }
     }
