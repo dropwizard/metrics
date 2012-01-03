@@ -3,7 +3,7 @@ package com.yammer.metrics.core;
 /**
  * An object which can produce statistical summaries.
  */
-public interface Summarized {
+public interface Summarizable {
     /**
      * Returns the largest recorded value.
      *

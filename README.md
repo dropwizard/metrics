@@ -11,4 +11,4 @@ License
 
 Copyright (c) 2010-2011 Coda Hale, Yammer.com
 
-Published under The MIT License, see LICENSE
+Published under Apache Software License 2.0, see LICENSE

@@ -307,26 +307,26 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
     @Override
     public void processHistogram(MetricName name, Histogram histogram, Long epoch) throws IOException {
         final String sanitizedName = sanitizeName(name);
-        sendSummarized(epoch, sanitizedName, histogram);
-        sendQuantized(epoch, sanitizedName, histogram);
+        sendSummarizable(epoch, sanitizedName, histogram);
+        sendSampling(epoch, sanitizedName, histogram);
     }
 
     @Override
     public void processTimer(MetricName name, Timer timer, Long epoch) throws IOException {
         processMeter(name, timer, epoch);
         final String sanitizedName = sanitizeName(name);
-        sendSummarized(epoch, sanitizedName, timer);
-        sendQuantized(epoch, sanitizedName, timer);
+        sendSummarizable(epoch, sanitizedName, timer);
+        sendSampling(epoch, sanitizedName, timer);
     }
 
-    private void sendSummarized(long epoch, String sanitizedName, Summarized metric) throws IOException {
+    private void sendSummarizable(long epoch, String sanitizedName, Summarizable metric) throws IOException {
         sendFloat(epoch, sanitizedName, "min", metric.min());
         sendFloat(epoch, sanitizedName, "max", metric.max());
         sendFloat(epoch, sanitizedName, "mean", metric.mean());
         sendFloat(epoch, sanitizedName, "stddev", metric.stdDev());
     }
 
-    private void sendQuantized(long epoch, String sanitizedName, Quantized metric) throws IOException {
+    private void sendSampling(long epoch, String sanitizedName, Sampling metric) throws IOException {
         final Snapshot snapshot = metric.getSnapshot();
         sendFloat(epoch, sanitizedName, "median", snapshot.getMedian());
         sendFloat(epoch, sanitizedName, "75percentile", snapshot.get75thPercentile());

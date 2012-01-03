@@ -27,8 +27,6 @@ v2.0.0-BETA19: TBD
   `#newScheduledThreadPool`.
 * Added `MetricsRegistry#shutdown()`.
 * Renamed `ThreadPools#shutdownThreadPools()` to `#shutdown()`.
-* Renamed `Percentiled` to `Quantized`, and `#percentile(double)` and `#percentiles(Double[])` to
-  `#quantile` and `#quantiles`. This affects both `Histogram` and `Timer`.
 * Replaced `HealthCheck`'s abstract `name` method with a required constructor parameter.
 * `HealthCheck#check()` is now `protected`.
 * Moved `DeadlockHealthCheck` from `com.yammer.metrics.core` to `com.yammer.metrics.utils`.
@@ -39,6 +37,10 @@ v2.0.0-BETA19: TBD
 * `Metrics.newJmxGauge` and `MetricsRegistry.newJmxGauge` are deprecated.
 * Added `metrics-guava`, which allows you to measure cache misses and evictions.
 * Fixed heap metrics in `VirtualMachineMetrics`.
+* Added `Snapshot`, which calculates quantiles.
+* Renamed `Percentiled` to `Sampling` and dropped `percentile` and `percentiles` in favor of
+  producing `Snapshot` instances. This affects both `Histogram` and `Timer`.
+* Renamed `Summarized` to `Summarizable`.
 
 
 v2.0.0-BETA18: Dec 16 2011
