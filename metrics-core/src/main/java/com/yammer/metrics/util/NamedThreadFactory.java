@@ -11,6 +11,12 @@ public class NamedThreadFactory implements ThreadFactory {
     private final AtomicInteger threadNumber = new AtomicInteger(1);
     private final String namePrefix;
 
+    /**
+     * Creates a new {@link NamedThreadFactory} with the given name.
+     *
+     * @param name    the name of the threads, to be used in the pattern
+     *                {@code metrics-$NAME$-thread-$NUMBER$}
+     */
     public NamedThreadFactory(String name) {
         final SecurityManager s = System.getSecurityManager();
         this.group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();

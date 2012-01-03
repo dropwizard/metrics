@@ -2,9 +2,18 @@ package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.core.MetricsRegistry;
 
+/**
+ * The base class for all metric reporters.
+ */
 public abstract class AbstractReporter {
     private final MetricsRegistry metricsRegistry;
 
+    /**
+     * Creates a new {@link AbstractReporter} instance.
+     *
+     * @param registry    the {@link MetricsRegistry} containing the metrics this reporter will
+     *                    report
+     */
     protected AbstractReporter(MetricsRegistry registry) {
         this.metricsRegistry = registry;
     }

@@ -528,6 +528,14 @@ public class MetricsRegistry {
         return new ConcurrentHashMap<MetricName, Metric>(EXPECTED_METRIC_COUNT);
     }
 
+    /**
+     * Gets any existing metric with the given name or, if none exists, adds the given metric.
+     *
+     * @param name      the metric's name
+     * @param metric    the new metric
+     * @param <T>       the type of the metric
+     * @return either the existing metric or {@code metric}
+     */
     @SuppressWarnings("unchecked")
     protected final <T extends Metric> T getOrAdd(MetricName name, T metric) {
         final Metric existingMetric = metrics.get(name);

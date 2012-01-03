@@ -41,6 +41,8 @@ v2.0.0-BETA19: TBD
 * Renamed `Percentiled` to `Sampling` and dropped `percentile` and `percentiles` in favor of
   producing `Snapshot` instances. This affects both `Histogram` and `Timer`.
 * Renamed `Summarized` to `Summarizable`.
+* Changed order of `CsvReporter`'s construction parameters.
+* Renamed `VirtualMachineMetrics.GarbageCollector` to `VirtualMachineMetrics.GarbageCollectorStats`.
 
 
 v2.0.0-BETA18: Dec 16 2011
