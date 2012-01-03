@@ -38,6 +38,7 @@ v2.0.0-BETA19: TBD
 * All metric types are created exclusively through `MetricsRegistry` now.
 * `Metrics.newJmxGauge` and `MetricsRegistry.newJmxGauge` are deprecated.
 * Added `metrics-guava`, which allows you to measure cache misses and evictions.
+* Fixed heap metrics in `VirtualMachineMetrics`.
 
 
 v2.0.0-BETA18: Dec 16 2011
