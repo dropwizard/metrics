@@ -1,6 +1,5 @@
 package com.yammer.metrics.core;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.Thread.State;
@@ -295,9 +294,8 @@ public class VirtualMachineMetrics {
      * Dumps all of the threads' current information to an output stream.
      *
      * @param out an output stream
-     * @throws IOException if something goes wrong
      */
-    public void threadDump(OutputStream out) throws IOException {
+    public void threadDump(OutputStream out) {
         final ThreadInfo[] threads = ManagementFactory.getThreadMXBean().dumpAllThreads(true, true);
         final PrintWriter writer = new PrintWriter(out, true);
 
