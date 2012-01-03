@@ -434,7 +434,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
 
     String getHostLabel() {
         try {
-            InetAddress addr = InetAddress.getLocalHost();
+            final InetAddress addr = InetAddress.getLocalHost();
             return addr.getHostAddress() + ":" + addr.getHostName();
         } catch (UnknownHostException e) {
             LOG.error("Unable to get local gangliaHost name: ", e);
@@ -448,9 +448,9 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
         }
         final String qualifiedTypeName = name.getGroup() + "." + name.getType() + "." + name.getName();
         final String metricName = name.hasScope() ? qualifiedTypeName + '.' + name.getScope() : qualifiedTypeName;
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < metricName.length(); i++) {
-            char p = metricName.charAt(i);
+            final char p = metricName.charAt(i);
             if (!(p >= 'A' && p <= 'Z')
                     && !(p >= 'a' && p <= 'z')
                     && !(p >= '0' && p <= '9')
@@ -468,9 +468,9 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
 
     private String compressPackageName(String name) {
         if (compressPackageNames && name.indexOf(".") > 0) {
-            String[] nameParts = name.split("\\.");
-            StringBuilder sb = new StringBuilder();
-            int numParts = nameParts.length;
+            final String[] nameParts = name.split("\\.");
+            final StringBuilder sb = new StringBuilder();
+            final int numParts = nameParts.length;
             int count = 0;
             for (String namePart : nameParts) {
                 if (++count < numParts - 1) {

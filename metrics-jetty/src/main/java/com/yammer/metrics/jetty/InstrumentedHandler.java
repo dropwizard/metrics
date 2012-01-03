@@ -1,22 +1,10 @@
 package com.yammer.metrics.jetty;
 
-import static org.eclipse.jetty.http.HttpMethods.CONNECT;
-import static org.eclipse.jetty.http.HttpMethods.DELETE;
-import static org.eclipse.jetty.http.HttpMethods.GET;
-import static org.eclipse.jetty.http.HttpMethods.HEAD;
-import static org.eclipse.jetty.http.HttpMethods.OPTIONS;
-import static org.eclipse.jetty.http.HttpMethods.POST;
-import static org.eclipse.jetty.http.HttpMethods.PUT;
-import static org.eclipse.jetty.http.HttpMethods.TRACE;
-
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Gauge;
+import com.yammer.metrics.core.Meter;
+import com.yammer.metrics.core.Timer;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationListener;
 import org.eclipse.jetty.server.AsyncContinuation;
@@ -24,10 +12,13 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Counter;
-import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.Timer;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import static org.eclipse.jetty.http.HttpMethods.*;
 
 /**
  * A Jetty {@link Handler} which records various metrics about an underlying
@@ -177,8 +168,8 @@ public class InstrumentedHandler extends HandlerWrapper {
 
         final AsyncContinuation continuation = request.getAsyncContinuation();
 
-        long start;
-        boolean isMilliseconds;
+        final long start;
+        final boolean isMilliseconds;
 
         if (continuation.isInitial()) {
             activeRequests.inc();

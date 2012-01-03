@@ -22,7 +22,7 @@ public class MeteredTest {
 
     @Before
     public void setup() {
-        Injector injector = Guice.createInjector(new InstrumentationModule());
+        final Injector injector = Guice.createInjector(new InstrumentationModule());
         instance = injector.getInstance(InstrumentedWithMetered.class);
         registry = injector.getInstance(MetricsRegistry.class);
     }

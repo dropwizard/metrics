@@ -21,7 +21,7 @@ class SearchingClassLoader extends ClassLoader {
     }
 
     private static ClassLoader combineLoadersOf(Class<?> first, Class<?>... others) {
-        List<ClassLoader> loaders = new ArrayList<ClassLoader>();
+        final List<ClassLoader> loaders = new ArrayList<ClassLoader>();
 
         addIfNewElement(loaders, first.getClassLoader());
         for (Class<?> c : others) {
