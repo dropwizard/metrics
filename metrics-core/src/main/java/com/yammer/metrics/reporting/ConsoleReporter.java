@@ -228,7 +228,8 @@ public class ConsoleReporter extends AbstractPollingReporter implements
                 return "h";
             case DAYS:
                 return "d";
+            default:
+                throw new IllegalArgumentException("Unrecognized TimeUnit: " + unit);
         }
-        throw new IllegalArgumentException("Unrecognized TimeUnit: " + unit);
     }
 }
