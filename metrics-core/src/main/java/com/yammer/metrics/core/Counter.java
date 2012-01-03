@@ -36,7 +36,7 @@ public class Counter implements Metric {
     }
 
     /**
-     * Decrement the counter by {@code n}
+     * Decrement the counter by {@code n}.
      *
      * @param n the amount by which the counter will be increased
      */
