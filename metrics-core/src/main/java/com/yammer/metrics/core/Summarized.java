@@ -1,33 +1,35 @@
 package com.yammer.metrics.core;
 
+/**
+ * An object which can produce statistical summaries.
+ */
 public interface Summarized {
-
     /**
      * Returns the largest recorded value.
      *
      * @return the largest recorded value
      */
-    public double max();
+    double max();
 
     /**
      * Returns the smallest recorded value.
      *
      * @return the smallest recorded value
      */
-    public double min();
+    double min();
 
     /**
      * Returns the arithmetic mean of all recorded values.
      *
      * @return the arithmetic mean of all recorded values
      */
-    public double mean();
+    double mean();
 
     /**
      * Returns the standard deviation of all recorded values.
      *
      * @return the standard deviation of all recorded values
      */
-    public double stdDev();
+    double stdDev();
 
 }
