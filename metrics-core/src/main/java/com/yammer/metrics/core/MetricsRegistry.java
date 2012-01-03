@@ -75,7 +75,10 @@ public class MetricsRegistry {
      * @param attribute  the name of the bean's attribute
      * @return a new {@link JmxGauge}
      * @throws MalformedObjectNameException if the object name is malformed
+     * @deprecated use {@link #newGauge(Class, String, Gauge)} and {@link JmxGauge} instead
      */
+    @Deprecated
+    @SuppressWarnings({"UnusedDeclaration", "deprecation"})
     public JmxGauge newJmxGauge(Class<?> klass,
                                 String name,
                                 String objectName,
@@ -94,7 +97,10 @@ public class MetricsRegistry {
      * @param attribute  the name of the bean's attribute
      * @return a new {@link JmxGauge}
      * @throws MalformedObjectNameException if the object name is malformed
+     * @deprecated use {@link #newGauge(Class, String, String, Gauge)} and {@link JmxGauge} instead
      */
+    @Deprecated
+    @SuppressWarnings("deprecation")
     public JmxGauge newJmxGauge(Class<?> klass,
                                 String name,
                                 String scope,
@@ -112,7 +118,9 @@ public class MetricsRegistry {
      * @param attribute  the name of the bean's attribute
      * @return a new {@link JmxGauge}
      * @throws MalformedObjectNameException if the object name is malformed
+     * @deprecated use {@link #newGauge(MetricName, Gauge)} and {@link JmxGauge} instead
      */
+    @Deprecated
     public JmxGauge newJmxGauge(MetricName metricName,
                                 String objectName,
                                 String attribute) throws MalformedObjectNameException {
