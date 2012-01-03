@@ -121,7 +121,7 @@ public abstract class HealthCheck {
             return builder.toString();
         }
     }
-    
+
     private final String name;
 
     /**
