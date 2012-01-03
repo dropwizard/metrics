@@ -2,6 +2,9 @@ package com.yammer.metrics.core;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * An object which maintains mean and exponentially-weighted rate.
+ */
 public interface Metered extends Metric {
     /**
      * Returns the meter's rate unit.
