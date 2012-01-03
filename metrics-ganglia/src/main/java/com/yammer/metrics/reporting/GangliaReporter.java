@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * which is based on <a href="http://search-hadoop.com/c/Hadoop:/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/metrics/ganglia/GangliaContext31.java">GangliaContext31</a>
  * from Hadoop.
  */
-public class GangliaReporter extends AbstractPollingReporter implements MetricsProcessor<String> {
+public class GangliaReporter extends AbstractPollingReporter implements MetricProcessor<String> {
     private static final Logger LOG = LoggerFactory.getLogger(GangliaReporter.class);
     private static final int GANGLIA_TMAX = 60;
     private static final int GANGLIA_DMAX = 0;

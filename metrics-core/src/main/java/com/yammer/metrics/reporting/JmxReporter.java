@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * A reporter which exposes application metric as JMX MBeans.
  */
 public class JmxReporter extends AbstractReporter implements MetricsRegistryListener,
-                                                             MetricsProcessor<JmxReporter.Context> {
+                                                             MetricProcessor<JmxReporter.Context> {
 
     private final Map<MetricName, ObjectName> registeredBeans;
     private final MBeanServer server;

@@ -295,7 +295,7 @@ public class Histogram implements Metric, Quantized, Summarized {
     }
 
     @Override
-    public <T> void processWith(MetricsProcessor<T> processor, MetricName name, T context) throws Exception {
+    public <T> void processWith(MetricProcessor<T> processor, MetricName name, T context) throws Exception {
         processor.processHistogram(name, this, context);
     }
 }

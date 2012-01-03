@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class CsvReporter extends AbstractPollingReporter implements
-                                                         MetricsProcessor<CsvReporter.Context> {
+                                                         MetricProcessor<CsvReporter.Context> {
     private final MetricPredicate predicate;
     private final File outputDir;
     private final Map<MetricName, PrintStream> streamMap;

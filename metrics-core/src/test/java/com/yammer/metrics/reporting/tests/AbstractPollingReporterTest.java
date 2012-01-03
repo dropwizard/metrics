@@ -139,7 +139,7 @@ public abstract class AbstractPollingReporterTest {
         when(mock.count()).thenReturn(count);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
-            void delegateToProcessor(MetricsProcessor processor, MetricName name, Object context) throws Exception {
+            void delegateToProcessor(MetricProcessor processor, MetricName name, Object context) throws Exception {
                 processor.processCounter(name, mock, context);
             }
         }));
@@ -152,7 +152,7 @@ public abstract class AbstractPollingReporterTest {
         setupQuantizedMock(mock);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
-            void delegateToProcessor(MetricsProcessor processor, MetricName name, Object context) throws Exception {
+            void delegateToProcessor(MetricProcessor processor, MetricName name, Object context) throws Exception {
                 processor.processHistogram(name, mock, context);
             }
         }));
@@ -164,7 +164,7 @@ public abstract class AbstractPollingReporterTest {
         when(mock.value()).thenReturn("gaugeValue");
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
-            void delegateToProcessor(MetricsProcessor processor, MetricName name, Object context) throws Exception {
+            void delegateToProcessor(MetricProcessor processor, MetricName name, Object context) throws Exception {
                 processor.processGauge(name, mock, context);
             }
         }));
@@ -179,7 +179,7 @@ public abstract class AbstractPollingReporterTest {
         setupQuantizedMock(mock);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
-            void delegateToProcessor(MetricsProcessor processor, MetricName name, Object context) throws Exception {
+            void delegateToProcessor(MetricProcessor processor, MetricName name, Object context) throws Exception {
                 processor.processTimer(name, mock, context);
             }
         }));
@@ -191,7 +191,7 @@ public abstract class AbstractPollingReporterTest {
         setupMeteredMock(mock);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
-            void delegateToProcessor(MetricsProcessor processor, MetricName name, Object context) throws Exception {
+            void delegateToProcessor(MetricProcessor processor, MetricName name, Object context) throws Exception {
                 processor.processMeter(name, mock, context);
             }
         }));
@@ -199,21 +199,21 @@ public abstract class AbstractPollingReporterTest {
 
     @SuppressWarnings("unchecked")
     static <T extends Metric> T configureMatcher(T mock, Stubber stub) throws Exception {
-        stub.when(mock).processWith(any(MetricsProcessor.class), any(MetricName.class), any());
+        stub.when(mock).processWith(any(MetricProcessor.class), any(MetricName.class), any());
         return mock;
     }
 
     static abstract class MetricsProcessorAction implements Answer<Object> {
         @Override
         public Object answer(InvocationOnMock invocation) throws Throwable {
-            final MetricsProcessor<?> processor = (MetricsProcessor<?>) invocation.getArguments()[0];
+            final MetricProcessor<?> processor = (MetricProcessor<?>) invocation.getArguments()[0];
             final MetricName name = (MetricName) invocation.getArguments()[1];
             final Object context = invocation.getArguments()[2];
             delegateToProcessor(processor, name, context);
             return null;
         }
 
-        abstract void delegateToProcessor(MetricsProcessor<?> processor, MetricName name, Object context) throws Exception;
+        abstract void delegateToProcessor(MetricProcessor<?> processor, MetricName name, Object context) throws Exception;
     }
 
     static void setupSummarizedMock(Summarized summarized) {

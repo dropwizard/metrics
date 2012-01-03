@@ -237,7 +237,7 @@ public class Timer implements Metered, Stoppable, Quantized, Summarized {
     }
 
     @Override
-    public <T> void processWith(MetricsProcessor<T> processor, MetricName name, T context) throws Exception {
+    public <T> void processWith(MetricProcessor<T> processor, MetricName name, T context) throws Exception {
         processor.processTimer(name, this, context);
     }
 }

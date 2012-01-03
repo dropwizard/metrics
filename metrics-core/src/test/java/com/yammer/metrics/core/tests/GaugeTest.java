@@ -2,7 +2,7 @@ package com.yammer.metrics.core.tests;
 
 import com.yammer.metrics.core.Gauge;
 import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricsProcessor;
+import com.yammer.metrics.core.MetricProcessor;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
@@ -30,7 +30,7 @@ public class GaugeTest {
     public void isProcessedAsAGauge() throws Exception {
         final MetricName name = new MetricName(GaugeTest.class, "gauge");
         final Object context = new Object();
-        final MetricsProcessor<Object> processor = mock(MetricsProcessor.class);
+        final MetricProcessor<Object> processor = mock(MetricProcessor.class);
 
         gauge.processWith(processor, name, context);
 

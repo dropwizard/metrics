@@ -2,7 +2,7 @@ package com.yammer.metrics.core.tests;
 
 import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricsProcessor;
+import com.yammer.metrics.core.MetricProcessor;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
@@ -71,7 +71,7 @@ public class CounterTest {
     public void isProcessedAsACounter() throws Exception {
         final MetricName name = new MetricName(CounterTest.class, "counter");
         final Object context = new Object();
-        final MetricsProcessor<Object> processor = mock(MetricsProcessor.class);
+        final MetricProcessor<Object> processor = mock(MetricProcessor.class);
 
         counter.processWith(processor, name, context);
 
