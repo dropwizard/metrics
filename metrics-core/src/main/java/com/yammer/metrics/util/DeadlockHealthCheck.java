@@ -6,7 +6,7 @@ import com.yammer.metrics.core.VirtualMachineMetrics;
 import java.util.Set;
 
 /**
- * A {@link com.yammer.metrics.core.HealthCheck} implementation which returns a list of deadlocked threads, if any.
+ * A {@link HealthCheck} implementation which returns a list of deadlocked threads, if any.
  */
 public class DeadlockHealthCheck extends HealthCheck {
     private final VirtualMachineMetrics vm;
