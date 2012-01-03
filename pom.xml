@@ -210,6 +210,14 @@
                                 <encoding>UTF-8</encoding>
                             </configuration>
                         </plugin>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>findbugs-maven-plugin</artifactId>
+                            <version>2.3.2</version>
+                            <configuration>
+                                <effort>Max</effort>
+                            </configuration>
+                        </plugin>
                     </reportPlugins>
                 </configuration>
             </plugin>
