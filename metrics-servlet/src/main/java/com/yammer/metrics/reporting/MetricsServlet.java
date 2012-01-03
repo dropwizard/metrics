@@ -356,12 +356,12 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
                 json.writeNumberField("totalInit", vm.totalInit());
                 json.writeNumberField("totalUsed", vm.totalUsed());
                 json.writeNumberField("totalMax", vm.totalMax());
-                json.writeNumberField("totalCommited", vm.totalCommited());
+                json.writeNumberField("totalCommitted", vm.totalCommitted());
 
                 json.writeNumberField("heapInit", vm.heapInit());
                 json.writeNumberField("heapUsed", vm.heapUsed());
                 json.writeNumberField("heapMax", vm.heapMax());
-                json.writeNumberField("heapCommited", vm.heapCommited());
+                json.writeNumberField("heapCommitted", vm.heapCommitted());
 
                 json.writeNumberField("heap_usage", vm.heapUsage());
                 json.writeNumberField("non_heap_usage", vm.nonHeapUsage());
