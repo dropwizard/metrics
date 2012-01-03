@@ -3,7 +3,9 @@ package com.yammer.metrics.core.tests;
 import com.yammer.metrics.core.Histogram;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricProcessor;
-import com.yammer.metrics.stats.UniformSample;
+import com.yammer.metrics.core.MetricsRegistry;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.closeTo;
@@ -13,10 +15,22 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class HistogramTest {
+    private MetricsRegistry registry;
+    private Histogram histogram;
+
+    @Before
+    public void setUp() throws Exception {
+        this.registry = new MetricsRegistry();
+        this.histogram = registry.newHistogram(HistogramTest.class, "histogram", false);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        registry.shutdown();
+    }
+
     @Test
     public void anEmptyHistogram() throws Exception {
-        final Histogram histogram = new Histogram(new UniformSample(100));
-
         assertThat("the histogram has a count of zero",
                    histogram.count(),
                    is(0L));
@@ -57,55 +71,53 @@ public class HistogramTest {
     }
 
     @Test
-    public void aHistogramWith10000Elements() throws Exception {
-        final Histogram histogram = new Histogram(new UniformSample(100000));
-        for (int i = 1; i <= 10000; i++) {
+    public void aHistogramWith1000Elements() throws Exception {
+        for (int i = 1; i <= 1000; i++) {
             histogram.update(i);
         }
 
-        assertThat("the histogram has a count of zero",
+        assertThat("the histogram has a count of 1000",
                    histogram.count(),
-                   is(10000L));
+                   is(1000L));
 
-        assertThat("the histogram has a max of 10000",
+        assertThat("the histogram has a max of 1000",
                    histogram.max(),
-                   is(closeTo(10000.0, 0.0001)));
+                   is(closeTo(1000.0, 0.0001)));
 
         assertThat("the histogram has a min of 1",
                    histogram.min(),
                    is(closeTo(1.0, 0.0001)));
 
-        assertThat("the histogram has a mean of 5000.5",
+        assertThat("the histogram has a mean of 500.5",
                    histogram.mean(),
-                   is(closeTo(5000.5, 0.0001)));
+                   is(closeTo(500.5, 0.0001)));
 
-        assertThat("the histogram has a standard deviation of 2886.89",
+        assertThat("the histogram has a standard deviation of 288.82",
                    histogram.stdDev(),
-                   is(closeTo(2886.8956799071675, 0.0001)));
+                   is(closeTo(288.8194360957494, 0.0001)));
 
         final Double[] quantiles = histogram.quantiles(0.5, 0.75, 0.99);
 
-        assertThat("the histogram has a median of 5000.5",
+        assertThat("the histogram has a median of 500.5",
                    quantiles[0],
-                   is(closeTo(5000.5, 0.0001)));
+                   is(closeTo(500.5, 0.0001)));
 
-        assertThat("the histogram has a 75th percentile of 7500.75",
+        assertThat("the histogram has a 75th percentile of 750.75",
                    quantiles[1],
-                   is(closeTo(7500.75, 0.0001)));
+                   is(closeTo(750.75, 0.0001)));
 
-        assertThat("the histogram has a 99th percentile of 9900.99",
+        assertThat("the histogram has a 99th percentile of 990.99",
                    quantiles[2],
-                   is(closeTo(9900.99, 0.0001)));
+                   is(closeTo(990.99, 0.0001)));
 
-        assertThat("the histogram is has 10000 values",
+        assertThat("the histogram has 1000 values",
                    histogram.values().size(),
-                   is(10000));
+                   is(1000));
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void isProcessedAsAHistogram() throws Exception {
-        final Histogram histogram = new Histogram(new UniformSample(100000));
         final MetricName name = new MetricName(HistogramTest.class, "histogram");
         final Object context = new Object();
         final MetricProcessor<Object> processor = mock(MetricProcessor.class);

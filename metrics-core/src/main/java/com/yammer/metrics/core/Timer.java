@@ -28,7 +28,7 @@ public class Timer implements Metered, Stoppable, Quantized, Summarized {
      * @param durationUnit the scale unit for this timer's duration metrics
      * @param rateUnit     the scale unit for this timer's rate metrics
      */
-    public Timer(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit) {
+    Timer(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit) {
         this(tickThread, durationUnit, rateUnit, Clock.DEFAULT);
     }
 
@@ -40,7 +40,7 @@ public class Timer implements Metered, Stoppable, Quantized, Summarized {
      * @param rateUnit     the scale unit for this timer's rate metrics
      * @param clock        the clock used to calculate duration
      */
-    public Timer(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
+    Timer(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
         this.durationUnit = durationUnit;
         this.rateUnit = rateUnit;
         this.meter = new Meter(tickThread, "calls", rateUnit, clock);
