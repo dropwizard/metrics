@@ -298,8 +298,8 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
         {
             json.writeStringField("type", "histogram");
             json.writeNumberField("count", histogram.count());
-            writeSummarized(histogram, json);
-            writeQuantized(histogram, json);
+            writeSummarizable(histogram, json);
+            writeSampling(histogram, json);
 
             if (context.showFullSamples) {
                 json.writeObjectField("values", histogram.values());
@@ -433,8 +433,8 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
             json.writeStartObject();
             {
                 json.writeStringField("unit", timer.durationUnit().toString().toLowerCase());
-                writeSummarized(timer,json);
-                writeQuantized(timer, json);
+                writeSummarizable(timer,json);
+                writeSampling(timer, json);
                 if (context.showFullSamples) {
                     json.writeObjectField("values", timer.values());
                 }
@@ -451,14 +451,14 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
         json.writeEndObject();
     }
 
-    private static void writeSummarized(Summarized metric, JsonGenerator json) throws IOException {
+    private static void writeSummarizable(Summarizable metric, JsonGenerator json) throws IOException {
         json.writeNumberField("min", metric.min());
         json.writeNumberField("max", metric.max());
         json.writeNumberField("mean", metric.mean());
         json.writeNumberField("std_dev", metric.stdDev());
     }
     
-    private static void writeQuantized(Quantized metric, JsonGenerator json) throws IOException {
+    private static void writeSampling(Sampling metric, JsonGenerator json) throws IOException {
         final Snapshot snapshot = metric.getSnapshot();
         json.writeNumberField("median", snapshot.getMedian());
         json.writeNumberField("p75", snapshot.get75thPercentile());

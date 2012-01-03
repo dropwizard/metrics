@@ -3,9 +3,9 @@ package com.yammer.metrics.core;
 import com.yammer.metrics.stats.Snapshot;
 
 /**
- * An object which can produce quantiles.
+ * An object which samples values.
  */
-public interface Quantized {
+public interface Sampling {
     /**
      * Returns a snapshot of the values.
      *

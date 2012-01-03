@@ -147,8 +147,8 @@ public abstract class AbstractPollingReporterTest {
     @SuppressWarnings("unchecked")
     static Histogram createHistogram() throws Exception {
         final Histogram mock = mock(Histogram.class);
-        setupSummarizedMock(mock);
-        setupQuantizedMock(mock);
+        setupSummarizableMock(mock);
+        setupSamplingMock(mock);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
             void delegateToProcessor(MetricProcessor processor, MetricName name, Object context) throws Exception {
@@ -173,9 +173,9 @@ public abstract class AbstractPollingReporterTest {
     static Timer createTimer() throws Exception {
         final Timer mock = mock(Timer.class);
         when(mock.durationUnit()).thenReturn(TimeUnit.MILLISECONDS);
-        setupSummarizedMock(mock);
+        setupSummarizableMock(mock);
         setupMeteredMock(mock);
-        setupQuantizedMock(mock);
+        setupSamplingMock(mock);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
             void delegateToProcessor(MetricProcessor processor, MetricName name, Object context) throws Exception {
@@ -215,11 +215,11 @@ public abstract class AbstractPollingReporterTest {
         abstract void delegateToProcessor(MetricProcessor<?> processor, MetricName name, Object context) throws Exception;
     }
 
-    static void setupSummarizedMock(Summarized summarized) {
-        when(summarized.min()).thenReturn(1d);
-        when(summarized.max()).thenReturn(3d);
-        when(summarized.mean()).thenReturn(2d);
-        when(summarized.stdDev()).thenReturn(1.5d);
+    static void setupSummarizableMock(Summarizable summarizable) {
+        when(summarizable.min()).thenReturn(1d);
+        when(summarizable.max()).thenReturn(3d);
+        when(summarizable.mean()).thenReturn(2d);
+        when(summarizable.stdDev()).thenReturn(1.5d);
     }
 
     static void setupMeteredMock(Metered metered) {
@@ -232,12 +232,12 @@ public abstract class AbstractPollingReporterTest {
         when(metered.rateUnit()).thenReturn(TimeUnit.SECONDS);
     }
 
-    static void setupQuantizedMock(Quantized quantized) {
+    static void setupSamplingMock(Sampling sampling) {
         final double[] values = new double[1000];
         for (int i = 0; i < values.length; i++) {
             values[i] = i / 1000.0;
         }
-        when(quantized.getSnapshot()).thenReturn(new Snapshot(values));
+        when(sampling.getSnapshot()).thenReturn(new Snapshot(values));
     }
 
     public abstract String[] expectedGaugeResult(String value);

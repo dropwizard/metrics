@@ -19,7 +19,7 @@ import static java.lang.Math.sqrt;
  * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately computing running
  *      variance</a>
  */
-public class Histogram implements Metric, Quantized, Summarized {
+public class Histogram implements Metric, Sampling, Summarizable {
     /**
      * The type of sampling the histogram should be performing.
      */
@@ -135,7 +135,7 @@ public class Histogram implements Metric, Quantized, Summarized {
     }
 
     /* (non-Javadoc)
-     * @see com.yammer.metrics.core.Summarized#max()
+     * @see com.yammer.metrics.core.Summarizable#max()
      */
     @Override
     public double max() {
@@ -146,7 +146,7 @@ public class Histogram implements Metric, Quantized, Summarized {
     }
 
     /* (non-Javadoc)
-     * @see com.yammer.metrics.core.Summarized#min()
+     * @see com.yammer.metrics.core.Summarizable#min()
      */
     @Override
     public double min() {
@@ -157,7 +157,7 @@ public class Histogram implements Metric, Quantized, Summarized {
     }
 
     /* (non-Javadoc)
-     * @see com.yammer.metrics.core.Summarized#mean()
+     * @see com.yammer.metrics.core.Summarizable#mean()
      */
     @Override
     public double mean() {
@@ -168,7 +168,7 @@ public class Histogram implements Metric, Quantized, Summarized {
     }
 
     /* (non-Javadoc)
-     * @see com.yammer.metrics.core.Summarized#stdDev()
+     * @see com.yammer.metrics.core.Summarizable#stdDev()
      */
     @Override
     public double stdDev() {
