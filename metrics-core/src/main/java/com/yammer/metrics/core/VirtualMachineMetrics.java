@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.Thread.State;
 import java.lang.management.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -150,18 +151,18 @@ public class VirtualMachineMetrics {
     public double fileDescriptorUsage() {
         try {
             final OperatingSystemMXBean bean = getOperatingSystemMXBean();
-            final Method getOpenFileDescriptorCount = bean.getClass()
-                                                          .getDeclaredMethod(
-                                                                  "getOpenFileDescriptorCount");
+            final Method getOpenFileDescriptorCount = bean.getClass().getDeclaredMethod("getOpenFileDescriptorCount");
             getOpenFileDescriptorCount.setAccessible(true);
             final Long openFds = (Long) getOpenFileDescriptorCount.invoke(bean);
-            final Method getMaxFileDescriptorCount = bean.getClass()
-                                                         .getDeclaredMethod(
-                                                                 "getMaxFileDescriptorCount");
+            final Method getMaxFileDescriptorCount = bean.getClass().getDeclaredMethod("getMaxFileDescriptorCount");
             getMaxFileDescriptorCount.setAccessible(true);
             final Long maxFds = (Long) getMaxFileDescriptorCount.invoke(bean);
             return openFds.doubleValue() / maxFds.doubleValue();
-        } catch (Exception e) {
+        } catch (NoSuchMethodException e) {
+            return Double.NaN;
+        } catch (IllegalAccessException e) {
+            return Double.NaN;
+        } catch (InvocationTargetException e) {
             return Double.NaN;
         }
     }
