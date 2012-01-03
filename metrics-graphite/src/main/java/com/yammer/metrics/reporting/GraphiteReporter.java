@@ -3,6 +3,7 @@ package com.yammer.metrics.reporting;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.VirtualMachineMetrics.GarbageCollector;
+import com.yammer.metrics.stats.Snapshot;
 import com.yammer.metrics.util.MetricPredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -326,13 +327,13 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
     }
 
     private void sendQuantized(long epoch, String sanitizedName, Quantized metric) throws IOException {
-        final Double[] quantiles = metric.quantiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
-        sendFloat(epoch, sanitizedName, "median", quantiles[0]);
-        sendFloat(epoch, sanitizedName, "75percentile", quantiles[1]);
-        sendFloat(epoch, sanitizedName, "95percentile", quantiles[2]);
-        sendFloat(epoch, sanitizedName, "98percentile", quantiles[3]);
-        sendFloat(epoch, sanitizedName, "99percentile", quantiles[4]);
-        sendFloat(epoch, sanitizedName, "999percentile", quantiles[5]);
+        final Snapshot snapshot = metric.getSnapshot();
+        sendFloat(epoch, sanitizedName, "median", snapshot.getMedian());
+        sendFloat(epoch, sanitizedName, "75percentile", snapshot.get75thPercentile());
+        sendFloat(epoch, sanitizedName, "95percentile", snapshot.get95thPercentile());
+        sendFloat(epoch, sanitizedName, "98percentile", snapshot.get98thPercentile());
+        sendFloat(epoch, sanitizedName, "99percentile", snapshot.get99thPercentile());
+        sendFloat(epoch, sanitizedName, "999percentile", snapshot.get999thPercentile());
     }
 
     private void printVmMetrics(long epoch) {

@@ -60,14 +60,9 @@ class Histogram(metric: com.yammer.metrics.core.Histogram) {
   def values = metric.values.toSeq
 
   /**
-   * Returns an array of values at the given quantiles.
+   * Returns a snapshot of the values in the histogram's sample.
    */
-  def quantiles(quantiles: Seq[java.lang.Double]) = metric.quantiles(quantiles:_*)
-
-  /**
-   * Returns the value at the given quantile.
-   */
-  def quantile(quantile: Double) = metric.quantile(quantile)
+  def snapshot = metric.getSnapshot
 
   /**
    * Dumps the recoded values in the timer's sample to the given file.

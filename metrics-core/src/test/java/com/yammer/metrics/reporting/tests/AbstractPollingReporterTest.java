@@ -2,9 +2,9 @@ package com.yammer.metrics.reporting.tests;
 
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.reporting.AbstractPollingReporter;
+import com.yammer.metrics.stats.Snapshot;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.Stubber;
@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Mockito.*;
 
 public abstract class AbstractPollingReporterTest {
@@ -234,19 +233,11 @@ public abstract class AbstractPollingReporterTest {
     }
 
     static void setupQuantizedMock(Quantized quantized) {
-        when(quantized.quantile(anyDouble())).thenAnswer(new Answer<Double>() {
-            @Override
-            public Double answer(InvocationOnMock invocation) throws Throwable {
-                return (Double) invocation.getArguments()[0];
-            }
-        });
-        doAnswer(new Answer<Double[]>() {
-            @Override
-            public Double[] answer(InvocationOnMock invocation) throws Throwable {
-                final Object[] arguments = invocation.getArguments();
-                return Arrays.copyOf(arguments, arguments.length, Double[].class);
-            }
-        }).when(quantized).quantiles(Mockito.<Double>anyVararg());
+        final double[] values = new double[1000];
+        for (int i = 0; i < values.length; i++) {
+            values[i] = i / 1000.0;
+        }
+        when(quantized.getSnapshot()).thenReturn(new Snapshot(values));
     }
 
     public abstract String[] expectedGaugeResult(String value);

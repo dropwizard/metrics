@@ -4,6 +4,7 @@ import com.yammer.metrics.core.Histogram;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricProcessor;
 import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.stats.Snapshot;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,18 +52,18 @@ public class HistogramTest {
                    histogram.stdDev(),
                    is(closeTo(0.0, 0.0001)));
 
-        final Double[] quantiles = histogram.quantiles(0.5, 0.75, 0.99);
+        final Snapshot snapshot = histogram.getSnapshot();
 
         assertThat("the histogram has a median of zero",
-                   quantiles[0],
+                   snapshot.getMedian(),
                    is(closeTo(0.0, 0.0001)));
 
         assertThat("the histogram has a 75th percentile of zero",
-                   quantiles[1],
+                   snapshot.get75thPercentile(),
                    is(closeTo(0.0, 0.0001)));
 
         assertThat("the histogram has a 99th percentile of zero",
-                   quantiles[2],
+                   snapshot.get99thPercentile(),
                    is(closeTo(0.0, 0.0001)));
 
         assertThat("the histogram is empty",
@@ -96,18 +97,18 @@ public class HistogramTest {
                    histogram.stdDev(),
                    is(closeTo(288.8194360957494, 0.0001)));
 
-        final Double[] quantiles = histogram.quantiles(0.5, 0.75, 0.99);
+        final Snapshot snapshot = histogram.getSnapshot();
 
         assertThat("the histogram has a median of 500.5",
-                   quantiles[0],
+                   snapshot.getMedian(),
                    is(closeTo(500.5, 0.0001)));
 
         assertThat("the histogram has a 75th percentile of 750.75",
-                   quantiles[1],
+                   snapshot.get75thPercentile(),
                    is(closeTo(750.75, 0.0001)));
 
         assertThat("the histogram has a 99th percentile of 990.99",
-                   quantiles[2],
+                   snapshot.get99thPercentile(),
                    is(closeTo(990.99, 0.0001)));
 
         assertThat("the histogram has 1000 values",

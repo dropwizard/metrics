@@ -1,6 +1,7 @@
 package com.yammer.metrics.core;
 
 import com.yammer.metrics.core.Histogram.SampleType;
+import com.yammer.metrics.stats.Snapshot;
 
 import java.io.File;
 import java.io.IOException;
@@ -171,25 +172,14 @@ public class Timer implements Metered, Stoppable, Quantized, Summarized {
         return convertFromNS(histogram.stdDev());
     }
 
-    /* (non-Javadoc)
-     * @see com.yammer.metrics.core.Quantized#quantile(double)
-     */
     @Override
-    public double quantile(double quantile) {
-        return quantiles(quantile)[0];
-    }
-
-    /* (non-Javadoc)
-     * @see com.yammer.metrics.core.Quantized#quantiles(double)
-     */
-    @Override
-    public Double[] quantiles(Double... quantiles) {
-        final Double[] scores = histogram.quantiles(quantiles);
-        for (int i = 0; i < scores.length; i++) {
-            scores[i] = convertFromNS(scores[i]);
+    public Snapshot getSnapshot() {
+        final double[] values = histogram.getSnapshot().getValues();
+        final double[] converted = new double[values.length];
+        for (int i = 0; i < values.length; i++) {
+            converted[i] = convertFromNS(values[i]);
         }
-
-        return scores;
+        return new Snapshot(converted);
     }
 
     @Override

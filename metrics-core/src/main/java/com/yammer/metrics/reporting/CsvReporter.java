@@ -1,6 +1,7 @@
 package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.core.*;
+import com.yammer.metrics.stats.Snapshot;
 import com.yammer.metrics.util.MetricPredicate;
 
 import java.io.File;
@@ -123,17 +124,17 @@ public class CsvReporter extends AbstractPollingReporter implements
 
     @Override
     public void processHistogram(MetricName name, Histogram histogram, Context context) throws IOException {
-        final PrintStream stream = context.getStream("# time,min,max,mean,median,stddev,90%,95%,99%");
-        final Double[] quantiles = histogram.quantiles(0.5, 0.90, 0.95, 0.99);
+        final PrintStream stream = context.getStream("# time,min,max,mean,median,stddev,95%,99%,99.9%");
+        final Snapshot snapshot = histogram.getSnapshot();
         stream.append(new StringBuilder()
                               .append(histogram.min()).append(',')
                               .append(histogram.max()).append(',')
                               .append(histogram.mean()).append(',')
-                              .append(quantiles[0]).append(',')     // median
+                              .append(snapshot.getMedian()).append(',')
                               .append(histogram.stdDev()).append(',')
-                              .append(quantiles[1]).append(',')     // 90%
-                              .append(quantiles[2]).append(',')     // 95%
-                              .append(quantiles[3]).toString())     // 99 %
+                              .append(snapshot.get95thPercentile()).append(',')
+                              .append(snapshot.get99thPercentile()).append(',')
+                              .append(snapshot.get999thPercentile()).toString())
                 .println();
         stream.println();
         stream.flush();
@@ -141,17 +142,17 @@ public class CsvReporter extends AbstractPollingReporter implements
 
     @Override
     public void processTimer(MetricName name, Timer timer, Context context) throws IOException {
-        final PrintStream stream = context.getStream("# time,min,max,mean,median,stddev,90%,95%,99%");
-        final Double[] quantiles = timer.quantiles(0.5, 0.90, 0.95, 0.99);
+        final PrintStream stream = context.getStream("# time,min,max,mean,median,stddev,95%,99%,99.9%");
+        final Snapshot snapshot = timer.getSnapshot();
         stream.append(new StringBuilder()
                               .append(timer.min()).append(',')
                               .append(timer.max()).append(',')
                               .append(timer.mean()).append(',')
-                              .append(quantiles[0]).append(',')     // median
+                              .append(snapshot.getMedian()).append(',')
                               .append(timer.stdDev()).append(',')
-                              .append(quantiles[1]).append(',')     // 90%
-                              .append(quantiles[2]).append(',')     // 95%
-                              .append(quantiles[3]).toString())     // 99 %
+                              .append(snapshot.get95thPercentile()).append(',')
+                              .append(snapshot.get99thPercentile()).append(',')
+                              .append(snapshot.get999thPercentile()).toString())
                 .println();
         stream.flush();
     }

@@ -2,6 +2,7 @@ package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
+import com.yammer.metrics.stats.Snapshot;
 import com.yammer.metrics.util.MetricPredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -350,36 +351,36 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
     @Override
     public void processHistogram(MetricName name, Histogram histogram, String x) throws IOException {
         final String sanitizedName = sanitizeName(name);
-        final Double[] quantiles = histogram.quantiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
+        final Snapshot snapshot = histogram.getSnapshot();
         // TODO:  what units make sense for histograms?  should we add event type to the Histogram metric?
         printDoubleField(sanitizedName + ".min", histogram.min(), "histo");
         printDoubleField(sanitizedName + ".max", histogram.max(), "histo");
         printDoubleField(sanitizedName + ".mean", histogram.mean(), "histo");
         printDoubleField(sanitizedName + ".stddev", histogram.stdDev(), "histo");
-        printDoubleField(sanitizedName + ".median", quantiles[0], "histo");
-        printDoubleField(sanitizedName + ".75percentile", quantiles[1], "histo");
-        printDoubleField(sanitizedName + ".95percentile", quantiles[2], "histo");
-        printDoubleField(sanitizedName + ".98percentile", quantiles[3], "histo");
-        printDoubleField(sanitizedName + ".99percentile", quantiles[4], "histo");
-        printDoubleField(sanitizedName + ".999percentile", quantiles[5], "histo");
+        printDoubleField(sanitizedName + ".median", snapshot.getMedian(), "histo");
+        printDoubleField(sanitizedName + ".75percentile", snapshot.get75thPercentile(), "histo");
+        printDoubleField(sanitizedName + ".95percentile", snapshot.get95thPercentile(), "histo");
+        printDoubleField(sanitizedName + ".98percentile", snapshot.get98thPercentile(), "histo");
+        printDoubleField(sanitizedName + ".99percentile", snapshot.get99thPercentile(), "histo");
+        printDoubleField(sanitizedName + ".999percentile", snapshot.get999thPercentile(), "histo");
     }
 
     @Override
     public void processTimer(MetricName name, Timer timer, String x) throws IOException {
         processMeter(name, timer, x);
         final String sanitizedName = sanitizeName(name);
-        final Double[] quantiles = timer.quantiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
+        final Snapshot snapshot = timer.getSnapshot();
         final String durationUnit = timer.durationUnit().name();
         printDoubleField(sanitizedName + ".min", timer.min(), "timer", durationUnit);
         printDoubleField(sanitizedName + ".max", timer.max(), "timer", durationUnit);
         printDoubleField(sanitizedName + ".mean", timer.mean(), "timer", durationUnit);
         printDoubleField(sanitizedName + ".stddev", timer.stdDev(), "timer", durationUnit);
-        printDoubleField(sanitizedName + ".median", quantiles[0], "timer", durationUnit);
-        printDoubleField(sanitizedName + ".75percentile", quantiles[1], "timer", durationUnit);
-        printDoubleField(sanitizedName + ".95percentile", quantiles[2], "timer", durationUnit);
-        printDoubleField(sanitizedName + ".98percentile", quantiles[3], "timer", durationUnit);
-        printDoubleField(sanitizedName + ".99percentile", quantiles[4], "timer", durationUnit);
-        printDoubleField(sanitizedName + ".999percentile", quantiles[5], "timer", durationUnit);
+        printDoubleField(sanitizedName + ".median", snapshot.getMedian(), "timer", durationUnit);
+        printDoubleField(sanitizedName + ".75percentile", snapshot.get75thPercentile(), "timer", durationUnit);
+        printDoubleField(sanitizedName + ".95percentile", snapshot.get95thPercentile(), "timer", durationUnit);
+        printDoubleField(sanitizedName + ".98percentile", snapshot.get98thPercentile(), "timer", durationUnit);
+        printDoubleField(sanitizedName + ".99percentile", snapshot.get99thPercentile(), "timer", durationUnit);
+        printDoubleField(sanitizedName + ".999percentile", snapshot.get999thPercentile(), "timer", durationUnit);
     }
 
     private void printDoubleField(String name, double value, String groupName, String units) {

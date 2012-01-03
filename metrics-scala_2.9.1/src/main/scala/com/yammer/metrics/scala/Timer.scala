@@ -63,14 +63,9 @@ class Timer(metric: com.yammer.metrics.core.Timer) {
   def values = metric.values.toSeq
 
   /**
-   * Returns an array of durations at the given quantiles.
+   * Returns a snapshot of the values in the timer's sample.
    */
-  def quantiles(quantiles: Seq[java.lang.Double]) = metric.quantiles(quantiles: _*)
-
-  /**
-   * Returns the duration at the given quantile.
-   */
-  def quantile(quantile: Double) = metric.quantile(quantile)
+  def snapshot = metric.getSnapshot
 
   /**
    * Returns the timer's rate unit.
