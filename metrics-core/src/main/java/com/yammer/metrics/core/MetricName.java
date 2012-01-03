@@ -9,7 +9,7 @@ public class MetricName implements Comparable<MetricName> {
     private final String type;
     private final String name;
     private final String scope;
-    private final String mbeanName;
+    private final String mBeanName;
 
     /**
      * Creates a new {@link MetricName} without a scope.
@@ -65,10 +65,10 @@ public class MetricName implements Comparable<MetricName> {
      * @param type      the type to which the {@link Metric} belongs
      * @param name      the name of the {@link Metric}
      * @param scope     the scope of the {@link Metric}
-     * @param mbeanName the 'ObjectName', represented as a string, to use when registering the
-     *                  mbean.
+     * @param mBeanName the 'ObjectName', represented as a string, to use when registering the
+     *                  MBean.
      */
-    public MetricName(String group, String type, String name, String scope, String mbeanName) {
+    public MetricName(String group, String type, String name, String scope, String mBeanName) {
         if (group == null || type == null) {
             throw new IllegalArgumentException("Both group and type need to be specified");
         }
@@ -79,7 +79,7 @@ public class MetricName implements Comparable<MetricName> {
         this.type = type;
         this.name = name;
         this.scope = scope;
-        this.mbeanName = mbeanName;
+        this.mBeanName = mBeanName;
     }
 
     /**
@@ -130,12 +130,12 @@ public class MetricName implements Comparable<MetricName> {
     }
 
     /**
-     * Returns the mbean name for the {@link Metric} identified by this metric name.
+     * Returns the MBean name for the {@link Metric} identified by this metric name.
      *
-     * @return the mbean name
+     * @return the MBean name
      */
     public String getMBeanName() {
-        return mbeanName;
+        return mBeanName;
     }
 
     @Override
@@ -143,37 +143,37 @@ public class MetricName implements Comparable<MetricName> {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         final MetricName that = (MetricName) o;
-        return mbeanName.equals(that.mbeanName);
+        return mBeanName.equals(that.mBeanName);
     }
 
     @Override
     public int hashCode() {
-        return mbeanName.hashCode();
+        return mBeanName.hashCode();
     }
 
     @Override
     public String toString() {
-        return mbeanName;
+        return mBeanName;
     }
 
     private static String createMBeanName(String group, String type, String name, String scope) {
-        final StringBuilder mbeanNameBuilder = new StringBuilder();
-        mbeanNameBuilder.append(group);
-        mbeanNameBuilder.append(":type=");
-        mbeanNameBuilder.append(type);
+        final StringBuilder nameBuilder = new StringBuilder();
+        nameBuilder.append(group);
+        nameBuilder.append(":type=");
+        nameBuilder.append(type);
         if (scope != null) {
-            mbeanNameBuilder.append(",scope=");
-            mbeanNameBuilder.append(scope);
+            nameBuilder.append(",scope=");
+            nameBuilder.append(scope);
         }
         if (name.length() > 0) {
-            mbeanNameBuilder.append(",name=");
-            mbeanNameBuilder.append(name);
+            nameBuilder.append(",name=");
+            nameBuilder.append(name);
         }
-        return mbeanNameBuilder.toString();
+        return nameBuilder.toString();
     }
 
     @Override
     public int compareTo(MetricName o) {
-        return mbeanName.compareTo(o.mbeanName);
+        return mBeanName.compareTo(o.mBeanName);
     }
 }
