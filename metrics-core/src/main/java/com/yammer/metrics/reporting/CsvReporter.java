@@ -96,8 +96,8 @@ public class CsvReporter extends AbstractPollingReporter implements
         }
     }
 
-    public static interface Context {
-        public PrintStream getStream(String header) throws IOException;
+    public interface Context {
+        PrintStream getStream(String header) throws IOException;
     }
 
     @Override
