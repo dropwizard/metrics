@@ -33,6 +33,10 @@ v2.0.0-BETA19: TBD
 * `HealthCheck#check()` is now `protected`.
 * Moved `DeadlockHealthCheck` from `com.yammer.metrics.core` to `com.yammer.metrics.utils`.
 * Added `HealthCheckRegistry#unregister(HealthCheck)`.
+* Fixed typo in `VirtualMachineMetrics` and `MetricsServlet`: `commited` to `committed`.
+* Changed `MetricsRegistry#createName` to `protected`.
+* All metric types are created exclusively through `MetricsRegistry` now.
+* `Metrics.newJmxGauge` and `MetricsRegistry.newJmxGauge` are deprecated.
 
 
 v2.0.0-BETA18: Dec 16 2011
