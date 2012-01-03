@@ -105,6 +105,16 @@ public class ExponentiallyDecayingSample implements Sample {
     }
 
     @Override
+    public Snapshot getSnapshot() {
+        lockForRegularUsage();
+        try {
+            return new Snapshot(values.values());
+        } finally {
+            unlockForRegularUsage();
+        }
+    }
+
+    @Override
     public List<Long> values() {
         lockForRegularUsage();
         try {

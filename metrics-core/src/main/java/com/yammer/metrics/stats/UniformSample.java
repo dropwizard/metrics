@@ -76,6 +76,15 @@ public class UniformSample implements Sample {
         return val;
     }
 
+    @Override
+    public Snapshot getSnapshot() {
+        final int s = size();
+        final List<Long> copy = new ArrayList<Long>(s);
+        for (int i = 0; i < s; i++) {
+            copy.add(values.get(i));
+        }
+        return new Snapshot(copy);
+    }
 
     @Override
     public List<Long> values() {
