@@ -43,7 +43,7 @@ public class Timer implements Metered, Stoppable, Quantized, Summarized {
     public Timer(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
         this.durationUnit = durationUnit;
         this.rateUnit = rateUnit;
-        this.meter = Meter.newMeter(tickThread, "calls", rateUnit);
+        this.meter = new Meter(tickThread, "calls", rateUnit, clock);
         this.clock = clock;
         clear();
     }
