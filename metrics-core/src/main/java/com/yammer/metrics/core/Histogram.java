@@ -20,6 +20,9 @@ import static java.lang.Math.sqrt;
  *      variance</a>
  */
 public class Histogram implements Metric, Sampling, Summarizable {
+    private static final int DEFAULT_SAMPLE_SIZE = 1028;
+    private static final double DEFAULT_ALPHA = 0.015;
+
     /**
      * The type of sampling the histogram should be performing.
      */
@@ -31,7 +34,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
         UNIFORM {
             @Override
             public Sample newSample() {
-                return new UniformSample(1028);
+                return new UniformSample(DEFAULT_SAMPLE_SIZE);
             }
         },
 
@@ -43,7 +46,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
         BIASED {
             @Override
             public Sample newSample() {
-                return new ExponentiallyDecayingSample(1028, 0.015);
+                return new ExponentiallyDecayingSample(DEFAULT_SAMPLE_SIZE, DEFAULT_ALPHA);
             }
         };
 
