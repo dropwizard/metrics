@@ -375,18 +375,6 @@ public class MetricsRegistry {
     }
 
     /**
-     * Override to customize how {@link MetricName}s are created.
-     *
-     * @param klass the class which owns the metric
-     * @param name  the name of the metric
-     * @param scope the metric's scope
-     * @return the metric's full name
-     */
-    public MetricName createName(Class<?> klass, String name, String scope) {
-        return new MetricName(klass, name, scope);
-    }
-
-    /**
      * Returns an unmodifiable map of all metrics and their names.
      *
      * @return an unmodifiable map of all metrics and their names
@@ -515,6 +503,18 @@ public class MetricsRegistry {
      */
     public void removeListener(MetricsRegistryListener listener) {
         listeners.remove(listener);
+    }
+
+    /**
+     * Override to customize how {@link MetricName}s are created.
+     *
+     * @param klass the class which owns the metric
+     * @param name  the name of the metric
+     * @param scope the metric's scope
+     * @return the metric's full name
+     */
+    protected MetricName createName(Class<?> klass, String name, String scope) {
+        return new MetricName(klass, name, scope);
     }
 
     /**
