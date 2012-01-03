@@ -2,16 +2,15 @@ package com.yammer.metrics.core;
 
 import com.yammer.metrics.stats.ExponentiallyDecayingSample;
 import com.yammer.metrics.stats.Sample;
+import com.yammer.metrics.stats.Snapshot;
 import com.yammer.metrics.stats.UniformSample;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static java.lang.Math.floor;
 import static java.lang.Math.sqrt;
 
 /**
@@ -179,51 +178,9 @@ public class Histogram implements Metric, Quantized, Summarized {
         return 0.0;
     }
 
-    /**
-     * Returns the value at the given quantile.
-     *
-     * @param quantile a quantile ({@code 0..1})
-     * @return the value at the given quantile
-     */
     @Override
-    public double quantile(double quantile) {
-        return quantiles(quantile)[0];
-    }
-
-    /**
-     * Returns an array of values at the given quantiles.
-     *
-     * @param quantiles one or more quantiles ({@code 0..1})
-     * @return an array of values at the given quantiles
-     */
-    @Override
-    public Double[] quantiles(Double... quantiles) {
-        final Double[] scores = new Double[quantiles.length];
-        for (int i = 0; i < scores.length; i++) {
-            scores[i] = 0.0;
-
-        }
-
-        if (count() > 0) {
-            final List<Long> values = sample.values();
-            Collections.sort(values);
-
-            for (int i = 0; i < quantiles.length; i++) {
-                final double p = quantiles[i];
-                final double pos = p * (values.size() + 1);
-                if (pos < 1) {
-                    scores[i] = Double.valueOf(values.get(0));
-                } else if (pos >= values.size()) {
-                    scores[i] = Double.valueOf(values.get(values.size() - 1));
-                } else {
-                    final double lower = values.get((int) pos - 1);
-                    final double upper = values.get((int) pos);
-                    scores[i] = lower + (pos - floor(pos)) * (upper - lower);
-                }
-            }
-        }
-
-        return scores;
+    public Snapshot getSnapshot() {
+        return sample.getSnapshot();
     }
 
     /**

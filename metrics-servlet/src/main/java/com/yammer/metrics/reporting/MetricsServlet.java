@@ -5,6 +5,7 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HealthCheck.Result;
 import com.yammer.metrics.core.VirtualMachineMetrics.GarbageCollector;
+import com.yammer.metrics.stats.Snapshot;
 import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
@@ -458,13 +459,13 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
     }
     
     private static void writeQuantized(Quantized metric, JsonGenerator json) throws IOException {
-        final Double[] quantiles = metric.quantiles(0.5, 0.75, 0.95, 0.98, 0.99, 0.999);
-        json.writeNumberField("median", quantiles[0]);
-        json.writeNumberField("p75", quantiles[1]);
-        json.writeNumberField("p95", quantiles[2]);
-        json.writeNumberField("p98", quantiles[3]);
-        json.writeNumberField("p99", quantiles[4]);
-        json.writeNumberField("p999", quantiles[5]);
+        final Snapshot snapshot = metric.getSnapshot();
+        json.writeNumberField("median", snapshot.getMedian());
+        json.writeNumberField("p75", snapshot.get75thPercentile());
+        json.writeNumberField("p95", snapshot.get95thPercentile());
+        json.writeNumberField("p98", snapshot.get98thPercentile());
+        json.writeNumberField("p99", snapshot.get99thPercentile());
+        json.writeNumberField("p999",snapshot.get999thPercentile());
     }
     
     private static void writeMeteredFields(Metered metered, JsonGenerator json) throws IOException {

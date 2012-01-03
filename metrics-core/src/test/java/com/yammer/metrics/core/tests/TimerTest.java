@@ -3,6 +3,7 @@ package com.yammer.metrics.core.tests;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
+import com.yammer.metrics.stats.Snapshot;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,18 +65,18 @@ public class TimerTest {
                    timer.stdDev(),
                    is(closeTo(0.0, 0.001)));
 
-        final Double[] quantiles = timer.quantiles(0.5, 0.75, 0.99);
+        final Snapshot snapshot = timer.getSnapshot();
 
         assertThat("the timer has a median duration of zero",
-                   quantiles[0],
+                   snapshot.getMedian(),
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has a 75th percentile duration of zero",
-                   quantiles[1],
+                   snapshot.get75thPercentile(),
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has a 99th percentile duration of zero",
-                   quantiles[2],
+                   snapshot.get99thPercentile(),
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has a mean rate of zero",
@@ -127,23 +128,23 @@ public class TimerTest {
                    timer.stdDev(),
                    is(closeTo(11.401, 0.001)));
 
-        final Double[] quantiles = timer.quantiles(0.5, 0.75, 0.99);
+        final Snapshot snapshot = timer.getSnapshot();
 
         assertThat("the timer has a median duration of 20",
-                   quantiles[0],
+                   snapshot.getMedian(),
                    is(closeTo(20.0, 0.001)));
 
         assertThat("the timer has a 75th percentile duration of 35",
-                   quantiles[1],
+                   snapshot.get75thPercentile(),
                    is(closeTo(35.0, 0.001)));
 
         assertThat("the timer has a 99th percentile duration of 40",
-                   quantiles[2],
+                   snapshot.get99thPercentile(),
                    is(closeTo(40.0, 0.001)));
 
         assertThat("the timer has no values",
-                   timer.values(),
-                   hasItems(10.0, 20.0, 20.0, 30.0, 40.0));
+                   timer.getSnapshot().getValues(),
+                   is(new double[]{10.0, 20.0, 20.0, 30.0, 40.0}));
     }
 
     @Test

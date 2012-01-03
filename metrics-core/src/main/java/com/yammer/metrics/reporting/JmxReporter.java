@@ -178,7 +178,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         @Override
         public double get50thPercentile() {
-            return metric.quantiles(0.5)[0];
+            return metric.getSnapshot().getMedian();
         }
 
         @Override
@@ -208,27 +208,27 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         @Override
         public double get75thPercentile() {
-            return metric.quantiles(0.75)[0];
+            return metric.getSnapshot().get75thPercentile();
         }
 
         @Override
         public double get95thPercentile() {
-            return metric.quantiles(0.95)[0];
+            return metric.getSnapshot().get95thPercentile();
         }
 
         @Override
         public double get98thPercentile() {
-            return metric.quantiles(0.98)[0];
+            return metric.getSnapshot().get98thPercentile();
         }
 
         @Override
         public double get99thPercentile() {
-            return metric.quantiles(0.99)[0];
+            return metric.getSnapshot().get99thPercentile();
         }
 
         @Override
         public double get999thPercentile() {
-            return metric.quantiles(0.999)[0];
+            return metric.getSnapshot().get999thPercentile();
         }
 
         @Override
@@ -252,7 +252,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         @Override
         public double get50thPercentile() {
-            return metric.quantiles(0.5)[0];
+            return metric.getSnapshot().getMedian();
         }
 
         @Override
@@ -282,27 +282,27 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         @Override
         public double get75thPercentile() {
-            return metric.quantiles(0.75)[0];
+            return metric.getSnapshot().get75thPercentile();
         }
 
         @Override
         public double get95thPercentile() {
-            return metric.quantiles(0.95)[0];
+            return metric.getSnapshot().get95thPercentile();
         }
 
         @Override
         public double get98thPercentile() {
-            return metric.quantiles(0.98)[0];
+            return metric.getSnapshot().get98thPercentile();
         }
 
         @Override
         public double get99thPercentile() {
-            return metric.quantiles(0.99)[0];
+            return metric.getSnapshot().get99thPercentile();
         }
 
         @Override
         public double get999thPercentile() {
-            return metric.quantiles(0.999)[0];
+            return metric.getSnapshot().get999thPercentile();
         }
 
         @Override
