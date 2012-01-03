@@ -31,7 +31,7 @@ public class VirtualMachineMetrics {
         }
     }
 
-    public static VirtualMachineMetrics INSTANCE = new VirtualMachineMetrics();
+    public static final VirtualMachineMetrics INSTANCE = new VirtualMachineMetrics();
 
     private VirtualMachineMetrics() { /* unused */ }
 
