@@ -2,7 +2,7 @@ package com.yammer.metrics.core.tests;
 
 import com.yammer.metrics.core.Histogram;
 import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricsProcessor;
+import com.yammer.metrics.core.MetricProcessor;
 import com.yammer.metrics.stats.UniformSample;
 import org.junit.Test;
 
@@ -108,7 +108,7 @@ public class HistogramTest {
         final Histogram histogram = new Histogram(new UniformSample(100000));
         final MetricName name = new MetricName(HistogramTest.class, "histogram");
         final Object context = new Object();
-        final MetricsProcessor<Object> processor = mock(MetricsProcessor.class);
+        final MetricProcessor<Object> processor = mock(MetricProcessor.class);
 
         histogram.processWith(processor, name, context);
 

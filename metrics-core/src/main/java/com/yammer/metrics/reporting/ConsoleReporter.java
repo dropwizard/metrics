@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * A simple reporters which prints out application metrics to a {@link PrintStream} periodically.
  */
 public class ConsoleReporter extends AbstractPollingReporter implements
-                                                             MetricsProcessor<PrintStream> {
+                                                             MetricProcessor<PrintStream> {
 
     /**
      * Enables the console reporter for the default metrics registry, and causes it to print to

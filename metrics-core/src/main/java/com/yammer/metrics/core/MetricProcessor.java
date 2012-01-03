@@ -5,7 +5,7 @@ package com.yammer.metrics.core;
  *
  * @param <T>
  */
-public interface MetricsProcessor<T> {
+public interface MetricProcessor<T> {
     /**
      * Process the given {@link Metered} instance.
      *
