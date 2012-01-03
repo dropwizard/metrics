@@ -51,6 +51,16 @@ public class Histogram implements Metric, Quantized, Summarized {
         public abstract Sample newSample();
     }
 
+    /**
+     * Cache arrays for the variance calculation, so as to avoid memory allocation.
+     */
+    private static class ArrayCache extends ThreadLocal<double[]> {
+        @Override
+        protected double[] initialValue() {
+            return new double[2];
+        }
+    }
+
     private final Sample sample;
     private final AtomicLong _min = new AtomicLong();
     private final AtomicLong _max = new AtomicLong();
@@ -60,6 +70,7 @@ public class Histogram implements Metric, Quantized, Summarized {
     private final AtomicReference<double[]> variance =
             new AtomicReference<double[]>(new double[]{-1, 0}); // M, S
     private final AtomicLong count = new AtomicLong();
+    private final ArrayCache arrayCache = new ArrayCache();
 
     /**
      * Creates a new {@link Histogram} with the given sample type.
@@ -256,17 +267,6 @@ public class Histogram implements Metric, Quantized, Summarized {
             done = currentMin <= potentialMin || _min.compareAndSet(currentMin, potentialMin);
         }
     }
-
-    /**
-     * Cache arrays for the variance calculation, so as to avoid memory allocation.
-     */
-    private final ThreadLocal<double[]> arrayCache =
-            new ThreadLocal<double[]>() {
-                @Override
-                protected double[] initialValue() {
-                    return new double[2];
-                }
-            };
 
     private void updateVariance(long value) {
         boolean done = false;
