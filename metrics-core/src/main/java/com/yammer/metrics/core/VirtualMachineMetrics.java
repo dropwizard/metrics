@@ -241,8 +241,7 @@ public class VirtualMachineMetrics {
         final long[] threadIds = getThreadMXBean().findDeadlockedThreads();
         if (threadIds != null) {
             final Set<String> threads = new HashSet<String>();
-            final ThreadInfo[] infos = getThreadMXBean().getThreadInfo(threadIds, 100);
-            for (ThreadInfo info : infos) {
+            for (ThreadInfo info : getThreadMXBean().getThreadInfo(threadIds, 100)) {
                 final StringBuilder stackTrace = new StringBuilder();
                 for (StackTraceElement element : info.getStackTrace()) {
                     stackTrace.append("\t at ").append(element.toString()).append('\n');
