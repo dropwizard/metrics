@@ -1,25 +1,39 @@
 package com.yammer.metrics.core.tests;
 
-import com.yammer.metrics.core.Counter;
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.*;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 public class MetricsRegistryTest {
+    private MetricsRegistry registry;
+
+    @Before
+    public void setUp() throws Exception {
+        this.registry = new MetricsRegistry();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        registry.shutdown();
+    }
+
     @Test
     public void sortingMetricNamesSortsThemByClassThenScopeThenName() throws Exception {
         final MetricName one = new MetricName(Object.class, "one");
         final MetricName two = new MetricName(Object.class, "two");
         final MetricName three = new MetricName(String.class, "three");
 
-        final MetricsRegistry registry = new MetricsRegistry();
         final Counter mOne = registry.newCounter(Object.class, "one");
         final Counter mTwo = registry.newCounter(Object.class, "two");
         final Counter mThree = registry.newCounter(String.class, "three");
@@ -38,4 +52,45 @@ public class MetricsRegistryTest {
                    is(sortedMetrics));
     }
 
+    @Test
+    public void listenersRegisterNewMetrics() throws Exception {
+        final MetricsRegistryListener listener = mock(MetricsRegistryListener.class);
+        registry.addListener(listener);
+
+        final Gauge<?> gauge = mock(Gauge.class);
+        registry.newGauge(MetricsRegistryTest.class, "gauge", gauge);
+        final Counter counter = registry.newCounter(MetricsRegistryTest.class, "counter");
+        final Histogram histogram = registry.newHistogram(MetricsRegistryTest.class, "histogram");
+        final Meter meter = registry.newMeter(MetricsRegistryTest.class,
+                                              "meter",
+                                              "things",
+                                              TimeUnit.SECONDS);
+        final Timer timer = registry.newTimer(MetricsRegistryTest.class, "timer");
+
+        verify(listener).onMetricAdded(new MetricName(MetricsRegistryTest.class, "gauge"), gauge);
+
+        verify(listener).onMetricAdded(new MetricName(MetricsRegistryTest.class, "counter"), counter);
+
+        verify(listener).onMetricAdded(new MetricName(MetricsRegistryTest.class, "histogram"), histogram);
+
+        verify(listener).onMetricAdded(new MetricName(MetricsRegistryTest.class, "meter"), meter);
+
+        verify(listener).onMetricAdded(new MetricName(MetricsRegistryTest.class, "timer"), timer);
+    }
+
+    @Test
+    public void removedListenersDoNotReceiveEvents() throws Exception {
+        final MetricsRegistryListener listener = mock(MetricsRegistryListener.class);
+        registry.addListener(listener);
+
+        final Counter counter1 = registry.newCounter(MetricsRegistryTest.class, "counter1");
+
+        registry.removeListener(listener);
+
+        final Counter counter2 = registry.newCounter(MetricsRegistryTest.class, "counter2");
+
+        verify(listener).onMetricAdded(new MetricName(MetricsRegistryTest.class, "counter1"), counter1);
+
+        verify(listener, never()).onMetricAdded(new MetricName(MetricsRegistryTest.class, "counter2"), counter2);
+    }
 }

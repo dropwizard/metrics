@@ -486,16 +486,6 @@ public class MetricsRegistry {
     }
 
     /**
-     * Returns a new {@link ConcurrentMap} implementation. Subclass this to do weird things with
-     * your own {@link MetricsRegistry} implementation.
-     *
-     * @return a new {@link ConcurrentMap}
-     */
-    protected ConcurrentMap<MetricName, Metric> newMetricsMap() {
-        return new ConcurrentHashMap<MetricName, Metric>(1024);
-    }
-
-    /**
      * Adds a {@link MetricsRegistryListener} to a collection of listeners that will be notified on
      * metric creation.  Listeners will be notified in the order in which they are added.
      * <p/>
@@ -519,20 +509,14 @@ public class MetricsRegistry {
         listeners.remove(listener);
     }
 
-    private ScheduledExecutorService newMeterTickThreadPool() {
-        return threadPools.newScheduledThreadPool(2, "meter-tick");
-    }
-
-    private void notifyMetricRemoved(MetricName name) {
-        for (MetricsRegistryListener listener : listeners) {
-            listener.onMetricRemoved(name);
-        }
-    }
-
-    private void notifyMetricAdded(MetricName name, Metric metric) {
-        for (MetricsRegistryListener listener : listeners) {
-            listener.onMetricAdded(name, metric);
-        }
+    /**
+     * Returns a new {@link ConcurrentMap} implementation. Subclass this to do weird things with
+     * your own {@link MetricsRegistry} implementation.
+     *
+     * @return a new {@link ConcurrentMap}
+     */
+    protected ConcurrentMap<MetricName, Metric> newMetricsMap() {
+        return new ConcurrentHashMap<MetricName, Metric>(1024);
     }
 
     @SuppressWarnings("unchecked")
@@ -552,5 +536,21 @@ public class MetricsRegistry {
             return (T) justAddedMetric;
         }
         return (T) existingMetric;
+    }
+
+    private ScheduledExecutorService newMeterTickThreadPool() {
+        return threadPools.newScheduledThreadPool(2, "meter-tick");
+    }
+
+    private void notifyMetricRemoved(MetricName name) {
+        for (MetricsRegistryListener listener : listeners) {
+            listener.onMetricRemoved(name);
+        }
+    }
+
+    private void notifyMetricAdded(MetricName name, Metric metric) {
+        for (MetricsRegistryListener listener : listeners) {
+            listener.onMetricAdded(name, metric);
+        }
     }
 }
