@@ -222,7 +222,8 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
     }
 
     private void printRegularMetrics(final Long epoch) {
-        for (Entry<String,SortedMap<MetricName,Metric>> entry : metricsRegistry.groupedMetrics(predicate).entrySet()) {
+        for (Entry<String,SortedMap<MetricName,Metric>> entry : getMetricsRegistry().groupedMetrics(
+                predicate).entrySet()) {
             for (Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
                 final Metric metric = subEntry.getValue();
                 if (metric != null) {

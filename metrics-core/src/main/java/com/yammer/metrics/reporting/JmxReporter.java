@@ -393,7 +393,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
 
     public final void start() {
-        metricsRegistry.addListener(this);
+        getMetricsRegistry().addListener(this);
     }
 
     private void registerBean(MetricName name, MetricMBean bean, ObjectName objectName) throws MBeanRegistrationException, InstanceAlreadyExistsException, NotCompliantMBeanException {
@@ -403,7 +403,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     @Override
     public void shutdown() {
-        metricsRegistry.removeListener(this);
+        getMetricsRegistry().removeListener(this);
         for (ObjectName name : registeredBeans.values()) {
             try {
                 server.unregisterMBean(name);

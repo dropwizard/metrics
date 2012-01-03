@@ -129,7 +129,8 @@ public class ConsoleReporter extends AbstractPollingReporter implements
                 out.print('=');
             }
             out.println();
-            for (Entry<String, SortedMap<MetricName, Metric>> entry : metricsRegistry.groupedMetrics(predicate).entrySet()) {
+            for (Entry<String, SortedMap<MetricName, Metric>> entry : getMetricsRegistry().groupedMetrics(
+                    predicate).entrySet()) {
                 out.print(entry.getKey());
                 out.println(':');
                 for (Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
