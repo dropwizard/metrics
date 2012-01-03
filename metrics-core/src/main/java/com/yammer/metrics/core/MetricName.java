@@ -40,7 +40,7 @@ public class MetricName implements Comparable<MetricName> {
      * @param scope the scope of the {@link Metric}
      */
     public MetricName(Class<?> klass, String name, String scope) {
-        this(klass.getPackage() == null ? "": klass.getPackage().getName(),
+        this(klass.getPackage() == null ? "" : klass.getPackage().getName(),
              klass.getSimpleName().replaceAll("\\$$", ""),
              name,
              scope);
