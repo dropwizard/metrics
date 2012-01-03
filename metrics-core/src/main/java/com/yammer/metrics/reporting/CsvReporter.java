@@ -72,7 +72,7 @@ public class CsvReporter extends AbstractPollingReporter implements
 
     @Override
     public void run() {
-        final long time = (clock.time() - startTime) / 1000;
+        final long time = TimeUnit.MILLISECONDS.toSeconds(clock.time() - startTime);
         final Set<Entry<MetricName, Metric>> metrics = getMetricsRegistry().allMetrics().entrySet();
         try {
             for (Entry<MetricName, Metric> entry : metrics) {

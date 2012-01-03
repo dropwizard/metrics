@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicLongArray;
  */
 public class UniformSample implements Sample {
     private static final Random RANDOM = new Random();
+    private static final int BITS_PER_LONG = 63;
     private final AtomicLong count = new AtomicLong();
     private final AtomicLongArray values;
 
@@ -70,7 +71,7 @@ public class UniformSample implements Sample {
     private static long nextLong(long n) {
         long bits, val;
         do {
-            bits = RANDOM.nextLong() & (~(1L << 63));
+            bits = RANDOM.nextLong() & (~(1L << BITS_PER_LONG));
             val = bits % n;
         } while (bits - val + (n - 1) < 0L);
         return val;

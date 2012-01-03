@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ConsoleReporter extends AbstractPollingReporter implements
                                                              MetricProcessor<PrintStream> {
+    private static final int CONSOLE_WIDTH = 80;
 
     /**
      * Enables the console reporter for the default metrics registry, and causes it to print to
@@ -126,7 +127,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements
             final String dateTime = format.format(new Date(clock.time()));
             out.print(dateTime);
             out.print(' ');
-            for (int i = 0; i < (80 - dateTime.length() - 1); i++) {
+            for (int i = 0; i < (CONSOLE_WIDTH - dateTime.length() - 1); i++) {
                 out.print('=');
             }
             out.println();

@@ -10,6 +10,7 @@ public abstract class HealthCheck {
      */
     public static class Result {
         private static final Result HEALTHY = new Result(true, null, null);
+        private static final int PRIME = 31;
 
         /**
          * Returns a healthy {@link Result} with no additional message.
@@ -101,8 +102,8 @@ public abstract class HealthCheck {
         @Override
         public int hashCode() {
             int result = (healthy ? 1 : 0);
-            result = 31 * result + (message != null ? message.hashCode() : 0);
-            result = 31 * result + (error != null ? error.hashCode() : 0);
+            result = PRIME * result + (message != null ? message.hashCode() : 0);
+            result = PRIME * result + (error != null ? error.hashCode() : 0);
             return result;
         }
 
