@@ -35,15 +35,21 @@ import org.slf4j.LoggerFactory;
 public class DeathRattleExceptionHandler implements Thread.UncaughtExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(DeathRattleExceptionHandler.class);
 
-    private final Counter deathRattle;
+    private final Counter counter;
 
-    public DeathRattleExceptionHandler(Counter deathRattle) {
-        this.deathRattle = deathRattle;
+    /**
+     * Creates a new {@link DeathRattleExceptionHandler} with the given {@link Counter}.
+     *
+     * @param counter    the {@link Counter} which will be used to record the number of uncaught
+     *                   exceptions
+     */
+    public DeathRattleExceptionHandler(Counter counter) {
+        this.counter = counter;
     }
 
     @Override
     public void uncaughtException(Thread t, Throwable e) {
-        deathRattle.inc();
+        counter.inc();
         LOGGER.error("Uncaught exception on thread " + t, e);
     }
 }

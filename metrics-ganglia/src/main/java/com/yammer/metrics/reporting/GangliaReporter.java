@@ -424,7 +424,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
                              "jvm");
         }
 
-        for (Map.Entry<String, VirtualMachineMetrics.GarbageCollector> entry : vm.garbageCollectors().entrySet()) {
+        for (Map.Entry<String, VirtualMachineMetrics.GarbageCollectorStats> entry : vm.garbageCollectors().entrySet()) {
             printLongField("jvm.gc." + entry.getKey() + ".time",
                            entry.getValue().getTime(TimeUnit.MILLISECONDS),
                            "jvm");

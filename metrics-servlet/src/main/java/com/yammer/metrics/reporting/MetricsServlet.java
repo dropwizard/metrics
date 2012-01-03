@@ -4,7 +4,6 @@ import com.yammer.metrics.HealthChecks;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.HealthCheck.Result;
-import com.yammer.metrics.core.VirtualMachineMetrics.GarbageCollector;
 import com.yammer.metrics.stats.Snapshot;
 import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
@@ -395,11 +394,11 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
             json.writeFieldName("garbage-collectors");
             json.writeStartObject();
             {
-                for (Entry<String, GarbageCollector> entry : vm.garbageCollectors().entrySet()) {
+                for (Entry<String, VirtualMachineMetrics.GarbageCollectorStats> entry : vm.garbageCollectors().entrySet()) {
                     json.writeFieldName(entry.getKey());
                     json.writeStartObject();
                     {
-                        final GarbageCollector gc = entry.getValue();
+                        final VirtualMachineMetrics.GarbageCollectorStats gc = entry.getValue();
                         json.writeNumberField("runs", gc.getRuns());
                         json.writeNumberField("time", gc.getTime(TimeUnit.MILLISECONDS));
                     }
@@ -433,7 +432,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
             json.writeStartObject();
             {
                 json.writeStringField("unit", timer.durationUnit().toString().toLowerCase());
-                writeSummarizable(timer,json);
+                writeSummarizable(timer, json);
                 writeSampling(timer, json);
                 if (context.showFullSamples) {
                     json.writeObjectField("values", timer.values());

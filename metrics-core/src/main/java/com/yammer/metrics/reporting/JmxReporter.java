@@ -22,10 +22,13 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     private final Map<MetricName, ObjectName> registeredBeans;
     private final MBeanServer server;
 
+    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface MetricMBean {
         ObjectName objectName();
     }
+    // CHECKSTYLE:ON
+
 
     private abstract static class AbstractBean implements MetricMBean {
         private final ObjectName objectName;
@@ -40,10 +43,13 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
     }
 
+    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface GaugeMBean extends MetricMBean {
         Object getValue();
     }
+    // CHECKSTYLE:ON
+
 
     private static class Gauge extends AbstractBean implements GaugeMBean {
         private final com.yammer.metrics.core.Gauge<?> metric;
@@ -59,10 +65,13 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
     }
 
+    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface CounterMBean extends MetricMBean {
         long getCount();
     }
+    // CHECKSTYLE:ON
+
 
     private static class Counter extends AbstractBean implements CounterMBean {
         private final com.yammer.metrics.core.Counter metric;
@@ -78,6 +87,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
     }
 
+    //CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface MeterMBean extends MetricMBean {
         long getCount();
@@ -94,6 +104,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         double getFifteenMinuteRate();
     }
+    //CHECKSTYLE:ON
 
     private static class Meter extends AbstractBean implements MeterMBean {
         private final Metered metric;
@@ -139,6 +150,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
     }
 
+    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface HistogramMBean extends MetricMBean {
         long getCount();
@@ -165,6 +177,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         List<?> values();
     }
+    // CHECKSTYLE:ON
 
     private static class Histogram implements HistogramMBean {
         private final ObjectName objectName;
@@ -241,10 +254,12 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
     }
 
+    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface TimerMBean extends MeterMBean, HistogramMBean {
         TimeUnit getLatencyUnit();
     }
+    // CHECKSTYLE:ON
 
     static class Timer extends Meter implements TimerMBean {
         private final com.yammer.metrics.core.Timer metric;
@@ -317,18 +332,26 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     private static JmxReporter INSTANCE;
 
-    public static void startDefault(MetricsRegistry defaultMetricsRegistry) {
-        INSTANCE = new JmxReporter(defaultMetricsRegistry);
+    /**
+     * Starts the default instance of {@link JmxReporter}.
+     *
+     * @param registry    the {@link MetricsRegistry} to report from
+     */
+    public static void startDefault(MetricsRegistry registry) {
+        INSTANCE = new JmxReporter(registry);
         INSTANCE.start();
     }
 
+    /**
+     * Stops the default instance of {@link JmxReporter}.
+     */
     public static void shutdownDefault() {
         if (INSTANCE != null) {
             INSTANCE.shutdown();
         }
     }
 
-    public static final class Context {
+    static final class Context {
         private final MetricName metricName;
         private final ObjectName objectName;
 
@@ -346,8 +369,13 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
     }
 
-    public JmxReporter(MetricsRegistry metricsRegistry) {
-        super(metricsRegistry);
+    /**
+     * Creates a new {@link JmxReporter} for the given registry.
+     *
+     * @param registry    a {@link MetricsRegistry}
+     */
+    public JmxReporter(MetricsRegistry registry) {
+        super(registry);
         this.registeredBeans = new HashMap<MetricName, ObjectName>();
         this.server = ManagementFactory.getPlatformMBeanServer();
     }
@@ -356,12 +384,18 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     public void onMetricAdded(MetricName name, Metric metric) {
         if (metric != null) {
             try {
-                metric.processWith(this,
-                                   name,
-                                   new Context(name, new ObjectName(name.getMBeanName())));
+                metric.processWith(this, name, new Context(name, new ObjectName(name.getMBeanName())));
             } catch (Exception e) {
                 LOGGER.warn("Error processing " + name, e);
             }
+        }
+    }
+
+    @Override
+    public void onMetricRemoved(MetricName name) {
+        final ObjectName objectName = registeredBeans.remove(name);
+        if (objectName != null) {
+            unregisterBean(objectName);
         }
     }
 
@@ -398,36 +432,32 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
 
     @Override
-    public void onMetricRemoved(MetricName name) {
-        final ObjectName objectName = registeredBeans.remove(name);
-        if (objectName != null) {
-            try {
-                server.unregisterMBean(objectName);
-            } catch (Exception e) {
-                LOGGER.warn("Error unregistering " + name, e);
-            }
+    public void shutdown() {
+        getMetricsRegistry().removeListener(this);
+        for (ObjectName name : registeredBeans.values()) {
+            unregisterBean(name);
         }
+        registeredBeans.clear();
     }
 
+    /**
+     * Starts the reporter.
+     */
     public final void start() {
         getMetricsRegistry().addListener(this);
     }
 
-    private void registerBean(MetricName name, MetricMBean bean, ObjectName objectName) throws MBeanRegistrationException, InstanceAlreadyExistsException, NotCompliantMBeanException {
+    private void registerBean(MetricName name, MetricMBean bean, ObjectName objectName)
+            throws MBeanRegistrationException, OperationsException {
         server.registerMBean(bean, objectName);
         registeredBeans.put(name, objectName);
     }
 
-    @Override
-    public void shutdown() {
-        getMetricsRegistry().removeListener(this);
-        for (ObjectName name : registeredBeans.values()) {
-            try {
-                server.unregisterMBean(name);
-            } catch (Exception e) {
-                LOGGER.warn("Error unregistering " + name, e);
-            }
+    private void unregisterBean(ObjectName name) {
+        try {
+            server.unregisterMBean(name);
+        } catch (Exception e) {
+            LOGGER.warn("Error unregistering " + name, e);
         }
-        registeredBeans.clear();
     }
 }

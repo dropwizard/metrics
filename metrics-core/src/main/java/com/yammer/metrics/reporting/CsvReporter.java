@@ -14,25 +14,83 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A reporter which periodically appends data from each metric to a metric-specific CSV file in
+ * an output directory.
+ */
 public class CsvReporter extends AbstractPollingReporter implements
                                                          MetricProcessor<CsvReporter.Context> {
+
+    /**
+     * The context used to output metrics.
+     */
+    public interface Context {
+        /**
+         * Returns an open {@link PrintStream} for the metric with {@code header} already written
+         * to it.
+         *
+         * @param header    the CSV header
+         * @return an open {@link PrintStream}
+         * @throws IOException if there is an error opening the stream or writing to it
+         */
+        PrintStream getStream(String header) throws IOException;
+    }
+
     private final MetricPredicate predicate;
     private final File outputDir;
     private final Map<MetricName, PrintStream> streamMap;
     private final Clock clock;
     private long startTime;
 
-    public CsvReporter(File outputDir,
-                       MetricsRegistry metricsRegistry,
-                       MetricPredicate predicate) throws Exception {
-        this(outputDir, metricsRegistry, predicate, Clock.DEFAULT);
+    /**
+     * Creates a new {@link CsvReporter} which will write all metrics from the given
+     * {@link MetricsRegistry} to CSV files in the given output directory.
+     *
+     * @param metricsRegistry    the {@link MetricsRegistry} containing the metrics this reporter
+     *                           will report
+     * @param outputDir          the directory to which files will be written
+     */
+    public CsvReporter(File outputDir, MetricsRegistry metricsRegistry) {
+        this(metricsRegistry, MetricPredicate.ALL, outputDir);
     }
 
-    public CsvReporter(File outputDir,
-                       MetricsRegistry metricsRegistry,
+    /**
+     * Creates a new {@link CsvReporter} which will write metrics from the given
+     * {@link MetricsRegistry} which match the given {@link MetricPredicate} to CSV files in the
+     * given output directory.
+     *
+     * @param metricsRegistry    the {@link MetricsRegistry} containing the metrics this reporter
+     *                           will report
+     * @param predicate          the {@link MetricPredicate} which metrics are required to match
+     *                           before being written to files
+     * @param outputDir          the directory to which files will be written
+     */
+    public CsvReporter(MetricsRegistry metricsRegistry,
                        MetricPredicate predicate,
-                       Clock clock) throws Exception {
+                       File outputDir) {
+        this(metricsRegistry, predicate, outputDir, Clock.DEFAULT);
+    }
+
+    /**
+     * Creates a new {@link CsvReporter} which will write metrics from the given
+     * {@link MetricsRegistry} which match the given {@link MetricPredicate} to CSV files in the
+     * given output directory.
+     *
+     * @param metricsRegistry    the {@link MetricsRegistry} containing the metrics this reporter
+     *                           will report
+     * @param predicate          the {@link MetricPredicate} which metrics are required to match
+     *                           before being written to files
+     * @param outputDir          the directory to which files will be written
+     * @param clock              the clock used to measure time
+     */
+    public CsvReporter(MetricsRegistry metricsRegistry,
+                       MetricPredicate predicate,
+                       File outputDir,
+                       Clock clock) {
         super(metricsRegistry, "csv-reporter");
+        if (outputDir.exists() && !outputDir.isDirectory()) {
+            throw new IllegalArgumentException(outputDir + " is not a directory");
+        }
         this.outputDir = outputDir;
         this.predicate = predicate;
         this.streamMap = new HashMap<MetricName, PrintStream>();
@@ -40,27 +98,13 @@ public class CsvReporter extends AbstractPollingReporter implements
         this.clock = clock;
     }
 
-    public CsvReporter(File outputDir, MetricsRegistry metricsRegistry)
-            throws Exception {
-        this(outputDir, metricsRegistry, MetricPredicate.ALL);
-    }
-
-    private PrintStream getPrintStream(MetricName metricName, String header)
-            throws IOException {
-        PrintStream stream;
-        synchronized (streamMap) {
-            stream = streamMap.get(metricName);
-            if (stream == null) {
-                stream = createStreamForMetric(metricName);
-                streamMap.put(metricName, stream);
-                stream.println(header);
-            }
-        }
-        return stream;
-    }
-
     /**
-     * Override to do tricks (such as testing).
+     * Returns an opened {@link PrintStream} for the given {@link MetricName} which outputs data
+     * to a metric-specific {@code .csv} file in the output directory.
+     *
+     * @param metricName    the name of the metric
+     * @return an opened {@link PrintStream} specific to {@code metricName}
+     * @throws IOException if there is an error opening the stream
      */
     protected PrintStream createStreamForMetric(MetricName metricName) throws IOException {
         final File newFile = new File(outputDir, metricName.getName() + ".csv");
@@ -95,10 +139,6 @@ public class CsvReporter extends AbstractPollingReporter implements
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public interface Context {
-        PrintStream getStream(String header) throws IOException;
     }
 
     @Override
@@ -179,5 +219,19 @@ public class CsvReporter extends AbstractPollingReporter implements
                 out.close();
             }
         }
+    }
+
+    private PrintStream getPrintStream(MetricName metricName, String header)
+            throws IOException {
+        PrintStream stream;
+        synchronized (streamMap) {
+            stream = streamMap.get(metricName);
+            if (stream == null) {
+                stream = createStreamForMetric(metricName);
+                streamMap.put(metricName, stream);
+                stream.println(header);
+            }
+        }
+        return stream;
     }
 }

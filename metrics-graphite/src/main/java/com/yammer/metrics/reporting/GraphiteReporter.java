@@ -2,7 +2,6 @@ package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
-import com.yammer.metrics.core.VirtualMachineMetrics.GarbageCollector;
 import com.yammer.metrics.stats.Snapshot;
 import com.yammer.metrics.util.MetricPredicate;
 import org.slf4j.Logger;
@@ -352,7 +351,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
             sendFloat(epoch, "jvm.thread-states", entry.getKey().toString().toLowerCase(), entry.getValue());
         }
 
-        for (Entry<String, GarbageCollector> entry : vm.garbageCollectors().entrySet()) {
+        for (Entry<String, VirtualMachineMetrics.GarbageCollectorStats> entry : vm.garbageCollectors().entrySet()) {
             final String name = "jvm.gc." + entry.getKey();
             sendInt(epoch, name, "time", entry.getValue().getTime(TimeUnit.MILLISECONDS));
             sendInt(epoch, name, "runs", entry.getValue().getRuns());

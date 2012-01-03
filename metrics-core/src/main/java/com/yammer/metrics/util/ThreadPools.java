@@ -2,6 +2,9 @@ package com.yammer.metrics.util;
 
 import java.util.concurrent.*;
 
+/**
+ * A manager class for a set of named thread pools.
+ */
 public class ThreadPools {
     private final ConcurrentMap<String, ScheduledExecutorService> threadPools =
             new ConcurrentHashMap<String, ScheduledExecutorService>(100);

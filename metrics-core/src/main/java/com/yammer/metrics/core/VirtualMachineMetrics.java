@@ -17,23 +17,40 @@ import static java.lang.management.ManagementFactory.*;
 public class VirtualMachineMetrics {
     private static final int MAX_STACK_TRACE_DEPTH = 100;
 
-    public static class GarbageCollector {
+    /**
+     * Per-GC statistics.
+     */
+    public static class GarbageCollectorStats {
         private final long runs, timeMS;
 
-        public GarbageCollector(long runs, long timeMS) {
+        private GarbageCollectorStats(long runs, long timeMS) {
             this.runs = runs;
             this.timeMS = timeMS;
         }
 
+        /**
+         * Returns the number of times the garbage collector has run.
+         *
+         * @return the number of times the garbage collector has run
+         */
         public long getRuns() {
             return runs;
         }
 
+        /**
+         * Returns the amount of time in the given unit the garbage collector has taken in total.
+         *
+         * @param unit    the time unit for the return value
+         * @return the amount of time in the given unit the garbage collector
+         */
         public long getTime(TimeUnit unit) {
             return unit.convert(timeMS, TimeUnit.MILLISECONDS);
         }
     }
 
+    /**
+     * The default instance of {@link VirtualMachineMetrics}.
+     */
     public static final VirtualMachineMetrics INSTANCE = new VirtualMachineMetrics();
 
     private VirtualMachineMetrics() { /* unused */ }
@@ -224,11 +241,11 @@ public class VirtualMachineMetrics {
      *
      * @return a map of garbage collector names to garbage collector information
      */
-    public Map<String, GarbageCollector> garbageCollectors() {
-        final Map<String, GarbageCollector> gcs = new HashMap<String, GarbageCollector>();
+    public Map<String, GarbageCollectorStats> garbageCollectors() {
+        final Map<String, GarbageCollectorStats> gcs = new HashMap<String, GarbageCollectorStats>();
         for (GarbageCollectorMXBean bean : getGarbageCollectorMXBeans()) {
             gcs.put(bean.getName(),
-                    new GarbageCollector(bean.getCollectionCount(), bean.getCollectionTime()));
+                    new GarbageCollectorStats(bean.getCollectionCount(), bean.getCollectionTime()));
         }
         return gcs;
     }
