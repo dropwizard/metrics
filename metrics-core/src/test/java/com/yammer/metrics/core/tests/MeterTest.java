@@ -1,5 +1,6 @@
 package com.yammer.metrics.core.tests;
 
+import com.yammer.metrics.core.Clock;
 import com.yammer.metrics.core.Meter;
 import org.junit.After;
 import org.junit.Test;
@@ -13,8 +14,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public class MeterTest {
-    final ScheduledExecutorService pool = Executors.newSingleThreadScheduledExecutor();
-    final Meter meter = Meter.newMeter(pool, "thangs", TimeUnit.SECONDS);
+    private final ScheduledExecutorService pool = Executors.newSingleThreadScheduledExecutor();
+    private final Meter meter = new Meter(pool, "thangs", TimeUnit.SECONDS, Clock.DEFAULT);
 
     @After
     public void tearDown() throws Exception {

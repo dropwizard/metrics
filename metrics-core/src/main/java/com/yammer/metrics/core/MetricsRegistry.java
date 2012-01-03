@@ -282,8 +282,7 @@ public class MetricsRegistry {
         if (existingMetric != null) {
             return (Meter) existingMetric;
         }
-        return getOrAdd(metricName,
-                        Meter.newMeter(newMeterTickThreadPool(), eventType, unit));
+        return getOrAdd(metricName, new Meter(newMeterTickThreadPool(), eventType, unit, Clock.DEFAULT));
     }
 
     /**

@@ -15,20 +15,6 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Meter implements Metered, Stoppable {
     private static final long INTERVAL = 5; // seconds
-    private final Clock clock;
-
-    /**
-     * Creates a new {@link Meter}.
-     *
-     * @param tickThread background thread for updating the rates
-     * @param eventType  the plural name of the event the meter is measuring (e.g., {@code
-     *                   "requests"})
-     * @param rateUnit   the rate unit of the new meter
-     * @return a new {@link Meter}
-     */
-    public static Meter newMeter(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit) {
-        return new Meter(tickThread, eventType, rateUnit, Clock.DEFAULT);
-    }
 
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
     private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
@@ -39,7 +25,17 @@ public class Meter implements Metered, Stoppable {
     private final TimeUnit rateUnit;
     private final String eventType;
     private final ScheduledFuture<?> future;
+    private final Clock clock;
 
+    /**
+     * Creates a new {@link Meter}.
+     *
+     * @param tickThread background thread for updating the rates
+     * @param eventType  the plural name of the event the meter is measuring (e.g., {@code
+     *                   "requests"})
+     * @param rateUnit   the rate unit of the new meter
+     * @param clock      the clock to use for the meter ticks
+     */
     public Meter(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit, Clock clock) {
         this.rateUnit = rateUnit;
         this.eventType = eventType;
