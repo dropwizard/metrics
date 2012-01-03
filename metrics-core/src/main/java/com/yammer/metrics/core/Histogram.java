@@ -62,9 +62,9 @@ public class Histogram implements Metric, Quantized, Summarized {
     }
 
     private final Sample sample;
-    private final AtomicLong _min = new AtomicLong();
-    private final AtomicLong _max = new AtomicLong();
-    private final AtomicLong _sum = new AtomicLong();
+    private final AtomicLong min = new AtomicLong();
+    private final AtomicLong max = new AtomicLong();
+    private final AtomicLong sum = new AtomicLong();
     // These are for the Welford algorithm for calculating running variance
     // without floating-point doom.
     private final AtomicReference<double[]> variance =
@@ -97,9 +97,9 @@ public class Histogram implements Metric, Quantized, Summarized {
     public void clear() {
         sample.clear();
         count.set(0);
-        _max.set(Long.MIN_VALUE);
-        _min.set(Long.MAX_VALUE);
-        _sum.set(0);
+        max.set(Long.MIN_VALUE);
+        min.set(Long.MAX_VALUE);
+        sum.set(0);
         variance.set(new double[]{-1, 0});
     }
 
@@ -122,7 +122,7 @@ public class Histogram implements Metric, Quantized, Summarized {
         sample.update(value);
         setMax(value);
         setMin(value);
-        _sum.getAndAdd(value);
+        sum.getAndAdd(value);
         updateVariance(value);
     }
 
@@ -141,7 +141,7 @@ public class Histogram implements Metric, Quantized, Summarized {
     @Override
     public double max() {
         if (count() > 0) {
-            return _max.get();
+            return max.get();
         }
         return 0.0;
     }
@@ -152,7 +152,7 @@ public class Histogram implements Metric, Quantized, Summarized {
     @Override
     public double min() {
         if (count() > 0) {
-            return _min.get();
+            return min.get();
         }
         return 0.0;
     }
@@ -163,7 +163,7 @@ public class Histogram implements Metric, Quantized, Summarized {
     @Override
     public double mean() {
         if (count() > 0) {
-            return _sum.get() / (double) count();
+            return sum.get() / (double) count();
         }
         return 0.0;
     }
@@ -255,16 +255,16 @@ public class Histogram implements Metric, Quantized, Summarized {
     private void setMax(long potentialMax) {
         boolean done = false;
         while (!done) {
-            final long currentMax = _max.get();
-            done = currentMax >= potentialMax || _max.compareAndSet(currentMax, potentialMax);
+            final long currentMax = max.get();
+            done = currentMax >= potentialMax || max.compareAndSet(currentMax, potentialMax);
         }
     }
 
     private void setMin(long potentialMin) {
         boolean done = false;
         while (!done) {
-            final long currentMin = _min.get();
-            done = currentMin <= potentialMin || _min.compareAndSet(currentMin, potentialMin);
+            final long currentMin = min.get();
+            done = currentMin <= potentialMin || min.compareAndSet(currentMin, potentialMin);
         }
     }
 
