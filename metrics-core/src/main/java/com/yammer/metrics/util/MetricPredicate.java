@@ -25,5 +25,5 @@ public interface MetricPredicate {
      * @param metric the metric itself
      * @return {@code true} if the predicate applies, {@code false} otherwise
      */
-    public boolean matches(MetricName name, Metric metric);
+    boolean matches(MetricName name, Metric metric);
 }
