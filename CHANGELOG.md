@@ -37,6 +37,7 @@ v2.0.0-BETA19: TBD
 * Changed `MetricsRegistry#createName` to `protected`.
 * All metric types are created exclusively through `MetricsRegistry` now.
 * `Metrics.newJmxGauge` and `MetricsRegistry.newJmxGauge` are deprecated.
+* Added `metrics-guava`, which allows you to measure cache misses and evictions.
 
 
 v2.0.0-BETA18: Dec 16 2011
