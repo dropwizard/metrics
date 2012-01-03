@@ -9,10 +9,10 @@ import static org.junit.Assert.assertEquals;
 public class GangliaMessageBuilderTests {
     @Test
     public void providesCorrectHostAndPort() throws SocketException {
-        String hostName = "hostName";
-        int port = 12345;
+        final String hostName = "hostName";
+        final int port = 12345;
 
-        GangliaMessageBuilder builder = new GangliaMessageBuilder(hostName, port);
+        final GangliaMessageBuilder builder = new GangliaMessageBuilder(hostName, port);
 
         assertEquals(hostName, builder.getHostName());
         assertEquals(port, builder.getPort());

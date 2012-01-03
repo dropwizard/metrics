@@ -1,16 +1,15 @@
 package com.yammer.metrics.jetty;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import org.eclipse.jetty.io.Connection;
-import org.eclipse.jetty.server.bio.SocketConnector;
-
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
+import org.eclipse.jetty.io.Connection;
+import org.eclipse.jetty.server.bio.SocketConnector;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class InstrumentedSocketConnector extends SocketConnector {
     private final Timer duration;
@@ -66,7 +65,7 @@ public class InstrumentedSocketConnector extends SocketConnector {
     protected void connectionClosed(Connection connection) {
         super.connectionClosed(connection);
         disconnects.mark();
-        long duration = System.currentTimeMillis() - connection.getTimeStamp();
+        final long duration = System.currentTimeMillis() - connection.getTimeStamp();
         this.duration.update(duration, TimeUnit.MILLISECONDS);
         connections.dec();
     }

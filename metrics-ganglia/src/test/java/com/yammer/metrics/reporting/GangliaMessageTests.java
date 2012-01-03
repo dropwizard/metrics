@@ -8,11 +8,11 @@ import static org.junit.Assert.assertEquals;
 public class GangliaMessageTests {
     @Test
     public void canAddInt() {
-        int bytesToWrite = 4; //integer
-        byte[] buffer = new byte[bytesToWrite];
-        byte[] expecteds = new byte[]{0, 0, 2, (byte) 166};
+        final int bytesToWrite = 4; //integer
+        final byte[] buffer = new byte[bytesToWrite];
+        final byte[] expecteds = new byte[]{0, 0, 2, (byte) 166};
 
-        GangliaMessage message = new GangliaMessage(null, buffer, null);
+        final GangliaMessage message = new GangliaMessage(null, buffer, null);
 
         message.addInt(678);
 
@@ -22,11 +22,11 @@ public class GangliaMessageTests {
 
     @Test
     public void canAddString() {
-        int bytesToWrite = 4 + 4; //integer + message
-        byte[] buffer = new byte[bytesToWrite];
-        byte[] expecteds = new byte[]{0, 0, 0, 4, 't', 'e', 's', 't'};
+        final int bytesToWrite = 4 + 4; //integer + message
+        final byte[] buffer = new byte[bytesToWrite];
+        final byte[] expecteds = new byte[]{0, 0, 0, 4, 't', 'e', 's', 't'};
 
-        GangliaMessage message = new GangliaMessage(null, buffer, null);
+        final GangliaMessage message = new GangliaMessage(null, buffer, null);
 
         message.addString("test");
 
@@ -36,11 +36,11 @@ public class GangliaMessageTests {
 
     @Test
     public void canAddPaddedString() {
-        int bytesToWrite = 4 + 5 + 3; //integer + message + padding
-        byte[] buffer = new byte[bytesToWrite];
-        byte[] expecteds = new byte[]{0, 0, 0, 5, 't', 'e', 's', 't', 's', 0, 0, 0};
+        final int bytesToWrite = 4 + 5 + 3; //integer + message + padding
+        final byte[] buffer = new byte[bytesToWrite];
+        final byte[] expecteds = new byte[]{0, 0, 0, 5, 't', 'e', 's', 't', 's', 0, 0, 0};
 
-        GangliaMessage message = new GangliaMessage(null, buffer, null);
+        final GangliaMessage message = new GangliaMessage(null, buffer, null);
 
         message.addString("tests");
 

@@ -20,7 +20,7 @@ import com.yammer.metrics.reporting.JmxReporter;
 public class InstrumentationModule extends AbstractModule {
     @Override
     protected void configure() {
-        MetricsRegistry metricsRegistry = createMetricsRegistry();
+        final MetricsRegistry metricsRegistry = createMetricsRegistry();
         bind(MetricsRegistry.class).toInstance(metricsRegistry);
         bind(HealthCheckRegistry.class).toInstance(createHealthCheckRegistry());
         bindJmxReporter();

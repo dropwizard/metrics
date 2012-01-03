@@ -58,7 +58,7 @@ public class GangliaReporterTest extends AbstractPollingReporterTest {
             }
         };
 
-        GangliaMessageBuilder messageBuilder = mock(GangliaMessageBuilder.class);
+        final GangliaMessageBuilder messageBuilder = mock(GangliaMessageBuilder.class);
         when(messageBuilder.newMessage()).thenReturn(this.testMessage);
 
         final GangliaReporter reporter = new GangliaReporter(registry,
@@ -83,9 +83,9 @@ public class GangliaReporterTest extends AbstractPollingReporterTest {
 
     @Test
     public void testSanitizeName_noBadCharacters() throws IOException {
-        MetricName metricName = new MetricName("thisIs", "AClean", "MetricName");
-        GangliaReporter gangliaReporter = new GangliaReporter("localhost", 5555);
-        String cleanMetricName = gangliaReporter.sanitizeName(metricName);
+        final MetricName metricName = new MetricName("thisIs", "AClean", "MetricName");
+        final GangliaReporter gangliaReporter = new GangliaReporter("localhost", 5555);
+        final String cleanMetricName = gangliaReporter.sanitizeName(metricName);
         assertEquals("clean metric name was changed unexpectedly",
                      "thisIs.AClean.MetricName",
                      cleanMetricName);
@@ -93,10 +93,10 @@ public class GangliaReporterTest extends AbstractPollingReporterTest {
 
     @Test
     public void testSanitizeName_badCharacters() throws IOException {
-        MetricName metricName = new MetricName("thisIs", "AC>&!>lean", "Metric Name");
-        String expectedMetricName = "thisIs.AC____lean.Metric_Name";
-        GangliaReporter gangliaReporter = new GangliaReporter("localhost", 5555);
-        String cleanMetricName = gangliaReporter.sanitizeName(metricName);
+        final MetricName metricName = new MetricName("thisIs", "AC>&!>lean", "Metric Name");
+        final String expectedMetricName = "thisIs.AC____lean.Metric_Name";
+        final GangliaReporter gangliaReporter = new GangliaReporter("localhost", 5555);
+        final String cleanMetricName = gangliaReporter.sanitizeName(metricName);
         assertEquals("clean metric name did not match expected value",
                      expectedMetricName,
                      cleanMetricName);
@@ -104,10 +104,10 @@ public class GangliaReporterTest extends AbstractPollingReporterTest {
 
     @Test
     public void testCompressPackageName() throws IOException {
-        MetricName metricName = new MetricName("some.long.package.name.thisIs", "AC>&!>lean", "Metric Name");
-        String expectedMetricName = "s.l.p.n.t.AC____lean.Metric_Name";
-        GangliaReporter gangliaReporter = new GangliaReporter("localhost", 5555, true);
-        String cleanMetricName = gangliaReporter.sanitizeName(metricName);
+        final MetricName metricName = new MetricName("some.long.package.name.thisIs", "AC>&!>lean", "Metric Name");
+        final String expectedMetricName = "s.l.p.n.t.AC____lean.Metric_Name";
+        final GangliaReporter gangliaReporter = new GangliaReporter("localhost", 5555, true);
+        final String cleanMetricName = gangliaReporter.sanitizeName(metricName);
         assertEquals("clean metric name did not match expected value",
                      expectedMetricName,
                      cleanMetricName);

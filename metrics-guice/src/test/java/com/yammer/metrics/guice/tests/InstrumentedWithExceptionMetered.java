@@ -42,7 +42,7 @@ public class InstrumentedWithExceptionMetered {
                       rateUnit = TimeUnit.MINUTES,
                       cause = ArrayIndexOutOfBoundsException.class)
     public Object causeAnOutOfBoundsException() {
-        Object[] arr = {};
+        final Object[] arr = {};
         return arr[1];
     }
 
