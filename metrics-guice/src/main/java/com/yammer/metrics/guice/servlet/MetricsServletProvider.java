@@ -1,16 +1,15 @@
-package com.yammer.metrics.reporting.guice;
-
-import java.util.Set;
-
-import com.yammer.metrics.core.HealthCheckRegistry;
-import com.yammer.metrics.core.MetricsRegistry;
-import org.codehaus.jackson.JsonFactory;
+package com.yammer.metrics.guice.servlet;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
 import com.yammer.metrics.core.HealthCheck;
+import com.yammer.metrics.core.HealthCheckRegistry;
+import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.MetricsServlet;
+import org.codehaus.jackson.JsonFactory;
+
+import java.util.Set;
 
 public class MetricsServletProvider implements Provider<MetricsServlet>
 {

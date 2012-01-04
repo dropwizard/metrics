@@ -1,4 +1,4 @@
-package com.yammer.metrics.reporting.guice;
+package com.yammer.metrics.guice.servlet;
 
 import org.codehaus.jackson.JsonFactory;
 
