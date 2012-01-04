@@ -8,7 +8,6 @@
         <version>2.0.0-BETA19-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-servlet</artifactId>
     <name>Metrics Servlet</name>
 
