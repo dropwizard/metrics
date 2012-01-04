@@ -10,7 +10,6 @@
         <version>2.0.0-BETA19-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-guava</artifactId>
     <name>Metrics for Guava</name>
     <description>

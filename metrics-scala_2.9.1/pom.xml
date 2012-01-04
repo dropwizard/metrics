@@ -8,7 +8,6 @@
         <version>2.0.0-BETA19-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-scala_2.9.1</artifactId>
     <name>Metrics for Scala ${scala.version}</name>
 
