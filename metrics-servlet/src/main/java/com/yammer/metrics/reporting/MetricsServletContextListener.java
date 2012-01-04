@@ -12,11 +12,11 @@ import javax.servlet.ServletContextListener;
  * destroyed.
  */
 public class MetricsServletContextListener implements ServletContextListener {
-    @SuppressWarnings("deprecation")
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         final ServletContext context = sce.getServletContext();
-        final MetricsRegistry metricsRegistry = (MetricsRegistry) context.getAttribute(MetricsServlet.ATTR_NAME_METRICS_REGISTRY);
+        final MetricsRegistry metricsRegistry =
+                (MetricsRegistry) context.getAttribute(MetricsServlet.ATTR_NAME_METRICS_REGISTRY);
         if (metricsRegistry != null) {
             metricsRegistry.shutdown();
         } else {
