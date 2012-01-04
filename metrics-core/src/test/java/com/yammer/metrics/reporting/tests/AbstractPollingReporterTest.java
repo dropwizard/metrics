@@ -132,44 +132,43 @@ public abstract class AbstractPollingReporterTest {
                 expectedGaugeResult(value));
     }
 
-    @SuppressWarnings("unchecked")
     static Counter createCounter(long count) throws Exception {
         final Counter mock = mock(Counter.class);
         when(mock.count()).thenReturn(count);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
-            void delegateToProcessor(MetricProcessor processor, MetricName name, Object context) throws Exception {
+            void delegateToProcessor(MetricProcessor<Object> processor, MetricName name, Object context) throws Exception {
                 processor.processCounter(name, mock, context);
             }
         }));
     }
 
-    @SuppressWarnings("unchecked")
     static Histogram createHistogram() throws Exception {
         final Histogram mock = mock(Histogram.class);
         setupSummarizableMock(mock);
         setupSamplingMock(mock);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
-            void delegateToProcessor(MetricProcessor processor, MetricName name, Object context) throws Exception {
+            void delegateToProcessor(MetricProcessor<Object> processor, MetricName name, Object context) throws Exception {
                 processor.processHistogram(name, mock, context);
             }
         }));
     }
 
-    @SuppressWarnings("unchecked")
+    
     static Gauge<String> createGauge() throws Exception {
+        @SuppressWarnings("unchecked")
         final Gauge<String> mock = mock(Gauge.class);
         when(mock.value()).thenReturn("gaugeValue");
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
-            void delegateToProcessor(MetricProcessor processor, MetricName name, Object context) throws Exception {
+            void delegateToProcessor(MetricProcessor<Object> processor, MetricName name, Object context) throws Exception {
                 processor.processGauge(name, mock, context);
             }
         }));
     }
 
-    @SuppressWarnings("unchecked")
+
     static Timer createTimer() throws Exception {
         final Timer mock = mock(Timer.class);
         when(mock.durationUnit()).thenReturn(TimeUnit.MILLISECONDS);
@@ -178,19 +177,18 @@ public abstract class AbstractPollingReporterTest {
         setupSamplingMock(mock);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
-            void delegateToProcessor(MetricProcessor processor, MetricName name, Object context) throws Exception {
+            void delegateToProcessor(MetricProcessor<Object> processor, MetricName name, Object context) throws Exception {
                 processor.processTimer(name, mock, context);
             }
         }));
     }
 
-    @SuppressWarnings("unchecked")
     static Meter createMeter() throws Exception {
         final Meter mock = mock(Meter.class);
         setupMeteredMock(mock);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
-            void delegateToProcessor(MetricProcessor processor, MetricName name, Object context) throws Exception {
+            void delegateToProcessor(MetricProcessor<Object> processor, MetricName name, Object context) throws Exception {
                 processor.processMeter(name, mock, context);
             }
         }));
@@ -205,14 +203,15 @@ public abstract class AbstractPollingReporterTest {
     static abstract class MetricsProcessorAction implements Answer<Object> {
         @Override
         public Object answer(InvocationOnMock invocation) throws Throwable {
-            final MetricProcessor<?> processor = (MetricProcessor<?>) invocation.getArguments()[0];
+            @SuppressWarnings("unchecked")
+            final MetricProcessor<Object> processor = (MetricProcessor<Object>) invocation.getArguments()[0];
             final MetricName name = (MetricName) invocation.getArguments()[1];
             final Object context = invocation.getArguments()[2];
             delegateToProcessor(processor, name, context);
             return null;
         }
 
-        abstract void delegateToProcessor(MetricProcessor<?> processor, MetricName name, Object context) throws Exception;
+        abstract void delegateToProcessor(MetricProcessor<Object> processor, MetricName name, Object context) throws Exception;
     }
 
     static void setupSummarizableMock(Summarizable summarizable) {
