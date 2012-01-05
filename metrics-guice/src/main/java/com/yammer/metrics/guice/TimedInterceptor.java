@@ -1,4 +1,4 @@
-package com.yammer.metrics.aop;
+package com.yammer.metrics.guice;
 
 import com.yammer.metrics.annotation.Timed;
 import com.yammer.metrics.core.MetricsRegistry;

@@ -19,18 +19,8 @@
         </dependency>
         <dependency>
             <groupId>com.yammer.metrics</groupId>
-            <artifactId>metrics-aop</artifactId>
+            <artifactId>metrics-annotation</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>cglib</groupId>
-                    <artifactId>cglib</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.objenesis</groupId>
-                    <artifactId>objenesis</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>

@@ -43,6 +43,7 @@ v2.0.0-BETA19: TBD
 * Changed order of `CsvReporter`'s construction parameters.
 * Renamed `VirtualMachineMetrics.GarbageCollector` to `VirtualMachineMetrics.GarbageCollectorStats`.
 * Moved Guice/Servlet support from `metrics-servlet` to `metrics-guice`.
+* Removed `metrics-aop`.
 
 
 v2.0.0-BETA18: Dec 16 2011
