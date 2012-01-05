@@ -31,7 +31,7 @@
     </modules>
 
     <properties>
-        <jetty.version>7.6.0.RC2</jetty.version>
+        <jetty.version>7.6.0.RC3</jetty.version>
         <servlet.version>2.5</servlet.version>
         <jackson.version>1.9.3</jackson.version>
         <guice.version>3.0</guice.version>
