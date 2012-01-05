@@ -13,8 +13,8 @@ import com.yammer.metrics.reporting.JmxReporter;
  * @see com.yammer.metrics.annotation.Gauge
  * @see com.yammer.metrics.annotation.Metered
  * @see com.yammer.metrics.annotation.Timed
- * @see com.yammer.metrics.aop.MeteredInterceptor
- * @see com.yammer.metrics.aop.TimedInterceptor
+ * @see MeteredInterceptor
+ * @see TimedInterceptor
  * @see GaugeInjectionListener
  */
 public class InstrumentationModule extends AbstractModule {
