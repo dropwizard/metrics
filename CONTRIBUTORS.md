@@ -24,6 +24,7 @@ Many Many Thanks To
 * Mahesh Tiyyagura (@tmahesh)
 * Martin Traverso (@martint)
 * Matt Abrams (@abramsm)
+* Matthew O'Connor (@oconnor0)
 * Matt Ryall (@mattryall)
 * Matthew Gilliard (@mjg123)
 * Mårten Gustafson (@chids)
