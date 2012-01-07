@@ -1,6 +1,6 @@
-package com.yammer.metrics.core.tests;
+package com.yammer.metrics.util.tests;
 
-import com.yammer.metrics.core.JmxGauge;
+import com.yammer.metrics.util.JmxGauge;
 import org.junit.Before;
 import org.junit.Test;
 
