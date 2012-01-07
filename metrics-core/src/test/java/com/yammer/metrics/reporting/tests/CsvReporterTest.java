@@ -2,10 +2,10 @@ package com.yammer.metrics.reporting.tests;
 
 import com.yammer.metrics.core.Clock;
 import com.yammer.metrics.core.MetricName;
+import com.yammer.metrics.core.MetricPredicate;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.AbstractPollingReporter;
 import com.yammer.metrics.reporting.CsvReporter;
-import com.yammer.metrics.util.MetricPredicate;
 
 import java.io.File;
 import java.io.IOException;

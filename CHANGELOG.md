@@ -46,6 +46,7 @@ v2.0.0-BETA19: TBD
 * Removed `metrics-aop`.
 * Removed `newJmxGauge` from both `Metrics` and `MetricsRegistry`. Just use `JmxGauge`.
 * Moved `JmxGauge` to `com.yammer.metrics.util`.
+* Moved `MetricPredicate` to `com.yammer.metrics.core`.
 
 
 v2.0.0-BETA18: Dec 16 2011
