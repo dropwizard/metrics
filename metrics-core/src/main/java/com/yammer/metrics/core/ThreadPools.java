@@ -1,11 +1,44 @@
-package com.yammer.metrics.util;
+package com.yammer.metrics.core;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A manager class for a set of named thread pools.
  */
-public class ThreadPools {
+class ThreadPools {
+    /**
+     * A simple named thread factory.
+     */
+    private static class NamedThreadFactory implements ThreadFactory {
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        /**
+         * Creates a new {@link com.yammer.metrics.core.ThreadPools.NamedThreadFactory} with the
+         * given name.
+         *
+         * @param name the name of the threads, to be used in the pattern {@code
+         *             metrics-$NAME$-thread-$NUMBER$}
+         */
+        NamedThreadFactory(String name) {
+            final SecurityManager s = System.getSecurityManager();
+            this.group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+            this.namePrefix = "metrics-" + name + "-thread-";
+        }
+
+        @Override
+        public Thread newThread(Runnable r) {
+            final Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
+            t.setDaemon(true);
+            if (t.getPriority() != Thread.NORM_PRIORITY) {
+                t.setPriority(Thread.NORM_PRIORITY);
+            }
+            return t;
+        }
+    }
+
     private final ConcurrentMap<String, ScheduledExecutorService> threadPools =
             new ConcurrentHashMap<String, ScheduledExecutorService>(100);
 
@@ -17,7 +50,7 @@ public class ThreadPools {
      * @param name     the name of the pool
      * @return a new {@link ScheduledExecutorService}
      */
-    public ScheduledExecutorService newScheduledThreadPool(int poolSize, String name) {
+    ScheduledExecutorService newScheduledThreadPool(int poolSize, String name) {
         final ScheduledExecutorService existing = threadPools.get(name);
         if (existing == null) {
             // We lock here because executors are expensive to create. So
@@ -44,7 +77,7 @@ public class ThreadPools {
     /**
      * Shuts down all thread pools created by this class in an orderly fashion.
      */
-    public void shutdown() {
+    void shutdown() {
         synchronized (this) {
             for (ExecutorService executor : threadPools.values()) {
                 executor.shutdown();
@@ -52,5 +85,4 @@ public class ThreadPools {
             threadPools.clear();
         }
     }
-
 }
