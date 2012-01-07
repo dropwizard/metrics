@@ -79,7 +79,7 @@ public class MetricsRegistry {
      * @deprecated use {@link #newGauge(Class, String, Gauge)} and {@link JmxGauge} instead
      */
     @Deprecated
-    @SuppressWarnings({"UnusedDeclaration", "deprecation"})
+    @SuppressWarnings({"UnusedDeclaration", "deprecation" })
     public JmxGauge newJmxGauge(Class<?> klass,
                                 String name,
                                 String objectName,

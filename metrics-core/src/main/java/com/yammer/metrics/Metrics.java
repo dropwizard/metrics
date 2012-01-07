@@ -85,7 +85,7 @@ public class Metrics {
      *             instead
      */
     @Deprecated
-    @SuppressWarnings({"UnusedDeclaration", "deprecation"})
+    @SuppressWarnings({ "UnusedDeclaration", "deprecation" })
     public static JmxGauge newJmxGauge(Class<?> klass,
                                        String name,
                                        String objectName,
@@ -108,7 +108,7 @@ public class Metrics {
      *             instead
      */
     @Deprecated
-    @SuppressWarnings({"UnusedDeclaration", "deprecation"})
+    @SuppressWarnings({ "UnusedDeclaration", "deprecation" })
     public static JmxGauge newJmxGauge(Class<?> klass,
                                        String name,
                                        String scope,
@@ -130,7 +130,7 @@ public class Metrics {
      *             instead
      */
     @Deprecated
-    @SuppressWarnings({"UnusedDeclaration", "deprecation"})
+    @SuppressWarnings({ "UnusedDeclaration", "deprecation" })
     public static JmxGauge newJmxGauge(MetricName metricName,
                                        String objectName,
                                        String attribute) throws MalformedObjectNameException {
