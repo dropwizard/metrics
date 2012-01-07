@@ -1,7 +1,6 @@
 package com.yammer.metrics.core;
 
 import com.yammer.metrics.core.Histogram.SampleType;
-import com.yammer.metrics.util.MetricPredicate;
 import com.yammer.metrics.util.ThreadPools;
 
 import java.util.*;

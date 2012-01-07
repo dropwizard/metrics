@@ -1,7 +1,4 @@
-package com.yammer.metrics.util;
-
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
+package com.yammer.metrics.core;
 
 /**
  * A {@link MetricPredicate} is used to determine whether a metric should be included when sorting

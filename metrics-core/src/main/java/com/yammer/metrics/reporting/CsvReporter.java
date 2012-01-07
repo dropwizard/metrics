@@ -2,7 +2,7 @@ package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.stats.Snapshot;
-import com.yammer.metrics.util.MetricPredicate;
+import com.yammer.metrics.core.MetricPredicate;
 
 import java.io.File;
 import java.io.FileOutputStream;
