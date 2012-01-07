@@ -3,7 +3,6 @@ package com.yammer.metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.reporting.JmxReporter;
 
-import javax.management.MalformedObjectNameException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -69,72 +68,6 @@ public class Metrics {
     public static <T> Gauge<T> newGauge(MetricName metricName,
                                         Gauge<T> metric) {
         return DEFAULT_REGISTRY.newGauge(metricName, metric);
-    }
-
-    /**
-     * Given a JMX MBean's object name and an attribute name, registers a gauge for that attribute
-     * under the given class and name.
-     *
-     * @param klass      the class which owns the metric
-     * @param name       the name of the metric
-     * @param objectName the object name of the MBean
-     * @param attribute  the name of the bean's attribute
-     * @return a new {@link JmxGauge}
-     * @throws MalformedObjectNameException if the object name is malformed
-     * @deprecated use {@link MetricsRegistry#newGauge(Class, String, Gauge)} and {@link JmxGauge}
-     *             instead
-     */
-    @Deprecated
-    @SuppressWarnings({ "UnusedDeclaration", "deprecation" })
-    public static JmxGauge newJmxGauge(Class<?> klass,
-                                       String name,
-                                       String objectName,
-                                       String attribute) throws MalformedObjectNameException {
-        return DEFAULT_REGISTRY.newJmxGauge(klass, name, null, objectName, attribute);
-    }
-
-    /**
-     * Given a JMX MBean's object name and an attribute name, registers a gauge for that attribute
-     * under the given class, name, and scope.
-     *
-     * @param klass      the class which owns the metric
-     * @param name       the name of the metric
-     * @param scope      the scope of the metric
-     * @param objectName the object name of the MBean
-     * @param attribute  the name of the bean's attribute
-     * @return a new {@link JmxGauge}
-     * @throws MalformedObjectNameException if the object name is malformed
-     * @deprecated use {@link MetricsRegistry#newGauge(Class, String, Gauge)} and {@link JmxGauge}
-     *             instead
-     */
-    @Deprecated
-    @SuppressWarnings({ "UnusedDeclaration", "deprecation" })
-    public static JmxGauge newJmxGauge(Class<?> klass,
-                                       String name,
-                                       String scope,
-                                       String objectName,
-                                       String attribute) throws MalformedObjectNameException {
-        return DEFAULT_REGISTRY.newJmxGauge(klass, name, scope, objectName, attribute);
-    }
-
-    /**
-     * Given a JMX MBean's object name and an attribute name, registers a gauge for that attribute
-     * under the given metric name.
-     *
-     * @param metricName the name of the metric
-     * @param objectName the object name of the MBean
-     * @param attribute  the name of the bean's attribute
-     * @return a new {@link JmxGauge}
-     * @throws MalformedObjectNameException if the object name is malformed
-     * @deprecated use {@link MetricsRegistry#newGauge(Class, String, Gauge)} and {@link JmxGauge}
-     *             instead
-     */
-    @Deprecated
-    @SuppressWarnings({ "UnusedDeclaration", "deprecation" })
-    public static JmxGauge newJmxGauge(MetricName metricName,
-                                       String objectName,
-                                       String attribute) throws MalformedObjectNameException {
-        return DEFAULT_REGISTRY.newJmxGauge(metricName, objectName, attribute);
     }
 
     /**
