@@ -47,6 +47,7 @@ v2.0.0-BETA19: TBD
 * Removed `newJmxGauge` from both `Metrics` and `MetricsRegistry`. Just use `JmxGauge`.
 * Moved `JmxGauge` to `com.yammer.metrics.util`.
 * Moved `MetricPredicate` to `com.yammer.metrics.core`.
+* Moved `NameThreadFactory` into `ThreadPools` and made `ThreadPools` package-visible.
 
 
 v2.0.0-BETA18: Dec 16 2011
