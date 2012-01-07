@@ -45,6 +45,7 @@ v2.0.0-BETA19: TBD
 * Moved Guice/Servlet support from `metrics-servlet` to `metrics-guice`.
 * Removed `metrics-aop`.
 * Removed `newJmxGauge` from both `Metrics` and `MetricsRegistry`. Just use `JmxGauge`.
+* Moved `JmxGauge` to `com.yammer.metrics.util`.
 
 
 v2.0.0-BETA18: Dec 16 2011

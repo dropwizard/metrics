@@ -1,4 +1,6 @@
-package com.yammer.metrics.core;
+package com.yammer.metrics.util;
+
+import com.yammer.metrics.core.Gauge;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
