@@ -106,7 +106,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
                                                                    predicate,
                                                                    new DefaultSocketProvider(host,
                                                                                              port),
-                                                                   Clock.DEFAULT);
+                                                                   Clock.defaultClock());
             reporter.start(period, unit);
         } catch (Exception e) {
             LOG.error("Error creating/starting Graphite reporter:", e);
@@ -139,7 +139,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
              prefix,
              MetricPredicate.ALL,
              new DefaultSocketProvider(host, port),
-             Clock.DEFAULT);
+             Clock.defaultClock());
     }
 
     /**

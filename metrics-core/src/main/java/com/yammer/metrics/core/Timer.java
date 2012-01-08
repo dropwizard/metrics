@@ -26,7 +26,7 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      * @param rateUnit     the scale unit for this timer's rate metrics
      */
     Timer(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit) {
-        this(tickThread, durationUnit, rateUnit, Clock.DEFAULT);
+        this(tickThread, durationUnit, rateUnit, Clock.defaultClock());
     }
 
     /**

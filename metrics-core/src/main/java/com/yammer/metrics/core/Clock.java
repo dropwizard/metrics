@@ -7,7 +7,6 @@ import java.lang.management.ThreadMXBean;
  * An abstraction for how time passes. It is passed to {@link Timer} to track timing.
  */
 public abstract class Clock {
-
     /**
      * Returns the current time tick.
      *
@@ -24,12 +23,19 @@ public abstract class Clock {
         return System.currentTimeMillis();
     }
 
+    private static final Clock DEFAULT = new UserTimeClock();
+
     /**
      * The default clock to use.
      *
-     * @see UserTimeClock
+     * @return the default {@link Clock} instance
+     *
+     * @see com.yammer.metrics.core.Clock.UserTimeClock
      */
-    public static final Clock DEFAULT = new UserTimeClock();
+    public static Clock defaultClock() {
+        return DEFAULT;
+    }
+
 
     /**
      * A clock implementation which returns the current time in epoch nanoseconds.

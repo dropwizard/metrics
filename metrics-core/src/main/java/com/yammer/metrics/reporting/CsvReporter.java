@@ -68,7 +68,7 @@ public class CsvReporter extends AbstractPollingReporter implements
     public CsvReporter(MetricsRegistry metricsRegistry,
                        MetricPredicate predicate,
                        File outputDir) {
-        this(metricsRegistry, predicate, outputDir, Clock.DEFAULT);
+        this(metricsRegistry, predicate, outputDir, Clock.defaultClock());
     }
 
     /**
