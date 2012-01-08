@@ -5,9 +5,6 @@ import com.yammer.metrics.stats.Sample;
 import com.yammer.metrics.stats.Snapshot;
 import com.yammer.metrics.stats.UniformSample;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -184,25 +181,6 @@ public class Histogram implements Metric, Sampling, Summarizable {
     @Override
     public Snapshot getSnapshot() {
         return sample.getSnapshot();
-    }
-
-    /**
-     * Returns a list of all values in the histogram's sample.
-     *
-     * @return a list of all values in the histogram's sample
-     */
-    public List<Long> values() {
-        return sample.values();
-    }
-
-    /**
-     * Writes the values of the histogram's sample to the given file.
-     *
-     * @param output the file to which the values will be written
-     * @throws IOException if there is an error writing the values
-     */
-    public void dump(File output) throws IOException {
-        sample.dump(output);
     }
 
     private double variance() {

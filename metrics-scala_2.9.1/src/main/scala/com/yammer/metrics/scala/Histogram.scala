@@ -55,20 +55,8 @@ class Histogram(metric: com.yammer.metrics.core.Histogram) {
   def stdDev = metric.stdDev
 
   /**
-   * Returns a sequence of all values in the histogram's sample.
-   */
-  def values = metric.values.toSeq
-
-  /**
    * Returns a snapshot of the values in the histogram's sample.
    */
   def snapshot = metric.getSnapshot
-
-  /**
-   * Dumps the recoded values in the timer's sample to the given file.
-   */
-  def dump(output: File) {
-    metric.dump(output)
-  }
 }
 

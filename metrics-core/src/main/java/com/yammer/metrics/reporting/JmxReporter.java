@@ -4,10 +4,12 @@ import com.yammer.metrics.core.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.*;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.management.OperationsException;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -175,7 +177,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         double get999thPercentile();
 
-        List<?> values();
+        double[] values();
     }
     // CHECKSTYLE:ON
 
@@ -249,8 +251,8 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
 
         @Override
-        public List<?> values() {
-            return metric.values();
+        public double[] values() {
+            return metric.getSnapshot().getValues();
         }
     }
 
@@ -325,8 +327,8 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
 
         @Override
-        public List<?> values() {
-            return metric.values();
+        public double[] values() {
+            return metric.getSnapshot().getValues();
         }
     }
 
