@@ -222,7 +222,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
              groupPrefix,
              predicate,
              compressPackageNames,
-             new GangliaMessageBuilder(gangliaHost, port), VirtualMachineMetrics.INSTANCE);
+             new GangliaMessageBuilder(gangliaHost, port), VirtualMachineMetrics.getInstance());
     }
 
     /**

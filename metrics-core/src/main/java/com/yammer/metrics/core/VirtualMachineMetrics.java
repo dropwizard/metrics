@@ -17,6 +17,17 @@ import static java.lang.management.ManagementFactory.*;
 public class VirtualMachineMetrics {
     private static final int MAX_STACK_TRACE_DEPTH = 100;
 
+    private static final VirtualMachineMetrics INSTANCE = new VirtualMachineMetrics();
+
+    /**
+     * The default instance of {@link VirtualMachineMetrics}.
+     *
+     * @return the default {@link VirtualMachineMetrics instance}
+     */
+    public static VirtualMachineMetrics getInstance() {
+        return INSTANCE;
+    }
+
     /**
      * Per-GC statistics.
      */
@@ -47,11 +58,6 @@ public class VirtualMachineMetrics {
             return unit.convert(timeMS, TimeUnit.MILLISECONDS);
         }
     }
-
-    /**
-     * The default instance of {@link VirtualMachineMetrics}.
-     */
-    public static final VirtualMachineMetrics INSTANCE = new VirtualMachineMetrics();
 
     private VirtualMachineMetrics() { /* unused */ }
 

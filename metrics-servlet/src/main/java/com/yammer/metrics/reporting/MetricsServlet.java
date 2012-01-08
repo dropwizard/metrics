@@ -95,7 +95,8 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
     }
 
     public MetricsServlet(MetricsRegistry metricsRegistry, HealthCheckRegistry healthCheckRegistry, JsonFactory factory, String healthcheckUri, String metricsUri, String pingUri, String threadsUri, boolean showJvmMetrics) {
-        this(metricsRegistry, healthCheckRegistry, VirtualMachineMetrics.INSTANCE, factory, healthcheckUri, metricsUri, pingUri, threadsUri, showJvmMetrics);
+        this(metricsRegistry, healthCheckRegistry,
+             VirtualMachineMetrics.getInstance(), factory, healthcheckUri, metricsUri, pingUri, threadsUri, showJvmMetrics);
     }
 
     public MetricsServlet(MetricsRegistry metricsRegistry, HealthCheckRegistry healthCheckRegistry, VirtualMachineMetrics vm, JsonFactory factory, String healthcheckUri, String metricsUri, String pingUri, String threadsUri, boolean showJvmMetrics) {

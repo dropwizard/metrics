@@ -63,7 +63,7 @@ public class GangliaReporterTest extends AbstractPollingReporterTest {
                                                              MetricPredicate.ALL,
                                                              false,
                                                              messageBuilder,
-                                                             VirtualMachineMetrics.INSTANCE) {
+                                                             VirtualMachineMetrics.getInstance()) {
             @Override
             String getHostLabel() {
                 return "localhost";
