@@ -72,7 +72,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements
      *                        output
      */
     public ConsoleReporter(MetricsRegistry metricsRegistry, PrintStream out, MetricPredicate predicate) {
-        this(metricsRegistry, out, predicate, Clock.DEFAULT, TimeZone.getDefault());
+        this(metricsRegistry, out, predicate, Clock.defaultClock(), TimeZone.getDefault());
     }
 
     /**
