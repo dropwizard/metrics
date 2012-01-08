@@ -1,7 +1,10 @@
-v2.0.0-BETA19: TBD
+v2.0.0-RC0: TBD
 ==========================
 
-**This release contains breaking changes.**
+
+
+v2.0.0-BETA19: Jan 07 2012
+==========================
 
 * Added absolute memory usage to `MetricsServlet`.
 * Extracted `@Timed` etc. to `metrics-annotations`.
