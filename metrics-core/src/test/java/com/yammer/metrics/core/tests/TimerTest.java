@@ -96,8 +96,8 @@ public class TimerTest {
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has no values",
-                   timer.values().isEmpty(),
-                   is(true));
+                   timer.getSnapshot().size(),
+                   is(0));
     }
 
     @Test

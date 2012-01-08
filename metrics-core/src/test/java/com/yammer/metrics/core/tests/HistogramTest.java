@@ -67,8 +67,8 @@ public class HistogramTest {
                    is(closeTo(0.0, 0.0001)));
 
         assertThat("the histogram is empty",
-                   histogram.values().isEmpty(),
-                   is(true));
+                   snapshot.size(),
+                   is(0));
     }
 
     @Test
@@ -112,7 +112,7 @@ public class HistogramTest {
                    is(closeTo(990.99, 0.0001)));
 
         assertThat("the histogram has 1000 values",
-                   histogram.values().size(),
+                   snapshot.size(),
                    is(1000));
     }
 

@@ -16,11 +16,11 @@ public class ExponentiallyDecayingSampleTest {
             sample.update(i);
         }
 
-        final Snapshot snapshot = sample.getSnapshot();
-
         assertThat("the sample has a size of 100",
                    sample.size(),
                    is(100));
+
+        final Snapshot snapshot = sample.getSnapshot();
 
         assertThat("the sample has 100 elements",
                    snapshot.size(),
@@ -44,20 +44,22 @@ public class ExponentiallyDecayingSampleTest {
             sample.update(i);
         }
 
+        final Snapshot snapshot = sample.getSnapshot();
+
         assertThat("the sample has a size of 10",
-                   sample.size(),
+                   snapshot.size(),
                    is(10));
 
         assertThat("the sample has 10 elements",
-                   sample.values().size(),
+                   snapshot.size(),
                    is(10));
 
-        for (Long i : sample.values()) {
+        for (double i : snapshot.getValues()) {
             assertThat("the sample only contains elements from the population",
                        i,
                        is(allOf(
-                               lessThan(10L),
-                               greaterThanOrEqualTo(0L)
+                               lessThan(10.0),
+                               greaterThanOrEqualTo(0.0)
                        )));
         }
     }
@@ -70,20 +72,24 @@ public class ExponentiallyDecayingSampleTest {
             sample.update(i);
         }
 
+
+
         assertThat("the sample has a size of 100",
                    sample.size(),
                    is(100));
 
+        final Snapshot snapshot = sample.getSnapshot();
+
         assertThat("the sample has 100 elements",
-                   sample.values().size(),
+                   snapshot.size(),
                    is(100));
 
-        for (Long i : sample.values()) {
+        for (double i : snapshot.getValues()) {
             assertThat("the sample only contains elements from the population",
                        i,
                        is(allOf(
-                               lessThan(100L),
-                               greaterThanOrEqualTo(0L)
+                               lessThan(100.0),
+                               greaterThanOrEqualTo(0.0)
                        )));
         }
     }

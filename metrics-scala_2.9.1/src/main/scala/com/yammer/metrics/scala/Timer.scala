@@ -58,11 +58,6 @@ class Timer(metric: com.yammer.metrics.core.Timer) {
   def stdDev = metric.stdDev
 
   /**
-   * Returns a sequence of all durations in the timer's sample.
-   */
-  def values = metric.values.toSeq
-
-  /**
    * Returns a snapshot of the values in the timer's sample.
    */
   def snapshot = metric.getSnapshot
@@ -101,12 +96,5 @@ class Timer(metric: com.yammer.metrics.core.Timer) {
    * Returns the one-minute rate of timings.
    */
   def oneMinuteRate = metric.oneMinuteRate
-
-  /**
-   * Dumps the recoded values in the timer's sample to the given file.
-   */
-  def dump(output: File) {
-    metric.dump(output)
-  }
 }
 

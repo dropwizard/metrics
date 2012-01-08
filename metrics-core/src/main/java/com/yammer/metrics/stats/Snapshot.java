@@ -1,5 +1,8 @@
 package com.yammer.metrics.stats;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -143,5 +146,22 @@ public class Snapshot {
      */
     public double[] getValues() {
         return Arrays.copyOf(values, values.length);
+    }
+
+    /**
+     * Writes the values of the sample to the given file.
+     *
+     * @param output the file to which the values will be written
+     * @throws IOException if there is an error writing the values
+     */
+    public void dump(File output) throws IOException {
+        final PrintWriter writer = new PrintWriter(output);
+        try {
+            for (double value : values) {
+                writer.printf("%f\n", value);
+            }
+        } finally {
+            writer.close();
+        }
     }
 }

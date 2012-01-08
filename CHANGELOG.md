@@ -48,6 +48,9 @@ v2.0.0-BETA19: TBD
 * Moved `JmxGauge` to `com.yammer.metrics.util`.
 * Moved `MetricPredicate` to `com.yammer.metrics.core`.
 * Moved `NameThreadFactory` into `ThreadPools` and made `ThreadPools` package-visible.
+* Removed `Timer#values()`, `Histogram#values()`, and `Sample#values()`. Use `getSnapshot()` instead.
+* Removed `Timer#dump(File)` and `Histogram#dump(File)`, and `Sample#dump(File)`. Use
+  `Snapshot#dump(File)` instead.
 
 
 v2.0.0-BETA18: Dec 16 2011

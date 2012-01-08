@@ -29,8 +29,8 @@ object RecencyBiasExperiment {
       expSample.update(t)
       uniSample.update(t)
 
-      val expValues = expSample.values.map {_.longValue}.sorted
-      val uniValues = uniSample.values.map {_.longValue}.sorted
+      val expValues = expSample.getSnapshot.getValues.map {_.longValue}.sorted
+      val uniValues = uniSample.getSnapshot.getValues.map {_.longValue}.sorted
 
       val expMean = expValues.sum / expValues.size.toDouble
       val expExpectedMean = ((t - 300).max(1) to t).sum / 300.0.min(t)

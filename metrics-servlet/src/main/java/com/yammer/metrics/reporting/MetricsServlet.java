@@ -302,7 +302,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
             writeSampling(histogram, json);
 
             if (context.showFullSamples) {
-                json.writeObjectField("values", histogram.values());
+                json.writeObjectField("values", histogram.getSnapshot().getValues());
             }
         }
         json.writeEndObject();
@@ -436,7 +436,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
                 writeSummarizable(timer, json);
                 writeSampling(timer, json);
                 if (context.showFullSamples) {
-                    json.writeObjectField("values", timer.values());
+                    json.writeObjectField("values", timer.getSnapshot().getValues());
                 }
             }
             json.writeEndObject();
