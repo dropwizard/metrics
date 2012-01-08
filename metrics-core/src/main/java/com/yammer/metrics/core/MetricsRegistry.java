@@ -226,7 +226,8 @@ public class MetricsRegistry {
         if (existingMetric != null) {
             return (Meter) existingMetric;
         }
-        return getOrAdd(metricName, new Meter(newMeterTickThreadPool(), eventType, unit, Clock.DEFAULT));
+        return getOrAdd(metricName, new Meter(newMeterTickThreadPool(), eventType, unit,
+                                              Clock.defaultClock()));
     }
 
     /**
@@ -356,7 +357,7 @@ public class MetricsRegistry {
                 group.put(entry.getKey(), entry.getValue());
             }
         }
-        return groups;
+        return Collections.unmodifiableSortedMap(groups);
     }
 
     /**

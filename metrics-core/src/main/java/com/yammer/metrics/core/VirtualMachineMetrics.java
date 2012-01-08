@@ -160,7 +160,7 @@ public class VirtualMachineMetrics {
                     bean.getUsage().getMax();
             pools.put(bean.getName(), bean.getUsage().getUsed() / max);
         }
-        return pools;
+        return Collections.unmodifiableMap(pools);
     }
 
     /**
@@ -242,12 +242,13 @@ public class VirtualMachineMetrics {
      * @return a map of garbage collector names to garbage collector information
      */
     public Map<String, GarbageCollectorStats> garbageCollectors() {
-        final Map<String, GarbageCollectorStats> gcs = new HashMap<String, GarbageCollectorStats>();
+        final Map<String, GarbageCollectorStats> stats = new HashMap<String, GarbageCollectorStats>();
         for (GarbageCollectorMXBean bean : getGarbageCollectorMXBeans()) {
-            gcs.put(bean.getName(),
-                    new GarbageCollectorStats(bean.getCollectionCount(), bean.getCollectionTime()));
+            stats.put(bean.getName(),
+                      new GarbageCollectorStats(bean.getCollectionCount(),
+                                                bean.getCollectionTime()));
         }
-        return gcs;
+        return Collections.unmodifiableMap(stats);
     }
 
     /**
@@ -274,7 +275,7 @@ public class VirtualMachineMetrics {
                         )
                 );
             }
-            return threads;
+            return Collections.unmodifiableSet(threads);
         }
         return Collections.emptySet();
     }
@@ -304,7 +305,7 @@ public class VirtualMachineMetrics {
             conditions.put(state, conditions.get(state) / liveCount);
         }
 
-        return conditions;
+        return Collections.unmodifiableMap(conditions);
     }
 
     /**
