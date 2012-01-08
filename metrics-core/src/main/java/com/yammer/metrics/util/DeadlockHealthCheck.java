@@ -27,7 +27,7 @@ public class DeadlockHealthCheck extends HealthCheck {
      */
     @SuppressWarnings("UnusedDeclaration")
     public DeadlockHealthCheck() {
-        this(VirtualMachineMetrics.INSTANCE);
+        this(VirtualMachineMetrics.getInstance());
     }
 
     @Override

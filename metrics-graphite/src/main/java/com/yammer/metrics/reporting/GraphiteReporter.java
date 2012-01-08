@@ -153,7 +153,8 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
      * @throws IOException if there is an error connecting to the Graphite server
      */
     public GraphiteReporter(MetricsRegistry metricsRegistry, String prefix, MetricPredicate predicate, SocketProvider socketProvider, Clock clock) throws IOException {
-        this(metricsRegistry, prefix, predicate, socketProvider, clock, VirtualMachineMetrics.INSTANCE);
+        this(metricsRegistry, prefix, predicate, socketProvider, clock,
+             VirtualMachineMetrics.getInstance());
     }
 
     /**
