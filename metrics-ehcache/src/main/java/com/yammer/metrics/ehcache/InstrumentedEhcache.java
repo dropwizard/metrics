@@ -1,18 +1,9 @@
 package com.yammer.metrics.ehcache;
 
-import java.beans.PropertyChangeListener;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.Statistics;
-import net.sf.ehcache.Status;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Gauge;
+import com.yammer.metrics.core.Timer;
+import net.sf.ehcache.*;
 import net.sf.ehcache.bootstrap.BootstrapCacheLoader;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.event.RegisteredEventListeners;
@@ -29,9 +20,12 @@ import net.sf.ehcache.transaction.manager.TransactionManagerLookup;
 import net.sf.ehcache.writer.CacheWriter;
 import net.sf.ehcache.writer.CacheWriterManager;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Gauge;
-import com.yammer.metrics.core.Timer;
+import java.beans.PropertyChangeListener;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * An instrumented {@link Ehcache} instance.
@@ -318,7 +312,7 @@ public class InstrumentedEhcache implements Ehcache {
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        return InstrumentedEhcache.instrument((Ehcache) cache.clone());
+        return super.clone();
     }
 
     @Override
