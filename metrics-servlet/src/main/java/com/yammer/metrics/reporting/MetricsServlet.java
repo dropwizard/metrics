@@ -283,7 +283,8 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
                         try {
                             subEntry.getValue().processWith(this, subEntry.getKey(), new Context(json, showFullSamples));
                         }
-                        catch(Exception ignored) {
+                        catch(Exception e) {
+                            LOGGER.warn("Error writing out " + subEntry.getKey(), e);
                         }
                     }
                 }
