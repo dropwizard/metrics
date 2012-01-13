@@ -12,6 +12,7 @@
 
     <script src="js/prettify.js"></script>
     <script src="js/lang-yaml.js"></script>
+    <script src="js/lang-scala.js"></script>
 
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/prettify.css">
@@ -42,27 +43,47 @@
                 <li>
                     <a href="#core">Metrics Core</a>
                     <ul>
-                        <li><a href="#gauges">Gauges</a></li>
+                        <li>
+                            <a href="#gauges">Gauges</a>
+                            <ul>
+                                <li><a href="#jmx-gauges">JMX Gauges</a></li>
+                            </ul>
+                        </li>
                         <li><a href="#counters">Counters</a></li>
-                        <li><a href="#histograms">Histograms</a></li>
+                        <li>
+                            <a href="#histograms">Histograms</a>
+                            <ul>
+                                <li><a href="#uniform-histograms">Uniform Histograms</a></li>
+                                <li><a href="#biased-histograms">Biased Histograms</a></li>
+                            </ul>
+                        </li>
                         <li><a href="#meters">Meters</a></li>
                         <li><a href="#timers">Timers</a></li>
                         <li><a href="#healthchecks">Health Checks</a></li>
-                        <li><a href="#reporters">Reporters</a></li>
+                        <li>
+                            <a href="#reporters">Reporters</a>
+                            <ul>
+                                <li><a href="#jmx-reporter">JMX</a></li>
+                                <li><a href="#console-reporter">Console</a></li>
+                                <li><a href="#csv-reporter">CSV</a></li>
+                                <li><a href="#other-reporters">Other Reporters</a></li>
+                            </ul>
+                        </li>
                     </ul>
                 </li>
-                <li><a href="#aop">Metrics and AOP</a></li>
                 <li><a href="#ehcache">Metrics and Ehcache</a></li>
                 <li><a href="#ganglia">Metrics and Ganglia</a></li>
                 <li><a href="#graphite">Metrics and Graphite</a></li>
                 <li><a href="#guice">Metrics and Guice</a></li>
                 <li><a href="#httpclient">Metrics and HttpClient</a></li>
                 <li><a href="#jdbi">Metrics and JDBI</a></li>
+                <li><a href="#jersey">Metrics and Jersey</a></li>
                 <li><a href="#jetty">Metrics and Jetty</a></li>
                 <li><a href="#log4j">Metrics and Log4j</a></li>
                 <li><a href="#logback">Metrics and Logback</a></li>
                 <li><a href="#scala">Metrics and Scala</a></li>
-                <li><a href="#servlets">Metrics and Servlets</a></li>
+                <li><a href="#servlet">Metrics Servlet</a></li>
+                <li><a href="#webapp">Metrics and Web Applications</a></li>
             </ul>
         </div>
     </div>
@@ -71,62 +92,405 @@
         <h1>Metric User’s Manual</h1>
 
         <p>
-            TODO
+            This goal of this document is to provide you with all the information required to
+            effectively use the Metrics library in your application.
         </p>
 
         <h2 id="core">Metrics Core</h2>
 
         <p>
-            TODO
+            The central library for Metrics is <code>metrics-core</code>, which provides some basic
+            functionality:
+        </p>
+
+        <ul>
+            <li>
+                The five metric types: <a href="#gauges">gauges</a>,
+                <a href="#counters">counters</a>, <a href="#histograms">histograms</a>,
+                <a href="#meters">meters</a>, and <a href="#timers">timers</a>.
+            </li>
+            <li>
+                <a href="#healthchecks">Health checks.</a>
+            </li>
+            <li>
+                Reporting metrics values via JMX, the console, and CSV files.
+            </li>
+        </ul>
+
+        <p>
+            All metrics are created via either the <code>Metrics</code> class or a
+            <code>MetricsRegistry</code>. If your application is running alongside other
+            applications in a single JVM instance (e.g., multiple WARs deployed to an application
+            server), you should use per-application <code>MetricsRegistry</code> instances. If your
+            application is the sole occupant of the JVM instance (e.g., a
+            <a href="http://dropwizard.codahale.com/">Dropwizard application</a>), feel free to use
+            the <code>static</code> methods on <code>Metrics.</code>
+        </p>
+
+        <p>
+            For this documentation, we’ll assume you’re using <code>Metrics</code>, but the
+            interfaces are much the same.
+        </p>
+
+        <p>
+            Each metric has a unique <em>metric name</em>, which consists of four pieces of
+            information:
+        </p>
+
+        <dl>
+            <dt>group</dt>
+            <dd>
+                The top-level grouping of the metric. When a metric belongs to a class, this
+                defaults to the class’s <i>package name</i> (e.g.,
+                <code>com.example.proj.auth</code>).
+            </dd>
+
+            <dt>type</dt>
+            <dd>
+                The second-level grouping of the metric. When a metric belongs to a class, this
+                defaults to the class’s <i>name</i> (e.g., <code>SessionStore</code>).
+            </dd>
+
+            <dt>name</dt>
+            <dd>
+                A short name describing the metric’s purpose (e.g., <code>session-count</code>).
+            </dd>
+
+            <dt>scope</dt>
+            <dd>
+                An optional name describing the metric’s scope. Useful for when you have multiple
+                instances of a class.
+            </dd>
+        </dl>
+
+        <p>
+            The factory methods on <code>Metrics</code> and <code>MetricsRegistry</code> will accept
+            either class/name, class/name/scope, or <code>MetricName</code> instances with arbitrary
+            inputs.
         </p>
         
         <h3 id="gauges">Gauges</h3>
 
         <p>
-            TODO
+            A gauge is the simplest metric type. It just returns a <em>value</em>. If, for example,
+            your application has a value which is maintained by a third-party library, you can
+            easily expose it by registering a <code>Gauge</code> instance which returns that value:
         </p>
+
+        <pre class="prettyprint lang-java">
+Metrics.newGauge(SessionStore.class, "cache-evictions", new Gauge&lt;Integer&gt;() {
+    @Override
+    public Integer value() {
+        return cache.getEvictionsCount();
+    }
+});</pre>
+
+        <p>
+            This will create a new gauge named
+            <code>com.example.proj.auth.SessionStore.cache-evictions</code> which will return the
+            number of evictions from the cache.
+        </p>
+
+        <h4 id="jmx-gauges">JMX Gauges</h4>
+
+        <p>
+            Given that many third-party library often expose metrics only via JMX, Metrics provides
+            the <code>JmxGauge</code> class, which takes the object name of a JMX MBean and the
+            name of an attribute and produces a gauge implementation which returns the value of
+            that attribute:
+        </p>
+
+        <pre class="prettyprint lang-java">
+Metrics.newGauge(SessionStore.class, "cache-evictions",
+                 new JmxGauge("net.sf.ehcache:type=Cache,scope=sessions,name=eviction-count", "Value"));</pre>
 
         <h3 id="counters">Counters</h3>
 
         <p>
-            TODO
+            A counter is a simple incrementing and decrementing 64-bit integer:
+        </p>
+
+        <pre class="prettyprint lang-java">
+final Counter evictions = Metrics.newCounter(SessionStore.class, "cache-evictions");
+evictions.inc();
+evictions.inc(3);
+evictions.dec();
+evictions.dec(2);</pre>
+
+        <p>
+            All <code>Counter</code> metrics start out at 0.
         </p>
 
         <h3 id="histograms">Histograms</h3>
 
         <p>
-            TODO
+            A <code>Histogram</code> measures the distribution of values in a stream of data: e.g.,
+            the number of results returned by a search:
+        </p>
+
+        <pre class="prettyprint lang-java">
+final Histogram resultCounts = Metrics.newHistogram(ProductDAO.class, "result-counts");
+resultCounts.update(results.size());</pre>
+
+        <p>
+            <code>Histogram</code> metrics allow you to measure not just easy things like the
+            min, mean, max, and standard deviation of values, but also
+            <a href="http://en.wikipedia.org/wiki/Quantile" target="_blank">quantiles</a> like the
+            median or 95th percentile.
+        </p>
+
+        <p>
+            Traditionally, the way the median (or any other quantile) is calculated is to take the
+            entire data set, sort it, and take the value in the middle (or 1% from the end, for the
+            99th percentile). This works for small data sets, or batch processing systems, but not
+            for high-throughput, low-latency services.
+        </p>
+
+        <p>
+            The solution for this is to sample the data as it goes through. By maintaining a small,
+            manageable sample which is statistically representative of the data stream as a whole,
+            we can quickly and easily calculate quantiles which are valid approximations of the
+            actual quantiles. This technique is called <strong>reservoir sampling</strong>.
+        </p>
+
+        <p>
+            Metrics provides two types of histograms: <strong>uniform</strong> and
+            <strong>biased</strong>.
+        </p>
+
+        <h4 id="uniform-histograms">Uniform Histograms</h4>
+
+        <p>
+            A uniform histogram produces quantiles which are valid for the entirely of the
+            histogram’s lifetime. It will return a median value, for example, which is the median
+            of all the values the histogram has ever been updated with. It does this by using an
+            algorithm called
+            <a href="http://www.cs.umd.edu/~samir/498/vitter.pdf" target="_blank">Vitter’s R</a>,
+            which randomly selects values for the sample with linearly-decreasing probability.
+        </p>
+
+        <p>
+            Use a uniform histogram when you’re interested in long-term measurements. Don’t use one
+            where you’d want to know if the distribution of the underlying data stream has changed
+            recently.
+        </p>
+
+        <h4 id="biased-histograms">Biased Histograms</h4>
+
+        <p>
+            A biased histogram produces quantiles which are representative of (roughly) the last
+            five minutes of data. It does so by using a
+            <a href="http://www.research.att.com/people/Cormode_Graham/library/publications/CormodeShkapenyukSrivastavaXu09.pdf">forward-decaying priority sample</a>
+            with an exponential weighting towards newer data. Unlike the uniform histogram, a biased
+            histogram represents <strong>recent data</strong>, allowing you to know very quickly if
+            the distribution of the data has changed. <a href="#timers">Timers</a> use biased
+            histograms.
         </p>
 
         <h3 id="meters">Meters</h3>
 
         <p>
-            TODO
+            A meter measures the <em>rate</em> at which a set of events occur:
+        </p>
+
+        <pre class="prettyprint lang-java">
+final Meter getRequests = Metrics.newMeter(WebProxy.class, "get-requests", "requests", TimeUnit.SECONDS);
+getRequests.mark();
+getRequests.mark(requests.size());</pre>
+
+        <p>
+            A meter requires two additional pieces of information besides the name: the
+            <strong>event type</strong> and the <strong>rate unit</strong>. The event type simply
+            describes the type of events which the meter is measuring. In the above case, the meter
+            is measuring proxied requests, and so its event type is <code>"requests"</code>. The
+            rate unit is the unit of time denominating the rate. In the above case, the meter is
+            measuring the number of requests in each second, and so its rate unit is
+            <code>SECONDS</code>. When combined, the meter is measuring requests per second.
+        </p>
+
+        <p>
+            Meters measure the rate of the events in a few different ways. The <em>mean</em> rate is
+            the average rate of events. It’s generally useful for trivia, but as it represents the
+            total rate for your application’s entire lifetime (e.g., the total number of requests
+            handled, divided by the number of seconds the process has been running), it doesn’t
+            offer a sense of recency. Luckily, meters also record three different
+            <em>exponentially-weighted moving average</em> rates: the 1-, 5-, and 15-minute moving
+            averages. (Just like the Unix load averages visible in <code>uptime</code> or
+            <code>top</code>.)
         </p>
 
         <h3 id="timers">Timers</h3>
 
         <p>
-            TODO
+            A timer is basically a <a href="#histograms">histogram</a> of the duration of a type of
+            event and a <a href="#meters">meter</a> of the rate of its occurrence.
+        </p>
+
+        <pre class="prettyprint lang-java">
+final Timer timer = Metrics.newTimer(WebProxy.class, "get-requests", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+
+final TimerContext context = timer.time();
+try {
+    // handle request
+} finally {
+    context.stop();
+}</pre>
+
+        <p>
+            A timer requires two additional pieces of information besides the name: the
+            <strong>duration unit</strong> and the <strong>rate unit</strong>. The duration unit is
+            the unit of time in which the durations of events will be measured. In the above
+            example, the duration unit is <code>MILLISECONDS</code>, meaning the timed event’s
+            duration will be measured in milliseconds. The rate unit in the above example is
+            <code>SECONDS</code>, meaning the rate of the timed event is measured in calls/sec.
         </p>
 
         <h3 id="healthchecks">Health Checks</h3>
 
         <p>
-            TODO
+            Metrics also provides you with a consistent, unified way of performing application
+            health checks. A health check is basically a small self-test which your application
+            performs to verify that a specific component or responsibility is performing correctly.
         </p>
+
+        <p>
+            To create a health check, extend the <code>HealthCheck</code> class:
+        </p>
+
+        <pre class="prettyprint lang-java">
+public class DatabaseHealthCheck extends HealthCheck {
+    private final Database database;
+
+    public DatabaseHealthCheck(Database database) {
+        super("database");
+        this.database = database;
+    }
+
+    @Override
+    protected Result check() throws Exception {
+        if (database.ping()) {
+            return Result.healthy();
+        }
+        return Result.unhealthy("Can't ping database");
+    }
+}</pre>
+
+        <p>
+            In this example, we’ve created a health check for a <code>Database</code> class on which
+            our application depends. Our fictitious <code>Database</code> class has a
+            <code>ping()</code> method, which executes a safe test query (e.g.,
+            <code>SELECT 1</code>). <code>ping()</code>returns <code>true</code> if the query
+            returns the expected result, returns <code>false</code> if it returns something else,
+            and throws an exception if things have gone seriously wrong.
+        </p>
+
+        <p>
+            Our <code>DatabaseHealthCheck</code>, then, takes a <code>Database</code> instance and
+            in its <code>check()</code> method, attempts to ping the database. If it can, it returns
+            a <strong>healthy</strong> result. If it can’t, it returns an <strong>unhealthy</strong>
+            result. (Exceptions thrown inside a health check’s <code>check()</code> method are
+            automatically caught and turned into unhealthy results with the full stack trace.)
+        </p>
+
+        <p>
+            To register a health check, either use the <code>HealthChecks</code> singleton or a
+            <code>HealthCheckRegistry</code> instance:
+        </p>
+
+        <pre class="prettyprint lang-java">
+HealthChecks.register(new DatabaseHealthCheck(database));</pre>
+
+        <p>
+            You can also run the set of registered health checks:
+        </p>
+
+
+        <pre class="prettyprint lang-java">
+for (Entry&lt;String, Result&gt; entry : HealthChecks.run().entrySet()) {
+    if (entry.getValue().isHealthy()) {
+        System.out.println(entry.getKey() + ": PASS");
+    } else {
+        System.out.println(entry.getKey() + ": FAIL");
+    }
+}</pre>
 
         <h3 id="reporters">Reporters</h3>
 
         <p>
-            TODO
+            Reporters are the way that your application exports all the measurements being made by
+            its metrics. <code>metrics-core</code> comes with three ways of exporting your metrics:
+            JMX, console, and CSV.
         </p>
-
-        <h2 id="aop">Metrics and AOP</h2>
+        
+        <h4 id="jmx-reporter">JMX</h4>
 
         <p>
-            TODO
+            By default, Metrics always registers your metrics as JMX MBeans. To explore this you
+            can use <a href="http://visualvm.java.net/">VisualVM</a> (which ships with most JDKs
+            as <code>jvisualvm</code>) with the VisualVM-MBeans plugins installed or JConsole (which
+            ships with most JDKs as <code>jconsole</code>:
         </p>
+
+        <p><img src="images/metrics-visualvm.png" alt="JConsole values"
+                title="Metrics exposed as JMX MBeans being viewed in VisualVM’s MBeans browser"></p>
+
+        <p>
+            <strong>Bonus points</strong>: If you double-click any of the metric properties,
+            VisualVM will start graphing the data for that property.
+        </p>
+
+        <p>
+            Reporting via JMX is always enabled, but we don’t recommend that you try to gather
+            metrics from your production environment. JMX’s RPC API is fragile and bonkers. For
+            development purposes and browsing, though, it can be very useful.
+        </p>
+
+        <h4 id="console-reporter">Console</h4>
+
+        <p>
+            For simple benchmarks, Metrics comes with <code>ConsoleReporter</code>, which
+            periodically reports all registered metrics to the console:
+        </p>
+
+        <pre class="prettyprint lang-java">
+ConsoleReporter.enable(1, TimeUnit.SECONDS);</pre>
+
+        <h4 id="csv-reporter">CSV</h4>
+
+        <p>
+            For more complex benchmarks, Metrics comes with <code>CsvReporter</code>, which
+            periodically appends to a set of <code>.csv</code> files in a given directory:
+        </p>
+
+        <pre class="prettyprint lang-java">
+CsvReporter.enable(new File("work/measurements"), 1, TimeUnit.SECONDS);</pre>
+
+        <p>
+            For each metric registered, a <code>.csv</code> file will be created, and every second
+            its state will be written to it as a new row.
+        </p>
+
+        <h4 id="other-reporters">Other Reporters</h4>
+
+        <p>
+            Metrics has other reporter implementations, too:
+        </p>
+
+        <ul>
+            <li>
+                <a href="#servlet">MetricsServlet</a> is a servlet which not only exposes your
+                metrics as a JSON object, but it also runs your health checks, performs thread
+                dumps, and exposes valuable JVM-level and OS-level information.
+            </li>
+            <li>
+                <a href="#ganglia">GangliaReporter</a> allows you to constantly stream metrics data
+                to your Ganglia servers.
+            </li>
+            <li>
+                <a href="#graphite">GraphiteReporter</a> allows you to constantly stream metrics
+                data to your Graphite servers.
+            </li>
+        </ul>
 
         <h2 id="ehcache">Metrics and Ehcache</h2>
 
@@ -165,6 +529,12 @@
             TODO
         </p>
 
+        <h2 id="jersey">Metrics and Jersey</h2>
+
+        <p>
+            TODO
+        </p>
+
         <h2 id="jetty">Metrics and Jetty</h2>
 
         <p>
@@ -189,7 +559,13 @@
             TODO
         </p>
 
-        <h2 id="servlets">Metrics and Servlets</h2>
+        <h2 id="servlet">Metrics Servlet</h2>
+
+        <p>
+            TODO
+        </p>
+
+        <h2 id="webapp">Metrics and Web Applications</h2>
 
         <p>
             TODO
