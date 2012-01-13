@@ -1,5 +1,6 @@
 package com.yammer.metrics.reporting;
 
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.stats.Snapshot;
 import com.yammer.metrics.core.MetricPredicate;
@@ -20,6 +21,32 @@ import java.util.concurrent.TimeUnit;
  */
 public class CsvReporter extends AbstractPollingReporter implements
                                                          MetricProcessor<CsvReporter.Context> {
+
+    /**
+     * Enables the CSV reporter for the default metrics registry, and causes it to print to
+     * STDOUT with the specified period.
+     *
+     * @param outputDir    the directory in which {@code .csv} files will be created
+     * @param period       the period between successive outputs
+     * @param unit         the time unit of {@code period}
+     */
+    public static void enable(File outputDir, long period, TimeUnit unit) {
+        enable(Metrics.defaultRegistry(), outputDir, period, unit);
+    }
+
+    /**
+     * Enables the console reporter for the given metrics registry, and causes it to print to STDOUT
+     * with the specified period and unrestricted output.
+     *
+     * @param metricsRegistry the metrics registry
+     * @param outputDir       the directory in which {@code .csv} files will be created
+     * @param period          the period between successive outputs
+     * @param unit            the time unit of {@code period}
+     */
+    public static void enable(MetricsRegistry metricsRegistry, File outputDir, long period, TimeUnit unit) {
+        final CsvReporter reporter = new CsvReporter(metricsRegistry, outputDir);
+        reporter.start(period, unit);
+    }
 
     /**
      * The context used to output metrics.
@@ -46,11 +73,11 @@ public class CsvReporter extends AbstractPollingReporter implements
      * Creates a new {@link CsvReporter} which will write all metrics from the given
      * {@link MetricsRegistry} to CSV files in the given output directory.
      *
+     * @param outputDir          the directory to which files will be written
      * @param metricsRegistry    the {@link MetricsRegistry} containing the metrics this reporter
      *                           will report
-     * @param outputDir          the directory to which files will be written
      */
-    public CsvReporter(File outputDir, MetricsRegistry metricsRegistry) {
+    public CsvReporter(MetricsRegistry metricsRegistry, File outputDir) {
         this(metricsRegistry, MetricPredicate.ALL, outputDir);
     }
 
