@@ -23,8 +23,8 @@ public class CsvReporter extends AbstractPollingReporter implements
                                                          MetricProcessor<CsvReporter.Context> {
 
     /**
-     * Enables the CSV reporter for the default metrics registry, and causes it to print to
-     * STDOUT with the specified period.
+     * Enables the CSV reporter for the default metrics registry, and causes it to write to files in
+     * {@code outputDir} with the specified period.
      *
      * @param outputDir    the directory in which {@code .csv} files will be created
      * @param period       the period between successive outputs
@@ -35,8 +35,8 @@ public class CsvReporter extends AbstractPollingReporter implements
     }
 
     /**
-     * Enables the console reporter for the given metrics registry, and causes it to print to STDOUT
-     * with the specified period and unrestricted output.
+     * Enables the CSV reporter for the given metrics registry, and causes it to write to files in
+     * {@code outputDir} with the specified period.
      *
      * @param metricsRegistry the metrics registry
      * @param outputDir       the directory in which {@code .csv} files will be created
