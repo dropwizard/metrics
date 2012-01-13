@@ -1,6 +1,11 @@
 v2.0.0-RC0: TBD
 ==========================
 
+* Small fixes for `InstrumentedEhcache#clone()`.
+* Added FindBugs checks to the build process.
+* Fixed the catching of `Error`s during health checks.
+* Added `enable` static methods to `CsvReporter` and changed `CsvReporter(File, MetricsRegistry)`
+  to `CsvReporter(MetricsRegistry, File)`.
 
 
 v2.0.0-BETA19: Jan 07 2012
