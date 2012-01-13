@@ -163,6 +163,8 @@ public abstract class HealthCheck {
     public Result execute() {
         try {
             return check();
+        } catch (Error e) {
+            throw e;
         } catch (Throwable e) {
             return Result.unhealthy(e);
         }
