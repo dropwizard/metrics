@@ -14,10 +14,10 @@ import java.util.concurrent.TimeUnit;
  * A route-specific connection pool which monitors the rate at which connections are created.
  */
 public class InstrumentedConnByRoute extends ConnPoolByRoute {
-    private static final Meter NEW_CONNECTIONS = Metrics.newMeter(InstrumentedConnByRoute.class,
-                                                                        "new-connections",
-                                                                        "connections",
-                                                                        TimeUnit.SECONDS);
+    private static final Meter NEW_CONNECTIONS = Metrics.newMeter(ConnPoolByRoute.class,
+                                                                  "new-connections",
+                                                                  "connections",
+                                                                  TimeUnit.SECONDS);
 
     public InstrumentedConnByRoute(ClientConnectionOperator operator,
                                    ConnPerRoute connPerRoute,

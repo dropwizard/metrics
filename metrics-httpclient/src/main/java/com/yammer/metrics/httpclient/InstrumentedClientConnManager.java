@@ -2,6 +2,7 @@ package com.yammer.metrics.httpclient;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Gauge;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.impl.conn.SchemeRegistryFactory;
 import org.apache.http.impl.conn.tsccm.ConnPoolByRoute;
@@ -10,8 +11,7 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A {@link org.apache.http.conn.ClientConnectionManager} which monitors the number of open
- * connections.
+ * A {@link ClientConnectionManager} which monitors the number of open connections.
  */
 public class InstrumentedClientConnManager extends ThreadSafeClientConnManager {
     public InstrumentedClientConnManager(SchemeRegistry registry) {
@@ -26,7 +26,7 @@ public class InstrumentedClientConnManager extends ThreadSafeClientConnManager {
                                          long connTTL,
                                          TimeUnit connTTLTimeUnit) {
         super(registry, connTTL, connTTLTimeUnit);
-        Metrics.newGauge(InstrumentedClientConnManager.class,
+        Metrics.newGauge(ClientConnectionManager.class,
                          "connections",
                          new Gauge<Integer>() {
                              @Override
