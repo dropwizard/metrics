@@ -165,7 +165,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
      *
      * @param gangliaHost          is ganglia server
      * @param port                 is port on which ganglia server is running
-     * @param compressPackageNames
+     * @param compressPackageNames whether or not Metrics' package names will be shortened
      * @throws java.io.IOException if there is an error connecting to the ganglia server
      */
     public GangliaReporter(String gangliaHost, int port, boolean compressPackageNames) throws IOException {
