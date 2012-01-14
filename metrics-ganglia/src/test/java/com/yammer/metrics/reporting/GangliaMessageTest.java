@@ -5,7 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-public class GangliaMessageTests {
+public class GangliaMessageTest {
     @Test
     public void canAddInt() {
         final int bytesToWrite = 4; //integer
