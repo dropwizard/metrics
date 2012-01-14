@@ -4,12 +4,11 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
-import java.net.SocketException;
 
 /**
  * Encapsulates logic for creating and sending a Ganglia message
  */
-public class GangliaMessage {
+class GangliaMessage {
 
     private final byte[] buffer;
     private int offset = 0;
@@ -25,10 +24,9 @@ public class GangliaMessage {
     /**
      * Creates and sends a new {@link DatagramPacket}
      *
-     * @throws SocketException
-     * @throws IOException
+     * @throws IOException if there is an error sending the packet
      */
-    public void send() throws SocketException, IOException {
+    public void send() throws IOException {
         this.datagramSocket
                 .send(new DatagramPacket(this.buffer, this.offset, this.inetSocketAddress));
     }
@@ -37,7 +35,7 @@ public class GangliaMessage {
      * Puts an integer into the buffer as 4 bytes, big-endian.
      *
      * @param value the integer to write to the buffer
-     * @return
+     * @return {@code this}
      */
     public GangliaMessage addInt(int value) {
         this.buffer[this.offset++] = (byte) ((value >> 24) & 0xff);
@@ -53,7 +51,7 @@ public class GangliaMessage {
      * the bytes of the string, padded if necessary to a multiple of 4.
      *
      * @param value the message to write to the buffer
-     * @return
+     * @return {@code this}
      */
     public GangliaMessage addString(String value) {
         final byte[] bytes = value.getBytes();
