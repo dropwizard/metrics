@@ -15,6 +15,7 @@ v2.0.0-RC0: TBD
 * Rewrote `InstrumentedAppender` in `metrics-log4j`. It no longer forwards events to an appender.
   Instead, you can just attach it to your root logger to instrument logging.
 * Rewrote `InstrumentedAppender` in `metrics-logback`. No major API changes.
+* Fixed bugs with `@ExceptionMetered`-annotated resource methods in `metrics-jersey`.
 
 
 v2.0.0-BETA19: Jan 07 2012
