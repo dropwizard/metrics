@@ -40,10 +40,6 @@ public class InstrumentedClientConnManager extends ThreadSafeClientConnManager {
     @Override
     protected ConnPoolByRoute createConnectionPool(long connTTL,
                                                    TimeUnit connTTLTimeUnit) {
-        return new InstrumentedConnByRoute(connOperator,
-                                           connPerRoute,
-                                           20,
-                                           connTTL,
-                                           connTTLTimeUnit);
+        return new InstrumentedConnByRoute(connOperator, connPerRoute, 20, connTTL, connTTLTimeUnit);
     }
 }

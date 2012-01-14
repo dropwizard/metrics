@@ -11,6 +11,7 @@ v2.0.0-RC0: TBD
 * Hid the internals of `metrics-guice`.
 * Changed `metrics-httpclient` to consistently associate metrics with the `org.apache` class being
   extended.
+* Hid the internals of `metrics-httpclient`.
 
 
 v2.0.0-BETA19: Jan 07 2012
