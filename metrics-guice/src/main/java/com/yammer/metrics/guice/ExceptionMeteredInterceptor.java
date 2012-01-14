@@ -13,8 +13,8 @@ import java.lang.reflect.Method;
  * method's name, if none was provided), and which measures the rate at which the annotated method
  * throws exceptions of a given type.
  */
-public class ExceptionMeteredInterceptor implements MethodInterceptor {
-    public static MethodInterceptor forMethod(MetricsRegistry metricsRegistry, Class<?> klass, Method method) {
+class ExceptionMeteredInterceptor implements MethodInterceptor {
+    static MethodInterceptor forMethod(MetricsRegistry metricsRegistry, Class<?> klass, Method method) {
         final ExceptionMetered annotation = method.getAnnotation(ExceptionMetered.class);
         if (annotation != null) {
             final String name = determineName(annotation, method);
