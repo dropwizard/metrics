@@ -6,7 +6,7 @@ import java.net.SocketException;
 
 import static org.junit.Assert.assertEquals;
 
-public class GangliaMessageBuilderTests {
+public class GangliaMessageBuilderTest {
     @Test
     public void providesCorrectHostAndPort() throws SocketException {
         final String hostName = "hostName";
