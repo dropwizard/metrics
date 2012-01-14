@@ -12,6 +12,8 @@ v2.0.0-RC0: TBD
 * Changed `metrics-httpclient` to consistently associate metrics with the `org.apache` class being
   extended.
 * Hid the internals of `metrics-httpclient`.
+* Rewrote `InstrumentedAppender`. It no longer forwards events to an appender. Instead, you can just
+  attach it to your root logger to instrument logging.
 
 
 v2.0.0-BETA19: Jan 07 2012
