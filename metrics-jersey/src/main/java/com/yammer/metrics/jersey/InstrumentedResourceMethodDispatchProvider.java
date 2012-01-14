@@ -13,6 +13,7 @@ import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 import sun.misc.Unsafe;
 
+import java.lang.reflect.Field;
 import java.util.concurrent.TimeUnit;
 
 class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispatchProvider {
@@ -70,11 +71,22 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
             try {
                 underlying.dispatch(resource, httpContext);
             } catch (Throwable e) {
-                if (exceptionClass.isAssignableFrom(e.getClass())) {
+                if (exceptionClass.isAssignableFrom(e.getClass()) ||
+                        (e.getCause() != null && exceptionClass.isAssignableFrom(e.getCause().getClass()))) {
                     meter.mark();
                 }
-                Unsafe.getUnsafe().throwException(e);
+                getUnsafe().throwException(e);
             }
+        }
+    }
+
+    private static Unsafe getUnsafe() {
+        try {
+            final Field field = Unsafe.class.getDeclaredField("theUnsafe");
+            field.setAccessible(true);
+            return (Unsafe) field.get(null);
+        } catch (Exception ex) {
+            throw new RuntimeException("can't get Unsafe instance", ex);
         }
     }
 
@@ -94,7 +106,7 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
         if (method.getMethod().isAnnotationPresent(Timed.class)) {
             final Timed annotation = method.getMethod().getAnnotation(Timed.class);
             final Timer timer = Metrics.newTimer(method.getDeclaringResource().getResourceClass(),
-                                                       annotation.name() == null || annotation.name().equals("")  ?
+                                                       annotation.name() == null || annotation.name().isEmpty()  ?
                                                                method.getMethod().getName() : annotation.name(),
                                                        annotation.durationUnit() == null ?
                                                                TimeUnit.MILLISECONDS : annotation.durationUnit(),
@@ -106,7 +118,7 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
         if (method.getMethod().isAnnotationPresent(Metered.class)) {
             final Metered annotation = method.getMethod().getAnnotation(Metered.class);
             final Meter meter = Metrics.newMeter(method.getDeclaringResource().getResourceClass(),
-                                                       annotation.name() == null || annotation.name().equals("") ?
+                                                       annotation.name() == null || annotation.name().isEmpty() ?
                                                                method.getMethod().getName() : annotation.name(),
                                                        annotation.eventType() == null ?
                                                                "requests" : annotation.eventType(),
