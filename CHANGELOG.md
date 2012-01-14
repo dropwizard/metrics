@@ -9,6 +9,8 @@ v2.0.0-RC0: TBD
 * Slimmed down `InstrumentedEhcache`.
 * Hid the internals of `GangliaReporter`.
 * Hid the internals of `metrics-guice`.
+* Changed `metrics-httpclient` to consistently associate metrics with the `org.apache` class being
+  extended.
 
 
 v2.0.0-BETA19: Jan 07 2012
