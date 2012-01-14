@@ -11,10 +11,10 @@ import java.lang.reflect.Method;
 /**
  * A listener which adds gauge injection listeners to classes with gauges.
  */
-public class GaugeListener implements TypeListener {
+class GaugeListener implements TypeListener {
     private final MetricsRegistry metricsRegistry;
 
-    public GaugeListener(MetricsRegistry metricsRegistry) {
+    GaugeListener(MetricsRegistry metricsRegistry) {
         this.metricsRegistry = metricsRegistry;
     }
 

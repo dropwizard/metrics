@@ -13,8 +13,8 @@ import java.lang.reflect.Method;
  * method's name, if none was provided), and which measures the rate at which the annotated method
  * is invoked.
  */
-public class MeteredInterceptor implements MethodInterceptor {
-    public static MethodInterceptor forMethod(MetricsRegistry metricsRegistry, Class<?> klass, Method method) {
+class MeteredInterceptor implements MethodInterceptor {
+    static MethodInterceptor forMethod(MetricsRegistry metricsRegistry, Class<?> klass, Method method) {
         final Metered annotation = method.getAnnotation(Metered.class);
         if (annotation != null) {
             final String name = annotation.name().isEmpty() ? method.getName() : annotation.name();

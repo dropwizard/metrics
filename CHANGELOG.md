@@ -8,7 +8,7 @@ v2.0.0-RC0: TBD
   to `CsvReporter(MetricsRegistry, File)`.
 * Slimmed down `InstrumentedEhcache`.
 * Hid the internals of `GangliaReporter`.
-
+* Hid the internals of `metrics-guice`.
 
 
 v2.0.0-BETA19: Jan 07 2012
