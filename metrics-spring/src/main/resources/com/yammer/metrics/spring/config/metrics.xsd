@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.yammer.com/schema/metrics"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans"
+	targetNamespace="http://www.yammer.com/schema/metrics"
+	elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans" />
+
+	<xsd:element name="annotation-driven">
+		<xsd:complexType>
+			<xsd:attribute name="metrics-registry" type="xsd:string" use="optional" />
+			<xsd:attribute name="health-check-registry" type="xsd:string" use="optional" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="metrics-registry">
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:string" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="health-check-registry">
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:string" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>
