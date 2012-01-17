@@ -6,8 +6,12 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 public class SnapshotTest {
     private final Snapshot snapshot = new Snapshot(new double[]{5, 1, 2, 3, 4});
@@ -74,16 +78,41 @@ public class SnapshotTest {
 
     @Test
     public void canAlsoBeCreatedFromACollectionOfLongs() throws Exception {
-        final List<Long> longs = new ArrayList<Long>();
+        final Snapshot other = new Snapshot(asList(5L, 1L, 2L, 3L, 4L));
+
+        assertThat(other.getValues(),
+                   is(new double[]{1.0, 2.0, 3.0, 4.0, 5.0}));
+    }
+
+    @Test
+    public void worksWithUnderestimatedCollections() throws Exception {
+        final List<Long> longs = spy(new ArrayList<Long>());
         longs.add(5L);
         longs.add(1L);
         longs.add(2L);
         longs.add(3L);
         longs.add(4L);
+        when(longs.size()).thenReturn(4, 5);
 
         final Snapshot other = new Snapshot(longs);
 
         assertThat(other.getValues(),
-                   is(new double[]{1.0, 2.0, 3.0, 4.0, 5.0}));
+                   is(new double[]{ 1.0, 2.0, 3.0, 4.0, 5.0 }));
+    }
+
+    @Test
+    public void worksWithOverestimatedCollections() throws Exception {
+        final List<Long> longs = spy(new ArrayList<Long>());
+        longs.add(5L);
+        longs.add(1L);
+        longs.add(2L);
+        longs.add(3L);
+        longs.add(4L);
+        when(longs.size()).thenReturn(6, 5);
+
+        final Snapshot other = new Snapshot(longs);
+
+        assertThat(other.getValues(),
+                   is(new double[]{ 1.0, 2.0, 3.0, 4.0, 5.0 }));
     }
 }
