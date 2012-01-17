@@ -16,6 +16,8 @@ v2.0.0-RC0: TBD
   Instead, you can just attach it to your root logger to instrument logging.
 * Rewrote `InstrumentedAppender` in `metrics-logback`. No major API changes.
 * Fixed bugs with `@ExceptionMetered`-annotated resource methods in `metrics-jersey`.
+* Fixed bugs generating `Snapshot` instances from concurrently modified collections.
+* Fixed edge case in `MetricsServlet`'s thread dumps where one thread could be missed.
 
 
 v2.0.0-BETA19: Jan 07 2012
