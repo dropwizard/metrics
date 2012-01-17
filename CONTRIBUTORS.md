@@ -29,6 +29,7 @@ Many Many Thanks To
 * Matthew Gilliard (@mjg123)
 * Mårten Gustafson (@chids)
 * Neil Prosser (@neilprosser)
+* Robby Walker (@robbywalker)
 * Ryan Kennedy (@ryankennedy)
 * Shaneal Manek (@smanek)
 * Thomas Dudziak (@tomdz)
