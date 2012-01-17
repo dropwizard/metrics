@@ -345,7 +345,7 @@ public class VirtualMachineMetrics {
         final ThreadInfo[] threads = this.threads.dumpAllThreads(true, true);
         final PrintWriter writer = new PrintWriter(out, true);
 
-        for (int ti = threads.length - 1; ti > 0; ti--) {
+        for (int ti = threads.length - 1; ti >= 0; ti--) {
             final ThreadInfo t = threads[ti];
             writer.printf("%s id=%d state=%s",
                           t.getThreadName(),
