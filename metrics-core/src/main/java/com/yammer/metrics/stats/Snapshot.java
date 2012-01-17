@@ -3,8 +3,7 @@ package com.yammer.metrics.stats;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 import static java.lang.Math.floor;
 
@@ -27,10 +26,10 @@ public class Snapshot {
      * @param values    an unordered set of values in the sample
      */
     public Snapshot(Collection<Long> values) {
-        this.values = new double[values.size()];
-        int i = 0;
-        for (Long value : values) {
-            this.values[i++] = value;
+        final Object[] copy = values.toArray();
+        this.values = new double[copy.length];
+        for (int i = 0; i < copy.length; i++) {
+            this.values[i] = (Long) copy[i];
         }
         Arrays.sort(this.values);
     }
