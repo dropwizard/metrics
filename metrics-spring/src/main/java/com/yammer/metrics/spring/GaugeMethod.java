@@ -11,7 +11,7 @@ public class GaugeMethod extends Gauge<Object> {
 	private final Object bean;
 	private final Method method;
 
-	public GaugeMethod(Object bean, Method method) {
+	public GaugeMethod(final Object bean, final Method method) {
 		this.bean = bean;
 		this.method = method;
 	}

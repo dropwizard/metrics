@@ -24,7 +24,7 @@ public class ExceptionMeteredMethodInterceptor implements MethodInterceptor, Met
 	private final Map<String, Meter> meters;
 	private final Map<String, Class<? extends Throwable>> causes;
 
-	public ExceptionMeteredMethodInterceptor(MetricsRegistry metrics, Class<?> targetClass) {
+	public ExceptionMeteredMethodInterceptor(final MetricsRegistry metrics, final Class<?> targetClass) {
 		this.metrics = metrics;
 		this.targetClass = targetClass;
 		this.meters = new HashMap<String, Meter>();
