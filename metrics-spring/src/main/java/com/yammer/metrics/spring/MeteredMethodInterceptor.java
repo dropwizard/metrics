@@ -40,9 +40,10 @@ public class MeteredMethodInterceptor implements MethodInterceptor, MethodCallba
 	@Override
 	public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 		Metered metered = method.getAnnotation(Metered.class);
-		String name = metered.name().isEmpty() ? method.getName() : metered.name();
-		Meter meter = metrics.newMeter(targetClass, name, metered.eventType(), metered.rateUnit());
-		meters.put(method.getName(), meter);
+		String methodName = method.getName();
+		String meterName = metered.name().isEmpty() ? methodName : metered.name();
+		Meter meter = metrics.newMeter(targetClass, meterName, metered.eventType(), metered.rateUnit());
+		meters.put(methodName, meter);
 	}
 
 	@Override

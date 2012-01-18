@@ -50,15 +50,16 @@ public class ExceptionMeteredMethodInterceptor implements MethodInterceptor, Met
 	@Override
 	public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 		ExceptionMetered metered = method.getAnnotation(ExceptionMetered.class);
-		String name = metered.name().isEmpty() ? method.getName() + ExceptionMetered.DEFAULT_NAME_SUFFIX : metered.name();
-		Meter meter = metrics.newMeter(targetClass, name, metered.eventType(), metered.rateUnit());
-		meters.put(method.getName(), meter);
-		causes.put(name, metered.cause());
+		String methodName = method.getName();
+		String meterName = metered.name().isEmpty() ? methodName + ExceptionMetered.DEFAULT_NAME_SUFFIX : metered.name();
+		Meter meter = metrics.newMeter(targetClass, meterName, metered.eventType(), metered.rateUnit());
+		meters.put(methodName, meter);
+		causes.put(methodName, metered.cause());
 	}
 
 	@Override
 	public int getOrder() {
-		return 0;
+		return HIGHEST_PRECEDENCE;
 	}
 
 }
