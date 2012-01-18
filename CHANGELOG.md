@@ -18,6 +18,8 @@ v2.0.0-RC0: TBD
 * Fixed bugs with `@ExceptionMetered`-annotated resource methods in `metrics-jersey`.
 * Fixed bugs generating `Snapshot` instances from concurrently modified collections.
 * Fixed edge case in `MetricsServlet`'s thread dumps where one thread could be missed.
+* Added `RatioGauge` and `PercentGauge`.
+* Changed `InstrumentedQueuedThreadPool`'s `percent-idle` gauge to be a ratio.
 
 
 v2.0.0-BETA19: Jan 07 2012

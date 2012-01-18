@@ -2,9 +2,9 @@ package com.yammer.metrics.jetty;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Counter;
-import com.yammer.metrics.core.Gauge;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.util.RatioGauge;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationListener;
 import org.eclipse.jetty.server.AsyncContinuation;
@@ -70,63 +70,75 @@ public class InstrumentedHandler extends HandlerWrapper {
                 Metrics.newMeter(underlying.getClass(), "5xx-responses", "responses", TimeUnit.SECONDS)  // 5xx
         };
 
-        Metrics.newGauge(underlying.getClass(), "percent-4xx-1m", new Gauge<Double>() {
+        Metrics.newGauge(underlying.getClass(), "percent-4xx-1m", new RatioGauge() {
             @Override
-            public Double value() {
-                if (requests.count() > 0) {
-                    return responses[3].oneMinuteRate() / requests.oneMinuteRate();
-                }
-                return 0.0;
+            protected double getNumerator() {
+                return responses[3].oneMinuteRate();
+            }
+
+            @Override
+            protected double getDenominator() {
+                return requests.oneMinuteRate();
             }
         });
 
-        Metrics.newGauge(underlying.getClass(), "percent-4xx-5m", new Gauge<Double>() {
+        Metrics.newGauge(underlying.getClass(), "percent-4xx-5m", new RatioGauge() {
             @Override
-            public Double value() {
-                if (requests.count() > 0) {
-                    return responses[3].fiveMinuteRate() / requests.fiveMinuteRate();
-                }
-                return 0.0;
+            protected double getNumerator() {
+                return responses[3].fiveMinuteRate();
+            }
+
+            @Override
+            protected double getDenominator() {
+                return requests.fiveMinuteRate();
             }
         });
 
-        Metrics.newGauge(underlying.getClass(), "percent-4xx-15m", new Gauge<Double>() {
+        Metrics.newGauge(underlying.getClass(), "percent-4xx-15m", new RatioGauge() {
             @Override
-            public Double value() {
-                if (requests.count() > 0) {
-                    return responses[3].fifteenMinuteRate() / requests.fifteenMinuteRate();
-                }
-                return 0.0;
+            protected double getNumerator() {
+                return responses[3].fifteenMinuteRate();
+            }
+
+            @Override
+            protected double getDenominator() {
+                return requests.fifteenMinuteRate();
             }
         });
 
-        Metrics.newGauge(underlying.getClass(), "percent-5xx-1m", new Gauge<Double>() {
+        Metrics.newGauge(underlying.getClass(), "percent-5xx-1m", new RatioGauge() {
             @Override
-            public Double value() {
-                if (requests.count() > 0) {
-                    return responses[4].oneMinuteRate() / requests.oneMinuteRate();
-                }
-                return 0.0;
+            protected double getNumerator() {
+                return responses[4].oneMinuteRate();
+            }
+
+            @Override
+            protected double getDenominator() {
+                return requests.oneMinuteRate();
             }
         });
 
-        Metrics.newGauge(underlying.getClass(), "percent-5xx-5m", new Gauge<Double>() {
+        Metrics.newGauge(underlying.getClass(), "percent-5xx-5m", new RatioGauge() {
             @Override
-            public Double value() {
-                if (requests.count() > 0) {
-                    return responses[4].fiveMinuteRate() / requests.fiveMinuteRate();
-                }
-                return 0.0;
+            protected double getNumerator() {
+                return responses[4].fiveMinuteRate();
+            }
+
+            @Override
+            protected double getDenominator() {
+                return requests.fiveMinuteRate();
             }
         });
 
-        Metrics.newGauge(underlying.getClass(), "percent-5xx-15m", new Gauge<Double>() {
+        Metrics.newGauge(underlying.getClass(), "percent-5xx-15m", new RatioGauge() {
             @Override
-            public Double value() {
-                if (requests.count() > 0) {
-                    return responses[4].fifteenMinuteRate() / requests.fifteenMinuteRate();
-                }
-                return 0.0;
+            protected double getNumerator() {
+                return responses[4].fifteenMinuteRate();
+            }
+
+            @Override
+            protected double getDenominator() {
+                return requests.fifteenMinuteRate();
             }
         });
 

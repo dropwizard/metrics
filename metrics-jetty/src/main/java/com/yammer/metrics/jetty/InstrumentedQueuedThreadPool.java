@@ -1,5 +1,6 @@
 package com.yammer.metrics.jetty;
 
+import com.yammer.metrics.util.RatioGauge;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import com.yammer.metrics.Metrics;
@@ -13,13 +14,15 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
 
     public InstrumentedQueuedThreadPool(MetricsRegistry registry) {
         super();
-        registry.newGauge(QueuedThreadPool.class, "percent-idle", new Gauge<Integer>() {
+        registry.newGauge(QueuedThreadPool.class, "percent-idle", new RatioGauge() {
             @Override
-            public Integer value() {
-                final double percent = getThreads() > 0 ?
-                        getIdleThreads() / ((double) getThreads()) :
-                        0.0;
-                return (int) (percent * 100);
+            protected double getNumerator() {
+                return getIdleThreads();
+            }
+
+            @Override
+            protected double getDenominator() {
+                return getThreads();
             }
         });
         registry.newGauge(QueuedThreadPool.class, "active-threads", new Gauge<Integer>() {
