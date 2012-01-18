@@ -14,7 +14,6 @@ import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.spring.ExceptionMeteredAnnotationBeanPostProcessor;
 import com.yammer.metrics.spring.GaugeAnnotationBeanPostProcessor;
 import com.yammer.metrics.spring.HealthCheckBeanPostProcessor;
-import com.yammer.metrics.spring.JmxReporterFactory;
 import com.yammer.metrics.spring.MeteredAnnotationBeanPostProcessor;
 import com.yammer.metrics.spring.TimedAnnotationBeanPostProcessor;
 
@@ -44,8 +43,6 @@ public class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParse
 		registerComponent(parserContext, source, ROLE_INFRASTRUCTURE, GaugeAnnotationBeanPostProcessor.class, metricsBeanName);
 		registerComponent(parserContext, source, ROLE_INFRASTRUCTURE, HealthCheckBeanPostProcessor.class, healthCheckBeanName);
 
-		registerJmxReporter(parserContext, source, ROLE_APPLICATION, metricsBeanName);
-
 		parserContext.popAndRegisterContainingComponent();
 
 		return null;
@@ -59,16 +56,6 @@ public class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParse
 		if (argBeanName != null) {
 			beanDefBuilder.addConstructorArgReference(argBeanName);
 		}
-
-		return registerComponent(parserContext, beanDefBuilder.getBeanDefinition());
-	}
-
-	private String registerJmxReporter(ParserContext parserContext, Object source, int role, String argBeanName) {
-		BeanDefinitionBuilder beanDefBuilder = BeanDefinitionBuilder.rootBeanDefinition(JmxReporterFactory.class, "createInstance");
-		beanDefBuilder.setLazyInit(true);
-		beanDefBuilder.setRole(role);
-		beanDefBuilder.addConstructorArgReference(argBeanName);
-		beanDefBuilder.getRawBeanDefinition().setSource(source);
 
 		return registerComponent(parserContext, beanDefBuilder.getBeanDefinition());
 	}
