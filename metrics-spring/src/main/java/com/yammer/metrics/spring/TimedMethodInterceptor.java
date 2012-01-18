@@ -45,9 +45,10 @@ public class TimedMethodInterceptor implements MethodInterceptor, MethodCallback
 	@Override
 	public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 		Timed timed = method.getAnnotation(Timed.class);
-		String name = timed.name().isEmpty() ? method.getName() : timed.name();
-		Timer timer = metrics.newTimer(targetClass, name, timed.durationUnit(), timed.rateUnit());
-		timers.put(method.getName(), timer);
+		String methodName = method.getName();
+		String timerName = timed.name().isEmpty() ? methodName: timed.name();
+		Timer timer = metrics.newTimer(targetClass, timerName, timed.durationUnit(), timed.rateUnit());
+		timers.put(methodName, timer);
 	}
 
 	@Override
