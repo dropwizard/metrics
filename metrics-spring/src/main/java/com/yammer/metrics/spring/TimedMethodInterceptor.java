@@ -24,7 +24,7 @@ public class TimedMethodInterceptor implements MethodInterceptor, MethodCallback
 	private final Class<?> targetClass;
 	private final Map<String, Timer> timers;
 
-	public TimedMethodInterceptor(MetricsRegistry metrics, Class<?> targetClass) {
+	public TimedMethodInterceptor(final MetricsRegistry metrics, final Class<?> targetClass) {
 		this.metrics = metrics;
 		this.targetClass = targetClass;
 		this.timers = new HashMap<String, Timer>();

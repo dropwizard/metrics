@@ -29,7 +29,7 @@ public abstract class AbstractProxyingBeanPostProcessor extends ProxyConfig impl
 	}
 
 	@Override
-	public Object postProcessAfterInitialization(final Object bean, String beanName) throws BeansException {
+	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean instanceof AopInfrastructureBean) {
 			return bean;
 		}

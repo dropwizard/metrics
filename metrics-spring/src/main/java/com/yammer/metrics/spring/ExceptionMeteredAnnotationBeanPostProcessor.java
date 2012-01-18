@@ -14,7 +14,7 @@ public class ExceptionMeteredAnnotationBeanPostProcessor extends AbstractProxyin
 	private final Pointcut pointcut = new AnnotationMatchingPointcut(null, ExceptionMetered.class);
 	private final MetricsRegistry metrics;
 
-	public ExceptionMeteredAnnotationBeanPostProcessor(MetricsRegistry metrics) {
+	public ExceptionMeteredAnnotationBeanPostProcessor(final MetricsRegistry metrics) {
 		this.metrics = metrics;
 	}
 

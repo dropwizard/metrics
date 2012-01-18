@@ -16,22 +16,22 @@ public class HealthCheckBeanPostProcessor implements BeanPostProcessor, Ordered 
 	}
 
 	@Override
-	public int getOrder() {
-		return LOWEST_PRECEDENCE;
-	}
-
-	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}
 
 	@Override
-	public Object postProcessAfterInitialization(final Object bean, String beanName) throws BeansException {
+	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean instanceof HealthCheck) {
 			healthChecks.register((HealthCheck) bean);
 		}
 
 		return bean;
+	}
+
+	@Override
+	public int getOrder() {
+		return LOWEST_PRECEDENCE;
 	}
 
 }
