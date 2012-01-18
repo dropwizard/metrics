@@ -39,7 +39,7 @@
         <jackson.version>1.9.3</jackson.version>
         <guice.version>3.0</guice.version>
         <slf4j.version>1.6.4</slf4j.version>
-		<spring.version>3.1.0.RELEASE</spring.version>
+        <spring.version>3.1.0.RELEASE</spring.version>
     </properties>
 
     <developers>
