@@ -76,7 +76,7 @@
     &lt;dependency&gt;
         &lt;groupId&gt;com.yammer.metrics&lt;/groupId&gt;
         &lt;artifactId&gt;metrics-core&lt;/artifactId&gt;
-        &lt;version&gt;2.0.0-BETA19&lt;/version&gt;
+        &lt;version&gt;2.0.0-RC0&lt;/version&gt;
     &lt;/dependency&gt;
 &lt;/dependencies&gt;</pre>
         
@@ -289,9 +289,12 @@ for (Entry&lt;String, Result&gt; entry : results.entrySet()) {
         <h2 id="reporting-http">Reporting Via HTTP</h2>
 
         <p>
-            Metrics also ships with a servlet which will serve a JSON representation of all
-            registered metrics. It will also run health checks, print out a thread dump, and provide
-            a simple “ping” response for load-balancers.
+            Metrics also ships with a servlet (<code>AdminServlet</code>) which will serve a JSON
+            representation of all registered metrics. It will also run health checks, print out a
+            thread dump, and provide a simple “ping” response for load-balancers. (It also has
+            single servlets—<code>MetricsServlet</code>, <code>HealthCheckServlet</code>,
+            <code>ThreadDumpServlet</code>, and <code>PingServlet</code>—which do these individual
+            tasks.)
         </p>
 
         <p>
@@ -302,7 +305,7 @@ for (Entry&lt;String, Result&gt; entry : results.entrySet()) {
 &lt;dependency&gt;
     &lt;groupId&gt;com.yammer.metrics&lt;/groupId&gt;
     &lt;artifactId&gt;metrics-servlet&lt;/artifactId&gt;
-    &lt;version&gt;2.0.0-BETA19&lt;/version&gt;
+    &lt;version&gt;2.0.0-RC0&lt;/version&gt;
 &lt;/dependency&gt;</pre>
 
         <p>

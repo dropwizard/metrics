@@ -83,6 +83,7 @@
                 <li><a href="#logback">Metrics and Logback</a></li>
                 <li><a href="#scala">Metrics and Scala</a></li>
                 <li><a href="#servlet">Metrics Servlet</a></li>
+                <li><a href="#spring">Metrics and Spring</a></li>
                 <li><a href="#webapp">Metrics and Web Applications</a></li>
             </ul>
         </div>
@@ -379,7 +380,7 @@ public class DatabaseHealthCheck extends HealthCheck {
             In this example, we’ve created a health check for a <code>Database</code> class on which
             our application depends. Our fictitious <code>Database</code> class has a
             <code>ping()</code> method, which executes a safe test query (e.g.,
-            <code>SELECT 1</code>). <code>ping()</code>returns <code>true</code> if the query
+            <code>SELECT 1</code>). <code>ping()</code> returns <code>true</code> if the query
             returns the expected result, returns <code>false</code> if it returns something else,
             and throws an exception if things have gone seriously wrong.
         </p>
@@ -560,6 +561,12 @@ CsvReporter.enable(new File("work/measurements"), 1, TimeUnit.SECONDS);</pre>
         </p>
 
         <h2 id="servlet">Metrics Servlet</h2>
+
+        <p>
+            TODO
+        </p>
+
+        <h2 id="spring">Metrics and Spring</h2>
 
         <p>
             TODO
