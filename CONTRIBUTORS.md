@@ -31,7 +31,7 @@ Many Many Thanks To
 * Neil Prosser (@neilprosser)
 * Robby Walker (@robbywalker)
 * Ryan Kennedy (@ryankennedy)
-* Ryan Tenny (@ryantenny)
+* Ryan W Tenney (@ryantenney)
 * Shaneal Manek (@smanek)
 * Thomas Dudziak (@tomdz)
 * Tobias Lidskog (@tobli)
