@@ -1,9 +1,8 @@
 v2.0.0-RC0: TBD
 ==========================
 
-* Small fixes for `InstrumentedEhcache#clone()`.
 * Added FindBugs checks to the build process.
-* Fixed the catching of `Error`s during health checks.
+* Fixed the catching of `Error` instances thrown during health checks.
 * Added `enable` static methods to `CsvReporter` and changed `CsvReporter(File, MetricsRegistry)`
   to `CsvReporter(MetricsRegistry, File)`.
 * Slimmed down `InstrumentedEhcache`.
@@ -20,6 +19,9 @@ v2.0.0-RC0: TBD
 * Fixed edge case in `MetricsServlet`'s thread dumps where one thread could be missed.
 * Added `RatioGauge` and `PercentGauge`.
 * Changed `InstrumentedQueuedThreadPool`'s `percent-idle` gauge to be a ratio.
+* Decomposed `MetricsServlet` into a set of focused servlets: `HealthCheckServlet`,
+  `MetricsServlet`, `PingServlet`, and `ThreadDumpServlet`. The top-level servlet which provides the
+  HTML menu page is now `AdminServlet`.
 
 
 v2.0.0-BETA19: Jan 07 2012

@@ -15,10 +15,9 @@ public class MetricsServletContextListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         final ServletContext context = sce.getServletContext();
-        final MetricsRegistry metricsRegistry =
-                (MetricsRegistry) context.getAttribute(MetricsServlet.ATTR_NAME_METRICS_REGISTRY);
-        if (metricsRegistry != null) {
-            metricsRegistry.shutdown();
+        final Object metricsRegistry = context.getAttribute(MetricsServlet.REGISTRY_ATTRIBUTE);
+        if (metricsRegistry instanceof MetricsRegistry) {
+            ((MetricsRegistry) metricsRegistry).shutdown();
         } else {
             Metrics.shutdown();
         }

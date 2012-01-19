@@ -18,7 +18,7 @@ public class MetricsServletContextListenerTest {
         final MetricsRegistry registry = mock(MetricsRegistry.class);
 
         final ServletContext context = mock(ServletContext.class);
-        when(context.getAttribute(MetricsServlet.ATTR_NAME_METRICS_REGISTRY)).thenReturn(registry);
+        when(context.getAttribute(MetricsServlet.REGISTRY_ATTRIBUTE)).thenReturn(registry);
 
         final ServletContextEvent event = mock(ServletContextEvent.class);
         when(event.getServletContext()).thenReturn(context);
