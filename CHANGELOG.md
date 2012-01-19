@@ -1,5 +1,5 @@
-v2.0.0-RC0: TBD
-==========================
+v2.0.0-RC0: Jan 19 2012
+=======================
 
 * Added FindBugs checks to the build process.
 * Fixed the catching of `Error` instances thrown during health checks.
