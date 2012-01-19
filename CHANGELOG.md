@@ -22,6 +22,7 @@ v2.0.0-RC0: TBD
 * Decomposed `MetricsServlet` into a set of focused servlets: `HealthCheckServlet`,
   `MetricsServlet`, `PingServlet`, and `ThreadDumpServlet`. The top-level servlet which provides the
   HTML menu page is now `AdminServlet`.
+* Added `metrics-spring`.
 
 
 v2.0.0-BETA19: Jan 07 2012
