@@ -10,10 +10,21 @@ import java.util.concurrent.*;
  */
 public class MetricsRegistry {
     private static final int EXPECTED_METRIC_COUNT = 1024;
-    private final ConcurrentMap<MetricName, Metric> metrics = newMetricsMap();
-    private final ThreadPools threadPools = new ThreadPools();
-    private final List<MetricsRegistryListener> listeners =
-            new CopyOnWriteArrayList<MetricsRegistryListener>();
+    private final Clock clock;
+    private final ConcurrentMap<MetricName, Metric> metrics;
+    private final ThreadPools threadPools;
+    private final List<MetricsRegistryListener> listeners;
+
+    public MetricsRegistry() {
+        this(Clock.defaultClock());
+    }
+
+    public MetricsRegistry(Clock clock) {
+        this.clock = clock;
+        this.metrics = newMetricsMap();
+        this.threadPools = new ThreadPools();
+        this.listeners = new CopyOnWriteArrayList<MetricsRegistryListener>();
+    }
 
     /**
      * Given a new {@link Gauge}, registers it under the given class and name.
@@ -218,8 +229,7 @@ public class MetricsRegistry {
         if (existingMetric != null) {
             return (Meter) existingMetric;
         }
-        return getOrAdd(metricName, new Meter(newMeterTickThreadPool(), eventType, unit,
-                                              Clock.defaultClock()));
+        return getOrAdd(metricName, new Meter(newMeterTickThreadPool(), eventType, unit, clock));
     }
 
     /**
@@ -300,7 +310,7 @@ public class MetricsRegistry {
             return (Timer) existingMetric;
         }
         return getOrAdd(metricName,
-                        new Timer(newMeterTickThreadPool(), durationUnit, rateUnit));
+                        new Timer(newMeterTickThreadPool(), durationUnit, rateUnit, clock));
     }
 
     /**
