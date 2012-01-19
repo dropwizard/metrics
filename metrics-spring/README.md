@@ -6,7 +6,7 @@ Enables the use of metrics-annotations with Spring, complete with simple XML con
 Getting Started
 ---------------
 
-```java
+```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:metrics="http://www.yammer.com/schema/metrics"
