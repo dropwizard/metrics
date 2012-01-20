@@ -21,49 +21,78 @@ import static org.springframework.beans.factory.config.BeanDefinition.*;
 
 public class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 
-	public BeanDefinition parse(Element element, ParserContext parserContext) {
-		Object source = parserContext.extractSource(element);
+    public BeanDefinition parse(Element element, ParserContext parserContext) {
+        final Object source = parserContext.extractSource(element);
 
-		CompositeComponentDefinition compDefinition = new CompositeComponentDefinition(element.getTagName(), source);
-		parserContext.pushContainingComponent(compDefinition);
+        final CompositeComponentDefinition compDefinition = new CompositeComponentDefinition(element.getTagName(),
+                                                                                             source);
+        parserContext.pushContainingComponent(compDefinition);
 
-		String metricsBeanName = element.getAttribute("metrics-registry");
-		if (!StringUtils.hasText(metricsBeanName)) {
-			metricsBeanName = registerComponent(parserContext, source, ROLE_APPLICATION, MetricsRegistry.class, null);
-		}
+        String metricsBeanName = element.getAttribute("metrics-registry");
+        if (!StringUtils.hasText(metricsBeanName)) {
+            metricsBeanName = registerComponent(parserContext,
+                                                source,
+                                                ROLE_APPLICATION,
+                                                MetricsRegistry.class,
+                                                null);
+        }
 
-		String healthCheckBeanName = element.getAttribute("health-check-registry");
-		if (!StringUtils.hasText(healthCheckBeanName)) {
-			healthCheckBeanName = registerComponent(parserContext, source, ROLE_APPLICATION, HealthCheckRegistry.class, null);
-		}
+        String healthCheckBeanName = element.getAttribute("health-check-registry");
+        if (!StringUtils.hasText(healthCheckBeanName)) {
+            healthCheckBeanName = registerComponent(parserContext,
+                                                    source,
+                                                    ROLE_APPLICATION,
+                                                    HealthCheckRegistry.class,
+                                                    null);
+        }
 
-		registerComponent(parserContext, source, ROLE_INFRASTRUCTURE, ExceptionMeteredAnnotationBeanPostProcessor.class, metricsBeanName);
-		registerComponent(parserContext, source, ROLE_INFRASTRUCTURE, MeteredAnnotationBeanPostProcessor.class, metricsBeanName);
-		registerComponent(parserContext, source, ROLE_INFRASTRUCTURE, TimedAnnotationBeanPostProcessor.class, metricsBeanName);
-		registerComponent(parserContext, source, ROLE_INFRASTRUCTURE, GaugeAnnotationBeanPostProcessor.class, metricsBeanName);
-		registerComponent(parserContext, source, ROLE_INFRASTRUCTURE, HealthCheckBeanPostProcessor.class, healthCheckBeanName);
+        registerComponent(parserContext,
+                          source,
+                          ROLE_INFRASTRUCTURE,
+                          ExceptionMeteredAnnotationBeanPostProcessor.class,
+                          metricsBeanName);
+        registerComponent(parserContext,
+                          source,
+                          ROLE_INFRASTRUCTURE,
+                          MeteredAnnotationBeanPostProcessor.class,
+                          metricsBeanName);
+        registerComponent(parserContext,
+                          source,
+                          ROLE_INFRASTRUCTURE,
+                          TimedAnnotationBeanPostProcessor.class,
+                          metricsBeanName);
+        registerComponent(parserContext,
+                          source,
+                          ROLE_INFRASTRUCTURE,
+                          GaugeAnnotationBeanPostProcessor.class,
+                          metricsBeanName);
+        registerComponent(parserContext,
+                          source,
+                          ROLE_INFRASTRUCTURE,
+                          HealthCheckBeanPostProcessor.class,
+                          healthCheckBeanName);
 
-		parserContext.popAndRegisterContainingComponent();
+        parserContext.popAndRegisterContainingComponent();
 
-		return null;
-	}
+        return null;
+    }
 
-	private String registerComponent(ParserContext parserContext, Object source, int role, Class<?> klazz, String argBeanName) {
-		BeanDefinitionBuilder beanDefBuilder = BeanDefinitionBuilder.rootBeanDefinition(klazz);
-		beanDefBuilder.setRole(role);
-		beanDefBuilder.getRawBeanDefinition().setSource(source);
+    private String registerComponent(ParserContext parserContext, Object source, int role, Class<?> klazz, String argBeanName) {
+        final BeanDefinitionBuilder beanDefBuilder = BeanDefinitionBuilder.rootBeanDefinition(klazz);
+        beanDefBuilder.setRole(role);
+        beanDefBuilder.getRawBeanDefinition().setSource(source);
 
-		if (argBeanName != null) {
-			beanDefBuilder.addConstructorArgReference(argBeanName);
-		}
+        if (argBeanName != null) {
+            beanDefBuilder.addConstructorArgReference(argBeanName);
+        }
 
-		return registerComponent(parserContext, beanDefBuilder.getBeanDefinition());
-	}
+        return registerComponent(parserContext, beanDefBuilder.getBeanDefinition());
+    }
 
-	private String registerComponent(ParserContext parserContext, BeanDefinition beanDef) {
-		String beanName = parserContext.getReaderContext().registerWithGeneratedName(beanDef);
-		parserContext.registerComponent(new BeanComponentDefinition(beanDef, beanName));
-		return beanName;
-	}
+    private String registerComponent(ParserContext parserContext, BeanDefinition beanDef) {
+        final String beanName = parserContext.getReaderContext().registerWithGeneratedName(beanDef);
+        parserContext.registerComponent(new BeanComponentDefinition(beanDef, beanName));
+        return beanName;
+    }
 
 }

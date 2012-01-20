@@ -7,9 +7,9 @@ import com.yammer.metrics.core.MetricsRegistry;
 
 public class MetricsRegistryBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
-	@Override
-	protected Class<?> getBeanClass(Element element) {
-		return MetricsRegistry.class;
-	}
+    @Override
+    protected Class<?> getBeanClass(Element element) {
+        return MetricsRegistry.class;
+    }
 
 }

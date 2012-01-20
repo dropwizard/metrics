@@ -7,9 +7,9 @@ import com.yammer.metrics.core.HealthCheckRegistry;
 
 public class HealthCheckRegistryBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
-	@Override
-	protected Class<?> getBeanClass(Element element) {
-		return HealthCheckRegistry.class;
-	}
+    @Override
+    protected Class<?> getBeanClass(Element element) {
+        return HealthCheckRegistry.class;
+    }
 
 }
