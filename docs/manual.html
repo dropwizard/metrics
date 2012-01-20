@@ -781,7 +781,21 @@ root.addAppender(metrics);</pre>
         <h2 id="scala">Metrics and Scala</h2>
 
         <p>
-            TODO
+            The <code>metrics-scala</code> module provides the <code>Instrumented</code> trait for
+            Scala 2.9.1 applications:
+        </p>
+
+        <pre class="prettyprint lang-scala">
+class Example(db: Database) extends Instrumented {
+  private val loading = metrics.timer("loading")
+
+  def loadStuff(): Seq[Row] = loading.time {
+    db.fetchRows()
+  }
+}</pre>
+
+        <p>
+            It also provides Scala-specific wrappers for each metric type.
         </p>
 
         <h2 id="servlet">Metrics Servlet</h2>
