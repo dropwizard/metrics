@@ -665,7 +665,31 @@ this.cache = InstrumentedEhcache.instrument(c);</pre>
         <h2 id="jersey">Metrics and Jersey</h2>
 
         <p>
-            TODO
+            The <code>metrics-jersey</code> module provides
+            <code>InstrumentedResourceMethodDispatchAdapter</code>, which allows you to instrument
+            methods on your <a href="http://jersey.java.net/" target="_blank">Jersey</a> resource
+            classes:
+        </p>
+
+        <pre class="prettyprint lang-java">
+@Path("/example")
+@Produces(MediaType.TEXT_PLAIN)
+public class ExampleResource {
+    @GET
+    @Timed
+    public String show() {
+        return "yay";
+    }
+}</pre>
+
+        <p>
+            The <code>show</code> method in the above example will have a timer attached to it,
+            measuring the time spent in that method.
+        </p>
+
+        <p>
+            Use of the <code>@Metered</code> and <code>@ExceptionMetered</code> annotations is also
+            supported.
         </p>
 
         <h2 id="jetty">Metrics and Jetty</h2>
@@ -677,7 +701,7 @@ this.cache = InstrumentedEhcache.instrument(c);</pre>
         <h2 id="log4j">Metrics and Log4j</h2>
 
         <p>
-            TODO
+            The <code>metrics-log4j</code>
         </p>
 
         <h2 id="logback">Metrics and Logback</h2>
