@@ -620,14 +620,24 @@ this.cache = InstrumentedEhcache.instrument(c);</pre>
         <h2 id="ganglia">Metrics and Ganglia</h2>
 
         <p>
-            TODO
+            The <code>metrics-ganglia</code> provides <code>GangliaReporter</code>, which allows
+            your application to constantly stream metric values to a
+            <a href="http://ganglia.sourceforge.net/">Ganglia</a> server:
         </p>
+
+        <pre class="prettyprint lang-java">
+GangliaReporter.enable(1, TimeUnit.MINUTES, "ganglia.example.com", 8649);</pre>
 
         <h2 id="graphite">Metrics and Graphite</h2>
 
         <p>
-            TODO
+            The <code>metrics-graphite</code> provides <code>GraphiteReporter</code>, which allows
+            your application to constantly stream metric values to a
+            <a href="http://graphite.wikidot.com/">Graphite</a> server:
         </p>
+
+        <pre class="prettyprint lang-java">
+GraphiteReporter.enable(1, TimeUnit.MINUTES, "graphite.example.com", 2003);</pre>
 
         <h2 id="guice">Metrics and Guice</h2>
 
