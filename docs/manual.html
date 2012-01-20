@@ -638,7 +638,21 @@ this.cache = InstrumentedEhcache.instrument(c);</pre>
         <h2 id="httpclient">Metrics and HttpClient</h2>
 
         <p>
-            TODO
+            The <code>metrics-httpclient</code> provides <code>InstrumentedClientConnManager</code>
+            and <code>InstrumentedHttpClient</code>, two instrumented versions of
+            <a href="http://hc.apache.org/httpcomponents-client-ga/" target="_blank">Apache HttpClient 4.x</a>
+            classes.
+        </p>
+
+        <p>
+            <code>InstrumentedClientConnManager</code> is a thread-safe
+            <code>ClientConnectionManager</code> implementation which measures the number of open
+            connections in the pool and the rate at which new connections are opened.
+        </p>
+
+        <p>
+            <code>InstrumentedHttpClient</code> is a <code>HttpClient</code> implementation which
+            has per-HTTP method timers for HTTP requests.
         </p>
 
 
