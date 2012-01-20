@@ -9,23 +9,23 @@ import com.yammer.metrics.core.MetricsRegistry;
 
 public class MeteredAnnotationBeanPostProcessor extends AbstractProxyingBeanPostProcessor {
 
-	private static final long serialVersionUID = 3513098435344496676L;
+    private static final long serialVersionUID = 3513098435344496676L;
 
-	private final Pointcut pointcut = new AnnotationMatchingPointcut(null, Metered.class);
-	private final MetricsRegistry metrics;
+    private final Pointcut pointcut = new AnnotationMatchingPointcut(null, Metered.class);
+    private final MetricsRegistry metrics;
 
-	public MeteredAnnotationBeanPostProcessor(final MetricsRegistry metrics) {
-		this.metrics = metrics;
-	}
+    public MeteredAnnotationBeanPostProcessor(final MetricsRegistry metrics) {
+        this.metrics = metrics;
+    }
 
-	@Override
-	public Pointcut getPointcut() {
-		return pointcut;
-	}
+    @Override
+    public Pointcut getPointcut() {
+        return pointcut;
+    }
 
-	@Override
-	public MethodInterceptor getMethodInterceptor(Class<?> targetClass) {
-		return new MeteredMethodInterceptor(metrics, targetClass);
-	}
+    @Override
+    public MethodInterceptor getMethodInterceptor(Class<?> targetClass) {
+        return new MeteredMethodInterceptor(metrics, targetClass);
+    }
 
 }

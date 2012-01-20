@@ -5,10 +5,10 @@ import com.yammer.metrics.reporting.JmxReporter;
 
 public class JmxReporterFactory {
 
-	public static JmxReporter createInstance(MetricsRegistry metrics) {
-		JmxReporter reporter = new JmxReporter(metrics);
-		reporter.start();
-		return reporter;
-	}
+    public static JmxReporter createInstance(MetricsRegistry metrics) {
+        final JmxReporter reporter = new JmxReporter(metrics);
+        reporter.start();
+        return reporter;
+    }
 
 }

@@ -8,20 +8,20 @@ import com.yammer.metrics.spring.JmxReporterFactory;
 
 public class JmxReporterBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
-	@Override
-	protected Class<?> getBeanClass(Element element) {
-		return JmxReporterFactory.class;
-	}
+    @Override
+    protected Class<?> getBeanClass(Element element) {
+        return JmxReporterFactory.class;
+    }
 
-	@Override
-	protected boolean shouldGenerateIdAsFallback() {
-		return true;
-	}
+    @Override
+    protected boolean shouldGenerateIdAsFallback() {
+        return true;
+    }
 
-	@Override
-	protected void doParse(Element element, BeanDefinitionBuilder builder) {
-		builder.setFactoryMethod("createInstance");
-		builder.addConstructorArgReference(element.getAttribute("metrics-registry"));
-	}
+    @Override
+    protected void doParse(Element element, BeanDefinitionBuilder builder) {
+        builder.setFactoryMethod("createInstance");
+        builder.addConstructorArgReference(element.getAttribute("metrics-registry"));
+    }
 
 }
