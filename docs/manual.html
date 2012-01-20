@@ -740,8 +740,43 @@ public class ExampleResource {
         <h2 id="logback">Metrics and Logback</h2>
 
         <p>
-            TODO
+            The <code>metrics-logback</code> module provides <code>InstrumentedAppender</code>, a
+            Logback <code>Appender</code> implementation which records the rate of logged events
+            by their logging level.
         </p>
+
+        <p>
+            You can either add it to the root logger programmatically:
+        </p>
+
+        <pre class="prettyprint lang-java">
+final LoggerContext factory = (LoggerContext) LoggerFactory.getILoggerFactory();
+final Logger root = factory.getLogger(Logger.ROOT_LOGGER_NAME);
+
+final InstrumentedAppender metrics = new InstrumentedAppender();
+metrics.setContext(root.getLoggerContext());
+metrics.start();
+root.addAppender(metrics);</pre>
+
+        <p>
+            Or you can add it via Logback’s XML configuration:
+        </p>
+
+        <pre class="prettyprint lang-xml">
+&lt;configuration&gt;
+    &lt;appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender"&gt;
+        &lt;encoder&gt;
+            &lt;pattern&gt;%-4relative [%thread] %-5level %logger{35} - %msg %n&lt;/pattern&gt;
+        &lt;/encoder&gt;
+    &lt;/appender&gt;
+
+    &lt;appender name="metrics" class="com.yammer.metrics.logback.InstrumentedAppender"/&gt;
+
+    &lt;root level="DEBUG"&gt;
+        &lt;appender-ref ref="STDOUT"/&gt;
+        &lt;appender-ref ref="metrics"/&gt;
+    &lt;/root&gt;
+&lt;/configuration&gt;</pre>
 
         <h2 id="scala">Metrics and Scala</h2>
 
