@@ -695,7 +695,33 @@ public class ExampleResource {
         <h2 id="jetty">Metrics and Jetty</h2>
 
         <p>
-            TODO
+            The <code>metrics-jetty</code> modules provides a set of instrumented equivalents of
+            <a href="http://www.eclipse.org/jetty/" target="_blank">Jetty</a> classes:
+            <code>InstrumentedBlockingChannelConnector</code>, <code>InstrumentedHandler</code>,
+            <code>InstrumentedQueuedThreadPool</code>, <code>InstrumentedSelectChannelConnector</code>,
+            and <code>InstrumentedSocketConnector</code>.
+        </p>
+
+        <p>
+            The <code>Connector</code> implementations are simple, instrumented subclasses of the
+            Jetty connector types which measure connection duration, the rate of accepted
+            connections, connections, disconnections, and the total number of active connections.
+        </p>
+
+        <p>
+            <code>InstrumentedQueuedThreadPool</code> is a <code>QueuedThreadPool</code> subclass
+            which measures the ratio of idle threads to working threads as well as the absolute
+            number of threads (idle and otherwise).
+        </p>
+
+        <p>
+            <code>InstrumentedHandler</code> is a <code>Handler</code> decorator which measures a
+            wide range of HTTP behavior: dispatch times, requests, resumes, suspends, expires,
+            the number of active, suspected, and dispatched requests, as well as meters of responses
+            with <code>1xx</code>, <code>2xx</code>, <code>3xx</code>, <code>4xx</code>, and
+            <code>5xx</code> status codes. It even has gauges for the ratios of <code>4xx</code>
+            and <code>5xx</code> response rates to overall response rates. Finally, it includes
+            meters for requests by the HTTP method: <code>GET</code>, <code>POST</code>, etc.
         </p>
 
         <h2 id="log4j">Metrics and Log4j</h2>
