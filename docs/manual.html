@@ -701,8 +701,41 @@ public class ExampleResource {
         <h2 id="log4j">Metrics and Log4j</h2>
 
         <p>
-            The <code>metrics-log4j</code>
+            The <code>metrics-log4j</code> module provides <code>InstrumentedAppender</code>, a
+            Log4j <code>Appender</code> implementation which records the rate of logged events
+            by their logging level.
         </p>
+
+        <p>
+            You can either add it to the root logger programmatically:
+        </p>
+
+        <pre class="prettyprint lang-java">LogManager.getRootLogger().addAppender(new InstrumentedAppender());</pre>
+
+        <p>
+            Or you can add it via Log4j’s XML configuration:
+        </p>
+
+        <pre class="prettyprint lang-xml">
+&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;!DOCTYPE log4j:configuration SYSTEM "log4j.dtd"&gt;
+
+&lt;log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"&gt;
+    &lt;appender name="console" class="org.apache.log4j.ConsoleAppender"&gt;
+        &lt;param name="Target" value="System.out"/&gt;
+        &lt;layout class="org.apache.log4j.PatternLayout"&gt;
+            &lt;param name="ConversionPattern" value="%-5p %c{1} - %m%n"/&gt;
+        &lt;/layout&gt;
+    &lt;/appender&gt;
+
+    &lt;appender name="metrics" class="com.yammer.metrics.log4j.InstrumentedAppender"/&gt;
+
+    &lt;root&gt;
+        &lt;priority value="debug"/&gt;
+        &lt;appender-ref ref="console"/&gt;
+        &lt;appender-ref ref="metrics"/&gt;
+    &lt;/root&gt;
+&lt;/log4j:configuration&gt;</pre>
 
         <h2 id="logback">Metrics and Logback</h2>
 
