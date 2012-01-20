@@ -24,25 +24,25 @@ public class InstrumentedSocketConnector extends SocketConnector {
         super();
         setPort(port);
         this.duration = registry.newTimer(SocketConnector.class,
-                                                    "connection-duration",
-                                                    Integer.toString(port),
-                                                    TimeUnit.MILLISECONDS,
-                                                    TimeUnit.SECONDS);
+                                          "connection-duration",
+                                          Integer.toString(port),
+                                          TimeUnit.MILLISECONDS,
+                                          TimeUnit.SECONDS);
         this.accepts = registry.newMeter(SocketConnector.class,
                                          "accepts",
                                          Integer.toString(port),
                                          "connections",
                                          TimeUnit.SECONDS);
         this.connects = registry.newMeter(SocketConnector.class,
-                                                   "connects",
-                                                   Integer.toString(port),
-                                                   "connections",
-                                                   TimeUnit.SECONDS);
+                                          "connects",
+                                          Integer.toString(port),
+                                          "connections",
+                                          TimeUnit.SECONDS);
         this.disconnects = registry.newMeter(SocketConnector.class,
-                                                   "disconnects",
-                                                   Integer.toString(port),
-                                                   "connections",
-                                                   TimeUnit.SECONDS);
+                                             "disconnects",
+                                             Integer.toString(port),
+                                             "connections",
+                                             TimeUnit.SECONDS);
         this.connections = registry.newCounter(SocketConnector.class,
                                                "active-connections",
                                                Integer.toString(port));
