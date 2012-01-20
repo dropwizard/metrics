@@ -701,8 +701,25 @@ this.cache = InstrumentedEhcache.instrument(c);</pre>
         <h2 id="spring">Metrics and Spring</h2>
 
         <p>
-            TODO
+            The <code>metrics-spring</code> module enables the use of Metrics annotations with
+            <a href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/aop.html" target="_blank">Spring AOP</a>,
+            complete with simple XML configuration:
         </p>
+
+        <pre class="prettyprint lang-xml">
+&lt;beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:metrics="http://www.yammer.com/schema/metrics"
+       xsi:schemaLocation="http://www.yammer.com/schema/metrics http://www.yammer.com/schema/metrics/metrics.xsd"&gt;
+
+    &lt;metrics:metrics-registry id="metrics"/&gt;
+    &lt;metrics:health-check-registry id="health"/&gt;
+
+    &lt;metrics:annotation-driven metrics-registry="metrics" health-check-registry="health"/&gt;
+
+    &lt;metrics:jmx-reporter id="metricsJmxReporter" metrics-registry="metrics"/&gt;
+
+&lt;/beans&gt;</pre>
 
         <h2 id="webapp">Metrics and Web Applications</h2>
 
