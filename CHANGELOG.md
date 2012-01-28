@@ -2,6 +2,7 @@ v2.0.0: TBD
 ===================
 
 * Upgraded to Jackson 1.9.4.
+* Upgraded to Jetty 7.6.0.
 
 
 v2.0.0-RC0: Jan 19 2012
