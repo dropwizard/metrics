@@ -172,7 +172,7 @@ v2.0.0-BETA14: Jul 05 2011
   `metrics-scala` module which is now the only cross-built module. All other
   modules dropped the Scala version suffix in their `artifactId`s.
 * Fixed non-heap metric name in `GraphiteReporter`.
-* Fixed stability error in `GraphiteReporter` when dealing with unavilable
+* Fixed stability error in `GraphiteReporter` when dealing with unavailable
   servers.
 * Fixed error with anonymous, instrumented classes.
 * Fixed error in `MetricsServlet` when a gauge throws an exception.
@@ -185,7 +185,7 @@ v2.0.0-BETA14: Jul 05 2011
 v2.0.0-BETA13: May 13 2011
 ==========================
 
-* Fixed a bug in the intial startup phase of the `JmxReporter`.
+* Fixed a bug in the initial startup phase of the `JmxReporter`.
 * Added `metrics-ehcache`, for the instrumentation of `Ehcache` instances.
 * Fixed a typo in `metrics-jetty`'s `InstrumentedHandler`.
 * Added name prefixes to `GraphiteReporter`.
@@ -253,7 +253,7 @@ v2.0.0-BETA10: Mar 25 2011
 * Added `HealthCheck#name()`.
 * Added `Metrics.newJmxGauge()`.
 * Moved health checks into `HealthChecks`.
-* Upgraded to Jackon 1.7.3 and Jetty 7.3.1.
+* Upgraded to Jackson 1.7.3 and Jetty 7.3.1.
 
 v2.0.0-BETA10: Mar 25 2011
 ==========================
@@ -262,7 +262,7 @@ v2.0.0-BETA10: Mar 25 2011
 * Added `HealthCheck#name()`.
 * Added `Metrics.newJmxGauge()`.
 * Moved health checks into `HealthChecks`.
-* Upgraded to Jackon 1.7.3 and Jetty 7.3.1.
+* Upgraded to Jackson 1.7.3 and Jetty 7.3.1.
 
 v2.0.0-BETA9: Mar 14 2011
 =========================
