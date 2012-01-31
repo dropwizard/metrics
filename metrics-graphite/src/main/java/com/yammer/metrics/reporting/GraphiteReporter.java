@@ -353,7 +353,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
         }
 
         for (Entry<String, VirtualMachineMetrics.GarbageCollectorStats> entry : vm.garbageCollectors().entrySet()) {
-            final String name = "jvm.gc." + entry.getKey();
+            final String name = "jvm.gc." + sanitizeString(entry.getKey());
             sendInt(epoch, name, "time", entry.getValue().getTime(TimeUnit.MILLISECONDS));
             sendInt(epoch, name, "runs", entry.getValue().getRuns());
         }
