@@ -20,7 +20,7 @@ public class InstrumentedCache<K,V> extends ForwardingCache<K,V> {
      * <table>
      * <tr>
      * <td>{@code request-count}</td>
-     * <td>The the number of times lookup methods have returned either a
+     * <td>The number of times lookup methods have returned either a
      * cached or uncached value.</td>
      * </tr>
      * <tr>
