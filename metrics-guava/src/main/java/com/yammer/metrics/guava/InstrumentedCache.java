@@ -14,8 +14,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class InstrumentedCache<K,V> extends ForwardingCache<K,V> {
     /**
-     * Instruments the given {@link Cache} instance with a get timer
-     * and a set of gauges for Cache's built-in statistics:
+     * Instruments the given {@link Cache} instance with a set of gauges for
+     * Cache's built-in statistics:
      * <p/>
      * <table>
      * <tr>
@@ -80,10 +80,9 @@ public class InstrumentedCache<K,V> extends ForwardingCache<K,V> {
      *
      * @param cacheName the name of the cache
      * @param cache a {@link Cache} instance
-     * @return an instrumented decorator for {@code cache}
      * @see com.google.common.cache.CacheStats
      */
-    public static <K,V> Cache<K,V> instrument(String cacheName, final Cache<K,V> cache) {
+    public static void instrumentCache(String cacheName, final Cache<?,?> cache) {
         Metrics.newGauge(cache.getClass(), "request-count", cacheName, new Gauge<Long>() {
             @Override
             public Long value() {
@@ -174,7 +173,19 @@ public class InstrumentedCache<K,V> extends ForwardingCache<K,V> {
                 return cache.size();
             }
         });
+    }
 
+    /**
+     * Instruments the given {@link Cache} instance with a get timer
+     * and a set of gauges for Cache's built-in statistics.
+     *
+     * @param cacheName the name of the cache
+     * @param cache a {@link Cache} instance
+     * @return an instrumented decorator for {@code cache}
+     * @see #instrumentCache
+     */
+    public static <K,V> Cache<K,V> instrument(String cacheName, final Cache<K,V> cache) {
+        instrumentCache(cacheName, cache);
         return new InstrumentedCache(cacheName, cache);
     }
 
