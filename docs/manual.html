@@ -74,6 +74,7 @@
                 <li><a href="#ehcache">Metrics and Ehcache</a></li>
                 <li><a href="#ganglia">Metrics and Ganglia</a></li>
                 <li><a href="#graphite">Metrics and Graphite</a></li>
+                <li><a href="#guava">Metrics and Guava</a></li>
                 <li><a href="#guice">Metrics and Guice</a></li>
                 <li><a href="#httpclient">Metrics and HttpClient</a></li>
                 <li><a href="#jdbi">Metrics and JDBI</a></li>
@@ -638,6 +639,106 @@ GangliaReporter.enable(1, TimeUnit.MINUTES, "ganglia.example.com", 8649);</pre>
 
         <pre class="prettyprint lang-java">
 GraphiteReporter.enable(1, TimeUnit.MINUTES, "graphite.example.com", 2003);</pre>
+
+        <h2 id="guava">Metrics and Guava</h2>
+
+        <p>
+            The <code>metrics-guava</code> module provides instrumented
+            decorators for Guava's caching utilities, including
+            <code>Cache</code>, <code>LoadingCache</code>, and
+            <code>CacheLoader</code>:
+        </p>
+
+        <pre class="prettyprint lang-java">
+LoadingCache<Key, Graph> graphs = CacheBuilder.newBuilder()
+    .build(InstrumentedCacheBuilder.instrument(
+        new CacheLoader<Key, Graph>() {
+            public Graph load(Key key) throws AnyException {
+                return createExpensiveGraph(key);
+            }
+        }));
+LoadingCache<Key, Graph> instrumentedGraphs =
+    InstrumentedLoadingCache.instrument("graphs", graphs);</pre>
+
+        <p>
+            Instrumenting a <code>Cache</code> or <code>LoadedCache</code>
+            instance creates gauges for all of the <code>CacheStats</code>-provided
+            statistics:
+        </p>
+
+        <table>
+            <tr>
+                <td><code>request-count</code></td>
+                <td>The number of times lookup methods have returned either a
+                    cached or uncached value.</td>
+            </tr>
+            <tr>
+                <td><code>hit-count</code></td>
+                <td>The number of times lookup methods have returned a cached value.</td>
+            </tr>
+            <tr>
+                <td><code>hit-rate</code></td>
+                <td>The ratio of cache requests which were hits.</td>
+            </tr>
+            <tr>
+                <td><code>miss-count</code></td>
+                <td>The number of times lookup methods have returned an uncached (newly
+                    loaded) value, or null.</td>
+            </tr>
+            <tr>
+                <td><code>miss-rate</code></td>
+                <td>The ratio of cache requests which were misses.</td>
+            </tr>
+            <tr>
+                <td><code>load-count</code></td>
+                <td>The total number of times that lookup methods attempted to load new
+                    values.</td>
+            </tr>
+            <tr>
+                <td><code>load-success-count</code></td>
+                <td>The number of times lookup methods have successfully loaded a new
+                    value.</td>
+            </tr>
+            <tr>
+                <td><code>load-exception-count</code></td>
+                <td>The number of times lookup methods threw an exception while loading
+                    a new value.</td>
+            </tr>
+            <tr>
+                <td><code>load-exception-rate</code></td>
+                <td>The ratio of cache loading attempts which threw exceptions.</td>
+            </tr>
+            <tr>
+                <td><code>total-load-time</code></td>
+                <td>The total number of nanoseconds the cache has spent loading new
+                    values.</td>
+            </tr>
+            <tr>
+                <td><code>average-load-penalty</code></td>
+                <td>The average time spent loading new values.</td>
+            </tr>
+            <tr>
+                <td><code>eviction-count</code></td>
+                <td>The number of times an entry has been evicted.</td>
+            </tr>
+            <tr>
+                <td><code>entries</code></td>
+                <td>The approximate number of entries in the cache.</td>
+            </tr>
+        </table>
+
+        <p>
+            It also adds full timers for the cache’s <code>get</code> methods.
+        </p>
+
+        <p>
+            The metrics are all scoped to the cache’s caller-supplied name.
+        </p>
+
+        <p>
+            Instrumenting a <code>CacheLoader</code> instance adds a timer for
+            the <code>load</code> method.
+        </p>
 
         <h2 id="guice">Metrics and Guice</h2>
 
