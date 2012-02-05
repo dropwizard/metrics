@@ -340,7 +340,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
         sendFloat(epoch, "jvm.memory", "heap_usage", vm.heapUsage());
         sendFloat(epoch, "jvm.memory", "non_heap_usage", vm.nonHeapUsage());
         for (Entry<String, Double> pool : vm.memoryPoolUsage().entrySet()) {
-            sendFloat(epoch, "jvm.memory.memory_pool_usages", pool.getKey(), pool.getValue());
+            sendFloat(epoch, "jvm.memory.memory_pool_usages", sanitizeString(pool.getKey()), pool.getValue());
         }
 
         sendInt(epoch, "jvm", "daemon_thread_count", vm.daemonThreadCount());
