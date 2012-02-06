@@ -14,11 +14,11 @@ import com.yammer.metrics.jetty.InstrumentedQueuedThreadPool;
 import com.yammer.metrics.jetty.InstrumentedSelectChannelConnector;
 import com.yammer.metrics.reporting.AdminServlet;
 
-public class TestServer {
-    private static final Counter COUNTER_1 = Metrics.newCounter(TestServer.class, "wah", "doody");
-    private static final Counter COUNTER_2 = Metrics.newCounter(TestServer.class, "woo");
+public class ExampleServer {
+    private static final Counter COUNTER_1 = Metrics.newCounter(ExampleServer.class, "wah", "doody");
+    private static final Counter COUNTER_2 = Metrics.newCounter(ExampleServer.class, "woo");
     static {
-        Metrics.newGauge(TestServer.class, "boo", new Gauge<Integer>() {
+        Metrics.newGauge(ExampleServer.class, "boo", new Gauge<Integer>() {
             @Override
             public Integer value() {
                 throw new RuntimeException("asplode!");
