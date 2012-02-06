@@ -3,6 +3,10 @@ v2.0.0: TBD
 
 * Upgraded to Jackson 1.9.4.
 * Upgraded to Jetty 7.6.0.
+* Added escaping for garbage collector and memory pool names in `GraphiteReporter`.
+* Fixed the inability to start and stop multiple reporter instances.
+* Switched to using a backported version of `ThreadLocalRandom` for `UniformSample` and
+  `ExponentiallyDecayingSample` to reduce lock contention on random number generation.
 
 
 v2.0.0-RC0: Jan 19 2012
