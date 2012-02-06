@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public class InstrumentedClientConnManagerTest {
-    private final ClientConnectionManager manager = new InstrumentedClientConnManager();
+    private final InstrumentedClientConnManager manager = new InstrumentedClientConnManager();
 
     @After
     public void tearDown() throws Exception {
@@ -35,9 +35,11 @@ public class InstrumentedClientConnManagerTest {
         final ClientConnectionRequest request = manager.requestConnection(route, state);
         final ManagedClientConnection connection = request.getConnection(100, TimeUnit.SECONDS);
 
+        Thread.sleep(100);
+
         try {
             assertThat(gauge.value(),
-                       is(1));
+                       is(manager.getConnectionsInPool()));
         } finally {
             connection.close();
             manager.releaseConnection(connection, 0, TimeUnit.SECONDS);
