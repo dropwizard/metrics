@@ -5,11 +5,15 @@ import com.yammer.metrics.core.MetricPredicate;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.AbstractPollingReporter;
 import com.yammer.metrics.reporting.ConsoleReporter;
+import org.junit.Test;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.fail;
 
 public class ConsoleReporterTest extends AbstractPollingReporterTest {
 
@@ -98,5 +102,20 @@ public class ConsoleReporterTest extends AbstractPollingReporterTest {
                 "metric:",
                 String.format("value = %s", value)
         };
+    }
+
+    @Test
+    public void givenShutdownReporterWhenCreatingNewReporterExpectSuccess() {
+        try {
+            final ConsoleReporter reporter1 = new ConsoleReporter(System.out);
+            reporter1.start(1, TimeUnit.SECONDS);
+            reporter1.shutdown();
+            final ConsoleReporter reporter2 = new ConsoleReporter(System.out);
+            reporter2.start(1, TimeUnit.SECONDS);
+            reporter2.shutdown();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("should be able to start and shutdown reporters");
+        }
     }
 }

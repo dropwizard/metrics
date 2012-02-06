@@ -52,26 +52,29 @@ class ThreadPools {
      */
     ScheduledExecutorService newScheduledThreadPool(int poolSize, String name) {
         final ScheduledExecutorService existing = threadPools.get(name);
-        if (existing == null) {
+        if (isValidExecutor(existing)) {
+            return existing;
+        } else {
             // We lock here because executors are expensive to create. So
             // instead of just doing the usual putIfAbsent dance, we lock the
             // damn thing, check to see if anyone else put a thread pool in
             // there while we weren't watching.
             synchronized (this) {
                 final ScheduledExecutorService lastChance = threadPools.get(name);
-                if (lastChance == null) {
+                if (isValidExecutor(lastChance)) {
+                    return lastChance;
+                } else {
                     final ScheduledExecutorService service =
-                            Executors.newScheduledThreadPool(poolSize,
-                                                             new NamedThreadFactory(name));
+                            Executors.newScheduledThreadPool(poolSize, new NamedThreadFactory(name));
                     threadPools.put(name, service);
                     return service;
-                } else {
-                    return lastChance;
                 }
             }
-        } else {
-            return existing;
         }
+    }
+
+    private static boolean isValidExecutor(ExecutorService executor) {
+        return !(executor == null) && !executor.isShutdown() && !executor.isTerminated();
     }
 
     /**
