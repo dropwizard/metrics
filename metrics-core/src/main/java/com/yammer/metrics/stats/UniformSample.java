@@ -2,7 +2,6 @@ package com.yammer.metrics.stats;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicLongArray;
 
@@ -13,7 +12,6 @@ import java.util.concurrent.atomic.AtomicLongArray;
  * @see <a href="http://www.cs.umd.edu/~samir/498/vitter.pdf">Random Sampling with a Reservoir</a>
  */
 public class UniformSample implements Sample {
-    private static final Random RANDOM = new Random();
     private static final int BITS_PER_LONG = 63;
     private final AtomicLong count = new AtomicLong();
     private final AtomicLongArray values;
@@ -68,7 +66,7 @@ public class UniformSample implements Sample {
     private static long nextLong(long n) {
         long bits, val;
         do {
-            bits = RANDOM.nextLong() & (~(1L << BITS_PER_LONG));
+            bits = ThreadLocalRandom.current().nextLong() & (~(1L << BITS_PER_LONG));
             val = bits % n;
         } while (bits - val + (n - 1) < 0L);
         return val;
