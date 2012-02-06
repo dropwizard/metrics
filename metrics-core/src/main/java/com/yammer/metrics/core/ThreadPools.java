@@ -74,7 +74,7 @@ class ThreadPools {
     }
 
     private static boolean isValidExecutor(ExecutorService executor) {
-        return !(executor == null) && !executor.isShutdown() && !executor.isTerminated();
+        return executor != null && !executor.isShutdown() && !executor.isTerminated();
     }
 
     /**
