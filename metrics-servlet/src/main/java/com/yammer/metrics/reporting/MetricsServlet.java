@@ -68,11 +68,15 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
     public static final String REGISTRY_ATTRIBUTE = MetricsServlet.class.getName() + ".registry";
 
     /**
+     * The attribute name of the {@link JsonFactory} instance in the servlet context.
+     */
+    public static final String JSON_FACTORY_ATTRIBUTE = JsonFactory.class.getCanonicalName();
+
+    /**
      * The initialization parameter name which determines whether or not JVM_level metrics will be
      * included in the JSON output.
      */
     public static final String SHOW_JVM_METRICS = "show-jvm-metrics";
-
 
     static final class Context {
         final boolean showFullSamples;
@@ -136,7 +140,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
     @Override
     public void init(ServletConfig config) throws ServletException {
         final Object factory = config.getServletContext()
-                                     .getAttribute(JsonFactory.class.getCanonicalName());
+                                     .getAttribute(JSON_FACTORY_ATTRIBUTE);
         if (factory instanceof JsonFactory) {
             this.factory = (JsonFactory) factory;
         }
