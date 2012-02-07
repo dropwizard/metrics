@@ -1,10 +1,10 @@
 package com.yammer.metrics.jdbi;
 
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.jdbi.strategies.SmartNameStrategy;
 import com.yammer.metrics.jdbi.strategies.StatementNameStrategy;
-
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.TimingCollector;
 
@@ -19,6 +19,10 @@ public class InstrumentedTimingCollector implements TimingCollector {
     private final StatementNameStrategy statementNameStrategy;
     private final TimeUnit durationUnit;
     private final TimeUnit rateUnit;
+
+    public InstrumentedTimingCollector() {
+        this(Metrics.defaultRegistry());
+    }
 
     public InstrumentedTimingCollector(MetricsRegistry registry) {
         this(registry, new SmartNameStrategy(), TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
