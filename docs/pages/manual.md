@@ -452,7 +452,19 @@ GraphiteReporter.enable(1, TimeUnit.MINUTES, "graphite.example.com", 2003);
 
 ## Metrics and Guice #guice
 
-TODO
+The `metrics-guice` module provides integration with the Google
+[Guice](http://code.google.com/p/google-guice/) dependency injection framework.
+
+The `InstrumentationModule` class adds a set of method interceptors to your `Injector` which
+leverage Guice's AOP support to add meters to `@Metered`-annotated methods, timers to
+`@Timed`-annotated methods, exception meters to `@ExceptionMetered`-annotated methods, and gauges
+for the results of `@Gauge`-annotated methods.
+
+The `JmxReporterProvider` class is a `Provider` implementation which gives you access to a started
+`JmxReporter` instance.
+
+Finally, the `AdminServletModule` adds support for `metric-servlet`'s `AdminServlet` to your Guice
+Servlet configuration.
 
 ## Metrics and HttpClient #httpclient
 
