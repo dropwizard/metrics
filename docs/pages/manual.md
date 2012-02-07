@@ -482,7 +482,18 @@ per-HTTP method timers for HTTP requests.
 
 ## Metrics and JDBI #jdbi
 
-TODO
+The `metrics-jdbi` module provides a `TimingCollector` implementation for [JDBI](http://jdbi.org/),
+an SQL convenience library.
+
+To use it, just add a `InstrumentedTimingCollector` instance to your `DBI`:
+
+``` java
+final DBI dbi = new DBI(dataSource);
+dbi.setTimingCollector(new InstrumentedTimingCollector());
+```
+
+`InstrumentedTimingCollector` keeps per-SQL-object timing data, as well as general raw SQL timing
+data.
 
 ## Metrics and Jersey #jersey
 
