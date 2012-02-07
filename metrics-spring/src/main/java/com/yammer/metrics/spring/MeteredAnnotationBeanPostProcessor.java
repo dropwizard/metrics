@@ -13,9 +13,11 @@ public class MeteredAnnotationBeanPostProcessor extends AbstractProxyingBeanPost
 
     private final Pointcut pointcut = new AnnotationMatchingPointcut(null, Metered.class);
     private final MetricsRegistry metrics;
+    private final String scope;
 
-    public MeteredAnnotationBeanPostProcessor(final MetricsRegistry metrics) {
+    public MeteredAnnotationBeanPostProcessor(final MetricsRegistry metrics, final String scope) {
         this.metrics = metrics;
+        this.scope = scope;
     }
 
     @Override
@@ -25,7 +27,7 @@ public class MeteredAnnotationBeanPostProcessor extends AbstractProxyingBeanPost
 
     @Override
     public MethodInterceptor getMethodInterceptor(Class<?> targetClass) {
-        return new MeteredMethodInterceptor(metrics, targetClass);
+        return new MeteredMethodInterceptor(metrics, targetClass, scope);
     }
 
 }

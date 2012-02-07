@@ -11,6 +11,7 @@
         <xsd:complexType>
             <xsd:attribute name="metrics-registry" type="xsd:string" use="optional"/>
             <xsd:attribute name="health-check-registry" type="xsd:string" use="optional"/>
+            <xsd:attribute name="scope" type="xsd:string" use="optional"/>
         </xsd:complexType>
     </xsd:element>
 

@@ -17,9 +17,11 @@ public class GaugeAnnotationBeanPostProcessor implements BeanPostProcessor, Orde
     private static final MethodFilter filter = new AnnotationMethodFilter(Gauge.class);
 
     private final MetricsRegistry metrics;
+    private final String scope;
 
-    public GaugeAnnotationBeanPostProcessor(final MetricsRegistry metrics) {
+    public GaugeAnnotationBeanPostProcessor(final MetricsRegistry metrics, final String scope) {
         this.metrics = metrics;
+        this.scope = scope;
     }
 
     @Override
@@ -37,6 +39,7 @@ public class GaugeAnnotationBeanPostProcessor implements BeanPostProcessor, Orde
                     final String name = gauge.name().isEmpty() ? method.getName() : gauge.name();
                     metrics.newGauge(method.getDeclaringClass(),
                                      name,
+                                     scope,
                                      new GaugeMethod(bean, method));
                 } else {
                     throw new IllegalStateException("Method " + method.getName() + " is annotated with @Gauge but requires parameters.");

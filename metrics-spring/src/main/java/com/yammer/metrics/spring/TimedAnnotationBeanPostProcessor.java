@@ -13,9 +13,11 @@ public class TimedAnnotationBeanPostProcessor extends AbstractProxyingBeanPostPr
 
     private final Pointcut pointcut = new AnnotationMatchingPointcut(null, Timed.class);
     private final MetricsRegistry metrics;
+    private final String scope;
 
-    public TimedAnnotationBeanPostProcessor(final MetricsRegistry metrics) {
+    public TimedAnnotationBeanPostProcessor(final MetricsRegistry metrics, final String scope) {
         this.metrics = metrics;
+        this.scope = scope;
     }
 
     @Override
@@ -25,7 +27,7 @@ public class TimedAnnotationBeanPostProcessor extends AbstractProxyingBeanPostPr
 
     @Override
     public MethodInterceptor getMethodInterceptor(Class<?> targetClass) {
-        return new TimedMethodInterceptor(metrics, targetClass);
+        return new TimedMethodInterceptor(metrics, targetClass, scope);
     }
 
 }
