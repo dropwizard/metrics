@@ -23,12 +23,14 @@ public class ExceptionMeteredMethodInterceptor implements MethodInterceptor, Met
     private final Class<?> targetClass;
     private final Map<String, Meter> meters;
     private final Map<String, Class<? extends Throwable>> causes;
+    private final String scope;
 
-    public ExceptionMeteredMethodInterceptor(final MetricsRegistry metrics, final Class<?> targetClass) {
+    public ExceptionMeteredMethodInterceptor(final MetricsRegistry metrics, final Class<?> targetClass, final String scope) {
         this.metrics = metrics;
         this.targetClass = targetClass;
         this.meters = new HashMap<String, Meter>();
         this.causes = new HashMap<String, Class<? extends Throwable>>();
+        this.scope = scope;
 
         ReflectionUtils.doWithMethods(targetClass, this, filter);
     }
@@ -56,6 +58,7 @@ public class ExceptionMeteredMethodInterceptor implements MethodInterceptor, Met
                 metered.name();
         final Meter meter = metrics.newMeter(targetClass,
                                              meterName,
+                                             scope,
                                              metered.eventType(),
                                              metered.rateUnit());
         meters.put(methodName, meter);

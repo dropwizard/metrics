@@ -13,9 +13,11 @@ public class ExceptionMeteredAnnotationBeanPostProcessor extends AbstractProxyin
 
     private final Pointcut pointcut = new AnnotationMatchingPointcut(null, ExceptionMetered.class);
     private final MetricsRegistry metrics;
+    private final String scope;
 
-    public ExceptionMeteredAnnotationBeanPostProcessor(final MetricsRegistry metrics) {
+    public ExceptionMeteredAnnotationBeanPostProcessor(final MetricsRegistry metrics, final String scope) {
         this.metrics = metrics;
+        this.scope = scope;
     }
 
     @Override
@@ -25,7 +27,7 @@ public class ExceptionMeteredAnnotationBeanPostProcessor extends AbstractProxyin
 
     @Override
     public MethodInterceptor getMethodInterceptor(Class<?> targetClass) {
-        return new ExceptionMeteredMethodInterceptor(metrics, targetClass);
+        return new ExceptionMeteredMethodInterceptor(metrics, targetClass, scope);
     }
 
 }
