@@ -19,4 +19,9 @@ public class InstrumentedWithTimed {
     protected String doAThingWithProtectedScope() {
         return "defaultProtected";
     }
+
+    @Timed(group="g", type="t", name="n")
+    protected String doAThingWithCustomGroupTypeAndName() {
+        return "defaultProtected";
+    }
 }

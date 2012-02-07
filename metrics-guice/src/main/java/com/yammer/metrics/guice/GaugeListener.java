@@ -4,6 +4,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 import com.yammer.metrics.annotation.Gauge;
+import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
 
 import java.lang.reflect.Method;
@@ -24,11 +25,12 @@ class GaugeListener implements TypeListener {
             final Gauge annotation = method.getAnnotation(Gauge.class);
             if (annotation != null) {
                 if (method.getParameterTypes().length == 0) {
-                    final String name = annotation.name()
-                                                  .isEmpty() ? method.getName() : annotation.name();
+                    String group = MetricName.chooseGroup(annotation.group(), literal.getRawType());
+                    String type = MetricName.chooseType(annotation.type(), literal.getRawType());
+                    String name = MetricName.chooseName(annotation.name(), method);            
+                    MetricName metricName = new MetricName(group, type, name);
                     encounter.register(new GaugeInjectionListener<I>(metricsRegistry,
-                                                                     literal,
-                                                                     name,
+                                                                     metricName,
                                                                      method));
                 } else {
                     encounter.addError("Method %s is annotated with @Gauge but requires parameters.",

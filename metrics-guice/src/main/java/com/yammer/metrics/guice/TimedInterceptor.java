@@ -1,6 +1,7 @@
 package com.yammer.metrics.guice;
 
 import com.yammer.metrics.annotation.Timed;
+import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -17,9 +18,11 @@ class TimedInterceptor implements MethodInterceptor {
     static MethodInterceptor forMethod(MetricsRegistry metricsRegistry, Class<?> klass, Method method) {
         final Timed annotation = method.getAnnotation(Timed.class);
         if (annotation != null) {
-            final String name = annotation.name().isEmpty() ? method.getName() : annotation.name();
-            final Timer timer = metricsRegistry.newTimer(klass,
-                                                               name,
+            String group = MetricName.chooseGroup(annotation.group(), klass);
+            String type = MetricName.chooseType(annotation.type(), klass);
+            String name = MetricName.chooseName(annotation.name(), method);            
+            MetricName metricName = new MetricName(group, type, name);
+            final Timer timer = metricsRegistry.newTimer(metricName,
                                                                annotation.durationUnit(),
                                                                annotation.rateUnit());
             return new TimedInterceptor(timer);

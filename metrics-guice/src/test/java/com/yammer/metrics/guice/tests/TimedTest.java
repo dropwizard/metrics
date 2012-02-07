@@ -8,6 +8,8 @@ import com.yammer.metrics.guice.InstrumentationModule;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.instanceOf;
@@ -68,6 +70,16 @@ public class TimedTest {
 
         final Metric metric = registry.allMetrics().get(new MetricName(InstrumentedWithTimed.class,
                                                                        "doAThingWithProtectedScope"));
+
+        assertMetricSetup(metric);
+    }
+
+    @Test
+    public void aTimedAnnotatedMethodWithCustomGroupTypeAndName() throws Exception {
+
+        instance.doAThingWithCustomGroupTypeAndName();
+
+        final Metric metric = registry.allMetrics().get(new MetricName("g", "t", "n"));
 
         assertMetricSetup(metric);
     }
