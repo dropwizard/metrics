@@ -3,13 +3,11 @@ package com.yammer.metrics.spring;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
-import org.springframework.core.Ordered;
 
 import com.yammer.metrics.annotation.Timed;
 import com.yammer.metrics.core.MetricsRegistry;
 
-public class TimedAnnotationBeanPostProcessor extends AbstractProxyingBeanPostProcessor implements
-                                                                                        Ordered {
+public class TimedAnnotationBeanPostProcessor extends AbstractProxyingBeanPostProcessor {
 
     private static final long serialVersionUID = -1589475386869891203L;
 
@@ -28,11 +26,6 @@ public class TimedAnnotationBeanPostProcessor extends AbstractProxyingBeanPostPr
     @Override
     public MethodInterceptor getMethodInterceptor(Class<?> targetClass) {
         return new TimedMethodInterceptor(metrics, targetClass);
-    }
-
-    @Override
-    public int getOrder() {
-        return HIGHEST_PRECEDENCE;
     }
 
 }
