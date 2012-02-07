@@ -468,9 +468,9 @@ Servlet configuration.
 
 ## Metrics and HttpClient #httpclient
 
-The `metrics-httpclient` provides `InstrumentedClientConnManager` and
-`InstrumentedHttpClient`, two instrumented versions of [Apache
-HttpClient 4.x](http://hc.apache.org/httpcomponents-client-ga/) classes.
+The `metrics-httpclient` module provides `InstrumentedClientConnManager` and
+`InstrumentedHttpClient`, two instrumented versions of
+[Apache HttpClient 4.x](http://hc.apache.org/httpcomponents-client-ga/) classes.
 
 `InstrumentedClientConnManager` is a thread-safe
 `ClientConnectionManager` implementation which measures the number of
