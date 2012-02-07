@@ -1,4 +1,4 @@
-default:
+build:
 	mook
 
 upload:
