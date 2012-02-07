@@ -60,8 +60,7 @@ import java.util.concurrent.TimeUnit;
  *     </dd>
  * </dl>
  */
-public class MetricsServlet extends HttpServlet
-        implements MetricProcessor<MetricsServlet.Context> {
+public class MetricsServlet extends HttpServlet implements MetricProcessor<MetricsServlet.Context> {
 
     /**
      * The attribute name of the {@link MetricsRegistry} instance in the servlet context.
