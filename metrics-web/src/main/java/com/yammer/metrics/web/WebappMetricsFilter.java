@@ -4,6 +4,7 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
@@ -67,16 +68,16 @@ public abstract class WebappMetricsFilter implements Filter {
     public void doFilter(ServletRequest request,
                          ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
-        final long start = System.currentTimeMillis();
         final StatusExposingServletResponse wrappedResponse =
                 new StatusExposingServletResponse((HttpServletResponse) response);
         activeRequests.inc();
+        final TimerContext context = requestTimer.time();
         try {
             chain.doFilter(request, wrappedResponse);
         } finally {
+            context.stop();
             activeRequests.dec();
             markMeterForStatusCode(wrappedResponse.getStatus());
-            requestTimer.update(System.currentTimeMillis() - start, TimeUnit.MILLISECONDS);
         }
     }
 
