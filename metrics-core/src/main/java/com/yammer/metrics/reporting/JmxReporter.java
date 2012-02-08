@@ -9,8 +9,8 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.OperationsException;
 import java.lang.management.ManagementFactory;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -378,7 +378,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
      */
     public JmxReporter(MetricsRegistry registry) {
         super(registry);
-        this.registeredBeans = new HashMap<MetricName, ObjectName>();
+        this.registeredBeans = new ConcurrentHashMap<MetricName, ObjectName>(100);
         this.server = ManagementFactory.getPlatformMBeanServer();
     }
 
