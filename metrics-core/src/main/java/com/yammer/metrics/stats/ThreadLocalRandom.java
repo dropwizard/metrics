@@ -10,6 +10,7 @@ package com.yammer.metrics.stats;
 
 import java.util.Random;
 
+// CHECKSTYLE:OFF
 /**
  * Copied directly from the JSR-166 project.
  */
@@ -170,3 +171,4 @@ class ThreadLocalRandom extends Random {
 
     private static final long serialVersionUID = -5851777807851030925L;
 }
+// CHECKSTYLE:ON
