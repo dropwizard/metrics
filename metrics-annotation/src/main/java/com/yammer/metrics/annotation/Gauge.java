@@ -22,5 +22,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Gauge {
+    /**
+     * The gauge's name.
+     */
     String name() default "";
 }
