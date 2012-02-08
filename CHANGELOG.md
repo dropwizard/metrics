@@ -1,3 +1,9 @@
+v2.0.1: Feb 08 2012
+===================
+
+* Fixed a concurrency bug in `JmxReporter`.
+
+
 v2.0.0: Feb 07 2012
 ===================
 
