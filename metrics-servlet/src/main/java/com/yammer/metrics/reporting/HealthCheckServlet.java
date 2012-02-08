@@ -3,6 +3,7 @@ package com.yammer.metrics.reporting;
 import com.yammer.metrics.HealthChecks;
 import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.core.HealthCheckRegistry;
+import com.yammer.metrics.core.MetricName;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -58,7 +59,7 @@ public class HealthCheckServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse resp) throws ServletException, IOException {
-        final Map<String, HealthCheck.Result> results = registry.runHealthChecks();
+        final Map<MetricName, HealthCheck.Result> results = registry.runHealthChecks();
         resp.setContentType(CONTENT_TYPE);
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
         final PrintWriter writer = resp.getWriter();
@@ -71,7 +72,7 @@ public class HealthCheckServlet extends HttpServlet {
             } else {
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
-            for (Map.Entry<String, HealthCheck.Result> entry : results.entrySet()) {
+            for (Map.Entry<MetricName, HealthCheck.Result> entry : results.entrySet()) {
                 final HealthCheck.Result result = entry.getValue();
                 if (result.isHealthy()) {
                     if (result.getMessage() != null) {
@@ -97,7 +98,7 @@ public class HealthCheckServlet extends HttpServlet {
         writer.close();
     }
 
-    private static boolean isAllHealthy(Map<String, HealthCheck.Result> results) {
+    private static boolean isAllHealthy(Map<MetricName, HealthCheck.Result> results) {
         for (HealthCheck.Result result : results.values()) {
             if (!result.isHealthy()) {
                 return false;

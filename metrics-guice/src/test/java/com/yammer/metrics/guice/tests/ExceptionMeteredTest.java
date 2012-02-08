@@ -1,18 +1,25 @@
 package com.yammer.metrics.guice.tests;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.yammer.metrics.annotation.ExceptionMetered;
-import com.yammer.metrics.core.*;
-import com.yammer.metrics.guice.InstrumentationModule;
-import org.junit.Before;
-import org.junit.Test;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.yammer.metrics.annotation.ExceptionMetered;
+import com.yammer.metrics.core.Meter;
+import com.yammer.metrics.core.Metric;
+import com.yammer.metrics.core.MetricName;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.guice.InstrumentationModule;
 
 public class ExceptionMeteredTest {
 

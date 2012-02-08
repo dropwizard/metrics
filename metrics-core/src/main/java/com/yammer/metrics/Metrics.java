@@ -9,15 +9,18 @@ import java.util.concurrent.TimeUnit;
  * A set of factory methods for creating centrally registered metric instances.
  */
 public class Metrics {
-    private static final MetricsRegistry DEFAULT_REGISTRY = new MetricsRegistry();
+    private static final MetricsRegistry DEFAULT_METRICS = new MetricsRegistry();
+    private static final HealthCheckRegistry DEFAULT_CHECKS = new HealthCheckRegistry();
+    
     private static final Thread SHUTDOWN_HOOK = new Thread() {
+        @Override
         public void run() {
             JmxReporter.shutdownDefault();
         }
     };
 
     static {
-        JmxReporter.startDefault(DEFAULT_REGISTRY);
+        JmxReporter.startDefault(DEFAULT_METRICS, DEFAULT_CHECKS);
         Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
     }
 
@@ -36,7 +39,7 @@ public class Metrics {
     public static <T> Gauge<T> newGauge(Class<?> klass,
                                         String name,
                                         Gauge<T> metric) {
-        return DEFAULT_REGISTRY.newGauge(klass, name, metric);
+        return DEFAULT_METRICS.newGauge(klass, name, metric);
     }
 
     /**
@@ -54,7 +57,7 @@ public class Metrics {
                                         String name,
                                         String scope,
                                         Gauge<T> metric) {
-        return DEFAULT_REGISTRY.newGauge(klass, name, scope, metric);
+        return DEFAULT_METRICS.newGauge(klass, name, scope, metric);
     }
 
     /**
@@ -67,7 +70,7 @@ public class Metrics {
      */
     public static <T> Gauge<T> newGauge(MetricName metricName,
                                         Gauge<T> metric) {
-        return DEFAULT_REGISTRY.newGauge(metricName, metric);
+        return DEFAULT_METRICS.newGauge(metricName, metric);
     }
 
     /**
@@ -79,7 +82,7 @@ public class Metrics {
      * @return a new {@link com.yammer.metrics.core.Counter}
      */
     public static Counter newCounter(Class<?> klass, String name) {
-        return DEFAULT_REGISTRY.newCounter(klass, name);
+        return DEFAULT_METRICS.newCounter(klass, name);
     }
 
     /**
@@ -94,7 +97,7 @@ public class Metrics {
     public static Counter newCounter(Class<?> klass,
                                      String name,
                                      String scope) {
-        return DEFAULT_REGISTRY.newCounter(klass, name, scope);
+        return DEFAULT_METRICS.newCounter(klass, name, scope);
     }
 
     /**
@@ -105,7 +108,7 @@ public class Metrics {
      * @return a new {@link com.yammer.metrics.core.Counter}
      */
     public static Counter newCounter(MetricName metricName) {
-        return DEFAULT_REGISTRY.newCounter(metricName);
+        return DEFAULT_METRICS.newCounter(metricName);
     }
 
     /**
@@ -120,7 +123,7 @@ public class Metrics {
     public static Histogram newHistogram(Class<?> klass,
                                          String name,
                                          boolean biased) {
-        return DEFAULT_REGISTRY.newHistogram(klass, name, biased);
+        return DEFAULT_METRICS.newHistogram(klass, name, biased);
     }
 
     /**
@@ -137,7 +140,7 @@ public class Metrics {
                                          String name,
                                          String scope,
                                          boolean biased) {
-        return DEFAULT_REGISTRY.newHistogram(klass, name, scope, biased);
+        return DEFAULT_METRICS.newHistogram(klass, name, scope, biased);
     }
 
     /**
@@ -150,7 +153,7 @@ public class Metrics {
      */
     public static Histogram newHistogram(MetricName metricName,
                                          boolean biased) {
-        return DEFAULT_REGISTRY.newHistogram(metricName, biased);
+        return DEFAULT_METRICS.newHistogram(metricName, biased);
     }
 
     /**
@@ -162,7 +165,7 @@ public class Metrics {
      * @return a new {@link com.yammer.metrics.core.Histogram}
      */
     public static Histogram newHistogram(Class<?> klass, String name) {
-        return DEFAULT_REGISTRY.newHistogram(klass, name);
+        return DEFAULT_METRICS.newHistogram(klass, name);
     }
 
     /**
@@ -177,7 +180,7 @@ public class Metrics {
     public static Histogram newHistogram(Class<?> klass,
                                          String name,
                                          String scope) {
-        return DEFAULT_REGISTRY.newHistogram(klass, name, scope);
+        return DEFAULT_METRICS.newHistogram(klass, name, scope);
     }
 
     /**
@@ -206,7 +209,7 @@ public class Metrics {
                                  String name,
                                  String eventType,
                                  TimeUnit unit) {
-        return DEFAULT_REGISTRY.newMeter(klass, name, eventType, unit);
+        return DEFAULT_METRICS.newMeter(klass, name, eventType, unit);
     }
 
     /**
@@ -226,7 +229,7 @@ public class Metrics {
                                  String scope,
                                  String eventType,
                                  TimeUnit unit) {
-        return DEFAULT_REGISTRY.newMeter(klass, name, scope, eventType, unit);
+        return DEFAULT_METRICS.newMeter(klass, name, scope, eventType, unit);
     }
 
     /**
@@ -242,7 +245,7 @@ public class Metrics {
     public static Meter newMeter(MetricName metricName,
                                  String eventType,
                                  TimeUnit unit) {
-        return DEFAULT_REGISTRY.newMeter(metricName, eventType, unit);
+        return DEFAULT_METRICS.newMeter(metricName, eventType, unit);
     }
 
     /**
@@ -259,7 +262,7 @@ public class Metrics {
                                  String name,
                                  TimeUnit durationUnit,
                                  TimeUnit rateUnit) {
-        return DEFAULT_REGISTRY.newTimer(klass, name, durationUnit, rateUnit);
+        return DEFAULT_METRICS.newTimer(klass, name, durationUnit, rateUnit);
     }
 
     /**
@@ -272,7 +275,7 @@ public class Metrics {
      */
     public static Timer newTimer(Class<?> klass,
                                  String name) {
-        return DEFAULT_REGISTRY.newTimer(klass, name);
+        return DEFAULT_METRICS.newTimer(klass, name);
     }
 
     /**
@@ -291,7 +294,7 @@ public class Metrics {
                                  String scope,
                                  TimeUnit durationUnit,
                                  TimeUnit rateUnit) {
-        return DEFAULT_REGISTRY.newTimer(klass, name, scope, durationUnit, rateUnit);
+        return DEFAULT_METRICS.newTimer(klass, name, scope, durationUnit, rateUnit);
     }
 
     /**
@@ -306,7 +309,7 @@ public class Metrics {
     public static Timer newTimer(Class<?> klass,
                                  String name,
                                  String scope) {
-        return DEFAULT_REGISTRY.newTimer(klass, name, scope);
+        return DEFAULT_METRICS.newTimer(klass, name, scope);
     }
 
     /**
@@ -321,7 +324,7 @@ public class Metrics {
     public static Timer newTimer(MetricName metricName,
                                  TimeUnit durationUnit,
                                  TimeUnit rateUnit) {
-        return DEFAULT_REGISTRY.newTimer(metricName, durationUnit, rateUnit);
+        return DEFAULT_METRICS.newTimer(metricName, durationUnit, rateUnit);
     }
 
     /**
@@ -330,14 +333,14 @@ public class Metrics {
      * @return the metrics registry
      */
     public static MetricsRegistry defaultRegistry() {
-        return DEFAULT_REGISTRY;
+        return DEFAULT_METRICS;
     }
 
     /**
      * Shuts down all thread pools for the default registry.
      */
     public static void shutdown() {
-        DEFAULT_REGISTRY.shutdown();
+        DEFAULT_METRICS.shutdown();
         JmxReporter.shutdownDefault();
         Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
     }

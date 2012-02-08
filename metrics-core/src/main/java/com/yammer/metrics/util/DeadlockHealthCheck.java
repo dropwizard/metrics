@@ -18,7 +18,7 @@ public class DeadlockHealthCheck extends HealthCheck {
      * @param vm    a {@link VirtualMachineMetrics} instance
      */
     public DeadlockHealthCheck(VirtualMachineMetrics vm) {
-        super("deadlocks");
+        super(DeadlockHealthCheck.class, "deadlocks");
         this.vm = vm;
     }
 
