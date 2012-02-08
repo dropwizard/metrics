@@ -42,7 +42,9 @@ import java.util.concurrent.TimeUnit;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ExceptionMetered {
-
+    /**
+     * The default suffix for meter names.
+     */
     String DEFAULT_NAME_SUFFIX = "Exceptions";
 
     /**
