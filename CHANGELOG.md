@@ -7,6 +7,10 @@ v2.0.0: TBD
 * Fixed the inability to start and stop multiple reporter instances.
 * Switched to using a backported version of `ThreadLocalRandom` for `UniformSample` and
   `ExponentiallyDecayingSample` to reduce lock contention on random number generation.
+* Removed `Ordered` from `TimedAnnotationBeanPostProcessor` in `metrics-spring`.
+* Upgraded to JDBI 2.31.1.
+* Upgraded to Ehcache 2.5.1.
+* Added `#timerContext()` to Scala `Timer`.
 
 
 v2.0.0-RC0: Jan 19 2012
