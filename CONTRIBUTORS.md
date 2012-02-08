@@ -1,8 +1,10 @@
 Many Many Thanks To
 ===================
 
+* Alex Lambert (@bifflabs)
 * Brian Roberts (@flicken)
 * Bruce Mitchener (@waywardmonkeys)
+* C. Scott Andreas (@cscotta)
 * Charles Care (@ccare)
 * Chris Burroughs (@cburroughs)
 * Ciamac Moallemi (@ciamac)
@@ -24,9 +26,9 @@ Many Many Thanks To
 * Mahesh Tiyyagura (@tmahesh)
 * Martin Traverso (@martint)
 * Matt Abrams (@abramsm)
-* Matthew O'Connor (@oconnor0)
 * Matt Ryall (@mattryall)
 * Matthew Gilliard (@mjg123)
+* Matthew O'Connor (@oconnor0)
 * Mårten Gustafson (@chids)
 * Neil Prosser (@neilprosser)
 * Robby Walker (@robbywalker)
