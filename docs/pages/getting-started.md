@@ -20,7 +20,7 @@ Just add the `metrics-core` library as a dependency:
     <dependency>
         <groupId>com.yammer.metrics</groupId>
         <artifactId>metrics-core</artifactId>
-        <version>2.0.0-RC0</version>
+        <version>2.0.0</version>
     </dependency>
 </dependencies>
 ```
@@ -226,7 +226,7 @@ dependency:
 <dependency>
     <groupId>com.yammer.metrics</groupId>
     <artifactId>metrics-servlet</artifactId>
-    <version>2.0.0-RC0</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
