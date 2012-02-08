@@ -14,6 +14,7 @@ import java.util.Random;
 /**
  * Copied directly from the JSR-166 project.
  */
+@SuppressWarnings("UnusedDeclaration")
 class ThreadLocalRandom extends Random {
     // same constants as Random, but must be redeclared because private
     private static final long multiplier = 0x5DEECE66DL;
@@ -115,9 +116,9 @@ class ThreadLocalRandom extends Random {
         // half (which makes a difference only if odd).
         long offset = 0;
         while (n >= Integer.MAX_VALUE) {
-            int bits = next(2);
-            long half = n >>> 1;
-            long nextn = ((bits & 2) == 0) ? half : n - half;
+            final int bits = next(2);
+            final long half = n >>> 1;
+            final long nextn = ((bits & 2) == 0) ? half : n - half;
             if ((bits & 1) == 0)
                 offset += n - nextn;
             n = nextn;
