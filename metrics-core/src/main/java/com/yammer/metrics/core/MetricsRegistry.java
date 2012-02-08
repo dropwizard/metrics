@@ -15,10 +15,18 @@ public class MetricsRegistry {
     private final ThreadPools threadPools;
     private final List<MetricsRegistryListener> listeners;
 
+    /**
+     * Creates a new {@link MetricsRegistry}.
+     */
     public MetricsRegistry() {
         this(Clock.defaultClock());
     }
 
+    /**
+     * Creates a new {@link MetricsRegistry} with the given {@link Clock} instance.
+     *
+     * @param clock    a {@link Clock} instance
+     */
     public MetricsRegistry(Clock clock) {
         this.clock = clock;
         this.metrics = newMetricsMap();
