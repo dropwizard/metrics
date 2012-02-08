@@ -25,10 +25,10 @@ class GaugeListener implements TypeListener {
             final Gauge annotation = method.getAnnotation(Gauge.class);
             if (annotation != null) {
                 if (method.getParameterTypes().length == 0) {
-                    String group = MetricName.chooseGroup(annotation.group(), literal.getRawType());
-                    String type = MetricName.chooseType(annotation.type(), literal.getRawType());
-                    String name = MetricName.chooseName(annotation.name(), method);            
-                    MetricName metricName = new MetricName(group, type, name);
+                    final String group = MetricName.chooseGroup(annotation.group(), literal.getRawType());
+                    final String type = MetricName.chooseType(annotation.type(), literal.getRawType());
+                    final String name = MetricName.chooseName(annotation.name(), method);            
+                    final MetricName metricName = new MetricName(group, type, name);
                     encounter.register(new GaugeInjectionListener<I>(metricsRegistry,
                                                                      metricName,
                                                                      method));

@@ -18,10 +18,10 @@ class MeteredInterceptor implements MethodInterceptor {
     static MethodInterceptor forMethod(MetricsRegistry metricsRegistry, Class<?> klass, Method method) {
         final Metered annotation = method.getAnnotation(Metered.class);
         if (annotation != null) {
-            String group = MetricName.chooseGroup(annotation.group(), klass);
-            String type = MetricName.chooseType(annotation.type(), klass);
-            String name = MetricName.chooseName(annotation.name(), method);            
-            MetricName metricName = new MetricName(group, type, name);
+            final String group = MetricName.chooseGroup(annotation.group(), klass);
+            final String type = MetricName.chooseType(annotation.type(), klass);
+            final String name = MetricName.chooseName(annotation.name(), method);            
+            final MetricName metricName = new MetricName(group, type, name);
             final Meter meter = metricsRegistry.newMeter(metricName,
                                                                annotation.eventType(),
                                                                annotation.rateUnit());

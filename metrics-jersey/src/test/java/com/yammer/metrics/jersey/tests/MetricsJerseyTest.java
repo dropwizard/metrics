@@ -6,7 +6,6 @@ import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.jersey.InstrumentedResourceMethodDispatchAdapter;
 import com.yammer.metrics.jersey.tests.resources.InstrumentedResource;
