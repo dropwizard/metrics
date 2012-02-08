@@ -92,6 +92,6 @@ public class GaugeTest {
 
         assertThat("Guice creates a gauge with the given value",
                    ((Gauge<String>) metric).value(),
-                   is("anotherThingWIthGroupTypeAndName"));
+                   is("anotherThingWithGroupTypeAndName"));
     }
 }

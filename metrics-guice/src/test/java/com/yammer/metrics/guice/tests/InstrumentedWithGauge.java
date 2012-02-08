@@ -15,6 +15,6 @@ public class InstrumentedWithGauge {
 
     @Gauge(group="g", type="t", name="n")
     public String doAThingWithGroupTypeAndName() {
-        return "anotherThingWIthGroupTypeAndName";
+        return "anotherThingWithGroupTypeAndName";
     }
 }
