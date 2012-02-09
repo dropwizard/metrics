@@ -23,6 +23,16 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Gauge {
     /**
+     * The gauge's group.
+     */
+    String group() default "";
+
+    /**
+     * The gauge's type.
+     */
+    String type() default "";
+
+    /**
      * The gauge's name.
      */
     String name() default "";

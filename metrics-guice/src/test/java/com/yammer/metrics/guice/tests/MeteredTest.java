@@ -90,6 +90,24 @@ public class MeteredTest {
                    is(1L));
     }
 
+    @Test
+    public void aMeteredAnnotatedMethodWithGroupTypeAndName() throws Exception {
+
+        final Metric metric = registry.allMetrics().get(new MetricName("g", "t", "n"));
+
+        assertMetricIsSetup(metric);
+
+        assertThat("Metric intialises to zero",
+                   ((Meter) metric).count(),
+                   is(0L));
+
+        instance.doAThingWithGroupTypeAndName();
+
+        assertThat("Metric is marked",
+                   ((Meter) metric).count(),
+                   is(1L));
+    }
+
     private void assertMetricIsSetup(final Metric metric) {
         assertThat("Guice creates a metric",
                    metric,

@@ -47,7 +47,7 @@ public class HealthCheckServletTest {
 
         servlet.service(request, response);
 
-        assertThat(output.toString(),
+        assertThat(output.toString().replaceAll("\r\n", "\n"),
                    is("! No health checks registered.\n"));
 
         verify(response).setStatus(501);
@@ -89,7 +89,7 @@ public class HealthCheckServletTest {
 
         servlet.service(request, response);
 
-        assertThat(output.toString(),
+        assertThat(output.toString().replaceAll("\r\n", "\n"),
                    is(
                            "! one: ERROR\n" +
                                    "!  msg\n" +

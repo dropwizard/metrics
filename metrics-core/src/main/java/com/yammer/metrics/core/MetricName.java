@@ -1,5 +1,6 @@
 package com.yammer.metrics.core;
 
+import java.lang.reflect.Method;
 
 /**
  * A value class encapsulating a metric's owning class and name.
@@ -175,5 +176,44 @@ public class MetricName implements Comparable<MetricName> {
             nameBuilder.append(name);
         }
         return nameBuilder.toString();
+    }
+
+    /**
+     * If the group is empty, use the package name of the given class. Otherwise use group
+     * @param group The group to use by default
+     * @param klass The class being tracked
+     * @return a group for the metric
+     */
+    public static String chooseGroup(String group, Class<?> klass) {
+        if(group == null || group.isEmpty()) {
+            group = klass.getPackage() == null ? "" : klass.getPackage().getName();
+        }
+        return group;
+    }
+
+    /**
+     * If the type is empty, use the simple name of the given class. Otherwise use type
+     * @param type The type to use by default
+     * @param klass The class being tracked
+     * @return a type for the metric
+     */
+    public static String chooseType(String type, Class<?> klass) {
+        if(type == null || type.isEmpty()) {
+            type = klass.getSimpleName().replaceAll("\\$$", ""); 
+        }
+        return type;
+    }
+
+    /**
+     * If name is empty, use the name of the given method. Otherwise use name
+     * @param name The name to use by default
+     * @param method The method being tracked
+     * @return a name for the metric
+     */
+    public static String chooseName(String name, Method method) {
+        if(name == null || name.isEmpty()) {
+            name = method.getName();
+        }
+        return name;
     }
 }
