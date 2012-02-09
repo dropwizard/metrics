@@ -1,3 +1,10 @@
+v2.0.2: TBD
+===================
+
+* `InstrumentationModule` in `metrics-guice` now uses the default `MetricsRegistry` and
+  `HealthCheckRegistry`.
+
+
 v2.0.1: Feb 08 2012
 ===================
 
