@@ -72,6 +72,16 @@ public class TimedTest {
         assertMetricSetup(metric);
     }
 
+    @Test
+    public void aTimedAnnotatedMethodWithCustomGroupTypeAndName() throws Exception {
+
+        instance.doAThingWithCustomGroupTypeAndName();
+
+        final Metric metric = registry.allMetrics().get(new MetricName("g", "t", "n"));
+
+        assertMetricSetup(metric);
+    }
+
     private void assertMetricSetup(final Metric metric) {
         assertThat("Guice creates a metric",
                    metric,

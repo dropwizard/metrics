@@ -25,6 +25,16 @@ import java.util.concurrent.TimeUnit;
 @Target(ElementType.METHOD)
 public @interface Timed {
     /**
+     * The group of the timer.
+     */
+    String group() default "";
+
+    /**
+     * The type of the timer.
+     */
+    String type() default "";
+
+    /**
      * The name of the timer.
      */
     String name() default "";
