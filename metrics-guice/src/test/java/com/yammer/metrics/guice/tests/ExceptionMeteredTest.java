@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.yammer.metrics.annotation.ExceptionMetered;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.guice.InstrumentationModule;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,15 +16,24 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 public class ExceptionMeteredTest {
-
-    InstrumentedWithExceptionMetered instance;
-    MetricsRegistry registry;
+    private InstrumentedWithExceptionMetered instance;
+    private MetricsRegistry registry;
 
     @Before
     public void setup() {
-        final Injector injector = Guice.createInjector(new InstrumentationModule());
-        instance = injector.getInstance(InstrumentedWithExceptionMetered.class);
-        registry = injector.getInstance(MetricsRegistry.class);
+        this.registry = new MetricsRegistry();
+        final Injector injector = Guice.createInjector(new InstrumentationModule() {
+            @Override
+            protected MetricsRegistry createMetricsRegistry() {
+                return registry;
+            }
+        });
+        this.instance = injector.getInstance(InstrumentedWithExceptionMetered.class);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        registry.shutdown();
     }
 
     @Test
