@@ -1,4 +1,4 @@
-v2.0.2: TBD
+v2.0.2: Feb 09 2012
 ===================
 
 * `InstrumentationModule` in `metrics-guice` now uses the default `MetricsRegistry` and
