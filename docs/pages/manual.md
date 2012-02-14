@@ -313,6 +313,8 @@ Metrics has other reporter implementations, too:
     data to your Ganglia servers.
 -   [GraphiteReporter](#graphite) allows you to constantly stream
     metrics data to your Graphite servers.
+-   [GraphitePickleReporter](#graphitepickle) allows you to constantly stream
+    metrics data to your Graphite servers using the pickle receiver.
 
 ## Metrics and Ehcache
 
@@ -448,6 +450,17 @@ application to constantly stream metric values to a
 
 ``` java
 GraphiteReporter.enable(1, TimeUnit.MINUTES, "graphite.example.com", 2003);
+```
+
+## Metrics, Graphite and Pickle #graphitepickle
+
+The `metrics-graphite-pickle` provides `GraphitePickleReporter`, which allows your
+application to constantly stream metric values to a
+[Graphite](http://graphite.wikidot.com/) server using graphite's pickle receiver. 
+This is recommended if sending large amounst of data:
+
+``` java
+GraphitePickleReporter.enable(1, TimeUnit.MINUTES, "graphite.example.com", 2004);
 ```
 
 ## Metrics and Guice #guice
