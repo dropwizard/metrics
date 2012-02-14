@@ -175,6 +175,7 @@ public class GraphitePickleReporter extends GraphiteReporter {
         pickler.addMetric(timestamp, name, valueName, String.format(locale, "%d", value));
     }
 
+    
     @Override
     protected void sendFloat(long timestamp, String name, String valueName, double value) {
         pickler.addMetric(timestamp, name, valueName, String.format(locale, "%2.2f", value));
@@ -215,7 +216,7 @@ public class GraphitePickleReporter extends GraphiteReporter {
             Compilable compilable = (Compilable) engine;
             pickleScript = compilable.compile(PICKLER_SCRIPT);
 
-            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
         }
         
         /**

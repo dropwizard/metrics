@@ -30,10 +30,13 @@ public class GraphitePickleReporterTest extends AbstractPollingReporterTest {
     // Pulls apart the pickled paylost. This skips ahead 4 characters to safely ignore
     // the header (length)
     private static final String UNPICKLER_SCRIPT = 
-        "import struct\n" +
         "import cPickle\n" +
-        "data = struct.unpack(\"!L\", payload[0:4])\n" +
-        "metrics = cPickle.loads(payload[4:])\n";
+        "import struct\n" +
+        "format = '!L'\n" +
+        "headerLength = struct.calcsize(format)\n" +
+        "payloadLength, = struct.unpack(format, payload[:headerLength])\n" +
+        "batchLength = headerLength + payloadLength.intValue()\n" +
+        "metrics = cPickle.loads(payload[headerLength:batchLength])\n";
         
     private CompiledScript unpickleScript;
 
@@ -52,14 +55,13 @@ public class GraphitePickleReporterTest extends AbstractPollingReporterTest {
         final SocketProvider provider = mock(SocketProvider.class);
         when(provider.get()).thenReturn(socket);
 
-        // currently this test only works if all the metrics are in the same message
-        // it appears the length header isn't coming out the same way it went in
+        // use a small batch size so the boundary cases are tested
         final GraphitePickleReporter reporter = new GraphitePickleReporter(registry,
                                                                "prefix",
                                                                MetricPredicate.ALL,
                                                                provider,
                                                                clock,
-                                                               100);
+                                                               2);
         reporter.printVMMetrics = false;
         return reporter;
     }
@@ -132,13 +134,20 @@ public class GraphitePickleReporterTest extends AbstractPollingReporterTest {
             registry.add(new MetricName(Object.class, "metric"), metric);
             reporter.run();
             out.flush();
-            String payload = out.toString();
+            // the charset is important. if the GraphitePickleReporter and this test
+            // don't agree, the header is not always correctly unpacked.
+            String payload = out.toString("UTF-8");
             
-            Bindings bindings = new SimpleBindings();
-            bindings.put("payload", payload);
-            unpickleScript.eval(bindings);
-            PyList result = (PyList) bindings.get("metrics");
-            
+            PyList result = new PyList();
+
+            int nextIndex = 0;
+            while(nextIndex < payload.length()) {
+                Bindings bindings = new SimpleBindings();
+                bindings.put("payload", payload.substring(nextIndex));
+                unpickleScript.eval(bindings);
+                result.addAll(result.size(), (PyList) bindings.get("metrics"));
+                nextIndex += (Integer) bindings.get("batchLength");
+            }
             
             // Assertions: first check that the line count matches then compare line by line ignoring leading and trailing whitespace
             assertEquals("Line count mismatch, was:\n" + payload, expected.length,
