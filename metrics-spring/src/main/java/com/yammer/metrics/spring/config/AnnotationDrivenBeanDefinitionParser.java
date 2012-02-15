@@ -1,5 +1,6 @@
 package com.yammer.metrics.spring.config;
 
+import org.springframework.aop.framework.ProxyConfig;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -49,12 +50,23 @@ public class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParse
             scope = null;
         }
 
+        ProxyConfig proxyConfig = new ProxyConfig();
+
+        if (StringUtils.hasText(element.getAttribute("expose-proxy"))) {
+            proxyConfig.setExposeProxy(Boolean.valueOf(element.getAttribute("expose-proxy")));
+        }
+
+        if (StringUtils.hasText(element.getAttribute("proxy-target-class"))) {
+            proxyConfig.setProxyTargetClass(Boolean.valueOf(element.getAttribute("proxy-target-class")));
+        }
+
         registerComponent(parserContext,
                           build(ExceptionMeteredAnnotationBeanPostProcessor.class,
                                 source,
                                 ROLE_INFRASTRUCTURE
                           )
                           .addConstructorArgReference(metricsBeanName)
+                          .addConstructorArgValue(proxyConfig)
                           .addConstructorArgValue(scope));
 
         registerComponent(parserContext,
@@ -63,6 +75,7 @@ public class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParse
                                 ROLE_INFRASTRUCTURE
                           )
                           .addConstructorArgReference(metricsBeanName)
+                          .addConstructorArgValue(proxyConfig)
                           .addConstructorArgValue(scope));
 
         registerComponent(parserContext,
@@ -71,6 +84,7 @@ public class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParse
                                 ROLE_INFRASTRUCTURE
                           )
                           .addConstructorArgReference(metricsBeanName)
+                          .addConstructorArgValue(proxyConfig)
                           .addConstructorArgValue(scope));
 
         registerComponent(parserContext,
