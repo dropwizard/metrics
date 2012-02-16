@@ -25,13 +25,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class GraphiteReporter extends AbstractPollingReporter implements MetricProcessor<Long> {
     private static final Logger LOG = LoggerFactory.getLogger(GraphiteReporter.class);
-    private final String prefix;
-    private final MetricPredicate predicate;
-    private final Locale locale = Locale.US;
-    private final Clock clock;
-    private final SocketProvider socketProvider;
-    private final VirtualMachineMetrics vm;
-    private Writer writer;
+    protected final String prefix;
+    protected final MetricPredicate predicate;
+    protected final Locale locale = Locale.US;
+    protected final Clock clock;
+    protected final SocketProvider socketProvider;
+    protected final VirtualMachineMetrics vm;
+    protected Writer writer;
     public boolean printVMMetrics = true;
 
     /**
@@ -169,7 +169,22 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
      * @throws IOException if there is an error connecting to the Graphite server
      */
     public GraphiteReporter(MetricsRegistry metricsRegistry, String prefix, MetricPredicate predicate, SocketProvider socketProvider, Clock clock, VirtualMachineMetrics vm) throws IOException {
-        super(metricsRegistry, "graphite-reporter");
+        this(metricsRegistry, prefix, predicate, socketProvider, clock, vm, "graphite-reporter");
+    }
+    
+    /**
+     * Creates a new {@link GraphiteReporter}.
+     *
+     * @param metricsRegistry the metrics registry
+     * @param prefix          is prepended to all names reported to graphite
+     * @param predicate       filters metrics to be reported
+     * @param socketProvider  a {@link SocketProvider} instance
+     * @param clock           a {@link Clock} instance
+     * @param vm              a {@link VirtualMachineMetrics} instance
+     * @throws IOException if there is an error connecting to the Graphite server
+     */
+    public GraphiteReporter(MetricsRegistry metricsRegistry, String prefix, MetricPredicate predicate, SocketProvider socketProvider, Clock clock, VirtualMachineMetrics vm, String name) throws IOException {    
+        super(metricsRegistry, name);
         this.socketProvider = socketProvider;
         this.vm = vm;
 
@@ -222,7 +237,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
         }
     }
 
-    private void printRegularMetrics(final Long epoch) {
+    protected void printRegularMetrics(final Long epoch) {
         for (Entry<String,SortedMap<MetricName,Metric>> entry : getMetricsRegistry().groupedMetrics(
                 predicate).entrySet()) {
             for (Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
@@ -238,19 +253,19 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
         }
     }
 
-    private void sendInt(long timestamp, String name, String valueName, long value) {
+    protected void sendInt(long timestamp, String name, String valueName, long value) {
         sendToGraphite(timestamp, name, valueName + " " + String.format(locale, "%d", value));
     }
 
-    private void sendFloat(long timestamp, String name, String valueName, double value) {
+    protected void sendFloat(long timestamp, String name, String valueName, double value) {
         sendToGraphite(timestamp, name, valueName + " " + String.format(locale, "%2.2f", value));
     }
 
-    private void sendObjToGraphite(long timestamp, String name, String valueName, Object value) {
+    protected void sendObjToGraphite(long timestamp, String name, String valueName, Object value) {
         sendToGraphite(timestamp, name, valueName + " " + String.format(locale, "%s", value));
     }
 
-    private void sendToGraphite(long timestamp, String name, String value) {
+    protected void sendToGraphite(long timestamp, String name, String value) {
         try {
             if (!prefix.isEmpty()) {
                 writer.write(prefix);
@@ -267,7 +282,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
         }
     }
 
-    private String sanitizeName(MetricName name) {
+    protected String sanitizeName(MetricName name) {
         final StringBuilder sb = new StringBuilder()
                 .append(name.getGroup())
                 .append('.')
@@ -280,7 +295,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
         return sb.append(name.getName()).toString();
     }
     
-    private String sanitizeString(String s) {
+    protected String sanitizeString(String s) {
         return s.replace(' ', '-');
     }
 
@@ -319,14 +334,14 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
         sendSampling(epoch, sanitizedName, timer);
     }
 
-    private void sendSummarizable(long epoch, String sanitizedName, Summarizable metric) throws IOException {
+    protected void sendSummarizable(long epoch, String sanitizedName, Summarizable metric) throws IOException {
         sendFloat(epoch, sanitizedName, "min", metric.min());
         sendFloat(epoch, sanitizedName, "max", metric.max());
         sendFloat(epoch, sanitizedName, "mean", metric.mean());
         sendFloat(epoch, sanitizedName, "stddev", metric.stdDev());
     }
 
-    private void sendSampling(long epoch, String sanitizedName, Sampling metric) throws IOException {
+    protected void sendSampling(long epoch, String sanitizedName, Sampling metric) throws IOException {
         final Snapshot snapshot = metric.getSnapshot();
         sendFloat(epoch, sanitizedName, "median", snapshot.getMedian());
         sendFloat(epoch, sanitizedName, "75percentile", snapshot.get75thPercentile());
@@ -336,7 +351,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
         sendFloat(epoch, sanitizedName, "999percentile", snapshot.get999thPercentile());
     }
 
-    private void printVmMetrics(long epoch) {
+    protected void printVmMetrics(long epoch) {
         sendFloat(epoch, "jvm.memory", "heap_usage", vm.heapUsage());
         sendFloat(epoch, "jvm.memory", "non_heap_usage", vm.nonHeapUsage());
         for (Entry<String, Double> pool : vm.memoryPoolUsage().entrySet()) {
@@ -359,7 +374,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
         }
     }
 
-    private static class DefaultSocketProvider implements SocketProvider {
+    public static class DefaultSocketProvider implements SocketProvider {
 
         private final String host;
         private final int port;
