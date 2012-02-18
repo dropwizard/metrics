@@ -36,6 +36,7 @@ Many, many thanks to:
 * `Matthew O'Connor <https://github.com/oconnor0>`_
 * `Mårten Gustafson <https://github.com/chids>`_
 * `Neil Prosser <https://github.com/neilprosser>`_
+* `Paul Bloch <https://github.com/pbloch>`_
 * `Robby Walker <https://github.com/robbywalker>`_
 * `Ryan Kennedy <https://github.com/ryankennedy>`_
 * `Ryan W Tenney <https://github.com/ryantenney>`_
