@@ -103,8 +103,8 @@ html_theme_options = {
     'gradient_text': u'#fff',
     'gradient_bg': u'#ED4A2D',
     'gradient_shadow': u'#CF2C0F',
-    'landing_logo': u'i-need-a-logo.png',
-    'landing_logo_width': u'150px',
+    'landing_logo': u'metrics-hat.png',
+    'landing_logo_width': u'200px',
     'github_page': u'https://github.com/codahale/metrics'
 }
 
