@@ -1,24 +1,26 @@
 package com.yammer.metrics.spring;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:proxy-target-class.xml" })
-public class ProxyTargetClassTest {
+public class ProxyTargetClassTest extends Assert {
 
-	@Autowired
-	ProxyTargetClass target;
+    @Test(expected = BeanCreationException.class)
+    public void negativeContextLoadingTest() {
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:dont-proxy-target-class.xml");
+        try {
+            ctx.stop();
+        } catch (Exception e) {
+            // ignore
+        }
+    }
 
 	@Test
-	public void loads() {
-		System.out.println(target.getClass());
-		Assert.assertNotNull(target);
+    public void positiveContextLoadingTest() {
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:proxy-target-class.xml");
+        assertNotNull("Expected to be able to get ProxyTargetClass by class.",ctx.getBean(ProxyTargetClass.class));
 	}
 
 }
