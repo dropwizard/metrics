@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Gauge;
+import com.yammer.metrics.core.MetricsRegistry;
 
 import org.hyperic.sigar.CpuInfo;
 import org.hyperic.sigar.CpuPerc;
@@ -51,9 +52,8 @@ public class CpuMetrics extends AbstractSigarMetric {
         public double irq() { return irq; }
     }
 
-    @Override
-    protected void registerGauges() {
-        Metrics.newGauge(getClass(), "total-cores", new Gauge<Integer>() {
+    public void registerGauges(MetricsRegistry registry) {
+        registry.newGauge(getClass(), "total-cores", new Gauge<Integer>() {
             public Integer value() {
                 return totalCoreCount();
             }

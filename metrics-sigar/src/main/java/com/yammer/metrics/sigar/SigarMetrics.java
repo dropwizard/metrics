@@ -1,9 +1,11 @@
 package com.yammer.metrics.sigar;
 
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.MetricsRegistry;
+
 import org.hyperic.sigar.Sigar;
 
-public class SigarMetrics {
+public class SigarMetrics implements CanRegisterGauges {
     private static final SigarMetrics instance = new SigarMetrics();
 
     public static SigarMetrics getInstance() {
@@ -18,9 +20,16 @@ public class SigarMetrics {
         // singleton
     }
 
+    /**
+     * Register all gauges in the default registry.
+     */
     public void registerGauges() {
-        cpu.registerGauges();
-        memory.registerGauges();
+        registerGauges(Metrics.defaultRegistry());
+    }
+
+    public void registerGauges(MetricsRegistry registry) {
+        cpu.registerGauges(registry);
+        memory.registerGauges(registry);
     }
 
     public CpuMetrics cpu() {
