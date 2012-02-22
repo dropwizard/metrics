@@ -2,6 +2,34 @@
 
 An optional extension to Metrics that uses the [Hyperic Sigar](http://support.hyperic.com/display/SIGAR/Home) library to provide more information about the JVM process and the machine on which it is running.
 
+## Features ##
+
+Currently the following data can be collected:
+
+* CPU (/proc/cpuinfo)
+    * Number of physical CPUs, total number of cores
+    * Per-core load ratios:
+        * Ratio of time spent in userland
+        * Ratio of time spent in kernel
+        * Ratio of time spent running 'nice' tasks
+        * Ratio of time spent waiting for I/O
+        * Ratio of time spent idle
+        * Ratio of time spent servicing interrupts 
+* Memory (free)
+    * RAM size in MB
+    * Main memory total, used, free (KB)
+    * Main memory 'actual' used, free (the "+/- buffers/cache" row in the Linux free command)
+    * Swap memory total, used, free
+    * Pages swapped in, out
+* Disk usage (df)
+    * TODO
+* Disk I/O (iostat) 
+    * TODO
+* Resource limits (ulimit)
+    * TODO
+* JVM process
+    * TODO
+
 ## Usage ##
 
 1. Add a dependency on metrics-sigar to your project:
@@ -33,11 +61,11 @@ An optional extension to Metrics that uses the [Hyperic Sigar](http://support.hy
 
 4. You're ready to use metrics-sigar! 
 
-    * Use the `SigarMetrics` singleton object directly:
+    * Use the `SigarMetrics` singleton object directly for detailed data:
 
             SigarMetrics sm = SigarMetrics.getInstance();
 
-    * Optionally expose the most useful metrics as `Gauge`s:
+    * Optionally expose the most useful data as `Gauge`s:
 
             SigarMetrics.getInstance().registerGauges();
 
