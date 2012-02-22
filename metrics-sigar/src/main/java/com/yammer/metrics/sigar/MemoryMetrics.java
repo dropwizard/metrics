@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Gauge;
+import com.yammer.metrics.core.MetricsRegistry;
 
 import org.hyperic.sigar.Mem;
 import org.hyperic.sigar.Swap;
@@ -106,14 +107,13 @@ public class MemoryMetrics extends AbstractSigarMetric {
         }
     }
 
-    @Override
-    protected void registerGauges() {
-        Metrics.newGauge(getClass(), "free", new Gauge<Long>() {
+    public void registerGauges(MetricsRegistry registry) {
+        registry.newGauge(getClass(), "free", new Gauge<Long>() {
             public Long value() {
                 return mem().free();
             }
         });
-        Metrics.newGauge(getClass(), "actual-free", new Gauge<Long>() {
+        registry.newGauge(getClass(), "actual-free", new Gauge<Long>() {
             public Long value() {
                 return mem().actualFree();
             }
