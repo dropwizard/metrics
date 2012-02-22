@@ -4,10 +4,7 @@ import com.yammer.metrics.core.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-import javax.management.OperationsException;
+import javax.management.*;
 import java.lang.management.ManagementFactory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -458,8 +455,13 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     private void unregisterBean(ObjectName name) {
         try {
             server.unregisterMBean(name);
-        } catch (Exception e) {
-            LOGGER.warn("Error unregistering " + name, e);
+        } catch (InstanceNotFoundException e) {
+            // This is often thrown when the process is shutting down. An application with lots of
+            // metrics will often begin unregistering metrics *after* JMX itself has cleared,
+            // resulting in a huge dump of exceptions as the process is exiting.
+            LOGGER.trace("Error unregistering " + name, e);
+        } catch (MBeanRegistrationException e) {
+            LOGGER.debug("Error unregistering " + name, e);
         }
     }
 }
