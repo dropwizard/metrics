@@ -27,6 +27,7 @@
             <artifactId>sigar</artifactId>
             <version>1.6.4</version>
             <classifier>native</classifier>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -52,6 +53,7 @@
                                     <classifier>native</classifier>
                                 </artifactItem>
                             </artifactItems>
+                            <outputDirectory>${project.build.directory}/sigar-native-libs</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -62,7 +64,7 @@
                 <version>2.8.1</version>
                 <configuration>
                     <systemPropertyVariables>
-                        <org.hyperic.sigar.path>${project.build.directory}/dependency</org.hyperic.sigar.path>
+                        <org.hyperic.sigar.path>${project.build.directory}/sigar-native-libs</org.hyperic.sigar.path>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
