@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Gauge;
 import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.util.PercentGauge;
 
 import org.hyperic.sigar.CpuInfo;
 import org.hyperic.sigar.CpuPerc;
@@ -56,6 +57,37 @@ public class CpuMetrics extends AbstractSigarMetric {
         registry.newGauge(getClass(), "total-cores", new Gauge<Integer>() {
             public Integer value() {
                 return totalCoreCount();
+            }
+        });
+        registry.newGauge(getClass(), "physical-cpus", new Gauge<Integer>() {
+            public Integer value() {
+                return physicalCpuCount();
+            }
+        });
+        registry.newGauge(getClass(), "cpu-time-user-percent", new PercentGauge() {
+            public double getNumerator() {
+                List<CpuTime> cpus = cpus();
+                double userTime = 0.0;
+                for (CpuTime cpu : cpus) {
+                    userTime += cpu.user();
+                }
+                return userTime;
+            }
+            public double getDenominator() {
+                return 1.0;
+            }
+        });
+        registry.newGauge(getClass(), "cpu-time-sys-percent", new PercentGauge() {
+            public double getNumerator() {
+                List<CpuTime> cpus = cpus();
+                double userTime = 0.0;
+                for (CpuTime cpu : cpus) {
+                    userTime += cpu.sys();
+                }
+                return userTime;
+            }
+            public double getDenominator() {
+                return 1.0;
             }
         });
     }
