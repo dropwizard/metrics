@@ -148,7 +148,7 @@ public class CpuMetrics extends AbstractSigarMetric {
     private CpuInfo cpuInfo() {
         try {
             CpuInfo[] infos = sigar.getCpuInfoList();
-            if (infos == null | infos.length == 0) {
+            if (infos == null || infos.length == 0) {
                 return null;
             }
             return infos[0];
