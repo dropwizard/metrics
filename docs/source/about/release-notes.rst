@@ -4,6 +4,15 @@
 Release Notes
 #############
 
+.. _rel-2.0.3:
+
+v2.0.3-SNAPSHOT: TBD
+====================
+
+* Change logging of ``InstanceNotFoundException`` exceptions thrown while unregistering a metric
+  in ``JmxReporter`` to ``TRACE``. It being ``WARN`` resulted in huge log dumps preventing process
+  shutdowns when applications had ~1K+ metrics.
+
 .. _rel-2.0.2:
 
 v2.0.2: Feb 09 2012
