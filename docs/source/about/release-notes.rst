@@ -14,6 +14,7 @@ v2.0.3-SNAPSHOT: TBD
   shutdowns when applications had ~1K+ metrics.
 * Upgraded to Spring 3.1.1 for ``metrics-spring``.
 * Upgraded to JDBI 2.31.2.
+* Upgraded to Jersey 1.12.
 
 .. _rel-2.0.2:
 
