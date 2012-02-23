@@ -15,6 +15,7 @@ v2.0.3-SNAPSHOT: TBD
 * Upgraded to Spring 3.1.1 for ``metrics-spring``.
 * Upgraded to JDBI 2.31.2.
 * Upgraded to Jersey 1.12.
+* Upgraded to Jetty 7.6.1.
 
 .. _rel-2.0.2:
 
