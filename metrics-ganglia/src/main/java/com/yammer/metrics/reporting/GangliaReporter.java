@@ -337,15 +337,17 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
     @Override
     public void processMeter(MetricName name, Metered meter, String x) throws IOException {
         final String sanitizedName = sanitizeName(name);
-        final String units = meter.rateUnit().name();
-        printLongField(sanitizedName + ".count", meter.count(), "metered", units);
-        printDoubleField(sanitizedName + ".meanRate", meter.meanRate(), "metered", units);
-        printDoubleField(sanitizedName + ".1MinuteRate", meter.oneMinuteRate(), "metered", units);
-        printDoubleField(sanitizedName + ".5MinuteRate", meter.fiveMinuteRate(), "metered", units);
+        final String rateUnits = meter.rateUnit().name();
+        final String rateUnit = rateUnits.substring(0, rateUnits.length() - 1).toLowerCase(Locale.US);
+        final String unit = meter.eventType() + '/' + rateUnit;
+        printLongField(sanitizedName + ".count", meter.count(), "metered", unit);
+        printDoubleField(sanitizedName + ".meanRate", meter.meanRate(), "metered", rateUnits);
+        printDoubleField(sanitizedName + ".1MinuteRate", meter.oneMinuteRate(), "metered", rateUnits);
+        printDoubleField(sanitizedName + ".5MinuteRate", meter.fiveMinuteRate(), "metered", rateUnits);
         printDoubleField(sanitizedName + ".15MinuteRate",
                          meter.fifteenMinuteRate(),
                          "metered",
-                         units);
+                         rateUnits);
     }
 
     @Override
