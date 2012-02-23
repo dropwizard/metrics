@@ -34,7 +34,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <jetty.version>7.6.0.v20120127</jetty.version>
+        <jetty.version>7.6.1.v20120215</jetty.version>
         <servlet.version>2.5</servlet.version>
         <jackson.version>1.9.4</jackson.version>
         <guice.version>3.0</guice.version>
