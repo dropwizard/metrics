@@ -105,7 +105,9 @@ html_theme_options = {
     'gradient_shadow': u'#CF2C0F',
     'landing_logo': u'metrics-hat.png',
     'landing_logo_width': u'200px',
-    'github_page': u'https://github.com/codahale/metrics'
+    'github_page': u'https://github.com/codahale/metrics',
+    'mailing_list': u'https://groups.google.com/forum/#!forum/metrics-user',
+    'maven_site': u'http://metrics.codahale.com/maven/'
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -139,6 +141,8 @@ html_static_path = ['_static']
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
 html_use_smartypants = True
+
+html_add_permalinks = None
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
