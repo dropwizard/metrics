@@ -1,5 +1,6 @@
 package com.yammer.metrics.core;
 
+import javax.management.*;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.Thread.State;
@@ -21,7 +22,8 @@ public class VirtualMachineMetrics {
             ManagementFactory.getOperatingSystemMXBean(),
             ManagementFactory.getThreadMXBean(),
             ManagementFactory.getGarbageCollectorMXBeans(),
-            ManagementFactory.getRuntimeMXBean());
+            ManagementFactory.getRuntimeMXBean(),
+            ManagementFactory.getPlatformMBeanServer());
 
     /**
      * The default instance of {@link VirtualMachineMetrics}.
@@ -63,25 +65,76 @@ public class VirtualMachineMetrics {
         }
     }
 
+    /**
+     * The management interface for a buffer pool, for example a pool of {@link
+     * java.nio.ByteBuffer#allocateDirect direct} or {@link java.nio.MappedByteBuffer mapped}
+     * buffers.
+     */
+    public static class BufferPoolStats {
+        private final long count, memoryUsed, totalCapacity;
+
+        private BufferPoolStats(long count, long memoryUsed, long totalCapacity) {
+            this.count = count;
+            this.memoryUsed = memoryUsed;
+            this.totalCapacity = totalCapacity;
+        }
+
+        /**
+         * Returns an estimate of the number of buffers in the pool.
+         *
+         * @return An estimate of the number of buffers in this pool
+         */
+        public long getCount() {
+            return count;
+        }
+
+        /**
+         * Returns an estimate of the memory that the Java virtual machine is using for this buffer
+         * pool. The value returned by this method may differ from the estimate of the total {@link
+         * #getTotalCapacity capacity} of the buffers in this pool. This difference is explained by
+         * alignment, memory allocator, and other implementation specific reasons.
+         *
+         * @return An estimate of the memory that the Java virtual machine is using for this buffer
+         *         pool in bytes, or {@code -1L} if an estimate of the memory usage is not
+         *         available
+         */
+        public long getMemoryUsed() {
+            return memoryUsed;
+        }
+
+        /**
+         * Returns an estimate of the total capacity of the buffers in this pool. A buffer's
+         * capacity is the number of elements it contains and the value returned by this method is
+         * an estimate of the total capacity of buffers in the pool in bytes.
+         *
+         * @return An estimate of the total capacity of the buffers in this pool in bytes
+         */
+        public long getTotalCapacity() {
+            return totalCapacity;
+        }
+    }
+
     private final MemoryMXBean memory;
     private final List<MemoryPoolMXBean> memoryPools;
     private final OperatingSystemMXBean os;
     private final ThreadMXBean threads;
     private final List<GarbageCollectorMXBean> garbageCollectors;
     private final RuntimeMXBean runtime;
+    private final MBeanServer mBeanServer;
 
     VirtualMachineMetrics(MemoryMXBean memory,
                           List<MemoryPoolMXBean> memoryPools,
                           OperatingSystemMXBean os,
                           ThreadMXBean threads,
                           List<GarbageCollectorMXBean> garbageCollectors,
-                          RuntimeMXBean runtime) {
+                          RuntimeMXBean runtime, MBeanServer mBeanServer) {
         this.memory = memory;
         this.memoryPools = memoryPools;
         this.os = os;
         this.threads = threads;
         this.garbageCollectors = garbageCollectors;
         this.runtime = runtime;
+        this.mBeanServer = mBeanServer;
     }
 
     /**
@@ -405,5 +458,35 @@ public class VirtualMachineMetrics {
 
         writer.println();
         writer.flush();
+    }
+    
+    public Map<String, BufferPoolStats> getBufferPoolStats() {
+        try {
+            final String[] attributes = { "Count", "MemoryUsed", "TotalCapacity" };
+
+            final ObjectName direct = new ObjectName("java.nio:type=BufferPool,name=direct");
+            final ObjectName mapped = new ObjectName("java.nio:type=BufferPool,name=mapped");
+
+            final AttributeList directAttributes = mBeanServer.getAttributes(direct, attributes);
+            final AttributeList mappedAttributes = mBeanServer.getAttributes(mapped, attributes);
+
+            final Map<String, BufferPoolStats> stats = new TreeMap<String, BufferPoolStats>();
+
+            final BufferPoolStats directStats = new BufferPoolStats((Long) ((Attribute) directAttributes.get(0)).getValue(),
+                                                                    (Long) ((Attribute) directAttributes.get(1)).getValue(),
+                                                                    (Long) ((Attribute) directAttributes.get(2)).getValue());
+
+            stats.put("direct", directStats);
+
+            final BufferPoolStats mappedStats = new BufferPoolStats((Long) ((Attribute) mappedAttributes.get(0)).getValue(),
+                                                                    (Long) ((Attribute) mappedAttributes.get(1)).getValue(),
+                                                                    (Long) ((Attribute) mappedAttributes.get(2)).getValue());
+
+            stats.put("mapped", mappedStats);
+
+            return Collections.unmodifiableMap(stats);
+        } catch (JMException e) {
+            return Collections.emptyMap();
+        }
     }
 }
