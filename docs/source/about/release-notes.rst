@@ -24,7 +24,7 @@ v2.0.3: Feb 24 2012
 * Upgraded to JDBI 2.31.2.
 * Upgraded to Jersey 1.12.
 * Upgraded to Jetty 7.6.1.
-* Fixed rate units for meters in ``GraphiteReporter``.
+* Fixed rate units for meters in ``GangliaReporter``.
 
 .. _rel-2.0.2:
 
