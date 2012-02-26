@@ -21,11 +21,13 @@ public class MeteredMethodInterceptor implements MethodInterceptor, MethodCallba
     protected final MetricsRegistry metrics;
     protected final Class<?> targetClass;
     protected final Map<String, Meter> meters;
+    protected final String scope;
 
-    public MeteredMethodInterceptor(final MetricsRegistry metrics, final Class<?> targetClass) {
+    public MeteredMethodInterceptor(final MetricsRegistry metrics, final Class<?> targetClass, final String scope) {
         this.metrics = metrics;
         this.targetClass = targetClass;
         this.meters = new HashMap<String, Meter>();
+        this.scope = scope;
 
         ReflectionUtils.doWithMethods(targetClass, this, filter);
     }
@@ -44,7 +46,7 @@ public class MeteredMethodInterceptor implements MethodInterceptor, MethodCallba
         final String group = MetricName.chooseGroup(metered.group(), targetClass);
         final String type = MetricName.chooseType(metered.type(), targetClass);
         final String name = metered.name() == null || metered.name().equals("") ? methodName : metered.name();
-        final MetricName metricName = new MetricName(group, type, name);
+        final MetricName metricName = new MetricName(group, type, name, scope);
         final Meter meter = metrics.newMeter(metricName, metered.eventType(), metered.rateUnit());
 
         meters.put(methodName, meter);
