@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class MeteredMethodInterceptor implements MethodInterceptor, MethodCallback {
 
-    private static final MethodFilter filter = new AnnotationMethodFilter(Metered.class);
+    private static final MethodFilter filter = new AnnotationFilter(Metered.class);
 
     protected final MetricsRegistry metrics;
     protected final Class<?> targetClass;

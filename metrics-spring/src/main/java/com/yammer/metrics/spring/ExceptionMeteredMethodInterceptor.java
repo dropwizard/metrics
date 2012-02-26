@@ -17,7 +17,7 @@ import java.util.Map;
 public class ExceptionMeteredMethodInterceptor implements MethodInterceptor, MethodCallback,
                                                           Ordered {
 
-    private static final MethodFilter filter = new AnnotationMethodFilter(ExceptionMetered.class);
+    private static final MethodFilter filter = new AnnotationFilter(ExceptionMetered.class);
 
     private final MetricsRegistry metrics;
     private final Class<?> targetClass;
