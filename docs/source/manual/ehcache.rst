@@ -61,3 +61,12 @@ It also adds full timers for the cache's ``get`` and ``put`` methods.
 
 The metrics are all scoped to the cache's name.
 
+Configuring via XML
+===================
+
+If you're using an ``ehcache.xml`` to configure your cache, you can instrument it by using
+``InstrumentedEhcacheFactory``:
+
+.. code-block:: xml
+
+    <cacheDecoratorFactory class="com.yammer.metrics.ehcache.InstrumentedEhcacheFactory" />
