@@ -1,6 +1,7 @@
 package com.yammer.metrics.spring;
 
 import com.yammer.metrics.annotation.Gauge;
+import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
@@ -49,9 +50,11 @@ public class GaugeAnnotationBeanPostProcessor implements BeanPostProcessor, Orde
                 if (method.getParameterTypes().length == 0) {
                     final Gauge gauge = method.getAnnotation(Gauge.class);
                     final String name = gauge.name().isEmpty() ? method.getName() : gauge.name();
-                    metrics.newGauge(method.getDeclaringClass(),
-                                     name,
-                                     new GaugeMethod(bean, method));
+                    final String group = MetricName.chooseGroup(gauge.group(), method.getDeclaringClass());
+                    final String type = MetricName.chooseType(gauge.type(), method.getDeclaringClass());
+                    final MetricName metricName = new MetricName(group, type, name);
+
+                    metrics.newGauge(metricName, new GaugeMethod(bean, method));
                 } else {
                     throw new IllegalStateException("Method " + method.getName() + " is annotated with @Gauge but requires parameters.");
                 }
