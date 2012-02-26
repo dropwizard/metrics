@@ -9,6 +9,7 @@ import com.yammer.metrics.annotation.ExceptionMetered;
 import com.yammer.metrics.annotation.Metered;
 import com.yammer.metrics.annotation.Timed;
 import com.yammer.metrics.core.Meter;
+import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 import sun.misc.Unsafe;
@@ -105,9 +106,14 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
 
         if (method.getMethod().isAnnotationPresent(Timed.class)) {
             final Timed annotation = method.getMethod().getAnnotation(Timed.class);
-            final Timer timer = Metrics.newTimer(method.getDeclaringResource().getResourceClass(),
-                                                       annotation.name() == null || annotation.name().isEmpty()  ?
-                                                               method.getMethod().getName() : annotation.name(),
+            
+            Class<?> klass = method.getDeclaringResource().getResourceClass();
+            String group = MetricName.chooseGroup(annotation.group(), klass);
+            String type = MetricName.chooseType(annotation.type(), klass);
+            String name = MetricName.chooseName(annotation.name(), method.getMethod());            
+            MetricName metricName = new MetricName(group, type, name);
+            
+            final Timer timer = Metrics.newTimer(metricName,
                                                        annotation.durationUnit() == null ?
                                                                TimeUnit.MILLISECONDS : annotation.durationUnit(),
                                                        annotation.rateUnit() == null ?
@@ -117,9 +123,14 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
 
         if (method.getMethod().isAnnotationPresent(Metered.class)) {
             final Metered annotation = method.getMethod().getAnnotation(Metered.class);
-            final Meter meter = Metrics.newMeter(method.getDeclaringResource().getResourceClass(),
-                                                       annotation.name() == null || annotation.name().isEmpty() ?
-                                                               method.getMethod().getName() : annotation.name(),
+            
+            Class<?> klass = method.getDeclaringResource().getResourceClass();
+            String group = MetricName.chooseGroup(annotation.group(), klass);
+            String type = MetricName.chooseType(annotation.type(), klass);
+            String name = MetricName.chooseName(annotation.name(), method.getMethod());            
+            MetricName metricName = new MetricName(group, type, name);
+            
+            final Meter meter = Metrics.newMeter(metricName,
                                                        annotation.eventType() == null ?
                                                                "requests" : annotation.eventType(),
                                                        annotation.rateUnit() == null ?
@@ -129,9 +140,15 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
 
         if (method.getMethod().isAnnotationPresent(ExceptionMetered.class)) {
             final ExceptionMetered annotation = method.getMethod().getAnnotation(ExceptionMetered.class);
-            final Meter meter = Metrics.newMeter(method.getDeclaringResource().getResourceClass(),
-                                                       annotation.name() == null || annotation.name().equals("") ?
-                                                               method.getMethod().getName() + ExceptionMetered.DEFAULT_NAME_SUFFIX : annotation.name(),
+
+            Class<?> klass = method.getDeclaringResource().getResourceClass();
+            String group = MetricName.chooseGroup(annotation.group(), klass);
+            String type = MetricName.chooseType(annotation.type(), klass);
+            String name = annotation.name() == null || annotation.name().equals("") ?
+                    method.getMethod().getName() + ExceptionMetered.DEFAULT_NAME_SUFFIX : annotation.name();            
+            MetricName metricName = new MetricName(group, type, name);
+            
+            final Meter meter = Metrics.newMeter(metricName,
                                                        annotation.eventType() == null ?
                                                                "requests" : annotation.eventType(),
                                                        annotation.rateUnit() == null ?
@@ -141,4 +158,5 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
 
         return dispatcher;
     }
+
 }

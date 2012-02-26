@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.guice.InstrumentationModule;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,15 +17,24 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 public class MeteredTest {
-
-    InstrumentedWithMetered instance;
-    MetricsRegistry registry;
+    private InstrumentedWithMetered instance;
+    private MetricsRegistry registry;
 
     @Before
     public void setup() {
-        final Injector injector = Guice.createInjector(new InstrumentationModule());
-        instance = injector.getInstance(InstrumentedWithMetered.class);
-        registry = injector.getInstance(MetricsRegistry.class);
+        this.registry = new MetricsRegistry();
+        final Injector injector = Guice.createInjector(new InstrumentationModule() {
+            @Override
+            protected MetricsRegistry createMetricsRegistry() {
+                return registry;
+            }
+        });
+        this.instance = injector.getInstance(InstrumentedWithMetered.class);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        registry.shutdown();
     }
 
     @Test
@@ -84,6 +94,24 @@ public class MeteredTest {
                    is(0L));
 
         instance.doAThingWithProtectedScope();
+
+        assertThat("Metric is marked",
+                   ((Meter) metric).count(),
+                   is(1L));
+    }
+
+    @Test
+    public void aMeteredAnnotatedMethodWithGroupTypeAndName() throws Exception {
+
+        final Metric metric = registry.allMetrics().get(new MetricName("g", "t", "n"));
+
+        assertMetricIsSetup(metric);
+
+        assertThat("Metric intialises to zero",
+                   ((Meter) metric).count(),
+                   is(0L));
+
+        instance.doAThingWithGroupTypeAndName();
 
         assertThat("Metric is marked",
                    ((Meter) metric).count(),

@@ -5,18 +5,18 @@
     <parent>
         <groupId>com.yammer.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
+        <version>2.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-jersey</artifactId>
     <name>Metrics Jersey Support</name>
     <description>
-        A set of class providing Metrics integration for Jersey, the reference JAX-
+        A set of class providing Metrics integration for Jersey, the reference JAX-RS
         implementation.
     </description>
 
     <properties>
-        <jersey.version>1.11</jersey.version>
+        <jersey.version>1.12</jersey.version>
     </properties>
 
     <dependencies>

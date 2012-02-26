@@ -28,6 +28,12 @@ class Timer(metric: com.yammer.metrics.core.Timer) {
   }
 
   /**
+   * Returns a timing [[com.metrics.yammer.core.TimerContext]],
+   * which measures an elapsed time in nanoseconds.
+   */
+  def timerContext() = metric.time()
+
+  /**
    * Returns the number of durations recorded.
    */
   def count = metric.count

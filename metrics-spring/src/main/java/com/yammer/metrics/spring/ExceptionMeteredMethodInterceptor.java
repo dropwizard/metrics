@@ -2,6 +2,7 @@ package com.yammer.metrics.spring;
 
 import com.yammer.metrics.annotation.ExceptionMetered;
 import com.yammer.metrics.core.Meter;
+import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class ExceptionMeteredMethodInterceptor implements MethodInterceptor, MethodCallback,
                                                           Ordered {
 
-    private static final MethodFilter filter = new AnnotationMethodFilter(ExceptionMetered.class);
+    private static final MethodFilter filter = new AnnotationFilter(ExceptionMetered.class);
 
     private final MetricsRegistry metrics;
     private final Class<?> targetClass;
@@ -52,15 +53,14 @@ public class ExceptionMeteredMethodInterceptor implements MethodInterceptor, Met
     @Override
     public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
         final ExceptionMetered metered = method.getAnnotation(ExceptionMetered.class);
+
         final String methodName = method.getName();
-        final String meterName = metered.name().isEmpty() ?
-                methodName + ExceptionMetered.DEFAULT_NAME_SUFFIX :
-                metered.name();
-        final Meter meter = metrics.newMeter(targetClass,
-                                             meterName,
-                                             scope,
-                                             metered.eventType(),
-                                             metered.rateUnit());
+        final String group = MetricName.chooseGroup(metered.group(), targetClass);
+        final String type = MetricName.chooseType(metered.type(), targetClass);
+        final String name = metered.name() == null || metered.name().equals("") ? methodName + ExceptionMetered.DEFAULT_NAME_SUFFIX : metered.name();
+        final MetricName metricName = new MetricName(group, type, name, scope);
+        final Meter meter = metrics.newMeter(metricName, metered.eventType(), metered.rateUnit());
+
         meters.put(methodName, meter);
         causes.put(methodName, metered.cause());
     }
