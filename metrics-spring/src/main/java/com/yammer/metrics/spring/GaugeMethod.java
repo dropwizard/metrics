@@ -13,16 +13,13 @@ public class GaugeMethod extends Gauge<Object> {
     public GaugeMethod(final Object bean, final Method method) {
         this.bean = bean;
         this.method = method;
+
+        ReflectionUtils.makeAccessible(method);
     }
 
     @Override
     public Object value() {
-        try {
-            return method.invoke(bean);
-        } catch (Exception e) {
-            ReflectionUtils.rethrowRuntimeException(e);
-            return null;
-        }
+        return ReflectionUtils.invokeMethod(method, bean);
     }
 
 }
