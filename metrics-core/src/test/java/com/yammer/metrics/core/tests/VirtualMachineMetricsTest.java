@@ -7,6 +7,7 @@ import com.yammer.metrics.core.VirtualMachineMetrics.GarbageCollectorStats;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.management.*;
 import java.lang.management.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -17,6 +18,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,13 +38,15 @@ public class VirtualMachineMetricsTest {
     private final GarbageCollectorMXBean gc2 = mock(GarbageCollectorMXBean.class);
     private final List<GarbageCollectorMXBean> garbageCollectors = asList(gc1, gc2);
     private final RuntimeMXBean runtime = mock(RuntimeMXBean.class);
+    private final MBeanServer mBeanServer = mock(MBeanServer.class);
 
     private final VirtualMachineMetrics vmm = VMMFactory.build(memory,
                                                                memoryPools,
                                                                os,
                                                                threads,
                                                                garbageCollectors,
-                                                               runtime);
+                                                               runtime,
+                                                               mBeanServer);
 
     @Before
     public void setUp() throws Exception {
@@ -210,6 +214,53 @@ public class VirtualMachineMetricsTest {
 
         assertThat(stats.get("gc2").getTime(TimeUnit.MILLISECONDS),
                    is(20L));
+    }
+
+    @Test
+    public void handlesMissingBufferPools() throws Exception {
+        when(mBeanServer.getAttributes(any(ObjectName.class), any(String[].class))).thenThrow(new InstanceNotFoundException("OH NO"));
+
+        assertThat(vmm.getBufferPoolStats().isEmpty(),
+                   is(true));
+    }
+
+    @Test
+    public void handlesMappedAndDirectBufferPools() throws Exception {
+        final String[] attributes = { "Count", "MemoryUsed", "TotalCapacity" };
+
+        final ObjectName direct = new ObjectName("java.nio:type=BufferPool,name=direct");
+        final ObjectName mapped = new ObjectName("java.nio:type=BufferPool,name=mapped");
+
+        final AttributeList directAttributes = new AttributeList();
+        directAttributes.add(new Attribute("Count", 100L));
+        directAttributes.add(new Attribute("MemoryUsed", 200L));
+        directAttributes.add(new Attribute("TotalCapacity", 300L));
+
+        final AttributeList mappedAttributes = new AttributeList();
+        mappedAttributes.add(new Attribute("Count", 1000L));
+        mappedAttributes.add(new Attribute("MemoryUsed", 2000L));
+        mappedAttributes.add(new Attribute("TotalCapacity", 3000L));
+
+        when(mBeanServer.getAttributes(direct, attributes)).thenReturn(directAttributes);
+        when(mBeanServer.getAttributes(mapped, attributes)).thenReturn(mappedAttributes);
+
+        assertThat(vmm.getBufferPoolStats().get("direct").getCount(),
+                   is(100L));
+
+        assertThat(vmm.getBufferPoolStats().get("direct").getMemoryUsed(),
+                   is(200L));
+
+        assertThat(vmm.getBufferPoolStats().get("direct").getTotalCapacity(),
+                   is(300L));
+
+        assertThat(vmm.getBufferPoolStats().get("mapped").getCount(),
+                   is(1000L));
+
+        assertThat(vmm.getBufferPoolStats().get("mapped").getMemoryUsed(),
+                   is(2000L));
+
+        assertThat(vmm.getBufferPoolStats().get("mapped").getTotalCapacity(),
+                   is(3000L));
     }
 
     // TODO: 1/13/12 <coda> -- test thread state percentages

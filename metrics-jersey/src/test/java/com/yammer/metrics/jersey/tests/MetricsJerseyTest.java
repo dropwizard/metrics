@@ -57,7 +57,7 @@ public class MetricsJerseyTest extends JerseyTest {
     @Test
     public void exceptionMeteredMethodsAreExceptionMetered() {
         final Meter meter = Metrics.newMeter(InstrumentedResource.class, "exceptionMeteredExceptions", "blah", TimeUnit.SECONDS);
-
+        
         assertThat(resource().path("exception-metered").get(String.class),
                    is("fuh"));
 

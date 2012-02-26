@@ -4,13 +4,10 @@ import com.yammer.metrics.core.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-import javax.management.OperationsException;
+import javax.management.*;
 import java.lang.management.ManagementFactory;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,13 +23,13 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
-    public interface MetricMBean {
+    public interface MetricMXBean {
         ObjectName objectName();
     }
     // CHECKSTYLE:ON
 
 
-    private abstract static class AbstractBean implements MetricMBean {
+    private abstract static class AbstractBean implements MetricMXBean {
         private final ObjectName objectName;
 
         protected AbstractBean(ObjectName objectName) {
@@ -47,13 +44,13 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
-    public interface GaugeMBean extends MetricMBean {
+    public interface GaugeMXBean extends MetricMXBean {
         Object getValue();
     }
     // CHECKSTYLE:ON
 
 
-    private static class Gauge extends AbstractBean implements GaugeMBean {
+    private static class Gauge extends AbstractBean implements GaugeMXBean {
         private final com.yammer.metrics.core.Gauge<?> metric;
 
         private Gauge(com.yammer.metrics.core.Gauge<?> metric, ObjectName objectName) {
@@ -69,13 +66,13 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
-    public interface CounterMBean extends MetricMBean {
+    public interface CounterMXBean extends MetricMXBean {
         long getCount();
     }
     // CHECKSTYLE:ON
 
 
-    private static class Counter extends AbstractBean implements CounterMBean {
+    private static class Counter extends AbstractBean implements CounterMXBean {
         private final com.yammer.metrics.core.Counter metric;
 
         private Counter(com.yammer.metrics.core.Counter metric, ObjectName objectName) {
@@ -91,7 +88,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     //CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
-    public interface MeterMBean extends MetricMBean {
+    public interface MeterMXBean extends MetricMXBean {
         long getCount();
 
         String getEventType();
@@ -108,7 +105,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
     //CHECKSTYLE:ON
 
-    private static class Meter extends AbstractBean implements MeterMBean {
+    private static class Meter extends AbstractBean implements MeterMXBean {
         private final Metered metric;
 
         private Meter(Metered metric, ObjectName objectName) {
@@ -154,7 +151,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
-    public interface HistogramMBean extends MetricMBean {
+    public interface HistogramMXBean extends MetricMXBean {
         long getCount();
 
         double getMin();
@@ -181,7 +178,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
     // CHECKSTYLE:ON
 
-    private static class Histogram implements HistogramMBean {
+    private static class Histogram implements HistogramMXBean {
         private final ObjectName objectName;
         private final com.yammer.metrics.core.Histogram metric;
 
@@ -258,12 +255,12 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
-    public interface TimerMBean extends MeterMBean, HistogramMBean {
+    public interface TimerMXBean extends MeterMXBean, HistogramMXBean {
         TimeUnit getLatencyUnit();
     }
     // CHECKSTYLE:ON
 
-    static class Timer extends Meter implements TimerMBean {
+    static class Timer extends Meter implements TimerMXBean {
         private final com.yammer.metrics.core.Timer metric;
 
         private Timer(com.yammer.metrics.core.Timer metric, ObjectName objectName) {
@@ -378,7 +375,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
      */
     public JmxReporter(MetricsRegistry registry) {
         super(registry);
-        this.registeredBeans = new HashMap<MetricName, ObjectName>();
+        this.registeredBeans = new ConcurrentHashMap<MetricName, ObjectName>(100);
         this.server = ManagementFactory.getPlatformMBeanServer();
     }
 
@@ -449,7 +446,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         getMetricsRegistry().addListener(this);
     }
 
-    private void registerBean(MetricName name, MetricMBean bean, ObjectName objectName)
+    private void registerBean(MetricName name, MetricMXBean bean, ObjectName objectName)
             throws MBeanRegistrationException, OperationsException {
         server.registerMBean(bean, objectName);
         registeredBeans.put(name, objectName);
@@ -458,8 +455,13 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     private void unregisterBean(ObjectName name) {
         try {
             server.unregisterMBean(name);
-        } catch (Exception e) {
-            LOGGER.warn("Error unregistering " + name, e);
+        } catch (InstanceNotFoundException e) {
+            // This is often thrown when the process is shutting down. An application with lots of
+            // metrics will often begin unregistering metrics *after* JMX itself has cleared,
+            // resulting in a huge dump of exceptions as the process is exiting.
+            LOGGER.trace("Error unregistering " + name, e);
+        } catch (MBeanRegistrationException e) {
+            LOGGER.debug("Error unregistering " + name, e);
         }
     }
 }

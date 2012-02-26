@@ -2,6 +2,8 @@ package com.yammer.metrics.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
+import com.yammer.metrics.HealthChecks;
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.HealthCheckRegistry;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.JmxReporter;
@@ -41,13 +43,13 @@ public class InstrumentationModule extends AbstractModule {
      * Override to provide a custom {@link HealthCheckRegistry}
      */
     protected HealthCheckRegistry createHealthCheckRegistry() {
-        return new HealthCheckRegistry();
+        return HealthChecks.defaultRegistry();
     }
 
     /**
      * Override to provide a custom {@link MetricsRegistry}
      */
     protected MetricsRegistry createMetricsRegistry() {
-        return new MetricsRegistry();
+        return Metrics.defaultRegistry();
     }
 }

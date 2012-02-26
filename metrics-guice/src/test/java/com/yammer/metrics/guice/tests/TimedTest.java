@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.guice.InstrumentationModule;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,15 +17,24 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 public class TimedTest {
-
-    InstrumentedWithTimed instance;
-    MetricsRegistry registry;
+    private InstrumentedWithTimed instance;
+    private MetricsRegistry registry;
 
     @Before
     public void setup() {
-        final Injector injector = Guice.createInjector(new InstrumentationModule());
-        instance = injector.getInstance(InstrumentedWithTimed.class);
-        registry = injector.getInstance(MetricsRegistry.class);
+        this.registry = new MetricsRegistry();
+        final Injector injector = Guice.createInjector(new InstrumentationModule() {
+            @Override
+            protected MetricsRegistry createMetricsRegistry() {
+                return registry;
+            }
+        });
+        this.instance = injector.getInstance(InstrumentedWithTimed.class);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        registry.shutdown();
     }
 
     @Test
@@ -68,6 +78,16 @@ public class TimedTest {
 
         final Metric metric = registry.allMetrics().get(new MetricName(InstrumentedWithTimed.class,
                                                                        "doAThingWithProtectedScope"));
+
+        assertMetricSetup(metric);
+    }
+
+    @Test
+    public void aTimedAnnotatedMethodWithCustomGroupTypeAndName() throws Exception {
+
+        instance.doAThingWithCustomGroupTypeAndName();
+
+        final Metric metric = registry.allMetrics().get(new MetricName("g", "t", "n"));
 
         assertMetricSetup(metric);
     }
