@@ -14,6 +14,8 @@ v2.1.0-SNAPSHOT
 * Added support for XML configuration in ``metrics-ehcache``.
 * ``metrics-spring`` now support ``@Gauge``-annotated fields.
 * Opened ``GraphiteReporter`` up for extension.
+* Added ``group`` and ``type`` to ``metrics-annotations``, ``metrics-guice``, ``metrics-jersey``,
+  and ``metrics-spring``.
 
 .. _rel-2.0.3:
 
