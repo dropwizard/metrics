@@ -38,6 +38,7 @@ Many, many thanks to:
 * `Michał Minicki <https://github.com/martel>`_
 * `Neil Prosser <https://github.com/neilprosser>`_
 * `Paul Bloch <https://github.com/pbloch>`_
+* `Paul Brown <https://github.com/prb>`_
 * `Robby Walker <https://github.com/robbywalker>`_
 * `Ryan Kennedy <https://github.com/ryankennedy>`_
 * `Ryan W Tenney <https://github.com/ryantenney>`_
