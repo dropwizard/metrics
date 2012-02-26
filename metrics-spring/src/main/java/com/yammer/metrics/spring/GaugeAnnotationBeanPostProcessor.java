@@ -7,14 +7,15 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.Ordered;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.ReflectionUtils.FieldCallback;
 import org.springframework.util.ReflectionUtils.MethodCallback;
-import org.springframework.util.ReflectionUtils.MethodFilter;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class GaugeAnnotationBeanPostProcessor implements BeanPostProcessor, Ordered {
 
-    private static final MethodFilter filter = new AnnotationMethodFilter(Gauge.class);
+    private static final AnnotationFilter filter = new AnnotationFilter(Gauge.class);
 
     private final MetricsRegistry metrics;
 
@@ -29,7 +30,20 @@ public class GaugeAnnotationBeanPostProcessor implements BeanPostProcessor, Orde
 
     @Override
     public Object postProcessAfterInitialization(final Object bean, String beanName) throws BeansException {
-        ReflectionUtils.doWithMethods(AopUtils.getTargetClass(bean), new MethodCallback() {
+        Class<?> targetClass = AopUtils.getTargetClass(bean);
+
+        ReflectionUtils.doWithFields(targetClass, new FieldCallback() {
+            @Override
+            public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
+                final Gauge gauge = field.getAnnotation(Gauge.class);
+                final String name = gauge.name().isEmpty() ? field.getName() : gauge.name();
+                metrics.newGauge(field.getDeclaringClass(),
+                                 name,
+                                 new GaugeField(bean, field));
+            }
+        }, filter);
+
+        ReflectionUtils.doWithMethods(targetClass, new MethodCallback() {
             @Override
             public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
                 if (method.getParameterTypes().length == 0) {

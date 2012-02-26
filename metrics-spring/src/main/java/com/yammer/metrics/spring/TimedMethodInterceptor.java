@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class TimedMethodInterceptor implements MethodInterceptor, MethodCallback, Ordered {
 
-    private static final MethodFilter filter = new AnnotationMethodFilter(Timed.class);
+    private static final MethodFilter filter = new AnnotationFilter(Timed.class);
 
     private final MetricsRegistry metrics;
     private final Class<?> targetClass;
