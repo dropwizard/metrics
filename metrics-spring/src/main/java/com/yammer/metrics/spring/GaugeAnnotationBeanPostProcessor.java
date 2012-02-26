@@ -19,9 +19,11 @@ public class GaugeAnnotationBeanPostProcessor implements BeanPostProcessor, Orde
     private static final AnnotationFilter filter = new AnnotationFilter(Gauge.class);
 
     private final MetricsRegistry metrics;
+    private final String scope;
 
-    public GaugeAnnotationBeanPostProcessor(final MetricsRegistry metrics) {
+    public GaugeAnnotationBeanPostProcessor(final MetricsRegistry metrics, final String scope) {
         this.metrics = metrics;
+        this.scope = scope;
     }
 
     @Override
@@ -52,7 +54,7 @@ public class GaugeAnnotationBeanPostProcessor implements BeanPostProcessor, Orde
                     final String name = gauge.name().isEmpty() ? method.getName() : gauge.name();
                     final String group = MetricName.chooseGroup(gauge.group(), method.getDeclaringClass());
                     final String type = MetricName.chooseType(gauge.type(), method.getDeclaringClass());
-                    final MetricName metricName = new MetricName(group, type, name);
+                    final MetricName metricName = new MetricName(group, type, name, scope);
 
                     metrics.newGauge(metricName, new GaugeMethod(bean, method));
                 } else {

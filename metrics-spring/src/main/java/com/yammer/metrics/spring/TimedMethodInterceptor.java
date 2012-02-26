@@ -20,11 +20,13 @@ public class TimedMethodInterceptor implements MethodInterceptor, MethodCallback
     private final MetricsRegistry metrics;
     private final Class<?> targetClass;
     private final Map<String, Timer> timers;
+    private final String scope;
 
-    public TimedMethodInterceptor(final MetricsRegistry metrics, final Class<?> targetClass) {
+    public TimedMethodInterceptor(final MetricsRegistry metrics, final Class<?> targetClass, final String scope) {
         this.metrics = metrics;
         this.targetClass = targetClass;
         this.timers = new HashMap<String, Timer>();
+        this.scope = scope;
 
         ReflectionUtils.doWithMethods(targetClass, this, filter);
     }
@@ -47,7 +49,7 @@ public class TimedMethodInterceptor implements MethodInterceptor, MethodCallback
         final String group = MetricName.chooseGroup(timed.group(), targetClass);
         final String type = MetricName.chooseType(timed.type(), targetClass);
         final String name = timed.name() == null || timed.name().equals("") ? methodName : timed.name();
-        final MetricName metricName = new MetricName(group, type, name);
+        final MetricName metricName = new MetricName(group, type, name, scope);
 
         final Timer timer = metrics.newTimer(metricName,
                                              timed.durationUnit(),
