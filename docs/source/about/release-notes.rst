@@ -16,6 +16,7 @@ v2.1.0-SNAPSHOT
 * Opened ``GraphiteReporter`` up for extension.
 * Added ``group`` and ``type`` to ``metrics-annotations``, ``metrics-guice``, ``metrics-jersey``,
   and ``metrics-spring``.
+* Fixed handling of non-int gauges in ``GangliaReporter``.
 
 .. _rel-2.0.3:
 

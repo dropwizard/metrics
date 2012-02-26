@@ -32,6 +32,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
     private static final int GANGLIA_DMAX = 0;
     private static final String GANGLIA_INT_TYPE = "int32";
     private static final String GANGLIA_DOUBLE_TYPE = "double";
+    private static final String GANGLIA_STRING_TYPE = "string";
     private final MetricPredicate predicate;
     private final VirtualMachineMetrics vm;
     private final Locale locale = Locale.US;
@@ -320,8 +321,20 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
 
     @Override
     public void processGauge(MetricName name, Gauge<?> gauge, String x) throws IOException {
+        final Object value = gauge.value();
+        final Class<?> klass = value.getClass();
+
+        final String type;
+        if (klass == Integer.class || klass == Long.class) {
+            type = GANGLIA_INT_TYPE;
+        } else if (klass == Float.class || klass == Double.class) {
+            type = GANGLIA_DOUBLE_TYPE;
+        } else {
+            type = GANGLIA_STRING_TYPE;
+        }
+
         sendToGanglia(sanitizeName(name),
-                      GANGLIA_INT_TYPE,
+                      type,
                       String.format(locale, "%s", gauge.value()),
                       "gauge");
     }
