@@ -2,6 +2,7 @@ package com.yammer.metrics.spring;
 
 import com.yammer.metrics.annotation.Metered;
 import com.yammer.metrics.core.Meter;
+import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -38,12 +39,14 @@ public class MeteredMethodInterceptor implements MethodInterceptor, MethodCallba
     @Override
     public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
         final Metered metered = method.getAnnotation(Metered.class);
+
         final String methodName = method.getName();
-        final String meterName = metered.name().isEmpty() ? methodName : metered.name();
-        final Meter meter = metrics.newMeter(targetClass,
-                                             meterName,
-                                             metered.eventType(),
-                                             metered.rateUnit());
+        final String group = MetricName.chooseGroup(metered.group(), targetClass);
+        final String type = MetricName.chooseType(metered.type(), targetClass);
+        final String name = metered.name() == null || metered.name().equals("") ? methodName : metered.name();
+        final MetricName metricName = new MetricName(group, type, name);
+        final Meter meter = metrics.newMeter(metricName, metered.eventType(), metered.rateUnit());
+
         meters.put(methodName, meter);
     }
 
