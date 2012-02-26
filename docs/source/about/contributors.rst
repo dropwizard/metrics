@@ -41,6 +41,7 @@ Many, many thanks to:
 * `Robby Walker <https://github.com/robbywalker>`_
 * `Ryan Kennedy <https://github.com/ryankennedy>`_
 * `Ryan W Tenney <https://github.com/ryantenney>`_
+* `Sam Perman <https://github.com/samperman>`_
 * `Shaneal Manek <https://github.com/smanek>`_
 * `Thomas Dudziak <https://github.com/tomdz>`_
 * `Tobias Lidskog <https://github.com/tobli>`_
