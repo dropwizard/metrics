@@ -1,11 +1,11 @@
 package com.yammer.metrics.guice;
 
-import com.google.inject.TypeLiteral;
+import java.lang.reflect.Method;
+
 import com.google.inject.spi.InjectionListener;
 import com.yammer.metrics.core.Gauge;
+import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
-
-import java.lang.reflect.Method;
 
 /**
  * An injection listener which creates a gauge for the declaring class with the given name (or the
@@ -13,20 +13,18 @@ import java.lang.reflect.Method;
  */
 class GaugeInjectionListener<I> implements InjectionListener<I> {
     private final MetricsRegistry metricsRegistry;
-    private final TypeLiteral<I> literal;
-    private final String name;
+    private final MetricName metricName;
     private final Method method;
 
-    GaugeInjectionListener(MetricsRegistry metricsRegistry, TypeLiteral<I> literal, String name, Method method) {
+    GaugeInjectionListener(MetricsRegistry metricsRegistry, MetricName metricName, Method method) {
         this.metricsRegistry = metricsRegistry;
-        this.literal = literal;
-        this.name = name;
+        this.metricName = metricName;
         this.method = method;
     }
 
     @Override
     public void afterInjection(final I i) {
-        metricsRegistry.newGauge(literal.getRawType(), name, new Gauge<Object>() {
+        metricsRegistry.newGauge(metricName, new Gauge<Object>() {
             @Override
             public Object value() {
                 try {

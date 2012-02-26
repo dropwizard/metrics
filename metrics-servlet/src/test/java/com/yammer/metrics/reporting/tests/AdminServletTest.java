@@ -70,7 +70,7 @@ public class AdminServletTest {
         verify(response).setStatus(200);
         verify(response).setContentType("text/html");
 
-        assertThat(output.toString(),
+        assertThat(output.toString().replaceAll("\r\n", "\n"),
                    is("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n        " +
                               "\"http://www.w3.org/TR/html4/loose.dtd\">\n<html>\n<head>\n  " +
                               "<title>Metrics</title>\n</head>\n<body>\n  " +
@@ -91,7 +91,7 @@ public class AdminServletTest {
         verify(response).setStatus(200);
         verify(response).setContentType("text/html");
 
-        assertThat(output.toString(),
+        assertThat(output.toString().replaceAll("\r\n", "\n"),
                    is("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n        " +
                               "\"http://www.w3.org/TR/html4/loose.dtd\">\n<html>\n<head>\n  " +
                               "<title>Metrics</title>\n</head>\n<body>\n  " +

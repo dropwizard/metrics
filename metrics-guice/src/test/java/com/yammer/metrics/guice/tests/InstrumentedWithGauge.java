@@ -12,4 +12,9 @@ public class InstrumentedWithGauge {
     public String doAnotherThing() {
         return "anotherThing";
     }
+
+    @Gauge(group="g", type="t", name="n")
+    public String doAThingWithGroupTypeAndName() {
+        return "anotherThingWithGroupTypeAndName";
+    }
 }

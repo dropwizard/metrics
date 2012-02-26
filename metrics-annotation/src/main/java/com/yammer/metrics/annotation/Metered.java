@@ -24,6 +24,16 @@ import java.util.concurrent.TimeUnit;
 @Target(ElementType.METHOD)
 public @interface Metered {
     /**
+     * The group of the timer.
+     */
+    String group() default "";
+
+    /**
+     * The type of the timer.
+     */
+    String type() default "";
+
+    /**
      * The name of the meter.
      */
     String name() default "";
