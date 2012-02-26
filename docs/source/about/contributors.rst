@@ -35,6 +35,7 @@ Many, many thanks to:
 * `Matthew Gilliard <https://github.com/mjg123>`_
 * `Matthew O'Connor <https://github.com/oconnor0>`_
 * `Mårten Gustafson <https://github.com/chids>`_
+* `Michał Minicki <https://github.com/martel>`_
 * `Neil Prosser <https://github.com/neilprosser>`_
 * `Paul Bloch <https://github.com/pbloch>`_
 * `Robby Walker <https://github.com/robbywalker>`_
