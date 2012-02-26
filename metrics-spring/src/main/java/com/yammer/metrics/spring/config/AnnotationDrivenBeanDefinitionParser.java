@@ -1,5 +1,6 @@
 package com.yammer.metrics.spring.config;
 
+import org.springframework.aop.framework.ProxyConfig;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -31,65 +32,90 @@ public class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParse
         String metricsBeanName = element.getAttribute("metrics-registry");
         if (!StringUtils.hasText(metricsBeanName)) {
             metricsBeanName = registerComponent(parserContext,
-                                                source,
-                                                ROLE_APPLICATION,
-                                                MetricsRegistry.class,
-                                                null);
+                                                build(MetricsRegistry.class,
+                                                      source,
+                                                      ROLE_APPLICATION));
         }
 
         String healthCheckBeanName = element.getAttribute("health-check-registry");
         if (!StringUtils.hasText(healthCheckBeanName)) {
             healthCheckBeanName = registerComponent(parserContext,
-                                                    source,
-                                                    ROLE_APPLICATION,
-                                                    HealthCheckRegistry.class,
-                                                    null);
+                                                    build(HealthCheckRegistry.class,
+                                                          source,
+                                                          ROLE_APPLICATION));
+        }
+
+        String scope = element.getAttribute("scope");
+        if (!StringUtils.hasText(scope)) {
+            scope = null;
+        }
+
+        ProxyConfig proxyConfig = new ProxyConfig();
+
+        if (StringUtils.hasText(element.getAttribute("expose-proxy"))) {
+            proxyConfig.setExposeProxy(Boolean.valueOf(element.getAttribute("expose-proxy")));
+        }
+
+        if (StringUtils.hasText(element.getAttribute("proxy-target-class"))) {
+            proxyConfig.setProxyTargetClass(Boolean.valueOf(element.getAttribute("proxy-target-class")));
         }
 
         registerComponent(parserContext,
-                          source,
-                          ROLE_INFRASTRUCTURE,
-                          ExceptionMeteredAnnotationBeanPostProcessor.class,
-                          metricsBeanName);
+                          build(ExceptionMeteredAnnotationBeanPostProcessor.class,
+                                source,
+                                ROLE_INFRASTRUCTURE
+                          )
+                          .addConstructorArgReference(metricsBeanName)
+                          .addConstructorArgValue(proxyConfig)
+                          .addConstructorArgValue(scope));
+
         registerComponent(parserContext,
-                          source,
-                          ROLE_INFRASTRUCTURE,
-                          MeteredAnnotationBeanPostProcessor.class,
-                          metricsBeanName);
+                          build(MeteredAnnotationBeanPostProcessor.class,
+                                source,
+                                ROLE_INFRASTRUCTURE
+                          )
+                          .addConstructorArgReference(metricsBeanName)
+                          .addConstructorArgValue(proxyConfig)
+                          .addConstructorArgValue(scope));
+
         registerComponent(parserContext,
-                          source,
-                          ROLE_INFRASTRUCTURE,
-                          TimedAnnotationBeanPostProcessor.class,
-                          metricsBeanName);
+                          build(TimedAnnotationBeanPostProcessor.class,
+                                source,
+                                ROLE_INFRASTRUCTURE
+                          )
+                          .addConstructorArgReference(metricsBeanName)
+                          .addConstructorArgValue(proxyConfig)
+                          .addConstructorArgValue(scope));
+
         registerComponent(parserContext,
-                          source,
-                          ROLE_INFRASTRUCTURE,
-                          GaugeAnnotationBeanPostProcessor.class,
-                          metricsBeanName);
+                          build(GaugeAnnotationBeanPostProcessor.class,
+                                source,
+                                ROLE_INFRASTRUCTURE
+                          )
+                          .addConstructorArgReference(metricsBeanName)
+                          .addConstructorArgValue(scope));
+
         registerComponent(parserContext,
-                          source,
-                          ROLE_INFRASTRUCTURE,
-                          HealthCheckBeanPostProcessor.class,
-                          healthCheckBeanName);
+                          build(HealthCheckBeanPostProcessor.class,
+                                source,
+                                ROLE_INFRASTRUCTURE
+                          )
+                          .addConstructorArgReference(healthCheckBeanName));
 
         parserContext.popAndRegisterContainingComponent();
 
         return null;
     }
 
-    private String registerComponent(ParserContext parserContext, Object source, int role, Class<?> klazz, String argBeanName) {
+    private BeanDefinitionBuilder build(Class<?> klazz, Object source, int role) {
         final BeanDefinitionBuilder beanDefBuilder = BeanDefinitionBuilder.rootBeanDefinition(klazz);
         beanDefBuilder.setRole(role);
         beanDefBuilder.getRawBeanDefinition().setSource(source);
-
-        if (argBeanName != null) {
-            beanDefBuilder.addConstructorArgReference(argBeanName);
-        }
-
-        return registerComponent(parserContext, beanDefBuilder.getBeanDefinition());
+        return beanDefBuilder;
     }
 
-    private String registerComponent(ParserContext parserContext, BeanDefinition beanDef) {
+    private String registerComponent(ParserContext parserContext, BeanDefinitionBuilder beanDefBuilder) {
+    	final BeanDefinition beanDef = beanDefBuilder.getBeanDefinition();
         final String beanName = parserContext.getReaderContext().registerWithGeneratedName(beanDef);
         parserContext.registerComponent(new BeanComponentDefinition(beanDef, beanName));
         return beanName;
