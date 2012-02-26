@@ -21,6 +21,11 @@ public class InstrumentedWithExceptionMetered {
     String explodeForUnnamedMetric() {
         throw new RuntimeException("Boom!");
     }
+    
+    @ExceptionMetered(group="g", type="t", name="n")
+    String explodeForMetricWithGroupTypeAndName() {
+        throw new RuntimeException("Boom!");
+    }
 
     @ExceptionMetered
     String explodeWithDefaultScope() {
