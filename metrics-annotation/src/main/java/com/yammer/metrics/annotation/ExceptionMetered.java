@@ -48,6 +48,18 @@ public @interface ExceptionMetered {
     String DEFAULT_NAME_SUFFIX = "Exceptions";
 
     /**
+     * The group of the timer. If not specified, the meter will be given a group based on
+     * the package.
+     */
+    String group() default "";
+
+    /**
+     * The type of the timer. If not specified the meter will be given a type based on
+     * the class name.
+     */
+    String type() default "";
+
+    /**
      * The name of the meter. If not specified, the meter will be given a name based on the method
      * it decorates and the suffix "Exceptions".
      */
