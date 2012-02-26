@@ -12,6 +12,7 @@ v2.1.0-SNAPSHOT: TBD
 * Added support for Java 7's direct and mapped buffer pool stats in ``VirtualMachineMetrics`` and
   ``metrics-servlet``.
 * Added support for XML configuration in ``metrics-ehcache``.
+* ``metrics-spring`` now support ``@Gauge``-annotated fields.
 
 .. _rel-2.0.3:
 
