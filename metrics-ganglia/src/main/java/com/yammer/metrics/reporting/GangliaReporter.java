@@ -353,14 +353,11 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
         final String rateUnits = meter.rateUnit().name();
         final String rateUnit = rateUnits.substring(0, rateUnits.length() - 1).toLowerCase(Locale.US);
         final String unit = meter.eventType() + '/' + rateUnit;
-        printLongField(sanitizedName + ".count", meter.count(), "metered", unit);
-        printDoubleField(sanitizedName + ".meanRate", meter.meanRate(), "metered", rateUnits);
-        printDoubleField(sanitizedName + ".1MinuteRate", meter.oneMinuteRate(), "metered", rateUnits);
-        printDoubleField(sanitizedName + ".5MinuteRate", meter.fiveMinuteRate(), "metered", rateUnits);
-        printDoubleField(sanitizedName + ".15MinuteRate",
-                         meter.fifteenMinuteRate(),
-                         "metered",
-                         rateUnits);
+        printLongField(sanitizedName + ".count", meter.count(), "metered", meter.eventType());
+        printDoubleField(sanitizedName + ".meanRate", meter.meanRate(), "metered", unit);
+        printDoubleField(sanitizedName + ".1MinuteRate", meter.oneMinuteRate(), "metered", unit);
+        printDoubleField(sanitizedName + ".5MinuteRate", meter.fiveMinuteRate(), "metered", unit);
+        printDoubleField(sanitizedName + ".15MinuteRate", meter.fifteenMinuteRate(), "metered", unit);
     }
 
     @Override
