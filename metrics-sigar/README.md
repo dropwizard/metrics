@@ -21,8 +21,8 @@ Currently the following data can be collected:
     * Main memory 'actual' used, free (the "+/- buffers/cache" row in the Linux free command)
     * Swap memory total, used, free
     * Pages swapped in, out
-* Disk usage (df)
-    * TODO
+* Filesystems/disk usage (df)
+    * Device name, mount point, FS type, free space and total size of all mounted filesystems
 * Disk I/O (iostat) 
     * TODO
 * Resource limits (ulimit)
