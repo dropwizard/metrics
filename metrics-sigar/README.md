@@ -23,8 +23,6 @@ Currently the following data can be collected:
     * Pages swapped in, out
 * Filesystems/disk usage (df)
     * Device name, mount point, FS type, free space and total size of all mounted filesystems
-* Disk I/O (iostat) 
-    * TODO
 * Resource limits (ulimit)
     * Core file size
     * Data segment size
@@ -37,7 +35,7 @@ Currently the following data can be collected:
     * User processes
     * Virtual memory
 * JVM process
-    * TODO
+    * pid
 
 ## Usage ##
 
