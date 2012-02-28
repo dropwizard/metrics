@@ -16,6 +16,7 @@ public class SigarMetrics implements CanRegisterGauges {
     private final CpuMetrics cpu = new CpuMetrics(sigar); 
     private final MemoryMetrics memory = new MemoryMetrics(sigar); 
     private final FilesystemMetrics fs = new FilesystemMetrics(sigar); 
+    private final UlimitMetrics ulimit = new UlimitMetrics(sigar); 
 
     private SigarMetrics() {
         // singleton
@@ -31,6 +32,8 @@ public class SigarMetrics implements CanRegisterGauges {
     public void registerGauges(MetricsRegistry registry) {
         cpu.registerGauges(registry);
         memory.registerGauges(registry);
+        fs.registerGauges(registry);
+        ulimit.registerGauges(registry);
     }
 
     public CpuMetrics cpu() {
@@ -43,5 +46,9 @@ public class SigarMetrics implements CanRegisterGauges {
 
     public FilesystemMetrics filesystems() {
         return fs;
+    }
+
+    public UlimitMetrics ulimit() {
+        return ulimit;
     }
 }
