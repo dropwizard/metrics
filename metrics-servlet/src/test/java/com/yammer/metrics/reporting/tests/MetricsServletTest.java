@@ -34,11 +34,7 @@ public class MetricsServletTest {
     private final HttpServletRequest request = mock(HttpServletRequest.class);
     private final HttpServletResponse response = mock(HttpServletResponse.class);
     private final ServletOutputStream output = mock(ServletOutputStream.class);
-    private final MetricsServlet servlet = new MetricsServlet(clock,
-                                                                        vm,
-                                                                        registry,
-                                                                        factory,
-                                                                        false);
+    private final MetricsServlet servlet = new MetricsServlet(clock, vm, registry, factory, false);
 
     private final ByteArrayOutputStream json = new ByteArrayOutputStream();
 
@@ -94,20 +90,40 @@ public class MetricsServletTest {
         gcs.put("one", gc);
         when(vm.garbageCollectors()).thenReturn(gcs);
 
+        final VirtualMachineMetrics.BufferPoolStats direct = mock(VirtualMachineMetrics.BufferPoolStats.class);
+        when(direct.getCount()).thenReturn(1L);
+        when(direct.getMemoryUsed()).thenReturn(2L);
+        when(direct.getTotalCapacity()).thenReturn(3L);
+        
+        final VirtualMachineMetrics.BufferPoolStats mapped = mock(VirtualMachineMetrics.BufferPoolStats.class);
+        when(mapped.getCount()).thenReturn(10L);
+        when(mapped.getMemoryUsed()).thenReturn(20L);
+        when(mapped.getTotalCapacity()).thenReturn(30L);
+
+        final Map<String, VirtualMachineMetrics.BufferPoolStats> bufferPoolStats =
+                new TreeMap<String, VirtualMachineMetrics.BufferPoolStats>();
+
+        bufferPoolStats.put("direct", direct);
+        bufferPoolStats.put("mapped", mapped);
+
+        when(vm.getBufferPoolStats()).thenReturn(bufferPoolStats);
+
         final MetricsServlet servlet = new MetricsServlet(clock, vm, registry, factory, true);
 
         servlet.service(request, response);
 
         assertThat(json.toString(),
-                   is("{\"jvm\":{\"vm\":{\"name\":\"vm\",\"version\":\"version\"},\"memory\":" +
-                              "{\"totalInit\":1.0,\"totalUsed\":2.0,\"totalMax\":3.0," +
-                              "\"totalCommitted\":4.0,\"heapInit\":5.0,\"heapUsed\":6.0," +
-                              "\"heapMax\":7.0,\"heapCommitted\":8.0,\"heap_usage\":34.0," +
+                   is("{\"jvm\":{\"vm\":{\"name\":\"vm\",\"version\":\"version\"},\"memory\":{" +
+                              "\"totalInit\":1.0,\"totalUsed\":2.0,\"totalMax\":3.0," +
+                              "\"totalCommitted\":4.0,\"heapInit\":5.0,\"heapUsed\":6.0,\"" +
+                              "heapMax\":7.0,\"heapCommitted\":8.0,\"heap_usage\":34.0," +
                               "\"non_heap_usage\":37.0,\"memory_pool_usages\":{\"one\":100.0," +
-                              "\"two\":200.0}},\"daemon_thread_count\":300,\"thread_count\":400," +
-                              "\"current_time\":12345678,\"uptime\":9991,\"fd_usage\":0.222," +
-                              "\"thread-states\":{\"blocked\":0.33},\"garbage-collectors\":" +
-                              "{\"one\":{\"runs\":20,\"time\":40}}}}"));
+                              "\"two\":200.0}},\"buffers\":{\"direct\":{\"count\":1," +
+                              "\"memoryUsed\":2,\"totalCapacity\":3},\"mapped\":{\"count\":10," +
+                              "\"memoryUsed\":20,\"totalCapacity\":30}},\"daemon_thread_count\":300," +
+                              "\"thread_count\":400,\"current_time\":12345678,\"uptime\":9991," +
+                              "\"fd_usage\":0.222,\"thread-states\":{\"blocked\":0.33}," +
+                              "\"garbage-collectors\":{\"one\":{\"runs\":20,\"time\":40}}}}"));
     }
 
     @Test

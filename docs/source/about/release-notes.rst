@@ -4,6 +4,34 @@
 Release Notes
 #############
 
+.. _rel-2.1.0:
+
+v2.1.0-SNAPSHOT
+===============
+
+* Added support for Java 7's direct and mapped buffer pool stats in ``VirtualMachineMetrics`` and
+  ``metrics-servlet``.
+* Added support for XML configuration in ``metrics-ehcache``.
+* ``metrics-spring`` now support ``@Gauge``-annotated fields.
+* Opened ``GraphiteReporter`` up for extension.
+* Added ``group`` and ``type`` to ``metrics-annotations``, ``metrics-guice``, ``metrics-jersey``,
+  and ``metrics-spring``.
+* Fixed handling of non-int gauges in ``GangliaReporter``.
+
+.. _rel-2.0.3:
+
+v2.0.3: Feb 24 2012
+===================
+
+* Change logging of ``InstanceNotFoundException`` exceptions thrown while unregistering a metric
+  in ``JmxReporter`` to ``TRACE``. It being ``WARN`` resulted in huge log dumps preventing process
+  shutdowns when applications had ~1K+ metrics.
+* Upgraded to Spring 3.1.1 for ``metrics-spring``.
+* Upgraded to JDBI 2.31.2.
+* Upgraded to Jersey 1.12.
+* Upgraded to Jetty 7.6.1.
+* Fixed rate units for meters in ``GangliaReporter``.
+
 .. _rel-2.0.2:
 
 v2.0.2: Feb 09 2012

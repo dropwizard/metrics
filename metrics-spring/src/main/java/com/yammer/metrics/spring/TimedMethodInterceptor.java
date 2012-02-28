@@ -1,9 +1,7 @@
 package com.yammer.metrics.spring;
 
 import com.yammer.metrics.annotation.Timed;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+import com.yammer.metrics.core.*;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.core.Ordered;
@@ -17,16 +15,18 @@ import java.util.Map;
 
 public class TimedMethodInterceptor implements MethodInterceptor, MethodCallback, Ordered {
 
-    private static final MethodFilter filter = new AnnotationMethodFilter(Timed.class);
+    private static final MethodFilter filter = new AnnotationFilter(Timed.class);
 
     private final MetricsRegistry metrics;
     private final Class<?> targetClass;
     private final Map<String, Timer> timers;
+    private final String scope;
 
-    public TimedMethodInterceptor(final MetricsRegistry metrics, final Class<?> targetClass) {
+    public TimedMethodInterceptor(final MetricsRegistry metrics, final Class<?> targetClass, final String scope) {
         this.metrics = metrics;
         this.targetClass = targetClass;
         this.timers = new HashMap<String, Timer>();
+        this.scope = scope;
 
         ReflectionUtils.doWithMethods(targetClass, this, filter);
     }
@@ -44,10 +44,14 @@ public class TimedMethodInterceptor implements MethodInterceptor, MethodCallback
     @Override
     public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
         final Timed timed = method.getAnnotation(Timed.class);
+
         final String methodName = method.getName();
-        final String timerName = timed.name().isEmpty() ? methodName : timed.name();
-        final Timer timer = metrics.newTimer(targetClass,
-                                             timerName,
+        final String group = MetricName.chooseGroup(timed.group(), targetClass);
+        final String type = MetricName.chooseType(timed.type(), targetClass);
+        final String name = timed.name() == null || timed.name().equals("") ? methodName : timed.name();
+        final MetricName metricName = new MetricName(group, type, name, scope);
+
+        final Timer timer = metrics.newTimer(metricName,
                                              timed.durationUnit(),
                                              timed.rateUnit());
         timers.put(methodName, timer);

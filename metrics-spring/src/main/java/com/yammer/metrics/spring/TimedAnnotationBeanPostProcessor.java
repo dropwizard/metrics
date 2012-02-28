@@ -2,6 +2,7 @@ package com.yammer.metrics.spring;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.aop.Pointcut;
+import org.springframework.aop.framework.ProxyConfig;
 import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
 
 import com.yammer.metrics.annotation.Timed;
@@ -13,9 +14,13 @@ public class TimedAnnotationBeanPostProcessor extends AbstractProxyingBeanPostPr
 
     private final Pointcut pointcut = new AnnotationMatchingPointcut(null, Timed.class);
     private final MetricsRegistry metrics;
+    private final String scope;
 
-    public TimedAnnotationBeanPostProcessor(final MetricsRegistry metrics) {
+    public TimedAnnotationBeanPostProcessor(final MetricsRegistry metrics, final ProxyConfig config, final String scope) {
         this.metrics = metrics;
+        this.scope = scope;
+
+        this.copyFrom(config);
     }
 
     @Override
@@ -25,7 +30,7 @@ public class TimedAnnotationBeanPostProcessor extends AbstractProxyingBeanPostPr
 
     @Override
     public MethodInterceptor getMethodInterceptor(Class<?> targetClass) {
-        return new TimedMethodInterceptor(metrics, targetClass);
+        return new TimedMethodInterceptor(metrics, targetClass, scope);
     }
 
 }

@@ -35,11 +35,14 @@ Many, many thanks to:
 * `Matthew Gilliard <https://github.com/mjg123>`_
 * `Matthew O'Connor <https://github.com/oconnor0>`_
 * `Mårten Gustafson <https://github.com/chids>`_
+* `Michał Minicki <https://github.com/martel>`_
 * `Neil Prosser <https://github.com/neilprosser>`_
 * `Paul Bloch <https://github.com/pbloch>`_
+* `Paul Brown <https://github.com/prb>`_
 * `Robby Walker <https://github.com/robbywalker>`_
 * `Ryan Kennedy <https://github.com/ryankennedy>`_
 * `Ryan W Tenney <https://github.com/ryantenney>`_
+* `Sam Perman <https://github.com/samperman>`_
 * `Shaneal Manek <https://github.com/smanek>`_
 * `Thomas Dudziak <https://github.com/tomdz>`_
 * `Tobias Lidskog <https://github.com/tobli>`_

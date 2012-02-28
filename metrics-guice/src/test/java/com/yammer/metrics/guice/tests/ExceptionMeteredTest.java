@@ -85,6 +85,29 @@ public class ExceptionMeteredTest {
     }
 
     @Test
+    public void anExceptionMeteredAnnotatedMethod_WithGroupTypeAndName() throws Exception {
+
+        final Metric metric = registry.allMetrics()
+                                      .get(new MetricName("g", "t", "n"));
+        assertMetricIsSetup(metric);
+
+        assertThat("Metric intialises to zero",
+                   ((Meter) metric).count(),
+                   is(0L));
+
+        try {
+            instance.explodeForMetricWithGroupTypeAndName();
+            fail("Expected an exception to be thrown");
+        } catch (RuntimeException e) {
+            // Swallow the expected exception
+        }
+
+        assertThat("Metric is marked",
+                   ((Meter) metric).count(),
+                   is(1L));
+    }
+
+    @Test
     public void anExceptionMeteredAnnotatedMethod_WithPublicScopeButNoExceptionThrown() throws Exception {
 
         final Metric metric = registry.allMetrics()

@@ -32,6 +32,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
     private static final int GANGLIA_DMAX = 0;
     private static final String GANGLIA_INT_TYPE = "int32";
     private static final String GANGLIA_DOUBLE_TYPE = "double";
+    private static final String GANGLIA_STRING_TYPE = "string";
     private final MetricPredicate predicate;
     private final VirtualMachineMetrics vm;
     private final Locale locale = Locale.US;
@@ -320,8 +321,20 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
 
     @Override
     public void processGauge(MetricName name, Gauge<?> gauge, String x) throws IOException {
+        final Object value = gauge.value();
+        final Class<?> klass = value.getClass();
+
+        final String type;
+        if (klass == Integer.class || klass == Long.class) {
+            type = GANGLIA_INT_TYPE;
+        } else if (klass == Float.class || klass == Double.class) {
+            type = GANGLIA_DOUBLE_TYPE;
+        } else {
+            type = GANGLIA_STRING_TYPE;
+        }
+
         sendToGanglia(sanitizeName(name),
-                      GANGLIA_INT_TYPE,
+                      type,
                       String.format(locale, "%s", gauge.value()),
                       "gauge");
     }
@@ -337,15 +350,14 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
     @Override
     public void processMeter(MetricName name, Metered meter, String x) throws IOException {
         final String sanitizedName = sanitizeName(name);
-        final String units = meter.rateUnit().name();
-        printLongField(sanitizedName + ".count", meter.count(), "metered", units);
-        printDoubleField(sanitizedName + ".meanRate", meter.meanRate(), "metered", units);
-        printDoubleField(sanitizedName + ".1MinuteRate", meter.oneMinuteRate(), "metered", units);
-        printDoubleField(sanitizedName + ".5MinuteRate", meter.fiveMinuteRate(), "metered", units);
-        printDoubleField(sanitizedName + ".15MinuteRate",
-                         meter.fifteenMinuteRate(),
-                         "metered",
-                         units);
+        final String rateUnits = meter.rateUnit().name();
+        final String rateUnit = rateUnits.substring(0, rateUnits.length() - 1).toLowerCase(Locale.US);
+        final String unit = meter.eventType() + '/' + rateUnit;
+        printLongField(sanitizedName + ".count", meter.count(), "metered", meter.eventType());
+        printDoubleField(sanitizedName + ".meanRate", meter.meanRate(), "metered", unit);
+        printDoubleField(sanitizedName + ".1MinuteRate", meter.oneMinuteRate(), "metered", unit);
+        printDoubleField(sanitizedName + ".5MinuteRate", meter.fiveMinuteRate(), "metered", unit);
+        printDoubleField(sanitizedName + ".15MinuteRate", meter.fifteenMinuteRate(), "metered", unit);
     }
 
     @Override
