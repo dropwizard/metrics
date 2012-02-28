@@ -6,7 +6,7 @@ An optional extension to Metrics that uses the [Hyperic Sigar](http://support.hy
 
 Currently the following data can be collected:
 
-* CPU (/proc/cpuinfo)
+* CPU (equivalent to `/proc/cpuinfo`)
     * Number of physical CPUs, total number of cores
     * Per-core load ratios:
         * Ratio of time spent in userland
@@ -15,15 +15,15 @@ Currently the following data can be collected:
         * Ratio of time spent waiting for I/O
         * Ratio of time spent idle
         * Ratio of time spent servicing interrupts 
-* Memory (free)
+* Memory (equivalent to `free` command)
     * RAM size in MB
     * Main memory total, used, free (KB)
     * Main memory 'actual' used, free (the "+/- buffers/cache" row in the Linux free command)
     * Swap memory total, used, free
     * Pages swapped in, out
-* Filesystems/disk usage (df)
+* Filesystems/disk usage (equivalent to `df` command)
     * Device name, mount point, FS type, free space and total size of all mounted filesystems
-* Resource limits (ulimit)
+* Resource limits (equivalent to `ulimit` command)
     * Core file size
     * Data segment size
     * File size
@@ -51,7 +51,7 @@ Currently the following data can be collected:
 
     * If downloading manually, download the Sigar binary package from SourceForge [here](http://sourceforge.net/projects/sigar/files/sigar/1.6/). 
 
-    * If you want to automate it in your build script, add the following dependency to your project and add a task to unzip the jar.
+    * If you want to automate it in your build script, add the following dependency to your project and add a task to unzip the jar. (Note: This jar is missing the Windows libraries.)
 
             <dependency>
                 <groupId>org.fusesource</groupId>
@@ -79,3 +79,7 @@ Currently the following data can be collected:
 ## Acknowledgements ##
 
 This module makes use of [Hyperic Sigar](http://support.hyperic.com/display/SIGAR/Home) ([Github link](https://github.com/hyperic/sigar)) under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+
+## Notes ##
+
+Sigar has a few wrinkles and may return crazy values for some metrics, depending on your platform. Still, hopefully better than nothing!
