@@ -26,7 +26,16 @@ Currently the following data can be collected:
 * Disk I/O (iostat) 
     * TODO
 * Resource limits (ulimit)
-    * TODO
+    * Core file size
+    * Data segment size
+    * File size
+    * Pipe size
+    * Memory size
+    * Open files
+    * Stack size
+    * CPU time
+    * User processes
+    * Virtual memory
 * JVM process
     * TODO
 
