@@ -1,6 +1,7 @@
 package com.yammer.metrics.sigar;
 
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Gauge;
 import com.yammer.metrics.core.MetricsRegistry;
 
 import org.hyperic.sigar.Sigar;
@@ -30,10 +31,20 @@ public class SigarMetrics implements CanRegisterGauges {
     }
 
     public void registerGauges(MetricsRegistry registry) {
+        registry.newGauge(getClass(), "pid", new Gauge<Long>() {
+          public Long value() {
+            return pid();
+          }
+        });     
+
         cpu.registerGauges(registry);
         memory.registerGauges(registry);
         fs.registerGauges(registry);
         ulimit.registerGauges(registry);
+    }
+
+    public long pid() {
+        return sigar.getPid();
     }
 
     public CpuMetrics cpu() {
