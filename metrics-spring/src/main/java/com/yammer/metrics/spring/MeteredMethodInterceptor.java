@@ -34,7 +34,10 @@ public class MeteredMethodInterceptor implements MethodInterceptor, MethodCallba
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        meters.get(invocation.getMethod().getName()).mark();
+        Meter meter = meters.get(invocation.getMethod().getName());
+        if (meter != null) {
+            meter.mark();
+        }
         return invocation.proceed();
     }
 
