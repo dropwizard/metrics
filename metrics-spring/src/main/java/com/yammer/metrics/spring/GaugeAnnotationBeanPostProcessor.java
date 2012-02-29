@@ -51,7 +51,7 @@ public class GaugeAnnotationBeanPostProcessor implements BeanPostProcessor, Orde
         ReflectionUtils.doWithMethods(targetClass, new MethodCallback() {
             @Override
             public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-                if (method.getParameterTypes().length >= 0) {
+                if (method.getParameterTypes().length > 0) {
                     throw new IllegalStateException("Method " + method.getName() + " is annotated with @Gauge but requires parameters.");
                 }
 
