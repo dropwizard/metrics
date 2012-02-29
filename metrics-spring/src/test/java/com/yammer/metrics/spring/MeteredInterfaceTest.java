@@ -38,20 +38,25 @@ public class MeteredInterfaceTest {
 
     @Test
     public void testTimedMethod() {
-        ctx.getBean(MeteredInterface.class).timedMethod();
+        Assert.assertTrue(ctx.getBean(MeteredInterface.class).timedMethod());
         Assert.assertTrue(ctx.getBean(MetricsRegistry.class).allMetrics().isEmpty());
     }
 
     @Test
     public void testMeteredMethod() {
-        ctx.getBean(MeteredInterface.class).meteredMethod();
+        Assert.assertTrue(ctx.getBean(MeteredInterface.class).meteredMethod());
         Assert.assertTrue(ctx.getBean(MetricsRegistry.class).allMetrics().isEmpty());
     }
 
     @Test(expected=BogusException.class)
     public void testExceptionMeteredMethod() throws Throwable {
-        ctx.getBean(MeteredInterface.class).exceptionMeteredMethod();
-        Assert.assertTrue(ctx.getBean(MetricsRegistry.class).allMetrics().isEmpty());
+    	try {
+    		ctx.getBean(MeteredInterface.class).exceptionMeteredMethod();
+    	} catch (Throwable t) {
+    		Assert.assertTrue(ctx.getBean(MetricsRegistry.class).allMetrics().isEmpty());
+    		throw t;
+    	}
+    	Assert.fail();
     }
 
 }
