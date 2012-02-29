@@ -33,11 +33,14 @@ public class TimedMethodInterceptor implements MethodInterceptor, MethodCallback
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        final TimerContext tc = timers.get(invocation.getMethod().getName()).time();
+        final Timer timer = timers.get(invocation.getMethod().getName());
+        final TimerContext timerCtx = timer != null ? timer.time() : null;
         try {
             return invocation.proceed();
         } finally {
-            tc.stop();
+            if (timerCtx != null) {
+                timerCtx.stop();
+            }
         }
     }
 
