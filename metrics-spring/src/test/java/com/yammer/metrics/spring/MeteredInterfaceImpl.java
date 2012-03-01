@@ -1,8 +1,5 @@
 package com.yammer.metrics.spring;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class MeteredInterfaceImpl implements MeteredInterface {
 
 	@Override
