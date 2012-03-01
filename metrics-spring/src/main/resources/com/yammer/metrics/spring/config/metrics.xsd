@@ -32,7 +32,7 @@
     <xsd:element name="jmx-reporter">
         <xsd:complexType>
             <xsd:attribute name="id" type="xsd:string" use="optional"/>
-            <xsd:attribute name="metrics-registry" type="xsd:string" use="required"/>
+            <xsd:attribute name="metrics-registry" type="xsd:string" use="optional"/>
         </xsd:complexType>
     </xsd:element>
 
