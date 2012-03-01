@@ -29,3 +29,22 @@ The ``metrics-spring`` module enables the use of Metrics annotations with
         <!-- other beans -->
 
     </beans>
+
+The most important part of the configuration is the element ``<metrics:annotation-driven />``.
+This registers custom Spring bean processors, which serve three main purposes:
+* Proxying beans which have methods annotated with ``@Timed``, ``@Metered``, and ``@ExceptionMetered``
+* Registering ``Gauge``s for beans which have members annotated with ``@Gauge``
+* Registering beans which extend the class ``HealthCheck``
+
+The element accepts 5 optional arguments:
+* ``metrics-registry``: the name of the ``MetricsRegsitry`` bean with which the generated metrics should be registered.
+  If omitted, this defaults to registry provided by ``Metrics.defaultRegistry()``.
+* ``health-check-registry``: the name of the ``HealthCheckRegsitry`` bean with which discovered ``HealthCheck``s should be registered.
+  If omitted, this defaults to registry provided by ``HealthChecks.defaultRegistry()``.
+* ``scope``: sets the scope for each of the metrics.
+* ``proxy-target-class``: if set to ``true``, always creates CGLIB proxies instead of defaulting to JDK proxies. This is necessary if you use class-based autowiring.
+* ``expose-proxy``: if set to ``true``, the target can access the proxy which wraps it by calling ``AopContext.currentProxy()``.
+
+The elements ``<metrics:metrics-registry />`` and ``<metrics:health-check-registry />`` are present as a convenience for creating new registry beans.
+
+The element ``<metrics:jmx-reporter />`` enables a JMX Reporter. If the attribute ``metrics-registry`` is omitted, the reporter is created with a reference to the registry provided by ``Metrics.defaultRegistry()``.
