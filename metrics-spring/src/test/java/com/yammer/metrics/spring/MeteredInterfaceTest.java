@@ -8,7 +8,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.spring.MeteredClass.BogusException;
+import com.yammer.metrics.spring.MeteredInterfaceImpl.BogusException;
 
 public class MeteredInterfaceTest {
 
@@ -32,7 +32,7 @@ public class MeteredInterfaceTest {
 
     @Test(expected=NoSuchBeanDefinitionException.class)
     public void testMeteredClass() {
-        MeteredClass mc = ctx.getBean(MeteredClass.class);
+        MeteredInterfaceImpl mc = ctx.getBean(MeteredInterfaceImpl.class);
         Assert.assertNull("Expected to be unable to get MeteredClass by class.", mc);
     }
 

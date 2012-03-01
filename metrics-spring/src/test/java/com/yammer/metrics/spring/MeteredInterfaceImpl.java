@@ -3,7 +3,7 @@ package com.yammer.metrics.spring;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MeteredClass implements MeteredInterface {
+public class MeteredInterfaceImpl implements MeteredInterface {
 
 	@Override
 	public boolean timedMethod() {
