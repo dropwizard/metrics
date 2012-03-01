@@ -48,4 +48,4 @@ The element accepts 5 optional arguments:
 
 The elements ``<metrics:metrics-registry />`` and ``<metrics:health-check-registry />`` are present as a convenience for creating new registry beans.
 
-The element ``<metrics:jmx-reporter />`` enables a JMX Reporter. If the attribute ``metrics-registry`` is omitted, the reporter is created with a reference to the registry provided by ``Metrics.defaultRegistry()``.
+The element ``<metrics:jmx-reporter />`` creates a JMX Reporter for the specified metrics registry. A JMX Reporter is automatically created for the default metrics registry.
