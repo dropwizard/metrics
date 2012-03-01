@@ -2,8 +2,10 @@ package com.yammer.metrics.spring.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.spring.JmxReporterFactory;
 
 public class JmxReporterBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
@@ -21,7 +23,12 @@ public class JmxReporterBeanDefinitionParser extends AbstractSingleBeanDefinitio
     @Override
     protected void doParse(Element element, BeanDefinitionBuilder builder) {
         builder.setFactoryMethod("createInstance");
-        builder.addConstructorArgReference(element.getAttribute("metrics-registry"));
+        String registry = element.getAttribute("metrics-registry");
+        if (StringUtils.hasText(registry)) {
+        	builder.addConstructorArgReference(registry);
+        } else {
+        	builder.addConstructorArgValue(Metrics.defaultRegistry());
+        }
     }
 
 }
