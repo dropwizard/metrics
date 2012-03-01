@@ -20,6 +20,4 @@ public class MeteredInterfaceImpl implements MeteredInterface {
 		throw new BogusException();
 	}
 
-    public static class BogusException extends Throwable {}
-
 }
