@@ -14,7 +14,10 @@ The ``metrics-spring`` module enables the use of Metrics annotations with
     <beans xmlns="http://www.springframework.org/schema/beans"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:metrics="http://www.yammer.com/schema/metrics"
-           xsi:schemaLocation="http://www.yammer.com/schema/metrics http://www.yammer.com/schema/metrics/metrics.xsd">
+           xsi:schemaLocation="
+               http://www.yammer.com/schema/metrics http://www.yammer.com/schema/metrics/metrics.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
 
         <metrics:metrics-registry id="metrics"/>
         <metrics:health-check-registry id="health"/>
@@ -22,5 +25,7 @@ The ``metrics-spring`` module enables the use of Metrics annotations with
         <metrics:annotation-driven metrics-registry="metrics" health-check-registry="health"/>
 
         <metrics:jmx-reporter id="metricsJmxReporter" metrics-registry="metrics"/>
+
+        <!-- other beans -->
 
     </beans>
