@@ -12,8 +12,6 @@ import org.w3c.dom.Element;
 
 import com.yammer.metrics.HealthChecks;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.HealthCheckRegistry;
-import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.spring.ExceptionMeteredAnnotationBeanPostProcessor;
 import com.yammer.metrics.spring.GaugeAnnotationBeanPostProcessor;
 import com.yammer.metrics.spring.HealthCheckBeanPostProcessor;
