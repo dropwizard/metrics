@@ -8,7 +8,6 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.spring.MeteredInterfaceImpl.BogusException;
 
 public class MeteredInterfaceTest {
 
