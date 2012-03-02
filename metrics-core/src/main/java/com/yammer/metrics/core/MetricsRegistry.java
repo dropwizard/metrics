@@ -475,6 +475,28 @@ public class MetricsRegistry {
     }
 
     /**
+     * Gets any existing metric with the given name or, if none exists, returns null.
+     *
+     * @param name   the metric's name
+     * @return either the existing metric or null
+     */
+    public final Metric get(MetricName name) {
+        return metrics.get(name);
+    }
+
+    /**
+     * Gets any existing metric with the given name or, if none exists, returns null.
+     *
+     * @param name   the metric's name
+     * @param clazz    the class of the metric
+     * @throws ClassCastException if the object is not null and is not assignable to the type T
+     * @return either the existing metric or null
+     */
+    public final <T extends Metric> T get(MetricName name, Class<T> clazz) {
+        return clazz.cast(metrics.get(name));
+    }
+
+    /**
      * Gets any existing metric with the given name or, if none exists, adds the given metric.
      *
      * @param name   the metric's name
