@@ -23,13 +23,13 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
-    public interface MetricMXBean {
+    public interface MetricMBean {
         ObjectName objectName();
     }
     // CHECKSTYLE:ON
 
 
-    private abstract static class AbstractBean implements MetricMXBean {
+    private abstract static class AbstractBean implements MetricMBean {
         private final ObjectName objectName;
 
         protected AbstractBean(ObjectName objectName) {
@@ -44,13 +44,13 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
-    public interface GaugeMXBean extends MetricMXBean {
+    public interface GaugeMBean extends MetricMBean {
         Object getValue();
     }
     // CHECKSTYLE:ON
 
 
-    private static class Gauge extends AbstractBean implements GaugeMXBean {
+    private static class Gauge extends AbstractBean implements GaugeMBean {
         private final com.yammer.metrics.core.Gauge<?> metric;
 
         private Gauge(com.yammer.metrics.core.Gauge<?> metric, ObjectName objectName) {
@@ -66,13 +66,13 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
-    public interface CounterMXBean extends MetricMXBean {
+    public interface CounterMBean extends MetricMBean {
         long getCount();
     }
     // CHECKSTYLE:ON
 
 
-    private static class Counter extends AbstractBean implements CounterMXBean {
+    private static class Counter extends AbstractBean implements CounterMBean {
         private final com.yammer.metrics.core.Counter metric;
 
         private Counter(com.yammer.metrics.core.Counter metric, ObjectName objectName) {
@@ -88,7 +88,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     //CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
-    public interface MeterMXBean extends MetricMXBean {
+    public interface MeterMBean extends MetricMBean {
         long getCount();
 
         String getEventType();
@@ -105,7 +105,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
     //CHECKSTYLE:ON
 
-    private static class Meter extends AbstractBean implements MeterMXBean {
+    private static class Meter extends AbstractBean implements MeterMBean {
         private final Metered metric;
 
         private Meter(Metered metric, ObjectName objectName) {
@@ -151,7 +151,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
-    public interface HistogramMXBean extends MetricMXBean {
+    public interface HistogramMBean extends MetricMBean {
         long getCount();
 
         double getMin();
@@ -178,7 +178,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
     // CHECKSTYLE:ON
 
-    private static class Histogram implements HistogramMXBean {
+    private static class Histogram implements HistogramMBean {
         private final ObjectName objectName;
         private final com.yammer.metrics.core.Histogram metric;
 
@@ -255,12 +255,12 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
-    public interface TimerMXBean extends MeterMXBean, HistogramMXBean {
+    public interface TimerMBean extends MeterMBean, HistogramMBean {
         TimeUnit getLatencyUnit();
     }
     // CHECKSTYLE:ON
 
-    static class Timer extends Meter implements TimerMXBean {
+    static class Timer extends Meter implements TimerMBean {
         private final com.yammer.metrics.core.Timer metric;
 
         private Timer(com.yammer.metrics.core.Timer metric, ObjectName objectName) {
@@ -446,7 +446,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         getMetricsRegistry().addListener(this);
     }
 
-    private void registerBean(MetricName name, MetricMXBean bean, ObjectName objectName)
+    private void registerBean(MetricName name, MetricMBean bean, ObjectName objectName)
             throws MBeanRegistrationException, OperationsException {
         server.registerMBean(bean, objectName);
         registeredBeans.put(name, objectName);
