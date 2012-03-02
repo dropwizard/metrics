@@ -10,8 +10,8 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
-import com.yammer.metrics.core.HealthCheckRegistry;
-import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.HealthChecks;
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.spring.ExceptionMeteredAnnotationBeanPostProcessor;
 import com.yammer.metrics.spring.GaugeAnnotationBeanPostProcessor;
 import com.yammer.metrics.spring.HealthCheckBeanPostProcessor;
@@ -32,17 +32,19 @@ public class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParse
         String metricsBeanName = element.getAttribute("metrics-registry");
         if (!StringUtils.hasText(metricsBeanName)) {
             metricsBeanName = registerComponent(parserContext,
-                                                build(MetricsRegistry.class,
+                                                build(Metrics.class,
                                                       source,
-                                                      ROLE_APPLICATION));
+                                                      ROLE_APPLICATION)
+                                                .setFactoryMethod("defaultRegistry"));
         }
 
         String healthCheckBeanName = element.getAttribute("health-check-registry");
         if (!StringUtils.hasText(healthCheckBeanName)) {
             healthCheckBeanName = registerComponent(parserContext,
-                                                    build(HealthCheckRegistry.class,
+                                                    build(HealthChecks.class,
                                                           source,
-                                                          ROLE_APPLICATION));
+                                                          ROLE_APPLICATION)
+                                                    .setFactoryMethod("defaultRegistry"));
         }
 
         String scope = element.getAttribute("scope");
