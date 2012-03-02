@@ -9,11 +9,9 @@
 			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
 			http://www.yammer.com/schema/metrics http://www.yammer.com/schema/metrics/metrics.xsd">
 
-	<context:annotation-config />
+	<metrics:metrics-registry id="metrics" />
+	<metrics:health-check-registry id="health" />
 
-	<metrics:annotation-driven proxy-target-class="false" />
-
-	<bean class="com.yammer.metrics.spring.ProxyTargetClass" />
-	<bean class="com.yammer.metrics.spring.AutowiredCollaborator" />
+	<metrics:annotation-driven metrics-registry="metrics" health-check-registry="health" />
 
 </beans>
