@@ -1,11 +1,11 @@
 package com.yammer.metrics.core;
 
-import com.yammer.metrics.core.Histogram.SampleType;
-import com.yammer.metrics.stats.Snapshot;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import com.yammer.metrics.core.Histogram.SampleType;
+import com.yammer.metrics.stats.Snapshot;
 
 /**
  * A timer metric which aggregates timing durations and provides duration statistics, plus
@@ -17,6 +17,7 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
     private final Meter meter;
     private final Histogram histogram = new Histogram(SampleType.BIASED);
     private final Clock clock;
+    private java.util.Timer timer;
 
     /**
      * Creates a new {@link Timer}.
@@ -42,6 +43,7 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
         this.rateUnit = rateUnit;
         this.meter = new Meter(tickThread, "calls", rateUnit, clock);
         this.clock = clock;
+        this.timer = new java.util.Timer(getClass().getSimpleName() + " - Timer", true);
         clear();
     }
 
@@ -91,6 +93,30 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
             return event.call();
         } finally {
             update(clock.tick() - startTime);
+        }
+    }
+
+    /**
+     * Times and records the duration of event and executes an callback if
+     * the duration exceeds the timeout specified in the supplied
+     * {@link Timeout}. 
+     *
+     * @param event a {@link Callable} whose {@link Callable#call()} method
+     * implements a process whose duration should be timed
+     * @param <T> the type of the value returned by {@code event}
+     * @param timeout A {@link Timeout} that will be invoked if the
+     * {@link Callable} excution exceeds its limit 
+     * @return the value returned by {@code event}
+     * @throws Exception if {@code event} throws an {@link Exception}
+     */
+    public <T> T time(Callable<T> event, Timeout timeout) throws Exception {
+        timeout.scheduleTo(timer, this);
+        final long startTime = clock.tick();
+        try {
+            return event.call();
+        } finally {
+            update(clock.tick() - startTime);
+            timeout.cancel();
         }
     }
 
@@ -196,6 +222,7 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
 
     @Override
     public void stop() {
+        timer.cancel();
         meter.stop();
     }
 

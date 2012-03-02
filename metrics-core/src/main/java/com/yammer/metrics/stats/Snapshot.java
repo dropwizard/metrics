@@ -11,12 +11,12 @@ import static java.lang.Math.floor;
  * A statistical snapshot of a {@link Snapshot}.
  */
 public class Snapshot {
-    private static final double MEDIAN_Q = 0.5;
-    private static final double P75_Q = 0.75;
-    private static final double P95_Q = 0.95;
-    private static final double P98_Q = 0.98;
-    private static final double P99_Q = 0.99;
-    private static final double P999_Q = 0.999;
+    public static final double MEDIAN_Q = 0.5;
+    public static final double P75_Q = 0.75;
+    public static final double P95_Q = 0.95;
+    public static final double P98_Q = 0.98;
+    public static final double P99_Q = 0.99;
+    public static final double P999_Q = 0.999;
 
     private final double[] values;
 

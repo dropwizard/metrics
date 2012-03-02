@@ -1,27 +1,37 @@
 package com.yammer.metrics.core.tests;
 
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
-import com.yammer.metrics.stats.Snapshot;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.Timeout;
+import com.yammer.metrics.core.Timeout.QuantileTimeout;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
+import com.yammer.metrics.stats.Snapshot;
 
 public class TimerTest {
     private MetricsRegistry registry;
     private Timer timer;
+    private final AtomicBoolean timedOut = new AtomicBoolean();
 
     @Before
     public void setUp() throws Exception {
         this.registry = new MetricsRegistry();
         this.timer = registry.newTimer(TimerTest.class, "timer");
+        this.timedOut.set(false);
     }
 
     @After
@@ -185,5 +195,62 @@ public class TimerTest {
         assertThat("records the duration of the context",
                    timer.max(),
                    is(closeTo(50, 5)));
+    }
+    private void executeTimeoutCallbackTest(final double taskDuration, Timeout timeout) throws Exception {
+        // Time a thing that takes 50ms to get some values into the timer
+        final TimerContext tc = timer.time();
+        Thread.sleep(50);
+        tc.stop();
+        timer.time(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                Thread.sleep(Math.round(taskDuration));
+                return "";
+            }
+        }, timeout);
+    }
+
+    @Test
+    public void slowEventTriggersTimeout() throws Exception {
+        executeTimeoutCallbackTest(50, new Timeout(10, MILLISECONDS) {
+            @Override
+            public void ifExceeded() {
+                timedOut.set(true);
+            }
+        });
+        assertTrue("timeout action should have triggered", timedOut.get());
+    }
+
+    @Test
+    public void fastEventDoesNotTriggerTimeout() throws Exception {
+        executeTimeoutCallbackTest(0, new Timeout(10, MILLISECONDS) {
+            @Override
+            public void ifExceeded() {
+                timedOut.set(true);
+            }
+        });
+        assertFalse("timeout action should NOT have triggered", timedOut.get());
+    }
+
+    @Test
+    public void eventSlowerThanMedianTriggersTimeout() throws Exception {
+        executeTimeoutCallbackTest(timer.getSnapshot().getMedian() + 100, new QuantileTimeout(Snapshot.MEDIAN_Q) {
+            @Override
+            protected void ifExceeded() {
+                timedOut.set(true);
+            }
+        });
+        assertTrue("timeout action should have triggered", timedOut.get());
+    }
+
+    @Test
+    public void eventFasteThanMedianTriggersTimeout() throws Exception {
+        executeTimeoutCallbackTest(10, new QuantileTimeout(Snapshot.MEDIAN_Q) {
+            @Override
+            protected void ifExceeded() {
+                timedOut.set(true);
+            }
+        });
+        assertFalse("timeout action should NOT have triggered", timedOut.get());
     }
 }
