@@ -34,7 +34,10 @@ public class MeteredMethodInterceptor implements MethodInterceptor, MethodCallba
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        meters.get(invocation.getMethod().getName()).mark();
+        Meter meter = meters.get(invocation.getMethod().getName());
+        if (meter != null) {
+            meter.mark();
+        }
         return invocation.proceed();
     }
 
@@ -42,14 +45,13 @@ public class MeteredMethodInterceptor implements MethodInterceptor, MethodCallba
     public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
         final Metered metered = method.getAnnotation(Metered.class);
 
-        final String methodName = method.getName();
         final String group = MetricName.chooseGroup(metered.group(), targetClass);
         final String type = MetricName.chooseType(metered.type(), targetClass);
-        final String name = metered.name() == null || metered.name().equals("") ? methodName : metered.name();
+        final String name = MetricName.chooseName(metered.name(), method);
         final MetricName metricName = new MetricName(group, type, name, scope);
         final Meter meter = metrics.newMeter(metricName, metered.eventType(), metered.rateUnit());
 
-        meters.put(methodName, meter);
+        meters.put(method.getName(), meter);
     }
 
 }

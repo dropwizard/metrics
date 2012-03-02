@@ -39,27 +39,29 @@ public class GaugeAnnotationBeanPostProcessor implements BeanPostProcessor, Orde
             @Override
             public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
                 final Gauge gauge = field.getAnnotation(Gauge.class);
+                final String group = MetricName.chooseGroup(gauge.group(), targetClass);
+                final String type = MetricName.chooseType(gauge.type(), targetClass);
                 final String name = gauge.name().isEmpty() ? field.getName() : gauge.name();
-                metrics.newGauge(field.getDeclaringClass(),
-                                 name,
-                                 new GaugeField(bean, field));
+                final MetricName metricName = new MetricName(group, type, name, scope);
+
+                metrics.newGauge(metricName, new GaugeField(bean, field));
             }
         }, filter);
 
         ReflectionUtils.doWithMethods(targetClass, new MethodCallback() {
             @Override
             public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-                if (method.getParameterTypes().length == 0) {
-                    final Gauge gauge = method.getAnnotation(Gauge.class);
-                    final String name = gauge.name().isEmpty() ? method.getName() : gauge.name();
-                    final String group = MetricName.chooseGroup(gauge.group(), method.getDeclaringClass());
-                    final String type = MetricName.chooseType(gauge.type(), method.getDeclaringClass());
-                    final MetricName metricName = new MetricName(group, type, name, scope);
-
-                    metrics.newGauge(metricName, new GaugeMethod(bean, method));
-                } else {
+                if (method.getParameterTypes().length > 0) {
                     throw new IllegalStateException("Method " + method.getName() + " is annotated with @Gauge but requires parameters.");
                 }
+
+                final Gauge gauge = method.getAnnotation(Gauge.class);
+                final String group = MetricName.chooseGroup(gauge.group(), targetClass);
+                final String type = MetricName.chooseType(gauge.type(), targetClass);
+                final String name = MetricName.chooseName(gauge.name(), method);
+                final MetricName metricName = new MetricName(group, type, name, scope);
+
+                metrics.newGauge(metricName, new GaugeMethod(bean, method));
             }
         }, filter);
 

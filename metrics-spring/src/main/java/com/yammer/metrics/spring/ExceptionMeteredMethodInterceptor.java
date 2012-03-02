@@ -42,11 +42,15 @@ public class ExceptionMeteredMethodInterceptor implements MethodInterceptor, Met
             return invocation.proceed();
         } catch (Throwable t) {
             final String name = invocation.getMethod().getName();
-            if (causes.get(name).isAssignableFrom(t.getClass())) {
-                meters.get(name).mark();
+            final Class<?> cause = causes.get(name);
+            if (cause != null && cause.isAssignableFrom(t.getClass())) {
+                // it may be safe to infer that `meter` is non-null if `cause` is non-null
+                Meter meter = meters.get(name);
+                if (meter != null) {
+                    meter.mark();
+                }
             }
-            ReflectionUtils.rethrowException(t);
-            return null;
+            throw t;
         }
     }
 
