@@ -4,6 +4,7 @@ import com.yammer.metrics.annotation.Timed;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
@@ -20,7 +21,7 @@ class TimedInterceptor implements MethodInterceptor {
         if (annotation != null) {
             final String group = MetricName.chooseGroup(annotation.group(), klass);
             final String type = MetricName.chooseType(annotation.type(), klass);
-            final String name = MetricName.chooseName(annotation.name(), method);            
+            final String name = MetricName.chooseName(annotation.name(), method);
             final MetricName metricName = new MetricName(group, type, name);
             final Timer timer = metricsRegistry.newTimer(metricName,
                                                                annotation.durationUnit(),
@@ -39,11 +40,11 @@ class TimedInterceptor implements MethodInterceptor {
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        final long startTime = System.nanoTime();
+        final TimerContext ctx = timer.time();
         try {
             return invocation.proceed();
         } finally {
-            timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
+            ctx.stop();
         }
     }
 }

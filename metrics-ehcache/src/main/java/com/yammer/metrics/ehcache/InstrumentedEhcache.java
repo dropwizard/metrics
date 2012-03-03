@@ -3,6 +3,7 @@ package com.yammer.metrics.ehcache;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Gauge;
 import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
@@ -244,7 +245,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
 
         return new InstrumentedEhcache(cache);
     }
-    
+
     private final Timer getTimer, putTimer;
 
     private InstrumentedEhcache(Ehcache cache) {
@@ -255,51 +256,51 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
 
     @Override
     public Element get(Object key) throws IllegalStateException, CacheException {
-        final long start = System.nanoTime();
+        final TimerContext ctx = getTimer.time();
         try {
             return underlyingCache.get(key);
         } finally {
-            getTimer.update(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            ctx.stop();
         }
     }
 
     @Override
     public Element get(Serializable key) throws IllegalStateException, CacheException {
-        final long start = System.nanoTime();
+        final TimerContext ctx = getTimer.time();
         try {
             return underlyingCache.get(key);
         } finally {
-            getTimer.update(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            ctx.stop();
         }
     }
 
     @Override
     public void put(Element element) throws IllegalArgumentException, IllegalStateException, CacheException {
-        final long start = System.nanoTime();
+        final TimerContext ctx = putTimer.time();
         try {
             underlyingCache.put(element);
         } finally {
-            putTimer.update(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            ctx.stop();
         }
     }
 
     @Override
     public void put(Element element, boolean doNotNotifyCacheReplicators) throws IllegalArgumentException, IllegalStateException, CacheException {
-        final long start = System.nanoTime();
+        final TimerContext ctx = putTimer.time();
         try {
             underlyingCache.put(element, doNotNotifyCacheReplicators);
         } finally {
-            putTimer.update(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            ctx.stop();
         }
     }
 
     @Override
     public Element putIfAbsent(Element element) throws NullPointerException {
-        final long start = System.nanoTime();
+        final TimerContext ctx = putTimer.time();
         try {
             return underlyingCache.putIfAbsent(element);
         } finally {
-            putTimer.update(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            ctx.stop();
         }
     }
 }
