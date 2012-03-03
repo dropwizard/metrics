@@ -12,11 +12,11 @@ class Timer(metric: com.yammer.metrics.core.Timer) {
    * Runs f, recording its duration, and returns the result of f.
    */
   def time[A](f: => A): A = {
-    val startTime = System.nanoTime
+    val ctx = metric.time
     try {
       f
     } finally {
-      metric.update(System.nanoTime - startTime, TimeUnit.NANOSECONDS)
+      ctx.stop
     }
   }
 
