@@ -60,6 +60,7 @@ AdminServlet
 ``PingServlet`` into a single, easy-to-use servlet which provides a set of URIs:
 
 * ``/``: an HTML admin menu with links to the following:
+
   * ``/healthcheck``: ``HealthCheckServlet``
   * ``/metrics``: ``MetricsServlet``
   * ``/ping``: ``PingServlet``
