@@ -100,7 +100,7 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      * @return a new {@link TimerContext}
      */
     public TimerContext time() {
-        return new TimerContext(this);
+        return new TimerContext(this, clock);
     }
 
     @Override

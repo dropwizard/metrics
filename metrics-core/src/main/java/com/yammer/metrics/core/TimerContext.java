@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TimerContext {
     private final Timer timer;
+    private final Clock clock;
     private final long startTime;
 
     /**
@@ -17,15 +18,16 @@ public class TimerContext {
      *
      * @param timer the {@link Timer} to report the elapsed time to
      */
-    TimerContext(Timer timer) {
+    TimerContext(Timer timer, Clock clock) {
         this.timer = timer;
-        this.startTime = System.nanoTime();
+        this.clock = clock;
+        this.startTime = clock.tick();
     }
 
     /**
      * Stops recording the elapsed time and updates the timer.
      */
     public void stop() {
-        timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
+        timer.update(clock.tick() - startTime, TimeUnit.NANOSECONDS);
     }
 }
