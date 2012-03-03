@@ -50,6 +50,6 @@ public class DeathRattleExceptionHandler implements Thread.UncaughtExceptionHand
     @Override
     public void uncaughtException(Thread t, Throwable e) {
         counter.inc();
-        LOGGER.error("Uncaught exception on thread " + t, e);
+        LOGGER.error("Uncaught exception on thread {}", t, e);
     }
 }
