@@ -17,6 +17,8 @@ v2.1.0-SNAPSHOT
 * Added ``group`` and ``type`` to ``metrics-annotations``, ``metrics-guice``, ``metrics-jersey``,
   and ``metrics-spring``.
 * Fixed handling of non-int gauges in ``GangliaReporter``.
+* Fixed ``NullPointerException`` errors in ``metrics-spring``.
+* General improvements to ``metrics-spring``, including allowing custom ``Clock`` instances.
 
 .. _rel-2.0.3:
 
