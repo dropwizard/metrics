@@ -1,8 +1,8 @@
 package com.yammer.metrics.core.tests;
 
+import com.yammer.metrics.core.Clock;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
 import com.yammer.metrics.stats.Snapshot;
 import org.junit.After;
 import org.junit.Before;
@@ -20,7 +20,15 @@ public class TimerTest {
 
     @Before
     public void setUp() throws Exception {
-        this.registry = new MetricsRegistry();
+        this.registry = new MetricsRegistry(new Clock() {
+            // a mock clock that increments its ticker by 50msec per call
+            private long val = 0;
+
+            @Override
+            public long tick() {
+                return val += 50000000;
+            }
+        });
         this.timer = registry.newTimer(TimerTest.class, "timer");
     }
 
@@ -162,10 +170,13 @@ public class TimerTest {
         final String value = timer.time(new Callable<String>() {
             @Override
             public String call() throws Exception {
-                Thread.sleep(50);
                 return "one";
             }
         });
+
+        assertThat("the timer has a count of 1",
+                   timer.count(),
+                   is(1L));
 
         assertThat("returns the result of the callable",
                    value,
@@ -173,17 +184,19 @@ public class TimerTest {
 
         assertThat("records the duration of the Callable#call()",
                    timer.max(),
-                   is(closeTo(50, 5)));
+                   is(closeTo(50.0, 0.001)));
     }
 
     @Test
     public void timingContexts() throws Exception {
-        final TimerContext context = timer.time();
-        Thread.sleep(50);
-        context.stop();
+        timer.time().stop();
+
+        assertThat("the timer has a count of 1",
+                   timer.count(),
+                   is(1L));
 
         assertThat("records the duration of the context",
                    timer.max(),
-                   is(closeTo(50, 5)));
+                   is(closeTo(50.0, 0.001)));
     }
 }
