@@ -74,10 +74,19 @@ public abstract class WebappMetricsFilter implements Filter {
         final TimerContext context = requestTimer.time();
         try {
             chain.doFilter(request, wrappedResponse);
+            markMeterForStatusCode(wrappedResponse.getStatus());
+        } catch (IOException e) {
+            markMeterForStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            throw e;
+        } catch (ServletException e) {
+            markMeterForStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            throw e;
+        } catch (RuntimeException e) {
+            markMeterForStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            throw e;
         } finally {
             context.stop();
             activeRequests.dec();
-            markMeterForStatusCode(wrappedResponse.getStatus());
         }
     }
 
@@ -91,7 +100,7 @@ public abstract class WebappMetricsFilter implements Filter {
     }
 
     private static class StatusExposingServletResponse extends HttpServletResponseWrapper {
-        private int httpStatus;
+        private int httpStatus = HttpServletResponse.SC_OK;
 
         public StatusExposingServletResponse(HttpServletResponse response) {
             super(response);
