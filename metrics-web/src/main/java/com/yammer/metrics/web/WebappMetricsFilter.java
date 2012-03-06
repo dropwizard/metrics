@@ -124,8 +124,22 @@ public abstract class WebappMetricsFilter implements Filter {
             super.setStatus(sc);
         }
 
+		@Override
+		public void setStatus(int sc, String sm) {
+			httpStatus = sc;
+			super.setStatus(sc, sm);
+		}
+		
+		@Override
+		public void sendRedirect(String location) throws IOException {
+			httpStatus = HttpServletResponse.SC_FOUND;
+			super.sendRedirect(location);
+		}
+		
         public int getStatus() {
             return httpStatus;
         }
+
+
     }
 }
