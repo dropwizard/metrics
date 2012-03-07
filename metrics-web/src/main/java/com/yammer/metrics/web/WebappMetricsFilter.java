@@ -3,6 +3,7 @@ package com.yammer.metrics.web;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Meter;
+import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 
@@ -21,45 +22,55 @@ import java.util.concurrent.TimeUnit;
  * codes being returned.
  */
 public abstract class WebappMetricsFilter implements Filter {
-    private final ConcurrentMap<Integer, Meter> metersByStatusCode;
-    private final Meter otherMeter;
-    private final Counter activeRequests;
-    private final Timer requestTimer;
-
-    /**
-     * Creates a new instance of the filter.
-     *
-     * @param meterNamesByStatusCode A map, keyed by status code, of meter names that we are
-     *                               interested in.
-     * @param otherMetricName        The name used for the catch-all meter.
-     */
-    public WebappMetricsFilter(Map<Integer, String> meterNamesByStatusCode,
-                               String otherMetricName) {
-        this.metersByStatusCode = new ConcurrentHashMap<Integer, Meter>(meterNamesByStatusCode
-                                                                                      .size());
-        for (Entry<Integer, String> entry : meterNamesByStatusCode.entrySet()) {
-            metersByStatusCode.put(entry.getKey(),
-                                   Metrics.newMeter(WebappMetricsFilter.class,
-                                                    entry.getValue(),
-                                                    "responses",
-                                                    TimeUnit.SECONDS));
-        }
-        this.otherMeter = Metrics.newMeter(WebappMetricsFilter.class,
-                                                 otherMetricName,
-                                                 "responses",
-                                                 TimeUnit.SECONDS);
-        this.activeRequests = Metrics.newCounter(WebappMetricsFilter.class, "activeRequests");
-        this.requestTimer = Metrics.newTimer(WebappMetricsFilter.class,
-                                             "requests",
-                                             TimeUnit.MILLISECONDS,
-                                             TimeUnit.SECONDS);
-
-    }
+    private ConcurrentMap<Integer, Meter> metersByStatusCode;
+    private Meter otherMeter;
+    private Counter activeRequests;
+    private Timer requestTimer;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        Map<Integer, String> meterNamesByStatusCode = getMeterNamesByStatusCode();
+        this.metersByStatusCode = new ConcurrentHashMap<Integer, Meter>(meterNamesByStatusCode 
+                                                                                      .size());
+        for (Entry<Integer, String> entry : meterNamesByStatusCode.entrySet()) {
+            metersByStatusCode.put(entry.getKey(),
+                                   Metrics.newMeter(createMetricName(entry.getValue()),
+                                                    "responses",
+                                                    TimeUnit.SECONDS));
+        }
+        this.otherMeter = Metrics.newMeter(createMetricName(getOtherMetricName()),
+                                                 "responses",
+                                                 TimeUnit.SECONDS);
+        this.activeRequests = Metrics.newCounter(createMetricName("activeRequests"));
+        this.requestTimer = Metrics.newTimer(createMetricName("requests"),
+                                             TimeUnit.MILLISECONDS,
+                                             TimeUnit.SECONDS);
     }
-
+    
+    /**
+     * @returns A map, keyed by status code, of meter names that we are
+     *          interested in.
+     */
+    protected abstract Map<Integer, String> getMeterNamesByStatusCode();
+    
+    /**
+     * 
+     * @return the name used for the catch-all meter.
+     */
+    protected abstract String getOtherMetricName();
+    
+    /**
+     * Creates a complete name based on the supplied simple metric name. This implementation
+     * returns a MetricName instance where the group is the package name of this class, the type is
+     * the simple name of this class, and the name is the supplied name.
+     * 
+     * @param name a metric name, for example "requests".
+     * @return the new name object
+     */
+    protected MetricName createMetricName(String name) {
+        return new MetricName(WebappMetricsFilter.class, name);
+    }
+    
     @Override
     public void destroy() {
     }
