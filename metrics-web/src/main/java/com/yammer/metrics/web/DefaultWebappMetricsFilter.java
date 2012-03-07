@@ -10,13 +10,8 @@ import com.yammer.metrics.core.MetricName;
 
 /**
  * Implementation of the {@link WebappMetricsFilter} which provides a default set of response codes
- * to capture information about.
- * <p>
- * Use it in your web.xml like this:
- * </p>
- * 
- * <pre>
- * {@code
+ * to capture information about. <p>Use it in your web.xml like this:</p>
+ * <pre>{@code
  * <filter>
  *     <filter-name>webappMetricsFilter</filter-name>
  *     <filter-class>com.yammer.metrics.web.DefaultWebappMetricsFilter</filter-class>
@@ -29,8 +24,7 @@ import com.yammer.metrics.core.MetricName;
  *     <filter-name>webappMetricsFilter</filter-name>
  *     <url-pattern>/*</url-pattern>
  * </filter-mapping>
- * }
- * </pre>
+ * }</pre>
  * 
  * The init-param element is optional. If the group initialization parameter is supplied then the
  * metrics of this filter will be created with that group name.
