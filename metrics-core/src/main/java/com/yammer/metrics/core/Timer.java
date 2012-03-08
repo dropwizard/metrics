@@ -168,6 +168,16 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
         return convertFromNS(histogram.stdDev());
     }
 
+    /**
+     * Returns the sum of all recorded durations.
+     *
+     * @return the sum of all recorded durations
+     */
+    @Override
+    public double sum() {
+        return convertFromNS(histogram.sum());
+    }
+
     @Override
     public Snapshot getSnapshot() {
         final double[] values = histogram.getSnapshot().getValues();
