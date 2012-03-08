@@ -101,7 +101,7 @@ public class HistogramTest {
                    histogram.stdDev(),
                    is(closeTo(288.8194360957494, 0.0001)));
         
-        assertThat("the histogram has a sum of 499500",
+        assertThat("the histogram has a sum of 500500",
                    histogram.sum(),
                    is(closeTo(500500, 0.1)));
 
