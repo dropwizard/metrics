@@ -32,4 +32,11 @@ public interface Summarizable {
      */
     double stdDev();
 
+    /**
+     * Returns the sum of all recorded values.
+     *
+     * @return the sum of all recorded values
+     */
+    double sum();
+
 }

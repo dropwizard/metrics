@@ -51,6 +51,10 @@ public class HistogramTest {
         assertThat("the histogram has a standard deviation of zero",
                    histogram.stdDev(),
                    is(closeTo(0.0, 0.0001)));
+        
+        assertThat("the histogram has a sum of zero",
+                   histogram.sum(),
+                   is(closeTo(0.0, 0.0001)));
 
         final Snapshot snapshot = histogram.getSnapshot();
 
@@ -96,6 +100,10 @@ public class HistogramTest {
         assertThat("the histogram has a standard deviation of 288.82",
                    histogram.stdDev(),
                    is(closeTo(288.8194360957494, 0.0001)));
+        
+        assertThat("the histogram has a sum of 499500",
+                   histogram.sum(),
+                   is(closeTo(500500, 0.1)));
 
         final Snapshot snapshot = histogram.getSnapshot();
 

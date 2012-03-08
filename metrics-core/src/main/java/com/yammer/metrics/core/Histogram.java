@@ -178,6 +178,14 @@ public class Histogram implements Metric, Sampling, Summarizable {
         return 0.0;
     }
 
+    /* (non-Javadoc)
+     * @see com.yammer.metrics.core.Summarizable#sum()
+     */
+    @Override
+    public double sum() {
+        return (double) sum.get();
+    }
+
     @Override
     public Snapshot getSnapshot() {
         return sample.getSnapshot();
