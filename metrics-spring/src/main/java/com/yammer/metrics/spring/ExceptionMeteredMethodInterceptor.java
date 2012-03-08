@@ -6,6 +6,8 @@ import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.core.Ordered;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.MethodCallback;
@@ -17,6 +19,8 @@ import java.util.Map;
 
 public class ExceptionMeteredMethodInterceptor implements MethodInterceptor, MethodCallback,
                                                           Ordered {
+
+    private static final Log log = LogFactory.getLog(ExceptionMeteredMethodInterceptor.class);
 
     private static final MethodFilter filter = new AnnotationFilter(ExceptionMetered.class);
 
@@ -32,6 +36,11 @@ public class ExceptionMeteredMethodInterceptor implements MethodInterceptor, Met
         this.meters = new HashMap<String, Meter>();
         this.causes = new HashMap<String, Class<? extends Throwable>>();
         this.scope = scope;
+
+        if (log.isDebugEnabled()) {
+            log.debug("Creating method interceptor for class " + targetClass.getCanonicalName());
+            log.debug("Scanning for @ExceptionMetered annotated methods");
+        }
 
         ReflectionUtils.doWithMethods(targetClass, this, filter);
     }
@@ -67,6 +76,10 @@ public class ExceptionMeteredMethodInterceptor implements MethodInterceptor, Met
 
         meters.put(methodName, meter);
         causes.put(methodName, metered.cause());
+
+        if (log.isDebugEnabled()) {
+            log.debug("Created metric " + metricName + " for method " + methodName);
+        }
     }
 
     @Override

@@ -4,6 +4,8 @@ import com.yammer.metrics.annotation.Timed;
 import com.yammer.metrics.core.*;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.core.Ordered;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.MethodCallback;
@@ -14,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TimedMethodInterceptor implements MethodInterceptor, MethodCallback, Ordered {
+
+    private static final Log log = LogFactory.getLog(TimedMethodInterceptor.class);
 
     private static final MethodFilter filter = new AnnotationFilter(Timed.class);
 
@@ -27,6 +31,11 @@ public class TimedMethodInterceptor implements MethodInterceptor, MethodCallback
         this.targetClass = targetClass;
         this.timers = new HashMap<String, Timer>();
         this.scope = scope;
+
+        if (log.isDebugEnabled()) {
+            log.debug("Creating method interceptor for class " + targetClass.getCanonicalName());
+            log.debug("Scanning for @Timed annotated methods");
+        }
 
         ReflectionUtils.doWithMethods(targetClass, this, filter);
     }
@@ -53,10 +62,12 @@ public class TimedMethodInterceptor implements MethodInterceptor, MethodCallback
         final String name = MetricName.chooseName(timed.name(), method);
         final MetricName metricName = new MetricName(group, type, name, scope);
 
-        final Timer timer = metrics.newTimer(metricName,
-                                             timed.durationUnit(),
-                                             timed.rateUnit());
+        final Timer timer = metrics.newTimer(metricName, timed.durationUnit(), timed.rateUnit());
         timers.put(method.getName(), timer);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Created metric " + metricName + " for method " + method.getName());
+        }
     }
 
     @Override
