@@ -1,7 +1,11 @@
 package com.yammer.metrics.reporting;
 
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.*;
+import com.yammer.metrics.stats.Snapshot;
+import com.yammer.metrics.core.MetricPredicate;
+
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -11,38 +15,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Clock;
-import com.yammer.metrics.core.Counter;
-import com.yammer.metrics.core.Gauge;
-import com.yammer.metrics.core.Histogram;
-import com.yammer.metrics.core.Metered;
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricPredicate;
-import com.yammer.metrics.core.MetricProcessor;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.stats.Snapshot;
-
 /**
  * A reporter which periodically appends data from each metric to a metric-specific CSV file in
  * an output directory.
  */
 public class CsvReporter extends AbstractPollingReporter implements
                                                          MetricProcessor<CsvReporter.Context> {
-  
-    /**
-     * local helper class
-     */
-    private static class StreamPair{
-        // file name
-        String file;
-        
-        // stream
-        PrintStream stream;
-    }
-
 
     /**
      * Enables the CSV reporter for the default metrics registry, and causes it to write to files in
@@ -87,11 +65,9 @@ public class CsvReporter extends AbstractPollingReporter implements
 
     private final MetricPredicate predicate;
     private final File outputDir;
-    private final Map<MetricName, StreamPair> streamMap;
+    private final Map<MetricName, PrintStream> streamMap;
     private final Clock clock;
     private long startTime;
-    private TimeUnit _rollDuration;
-    private File _currentFile;
 
     /**
      * Creates a new {@link CsvReporter} which will write all metrics from the given
@@ -144,97 +120,11 @@ public class CsvReporter extends AbstractPollingReporter implements
         }
         this.outputDir = outputDir;
         this.predicate = predicate;
-        this.streamMap = new HashMap<MetricName, StreamPair>();
+        this.streamMap = new HashMap<MetricName, PrintStream>();
         this.startTime = 0L;
         this.clock = clock;
-        _currentFile = null;
-        
-        // ok if this fails, just ensure the directory structure is created
-        this.outputDir.mkdirs();
-    }
-    
-    /**
-     * Sets how often the file rolls
-     * @param duration
-     */
-    public void setRollDuration(TimeUnit duration){
-        _rollDuration = duration;
-    }
-    
-    /**
-     * @return roll duration
-     */
-    public TimeUnit getRollDuration(){
-        return _rollDuration;
-    }
-    
-    /**
-     * Utility method that extracts the nano time from csv file name
-     * @param file csv file
-     * @return nano time in long
-     */
-    private static long getFileTime(File file){
-        String name = file.getName();
-        int idx = name.lastIndexOf('-');
-        int idx2 = name.lastIndexOf(".csv");
-        String numberString = name.substring(idx+1,idx2);
-        return Long.parseLong(numberString);
-    }
-    
-    private File getFile(MetricName metricName){
-        final String mname = metricName.getName();
-      
-        File[] files = outputDir.listFiles(new FileFilter(){
-
-          @Override
-          public boolean accept(File pathname) {
-            String filename = pathname.getName();
-            if (filename.startsWith(mname+"-") && filename.endsWith(".csv")){
-              return true;
-            }
-            return false;
-          }
-        
-        });
-      
-        long currentTime = System.nanoTime();
-        if (_currentFile == null){
-          if (files.length==0){
-            String filename = metricName.getName()+"-"+currentTime+".csv";
-            _currentFile = new File(outputDir,filename);
-            return _currentFile;
-          }
-        
-          // get the latest file
-          long maxTime = 0;
-          
-          for (File file : files){
-            long time = getFileTime(file);
-            if (time > maxTime){
-              maxTime = time;
-              _currentFile = file;
-            }
-          }
-        }
-      
-        long fileTime = getFileTime(_currentFile);
-        long duration = currentTime - fileTime;
-        
-        long maxDuration = _rollDuration.toNanos(1);
-        
-        if (duration > maxDuration){
-          String filename = metricName.getName()+"-"+currentTime+".csv";
-          _currentFile = new File(outputDir,filename);
-        }
-        return _currentFile;
     }
 
-
-   
-    protected PrintStream createStreamForMetric(MetricName metricName) throws IOException {
-        return getPrintStream(metricName, "");
-    }
-    
     /**
      * Returns an opened {@link PrintStream} for the given {@link MetricName} which outputs data
      * to a metric-specific {@code .csv} file in the output directory.
@@ -243,40 +133,13 @@ public class CsvReporter extends AbstractPollingReporter implements
      * @return an opened {@link PrintStream} specific to {@code metricName}
      * @throws IOException if there is an error opening the stream
      */
-    private PrintStream getPrintStream(MetricName metricName, String header)
-        throws IOException {
-    StreamPair streamPair;
-    synchronized (streamMap) {
-        streamPair = streamMap.get(metricName);
-        
-        if (streamPair != null){
-          File f = getFile(metricName);
-          if (!streamPair.file.equals(f.getName())){
-            streamPair.stream.close();
-            streamPair = null;
-          }
+    protected PrintStream createStreamForMetric(MetricName metricName) throws IOException {
+        final File newFile = new File(outputDir, metricName.getName() + ".csv");
+        if (newFile.createNewFile()) {
+            return new PrintStream(new FileOutputStream(newFile));
         }
-        if (streamPair == null) {
-            final File newFile = getFile(metricName);
-            
-            streamPair = new StreamPair();
-            streamPair.file = newFile.getName();
-            
-            PrintStream stream;
-            if (!newFile.exists() && newFile.createNewFile()) {
-                stream = new PrintStream(new FileOutputStream(newFile));
-                streamPair.stream = stream;
-                streamMap.put(metricName, streamPair);
-                streamPair.stream.println(header);
-            } else {
-                throw new IOException("Unable to create " + newFile);
-            }
-        }
+        throw new IOException("Unable to create " + newFile);
     }
-    
-    return streamPair.stream;
-}
-
 
     @Override
     public void run() {
@@ -379,39 +242,23 @@ public class CsvReporter extends AbstractPollingReporter implements
         try {
             super.shutdown();
         } finally {
-            for (StreamPair out : streamMap.values()) {
-                out.stream.close();
+            for (PrintStream out : streamMap.values()) {
+                out.close();
             }
         }
     }
 
-    
-    public static void main(String[] args) throws Exception{
-      
-      final Counter counterMetric = Metrics.newCounter(new MetricName("group","counter","test"));
-       
-       final int max = 100;
-       Thread t = new Thread(new Runnable(){
-         public void run(){
-           for (int i=0;i<max;++i){
-             counterMetric.inc();
-             
-             try {
-               Thread.sleep(1000);
-             } catch (InterruptedException e) {
-               e.printStackTrace();
-             }
-           }
-         }
-       });
-       
-       t.start();
-       
-       MetricsRegistry metricsRegistry = Metrics.defaultRegistry();
-       CsvReporter reporter = new CsvReporter(metricsRegistry,new File("/tmp/metrics-test"));
-       reporter.setRollDuration(TimeUnit.SECONDS);
-       
-       reporter.start(500, TimeUnit.MILLISECONDS);
-       t.join();
-     }
+    private PrintStream getPrintStream(MetricName metricName, String header)
+            throws IOException {
+        PrintStream stream;
+        synchronized (streamMap) {
+            stream = streamMap.get(metricName);
+            if (stream == null) {
+                stream = createStreamForMetric(metricName);
+                streamMap.put(metricName, stream);
+                stream.println(header);
+            }
+        }
+        return stream;
+    }
 }
