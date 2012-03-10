@@ -208,8 +208,7 @@ Reporting Via JMX
 
 All metrics are visible via **JConsole** or **VisualVM** (if you install the JConsole plugin):
 
-.. image:: metrics-visualvm.png
-    :alt: Metrics exposed as JMX MBeans being viewed in VisualVM's MBeans browser
+![Metrics exposed as JMX MBeans being viewed in VisualVM's MBeans browser](https://github.com/codahale/metrics/raw/master/docs/source/metrics-visualvm.png)
 
 .. tip::
 
