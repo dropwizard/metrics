@@ -51,6 +51,10 @@ public class TimedTest {
                    ((Timer) metric).count(),
                    is(1L));
 
+        assertThat("Guice creates a timer with the given event type",
+                   ((Timer) metric).eventType(),
+                   is("poops"));
+
         assertThat("Guice creates a timer with the given rate unit",
                    ((Timer) metric).rateUnit(),
                    is(TimeUnit.MINUTES));

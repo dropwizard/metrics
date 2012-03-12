@@ -25,8 +25,8 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      * @param durationUnit the scale unit for this timer's duration metrics
      * @param rateUnit     the scale unit for this timer's rate metrics
      */
-    Timer(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit) {
-        this(tickThread, durationUnit, rateUnit, Clock.defaultClock());
+    Timer(ScheduledExecutorService tickThread, String eventType, TimeUnit durationUnit, TimeUnit rateUnit) {
+        this(tickThread, eventType, durationUnit, rateUnit, Clock.defaultClock());
     }
 
     /**
@@ -37,10 +37,10 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      * @param rateUnit     the scale unit for this timer's rate metrics
      * @param clock        the clock used to calculate duration
      */
-    Timer(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
+    Timer(ScheduledExecutorService tickThread, String eventType, TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
         this.durationUnit = durationUnit;
         this.rateUnit = rateUnit;
-        this.meter = new Meter(tickThread, "calls", rateUnit, clock);
+        this.meter = new Meter(tickThread, eventType, rateUnit, clock);
         this.clock = clock;
         clear();
     }

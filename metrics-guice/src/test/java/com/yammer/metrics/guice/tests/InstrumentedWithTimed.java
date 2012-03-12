@@ -5,7 +5,7 @@ import com.yammer.metrics.annotation.Timed;
 import java.util.concurrent.TimeUnit;
 
 public class InstrumentedWithTimed {
-    @Timed(name = "things", rateUnit = TimeUnit.MINUTES, durationUnit = TimeUnit.MICROSECONDS)
+    @Timed(name = "things", eventType = "poops", rateUnit = TimeUnit.MINUTES, durationUnit = TimeUnit.MICROSECONDS)
     public String doAThing() {
         return "poop";
     }

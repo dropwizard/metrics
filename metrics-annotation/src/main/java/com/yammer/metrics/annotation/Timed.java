@@ -40,6 +40,11 @@ public @interface Timed {
     String name() default "";
 
     /**
+     * The name of the type of events the timer is measuring.
+     */
+    String eventType() default "calls";
+
+    /**
      * The time unit of the timer's rate.
      */
     TimeUnit rateUnit() default TimeUnit.SECONDS;

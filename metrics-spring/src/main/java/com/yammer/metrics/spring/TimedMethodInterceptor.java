@@ -62,7 +62,7 @@ public class TimedMethodInterceptor implements MethodInterceptor, MethodCallback
         final String name = MetricName.chooseName(timed.name(), method);
         final MetricName metricName = new MetricName(group, type, name, scope);
 
-        final Timer timer = metrics.newTimer(metricName, timed.durationUnit(), timed.rateUnit());
+        final Timer timer = metrics.newTimer(metricName, timed.eventType(), timed.durationUnit(), timed.rateUnit());
         timers.put(method.getName(), timer);
 
         if (log.isDebugEnabled()) {
