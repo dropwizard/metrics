@@ -320,6 +320,8 @@ public class MetricsRegistry {
      * Creates a new {@link Timer} and registers it under the given metric name.
      *
      * @param metricName   the name of the metric
+     * @param eventType    the plural name of the type of events the timer is measuring (e.g., {@code
+     *                     "requests"})
      * @param durationUnit the duration scale unit of the new timer
      * @param rateUnit     the rate scale unit of the new timer
      * @return a new {@link Timer}
