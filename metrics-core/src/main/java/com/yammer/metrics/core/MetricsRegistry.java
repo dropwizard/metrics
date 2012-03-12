@@ -313,12 +313,27 @@ public class MetricsRegistry {
     public Timer newTimer(MetricName metricName,
                           TimeUnit durationUnit,
                           TimeUnit rateUnit) {
+        return newTimer(metricName, "calls", durationUnit, rateUnit);
+    }
+
+    /**
+     * Creates a new {@link Timer} and registers it under the given metric name.
+     *
+     * @param metricName   the name of the metric
+     * @param durationUnit the duration scale unit of the new timer
+     * @param rateUnit     the rate scale unit of the new timer
+     * @return a new {@link Timer}
+     */
+    public Timer newTimer(MetricName metricName,
+                          String eventType,
+                          TimeUnit durationUnit,
+                          TimeUnit rateUnit) {
         final Metric existingMetric = metrics.get(metricName);
         if (existingMetric != null) {
             return (Timer) existingMetric;
         }
         return getOrAdd(metricName,
-                        new Timer(newMeterTickThreadPool(), durationUnit, rateUnit, clock));
+                        new Timer(newMeterTickThreadPool(), eventType, durationUnit, rateUnit, clock));
     }
 
     /**

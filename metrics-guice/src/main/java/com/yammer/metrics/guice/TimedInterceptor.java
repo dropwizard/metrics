@@ -24,6 +24,7 @@ class TimedInterceptor implements MethodInterceptor {
             final String name = MetricName.chooseName(annotation.name(), method);
             final MetricName metricName = new MetricName(group, type, name);
             final Timer timer = metricsRegistry.newTimer(metricName,
+                                                               annotation.eventType(),
                                                                annotation.durationUnit(),
                                                                annotation.rateUnit());
             return new TimedInterceptor(timer);
