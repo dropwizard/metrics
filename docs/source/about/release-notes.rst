@@ -4,6 +4,13 @@
 Release Notes
 #############
 
+.. _rel-2.1.1:
+
+v2.1.1: Mar 13 2012
+===================
+
+* Fixed instrumentation of all usages of ``InstrumentedHttpClient1``.
+
 .. _rel-2.1.0:
 
 v2.1.0: Mar 12 2012
