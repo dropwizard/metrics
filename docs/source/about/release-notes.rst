@@ -9,7 +9,7 @@ Release Notes
 v2.1.1: Mar 13 2012
 ===================
 
-* Fixed instrumentation of all usages of ``InstrumentedHttpClient1``.
+* Fixed instrumentation of all usages of ``InstrumentedHttpClient``.
 
 .. _rel-2.1.0:
 
