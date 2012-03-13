@@ -82,9 +82,39 @@ produces a gauge implementation which returns the value of that attribute:
     Metrics.newGauge(SessionStore.class, "cache-evictions",
                      new JmxGauge("net.sf.ehcache:type=Cache,scope=sessions,name=eviction-count", "Value"));
 
-.. todo:: document RatioGauge
 
-.. todo:: document PercentGauge
+Ratio Gauges
+------------
+
+A ratio gauge is a simple way to create a gauge which is the ratio between two numbers:
+
+.. code-block:: java
+
+    public class CacheHitRatio extends RatioGauge {
+        private final Meter hits;
+        private final Timer calls;
+
+        public CacheHitRatio(Meter hits, Timer calls) {
+            this.hits = hits;
+            this.calls = calls;
+        }
+
+        public double getNumerator() {
+            return hits.oneMinuteRate();
+        }
+
+        public double getDenominator() {
+            return calls.oneMinuteRate();
+        }
+    }
+
+This custom gauge returns the ratio of cache hits to misses using a meter and a timer.
+
+Percent Gauges
+--------------
+
+A percent gauge is a ratio gauge where the result is normalized to a value between 0 and 100. It has
+the same interface as a ratio gauge.
 
 .. _man-core-counters:
 
