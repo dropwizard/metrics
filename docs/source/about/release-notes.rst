@@ -6,8 +6,8 @@ Release Notes
 
 .. _rel-2.1.0:
 
-v2.1.0-SNAPSHOT
-===============
+v2.1.0: Mar 12 2012
+===================
 
 * Added support for Java 7's direct and mapped buffer pool stats in ``VirtualMachineMetrics`` and
   ``metrics-servlet``.
