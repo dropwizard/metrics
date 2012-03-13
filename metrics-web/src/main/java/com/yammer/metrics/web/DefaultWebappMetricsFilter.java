@@ -34,6 +34,7 @@ public class DefaultWebappMetricsFilter extends WebappMetricsFilter {
     private static final int OK = 200;
     private static final int CREATED = 201;
     private static final int NO_CONTENT = 204;
+    private static final int FOUND = 302;
     private static final int BAD_REQUEST = 400;
     private static final int NOT_FOUND = 404;
     private static final int SERVER_ERROR = 500;
@@ -58,6 +59,7 @@ public class DefaultWebappMetricsFilter extends WebappMetricsFilter {
         meterNamesByStatusCode.put(BAD_REQUEST, NAME_PREFIX + "badRequest");
         meterNamesByStatusCode.put(NOT_FOUND, NAME_PREFIX + "notFound");
         meterNamesByStatusCode.put(SERVER_ERROR, NAME_PREFIX + "serverError");
+        meterNamesByStatusCode.put(FOUND, NAME_PREFIX + "found");
         return meterNamesByStatusCode;
     }
 
