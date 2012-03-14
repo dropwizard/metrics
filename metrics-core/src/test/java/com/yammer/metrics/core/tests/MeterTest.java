@@ -46,4 +46,14 @@ public class MeterTest {
                    meter.count(),
                    is(3L));
     }
+
+    @Test
+    public void resetMeter() {
+        meter.mark();
+        meter.reset();
+
+        assertThat("the meter has a count of zero",
+                   meter.count(),
+                   is(0L));
+    }
 }
