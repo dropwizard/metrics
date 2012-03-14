@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  * A timer metric which aggregates timing durations and provides duration statistics, plus
  * throughput statistics via {@link Meter}.
  */
-public class Timer implements Metered, Stoppable, Sampling, Summarizable {
+public class Timer implements Metered, Stoppable, Sampling, Summarizable, Resettable {
 
     private final TimeUnit durationUnit, rateUnit;
     private final Meter meter;
@@ -212,5 +212,11 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
     @Override
     public <T> void processWith(MetricProcessor<T> processor, MetricName name, T context) throws Exception {
         processor.processTimer(name, this, context);
+    }
+
+    @Override
+    public void reset() {
+        meter.reset();
+        histogram.clear();
     }
 }

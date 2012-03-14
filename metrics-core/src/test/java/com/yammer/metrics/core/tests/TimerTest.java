@@ -199,4 +199,14 @@ public class TimerTest {
                    timer.max(),
                    is(closeTo(50.0, 0.001)));
     }
+
+    @Test
+    public void resetCount() {
+        timer.time().stop();
+        timer.reset();
+
+        assertThat("the timer has a count of zero",
+                   timer.count(),
+                   is(0L));
+    }
 }
