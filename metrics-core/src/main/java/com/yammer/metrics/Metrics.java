@@ -17,8 +17,12 @@ public class Metrics {
     };
 
     static {
-        JmxReporter.startDefault(DEFAULT_REGISTRY);
-        Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
+        String prop = System.getProperty("metrics.jmx.autostart");
+        boolean autostart = (prop == null || prop.isEmpty()) ? true : Boolean.parseBoolean(prop);
+        if (autostart) {
+            JmxReporter.startDefault(DEFAULT_REGISTRY);
+            Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
+        }
     }
 
     private Metrics() { /* unused */ }
