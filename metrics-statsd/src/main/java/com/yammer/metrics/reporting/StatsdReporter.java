@@ -10,6 +10,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Locale;
 import java.util.Map;
@@ -26,13 +28,13 @@ public class StatsdReporter extends AbstractPollingReporter implements MetricPro
     protected final MetricPredicate predicate;
     protected final Locale locale = Locale.US;
     protected final Clock clock;
-    protected final SocketProvider socketProvider;
+    protected final UDPSocketProvider socketProvider;
     protected final VirtualMachineMetrics vm;
     protected Writer writer;
 
     private boolean printVMMetrics = true;
 
-    public interface SocketProvider {
+    public interface UDPSocketProvider {
         Socket get() throws Exception;
     }
 
@@ -56,15 +58,15 @@ public class StatsdReporter extends AbstractPollingReporter implements MetricPro
              Clock.defaultClock());
     }
 
-    public StatsdReporter(MetricsRegistry metricsRegistry, String prefix, MetricPredicate predicate, SocketProvider socketProvider, Clock clock) throws IOException {
+    public StatsdReporter(MetricsRegistry metricsRegistry, String prefix, MetricPredicate predicate, UDPSocketProvider socketProvider, Clock clock) throws IOException {
         this(metricsRegistry, prefix, predicate, socketProvider, clock, VirtualMachineMetrics.getInstance());
     }
 
-    public StatsdReporter(MetricsRegistry metricsRegistry, String prefix, MetricPredicate predicate, SocketProvider socketProvider, Clock clock, VirtualMachineMetrics vm) throws IOException {
+    public StatsdReporter(MetricsRegistry metricsRegistry, String prefix, MetricPredicate predicate, UDPSocketProvider socketProvider, Clock clock, VirtualMachineMetrics vm) throws IOException {
         this(metricsRegistry, prefix, predicate, socketProvider, clock, vm, "graphite-reporter");
     }
 
-    public StatsdReporter(MetricsRegistry metricsRegistry, String prefix, MetricPredicate predicate, SocketProvider socketProvider, Clock clock, VirtualMachineMetrics vm, String name) throws IOException {
+    public StatsdReporter(MetricsRegistry metricsRegistry, String prefix, MetricPredicate predicate, UDPSocketProvider socketProvider, Clock clock, VirtualMachineMetrics vm, String name) throws IOException {
         super(metricsRegistry, name);
 
         this.socketProvider = socketProvider;
@@ -177,7 +179,7 @@ public class StatsdReporter extends AbstractPollingReporter implements MetricPro
 
     @Override
     public void processCounter(MetricName name, Counter counter, Long epoch) throws Exception {
-        sendInt(sanitizeName(name), StatType.GAUGE, counter.count());
+        sendInt(sanitizeName(name) + ".count", StatType.GAUGE, counter.count());
     }
 
     @Override
@@ -270,13 +272,14 @@ public class StatsdReporter extends AbstractPollingReporter implements MetricPro
             writer.write(value);
             writer.write("|");
             writer.write(statTypeStr);
+            writer.write('\n');
             writer.flush();
         } catch (IOException e) {
             LOG.error("Error sending to Graphite:", e);
         }
     }
 
-    public static class DefaultSocketProvider implements SocketProvider {
+    public static class DefaultSocketProvider implements UDPSocketProvider {
 
         private final String host;
         private final int port;
@@ -288,6 +291,7 @@ public class StatsdReporter extends AbstractPollingReporter implements MetricPro
 
         @Override
         public Socket get() throws Exception {
+            //return new DatagramSocket(new InetSocketAddress(this.host, this.port));
             return new Socket(this.host, this.port);
         }
     }
