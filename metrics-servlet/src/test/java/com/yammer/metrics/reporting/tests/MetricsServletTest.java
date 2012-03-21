@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 public class MetricsServletTest {
     private final Clock clock = mock(Clock.class);
     private final VirtualMachineMetrics vm = mock(VirtualMachineMetrics.class);
-    private final MetricsRegistry registry = new MetricsRegistry(clock);
+    private final MetricsRegistry registry = new MetricsRegistry(clock, "testRegistry");
     private final JsonFactory factory = mock(JsonFactory.class);
 
     private final HttpServletRequest request = mock(HttpServletRequest.class);
