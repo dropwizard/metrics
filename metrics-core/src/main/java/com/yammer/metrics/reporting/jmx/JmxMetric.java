@@ -40,7 +40,7 @@ public final class JmxMetric implements DynamicMBean {
     private final Metric object;
     private final ObjectName name;
     private final MBeanInfo beanInfo;
-    private final Map<String, PublishedAttribute> attrs = new HashMap<String, PublishedAttribute>();
+    private final Map<String, PublishedAttribute> metricAttributes = new HashMap<String, PublishedAttribute>();
     private final MetadataMBean metadataMBean;
 
     public JmxMetric(String registryName, MetricName metricName, Metric obj) throws Exception {
@@ -52,7 +52,6 @@ public final class JmxMetric implements DynamicMBean {
         name = createObjectName(registryName, metricName, "value");
         AnnotatedMetric annotatedMetric = new AnnotatedMetric(object);
 
-        Map<String, PublishedAttribute> builder = new HashMap<String, PublishedAttribute>();
         List<AnnotatedMetricAttribute> annotatedMetricAttrs = annotatedMetric.getAttributes();
         MBeanAttributeInfo[] attributes = new MBeanAttributeInfo[annotatedMetricAttrs.size()];
 
@@ -60,7 +59,7 @@ public final class JmxMetric implements DynamicMBean {
             AnnotatedMetricAttribute annotatedMetricAttribute = annotatedMetricAttrs.get(i);
             PublishedAttribute attr = new PublishedAttribute(metricName, annotatedMetricAttribute);
             Publish m = attr.getAnnotation();
-            builder.put(annotatedMetricAttribute.getName(), attr);
+            metricAttributes.put(annotatedMetricAttribute.getName(), attr);
             attributes[i] = attr.getValueAttributeInfo();
         }
 
@@ -81,22 +80,20 @@ public final class JmxMetric implements DynamicMBean {
                 null,  // constructors
                 null,  // operations
                 null); // notifications
-        metadataMBean = new MetadataMBean(metadataName, metadataInfo, attrs);
+        metadataMBean = new MetadataMBean(metadataName, metadataInfo, metricAttributes);
     }
 
-    private ObjectName createObjectName(String domain, MetricName metricName, String field) {
+    private ObjectName createObjectName(String registryName, MetricName metricName, String field) {
         StringBuilder buf = new StringBuilder();
-        buf.append((domain == null) ? "default" : domain)
+        buf.append((registryName == null) ? "default" : registryName)
                 .append(":group=")
-                .append(metricName.getGroup())
-                .append(",type=")
                 .append(metricName.getType())
+                .append(",type=")
+                .append(metricName.getGroup())
                 .append(",name=")
                 .append(metricName.getName())
                 .append(",scope=")
-                .append(metricName.getScope())
-                .append(",field=")
-                .append(field);
+                .append(metricName.getScope());
 
         String name = buf.toString();
         try {
@@ -116,7 +113,7 @@ public final class JmxMetric implements DynamicMBean {
 
     public Object getAttribute(String attribute)
             throws AttributeNotFoundException, MBeanException {
-        PublishedAttribute attr = attrs.get(attribute);
+        PublishedAttribute attr = metricAttributes.get(attribute);
         if (attr == null) {
             throw new AttributeNotFoundException(attribute);
         }

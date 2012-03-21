@@ -1,5 +1,7 @@
 package com.yammer.metrics.core;
 
+import com.yammer.metrics.annotation.Publish;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -49,6 +51,7 @@ public class Counter implements Metric {
      *
      * @return the counter's current value
      */
+    @Publish
     public long count() {
         return count.get();
     }

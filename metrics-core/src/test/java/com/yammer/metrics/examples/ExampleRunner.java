@@ -4,6 +4,7 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Histogram;
 import com.yammer.metrics.reporting.ConsoleReporter;
+import com.yammer.metrics.reporting.jmx.JmxReporter;
 
 import java.io.File;
 import java.util.List;
@@ -39,7 +40,7 @@ public class ExampleRunner {
 
     public static void main(String[] args) throws Exception {
         ConsoleReporter.enable(10, TimeUnit.SECONDS);
-
+        JmxReporter jmxReporter = new JmxReporter(Metrics.defaultRegistry());
         System.err.println("Scanning all files on your hard drive...");
 
         JOBS.add(new File("/"));
@@ -49,5 +50,6 @@ public class ExampleRunner {
         }
 
         POOL.awaitTermination(10, TimeUnit.DAYS);
+        jmxReporter.shutdown();
     }
 }

@@ -65,6 +65,10 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         super(registry);
         this.registeredBeans = new ConcurrentHashMap<MetricName, ObjectName>(100);
         this.server = ManagementFactory.getPlatformMBeanServer();
+        
+        for(Map.Entry<MetricName, Metric> metric : registry.allMetrics().entrySet()){
+            onMetricAdded(registry, metric.getKey(), metric.getValue());
+        }
     }
 
     @Override

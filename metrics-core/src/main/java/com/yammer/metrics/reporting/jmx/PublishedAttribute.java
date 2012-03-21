@@ -93,7 +93,7 @@ public final class PublishedAttribute {
 
         this.annotatedMetricAttribute = annotatedMetricAttribute;
 
-        String name = metricName.getName();
+        String name = annotatedMetricAttribute.getName();
         String type = metricName.getType();
         String desc = metricName.getGroup();
 
@@ -117,7 +117,7 @@ public final class PublishedAttribute {
             metadata = new CompositeDataSupport(
                     METADATA_TYPE,
                     ITEM_NAMES,
-                    new Object[]{name, type, desc});
+                    new Object[]{name, type, desc, null});
         } catch (OpenDataException e) {
             throw new IllegalArgumentException(
                     "failed to create mbean metadata value for " + toString(), e);
