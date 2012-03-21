@@ -20,15 +20,15 @@ public class MetricsRegistry {
      * Creates a new {@link MetricsRegistry}.
      */
     public MetricsRegistry(String name) {
-        this(Clock.defaultClock(), name);
+        this(name, Clock.defaultClock());
     }
 
     /**
      * Creates a new {@link MetricsRegistry} with the given {@link Clock} instance.
      *
-     * @param clock    a {@link Clock} instance
+     * @param clock    a {@link com.yammer.metrics.core.Clock} instance
      */
-    public MetricsRegistry(Clock clock, String name) {
+    public MetricsRegistry(String name, Clock clock) {
         this.clock = clock;
         this.metrics = newMetricsMap();
         this.threadPools = new ThreadPools();
@@ -184,7 +184,7 @@ public class MetricsRegistry {
     public Histogram newHistogram(MetricName metricName,
                                   boolean biased) {
         return getOrAdd(metricName,
-                        new Histogram(biased ? SampleType.BIASED : SampleType.UNIFORM));
+                new Histogram(biased ? SampleType.BIASED : SampleType.UNIFORM));
     }
 
     /**
@@ -320,7 +320,7 @@ public class MetricsRegistry {
             return (Timer) existingMetric;
         }
         return getOrAdd(metricName,
-                        new Timer(newMeterTickThreadPool(), durationUnit, rateUnit, clock));
+                new Timer(newMeterTickThreadPool(), durationUnit, rateUnit, clock));
     }
 
     /**

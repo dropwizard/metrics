@@ -20,7 +20,7 @@ public class TimerTest {
 
     @Before
     public void setUp() throws Exception {
-        this.registry = new MetricsRegistry(new Clock() {
+        this.registry = new MetricsRegistry("testRegistry", new Clock() {
             // a mock clock that increments its ticker by 50msec per call
             private long val = 0;
 
@@ -28,7 +28,7 @@ public class TimerTest {
             public long tick() {
                 return val += 50000000;
             }
-        }, "testRegistry");
+        });
         this.timer = registry.newTimer(TimerTest.class, "timer");
     }
 
