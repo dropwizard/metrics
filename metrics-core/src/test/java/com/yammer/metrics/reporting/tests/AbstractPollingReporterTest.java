@@ -37,6 +37,11 @@ public abstract class AbstractPollingReporterTest {
     }
 
     protected static class TestMetricsRegistry extends MetricsRegistry {
+
+        TestMetricsRegistry() {
+            super("testRegistry");
+        }
+
         public <T extends Metric> T add(MetricName name, T metric) {
             return getOrAdd(name, metric);
         }
@@ -54,7 +59,7 @@ public abstract class AbstractPollingReporterTest {
             // Assertions: first check that the line count matches then compare line by line ignoring leading and trailing whitespace
             assertEquals("Line count mismatch, was:\n" + Arrays.toString(lines) + "\nexpected:\n" + Arrays
                     .toString(expected) + "\n", expected.length,
-                         lines.length);
+                    lines.length);
             for (int i = 0; i < lines.length; i++) {
                 if (!expected[i].trim().equals(lines[i].trim())) {
                     System.err.println("Failure comparing line " + (1 + i));
@@ -155,7 +160,7 @@ public abstract class AbstractPollingReporterTest {
         }));
     }
 
-    
+
     static Gauge<String> createGauge() throws Exception {
         @SuppressWarnings("unchecked")
         final Gauge<String> mock = mock(Gauge.class);

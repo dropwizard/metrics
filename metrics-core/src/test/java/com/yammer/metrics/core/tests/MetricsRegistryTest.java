@@ -20,7 +20,7 @@ public class MetricsRegistryTest {
 
     @Before
     public void setUp() throws Exception {
-        this.registry = new MetricsRegistry();
+        this.registry = new MetricsRegistry("testRegistry");
     }
 
     @After
@@ -67,15 +67,15 @@ public class MetricsRegistryTest {
                                               TimeUnit.SECONDS);
         final Timer timer = registry.newTimer(MetricsRegistryTest.class, "timer");
 
-        verify(listener).onMetricAdded(new MetricName(MetricsRegistryTest.class, "gauge"), gauge);
+        verify(listener).onMetricAdded(registry, new MetricName(MetricsRegistryTest.class, "gauge"), gauge);
 
-        verify(listener).onMetricAdded(new MetricName(MetricsRegistryTest.class, "counter"), counter);
+        verify(listener).onMetricAdded(registry, new MetricName(MetricsRegistryTest.class, "counter"), counter);
 
-        verify(listener).onMetricAdded(new MetricName(MetricsRegistryTest.class, "histogram"), histogram);
+        verify(listener).onMetricAdded(registry, new MetricName(MetricsRegistryTest.class, "histogram"), histogram);
 
-        verify(listener).onMetricAdded(new MetricName(MetricsRegistryTest.class, "meter"), meter);
+        verify(listener).onMetricAdded(registry, new MetricName(MetricsRegistryTest.class, "meter"), meter);
 
-        verify(listener).onMetricAdded(new MetricName(MetricsRegistryTest.class, "timer"), timer);
+        verify(listener).onMetricAdded(registry, new MetricName(MetricsRegistryTest.class, "timer"), timer);
     }
 
     @Test
@@ -89,9 +89,9 @@ public class MetricsRegistryTest {
 
         final Counter counter2 = registry.newCounter(MetricsRegistryTest.class, "counter2");
 
-        verify(listener).onMetricAdded(new MetricName(MetricsRegistryTest.class, "counter1"), counter1);
+        verify(listener).onMetricAdded(registry, new MetricName(MetricsRegistryTest.class, "counter1"), counter1);
 
-        verify(listener, never()).onMetricAdded(new MetricName(MetricsRegistryTest.class, "counter2"), counter2);
+        verify(listener, never()).onMetricAdded(registry, new MetricName(MetricsRegistryTest.class, "counter2"), counter2);
     }
 
     @Test
@@ -105,8 +105,8 @@ public class MetricsRegistryTest {
         registry.removeMetric(MetricsRegistryTest.class, "counter1");
 
         final InOrder inOrder = inOrder(listener);
-        inOrder.verify(listener).onMetricAdded(name, counter1);
-        inOrder.verify(listener).onMetricRemoved(name);
+        inOrder.verify(listener).onMetricAdded(registry, name, counter1);
+        inOrder.verify(listener).onMetricRemoved(registry, name);
     }
 
     @Test

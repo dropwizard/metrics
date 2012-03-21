@@ -36,17 +36,11 @@ import java.util.Map;
  */
 public final class JmxMetric implements DynamicMBean {
 
-    private static final Logger LOGGER =
-            LoggerFactory.getLogger(JmxMetric.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(JmxMetric.class);
     private final Metric object;
-
     private final ObjectName name;
-
     private final MBeanInfo beanInfo;
-
     private final Map<String, PublishedAttribute> attrs = new HashMap<String, PublishedAttribute>();
-
     private final MetadataMBean metadataMBean;
 
     public JmxMetric(String registryName, MetricName metricName, Metric obj) throws Exception {
@@ -64,7 +58,7 @@ public final class JmxMetric implements DynamicMBean {
 
         for (int i = 0; i < annotatedMetricAttrs.size(); ++i) {
             AnnotatedMetricAttribute annotatedMetricAttribute = annotatedMetricAttrs.get(i);
-            PublishedAttribute attr = new PublishedAttribute(annotatedMetricAttribute);
+            PublishedAttribute attr = new PublishedAttribute(metricName, annotatedMetricAttribute);
             Publish m = attr.getAnnotation();
             builder.put(annotatedMetricAttribute.getName(), attr);
             attributes[i] = attr.getValueAttributeInfo();

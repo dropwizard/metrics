@@ -28,7 +28,7 @@ public class TimerTest {
             public long tick() {
                 return val += 50000000;
             }
-        });
+        }, "testRegistry");
         this.timer = registry.newTimer(TimerTest.class, "timer");
     }
 

@@ -18,7 +18,7 @@ public class MeterTest {
 
     @Before
     public void setUp() throws Exception {
-        this.registry = new MetricsRegistry();
+        this.registry = new MetricsRegistry("testRegistry");
         this.meter = registry.newMeter(MeterTest.class, "things", "thing", TimeUnit.SECONDS);
     }
 
