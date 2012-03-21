@@ -14,12 +14,13 @@ public class MetricsRegistry {
     private final ConcurrentMap<MetricName, Metric> metrics;
     private final ThreadPools threadPools;
     private final List<MetricsRegistryListener> listeners;
+    private final String name;
 
     /**
      * Creates a new {@link MetricsRegistry}.
      */
-    public MetricsRegistry() {
-        this(Clock.defaultClock());
+    public MetricsRegistry(String name) {
+        this(Clock.defaultClock(), name);
     }
 
     /**
@@ -27,11 +28,12 @@ public class MetricsRegistry {
      *
      * @param clock    a {@link Clock} instance
      */
-    public MetricsRegistry(Clock clock) {
+    public MetricsRegistry(Clock clock, String name) {
         this.clock = clock;
         this.metrics = newMetricsMap();
         this.threadPools = new ThreadPools();
         this.listeners = new CopyOnWriteArrayList<MetricsRegistryListener>();
+        this.name = name;
     }
 
     /**
@@ -439,7 +441,7 @@ public class MetricsRegistry {
     public void addListener(MetricsRegistryListener listener) {
         listeners.add(listener);
         for (Map.Entry<MetricName, Metric> entry : metrics.entrySet()) {
-            listener.onMetricAdded(entry.getKey(), entry.getValue());
+            listener.onMetricAdded(this, entry.getKey(), entry.getValue());
         }
     }
 
@@ -472,6 +474,10 @@ public class MetricsRegistry {
      */
     protected ConcurrentMap<MetricName, Metric> newMetricsMap() {
         return new ConcurrentHashMap<MetricName, Metric>(EXPECTED_METRIC_COUNT);
+    }
+
+    public String getName(){
+        return name;
     }
 
     /**
@@ -507,13 +513,13 @@ public class MetricsRegistry {
 
     private void notifyMetricRemoved(MetricName name) {
         for (MetricsRegistryListener listener : listeners) {
-            listener.onMetricRemoved(name);
+            listener.onMetricRemoved(this, name);
         }
     }
 
     private void notifyMetricAdded(MetricName name, Metric metric) {
         for (MetricsRegistryListener listener : listeners) {
-            listener.onMetricAdded(name, metric);
+            listener.onMetricAdded(this, name, metric);
         }
     }
 }

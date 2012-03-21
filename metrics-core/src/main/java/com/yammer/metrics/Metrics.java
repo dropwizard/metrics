@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  * A set of factory methods for creating centrally registered metric instances.
  */
 public class Metrics {
-    private static final MetricsRegistry DEFAULT_REGISTRY = new MetricsRegistry();
+    private static final MetricsRegistry DEFAULT_REGISTRY = new MetricsRegistry("default");
     private static final Thread SHUTDOWN_HOOK = new Thread() {
         public void run() {
             JmxReporter.shutdownDefault();

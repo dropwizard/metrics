@@ -12,12 +12,12 @@ public interface MetricsRegistryListener extends EventListener {
      * @param name   the name of the {@link Metric}
      * @param metric the {@link Metric}
      */
-    void onMetricAdded(MetricName name, Metric metric);
+    void onMetricAdded(MetricsRegistry registry, MetricName name, Metric metric);
 
     /**
      * Called when a metric has been removed from the {@link MetricsRegistry}.
      *
      * @param name the name of the {@link com.yammer.metrics.core.Metric}
      */
-    void onMetricRemoved(MetricName name);
+    void onMetricRemoved(MetricsRegistry registry, MetricName name);
 }
