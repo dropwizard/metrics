@@ -1,5 +1,6 @@
 package com.yammer.metrics.core;
 
+import com.yammer.metrics.annotation.Publish;
 import com.yammer.metrics.stats.EWMA;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -88,21 +89,25 @@ public class Meter implements Metered, Stoppable {
     }
 
     @Override
+    @Publish
     public long count() {
         return count.get();
     }
 
     @Override
+    @Publish
     public double fifteenMinuteRate() {
         return m15Rate.rate(rateUnit);
     }
 
     @Override
+    @Publish
     public double fiveMinuteRate() {
         return m5Rate.rate(rateUnit);
     }
 
     @Override
+    @Publish
     public double meanRate() {
         if (count() == 0) {
             return 0.0;
@@ -113,6 +118,7 @@ public class Meter implements Metered, Stoppable {
     }
 
     @Override
+    @Publish
     public double oneMinuteRate() {
         return m1Rate.rate(rateUnit);
     }

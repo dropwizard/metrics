@@ -1,5 +1,6 @@
 package com.yammer.metrics.core;
 
+import com.yammer.metrics.annotation.Publish;
 import com.yammer.metrics.stats.ExponentiallyDecayingSample;
 import com.yammer.metrics.stats.Sample;
 import com.yammer.metrics.stats.Snapshot;
@@ -130,6 +131,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
      *
      * @return the number of values recorded
      */
+    @Publish
     public long count() {
         return count.get();
     }
@@ -138,6 +140,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
      * @see com.yammer.metrics.core.Summarizable#max()
      */
     @Override
+    @Publish
     public double max() {
         if (count() > 0) {
             return max.get();
@@ -149,6 +152,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
      * @see com.yammer.metrics.core.Summarizable#min()
      */
     @Override
+    @Publish
     public double min() {
         if (count() > 0) {
             return min.get();
@@ -160,6 +164,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
      * @see com.yammer.metrics.core.Summarizable#mean()
      */
     @Override
+    @Publish
     public double mean() {
         if (count() > 0) {
             return sum.get() / (double) count();
@@ -171,6 +176,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
      * @see com.yammer.metrics.core.Summarizable#stdDev()
      */
     @Override
+    @Publish
     public double stdDev() {
         if (count() > 0) {
             return sqrt(variance());
@@ -182,6 +188,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
      * @see com.yammer.metrics.core.Summarizable#sum()
      */
     @Override
+    @Publish
     public double sum() {
         return (double) sum.get();
     }

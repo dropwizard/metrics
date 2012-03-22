@@ -1,5 +1,6 @@
 package com.yammer.metrics.core;
 
+import com.yammer.metrics.annotation.Publish;
 import com.yammer.metrics.core.Histogram.SampleType;
 import com.yammer.metrics.stats.Snapshot;
 
@@ -104,26 +105,31 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
     }
 
     @Override
+    @Publish
     public long count() {
         return histogram.count();
     }
 
     @Override
+    @Publish
     public double fifteenMinuteRate() {
         return meter.fifteenMinuteRate();
     }
 
     @Override
+    @Publish
     public double fiveMinuteRate() {
         return meter.fiveMinuteRate();
     }
 
     @Override
+    @Publish
     public double meanRate() {
         return meter.meanRate();
     }
 
     @Override
+    @Publish
     public double oneMinuteRate() {
         return meter.oneMinuteRate();
     }
@@ -134,6 +140,7 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      * @return the longest recorded duration
      */
     @Override
+    @Publish
     public double max() {
         return convertFromNS(histogram.max());
     }
@@ -144,6 +151,7 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      * @return the shortest recorded duration
      */
     @Override
+    @Publish
     public double min() {
         return convertFromNS(histogram.min());
     }
@@ -154,6 +162,7 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      * @return the arithmetic mean of all recorded durations
      */
     @Override
+    @Publish
     public double mean() {
         return convertFromNS(histogram.mean());
     }
@@ -164,6 +173,7 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      * @return the standard deviation of all recorded durations
      */
     @Override
+    @Publish
     public double stdDev() {
         return convertFromNS(histogram.stdDev());
     }
@@ -174,6 +184,7 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      * @return the sum of all recorded durations
      */
     @Override
+    @Publish
     public double sum() {
         return convertFromNS(histogram.sum());
     }
