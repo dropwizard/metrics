@@ -25,7 +25,7 @@ public class ExampleRunner {
                     final File file = JOBS.poll(1, TimeUnit.MINUTES);
                     QUEUE_DEPTH.dec();
                     if (file.isDirectory()) {
-                        final List<File> contents = new DirectoryLister(file).list();
+                        final List<File> contents = DirectoryLister.list(file);
                         DIRECTORY_SIZE.update(contents.size());
                         QUEUE_DEPTH.inc(contents.size());
                         JOBS.addAll(contents);

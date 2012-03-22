@@ -13,19 +13,14 @@ import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
 
 public class DirectoryLister {
-    private final Counter counter = Metrics.newCounter(getClass(), "directories");
-    private final Meter meter = Metrics.newMeter(getClass(), "files", "files", TimeUnit.SECONDS);
-    private final Timer timer = Metrics.newTimer(getClass(),
+    private static final Counter counter = Metrics.newCounter(DirectoryLister.class, "directories");
+    private static final Meter meter = Metrics.newMeter(DirectoryLister.class, "files", "files", TimeUnit.SECONDS);
+    private static final Timer timer = Metrics.newTimer(DirectoryLister.class,
                                                        "directory-listing",
                                                        TimeUnit.MILLISECONDS,
                                                        TimeUnit.SECONDS);
-    private final File directory;
 
-    public DirectoryLister(File directory) {
-        this.directory = directory;
-    }
-
-    public List<File> list() throws Exception {
+    public static List<File> list(final File directory) throws Exception {
         counter.inc();
         final File[] list = timer.time(new Callable<File[]>() {
             @Override
