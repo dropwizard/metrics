@@ -65,10 +65,8 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         super(registry);
         this.registeredBeans = new ConcurrentHashMap<MetricName, ObjectName>(100);
         this.server = ManagementFactory.getPlatformMBeanServer();
-        
-        for(Map.Entry<MetricName, Metric> metric : registry.allMetrics().entrySet()){
-            onMetricAdded(registry, metric.getKey(), metric.getValue());
-        }
+
+        registry.addListener(this);
     }
 
     @Override
@@ -132,7 +130,12 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
             throws MBeanRegistrationException, OperationsException {
         try{
             JmxMetric jmxMetric = new JmxMetric(registryName, name, metric);
+            //TODO Not sure this matters
+            if(server.isRegistered(jmxMetric.getObjectName())){
+                server.unregisterMBean(jmxMetric.getObjectName());
+            }
             server.registerMBean(jmxMetric, jmxMetric.getObjectName());
+            server.registerMBean(jmxMetric.getMetadataMBean(), jmxMetric.getMetadataMBean().getObjectName());
             registeredBeans.put(name, jmxMetric.getObjectName());
         } catch (Exception e){
             throw new MBeanRegistrationException(e, "Problem creating mBean.");

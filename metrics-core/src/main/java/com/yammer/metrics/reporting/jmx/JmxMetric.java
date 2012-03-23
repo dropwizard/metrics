@@ -84,23 +84,26 @@ public final class JmxMetric implements DynamicMBean {
     }
 
     private ObjectName createObjectName(String registryName, MetricName metricName, String field) {
-        StringBuilder buf = new StringBuilder();
-        buf.append((registryName == null) ? "default" : registryName)
-                .append(":group=")
-                .append(metricName.getType())
-                .append(",type=")
-                .append(metricName.getGroup())
-                .append(",name=")
-                .append(metricName.getName())
-                .append(",scope=")
-                .append(metricName.getScope());
+        StringBuilder nameBuilder = new StringBuilder();
+        nameBuilder.append((registryName == null) ? "DefaultMetricRegistry" : registryName)
+                .append(":type=")
+                .append(metricName.getType());
 
-        String name = buf.toString();
+        addIfNotNull(nameBuilder, "group", metricName.getGroup());
+        addIfNotNull(nameBuilder, "name", metricName.getName());
+        addIfNotNull(nameBuilder, "scope", metricName.getScope());
+        addIfNotNull(nameBuilder, "feild", field);
+
+        String name = nameBuilder.toString();
         try {
-            return new ObjectName(buf.toString());
+            return new ObjectName(nameBuilder.toString());
         } catch (MalformedObjectNameException e) {
             throw new IllegalArgumentException("invalid ObjectName " + name, e);
         }
+    }
+    
+    private void addIfNotNull(StringBuilder builder, String key, String value){
+        if(value!=null) builder.append(String.format(",%s=", key)).append(value);
     }
 
     public ObjectName getObjectName() {
