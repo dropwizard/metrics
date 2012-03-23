@@ -132,64 +132,64 @@ public class Histogram implements Metric, Sampling, Summarizable {
      * @return the number of values recorded
      */
     @Publish
-    public long count() {
+    public long getCount() {
         return count.get();
     }
 
     /* (non-Javadoc)
-     * @see com.yammer.metrics.core.Summarizable#max()
+     * @see com.yammer.metrics.core.Summarizable#getMax()
      */
     @Override
     @Publish
-    public double max() {
-        if (count() > 0) {
+    public double getMax() {
+        if (getCount() > 0) {
             return max.get();
         }
         return 0.0;
     }
 
     /* (non-Javadoc)
-     * @see com.yammer.metrics.core.Summarizable#min()
+     * @see com.yammer.metrics.core.Summarizable#getMin()
      */
     @Override
     @Publish
-    public double min() {
-        if (count() > 0) {
+    public double getMin() {
+        if (getCount() > 0) {
             return min.get();
         }
         return 0.0;
     }
 
     /* (non-Javadoc)
-     * @see com.yammer.metrics.core.Summarizable#mean()
+     * @see com.yammer.metrics.core.Summarizable#getMean()
      */
     @Override
     @Publish
-    public double mean() {
-        if (count() > 0) {
-            return sum.get() / (double) count();
+    public double getMean() {
+        if (getCount() > 0) {
+            return sum.get() / (double) getCount();
         }
         return 0.0;
     }
 
     /* (non-Javadoc)
-     * @see com.yammer.metrics.core.Summarizable#stdDev()
+     * @see com.yammer.metrics.core.Summarizable#getStdDev()
      */
     @Override
     @Publish
-    public double stdDev() {
-        if (count() > 0) {
+    public double getStdDev() {
+        if (getCount() > 0) {
             return sqrt(variance());
         }
         return 0.0;
     }
 
     /* (non-Javadoc)
-     * @see com.yammer.metrics.core.Summarizable#sum()
+     * @see com.yammer.metrics.core.Summarizable#getSum()
      */
     @Override
     @Publish
-    public double sum() {
+    public double getSum() {
         return (double) sum.get();
     }
 
@@ -198,11 +198,71 @@ public class Histogram implements Metric, Sampling, Summarizable {
         return sample.getSnapshot();
     }
 
+    /**
+     * Returns the median value in the distribution.
+     *
+     * @return the median value in the distribution
+     */
+    @Publish
+    public double getMedian() {
+        return getSnapshot().getMedian();
+    }
+
+    /**
+     * Returns the value at the 75th percentile in the distribution.
+     *
+     * @return the value at the 75th percentile in the distribution
+     */
+    @Publish
+    public double get75thPercentile() {
+        return getSnapshot().get75thPercentile();
+    }
+
+    /**
+     * Returns the value at the 95th percentile in the distribution.
+     *
+     * @return the value at the 95th percentile in the distribution
+     */
+    @Publish
+    public double get95thPercentile() {
+        return getSnapshot().get95thPercentile();
+    }
+
+    /**
+     * Returns the value at the 98th percentile in the distribution.
+     *
+     * @return the value at the 98th percentile in the distribution
+     */
+    @Publish
+    public double get98thPercentile() {
+        return getSnapshot().get98thPercentile();
+    }
+
+    /**
+     * Returns the value at the 99th percentile in the distribution.
+     *
+     * @return the value at the 99th percentile in the distribution
+     */
+    @Publish
+    public double get99thPercentile() {
+        return getSnapshot().get99thPercentile();
+    }
+
+    /**
+     * Returns the value at the 99.9th percentile in the distribution.
+     *
+     * @return the value at the 99.9th percentile in the distribution
+     */
+    @Publish
+    public double get999thPercentile() {
+        return getSnapshot().get999thPercentile();
+    }
+
     private double variance() {
-        if (count() <= 1) {
+        if (getCount() <= 1) {
             return 0.0;
         }
-        return variance.get()[1] / (count() - 1);
+        return variance.get()[1] / (getCount() - 1);
     }
 
     private void setMax(long potentialMax) {
@@ -233,7 +293,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
                 final double oldM = oldValues[0];
                 final double oldS = oldValues[1];
 
-                final double newM = oldM + ((value - oldM) / count());
+                final double newM = oldM + ((value - oldM) / getCount());
                 final double newS = oldS + ((value - oldM) * (value - newM));
 
                 newValues[0] = newM;

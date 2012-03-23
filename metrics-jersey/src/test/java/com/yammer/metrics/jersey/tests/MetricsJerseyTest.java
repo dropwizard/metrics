@@ -40,7 +40,7 @@ public class MetricsJerseyTest extends JerseyTest {
                    is("yay"));
 
         final Timer timer = Metrics.newTimer(InstrumentedResource.class, "timed");
-        assertThat(timer.count(),
+        assertThat(timer.getCount(),
                    is(1L));
     }
 
@@ -50,7 +50,7 @@ public class MetricsJerseyTest extends JerseyTest {
                    is("woo"));
 
         final Meter meter = Metrics.newMeter(InstrumentedResource.class, "metered", "blah", TimeUnit.SECONDS);
-        assertThat(meter.count(),
+        assertThat(meter.getCount(),
                    is(1L));
     }
 
@@ -61,7 +61,7 @@ public class MetricsJerseyTest extends JerseyTest {
         assertThat(resource().path("exception-metered").get(String.class),
                    is("fuh"));
 
-        assertThat(meter.count(),
+        assertThat(meter.getCount(),
                    is(0L));
         
         try {
@@ -72,7 +72,7 @@ public class MetricsJerseyTest extends JerseyTest {
                        is(instanceOf(IOException.class)));
         }
 
-        assertThat(meter.count(),
+        assertThat(meter.getCount(),
                    is(1L));
     }
 }

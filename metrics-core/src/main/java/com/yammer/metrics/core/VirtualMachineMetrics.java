@@ -448,7 +448,7 @@ public class VirtualMachineMetrics {
 
             final LockInfo[] locks = t.getLockedSynchronizers();
             if (locks.length > 0) {
-                writer.printf("    Locked synchronizers: count = %d\n", locks.length);
+                writer.printf("    Locked synchronizers: getCount = %d\n", locks.length);
                 for (LockInfo l : locks) {
                     writer.printf("      - %s\n", l);
                 }

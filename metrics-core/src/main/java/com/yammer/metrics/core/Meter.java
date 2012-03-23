@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * A meter metric which measures mean throughput and one-, five-, and fifteen-minute
+ * A meter metric which measures getMean throughput and one-, five-, and fifteen-minute
  * exponentially-weighted moving average throughputs.
  *
  * @see <a href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average">EMA</a>
@@ -90,36 +90,36 @@ public class Meter implements Metered, Stoppable {
 
     @Override
     @Publish
-    public long count() {
+    public long getCount() {
         return count.get();
     }
 
     @Override
     @Publish
-    public double fifteenMinuteRate() {
+    public double getFifteenMinuteRate() {
         return m15Rate.rate(rateUnit);
     }
 
     @Override
     @Publish
-    public double fiveMinuteRate() {
+    public double getFiveMinuteRate() {
         return m5Rate.rate(rateUnit);
     }
 
     @Override
     @Publish
-    public double meanRate() {
-        if (count() == 0) {
+    public double getMeanRate() {
+        if (getCount() == 0) {
             return 0.0;
         } else {
             final long elapsed = (clock.tick() - startTime);
-            return convertNsRate(count() / (double) elapsed);
+            return convertNsRate(getCount() / (double) elapsed);
         }
     }
 
     @Override
     @Publish
-    public double oneMinuteRate() {
+    public double getOneMinuteRate() {
         return m1Rate.rate(rateUnit);
     }
 

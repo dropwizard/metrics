@@ -106,32 +106,32 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
 
     @Override
     @Publish
-    public long count() {
-        return histogram.count();
+    public long getCount() {
+        return histogram.getCount();
     }
 
     @Override
     @Publish
-    public double fifteenMinuteRate() {
-        return meter.fifteenMinuteRate();
+    public double getFifteenMinuteRate() {
+        return meter.getFifteenMinuteRate();
     }
 
     @Override
     @Publish
-    public double fiveMinuteRate() {
-        return meter.fiveMinuteRate();
+    public double getFiveMinuteRate() {
+        return meter.getFiveMinuteRate();
     }
 
     @Override
     @Publish
-    public double meanRate() {
-        return meter.meanRate();
+    public double getMeanRate() {
+        return meter.getMeanRate();
     }
 
     @Override
     @Publish
-    public double oneMinuteRate() {
-        return meter.oneMinuteRate();
+    public double getOneMinuteRate() {
+        return meter.getOneMinuteRate();
     }
 
     /**
@@ -141,8 +141,8 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      */
     @Override
     @Publish
-    public double max() {
-        return convertFromNS(histogram.max());
+    public double getMax() {
+        return convertFromNS(histogram.getMax());
     }
 
     /**
@@ -152,19 +152,19 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      */
     @Override
     @Publish
-    public double min() {
-        return convertFromNS(histogram.min());
+    public double getMin() {
+        return convertFromNS(histogram.getMin());
     }
 
     /**
-     * Returns the arithmetic mean of all recorded durations.
+     * Returns the arithmetic getMean of all recorded durations.
      *
-     * @return the arithmetic mean of all recorded durations
+     * @return the arithmetic getMean of all recorded durations
      */
     @Override
     @Publish
-    public double mean() {
-        return convertFromNS(histogram.mean());
+    public double getMean() {
+        return convertFromNS(histogram.getMean());
     }
 
     /**
@@ -174,19 +174,19 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      */
     @Override
     @Publish
-    public double stdDev() {
-        return convertFromNS(histogram.stdDev());
+    public double getStdDev() {
+        return convertFromNS(histogram.getStdDev());
     }
 
     /**
-     * Returns the sum of all recorded durations.
+     * Returns the getSum of all recorded durations.
      *
-     * @return the sum of all recorded durations
+     * @return the getSum of all recorded durations
      */
     @Override
     @Publish
-    public double sum() {
-        return convertFromNS(histogram.sum());
+    public double getSum() {
+        return convertFromNS(histogram.getSum());
     }
 
     @Override
@@ -197,6 +197,66 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
             converted[i] = convertFromNS(values[i]);
         }
         return new Snapshot(converted);
+    }
+
+    /**
+     * Returns the median value in the distribution.
+     *
+     * @return the median value in the distribution
+     */
+    @Publish
+    public double getMedian() {
+        return getSnapshot().getMedian();
+    }
+
+    /**
+     * Returns the value at the 75th percentile in the distribution.
+     *
+     * @return the value at the 75th percentile in the distribution
+     */
+    @Publish
+    public double get75thPercentile() {
+        return getSnapshot().get75thPercentile();
+    }
+
+    /**
+     * Returns the value at the 95th percentile in the distribution.
+     *
+     * @return the value at the 95th percentile in the distribution
+     */
+    @Publish
+    public double get95thPercentile() {
+        return getSnapshot().get95thPercentile();
+    }
+
+    /**
+     * Returns the value at the 98th percentile in the distribution.
+     *
+     * @return the value at the 98th percentile in the distribution
+     */
+    @Publish
+    public double get98thPercentile() {
+        return getSnapshot().get98thPercentile();
+    }
+
+    /**
+     * Returns the value at the 99th percentile in the distribution.
+     *
+     * @return the value at the 99th percentile in the distribution
+     */
+    @Publish
+    public double get99thPercentile() {
+        return getSnapshot().get99thPercentile();
+    }
+
+    /**
+     * Returns the value at the 99.9th percentile in the distribution.
+     *
+     * @return the value at the 99.9th percentile in the distribution
+     */
+    @Publish
+    public double get999thPercentile() {
+        return getSnapshot().get999thPercentile();
     }
 
     @Override

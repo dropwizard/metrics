@@ -56,8 +56,8 @@ public abstract class AbstractPollingReporterTest {
             reporter.run();
             out.flush();
             final String[] lines = out.toString().split("\r?\n|\r");
-            // Assertions: first check that the line count matches then compare line by line ignoring leading and trailing whitespace
-            assertEquals("Line count mismatch, was:\n" + Arrays.toString(lines) + "\nexpected:\n" + Arrays
+            // Assertions: first check that the line getCount matches then compare line by line ignoring leading and trailing whitespace
+            assertEquals("Line getCount mismatch, was:\n" + Arrays.toString(lines) + "\nexpected:\n" + Arrays
                     .toString(expected) + "\n", expected.length,
                     lines.length);
             for (int i = 0; i < lines.length; i++) {
@@ -220,18 +220,18 @@ public abstract class AbstractPollingReporterTest {
     }
 
     static void setupSummarizableMock(Summarizable summarizable) {
-        when(summarizable.min()).thenReturn(1d);
-        when(summarizable.max()).thenReturn(3d);
-        when(summarizable.mean()).thenReturn(2d);
-        when(summarizable.stdDev()).thenReturn(1.5d);
+        when(summarizable.getMin()).thenReturn(1d);
+        when(summarizable.getMax()).thenReturn(3d);
+        when(summarizable.getMean()).thenReturn(2d);
+        when(summarizable.getStdDev()).thenReturn(1.5d);
     }
 
     static void setupMeteredMock(Metered metered) {
-        when(metered.count()).thenReturn(1L);
-        when(metered.oneMinuteRate()).thenReturn(1d);
-        when(metered.fiveMinuteRate()).thenReturn(5d);
-        when(metered.fifteenMinuteRate()).thenReturn(15d);
-        when(metered.meanRate()).thenReturn(2d);
+        when(metered.getCount()).thenReturn(1L);
+        when(metered.getOneMinuteRate()).thenReturn(1d);
+        when(metered.getFiveMinuteRate()).thenReturn(5d);
+        when(metered.getFifteenMinuteRate()).thenReturn(15d);
+        when(metered.getMeanRate()).thenReturn(2d);
         when(metered.eventType()).thenReturn("eventType");
         when(metered.rateUnit()).thenReturn(TimeUnit.SECONDS);
     }

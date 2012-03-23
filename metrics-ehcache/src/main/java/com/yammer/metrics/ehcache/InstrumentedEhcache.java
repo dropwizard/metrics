@@ -79,18 +79,18 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
      * <td>Number of objects in the disk store.</td>
      * </tr>
      * <tr>
-     * <td>{@code mean-get-time}</td>
+     * <td>{@code getMean-get-time}</td>
      * <td>The average get time. Because ehcache support JDK1.4.2, each
      * get time uses {@link System#currentTimeMillis()}, rather than
      * nanoseconds. The accuracy is thus limited.</td>
      * </tr>
      * <tr>
-     * <td>{@code mean-search-time}</td>
+     * <td>{@code getMean-search-time}</td>
      * <td>The average execution time (in milliseconds) within the last
      * sample period.</td>
      * </tr>
      * <tr>
-     * <td>{@code eviction-count}</td>
+     * <td>{@code eviction-getCount}</td>
      * <td>The number of cache evictions, since the cache was created,
      * or statistics were cleared.</td>
      * </tr>
@@ -201,21 +201,21 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
             }
         });
 
-        Metrics.newGauge(cache.getClass(), "mean-get-time", cache.getName(), new Gauge<Float>() {
+        Metrics.newGauge(cache.getClass(), "getMean-get-time", cache.getName(), new Gauge<Float>() {
             @Override
             public Float value() {
                 return cache.getStatistics().getAverageGetTime();
             }
         });
 
-        Metrics.newGauge(cache.getClass(), "mean-search-time", cache.getName(), new Gauge<Long>() {
+        Metrics.newGauge(cache.getClass(), "getMean-search-time", cache.getName(), new Gauge<Long>() {
             @Override
             public Long value() {
                 return cache.getStatistics().getAverageSearchTime();
             }
         });
 
-        Metrics.newGauge(cache.getClass(), "eviction-count", cache.getName(), new Gauge<Long>() {
+        Metrics.newGauge(cache.getClass(), "eviction-getCount", cache.getName(), new Gauge<Long>() {
             @Override
             public Long value() {
                 return cache.getStatistics().getEvictionCount();

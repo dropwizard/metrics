@@ -121,7 +121,7 @@ public final class AnnotationUtils {
      *
      * @param annotationClass the type of annotation to check for
      * @param obj             instance to query
-     * @param maxPerClass     max number of annotated attributes that are
+     * @param maxPerClass     getMax number of annotated attributes that are
      *                        permitted for this class
      * @return map of name to matching attributes. Note if a field and a method have the same name, the method will win.
      */

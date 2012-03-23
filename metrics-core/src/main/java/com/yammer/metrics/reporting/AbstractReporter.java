@@ -1,6 +1,7 @@
 package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.MetricsRegistryListener;
 
 /**
  * The base class for all metric reporters.
@@ -11,18 +12,26 @@ public abstract class AbstractReporter {
     /**
      * Creates a new {@link AbstractReporter} instance.
      *
-     * @param registry    the {@link MetricsRegistry} containing the metrics this reporter will
-     *                    report
+     * @param registry the {@link MetricsRegistry} containing the metrics this reporter will
+     *                 report
      */
     protected AbstractReporter(MetricsRegistry registry) {
         this.metricsRegistry = registry;
     }
 
     /**
+     * Start the reporter by adding it as a listener on the registry
+     */
+    /*
+    public void start() {
+        metricsRegistry.addListener(this);
+    }*/
+
+    /**
      * Stops the reporter and closes any internal resources.
      */
     public void shutdown() {
-        // nothing to do here
+        //metricsRegistry.removeListener(this);
     }
 
     /**

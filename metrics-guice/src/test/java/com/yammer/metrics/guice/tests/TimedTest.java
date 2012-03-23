@@ -48,7 +48,7 @@ public class TimedTest {
         assertMetricSetup(metric);
 
         assertThat("Guice creates a timer which records invocation length",
-                   ((Timer) metric).count(),
+                   ((Timer) metric).getCount(),
                    is(1L));
 
         assertThat("Guice creates a timer with the given rate unit",

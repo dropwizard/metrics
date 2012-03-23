@@ -353,11 +353,11 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
         final String rateUnits = meter.rateUnit().name();
         final String rateUnit = rateUnits.substring(0, rateUnits.length() - 1).toLowerCase(Locale.US);
         final String unit = meter.eventType() + '/' + rateUnit;
-        printLongField(sanitizedName + ".count", meter.count(), "metered", meter.eventType());
-        printDoubleField(sanitizedName + ".meanRate", meter.meanRate(), "metered", unit);
-        printDoubleField(sanitizedName + ".1MinuteRate", meter.oneMinuteRate(), "metered", unit);
-        printDoubleField(sanitizedName + ".5MinuteRate", meter.fiveMinuteRate(), "metered", unit);
-        printDoubleField(sanitizedName + ".15MinuteRate", meter.fifteenMinuteRate(), "metered", unit);
+        printLongField(sanitizedName + ".getCount", meter.getCount(), "metered", meter.eventType());
+        printDoubleField(sanitizedName + ".getMeanRate", meter.getMeanRate(), "metered", unit);
+        printDoubleField(sanitizedName + ".1MinuteRate", meter.getOneMinuteRate(), "metered", unit);
+        printDoubleField(sanitizedName + ".5MinuteRate", meter.getFiveMinuteRate(), "metered", unit);
+        printDoubleField(sanitizedName + ".15MinuteRate", meter.getFifteenMinuteRate(), "metered", unit);
     }
 
     @Override
@@ -365,10 +365,10 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
         final String sanitizedName = sanitizeName(name);
         final Snapshot snapshot = histogram.getSnapshot();
         // TODO:  what units make sense for histograms?  should we add event type to the Histogram metric?
-        printDoubleField(sanitizedName + ".min", histogram.min(), "histo");
-        printDoubleField(sanitizedName + ".max", histogram.max(), "histo");
-        printDoubleField(sanitizedName + ".mean", histogram.mean(), "histo");
-        printDoubleField(sanitizedName + ".stddev", histogram.stdDev(), "histo");
+        printDoubleField(sanitizedName + ".getMin", histogram.getMin(), "histo");
+        printDoubleField(sanitizedName + ".getMax", histogram.getMax(), "histo");
+        printDoubleField(sanitizedName + ".getMean", histogram.getMean(), "histo");
+        printDoubleField(sanitizedName + ".stddev", histogram.getStdDev(), "histo");
         printDoubleField(sanitizedName + ".median", snapshot.getMedian(), "histo");
         printDoubleField(sanitizedName + ".75percentile", snapshot.get75thPercentile(), "histo");
         printDoubleField(sanitizedName + ".95percentile", snapshot.get95thPercentile(), "histo");
@@ -383,10 +383,10 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
         final String sanitizedName = sanitizeName(name);
         final Snapshot snapshot = timer.getSnapshot();
         final String durationUnit = timer.durationUnit().name();
-        printDoubleField(sanitizedName + ".min", timer.min(), "timer", durationUnit);
-        printDoubleField(sanitizedName + ".max", timer.max(), "timer", durationUnit);
-        printDoubleField(sanitizedName + ".mean", timer.mean(), "timer", durationUnit);
-        printDoubleField(sanitizedName + ".stddev", timer.stdDev(), "timer", durationUnit);
+        printDoubleField(sanitizedName + ".getMin", timer.getMin(), "timer", durationUnit);
+        printDoubleField(sanitizedName + ".getMax", timer.getMax(), "timer", durationUnit);
+        printDoubleField(sanitizedName + ".getMean", timer.getMean(), "timer", durationUnit);
+        printDoubleField(sanitizedName + ".stddev", timer.getStdDev(), "timer", durationUnit);
         printDoubleField(sanitizedName + ".median", snapshot.getMedian(), "timer", durationUnit);
         printDoubleField(sanitizedName + ".75percentile", snapshot.get75thPercentile(), "timer", durationUnit);
         printDoubleField(sanitizedName + ".95percentile", snapshot.get95thPercentile(), "timer", durationUnit);

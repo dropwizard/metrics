@@ -29,12 +29,12 @@ public class MeterTest {
 
     @Test
     public void aBlankMeter() throws Exception {
-        assertThat("the meter has a count of zero",
-                   meter.count(),
+        assertThat("the meter has a getCount of zero",
+                   meter.getCount(),
                    is(0L));
 
-        assertThat("the meter has a mean rate of zero",
-                   meter.meanRate(),
+        assertThat("the meter has a getMean rate of zero",
+                   meter.getMeanRate(),
                    is(closeTo(0.0, 0.001)));
     }
 
@@ -42,8 +42,8 @@ public class MeterTest {
     public void aMeterWithThreeEvents() throws Exception {
         meter.mark(3);
 
-        assertThat("the meter has a count of three",
-                   meter.count(),
+        assertThat("the meter has a getCount of three",
+                   meter.getCount(),
                    is(3L));
     }
 }

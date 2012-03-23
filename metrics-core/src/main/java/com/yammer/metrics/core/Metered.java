@@ -3,7 +3,7 @@ package com.yammer.metrics.core;
 import java.util.concurrent.TimeUnit;
 
 /**
- * An object which maintains mean and exponentially-weighted rate.
+ * An object which maintains getMean and exponentially-weighted rate.
  */
 public interface Metered extends Metric {
     /**
@@ -25,7 +25,7 @@ public interface Metered extends Metric {
      *
      * @return the number of events which have been marked
      */
-    long count();
+    long getCount();
 
     /**
      * Returns the fifteen-minute exponentially-weighted moving average rate at which events have
@@ -37,7 +37,7 @@ public interface Metered extends Metric {
      * @return the fifteen-minute exponentially-weighted moving average rate at which events have
      *         occurred since the meter was created
      */
-    double fifteenMinuteRate();
+    double getFifteenMinuteRate();
 
     /**
      * Returns the five-minute exponentially-weighted moving average rate at which events have
@@ -49,14 +49,14 @@ public interface Metered extends Metric {
      * @return the five-minute exponentially-weighted moving average rate at which events have
      *         occurred since the meter was created
      */
-    double fiveMinuteRate();
+    double getFiveMinuteRate();
 
     /**
-     * Returns the mean rate at which events have occurred since the meter was created.
+     * Returns the getMean rate at which events have occurred since the meter was created.
      *
-     * @return the mean rate at which events have occurred since the meter was created
+     * @return the getMean rate at which events have occurred since the meter was created
      */
-    double meanRate();
+    double getMeanRate();
 
     /**
      * Returns the one-minute exponentially-weighted moving average rate at which events have
@@ -68,5 +68,5 @@ public interface Metered extends Metric {
      * @return the one-minute exponentially-weighted moving average rate at which events have
      *         occurred since the meter was created
      */
-    double oneMinuteRate();
+    double getOneMinuteRate();
 }

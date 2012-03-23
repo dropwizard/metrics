@@ -15,6 +15,8 @@
  */
 package com.yammer.metrics.annotation;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -43,6 +45,12 @@ public final class AnnotatedMetric {
 
     /** Returns the attributes with {@link Publish} annotations. */
     public List<AnnotatedMetricAttribute> getAttributes() {
+        Collections.sort(attrs, new Comparator<AnnotatedMetricAttribute>() {
+            @Override
+            public int compare(AnnotatedMetricAttribute annotatedMetricAttribute, AnnotatedMetricAttribute annotatedMetricAttribute1) {
+                return annotatedMetricAttribute.getName().compareTo(annotatedMetricAttribute1.getName());
+            }
+        });
         return attrs;
     }
 

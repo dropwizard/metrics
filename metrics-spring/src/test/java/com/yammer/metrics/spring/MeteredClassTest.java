@@ -68,36 +68,36 @@ public class MeteredClassTest {
 
 	@Test
 	public void timedMethod() throws Throwable {
-		assertEquals(0, timedMethod.count());
+		assertEquals(0, timedMethod.getCount());
 
 		meteredClass.timedMethod(false);
-		assertEquals(1, timedMethod.count());
+		assertEquals(1, timedMethod.getCount());
 
-		// count increments even when the method throws an exception
+		// getCount increments even when the method throws an exception
 		try {
 			meteredClass.timedMethod(true);
 			fail();
 		} catch (Throwable e) {
 			assertTrue(e instanceof BogusException);
 		}
-		assertEquals(2, timedMethod.count());
+		assertEquals(2, timedMethod.getCount());
 	}
 
 	@Test
 	public void meteredMethod() throws Throwable {
-		assertEquals(0, meteredMethod.count());
+		assertEquals(0, meteredMethod.getCount());
 
 		meteredClass.meteredMethod();
-		assertEquals(1, meteredMethod.count());
+		assertEquals(1, meteredMethod.getCount());
 	}
 
 	@Test
 	public void exceptionMeteredMethod() throws Throwable {
-		assertEquals(0, exceptionMeteredMethod.count());
+		assertEquals(0, exceptionMeteredMethod.getCount());
 
 		// doesn't throw an exception
 		meteredClass.exceptionMeteredMethod(null);
-		assertEquals(0, exceptionMeteredMethod.count());
+		assertEquals(0, exceptionMeteredMethod.getCount());
 
 		// throws the wrong exception
 		try {
@@ -106,7 +106,7 @@ public class MeteredClassTest {
 		} catch (Throwable t) {
 			assertTrue(t instanceof RuntimeException);
 		}
-		assertEquals(0, exceptionMeteredMethod.count());
+		assertEquals(0, exceptionMeteredMethod.getCount());
 
 		// throws the right exception
 		try {
@@ -115,20 +115,20 @@ public class MeteredClassTest {
 		} catch (Throwable t) {
 			assertTrue(t instanceof BogusException);
 		}
-		assertEquals(1, exceptionMeteredMethod.count());
+		assertEquals(1, exceptionMeteredMethod.getCount());
 	}
 
 	@Test
 	public void triplyMeteredMethod() throws Throwable {
-		assertEquals(0, triple_Metered.count());
-		assertEquals(0, triple_Timed.count());
-		assertEquals(0, triple_ExceptionMetered.count());
+		assertEquals(0, triple_Metered.getCount());
+		assertEquals(0, triple_Timed.getCount());
+		assertEquals(0, triple_ExceptionMetered.getCount());
 
 		// doesn't throw an exception
 		meteredClass.triplyMeteredMethod(false);
-		assertEquals(1, triple_Metered.count());
-		assertEquals(1, triple_Timed.count());
-		assertEquals(0, triple_ExceptionMetered.count());
+		assertEquals(1, triple_Metered.getCount());
+		assertEquals(1, triple_Timed.getCount());
+		assertEquals(0, triple_ExceptionMetered.getCount());
 
 		// throws an exception
 		try {
@@ -137,8 +137,8 @@ public class MeteredClassTest {
 		} catch (Throwable t) {
 			assertTrue(t instanceof BogusException);
 		}
-		assertEquals(2, triple_Metered.count());
-		assertEquals(2, triple_Timed.count());
-		assertEquals(1, triple_ExceptionMetered.count());
+		assertEquals(2, triple_Metered.getCount());
+		assertEquals(2, triple_Timed.getCount());
+		assertEquals(1, triple_ExceptionMetered.getCount());
 	}
 }

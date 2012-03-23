@@ -118,8 +118,8 @@ public class MetricsServletTest {
                               "\"totalCommitted\":4.0,\"heapInit\":5.0,\"heapUsed\":6.0,\"" +
                               "heapMax\":7.0,\"heapCommitted\":8.0,\"heap_usage\":34.0," +
                               "\"non_heap_usage\":37.0,\"memory_pool_usages\":{\"one\":100.0," +
-                              "\"two\":200.0}},\"buffers\":{\"direct\":{\"count\":1," +
-                              "\"memoryUsed\":2,\"totalCapacity\":3},\"mapped\":{\"count\":10," +
+                              "\"two\":200.0}},\"buffers\":{\"direct\":{\"getCount\":1," +
+                              "\"memoryUsed\":2,\"totalCapacity\":3},\"mapped\":{\"getCount\":10," +
                               "\"memoryUsed\":20,\"totalCapacity\":30}},\"daemon_thread_count\":300," +
                               "\"thread_count\":400,\"current_time\":12345678,\"uptime\":9991," +
                               "\"fd_usage\":0.222,\"thread-states\":{\"blocked\":0.33}," +
@@ -150,7 +150,7 @@ public class MetricsServletTest {
 
         assertThat(json.toString(),
                    is("{\"com.yammer.metrics.reporting.tests.MetricsServletTest\":" +
-                              "{\"counter\":{\"type\":\"counter\",\"count\":12}}}"));
+                              "{\"counter\":{\"type\":\"counter\",\"getCount\":12}}}"));
     }
 
     @Test
@@ -161,8 +161,8 @@ public class MetricsServletTest {
 
         assertThat(json.toString(),
                    is("{\"com.yammer.metrics.reporting.tests.MetricsServletTest\":" +
-                              "{\"histogram\":{\"type\":\"histogram\",\"count\":1,\"min\":12.0," +
-                              "\"max\":12.0,\"mean\":12.0,\"std_dev\":0.0,\"median\":12.0," +
+                              "{\"histogram\":{\"type\":\"histogram\",\"getCount\":1,\"getMin\":12.0," +
+                              "\"getMax\":12.0,\"getMean\":12.0,\"std_dev\":0.0,\"median\":12.0," +
                               "\"p75\":12.0,\"p95\":12.0,\"p98\":12.0,\"p99\":12.0,\"p999\":12.0}}}"));
     }
 
@@ -178,7 +178,7 @@ public class MetricsServletTest {
         assertThat(json.toString(),
                    is("{\"com.yammer.metrics.reporting.tests.MetricsServletTest\":" +
                               "{\"meter\":{\"type\":\"meter\",\"event_type\":\"things\"," +
-                              "\"unit\":\"seconds\",\"count\":12,\"mean\":1200000.0," +
+                              "\"unit\":\"seconds\",\"getCount\":12,\"getMean\":1200000.0," +
                               "\"m1\":0.0,\"m5\":0.0,\"m15\":0.0}}}"));
     }
 
@@ -193,10 +193,10 @@ public class MetricsServletTest {
         assertThat(json.toString(),
                    is("{\"com.yammer.metrics.reporting.tests.MetricsServletTest\":{\"timer\":" +
                               "{\"type\":\"timer\",\"duration\":{\"unit\":\"milliseconds\"," +
-                              "\"min\":100.0,\"max\":100.0,\"mean\":100.0,\"std_dev\":0.0," +
+                              "\"getMin\":100.0,\"getMax\":100.0,\"getMean\":100.0,\"std_dev\":0.0," +
                               "\"median\":100.0,\"p75\":100.0,\"p95\":100.0,\"p98\":100.0," +
                               "\"p99\":100.0,\"p999\":100.0},\"rate\":{\"unit\":\"seconds\"," +
-                              "\"count\":1,\"mean\":100000.0,\"m1\":0.0,\"m5\":0.0," +
+                              "\"getCount\":1,\"getMean\":100000.0,\"m1\":0.0,\"m5\":0.0," +
                               "\"m15\":0.0}}}}"));
     }
 

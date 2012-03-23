@@ -227,7 +227,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
                     json.writeFieldName("direct");
                     json.writeStartObject();
                     {
-                        json.writeNumberField("count", bufferPoolStats.get("direct").getCount());
+                        json.writeNumberField("getCount", bufferPoolStats.get("direct").getCount());
                         json.writeNumberField("memoryUsed", bufferPoolStats.get("direct").getMemoryUsed());
                         json.writeNumberField("totalCapacity", bufferPoolStats.get("direct").getTotalCapacity());
                     }
@@ -236,7 +236,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
                     json.writeFieldName("mapped");
                     json.writeStartObject();
                     {
-                        json.writeNumberField("count", bufferPoolStats.get("mapped").getCount());
+                        json.writeNumberField("getCount", bufferPoolStats.get("mapped").getCount());
                         json.writeNumberField("memoryUsed", bufferPoolStats.get("mapped").getMemoryUsed());
                         json.writeNumberField("totalCapacity", bufferPoolStats.get("mapped").getTotalCapacity());
                     }
@@ -312,7 +312,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
         json.writeStartObject();
         {
             json.writeStringField("type", "histogram");
-            json.writeNumberField("count", histogram.count());
+            json.writeNumberField("getCount", histogram.getCount());
             writeSummarizable(histogram, json);
             writeSampling(histogram, json);
 
@@ -329,7 +329,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
         json.writeStartObject();
         {
             json.writeStringField("type", "counter");
-            json.writeNumberField("count", counter.count());
+            json.writeNumberField("getCount", counter.count());
         }
         json.writeEndObject();
     }
@@ -395,10 +395,10 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
     }
 
     private static void writeSummarizable(Summarizable metric, JsonGenerator json) throws IOException {
-        json.writeNumberField("min", metric.min());
-        json.writeNumberField("max", metric.max());
-        json.writeNumberField("mean", metric.mean());
-        json.writeNumberField("std_dev", metric.stdDev());
+        json.writeNumberField("getMin", metric.getMin());
+        json.writeNumberField("getMax", metric.getMax());
+        json.writeNumberField("getMean", metric.getMean());
+        json.writeNumberField("std_dev", metric.getStdDev());
     }
 
     private static void writeSampling(Sampling metric, JsonGenerator json) throws IOException {
@@ -413,10 +413,10 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
 
     private static void writeMeteredFields(Metered metered, JsonGenerator json) throws IOException {
         json.writeStringField("unit", metered.rateUnit().toString().toLowerCase());
-        json.writeNumberField("count", metered.count());
-        json.writeNumberField("mean", metered.meanRate());
-        json.writeNumberField("m1", metered.oneMinuteRate());
-        json.writeNumberField("m5", metered.fiveMinuteRate());
-        json.writeNumberField("m15", metered.fifteenMinuteRate());
+        json.writeNumberField("getCount", metered.getCount());
+        json.writeNumberField("getMean", metered.getMeanRate());
+        json.writeNumberField("m1", metered.getOneMinuteRate());
+        json.writeNumberField("m5", metered.getFiveMinuteRate());
+        json.writeNumberField("m15", metered.getFifteenMinuteRate());
     }
 }

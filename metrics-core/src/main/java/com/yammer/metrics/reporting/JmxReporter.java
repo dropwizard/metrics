@@ -115,7 +115,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         @Override
         public long getCount() {
-            return metric.count();
+            return metric.getCount();
         }
 
         @Override
@@ -130,22 +130,22 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         @Override
         public double getMeanRate() {
-            return metric.meanRate();
+            return metric.getMeanRate();
         }
 
         @Override
         public double getOneMinuteRate() {
-            return metric.oneMinuteRate();
+            return metric.getOneMinuteRate();
         }
 
         @Override
         public double getFiveMinuteRate() {
-            return metric.fiveMinuteRate();
+            return metric.getFiveMinuteRate();
         }
 
         @Override
         public double getFifteenMinuteRate() {
-            return metric.fifteenMinuteRate();
+            return metric.getFifteenMinuteRate();
         }
     }
 
@@ -199,27 +199,27 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         @Override
         public long getCount() {
-            return metric.count();
+            return metric.getCount();
         }
 
         @Override
         public double getMin() {
-            return metric.min();
+            return metric.getMin();
         }
 
         @Override
         public double getMax() {
-            return metric.max();
+            return metric.getMax();
         }
 
         @Override
         public double getMean() {
-            return metric.mean();
+            return metric.getMean();
         }
 
         @Override
         public double getStdDev() {
-            return metric.stdDev();
+            return metric.getStdDev();
         }
 
         @Override
@@ -280,22 +280,22 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         @Override
         public double getMin() {
-            return metric.min();
+            return metric.getMin();
         }
 
         @Override
         public double getMax() {
-            return metric.max();
+            return metric.getMax();
         }
 
         @Override
         public double getMean() {
-            return metric.mean();
+            return metric.getMean();
         }
 
         @Override
         public double getStdDev() {
-            return metric.stdDev();
+            return metric.getStdDev();
         }
 
         @Override
@@ -448,6 +448,10 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     private void registerBean(MetricName name, MetricMBean bean, ObjectName objectName)
             throws MBeanRegistrationException, OperationsException {
+        if(server.isRegistered(objectName)){
+            //If you add another MBean with the same name, without unregistering the previous it causes a memory leak
+            server.unregisterMBean(objectName);
+        }
         server.registerMBean(bean, objectName);
         registeredBeans.put(name, objectName);
     }

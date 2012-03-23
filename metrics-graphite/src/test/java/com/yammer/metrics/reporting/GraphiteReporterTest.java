@@ -37,14 +37,14 @@ public class GraphiteReporterTest extends AbstractPollingReporterTest {
     @Override
     public String[] expectedTimerResult() {
         return new String[]{
-                "prefix.java.lang.Object.metric.count 1 5",
-                "prefix.java.lang.Object.metric.meanRate 2.00 5",
+                "prefix.java.lang.Object.metric.getCount 1 5",
+                "prefix.java.lang.Object.metric.getMeanRate 2.00 5",
                 "prefix.java.lang.Object.metric.1MinuteRate 1.00 5",
                 "prefix.java.lang.Object.metric.5MinuteRate 5.00 5",
                 "prefix.java.lang.Object.metric.15MinuteRate 15.00 5",
-                "prefix.java.lang.Object.metric.min 1.00 5",
-                "prefix.java.lang.Object.metric.max 3.00 5",
-                "prefix.java.lang.Object.metric.mean 2.00 5",
+                "prefix.java.lang.Object.metric.getMin 1.00 5",
+                "prefix.java.lang.Object.metric.getMax 3.00 5",
+                "prefix.java.lang.Object.metric.getMean 2.00 5",
                 "prefix.java.lang.Object.metric.stddev 1.50 5",
                 "prefix.java.lang.Object.metric.median 0.50 5",
                 "prefix.java.lang.Object.metric.75percentile 0.75 5",
@@ -58,8 +58,8 @@ public class GraphiteReporterTest extends AbstractPollingReporterTest {
     @Override
     public String[] expectedMeterResult() {
         return new String[]{
-                "prefix.java.lang.Object.metric.count 1 5",
-                "prefix.java.lang.Object.metric.meanRate 2.00 5",
+                "prefix.java.lang.Object.metric.getCount 1 5",
+                "prefix.java.lang.Object.metric.getMeanRate 2.00 5",
                 "prefix.java.lang.Object.metric.1MinuteRate 1.00 5",
                 "prefix.java.lang.Object.metric.5MinuteRate 5.00 5",
                 "prefix.java.lang.Object.metric.15MinuteRate 15.00 5",
@@ -69,9 +69,9 @@ public class GraphiteReporterTest extends AbstractPollingReporterTest {
     @Override
     public String[] expectedHistogramResult() {
         return new String[]{
-                "prefix.java.lang.Object.metric.min 1.00 5",
-                "prefix.java.lang.Object.metric.max 3.00 5",
-                "prefix.java.lang.Object.metric.mean 2.00 5",
+                "prefix.java.lang.Object.metric.getMin 1.00 5",
+                "prefix.java.lang.Object.metric.getMax 3.00 5",
+                "prefix.java.lang.Object.metric.getMean 2.00 5",
                 "prefix.java.lang.Object.metric.stddev 1.50 5",
                 "prefix.java.lang.Object.metric.median 0.50 5",
                 "prefix.java.lang.Object.metric.75percentile 0.75 5",
@@ -85,7 +85,7 @@ public class GraphiteReporterTest extends AbstractPollingReporterTest {
     @Override
     public String[] expectedCounterResult(long count) {
         return new String[]{
-                String.format("prefix.java.lang.Object.metric.count %d 5", count)
+                String.format("prefix.java.lang.Object.metric.getCount %d 5", count)
         };
     }
 }

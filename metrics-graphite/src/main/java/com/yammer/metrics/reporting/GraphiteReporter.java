@@ -306,17 +306,17 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
 
     @Override
     public void processCounter(MetricName name, Counter counter, Long epoch) throws IOException {
-        sendInt(epoch, sanitizeName(name), "count", counter.count());
+        sendInt(epoch, sanitizeName(name), "getCount", counter.count());
     }
 
     @Override
     public void processMeter(MetricName name, Metered meter, Long epoch) throws IOException {
         final String sanitizedName = sanitizeName(name);
-        sendInt(epoch, sanitizedName, "count", meter.count());
-        sendFloat(epoch, sanitizedName, "meanRate", meter.meanRate());
-        sendFloat(epoch, sanitizedName, "1MinuteRate", meter.oneMinuteRate());
-        sendFloat(epoch, sanitizedName, "5MinuteRate", meter.fiveMinuteRate());
-        sendFloat(epoch, sanitizedName, "15MinuteRate", meter.fifteenMinuteRate());
+        sendInt(epoch, sanitizedName, "getCount", meter.getCount());
+        sendFloat(epoch, sanitizedName, "getMeanRate", meter.getMeanRate());
+        sendFloat(epoch, sanitizedName, "1MinuteRate", meter.getOneMinuteRate());
+        sendFloat(epoch, sanitizedName, "5MinuteRate", meter.getFiveMinuteRate());
+        sendFloat(epoch, sanitizedName, "15MinuteRate", meter.getFifteenMinuteRate());
     }
 
     @Override
@@ -335,10 +335,10 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
     }
 
     protected void sendSummarizable(long epoch, String sanitizedName, Summarizable metric) throws IOException {
-        sendFloat(epoch, sanitizedName, "min", metric.min());
-        sendFloat(epoch, sanitizedName, "max", metric.max());
-        sendFloat(epoch, sanitizedName, "mean", metric.mean());
-        sendFloat(epoch, sanitizedName, "stddev", metric.stdDev());
+        sendFloat(epoch, sanitizedName, "getMin", metric.getMin());
+        sendFloat(epoch, sanitizedName, "getMax", metric.getMax());
+        sendFloat(epoch, sanitizedName, "getMean", metric.getMean());
+        sendFloat(epoch, sanitizedName, "stddev", metric.getStdDev());
     }
 
     protected void sendSampling(long epoch, String sanitizedName, Sampling metric) throws IOException {

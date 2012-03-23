@@ -171,34 +171,34 @@ public class CsvReporter extends AbstractPollingReporter implements
     @Override
     public void processMeter(MetricName name, Metered meter, Context context) throws IOException {
         final PrintStream stream = context.getStream(
-                "# time,count,1 min rate,mean rate,5 min rate,15 min rate");
+                "# time,getCount,1 getMin rate,getMean rate,5 getMin rate,15 getMin rate");
         stream.append(new StringBuilder()
-                              .append(meter.count()).append(',')
-                              .append(meter.oneMinuteRate()).append(',')
-                              .append(meter.meanRate()).append(',')
-                              .append(meter.fiveMinuteRate()).append(',')
-                              .append(meter.fifteenMinuteRate()).toString())
+                              .append(meter.getCount()).append(',')
+                              .append(meter.getOneMinuteRate()).append(',')
+                              .append(meter.getMeanRate()).append(',')
+                              .append(meter.getFiveMinuteRate()).append(',')
+                              .append(meter.getFifteenMinuteRate()).toString())
               .println();
         stream.flush();
     }
 
     @Override
     public void processCounter(MetricName name, Counter counter, Context context) throws IOException {
-        final PrintStream stream = context.getStream("# time,count");
+        final PrintStream stream = context.getStream("# time,getCount");
         stream.println(counter.count());
         stream.flush();
     }
 
     @Override
     public void processHistogram(MetricName name, Histogram histogram, Context context) throws IOException {
-        final PrintStream stream = context.getStream("# time,min,max,mean,median,stddev,95%,99%,99.9%");
+        final PrintStream stream = context.getStream("# time,getMin,getMax,getMean,median,stddev,95%,99%,99.9%");
         final Snapshot snapshot = histogram.getSnapshot();
         stream.append(new StringBuilder()
-                              .append(histogram.min()).append(',')
-                              .append(histogram.max()).append(',')
-                              .append(histogram.mean()).append(',')
+                              .append(histogram.getMin()).append(',')
+                              .append(histogram.getMax()).append(',')
+                              .append(histogram.getMean()).append(',')
                               .append(snapshot.getMedian()).append(',')
-                              .append(histogram.stdDev()).append(',')
+                              .append(histogram.getStdDev()).append(',')
                               .append(snapshot.get95thPercentile()).append(',')
                               .append(snapshot.get99thPercentile()).append(',')
                               .append(snapshot.get999thPercentile()).toString())
@@ -209,14 +209,14 @@ public class CsvReporter extends AbstractPollingReporter implements
 
     @Override
     public void processTimer(MetricName name, Timer timer, Context context) throws IOException {
-        final PrintStream stream = context.getStream("# time,min,max,mean,median,stddev,95%,99%,99.9%");
+        final PrintStream stream = context.getStream("# time,getMin,getMax,getMean,median,stddev,95%,99%,99.9%");
         final Snapshot snapshot = timer.getSnapshot();
         stream.append(new StringBuilder()
-                              .append(timer.min()).append(',')
-                              .append(timer.max()).append(',')
-                              .append(timer.mean()).append(',')
+                              .append(timer.getMin()).append(',')
+                              .append(timer.getMax()).append(',')
+                              .append(timer.getMean()).append(',')
                               .append(snapshot.getMedian()).append(',')
-                              .append(timer.stdDev()).append(',')
+                              .append(timer.getStdDev()).append(',')
                               .append(snapshot.get95thPercentile()).append(',')
                               .append(snapshot.get99thPercentile()).append(',')
                               .append(snapshot.get999thPercentile()).toString())
