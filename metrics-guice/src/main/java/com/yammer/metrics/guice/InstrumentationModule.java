@@ -36,7 +36,7 @@ public class InstrumentationModule extends AbstractModule {
      * Override to provide a custom binding for {@link JmxReporter}
      */
     protected void bindJmxReporter() {
-        bind(JmxReporter.class).toProvider(JmxReporterProvider.class).asEagerSingleton();
+        bind(JmxReporter.class).toInstance(JmxReporter.getDefault());
     }
 
     /**

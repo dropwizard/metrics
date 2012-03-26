@@ -342,6 +342,15 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     }
 
     /**
+     * Returns the default instance of {@link JmxReporter} if it has been started.
+     *
+     * @return The default instance or null if the default is not used
+     */
+    public static JmxReporter getDefault() {
+        return INSTANCE;
+    }
+
+    /**
      * Stops the default instance of {@link JmxReporter}.
      */
     public static void shutdownDefault() {
