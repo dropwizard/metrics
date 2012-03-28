@@ -15,97 +15,78 @@ import java.util.concurrent.TimeUnit;
 /**
  * A simple reporters which prints out application metrics to a {@link PrintStream} periodically.
  */
-public class ConsoleReporter extends AbstractPollingReporter implements
-                                                             MetricProcessor<PrintStream> {
+public class ConsoleReporter extends AbstractPollingReporter implements MetricProcessor<PrintStream> {
     private static final int CONSOLE_WIDTH = 80;
 
-    /**
-     * Enables the console reporter for the default metrics registry, and causes it to print to
-     * STDOUT with the specified period.
-     *
-     * @param period the period between successive outputs
-     * @param unit   the time unit of {@code period}
-     */
-    public static void enable(long period, TimeUnit unit) {
-        enable(Metrics.defaultRegistry(), period, unit);
+    private final PrintStream out;
+    private final MetricPredicate predicate;
+    private final Clock clock;
+    private final TimeZone timeZone;
+    private final Locale locale;
+
+
+    public static class Builder {
+        private final Set<MetricsRegistry> registries;
+        private final String name;
+        private final long period;
+        private final TimeUnit timeUnit;
+
+        private PrintStream out;
+        private MetricPredicate predicate;
+        private Clock clock;
+        private TimeZone timeZone;
+        private Locale locale;
+
+        public Builder(Set<MetricsRegistry> registries, String name, long period, TimeUnit unit){
+            this.registries = registries;
+            this.name = name;
+            this.period = period;
+            this.timeUnit = unit;
+            
+            //Set mutable items to sensible defaults
+            this.out = System.out;
+            this.predicate = MetricPredicate.ALL;
+            this.clock = Clock.defaultClock();
+            this.timeZone = TimeZone.getDefault();
+            this.locale = Locale.getDefault();
+        }
+        public Builder withPrintStream (PrintStream stream){
+            this.out = stream;
+            return this;
+        }
+
+        public Builder withClock (Clock clock){
+            this.clock = clock;
+            return this;
+        }
+
+        public Builder withPredicate (MetricPredicate predicate){
+            this.predicate = predicate;
+            return this;
+        }
+
+        public Builder withLocale(Locale locale){
+            this.locale = locale;
+            return this;
+        }
+
+        public Builder withTimeZone(TimeZone timeZone){
+            this.timeZone = timeZone;
+            return this;
+        }
+
+        public ConsoleReporter build() {
+            return new ConsoleReporter(this);
+        }
     }
 
-    /**
-     * Enables the console reporter for the given metrics registry, and causes it to print to STDOUT
-     * with the specified period and unrestricted output.
-     *
-     * @param metricsRegistry the metrics registry
-     * @param period          the period between successive outputs
-     * @param unit            the time unit of {@code period}
-     */
-    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit) {
-        ConsoleReporter reporter = ConsoleReporter.createReporter(metricsRegistry).withPrintStream(System.out)
-                .withPredicate(MetricPredicate.ALL).withClock(Clock.defaultClock()).withTimeZone(TimeZone.getDefault())
-                .withLocale(Locale.getDefault()).withPeriod(period).withTimeUnit(unit);
-        reporter.start();
-    }
-
-    private PrintStream out;
-    private MetricPredicate predicate;
-    private Clock clock;
-    private TimeZone timeZone;
-    private Locale locale;
-
-    private ConsoleReporter(MetricsRegistry registry){
-        super(registry);
-    }
-    
-    private ConsoleReporter(Set<MetricsRegistry> registries){
-        super(registries);
-    }
-    
-    public static ConsoleReporter createReporter(MetricsRegistry registry){
-        //TODO add defaults using with?
-        return new ConsoleReporter(registry).withName("console-reporter");
-    }
-    
-    public static ConsoleReporter createReporter(Set<MetricsRegistry> registries){
-        return new ConsoleReporter(registries).withName("console-reporter");
-    }
-
-    public ConsoleReporter withPeriod(long period){
-        setPeriod(period);
-        return this;
-    }
-
-    public ConsoleReporter withTimeUnit (TimeUnit unit){
-        setUnit(unit);
-        return this;
-    }
-
-    public ConsoleReporter withPrintStream (PrintStream stream){
-        this.out = stream;
-        return this;
-    }
-
-    public ConsoleReporter withClock (Clock clock){
-        this.clock = clock;
-        return this;
-    }
-
-    public ConsoleReporter withPredicate (MetricPredicate predicate){
-        this.predicate = predicate;
-        return this;
-    }
-
-    public ConsoleReporter withLocale(Locale locale){
-        this.locale = locale;
-        return this;
-    }
-
-    public ConsoleReporter withTimeZone(TimeZone timeZone){
-        this.timeZone = timeZone;
-        return this;
-    }
-    
-    public ConsoleReporter withName(String name){
-        setName(name);
-        return this;
+    private ConsoleReporter(Builder builder){
+        super(builder.registries, builder.name, builder.period, builder.timeUnit);
+        this.clock = builder.clock;
+        this.locale = builder.locale;
+        this.predicate = builder.predicate;
+        this.out = builder.out;
+        this.timeZone = builder.timeZone;
     }
 
     @Override
@@ -122,6 +103,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements
                 out.print('=');
             }
             out.println();
+            //TODO iterate registries
             for (Entry<String, SortedMap<MetricName, Metric>> entry : getMetricsRegistry().groupedMetrics(
                     predicate).entrySet()) {
                 out.print(entry.getKey());

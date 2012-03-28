@@ -23,42 +23,15 @@ public abstract class AbstractPollingReporter extends AbstractReporter implement
     /**
      * Creates a new {@link AbstractPollingReporter} instance.
      *
-     * @param registry    the {@link MetricsRegistry} containing the metrics this reporter will
-     *                    report
-     * @see AbstractReporter#AbstractReporter(MetricsRegistry)
-     */
-    protected AbstractPollingReporter(MetricsRegistry registry) {
-        super(registry);
-    }
-
-    /**
-     * Creates a new {@link AbstractPollingReporter} instance.
-     *
      * @param registries    the {@link MetricsRegistry} containing the metrics this reporter will
      *                    report
      * @see AbstractReporter#AbstractReporter(MetricsRegistry)
      */
-    protected AbstractPollingReporter(Set<MetricsRegistry> registries) {
-        super(registries);
-    }
-    
-    void setName(String name){
-        this.executor = ThreadPools.getInstance().newScheduledThreadPool(1, name);
-    }
-
-    public void setPeriod(long period) {
+    protected AbstractPollingReporter(Set<MetricsRegistry> registries, String name, long period, TimeUnit unit) {
+        super(registries, name);
         this.period = period;
-    }
-
-    public void setUnit(TimeUnit unit) {
         this.unit = unit;
-    }
-
-    /**
-     * Starts the reporter polling at the given period.
-     *
-     */
-    public void start() {
+        this.executor = ThreadPools.getInstance().newScheduledThreadPool(1, name);
         executor.scheduleWithFixedDelay(this, period, period, unit);
     }
 

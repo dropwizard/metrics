@@ -28,19 +28,9 @@ import java.util.Set;
  */
 public abstract class AbstractDynamicReporter extends AbstractReporter implements MetricsRegistryListener {
 
+    protected AbstractDynamicReporter(Set<MetricsRegistry> registries,  String name){
+        super(registries, name);
 
-    protected AbstractDynamicReporter(MetricsRegistry registry){
-        super(registry);
-    }
-    
-    protected AbstractDynamicReporter(Set<MetricsRegistry> registries){
-        super(registries);
-    }
-
-    /**
-     * Start the reporter by adding it as a listener on the registry
-     */
-    public void start() {
         for (MetricsRegistry metricsRegistry : metricsRegistries) {
             metricsRegistry.addListener(this);
         }

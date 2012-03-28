@@ -25,12 +25,7 @@ import java.util.Set;
  * Date: 3/23/12
  * Time: 12:17 PM
  */
-public interface Reporter<T> {
-
-    /**
-     * Start the reporter
-     */
-    public void start();
+public interface Reporter {
 
     /**
      * Stops the reporter and closes any internal resources.
@@ -42,4 +37,6 @@ public interface Reporter<T> {
      * @return registries
      */
     public Set<MetricsRegistry> getMetricsRegistries();
+    
+    public String getName();
 }

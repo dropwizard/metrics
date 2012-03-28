@@ -10,26 +10,20 @@ import java.util.Set;
  * The base class for all metric reporters.
  */
 public abstract class AbstractReporter implements Reporter{
-    //TODO Should probably make this a map =(
     protected final Set<MetricsRegistry> metricsRegistries;
+    protected final String name;
 
-    /**
-     * Creates a new {@link AbstractReporter} instance.
-     *
-     * @param registry the {@link MetricsRegistry} containing the metrics this reporter will
-     *                 report
-     */
-    protected AbstractReporter(MetricsRegistry registry) {
-        metricsRegistries = new HashSet<MetricsRegistry>(1);
-        metricsRegistries.add(registry);
-    }
-
-    protected AbstractReporter(Set<MetricsRegistry> registries) {
+    protected AbstractReporter(Set<MetricsRegistry> registries, String name) {
         this.metricsRegistries = registries;
+        this.name = name;
     }
 
     public Set<MetricsRegistry> getMetricsRegistries(){
         return metricsRegistries;
+    }
+
+    public String getName() {
+        return name;
     }
 
     /**
