@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * A manager class for a set of named thread pools.
  */
-class ThreadPools {
+public class ThreadPools {
     /**
      * A simple named thread factory.
      */
@@ -42,6 +42,13 @@ class ThreadPools {
     private final ConcurrentMap<String, ScheduledExecutorService> threadPools =
             new ConcurrentHashMap<String, ScheduledExecutorService>(100);
 
+    private static ThreadPools ourInstance = new ThreadPools();
+
+    public static ThreadPools getInstance() {
+        return ourInstance;
+    }
+
+    private ThreadPools(){}
     /**
      * Creates a new scheduled thread pool of a given size with the given name, or returns an
      * existing thread pool if one was already created with the same name.
@@ -50,7 +57,7 @@ class ThreadPools {
      * @param name     the name of the pool
      * @return a new {@link ScheduledExecutorService}
      */
-    ScheduledExecutorService newScheduledThreadPool(int poolSize, String name) {
+    public ScheduledExecutorService newScheduledThreadPool(int poolSize, String name) {
         final ScheduledExecutorService existing = threadPools.get(name);
         if (isValidExecutor(existing)) {
             return existing;

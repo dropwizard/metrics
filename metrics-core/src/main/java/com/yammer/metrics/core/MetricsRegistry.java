@@ -31,7 +31,7 @@ public class MetricsRegistry {
     public MetricsRegistry(String name, Clock clock) {
         this.clock = clock;
         this.metrics = newMetricsMap();
-        this.threadPools = new ThreadPools();
+        this.threadPools = ThreadPools.getInstance();
         this.listeners = new CopyOnWriteArrayList<MetricsRegistryListener>();
         this.name = name;
     }
@@ -387,6 +387,7 @@ public class MetricsRegistry {
      * @param name     the name of the pool
      * @return a new {@link ScheduledExecutorService}
      */
+    @Deprecated
     public ScheduledExecutorService newScheduledThreadPool(int poolSize, String name) {
         return threadPools.newScheduledThreadPool(poolSize, name);
     }

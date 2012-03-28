@@ -3,11 +3,15 @@ package com.yammer.metrics.reporting;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.MetricsRegistryListener;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * The base class for all metric reporters.
  */
-public abstract class AbstractReporter {
-    private final MetricsRegistry metricsRegistry;
+public abstract class AbstractReporter implements Reporter{
+    //TODO Should probably make this a map =(
+    protected final Set<MetricsRegistry> metricsRegistries;
 
     /**
      * Creates a new {@link AbstractReporter} instance.
@@ -16,30 +20,29 @@ public abstract class AbstractReporter {
      *                 report
      */
     protected AbstractReporter(MetricsRegistry registry) {
-        this.metricsRegistry = registry;
+        metricsRegistries = new HashSet<MetricsRegistry>(1);
+        metricsRegistries.add(registry);
+    }
+
+    protected AbstractReporter(Set<MetricsRegistry> registries) {
+        this.metricsRegistries = registries;
+    }
+
+    public Set<MetricsRegistry> getMetricsRegistries(){
+        return metricsRegistries;
     }
 
     /**
-     * Start the reporter by adding it as a listener on the registry
+     * This is for backwards compatability, and should not generally be used.
+     * @return
      */
-    /*
-    public void start() {
-        metricsRegistry.addListener(this);
-    }*/
+    @Deprecated
+    public MetricsRegistry getMetricsRegistry(){
+        for (MetricsRegistry r : metricsRegistries){
+            return r;
+        }
 
-    /**
-     * Stops the reporter and closes any internal resources.
-     */
-    public void shutdown() {
-        //metricsRegistry.removeListener(this);
-    }
-
-    /**
-     * Returns the reporter's {@link MetricsRegistry}.
-     *
-     * @return the reporter's {@link MetricsRegistry}
-     */
-    protected MetricsRegistry getMetricsRegistry() {
-        return metricsRegistry;
+        //Should be impossible ot get here.
+        return null;
     }
 }

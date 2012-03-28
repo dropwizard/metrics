@@ -1,7 +1,10 @@
 package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.core.ThreadPools;
 
+import java.util.Set;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -10,28 +13,52 @@ import java.util.concurrent.TimeUnit;
  * metrics (e.g., to send the data to another service).
  */
 public abstract class AbstractPollingReporter extends AbstractReporter implements Runnable {
-    private final ScheduledExecutorService executor;
+    static final long DEFAULT_PERIOD = 1;
+    static final TimeUnit DEFAULT_TIMEUNIT = TimeUnit.MINUTES;
+
+    protected ScheduledExecutorService executor;
+    protected long period;
+    protected TimeUnit unit;
 
     /**
      * Creates a new {@link AbstractPollingReporter} instance.
      *
      * @param registry    the {@link MetricsRegistry} containing the metrics this reporter will
      *                    report
-     * @param name        the reporter's name
      * @see AbstractReporter#AbstractReporter(MetricsRegistry)
      */
-    protected AbstractPollingReporter(MetricsRegistry registry, String name) {
+    protected AbstractPollingReporter(MetricsRegistry registry) {
         super(registry);
-        this.executor = registry.newScheduledThreadPool(1, name);
+    }
+
+    /**
+     * Creates a new {@link AbstractPollingReporter} instance.
+     *
+     * @param registries    the {@link MetricsRegistry} containing the metrics this reporter will
+     *                    report
+     * @see AbstractReporter#AbstractReporter(MetricsRegistry)
+     */
+    protected AbstractPollingReporter(Set<MetricsRegistry> registries) {
+        super(registries);
+    }
+    
+    void setName(String name){
+        this.executor = ThreadPools.getInstance().newScheduledThreadPool(1, name);
+    }
+
+    public void setPeriod(long period) {
+        this.period = period;
+    }
+
+    public void setUnit(TimeUnit unit) {
+        this.unit = unit;
     }
 
     /**
      * Starts the reporter polling at the given period.
      *
-     * @param period    the amount of time between polls
-     * @param unit      the unit for {@code period}
      */
-    public void start(long period, TimeUnit unit) {
+    public void start() {
         executor.scheduleWithFixedDelay(this, period, period, unit);
     }
 
@@ -51,7 +78,6 @@ public abstract class AbstractPollingReporter extends AbstractReporter implement
     @Override
     public void shutdown() {
         executor.shutdown();
-        super.shutdown();
     }
 
     /**

@@ -19,8 +19,7 @@ import java.util.concurrent.TimeUnit;
  * A reporter which periodically appends data from each metric to a metric-specific CSV file in
  * an output directory.
  */
-public class CsvReporter extends AbstractPollingReporter implements
-                                                         MetricProcessor<CsvReporter.Context> {
+public class CsvReporter extends AbstractPollingReporter implements MetricProcessor<CsvReporter.Context> {
 
     /**
      * Enables the CSV reporter for the default metrics registry, and causes it to write to files in
@@ -44,8 +43,9 @@ public class CsvReporter extends AbstractPollingReporter implements
      * @param unit            the time unit of {@code period}
      */
     public static void enable(MetricsRegistry metricsRegistry, File outputDir, long period, TimeUnit unit) {
-        final CsvReporter reporter = new CsvReporter(metricsRegistry, outputDir);
-        reporter.start(period, unit);
+        final CsvReporter reporter = new CsvReporter(metricsRegistry).withOutputDir(outputDir).withPeriod(period)
+                                        .withTimeUnit(unit);
+        reporter.start();
     }
 
     /**
@@ -63,66 +63,70 @@ public class CsvReporter extends AbstractPollingReporter implements
         PrintStream getStream(String header) throws IOException;
     }
 
-    private final MetricPredicate predicate;
-    private final File outputDir;
-    private final Map<MetricName, PrintStream> streamMap;
-    private final Clock clock;
+    private MetricPredicate predicate;
+    private File outputDir;
+    private Map<MetricName, PrintStream> streamMap;
+    private Clock clock;
     private long startTime;
 
     /**
      * Creates a new {@link CsvReporter} which will write all metrics from the given
      * {@link MetricsRegistry} to CSV files in the given output directory.
      *
-     * @param outputDir          the directory to which files will be written
      * @param metricsRegistry    the {@link MetricsRegistry} containing the metrics this reporter
      *                           will report
      */
-    public CsvReporter(MetricsRegistry metricsRegistry, File outputDir) {
-        this(metricsRegistry, MetricPredicate.ALL, outputDir);
+    private CsvReporter(MetricsRegistry metricsRegistry) {
+        super(metricsRegistry);
     }
 
     /**
-     * Creates a new {@link CsvReporter} which will write metrics from the given
-     * {@link MetricsRegistry} which match the given {@link MetricPredicate} to CSV files in the
-     * given output directory.
+     * Creates a new {@link CsvReporter} which will write all metrics from the given
+     * {@link MetricsRegistry} to CSV files in the given output directory.
      *
-     * @param metricsRegistry    the {@link MetricsRegistry} containing the metrics this reporter
+     * @param metricsRegistries  the {@link MetricsRegistry} containing the metrics this reporter
      *                           will report
-     * @param predicate          the {@link MetricPredicate} which metrics are required to match
-     *                           before being written to files
-     * @param outputDir          the directory to which files will be written
      */
-    public CsvReporter(MetricsRegistry metricsRegistry,
-                       MetricPredicate predicate,
-                       File outputDir) {
-        this(metricsRegistry, predicate, outputDir, Clock.defaultClock());
+    private CsvReporter(Set<MetricsRegistry> metricsRegistries) {
+        super(metricsRegistries);
+    }
+    
+    public static CsvReporter createReporter(MetricsRegistry registry){
+        return new CsvReporter(registry).withName("csv-reporter");
+    }
+    
+    public static CsvReporter createReporter(Set<MetricsRegistry> registries){
+        return new CsvReporter(registries).withName("csv-reporter");
     }
 
-    /**
-     * Creates a new {@link CsvReporter} which will write metrics from the given
-     * {@link MetricsRegistry} which match the given {@link MetricPredicate} to CSV files in the
-     * given output directory.
-     *
-     * @param metricsRegistry    the {@link MetricsRegistry} containing the metrics this reporter
-     *                           will report
-     * @param predicate          the {@link MetricPredicate} which metrics are required to match
-     *                           before being written to files
-     * @param outputDir          the directory to which files will be written
-     * @param clock              the clock used to measure time
-     */
-    public CsvReporter(MetricsRegistry metricsRegistry,
-                       MetricPredicate predicate,
-                       File outputDir,
-                       Clock clock) {
-        super(metricsRegistry, "csv-reporter");
-        if (outputDir.exists() && !outputDir.isDirectory()) {
-            throw new IllegalArgumentException(outputDir + " is not a directory");
-        }
-        this.outputDir = outputDir;
+    public CsvReporter withPredicate(MetricPredicate predicate){
         this.predicate = predicate;
-        this.streamMap = new HashMap<MetricName, PrintStream>();
-        this.startTime = 0L;
+        return this;
+    }
+    
+    public CsvReporter withOutputDir(File outputDir){
+        this.outputDir = outputDir;
+        return this;
+    }
+
+    public CsvReporter withClock(Clock clock){
         this.clock = clock;
+        return this;
+    }
+
+    public CsvReporter withPeriod(long period){
+        setPeriod(period);
+        return this;
+    }
+
+    public CsvReporter withTimeUnit (TimeUnit unit){
+        setUnit(unit);
+        return this;
+    }
+    
+    public CsvReporter withName(String name){
+        setName(name);
+        return this;
     }
 
     /**
@@ -146,6 +150,7 @@ public class CsvReporter extends AbstractPollingReporter implements
         final long time = TimeUnit.MILLISECONDS.toSeconds(clock.time() - startTime);
         final Set<Entry<MetricName, Metric>> metrics = getMetricsRegistry().allMetrics().entrySet();
         try {
+            //TODO need to loop through registries
             for (Entry<MetricName, Metric> entry : metrics) {
                 final MetricName metricName = entry.getKey();
                 final Metric metric = entry.getValue();
@@ -232,9 +237,9 @@ public class CsvReporter extends AbstractPollingReporter implements
     }
 
     @Override
-    public void start(long period, TimeUnit unit) {
+    public void start() {
         this.startTime = clock.time();
-        super.start(period, unit);
+        super.start();
     }
 
     @Override

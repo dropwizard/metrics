@@ -37,7 +37,6 @@ public class ExampleRunner {
         }
     }
 
-
     public static void main(String[] args) throws Exception {
         ConsoleReporter.enable(10, TimeUnit.SECONDS);
         JmxReporter jmxReporter = new JmxReporter(Metrics.defaultRegistry());

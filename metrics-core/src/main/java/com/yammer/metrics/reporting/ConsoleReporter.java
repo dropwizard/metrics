@@ -2,16 +2,14 @@ package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
+import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.stats.Snapshot;
 import com.yammer.metrics.core.MetricPredicate;
 
 import java.io.PrintStream;
 import java.text.DateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,80 +39,73 @@ public class ConsoleReporter extends AbstractPollingReporter implements
      * @param unit            the time unit of {@code period}
      */
     public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit) {
-        final ConsoleReporter reporter = new ConsoleReporter(metricsRegistry,
-                                                             System.out,
-                                                             MetricPredicate.ALL);
-        reporter.start(period, unit);
+        ConsoleReporter reporter = ConsoleReporter.createReporter(metricsRegistry).withPrintStream(System.out)
+                .withPredicate(MetricPredicate.ALL).withClock(Clock.defaultClock()).withTimeZone(TimeZone.getDefault())
+                .withLocale(Locale.getDefault()).withPeriod(period).withTimeUnit(unit);
+        reporter.start();
     }
 
-    private final PrintStream out;
-    private final MetricPredicate predicate;
-    private final Clock clock;
-    private final TimeZone timeZone;
-    private final Locale locale;
+    private PrintStream out;
+    private MetricPredicate predicate;
+    private Clock clock;
+    private TimeZone timeZone;
+    private Locale locale;
 
-    /**
-     * Creates a new {@link ConsoleReporter} for the default metrics registry, with unrestricted
-     * output.
-     *
-     * @param out the {@link PrintStream} to which output will be written
-     */
-    public ConsoleReporter(PrintStream out) {
-        this(Metrics.defaultRegistry(), out, MetricPredicate.ALL);
+    private ConsoleReporter(MetricsRegistry registry){
+        super(registry);
+    }
+    
+    private ConsoleReporter(Set<MetricsRegistry> registries){
+        super(registries);
+    }
+    
+    public static ConsoleReporter createReporter(MetricsRegistry registry){
+        //TODO add defaults using with?
+        return new ConsoleReporter(registry).withName("console-reporter");
+    }
+    
+    public static ConsoleReporter createReporter(Set<MetricsRegistry> registries){
+        return new ConsoleReporter(registries).withName("console-reporter");
     }
 
-    /**
-     * Creates a new {@link ConsoleReporter} for a given metrics registry.
-     *
-     * @param metricsRegistry the metrics registry
-     * @param out             the {@link PrintStream} to which output will be written
-     * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be
-     *                        output
-     */
-    public ConsoleReporter(MetricsRegistry metricsRegistry, PrintStream out, MetricPredicate predicate) {
-        this(metricsRegistry, out, predicate, Clock.defaultClock(), TimeZone.getDefault());
+    public ConsoleReporter withPeriod(long period){
+        setPeriod(period);
+        return this;
     }
 
-    /**
-     * Creates a new {@link ConsoleReporter} for a given metrics registry.
-     *
-     * @param metricsRegistry the metrics registry
-     * @param out             the {@link PrintStream} to which output will be written
-     * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be
-     *                        output
-     * @param clock           the {@link Clock} used to print time
-     * @param timeZone        the {@link TimeZone} used to print time
-     */
-    public ConsoleReporter(MetricsRegistry metricsRegistry,
-                           PrintStream out,
-                           MetricPredicate predicate,
-                           Clock clock,
-                           TimeZone timeZone) {
-        this(metricsRegistry, out, predicate, clock, timeZone, Locale.getDefault());
+    public ConsoleReporter withTimeUnit (TimeUnit unit){
+        setUnit(unit);
+        return this;
     }
 
-    /**
-     * Creates a new {@link ConsoleReporter} for a given metrics registry.
-     *
-     * @param metricsRegistry the metrics registry
-     * @param out             the {@link PrintStream} to which output will be written
-     * @param predicate       the {@link MetricPredicate} used to determine whether a metric will be
-     *                        output
-     * @param clock           the {@link com.yammer.metrics.core.Clock} used to print time
-     * @param timeZone        the {@link TimeZone} used to print time
-     * @param locale          the {@link Locale} used to print values
-     */
-    public ConsoleReporter(MetricsRegistry metricsRegistry,
-                           PrintStream out,
-                           MetricPredicate predicate,
-                           Clock clock,
-                           TimeZone timeZone, Locale locale) {
-        super(metricsRegistry, "console-reporter");
-        this.out = out;
-        this.predicate = predicate;
+    public ConsoleReporter withPrintStream (PrintStream stream){
+        this.out = stream;
+        return this;
+    }
+
+    public ConsoleReporter withClock (Clock clock){
         this.clock = clock;
-        this.timeZone = timeZone;
+        return this;
+    }
+
+    public ConsoleReporter withPredicate (MetricPredicate predicate){
+        this.predicate = predicate;
+        return this;
+    }
+
+    public ConsoleReporter withLocale(Locale locale){
         this.locale = locale;
+        return this;
+    }
+
+    public ConsoleReporter withTimeZone(TimeZone timeZone){
+        this.timeZone = timeZone;
+        return this;
+    }
+    
+    public ConsoleReporter withName(String name){
+        setName(name);
+        return this;
     }
 
     @Override

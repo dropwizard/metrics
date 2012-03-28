@@ -1,5 +1,6 @@
 package com.yammer.metrics.reporting.tests;
 
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Clock;
 import com.yammer.metrics.core.MetricPredicate;
 import com.yammer.metrics.core.MetricsRegistry;
@@ -19,12 +20,9 @@ public class ConsoleReporterTest extends AbstractPollingReporterTest {
 
     @Override
     protected AbstractPollingReporter createReporter(MetricsRegistry registry, OutputStream out, Clock clock) {
-        return new ConsoleReporter(registry,
-                                   new PrintStream(out),
-                                   MetricPredicate.ALL,
-                                   clock,
-                                   TimeZone.getTimeZone("UTC"),
-                                   Locale.US);
+        return ConsoleReporter.createReporter(registry).withPrintStream(new PrintStream(out))
+                .withPredicate(MetricPredicate.ALL).withClock(clock).withTimeZone(TimeZone.getTimeZone("UTC"))
+                .withLocale(Locale.US);
     }
 
     @Override
@@ -107,11 +105,13 @@ public class ConsoleReporterTest extends AbstractPollingReporterTest {
     @Test
     public void givenShutdownReporterWhenCreatingNewReporterExpectSuccess() {
         try {
-            final ConsoleReporter reporter1 = new ConsoleReporter(System.out);
-            reporter1.start(1, TimeUnit.SECONDS);
+            final ConsoleReporter reporter1 = ConsoleReporter.createReporter(Metrics.defaultRegistry()).withPeriod(1)
+                    .withTimeUnit(TimeUnit.SECONDS);
+            reporter1.start();
             reporter1.shutdown();
-            final ConsoleReporter reporter2 = new ConsoleReporter(System.out);
-            reporter2.start(1, TimeUnit.SECONDS);
+            final ConsoleReporter reporter2 = ConsoleReporter.createReporter(Metrics.defaultRegistry())
+                    .withPrintStream(System.out).withPeriod(1).withTimeUnit(TimeUnit.SECONDS);
+            reporter2.start();
             reporter2.shutdown();
         } catch (Exception e) {
             e.printStackTrace();

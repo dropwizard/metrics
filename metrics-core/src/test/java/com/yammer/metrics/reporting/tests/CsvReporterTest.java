@@ -11,17 +11,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.concurrent.TimeUnit;
 
 public class CsvReporterTest extends AbstractPollingReporterTest {
 
     @Override
-    protected AbstractPollingReporter createReporter(MetricsRegistry registry, final OutputStream out, Clock clock) throws Exception {
-        return new CsvReporter(registry, MetricPredicate.ALL, new File("/tmp"), clock) {
-            @Override
-            protected PrintStream createStreamForMetric(MetricName metricName) throws IOException {
-                return new PrintStream(out);
-            }
-        };
+    protected AbstractPollingReporter createReporter(MetricsRegistry registry, final OutputStream out, Clock clock)
+            throws Exception {
+        return CsvReporter.createReporter(registry).withPredicate(MetricPredicate.ALL)
+            .withOutputDir(new File("/tmp")).withClock(clock).withPeriod(1).withTimeUnit(TimeUnit.SECONDS);
     }
 
     @Override

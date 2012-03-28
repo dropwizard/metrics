@@ -17,6 +17,7 @@
 package com.yammer.metrics.reporting.jmx;
 
 import com.yammer.metrics.core.*;
+import com.yammer.metrics.reporting.AbstractDynamicReporter;
 import com.yammer.metrics.reporting.AbstractReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Date: 3/16/12
  * Time: 1:27 PM
  */
-public class JmxReporter extends AbstractReporter implements MetricsRegistryListener,
-        MetricProcessor<JmxReporter.Context> {
+public class JmxReporter extends AbstractDynamicReporter implements MetricProcessor<JmxReporter.Context> {
     private static final Logger LOGGER = LoggerFactory.getLogger(JmxReporter.class);
 
     private final Map<MetricName, ObjectName> registeredBeans;
@@ -65,11 +65,8 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         super(registry);
         this.registeredBeans = new ConcurrentHashMap<MetricName, ObjectName>(100);
         this.server = ManagementFactory.getPlatformMBeanServer();
-
-        registry.addListener(this);
     }
 
-    @Override
     public void onMetricAdded(MetricsRegistry registry, MetricName name, Metric metric) {
         if (metric != null) {
             try {
@@ -80,50 +77,38 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
     }
 
-    @Override
     public void onMetricRemoved(MetricsRegistry registry, MetricName name) {
         unregisterBean(name);
     }
 
-    @Override
     public void processMeter(MetricName name, Metered meter, Context context) throws Exception {
         registerBean(context.getRegistry().getName(), name, meter);
     }
 
-    @Override
     public void processCounter(MetricName name, Counter counter, Context context) throws Exception {
         registerBean(context.getRegistry().getName(), name, counter);
     }
 
-    @Override
     public void processHistogram(MetricName name, Histogram histogram, Context context) throws Exception {
         registerBean(context.getRegistry().getName(), name, histogram);
     }
 
-    @Override
     public void processTimer(MetricName name, Timer timer, Context context) throws Exception {
         registerBean(context.getRegistry().getName(), name, timer);
     }
 
-    @Override
     public void processGauge(MetricName name, Gauge<?> gauge, Context context) throws Exception {
         registerBean(context.getRegistry().getName(), name, gauge);
     }
 
     @Override
     public void shutdown() {
-        getMetricsRegistry().removeListener(this);
+        super.shutdown();
+        //TODO this could case name collisions between registries
         for (MetricName name : registeredBeans.keySet()) {
             unregisterBean(name);
         }
         registeredBeans.clear();
-    }
-
-    /**
-     * Starts the reporter.
-     */
-    public final void start() {
-        getMetricsRegistry().addListener(this);
     }
 
     private void registerBean(String registryName, MetricName name, Metric metric)
