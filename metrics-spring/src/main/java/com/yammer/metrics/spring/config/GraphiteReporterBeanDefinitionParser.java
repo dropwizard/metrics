@@ -27,12 +27,14 @@ import com.yammer.metrics.spring.GraphiteReporterFactory;
  */
 public class GraphiteReporterBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
+  private static final String METRICS_REGISTRY_ATTRIBUTE = "metrics-registry";
   private static final String HOST_ATTRIBUTE = "host";
   private static final String PORT_ATTRIBUTE = "port";
   private static final String PREFIX_ATTRIBUTE = "prefix";
   private static final String PERIOD_ATTRIBUTE = "period";
   private static final String TIMEUNIT_ATTRIBUTE = "timeUnit";
   private static final String PREDICATE_ATTRIBUTE = "predicate";
+  private static final String AUTOSTART_ATTRIBUTE = "autoStart";
 
   @Override
   protected Class<?> getBeanClass(final Element element) {
@@ -48,11 +50,18 @@ public class GraphiteReporterBeanDefinitionParser extends AbstractSingleBeanDefi
   protected void doParse(final Element element, final ParserContext parserContext,
       final BeanDefinitionBuilder builder) {
     builder.setFactoryMethod("createInstance");
-    builder.addConstructorArgReference(element.getAttribute("metrics-registry"));
+    final String registry = element.getAttribute(METRICS_REGISTRY_ATTRIBUTE);
+    if (StringUtils.hasText(registry)) {
+      builder.addConstructorArgReference(registry);
+    } else {
+      parserContext.getReaderContext().error("Attribute 'metrics-registry' must not be empty",
+          element);
+      return;
+    }
 
     final String host = element.getAttribute(HOST_ATTRIBUTE);
     if (StringUtils.hasText(host)) {
-      builder.addPropertyValue(HOST_ATTRIBUTE, host);
+      builder.addConstructorArgValue(host);
     } else {
       parserContext.getReaderContext().error("Attribute 'host' must not be empty", element);
       return;
@@ -60,31 +69,51 @@ public class GraphiteReporterBeanDefinitionParser extends AbstractSingleBeanDefi
 
     final String port = element.getAttribute(PORT_ATTRIBUTE);
     if (StringUtils.hasText(port)) {
-      builder.addPropertyValue(PORT_ATTRIBUTE, Integer.valueOf(port));
+      builder.addConstructorArgValue(Integer.valueOf(port));
     } else {
       parserContext.getReaderContext().error("Attribute 'port' must not be empty", element);
       return;
     }
 
-    final String prefix = element.getAttribute(PREFIX_ATTRIBUTE);
-    if (StringUtils.hasText(prefix)) {
-      builder.addPropertyValue(PREFIX_ATTRIBUTE, prefix);
-    }
-    final String period = element.getAttribute(PERIOD_ATTRIBUTE);
-    if (StringUtils.hasText(period)) {
-      builder.addPropertyValue(PERIOD_ATTRIBUTE, Long.valueOf(period));
-    }
-
     final String timeUnit = element.getAttribute(TIMEUNIT_ATTRIBUTE);
     if (StringUtils.hasText(timeUnit)) {
-      builder.addPropertyValue(TIMEUNIT_ATTRIBUTE, TimeUnit.valueOf(timeUnit.toUpperCase()));
+      final TimeUnit tu = TimeUnit.valueOf(timeUnit.toUpperCase());
+      if (null == tu) {
+        parserContext.getReaderContext().error(
+            "Attribute 'timeUnit' has invalid value: " + timeUnit
+                + ", which cannot be parsed as java.util.concurrent.TimeUnit", element);
+        return;
+      }
+      builder.addConstructorArgValue(tu);
+    } else {
+      parserContext.getReaderContext().error("Attribute 'timeUnit' must not be empty", element);
+      return;
+    }
+
+    final String period = element.getAttribute(PERIOD_ATTRIBUTE);
+    if (StringUtils.hasText(period)) {
+      builder.addConstructorArgValue(Long.valueOf(period));
+    } else {
+      parserContext.getReaderContext().error("Attribute 'period' must not be empty", element);
+      return;
+    }
+
+    final String autoStart = element.getAttribute(AUTOSTART_ATTRIBUTE);
+    if (StringUtils.hasText(autoStart)) {
+      builder.addConstructorArgValue(Boolean.valueOf(autoStart));
+    } else {
+      builder.addConstructorArgValue(true);
+    }
+
+    final String prefix = element.getAttribute(PREFIX_ATTRIBUTE);
+    if (StringUtils.hasText(prefix)) {
+      builder.addConstructorArgValue(prefix);
     }
 
     final String predicate = element.getAttribute(PREDICATE_ATTRIBUTE);
     if (StringUtils.hasText(predicate)) {
-      builder.addPropertyReference(PREDICATE_ATTRIBUTE, predicate);
+      builder.addConstructorArgReference(predicate);
     }
-
   }
 
 }

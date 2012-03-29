@@ -6,6 +6,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.util.Assert;
 
+import com.yammer.metrics.annotation.Timed;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
@@ -14,7 +15,10 @@ import com.yammer.metrics.core.TimerContext;
  * An implementation of a {@link MethodInterceptor} which creates a
  * {@link Timer} for each invocation measuring execution times. This class
  * utilizes a {@link MethodInvocationMetricNameFactory} for customizing metric
- * names based on invocation instances
+ * names based on invocation instances.
+ * <p>
+ * This interceptor can be used in xml-based configurations and for interception
+ * of third-party libraries which cannot use the {@link Timed} annotation
  * 
  * @author erez
  * @see MethodInvocationMetricNameFactory

@@ -12,6 +12,7 @@ public class MetricsNamespaceHandler extends NamespaceHandlerSupport {
         registerBeanDefinitionParser("health-check-registry",
                                      new HealthCheckRegistryBeanDefinitionParser());
         registerBeanDefinitionParser("jmx-reporter", new JmxReporterBeanDefinitionParser());
+        registerBeanDefinitionParser("graphite-reporter", new GraphiteReporterBeanDefinitionParser());
     }
 
 }
