@@ -2,17 +2,19 @@ package com.yammer.metrics.spring;
 
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.util.StringUtils;
+
 import com.yammer.metrics.core.MetricPredicate;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.GraphiteReporter;
 
-public class GraphiteReporterFactory  {
+public class GraphiteReporterFactory {
 
   private String prefix;
-  private int port;
+  private Integer port;
   private String host;
   private TimeUnit timeUnit;
-  private long period;
+  private Long period;
   private MetricsRegistry registery;
   private MetricPredicate predicate;
 
@@ -40,12 +42,18 @@ public class GraphiteReporterFactory  {
     this.registery = registery;
   }
 
-  public void setPredicate(MetricPredicate predicate) {
-	this.predicate = predicate;
-}
-  
-  public void createInstance()  {
-    GraphiteReporter.enable(registery, period, timeUnit, host, port, prefix, predicate);
+  public void setPredicate(final MetricPredicate predicate) {
+    this.predicate = predicate;
+  }
+
+  public void createInstance() {
+    if (null != predicate && StringUtils.hasText(prefix)) {
+      GraphiteReporter.enable(registery, period, timeUnit, host, port, prefix, predicate);
+    } else if (StringUtils.hasText(prefix)) {
+      GraphiteReporter.enable(registery, period, timeUnit, host, port, prefix);
+    } else {
+      GraphiteReporter.enable(registery, period, timeUnit, host, port);
+    }
   }
 
 }

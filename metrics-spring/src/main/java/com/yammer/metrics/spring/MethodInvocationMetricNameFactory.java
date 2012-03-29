@@ -14,12 +14,15 @@ import com.yammer.metrics.core.MetricName;
  * @author erez
  * 
  */
+
 public interface MethodInvocationMetricNameFactory {
-	/**
-	 * Create a metric name based on a {@link MethodInvocation}
-	 * @param invocation the instance of the invocation	
-	 * @return
-	 */
-	MetricName createMetricName(MethodInvocation invocation);
+  /**
+   * Create a metric name based on a {@link MethodInvocation}
+   * 
+   * @param invocation
+   *          the instance of the invocation
+   * @return
+   */
+  MetricName createMetricName(MethodInvocation invocation);
 
 }

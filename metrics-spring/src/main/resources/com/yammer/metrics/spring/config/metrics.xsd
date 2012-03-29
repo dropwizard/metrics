@@ -43,9 +43,9 @@
             <xsd:attribute name="metrics-registry" type="xsd:string" use="required"/>
             <xsd:attribute name="host" type="xsd:string" use="required"/>
             <xsd:attribute name="port" type="xsd:int" use="required"/>
+            <xsd:attribute name="priod" type="xsd:int" use="required"/>
+            <xsd:attribute name="timeUnit" type="xsd:string" use="required"/>
             <xsd:attribute name="prefix" type="xsd:string" use="optional"/>
-            <xsd:attribute name="priod" type="xsd:int" use="optional"/>
-            <xsd:attribute name="timeUnit" type="xsd:string" use="optional"/>
             <xsd:attribute name="predicate" type="xsd:string" use="optional"/>
         </xsd:complexType>
     </xsd:element>
