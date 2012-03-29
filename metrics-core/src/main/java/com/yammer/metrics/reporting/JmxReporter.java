@@ -6,7 +6,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.management.*;
 import java.lang.management.ManagementFactory;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -337,8 +339,9 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
      * @param registry    the {@link MetricsRegistry} to report from
      */
     public static void startDefault(MetricsRegistry registry) {
-        INSTANCE = new JmxReporter(registry);
-        INSTANCE.start();
+        Set<MetricsRegistry> registries = new HashSet<MetricsRegistry>(1);
+        registries.add(registry);
+        INSTANCE = new JmxReporter.Builder(registries, "DefaultJmxReporter").build();
     }
 
     /**
@@ -368,13 +371,29 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
     }
 
+    public static class Builder {
+        private final Set<MetricsRegistry> registries;
+        private final String name;
+
+        public Builder(Set<MetricsRegistry> registries, String name){
+            this.registries = registries;
+            this.name = name;
+
+            //Set mutable items to sensible defaults
+        }
+
+        public JmxReporter build(){
+            return new JmxReporter(this);
+        }
+    }
+
     /**
      * Creates a new {@link JmxReporter} for the given registry.
      *
-     * @param registry    a {@link MetricsRegistry}
+     * @param builder    a {@link JmxReporter.Builder}
      */
-    public JmxReporter(MetricsRegistry registry) {
-        super(registry);
+    private JmxReporter(Builder builder) {
+        super(builder.registries, builder.name);
         this.registeredBeans = new ConcurrentHashMap<MetricName, ObjectName>(100);
         this.server = ManagementFactory.getPlatformMBeanServer();
     }

@@ -10,7 +10,9 @@ import org.junit.Test;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -20,9 +22,11 @@ public class ConsoleReporterTest extends AbstractPollingReporterTest {
 
     @Override
     protected AbstractPollingReporter createReporter(MetricsRegistry registry, OutputStream out, Clock clock) {
-        return ConsoleReporter.createReporter(registry).withPrintStream(new PrintStream(out))
-                .withPredicate(MetricPredicate.ALL).withClock(clock).withTimeZone(TimeZone.getTimeZone("UTC"))
-                .withLocale(Locale.US);
+        Set<MetricsRegistry> registries = new HashSet<MetricsRegistry>(1);
+        registries.add(registry);
+        return new ConsoleReporter.Builder(registries, "testConsoleReporter", 1, TimeUnit.SECONDS)
+                .withPrintStream(new PrintStream(out)).withPredicate(MetricPredicate.ALL)
+                .withClock(clock).withTimeZone(TimeZone.getTimeZone("UTC")).withLocale(Locale.US).build();
     }
 
     @Override
@@ -105,13 +109,14 @@ public class ConsoleReporterTest extends AbstractPollingReporterTest {
     @Test
     public void givenShutdownReporterWhenCreatingNewReporterExpectSuccess() {
         try {
-            final ConsoleReporter reporter1 = ConsoleReporter.createReporter(Metrics.defaultRegistry()).withPeriod(1)
-                    .withTimeUnit(TimeUnit.SECONDS);
-            reporter1.start();
+            Set<MetricsRegistry> registries = new HashSet<MetricsRegistry>(1);
+            registries.add(Metrics.defaultRegistry());
+
+            final ConsoleReporter reporter1 = new ConsoleReporter.Builder(registries, "testConsoleReporter1", 1,
+                    TimeUnit.SECONDS).build();
             reporter1.shutdown();
-            final ConsoleReporter reporter2 = ConsoleReporter.createReporter(Metrics.defaultRegistry())
-                    .withPrintStream(System.out).withPeriod(1).withTimeUnit(TimeUnit.SECONDS);
-            reporter2.start();
+            final ConsoleReporter reporter2 = new ConsoleReporter.Builder(registries, "testConsoleReporter2", 1,
+                    TimeUnit.SECONDS).build();
             reporter2.shutdown();
         } catch (Exception e) {
             e.printStackTrace();

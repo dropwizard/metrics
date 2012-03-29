@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class CsvReporterTest extends AbstractPollingReporterTest {
@@ -18,8 +21,11 @@ public class CsvReporterTest extends AbstractPollingReporterTest {
     @Override
     protected AbstractPollingReporter createReporter(MetricsRegistry registry, final OutputStream out, Clock clock)
             throws Exception {
-        return CsvReporter.createReporter(registry).withPredicate(MetricPredicate.ALL)
-            .withOutputDir(new File("/tmp")).withClock(clock).withPeriod(1).withTimeUnit(TimeUnit.SECONDS);
+        Set<MetricsRegistry> registries = new HashSet<MetricsRegistry>(1);
+        registries.add(registry);
+        return new CsvReporter.Builder(registries, "test reporter", 1, TimeUnit.SECONDS)
+                .withPredicate(MetricPredicate.ALL)
+                .withOutputDir(new File("/tmp")).withClock(clock).build();
     }
 
     @Override

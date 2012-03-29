@@ -3,11 +3,14 @@ package com.yammer.metrics.examples;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Histogram;
+import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.ConsoleReporter;
 import com.yammer.metrics.reporting.jmx.JmxReporter;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.*;
 
 public class ExampleRunner {
@@ -38,8 +41,10 @@ public class ExampleRunner {
     }
 
     public static void main(String[] args) throws Exception {
-        ConsoleReporter.enable(10, TimeUnit.SECONDS);
-        JmxReporter jmxReporter = new JmxReporter(Metrics.defaultRegistry());
+        Set<MetricsRegistry> registries = new HashSet<MetricsRegistry>(1);
+        registries.add(Metrics.defaultRegistry());
+        new ConsoleReporter.Builder(registries, "consoleReporter", 10, TimeUnit.SECONDS).build();
+        JmxReporter jmxReporter = new JmxReporter.Builder(registries, "JmxRegistry").build();
         System.err.println("Scanning all files on your hard drive...");
 
         JOBS.add(new File("/"));
