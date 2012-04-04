@@ -39,16 +39,10 @@ public class ThreadPools {
         }
     }
 
-    private final ConcurrentMap<String, ScheduledExecutorService> threadPools =
-            new ConcurrentHashMap<String, ScheduledExecutorService>(100);
+    private final ConcurrentMap<String, ScheduledExecutorService> threadPools = new ConcurrentHashMap<String, ScheduledExecutorService>(100);
 
-    private static ThreadPools ourInstance = new ThreadPools();
 
-    public static ThreadPools getInstance() {
-        return ourInstance;
-    }
-
-    private ThreadPools(){}
+    ThreadPools(){}
     /**
      * Creates a new scheduled thread pool of a given size with the given name, or returns an
      * existing thread pool if one was already created with the same name.
@@ -57,7 +51,7 @@ public class ThreadPools {
      * @param name     the name of the pool
      * @return a new {@link ScheduledExecutorService}
      */
-    public ScheduledExecutorService newScheduledThreadPool(int poolSize, String name) {
+    public ScheduledExecutorService exisitingOrNewScheduledThreadPool(int poolSize, String name) {
         final ScheduledExecutorService existing = threadPools.get(name);
         if (isValidExecutor(existing)) {
             return existing;
@@ -79,6 +73,11 @@ public class ThreadPools {
             }
         }
     }
+
+    public static ScheduledExecutorService newScheduledThreadPool(int poolSize, String name) {
+        return Executors.newScheduledThreadPool(poolSize, new NamedThreadFactory(name));
+    }
+
 
     private static boolean isValidExecutor(ExecutorService executor) {
         return executor != null && !executor.isShutdown() && !executor.isTerminated();
