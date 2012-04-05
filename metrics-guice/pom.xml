@@ -10,6 +10,7 @@
 
     <artifactId>metrics-guice</artifactId>
     <name>Metrics Guice Support</name>
+    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>

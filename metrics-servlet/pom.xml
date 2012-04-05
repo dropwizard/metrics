@@ -10,6 +10,7 @@
 
     <artifactId>metrics-servlet</artifactId>
     <name>Metrics Servlet</name>
+    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
@@ -41,4 +42,18 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Fragment-Host>${project.groupId}.core</Fragment-Host>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
