@@ -10,6 +10,7 @@
 
     <artifactId>metrics-spring</artifactId>
     <name>Metrics Spring Support</name>
+    <packaging>bundle</packaging>
 
     <properties>
         <spring.version>3.1.1.RELEASE</spring.version>
