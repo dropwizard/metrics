@@ -10,6 +10,7 @@
 
     <artifactId>metrics-core</artifactId>
     <name>Metrics Core Library</name>
+    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
@@ -18,7 +19,7 @@
             <version>${slf4j.version}</version>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>
