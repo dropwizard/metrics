@@ -22,13 +22,16 @@ class TimedListener implements TypeListener {
     @Override
     public <T> void hear(TypeLiteral<T> literal,
                          TypeEncounter<T> encounter) {
-        final Class<? super T> klass = literal.getRawType();
-        for (Method method : klass.getDeclaredMethods()) {
-            final MethodInterceptor interceptor = TimedInterceptor.forMethod(metricsRegistry,
-                                                                             klass, method);
-            if (interceptor != null) {
-                encounter.bindInterceptor(Matchers.only(method), interceptor);
+        Class<? super T> klass = literal.getRawType();
+
+        do {
+            for (Method method : klass.getDeclaredMethods()) {
+                final MethodInterceptor interceptor = TimedInterceptor.forMethod(metricsRegistry,
+                                                                                 klass, method);
+                if (interceptor != null) {
+                    encounter.bindInterceptor(Matchers.only(method), interceptor);
+                }
             }
-        }
+        } while ( (klass = klass.getSuperclass() ) != null);
     }
 }
