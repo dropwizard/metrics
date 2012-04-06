@@ -1,9 +1,7 @@
 package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.MetricsRegistryListener;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -18,25 +16,19 @@ public abstract class AbstractReporter implements Reporter{
         this.name = name;
     }
 
+    /**
+     * Getter for the set of metric registries reported on.
+     * @return
+     */
     public Set<MetricsRegistry> getMetricsRegistries(){
         return metricsRegistries;
     }
 
-    public String getName() {
-        return name;
-    }
-
     /**
-     * This is for backwards compatability, and should not generally be used.
+     * Getter for the {@link Reporter} name.
      * @return
      */
-    @Deprecated
-    public MetricsRegistry getMetricsRegistry(){
-        for (MetricsRegistry r : metricsRegistries){
-            return r;
-        }
-
-        //Should be impossible ot get here.
-        return null;
+    public String getName() {
+        return name;
     }
 }

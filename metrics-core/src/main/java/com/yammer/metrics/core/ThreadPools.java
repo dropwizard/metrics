@@ -74,6 +74,12 @@ public class ThreadPools {
         }
     }
 
+    /**
+     * Creates a new scheduled threadpool with the given size and name.
+     * @param poolSize
+     * @param name
+     * @return
+     */
     public static ScheduledExecutorService newScheduledThreadPool(int poolSize, String name) {
         return Executors.newScheduledThreadPool(poolSize, new NamedThreadFactory(name));
     }

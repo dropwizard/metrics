@@ -34,6 +34,9 @@ public class CsvReporter extends AbstractPollingReporter implements MetricProces
         PrintStream getStream(String header) throws IOException;
     }
 
+    /**
+     * Builder for creating new CSV Reporters
+     */
     public static class Builder {
         private final Set<MetricsRegistry> registries;
         private final String name;
@@ -43,6 +46,13 @@ public class CsvReporter extends AbstractPollingReporter implements MetricProces
         private File outputDir;
         private Clock clock;
 
+        /**
+         * Create a new {@link Builder} with the set of required attributes.  Defaults are used for all mutable attributes.
+         * @param registries
+         * @param name
+         * @param period
+         * @param unit
+         */
         public Builder(Set<MetricsRegistry> registries, String name, long period, TimeUnit unit){
             this.registries = registries;
             this.name = name;
@@ -55,21 +65,40 @@ public class CsvReporter extends AbstractPollingReporter implements MetricProces
             this.outputDir = new File(System.getProperty("java.io.tmpdir"));
         }
 
+        /**
+         * 
+         * @param predicate
+         * @return {@link Builder} with the new attribute setting
+         */
         public Builder withPredicate(MetricPredicate predicate) {
             this.predicate = predicate;
             return this;
         }
 
+        /**
+         *
+         * @param outputDir
+         * @return {@link Builder} with the new attribute setting
+         */
         public Builder withOutputDir(File outputDir) {
             this.outputDir = outputDir;
             return this;
         }
 
+        /**
+         *
+         * @param clock
+         * @return {@link Builder} with the new attribute setting
+         */
         public Builder withClock(Clock clock) {
             this.clock = clock;
             return this;
         }
 
+        /**
+         * Create the new Reporter with the current builder settings.
+         * @return
+         */
         public CsvReporter build() {
             return new CsvReporter(this);
         }
@@ -83,7 +112,7 @@ public class CsvReporter extends AbstractPollingReporter implements MetricProces
 
     /**
      * Creates a new {@link CsvReporter} which will write all metrics from the given
-     * {@link MetricsRegistry} to CSV files in the given output directory.
+     * Metrics Registries to CSV files in the given output directory.
      *
      * @param builder
      */

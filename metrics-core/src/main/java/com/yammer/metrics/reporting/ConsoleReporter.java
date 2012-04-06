@@ -1,10 +1,8 @@
 package com.yammer.metrics.reporting;
 
-import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.stats.Snapshot;
-import com.yammer.metrics.core.MetricPredicate;
 
 import java.io.PrintStream;
 import java.text.DateFormat;
@@ -37,12 +35,12 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricPr
         private TimeZone timeZone;
         private Locale locale;
 
-        public Builder(Set<MetricsRegistry> registries, String name, long period, TimeUnit unit){
+        public Builder(Set<MetricsRegistry> registries, String name, long period, TimeUnit unit) {
             this.registries = registries;
             this.name = name;
             this.period = period;
             this.timeUnit = unit;
-            
+
             //Set mutable items to sensible defaults
             this.out = System.out;
             this.predicate = MetricPredicate.ALL;
@@ -50,27 +48,28 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricPr
             this.timeZone = TimeZone.getDefault();
             this.locale = Locale.getDefault();
         }
-        public Builder withPrintStream (PrintStream stream){
+
+        public Builder withPrintStream(PrintStream stream) {
             this.out = stream;
             return this;
         }
 
-        public Builder withClock (Clock clock){
+        public Builder withClock(Clock clock) {
             this.clock = clock;
             return this;
         }
 
-        public Builder withPredicate (MetricPredicate predicate){
+        public Builder withPredicate(MetricPredicate predicate) {
             this.predicate = predicate;
             return this;
         }
 
-        public Builder withLocale(Locale locale){
+        public Builder withLocale(Locale locale) {
             this.locale = locale;
             return this;
         }
 
-        public Builder withTimeZone(TimeZone timeZone){
+        public Builder withTimeZone(TimeZone timeZone) {
             this.timeZone = timeZone;
             return this;
         }
@@ -80,7 +79,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricPr
         }
     }
 
-    private ConsoleReporter(Builder builder){
+    private ConsoleReporter(Builder builder) {
         super(builder.registries, builder.name, builder.period, builder.timeUnit);
         this.clock = builder.clock;
         this.locale = builder.locale;
@@ -93,8 +92,8 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricPr
     public void run() {
         try {
             final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT,
-                                                                     DateFormat.MEDIUM,
-                                                                     locale);
+                    DateFormat.MEDIUM,
+                    locale);
             format.setTimeZone(timeZone);
             final String dateTime = format.format(new Date(clock.time()));
             out.print(dateTime);
@@ -103,19 +102,20 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricPr
                 out.print('=');
             }
             out.println();
-            //TODO iterate registries
-            for (Entry<String, SortedMap<MetricName, Metric>> entry : getMetricsRegistry().groupedMetrics(
-                    predicate).entrySet()) {
-                out.print(entry.getKey());
-                out.println(':');
-                for (Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
-                    out.print("  ");
-                    out.print(subEntry.getKey().getName());
+
+            for (MetricsRegistry registry : getMetricsRegistries()) {
+                for (Entry<String, SortedMap<MetricName, Metric>> entry : registry.groupedMetrics(predicate).entrySet()) {
+                    out.print(entry.getKey());
                     out.println(':');
-                    subEntry.getValue().processWith(this, subEntry.getKey(), out);
+                    for (Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
+                        out.print("  ");
+                        out.print(subEntry.getKey().getName());
+                        out.println(':');
+                        subEntry.getValue().processWith(this, subEntry.getKey(), out);
+                        out.println();
+                    }
                     out.println();
                 }
-                out.println();
             }
             out.println();
             out.flush();
@@ -139,21 +139,21 @@ public class ConsoleReporter extends AbstractPollingReporter implements MetricPr
         final String unit = abbrev(meter.rateUnit());
         stream.printf(locale, "             getCount = %d\n", meter.getCount());
         stream.printf(locale, "         getMean rate = %2.2f %s/%s\n",
-                      meter.getMeanRate(),
-                      meter.eventType(),
-                      unit);
+                meter.getMeanRate(),
+                meter.eventType(),
+                unit);
         stream.printf(locale, "     1-minute rate = %2.2f %s/%s\n",
-                      meter.getOneMinuteRate(),
-                      meter.eventType(),
-                      unit);
+                meter.getOneMinuteRate(),
+                meter.eventType(),
+                unit);
         stream.printf(locale, "     5-minute rate = %2.2f %s/%s\n",
-                      meter.getFiveMinuteRate(),
-                      meter.eventType(),
-                      unit);
+                meter.getFiveMinuteRate(),
+                meter.eventType(),
+                unit);
         stream.printf(locale, "    15-minute rate = %2.2f %s/%s\n",
-                      meter.getFifteenMinuteRate(),
-                      meter.eventType(),
-                      unit);
+                meter.getFifteenMinuteRate(),
+                meter.eventType(),
+                unit);
     }
 
     @Override

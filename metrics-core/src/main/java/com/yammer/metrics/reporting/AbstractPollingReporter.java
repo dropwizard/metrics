@@ -13,25 +13,15 @@ import java.util.concurrent.TimeUnit;
  * metrics (e.g., to send the data to another service).
  */
 public abstract class AbstractPollingReporter extends AbstractReporter implements Runnable {
-    static final long DEFAULT_PERIOD = 1;
-    static final TimeUnit DEFAULT_TIMEUNIT = TimeUnit.MINUTES;
-
     protected ScheduledExecutorService executor;
     protected long period;
     protected TimeUnit unit;
 
-    /**
-     * Creates a new {@link AbstractPollingReporter} instance.
-     *
-     * @param registries    the {@link MetricsRegistry} containing the metrics this reporter will
-     *                    report
-     * @see AbstractReporter#AbstractReporter(MetricsRegistry)
-     */
     protected AbstractPollingReporter(Set<MetricsRegistry> registries, String name, long period, TimeUnit unit) {
         super(registries, name);
         this.period = period;
         this.unit = unit;
-        this.executor = ThreadPools.getInstance().newScheduledThreadPool(1, name);
+        this.executor = ThreadPools.newScheduledThreadPool(1, name);
         executor.scheduleWithFixedDelay(this, period, period, unit);
     }
 
@@ -54,7 +44,7 @@ public abstract class AbstractPollingReporter extends AbstractReporter implement
     }
 
     /**
-     * The method called when a a poll is scheduled to occur.
+     * The method called when a poll is scheduled to occur.
      */
     @Override
     public abstract void run();

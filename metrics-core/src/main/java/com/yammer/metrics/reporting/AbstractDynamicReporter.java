@@ -21,11 +21,6 @@ import com.yammer.metrics.core.MetricsRegistryListener;
 
 import java.util.Set;
 
-/**
- * User: gorzell
- * Date: 3/23/12
- * Time: 12:23 PM
- */
 public abstract class AbstractDynamicReporter extends AbstractReporter implements MetricsRegistryListener {
 
     protected AbstractDynamicReporter(Set<MetricsRegistry> registries,  String name){

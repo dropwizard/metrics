@@ -32,11 +32,6 @@ import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-/**
- * User: gorzell
- * Date: 3/16/12
- * Time: 1:27 PM
- */
 public class JmxReporter extends AbstractDynamicReporter implements MetricProcessor<JmxReporter.Context> {
     private static final Logger LOGGER = LoggerFactory.getLogger(JmxReporter.class);
 
@@ -65,6 +60,11 @@ public class JmxReporter extends AbstractDynamicReporter implements MetricProces
         private final Set<MetricsRegistry> registries;
         private final String name;
 
+        /**
+         * Create a builder with the required attributes
+         * @param registries
+         * @param name
+         */
         public Builder(Set<MetricsRegistry> registries, String name){
             this.registries = registries;
             this.name = name;
@@ -78,7 +78,7 @@ public class JmxReporter extends AbstractDynamicReporter implements MetricProces
     }
 
     /**
-     * Creates a new {@link JmxReporter} for the given registry.
+     * Creates a new {@link JmxReporter} for the given registries.
      *
      * @param builder a {@link JmxReporter.Builder}
      */
@@ -125,7 +125,6 @@ public class JmxReporter extends AbstractDynamicReporter implements MetricProces
     @Override
     public void shutdown() {
         super.shutdown();
-        //TODO this could case name collisions between registries
         for (MetricName name : registeredBeans.keySet()) {
             unregisterBean(name);
         }
@@ -142,6 +141,7 @@ public class JmxReporter extends AbstractDynamicReporter implements MetricProces
             }
             server.registerMBean(jmxMetric, jmxMetric.getObjectName());
             server.registerMBean(jmxMetric.getMetadataMBean(), jmxMetric.getMetadataMBean().getObjectName());
+            //TODO this could case name collisions between registries
             registeredBeans.put(name, jmxMetric.getObjectName());
         } catch (Exception e){
             throw new MBeanRegistrationException(e, "Problem creating mBean.");

@@ -31,7 +31,7 @@ public class MetricsRegistry {
     public MetricsRegistry(String name, Clock clock) {
         this.clock = clock;
         this.metrics = newMetricsMap();
-        this.threadPools = ThreadPools.getInstance();
+        this.threadPools = new ThreadPools();
         this.listeners = new CopyOnWriteArrayList<MetricsRegistryListener>();
         this.name = name;
     }
@@ -389,7 +389,7 @@ public class MetricsRegistry {
      */
     @Deprecated
     public ScheduledExecutorService newScheduledThreadPool(int poolSize, String name) {
-        return threadPools.newScheduledThreadPool(poolSize, name);
+        return threadPools.exisitingOrNewScheduledThreadPool(poolSize, name);
     }
 
     /**
@@ -509,7 +509,7 @@ public class MetricsRegistry {
     }
 
     private ScheduledExecutorService newMeterTickThreadPool() {
-        return threadPools.newScheduledThreadPool(2, "meter-tick");
+        return threadPools.exisitingOrNewScheduledThreadPool(2, "meter-tick");
     }
 
     private void notifyMetricRemoved(MetricName name) {

@@ -17,14 +17,8 @@
 package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.core.MetricsRegistry;
-
 import java.util.Set;
 
-/**
- * User: gorzell
- * Date: 3/23/12
- * Time: 12:17 PM
- */
 public interface Reporter {
 
     /**
@@ -34,9 +28,15 @@ public interface Reporter {
 
     /**
      * Set of registries associated with this reporter
+     *
      * @return registries
      */
     public Set<MetricsRegistry> getMetricsRegistries();
-    
+
+    /**
+     * Name of this reporter.
+     *
+     * @return
+     */
     public String getName();
 }

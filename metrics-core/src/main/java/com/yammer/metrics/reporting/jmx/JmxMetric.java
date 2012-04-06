@@ -29,11 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * User: gorzell
- * Date: 3/16/12
- * Time: 1:27 PM
- */
+
 public final class JmxMetric implements DynamicMBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JmxMetric.class);

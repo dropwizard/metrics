@@ -14,7 +14,9 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A reporter which exposes application metric as JMX MBeans.
+ * @deprecated use {@link com.yammer.metrics.reporting.jmx.JmxReporter}
  */
+@Deprecated
 public class JmxReporter extends AbstractReporter implements MetricsRegistryListener,
                                                              MetricProcessor<JmxReporter.Context> {
 
@@ -460,7 +462,9 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     @Override
     public void shutdown() {
-        getMetricsRegistry().removeListener(this);
+        for(MetricsRegistry registry : getMetricsRegistries()){
+            registry.removeListener(this);
+        }
         for (ObjectName name : registeredBeans.values()) {
             unregisterBean(name);
         }
@@ -471,7 +475,9 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
      * Starts the reporter.
      */
     public final void start() {
-        getMetricsRegistry().addListener(this);
+        for (MetricsRegistry registry : getMetricsRegistries()){
+            registry.addListener(this);
+        }
     }
 
     private void registerBean(MetricName name, MetricMBean bean, ObjectName objectName)
