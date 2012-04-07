@@ -4,7 +4,7 @@
 Scala Support
 #############
 
-The ``metrics-scala`` module provides the ``Instrumented`` trait for Scala 2.9.1 applications:
+The ``metrics-scala_2.9.1`` module provides the ``Instrumented`` trait for Scala 2.9.1 applications:
 
 .. code-block:: scala
 

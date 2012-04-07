@@ -4,7 +4,7 @@
 Instrumenting Web Applications
 ##############################
 
-The ``metrics-webapp`` module provides a Servlet filter which has meters for status codes, a counter
+The ``metrics-web`` module provides a Servlet filter which has meters for status codes, a counter
 for the number of active requests, and a timer for request duration. You can use it in your
 ``web.xml`` like this:
 
