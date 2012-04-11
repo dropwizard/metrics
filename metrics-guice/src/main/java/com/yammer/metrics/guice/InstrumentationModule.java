@@ -1,6 +1,7 @@
 package com.yammer.metrics.guice;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Scopes;
 import com.google.inject.matcher.Matchers;
 import com.yammer.metrics.HealthChecks;
 import com.yammer.metrics.Metrics;
@@ -36,7 +37,7 @@ public class InstrumentationModule extends AbstractModule {
      * Override to provide a custom binding for {@link JmxReporter}
      */
     protected void bindJmxReporter() {
-        bind(JmxReporter.class).toInstance(JmxReporter.getDefault());
+        bind(JmxReporter.class).toProvider(JmxReporterProvider.class).in(Scopes.SINGLETON);
     }
 
     /**
