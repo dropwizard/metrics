@@ -29,6 +29,7 @@
         <module>metrics-servlet</module>
         <module>metrics-spring</module>
         <module>metrics-web</module>
+        <module>metrics-sigar</module>
     </modules>
 
     <properties>
