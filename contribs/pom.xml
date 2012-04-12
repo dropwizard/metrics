@@ -23,5 +23,6 @@
         <module>metrics-ganglia</module>
         <module>metrics-graphite</module>
         <module>metrics-guice</module>
+        <module>metrics-spring</module>
     </modules>
 </project>
