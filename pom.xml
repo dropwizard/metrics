@@ -17,7 +17,7 @@
         <module>metrics-annotation</module>
         <module>metrics-core</module>
         <module>metrics-ehcache</module>
-        <module>metrics-guice</module>
+
         <module>metrics-httpclient</module>
         <module>metrics-jdbi</module>
         <module>metrics-jersey</module>
