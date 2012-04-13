@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.yammer.com/schema/metrics"
+<xsd:schema xmlns="http://metrics.codahale.com/schema/metrics"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:beans="http://www.springframework.org/schema/beans"
-            targetNamespace="http://www.yammer.com/schema/metrics"
+            targetNamespace="http://metrics.codahale.com/schema/metrics"
             elementFormDefault="qualified" attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.springframework.org/schema/beans"/>
