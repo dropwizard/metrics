@@ -17,10 +17,10 @@ public class AdminServlet extends HttpServlet {
                                            "        \"http://www.w3.org/TR/html4/loose.dtd\">\n" +
                                            "<html>\n" +
                                            "<head>\n" +
-                                           "  <title>Metrics</title>\n" +
+                                           "  <title>Metrics{8}</title>\n" +
                                            "</head>\n" +
                                            "<body>\n" +
-                                           "  <h1>Operational Menu</h1>\n" +
+                                           "  <h1>Operational Menu{8}</h1>\n" +
                                            "  <ul>\n" +
                                            "    <li><a href=\"{0}{1}?pretty=true\">Metrics</a></li>\n" +
                                            "    <li><a href=\"{2}{3}\">Ping</a></li>\n" +
@@ -41,7 +41,7 @@ public class AdminServlet extends HttpServlet {
     private final PingServlet pingServlet;
     private final ThreadDumpServlet threadDumpServlet;
 
-    private String metricsUri, pingUri, threadsUri, healthcheckUri, contextPath;
+    private String metricsUri, pingUri, threadsUri, healthcheckUri, contextPath, serviceName;
 
     public AdminServlet() {
         this(new HealthCheckServlet(), new MetricsServlet(), new PingServlet(),
@@ -82,6 +82,11 @@ public class AdminServlet extends HttpServlet {
         this.pingUri = getParam(config.getInitParameter("ping-uri"), this.pingUri);
         this.threadsUri = getParam(config.getInitParameter("threads-uri"), this.threadsUri);
         this.healthcheckUri = getParam(config.getInitParameter("healthcheck-uri"), this.healthcheckUri);
+        this.serviceName = getParam(config.getInitParameter("service-name"), this.serviceName);
+    }
+    
+    public void setServiceName(String serviceName) {
+    	this.serviceName = serviceName;
     }
 
     @Override
@@ -95,7 +100,8 @@ public class AdminServlet extends HttpServlet {
             final PrintWriter writer = resp.getWriter();
             try {
                 writer.println(MessageFormat.format(TEMPLATE, path, metricsUri, path, pingUri, path,
-                                                    threadsUri, path, healthcheckUri));
+                                                    threadsUri, path, healthcheckUri,
+                                                    serviceName == null ? "" : " (" + serviceName + ")"));
             } finally {
                 writer.close();
             }
