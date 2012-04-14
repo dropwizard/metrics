@@ -14,4 +14,10 @@
         <Class name="~com\.yammer\.metrics\.spring\..*"/>
         <Bug code="Se"/>
     </Match>
+
+    <!-- Don't care that a metric report file already exists. -->
+    <Match>
+        <Class name="com.yammer.metrics.reporting.CsvReporter"/>
+        <Bug code="RV"/>
+    </Match>    
 </FindBugsFilter>
