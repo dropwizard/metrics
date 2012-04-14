@@ -66,5 +66,10 @@ class Meter(metric: com.yammer.metrics.core.Meter) {
    * average in the top Unix command.
    */
   def oneMinuteRate = metric.oneMinuteRate
+
+  /**
+  * Updates the moving averages.
+  */
+  def tick = metric.tick
 }
 
