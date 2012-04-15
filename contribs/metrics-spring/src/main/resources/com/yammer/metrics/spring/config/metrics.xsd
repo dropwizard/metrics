@@ -88,4 +88,58 @@
     </xsd:complexType>
   </xsd:element>
 
+  <xsd:element name="graphite-reporter">
+    <xsd:complexType>
+      <xsd:attribute name="id" type="xsd:string" use="optional" />
+      <xsd:attribute name="host" type="xsd:string" use="required">
+        <xsd:annotation>
+          <xsd:documentation>The graphite server name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="port" type="xsd:int" use="required">
+        <xsd:annotation>
+          <xsd:documentation>The graphite server port</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="period" type="xsd:int" use="required">
+        <xsd:annotation>
+          <xsd:documentation>The time period to report to graphite, correlated to the timeUnit attribute which
+            determines the unit for this value
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="timeUnit" type="xsd:string" use="required">
+        <xsd:annotation>
+          <xsd:documentation>
+            a enumerated value from java.util.concurrent.TimeUnit (case insensitive), correlated with
+            the period attribute
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="metrics-registry" type="xsd:string" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>A reference to the metrics registry bean id, if none is provided a default instance will be
+            created
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="autoStart" type="xsd:boolean" use="optional" default="true">
+        <xsd:annotation>
+          <xsd:documentation>determines weather the reporter is automatically started when context is loaded (note that
+            if this is set to false then timeUnit and period attributes are ignored)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="prefix" type="xsd:string" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>an optional prefix to the graphite entry</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="predicate" type="xsd:string" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>a reference to a predicate bean name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
 </xsd:schema>
