@@ -10,7 +10,8 @@
 
     <artifactId>metrics-jdbi</artifactId>
     <name>Metrics JDBI Support</name>
-    
+    <packaging>bundle</packaging>
+
     <dependencies>
         <dependency>
             <groupId>com.yammer.metrics</groupId>

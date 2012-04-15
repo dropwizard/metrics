@@ -10,6 +10,7 @@
 
     <artifactId>metrics-jetty</artifactId>
     <name>Metrics Jetty Support</name>
+    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>

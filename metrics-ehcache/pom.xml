@@ -10,6 +10,7 @@
 
     <artifactId>metrics-ehcache</artifactId>
     <name>Metrics Ehcache Support</name>
+    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
