@@ -326,7 +326,7 @@ public class MetricsRegistry {
      *
      * @return an unmodifiable map of all metrics and their names
      */
-    public Map<MetricName, Metric> allMetrics() {
+    public Map<MetricName, Metric> getAllMetrics() {
         return Collections.unmodifiableMap(metrics);
     }
 
@@ -335,8 +335,8 @@ public class MetricsRegistry {
      *
      * @return all registered metrics, grouped by name and sorted
      */
-    public SortedMap<String, SortedMap<MetricName, Metric>> groupedMetrics() {
-        return groupedMetrics(MetricPredicate.ALL);
+    public SortedMap<String, SortedMap<MetricName, Metric>> getGroupedMetrics() {
+        return getGroupedMetrics(MetricPredicate.ALL);
     }
 
     /**
@@ -346,7 +346,7 @@ public class MetricsRegistry {
      * @param predicate a predicate which metrics have to match to be in the results
      * @return all registered metrics which match {@code predicate}, sorted by name
      */
-    public SortedMap<String, SortedMap<MetricName, Metric>> groupedMetrics(MetricPredicate predicate) {
+    public SortedMap<String, SortedMap<MetricName, Metric>> getGroupedMetrics(MetricPredicate predicate) {
         final SortedMap<String, SortedMap<MetricName, Metric>> groups =
                 new TreeMap<String, SortedMap<MetricName, Metric>>();
         for (Map.Entry<MetricName, Metric> entry : metrics.entrySet()) {

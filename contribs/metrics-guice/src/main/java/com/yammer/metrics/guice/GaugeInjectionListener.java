@@ -26,7 +26,7 @@ class GaugeInjectionListener<I> implements InjectionListener<I> {
     public void afterInjection(final I i) {
         metricsRegistry.newGauge(metricName, new Gauge<Object>() {
             @Override
-            public Object value() {
+            public Object getValue() {
                 try {
                     return method.invoke(i);
                 } catch (Exception e) {

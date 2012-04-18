@@ -25,7 +25,7 @@ public class TimerTest {
             private long val = 0;
 
             @Override
-            public long tick() {
+            public long getTick() {
                 return val += 50000000;
             }
         });
@@ -40,37 +40,37 @@ public class TimerTest {
     @Test
     public void hasADurationUnit() throws Exception {
         assertThat("the timer has a duration unit",
-                   timer.durationUnit(),
+                   timer.getDurationUnit(),
                    is(TimeUnit.MILLISECONDS));
     }
 
     @Test
     public void hasARateUnit() throws Exception {
         assertThat("the timer has a rate unit",
-                   timer.rateUnit(),
+                   timer.getRateUnit(),
                    is(TimeUnit.SECONDS));
     }
 
     @Test
     public void aBlankTimer() throws Exception {
         assertThat("the timer has a count of zero",
-                   timer.count(),
+                   timer.getCount(),
                    is(0L));
 
         assertThat("the timer has a max duration of zero",
-                   timer.max(),
+                   timer.getMax(),
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has a min duration of zero",
-                   timer.min(),
+                   timer.getMin(),
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has a mean duration of zero",
-                   timer.mean(),
+                   timer.getMean(),
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has a duration standard deviation of zero",
-                   timer.stdDev(),
+                   timer.getStdDev(),
                    is(closeTo(0.0, 0.001)));
 
         final Snapshot snapshot = timer.getSnapshot();
@@ -88,19 +88,19 @@ public class TimerTest {
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has a mean rate of zero",
-                   timer.meanRate(),
+                   timer.getMeanRate(),
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has a one-minute rate of zero",
-                   timer.oneMinuteRate(),
+                   timer.getOneMinuteRate(),
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has a five-minute rate of zero",
-                   timer.fiveMinuteRate(),
+                   timer.getFiveMinuteRate(),
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has a fifteen-minute rate of zero",
-                   timer.fifteenMinuteRate(),
+                   timer.getFifteenMinuteRate(),
                    is(closeTo(0.0, 0.001)));
 
         assertThat("the timer has no values",
@@ -117,23 +117,23 @@ public class TimerTest {
         timer.update(40, TimeUnit.MILLISECONDS);
 
         assertThat("the timer has a count of 5",
-                   timer.count(),
+                   timer.getCount(),
                    is(5L));
 
         assertThat("the timer has a max duration of 40",
-                   timer.max(),
+                   timer.getMax(),
                    is(closeTo(40.0, 0.001)));
 
         assertThat("the timer has a min duration of 10",
-                   timer.min(),
+                   timer.getMin(),
                    is(closeTo(10.0, 0.001)));
 
         assertThat("the timer has a mean duration of 24",
-                   timer.mean(),
+                   timer.getMean(),
                    is(closeTo(24.0, 0.001)));
 
         assertThat("the timer has a duration standard deviation of zero",
-                   timer.stdDev(),
+                   timer.getStdDev(),
                    is(closeTo(11.401, 0.001)));
 
         final Snapshot snapshot = timer.getSnapshot();
@@ -161,7 +161,7 @@ public class TimerTest {
         timer.update(0, TimeUnit.NANOSECONDS);
 
         assertThat("the timer has an accurate standard deviation",
-                   timer.stdDev(),
+                   timer.getStdDev(),
                    is(closeTo(6.521908912666392E12, 0.001)));
     }
 
@@ -175,7 +175,7 @@ public class TimerTest {
         });
 
         assertThat("the timer has a count of 1",
-                   timer.count(),
+                   timer.getCount(),
                    is(1L));
 
         assertThat("returns the result of the callable",
@@ -183,7 +183,7 @@ public class TimerTest {
                    is("one"));
 
         assertThat("records the duration of the Callable#call()",
-                   timer.max(),
+                   timer.getMax(),
                    is(closeTo(50.0, 0.001)));
     }
 
@@ -192,11 +192,11 @@ public class TimerTest {
         timer.time().stop();
 
         assertThat("the timer has a count of 1",
-                   timer.count(),
+                   timer.getCount(),
                    is(1L));
 
         assertThat("records the duration of the context",
-                   timer.max(),
+                   timer.getMax(),
                    is(closeTo(50.0, 0.001)));
     }
 }

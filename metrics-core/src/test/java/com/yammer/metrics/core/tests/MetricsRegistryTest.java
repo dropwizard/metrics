@@ -48,7 +48,7 @@ public class MetricsRegistryTest {
         stringMetrics.put(three, mThree);
         sortedMetrics.put(String.class.getCanonicalName(), stringMetrics);
 
-        assertThat(registry.groupedMetrics(),
+        assertThat(registry.getGroupedMetrics(),
                    is(sortedMetrics));
     }
 

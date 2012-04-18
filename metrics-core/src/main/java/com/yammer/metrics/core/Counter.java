@@ -49,7 +49,7 @@ public class Counter implements Metric {
      *
      * @return the counter's current value
      */
-    public long count() {
+    public long getCount() {
         return count.get();
     }
 

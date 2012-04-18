@@ -11,7 +11,7 @@ public class ToggleGauge extends Gauge<Integer> {
     private final AtomicInteger value = new AtomicInteger(1);
 
     @Override
-    public Integer value() {
+    public Integer getValue() {
         try {
             return value.get();
         } finally {

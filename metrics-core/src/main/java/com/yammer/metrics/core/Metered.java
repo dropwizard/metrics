@@ -11,21 +11,21 @@ public interface Metered extends Metric {
      *
      * @return the meter's rate unit
      */
-    TimeUnit rateUnit();
+    TimeUnit getRateUnit();
 
     /**
      * Returns the type of events the meter is measuring.
      *
      * @return the meter's event type
      */
-    String eventType();
+    String getEventType();
 
     /**
      * Returns the number of events which have been marked.
      *
      * @return the number of events which have been marked
      */
-    long count();
+    long getCount();
 
     /**
      * Returns the fifteen-minute exponentially-weighted moving average rate at which events have
@@ -37,7 +37,7 @@ public interface Metered extends Metric {
      * @return the fifteen-minute exponentially-weighted moving average rate at which events have
      *         occurred since the meter was created
      */
-    double fifteenMinuteRate();
+    double getFifteenMinuteRate();
 
     /**
      * Returns the five-minute exponentially-weighted moving average rate at which events have
@@ -49,14 +49,14 @@ public interface Metered extends Metric {
      * @return the five-minute exponentially-weighted moving average rate at which events have
      *         occurred since the meter was created
      */
-    double fiveMinuteRate();
+    double getFiveMinuteRate();
 
     /**
      * Returns the mean rate at which events have occurred since the meter was created.
      *
      * @return the mean rate at which events have occurred since the meter was created
      */
-    double meanRate();
+    double getMeanRate();
 
     /**
      * Returns the one-minute exponentially-weighted moving average rate at which events have
@@ -68,5 +68,5 @@ public interface Metered extends Metric {
      * @return the one-minute exponentially-weighted moving average rate at which events have
      *         occurred since the meter was created
      */
-    double oneMinuteRate();
+    double getOneMinuteRate();
 }

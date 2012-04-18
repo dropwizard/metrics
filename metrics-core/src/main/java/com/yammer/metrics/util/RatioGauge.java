@@ -28,7 +28,7 @@ public abstract class RatioGauge extends Gauge<Double> {
     protected abstract double getDenominator();
 
     @Override
-    public Double value() {
+    public Double getValue() {
         final double d = getDenominator();
         if (isNaN(d) || isInfinite(d) || d == 0.0) {
             return Double.NaN;

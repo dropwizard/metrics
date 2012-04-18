@@ -60,7 +60,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         @Override
         public Object getValue() {
-            return metric.value();
+            return metric.getValue();
         }
     }
 
@@ -82,7 +82,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         @Override
         public long getCount() {
-            return metric.count();
+            return metric.getCount();
         }
     }
 
@@ -115,37 +115,37 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         @Override
         public long getCount() {
-            return metric.count();
+            return metric.getCount();
         }
 
         @Override
         public String getEventType() {
-            return metric.eventType();
+            return metric.getEventType();
         }
 
         @Override
         public TimeUnit getRateUnit() {
-            return metric.rateUnit();
+            return metric.getRateUnit();
         }
 
         @Override
         public double getMeanRate() {
-            return metric.meanRate();
+            return metric.getMeanRate();
         }
 
         @Override
         public double getOneMinuteRate() {
-            return metric.oneMinuteRate();
+            return metric.getOneMinuteRate();
         }
 
         @Override
         public double getFiveMinuteRate() {
-            return metric.fiveMinuteRate();
+            return metric.getFiveMinuteRate();
         }
 
         @Override
         public double getFifteenMinuteRate() {
-            return metric.fifteenMinuteRate();
+            return metric.getFifteenMinuteRate();
         }
     }
 
@@ -199,27 +199,27 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         @Override
         public long getCount() {
-            return metric.count();
+            return metric.getCount();
         }
 
         @Override
         public double getMin() {
-            return metric.min();
+            return metric.getMin();
         }
 
         @Override
         public double getMax() {
-            return metric.max();
+            return metric.getMax();
         }
 
         @Override
         public double getMean() {
-            return metric.mean();
+            return metric.getMean();
         }
 
         @Override
         public double getStdDev() {
-            return metric.stdDev();
+            return metric.getStdDev();
         }
 
         @Override
@@ -275,27 +275,27 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         @Override
         public TimeUnit getLatencyUnit() {
-            return metric.durationUnit();
+            return metric.getDurationUnit();
         }
 
         @Override
         public double getMin() {
-            return metric.min();
+            return metric.getMin();
         }
 
         @Override
         public double getMax() {
-            return metric.max();
+            return metric.getMax();
         }
 
         @Override
         public double getMean() {
-            return metric.mean();
+            return metric.getMean();
         }
 
         @Override
         public double getStdDev() {
-            return metric.stdDev();
+            return metric.getStdDev();
         }
 
         @Override
