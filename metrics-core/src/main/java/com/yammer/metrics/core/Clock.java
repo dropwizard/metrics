@@ -12,14 +12,14 @@ public abstract class Clock {
      *
      * @return time tick in nanoseconds
      */
-    public abstract long tick();
+    public abstract long getTick();
 
     /**
      * Returns the current time in milliseconds.
      *
      * @return time in milliseconds
      */
-    public long time() {
+    public long getTime() {
         return System.currentTimeMillis();
     }
 
@@ -42,7 +42,7 @@ public abstract class Clock {
      */
     public static class UserTimeClock extends Clock {
         @Override
-        public long tick() {
+        public long getTick() {
             return System.nanoTime();
         }
     }
@@ -54,7 +54,7 @@ public abstract class Clock {
         private static final ThreadMXBean THREAD_MX_BEAN = ManagementFactory.getThreadMXBean();
 
         @Override
-        public long tick() {
+        public long getTick() {
             return THREAD_MX_BEAN.getCurrentThreadCpuTime();
         }
     }

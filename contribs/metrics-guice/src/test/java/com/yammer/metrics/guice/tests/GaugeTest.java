@@ -46,7 +46,7 @@ public class GaugeTest {
     public void aGaugeAnnotatedMethod() throws Exception {
         instance.doAThing();
 
-        final Metric metric = registry.allMetrics().get(new MetricName(InstrumentedWithGauge.class,
+        final Metric metric = registry.getAllMetrics().get(new MetricName(InstrumentedWithGauge.class,
                                                                        "things"));
 
         assertThat("Guice creates a metric",
@@ -58,7 +58,7 @@ public class GaugeTest {
                    is(instanceOf(Gauge.class)));
 
         assertThat("Guice creates a gauge with the given value",
-                   ((Gauge<String>) metric).value(),
+                   ((Gauge<String>) metric).getValue(),
                    is("poop"));
     }
 
@@ -68,7 +68,7 @@ public class GaugeTest {
     public void aGaugeAnnotatedMethodWithDefaultName() throws Exception {
         instance.doAnotherThing();
 
-        final Metric metric = registry.allMetrics().get(new MetricName(InstrumentedWithGauge.class,
+        final Metric metric = registry.getAllMetrics().get(new MetricName(InstrumentedWithGauge.class,
                                                                        "doAnotherThing"));
 
         assertThat("Guice creates a metric",
@@ -80,7 +80,7 @@ public class GaugeTest {
                    is(instanceOf(Gauge.class)));
 
         assertThat("Guice creates a gauge with the given value",
-                   ((Gauge<String>) metric).value(),
+                   ((Gauge<String>) metric).getValue(),
                    is("anotherThing"));
     }
 
@@ -93,8 +93,8 @@ public class GaugeTest {
 
         instance.doAThingWithGroupTypeAndName();
 
-        Set<MetricName> keySet = registry.allMetrics().keySet();
-        final Metric metric = registry.allMetrics().get(new MetricName("g", "t", "n"));
+        Set<MetricName> keySet = registry.getAllMetrics().keySet();
+        final Metric metric = registry.getAllMetrics().get(new MetricName("g", "t", "n"));
 
         assertThat("Guice creates a metric",
                    metric,
@@ -105,7 +105,7 @@ public class GaugeTest {
                    is(instanceOf(Gauge.class)));
 
         assertThat("Guice creates a gauge with the given value",
-                   ((Gauge<String>) metric).value(),
+                   ((Gauge<String>) metric).getValue(),
                    is("anotherThingWithGroupTypeAndName"));
     }
 }

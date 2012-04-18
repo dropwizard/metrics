@@ -18,7 +18,7 @@ public class GaugeField extends Gauge<Object> {
     }
 
     @Override
-    public Object value() {
+    public Object getValue() {
         return ReflectionUtils.getField(field, bean);
     }
 

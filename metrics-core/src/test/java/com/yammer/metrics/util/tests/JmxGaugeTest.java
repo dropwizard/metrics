@@ -19,7 +19,7 @@ public class JmxGaugeTest {
 
     @Test
     public void queriesJmxForGaugeValues() throws Exception {
-        assertThat(gauge.value(),
+        assertThat(gauge.getValue(),
                    is((Object) getCompilationMXBean().isCompilationTimeMonitoringSupported()));
     }
 }

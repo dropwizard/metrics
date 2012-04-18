@@ -22,17 +22,17 @@ class Meter(metric: com.yammer.metrics.core.Meter) {
   /**
    * Returns the meter's rate unit.
    */
-  def rateUnit = metric.rateUnit
+  def rateUnit = metric.getRateUnit
 
   /**
    * Returns the type of events the meter is measuring.
    */
-  def eventType = metric.eventType
+  def eventType = metric.getEventType
 
   /**
    * Returns the number of events which have been marked.
    */
-  def count = metric.count
+  def count = metric.getCount
 
   /**
    * Returns the fifteen-minute exponentially-weighted moving average rate at
@@ -41,7 +41,7 @@ class Meter(metric: com.yammer.metrics.core.Meter) {
    * This rate has the same exponential decay factor as the fifteen-minute load
    * average in the top Unix command.
    */
-  def fifteenMinuteRate = metric.fifteenMinuteRate
+  def fifteenMinuteRate = metric.getFifteenMinuteRate
 
   /**
    * Returns the five-minute exponentially-weighted moving average rate at
@@ -50,13 +50,13 @@ class Meter(metric: com.yammer.metrics.core.Meter) {
    * This rate has the same exponential decay factor as the five-minute load
    * average in the top Unix command.
    */
-  def fiveMinuteRate = metric.fiveMinuteRate
+  def fiveMinuteRate = metric.getFiveMinuteRate
 
   /**
    * Returns the mean rate at which events have occurred since the meter was
    * created.
    */
-  def meanRate = metric.meanRate
+  def meanRate = metric.getMeanRate
 
   /**
    * Returns the one-minute exponentially-weighted moving average rate at
@@ -65,6 +65,6 @@ class Meter(metric: com.yammer.metrics.core.Meter) {
    * This rate has the same exponential decay factor as the one-minute load
    * average in the top Unix command.
    */
-  def oneMinuteRate = metric.oneMinuteRate
+  def oneMinuteRate = metric.getOneMinuteRate
 }
 

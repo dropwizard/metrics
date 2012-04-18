@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verify;
 public class GaugeTest {
     final Gauge<String> gauge = new Gauge<String>() {
         @Override
-        public String value() {
+        public String getValue() {
             return "woo";
         }
     };
@@ -21,7 +21,7 @@ public class GaugeTest {
     @Test
     public void returnsAValue() throws Exception {
         assertThat("a gauge returns a value",
-                   gauge.value(),
+                   gauge.getValue(),
                    is("woo"));
     }
 

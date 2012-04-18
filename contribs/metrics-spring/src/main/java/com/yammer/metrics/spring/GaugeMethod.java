@@ -18,7 +18,7 @@ public class GaugeMethod extends Gauge<Object> {
     }
 
     @Override
-    public Object value() {
+    public Object getValue() {
         return ReflectionUtils.invokeMethod(method, bean);
     }
 

@@ -30,7 +30,7 @@ public class InstrumentedClientConnManager extends ThreadSafeClientConnManager {
                          "connections",
                          new Gauge<Integer>() {
                              @Override
-                             public Integer value() {
+                             public Integer getValue() {
                                  // this acquires a lock on the connection pool; remove if contention sucks
                                  return getConnectionsInPool();
                              }

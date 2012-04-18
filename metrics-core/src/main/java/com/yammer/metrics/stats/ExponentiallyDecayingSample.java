@@ -65,7 +65,7 @@ public class ExponentiallyDecayingSample implements Sample {
             values.clear();
             count.set(0);
             this.startTime = currentTimeInSeconds();
-            nextScaleTime.set(clock.tick() + RESCALE_THRESHOLD);
+            nextScaleTime.set(clock.getTick() + RESCALE_THRESHOLD);
         } finally {
             unlockForRescale();
         }
@@ -117,7 +117,7 @@ public class ExponentiallyDecayingSample implements Sample {
     }
 
     private void rescaleIfNeeded() {
-        final long now = clock.tick();
+        final long now = clock.getTick();
         final long next = nextScaleTime.get();
         if (now >= next) {
             rescale(now, next);
@@ -135,7 +135,7 @@ public class ExponentiallyDecayingSample implements Sample {
     }
 
     private long currentTimeInSeconds() {
-        return TimeUnit.MILLISECONDS.toSeconds(clock.time());
+        return TimeUnit.MILLISECONDS.toSeconds(clock.getTime());
     }
 
     private double weight(long t) {

@@ -100,7 +100,7 @@ public class EWMA {
      * @param rateUnit the unit of time
      * @return the rate
      */
-    public double rate(TimeUnit rateUnit) {
+    public double getRate(TimeUnit rateUnit) {
         return rate * (double) rateUnit.toNanos(1);
     }
 }

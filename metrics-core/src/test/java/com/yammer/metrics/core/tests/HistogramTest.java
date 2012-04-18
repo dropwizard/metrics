@@ -33,27 +33,27 @@ public class HistogramTest {
     @Test
     public void anEmptyHistogram() throws Exception {
         assertThat("the histogram has a count of zero",
-                   histogram.count(),
+                   histogram.getCount(),
                    is(0L));
 
         assertThat("the histogram has a max of zero",
-                   histogram.max(),
+                   histogram.getMax(),
                    is(closeTo(0.0, 0.0001)));
 
         assertThat("the histogram has a min of zero",
-                   histogram.min(),
+                   histogram.getMin(),
                    is(closeTo(0.0, 0.0001)));
 
         assertThat("the histogram has a mean of zero",
-                   histogram.mean(),
+                   histogram.getMean(),
                    is(closeTo(0.0, 0.0001)));
 
         assertThat("the histogram has a standard deviation of zero",
-                   histogram.stdDev(),
+                   histogram.getStdDev(),
                    is(closeTo(0.0, 0.0001)));
         
         assertThat("the histogram has a sum of zero",
-                   histogram.sum(),
+                   histogram.getSum(),
                    is(closeTo(0.0, 0.0001)));
 
         final Snapshot snapshot = histogram.getSnapshot();
@@ -82,27 +82,27 @@ public class HistogramTest {
         }
 
         assertThat("the histogram has a count of 1000",
-                   histogram.count(),
+                   histogram.getCount(),
                    is(1000L));
 
         assertThat("the histogram has a max of 1000",
-                   histogram.max(),
+                   histogram.getMax(),
                    is(closeTo(1000.0, 0.0001)));
 
         assertThat("the histogram has a min of 1",
-                   histogram.min(),
+                   histogram.getMin(),
                    is(closeTo(1.0, 0.0001)));
 
         assertThat("the histogram has a mean of 500.5",
-                   histogram.mean(),
+                   histogram.getMean(),
                    is(closeTo(500.5, 0.0001)));
 
         assertThat("the histogram has a standard deviation of 288.82",
-                   histogram.stdDev(),
+                   histogram.getStdDev(),
                    is(closeTo(288.8194360957494, 0.0001)));
         
         assertThat("the histogram has a sum of 500500",
-                   histogram.sum(),
+                   histogram.getSum(),
                    is(closeTo(500500, 0.1)));
 
         final Snapshot snapshot = histogram.getSnapshot();
