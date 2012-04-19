@@ -4,6 +4,13 @@
 Release Notes
 #############
 
+.. _rel-2.1.2:
+
+v2.1.2: Apr 11 2012
+===================
+
+* Fixed double-registration in ``metrics-guice``.
+
 .. _rel-2.1.1:
 
 v2.1.1: Mar 13 2012

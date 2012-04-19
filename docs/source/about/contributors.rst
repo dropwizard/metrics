@@ -46,5 +46,6 @@ Many, many thanks to:
 * `Ryan W Tenney <https://github.com/ryantenney>`_
 * `Sam Perman <https://github.com/samperman>`_
 * `Shaneal Manek <https://github.com/smanek>`_
+* `Steven Schlansker <https://github.com/stevenschlansker>`_
 * `Thomas Dudziak <https://github.com/tomdz>`_
 * `Tobias Lidskog <https://github.com/tobli>`_

@@ -40,7 +40,7 @@ public class InstrumentedEhcacheTest {
                                             TimeUnit.MILLISECONDS,
                                             TimeUnit.SECONDS);
 
-        assertThat(gets.count(),
+        assertThat(gets.getCount(),
                    is(1L));
 
         final Timer puts = Metrics.newTimer(Cache.class,
@@ -49,7 +49,7 @@ public class InstrumentedEhcacheTest {
                                             TimeUnit.MILLISECONDS,
                                             TimeUnit.SECONDS);
 
-        assertThat(puts.count(),
+        assertThat(puts.getCount(),
                    is(1L));
     }
 }

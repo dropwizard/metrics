@@ -7,7 +7,7 @@ public abstract class PercentGauge extends RatioGauge {
     private static final int ONE_HUNDRED = 100;
 
     @Override
-    public Double value() {
-        return super.value() * ONE_HUNDRED;
+    public Double getValue() {
+        return super.getValue() * ONE_HUNDRED;
     }
 }

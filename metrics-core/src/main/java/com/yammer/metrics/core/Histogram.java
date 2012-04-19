@@ -130,7 +130,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
      *
      * @return the number of values recorded
      */
-    public long count() {
+    public long getCount() {
         return count.get();
     }
 
@@ -138,8 +138,8 @@ public class Histogram implements Metric, Sampling, Summarizable {
      * @see com.yammer.metrics.core.Summarizable#max()
      */
     @Override
-    public double max() {
-        if (count() > 0) {
+    public double getMax() {
+        if (getCount() > 0) {
             return max.get();
         }
         return 0.0;
@@ -149,8 +149,8 @@ public class Histogram implements Metric, Sampling, Summarizable {
      * @see com.yammer.metrics.core.Summarizable#min()
      */
     @Override
-    public double min() {
-        if (count() > 0) {
+    public double getMin() {
+        if (getCount() > 0) {
             return min.get();
         }
         return 0.0;
@@ -160,9 +160,9 @@ public class Histogram implements Metric, Sampling, Summarizable {
      * @see com.yammer.metrics.core.Summarizable#mean()
      */
     @Override
-    public double mean() {
-        if (count() > 0) {
-            return sum.get() / (double) count();
+    public double getMean() {
+        if (getCount() > 0) {
+            return sum.get() / (double) getCount();
         }
         return 0.0;
     }
@@ -171,9 +171,9 @@ public class Histogram implements Metric, Sampling, Summarizable {
      * @see com.yammer.metrics.core.Summarizable#stdDev()
      */
     @Override
-    public double stdDev() {
-        if (count() > 0) {
-            return sqrt(variance());
+    public double getStdDev() {
+        if (getCount() > 0) {
+            return sqrt(getVariance());
         }
         return 0.0;
     }
@@ -182,7 +182,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
      * @see com.yammer.metrics.core.Summarizable#sum()
      */
     @Override
-    public double sum() {
+    public double getSum() {
         return (double) sum.get();
     }
 
@@ -191,11 +191,11 @@ public class Histogram implements Metric, Sampling, Summarizable {
         return sample.getSnapshot();
     }
 
-    private double variance() {
-        if (count() <= 1) {
+    private double getVariance() {
+        if (getCount() <= 1) {
             return 0.0;
         }
-        return variance.get()[1] / (count() - 1);
+        return variance.get()[1] / (getCount() - 1);
     }
 
     private void setMax(long potentialMax) {
@@ -226,7 +226,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
                 final double oldM = oldValues[0];
                 final double oldS = oldValues[1];
 
-                final double newM = oldM + ((value - oldM) / count());
+                final double newM = oldM + ((value - oldM) / getCount());
                 final double newS = oldS + ((value - oldM) * (value - newM));
 
                 newValues[0] = newM;

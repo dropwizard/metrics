@@ -1,12 +1,15 @@
 package com.yammer.metrics.stats;
 
+import com.yammer.metrics.core.Clock;
+
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static java.lang.Math.*;
+import static java.lang.Math.exp;
+import static java.lang.Math.min;
 
 /**
  * An exponentially-decaying random sample of {@code long}s. Uses Cormode et al's forward-decaying
@@ -26,6 +29,7 @@ public class ExponentiallyDecayingSample implements Sample {
     private final AtomicLong count = new AtomicLong(0);
     private volatile long startTime;
     private final AtomicLong nextScaleTime = new AtomicLong(0);
+    private final Clock clock;
 
     /**
      * Creates a new {@link ExponentiallyDecayingSample}.
@@ -35,10 +39,22 @@ public class ExponentiallyDecayingSample implements Sample {
      *                      sample will be towards newer values
      */
     public ExponentiallyDecayingSample(int reservoirSize, double alpha) {
+        this(reservoirSize, alpha, Clock.defaultClock());
+    }
+
+    /**
+     * Creates a new {@link ExponentiallyDecayingSample}.
+     *
+     * @param reservoirSize the number of samples to keep in the sampling reservoir
+     * @param alpha         the exponential decay factor; the higher this is, the more biased the
+     *                      sample will be towards newer values
+     */
+    public ExponentiallyDecayingSample(int reservoirSize, double alpha, Clock clock) {
         this.values = new ConcurrentSkipListMap<Double, Long>();
         this.lock = new ReentrantReadWriteLock();
         this.alpha = alpha;
         this.reservoirSize = reservoirSize;
+        this.clock = clock;
         clear();
     }
 
@@ -48,8 +64,8 @@ public class ExponentiallyDecayingSample implements Sample {
         try {
             values.clear();
             count.set(0);
-            this.startTime = tick();
-            nextScaleTime.set(System.nanoTime() + RESCALE_THRESHOLD);
+            this.startTime = currentTimeInSeconds();
+            nextScaleTime.set(clock.getTick() + RESCALE_THRESHOLD);
         } finally {
             unlockForRescale();
         }
@@ -62,7 +78,7 @@ public class ExponentiallyDecayingSample implements Sample {
 
     @Override
     public void update(long value) {
-        update(value, tick());
+        update(value, currentTimeInSeconds());
     }
 
     /**
@@ -72,9 +88,13 @@ public class ExponentiallyDecayingSample implements Sample {
      * @param timestamp the epoch timestamp of {@code value} in seconds
      */
     public void update(long value, long timestamp) {
+
+        rescaleIfNeeded();
+
         lockForRegularUsage();
         try {
-            final double priority = weight(timestamp - startTime) / ThreadLocalRandom.current().nextDouble();
+            final double priority = weight(timestamp - startTime) / ThreadLocalRandom.current()
+                                                                                     .nextDouble();
             final long newCount = count.incrementAndGet();
             if (newCount <= reservoirSize) {
                 values.put(priority, value);
@@ -93,7 +113,11 @@ public class ExponentiallyDecayingSample implements Sample {
             unlockForRegularUsage();
         }
 
-        final long now = System.nanoTime();
+
+    }
+
+    private void rescaleIfNeeded() {
+        final long now = clock.getTick();
         final long next = nextScaleTime.get();
         if (now >= next) {
             rescale(now, next);
@@ -110,8 +134,8 @@ public class ExponentiallyDecayingSample implements Sample {
         }
     }
 
-    private long tick() {
-        return TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+    private long currentTimeInSeconds() {
+        return TimeUnit.MILLISECONDS.toSeconds(clock.getTime());
     }
 
     private double weight(long t) {
@@ -141,12 +165,15 @@ public class ExponentiallyDecayingSample implements Sample {
             lockForRescale();
             try {
                 final long oldStartTime = startTime;
-                this.startTime = tick();
+                this.startTime = currentTimeInSeconds();
                 final ArrayList<Double> keys = new ArrayList<Double>(values.keySet());
                 for (Double key : keys) {
                     final Long value = values.remove(key);
                     values.put(key * exp(-alpha * (startTime - oldStartTime)), value);
                 }
+
+                // make sure the counter is in sync with the number of stored samples.
+                count.set(values.size());
             } finally {
                 unlockForRescale();
             }

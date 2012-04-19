@@ -29,8 +29,8 @@ public abstract class AbstractPollingReporterTest {
 
     @Before
     public void init() throws Exception {
-        when(clock.tick()).thenReturn(1234L);
-        when(clock.time()).thenReturn(5678L);
+        when(clock.getTick()).thenReturn(1234L);
+        when(clock.getTime()).thenReturn(5678L);
         registry = new TestMetricsRegistry();
         out = new ByteArrayOutputStream();
         reporter = createReporter(registry, out, clock);
@@ -134,7 +134,7 @@ public abstract class AbstractPollingReporterTest {
 
     static Counter createCounter(long count) throws Exception {
         final Counter mock = mock(Counter.class);
-        when(mock.count()).thenReturn(count);
+        when(mock.getCount()).thenReturn(count);
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
             void delegateToProcessor(MetricProcessor<Object> processor, MetricName name, Object context) throws Exception {
@@ -159,7 +159,7 @@ public abstract class AbstractPollingReporterTest {
     static Gauge<String> createGauge() throws Exception {
         @SuppressWarnings("unchecked")
         final Gauge<String> mock = mock(Gauge.class);
-        when(mock.value()).thenReturn("gaugeValue");
+        when(mock.getValue()).thenReturn("gaugeValue");
         return configureMatcher(mock, doAnswer(new MetricsProcessorAction() {
             @Override
             void delegateToProcessor(MetricProcessor<Object> processor, MetricName name, Object context) throws Exception {
@@ -171,7 +171,7 @@ public abstract class AbstractPollingReporterTest {
 
     static Timer createTimer() throws Exception {
         final Timer mock = mock(Timer.class);
-        when(mock.durationUnit()).thenReturn(TimeUnit.MILLISECONDS);
+        when(mock.getDurationUnit()).thenReturn(TimeUnit.MILLISECONDS);
         setupSummarizableMock(mock);
         setupMeteredMock(mock);
         setupSamplingMock(mock);
@@ -215,20 +215,20 @@ public abstract class AbstractPollingReporterTest {
     }
 
     static void setupSummarizableMock(Summarizable summarizable) {
-        when(summarizable.min()).thenReturn(1d);
-        when(summarizable.max()).thenReturn(3d);
-        when(summarizable.mean()).thenReturn(2d);
-        when(summarizable.stdDev()).thenReturn(1.5d);
+        when(summarizable.getMin()).thenReturn(1d);
+        when(summarizable.getMax()).thenReturn(3d);
+        when(summarizable.getMean()).thenReturn(2d);
+        when(summarizable.getStdDev()).thenReturn(1.5d);
     }
 
     static void setupMeteredMock(Metered metered) {
-        when(metered.count()).thenReturn(1L);
-        when(metered.oneMinuteRate()).thenReturn(1d);
-        when(metered.fiveMinuteRate()).thenReturn(5d);
-        when(metered.fifteenMinuteRate()).thenReturn(15d);
-        when(metered.meanRate()).thenReturn(2d);
-        when(metered.eventType()).thenReturn("eventType");
-        when(metered.rateUnit()).thenReturn(TimeUnit.SECONDS);
+        when(metered.getCount()).thenReturn(1L);
+        when(metered.getOneMinuteRate()).thenReturn(1d);
+        when(metered.getFiveMinuteRate()).thenReturn(5d);
+        when(metered.getFifteenMinuteRate()).thenReturn(15d);
+        when(metered.getMeanRate()).thenReturn(2d);
+        when(metered.getEventType()).thenReturn("eventType");
+        when(metered.getRateUnit()).thenReturn(TimeUnit.SECONDS);
     }
 
     static void setupSamplingMock(Sampling sampling) {

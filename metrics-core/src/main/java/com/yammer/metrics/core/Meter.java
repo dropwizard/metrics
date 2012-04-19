@@ -46,16 +46,16 @@ public class Meter implements Metered, Stoppable {
             }
         }, INTERVAL, INTERVAL, TimeUnit.SECONDS);
         this.clock = clock;
-        this.startTime = this.clock.tick();
+        this.startTime = this.clock.getTick();
     }
 
     @Override
-    public TimeUnit rateUnit() {
+    public TimeUnit getRateUnit() {
         return rateUnit;
     }
 
     @Override
-    public String eventType() {
+    public String getEventType() {
         return eventType;
     }
 
@@ -88,37 +88,33 @@ public class Meter implements Metered, Stoppable {
     }
 
     @Override
-    public long count() {
+    public long getCount() {
         return count.get();
     }
 
     @Override
-    public double fifteenMinuteRate() {
-        return m15Rate.rate(rateUnit);
+    public double getFifteenMinuteRate() {
+        return m15Rate.getRate(rateUnit);
     }
 
     @Override
-    public double fiveMinuteRate() {
-        return m5Rate.rate(rateUnit);
+    public double getFiveMinuteRate() {
+        return m5Rate.getRate(rateUnit);
     }
 
     @Override
-    public double meanRate() {
-        if (count() == 0) {
+    public double getMeanRate() {
+        if (getCount() == 0) {
             return 0.0;
         } else {
-            final long elapsed = (clock.tick() - startTime);
-            return convertNsRate(count() / (double) elapsed);
+            final long elapsed = (clock.getTick() - startTime);
+            return convertNsRate(getCount() / (double) elapsed);
         }
     }
 
     @Override
-    public double oneMinuteRate() {
-        return m1Rate.rate(rateUnit);
-    }
-
-    private double convertNsRate(double ratePerNs) {
-        return ratePerNs * (double) rateUnit.toNanos(1);
+    public double getOneMinuteRate() {
+        return m1Rate.getRate(rateUnit);
     }
 
     @Override
@@ -129,5 +125,9 @@ public class Meter implements Metered, Stoppable {
     @Override
     public <T> void processWith(MetricProcessor<T> processor, MetricName name, T context) throws Exception {
         processor.processMeter(name, this, context);
+    }
+
+    private double convertNsRate(double ratePerNs) {
+        return ratePerNs * (double) rateUnit.toNanos(1);
     }
 }

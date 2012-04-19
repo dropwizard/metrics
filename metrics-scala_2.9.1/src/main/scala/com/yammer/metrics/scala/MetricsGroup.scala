@@ -18,7 +18,7 @@ class MetricsGroup(val klass: Class[_], val metricsRegistry: MetricsRegistry = M
    */
   def gauge[A](name: String, scope: String = null, registry: MetricsRegistry = metricsRegistry)(f: => A) = {
     registry.newGauge(klass, name, scope, new Gauge[A] {
-      def value = f
+      def getValue = f
     })
   }
 

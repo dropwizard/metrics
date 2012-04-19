@@ -31,7 +31,7 @@ public class CounterTest {
     @Test
     public void startsAtZero() throws Exception {
         assertThat("the counter's initial value is zero",
-                   counter.count(),
+                   counter.getCount(),
                    is(0L));
     }
 
@@ -40,7 +40,7 @@ public class CounterTest {
         counter.inc();
 
         assertThat("the counter's value after being incremented is one",
-                   counter.count(),
+                   counter.getCount(),
                    is(1L));
     }
 
@@ -49,7 +49,7 @@ public class CounterTest {
         counter.inc(12);
 
         assertThat("the counter's value after being incremented by 12 is 12",
-                   counter.count(),
+                   counter.getCount(),
                    is(12L));
     }
 
@@ -58,7 +58,7 @@ public class CounterTest {
         counter.dec();
 
         assertThat("the counter's value after being decremented is negative one",
-                   counter.count(),
+                   counter.getCount(),
                    is(-1L));
     }
 
@@ -67,7 +67,7 @@ public class CounterTest {
         counter.dec(12);
 
         assertThat("the counter's value after being decremented by 12 is -12",
-                   counter.count(),
+                   counter.getCount(),
                    is(-12L));
     }
 
@@ -77,7 +77,7 @@ public class CounterTest {
         counter.clear();
 
         assertThat("the counter's value after being cleared is zero",
-                   counter.count(),
+                   counter.getCount(),
                    is(0L));
     }
 

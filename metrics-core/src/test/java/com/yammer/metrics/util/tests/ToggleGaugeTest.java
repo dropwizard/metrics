@@ -11,16 +11,16 @@ public class ToggleGaugeTest {
 
     @Test
     public void returnsOneThenZero() throws Exception {
-        assertThat(toggle.value(),
+        assertThat(toggle.getValue(),
                    is(1));
 
-        assertThat(toggle.value(),
+        assertThat(toggle.getValue(),
                    is(0));
 
-        assertThat(toggle.value(),
+        assertThat(toggle.getValue(),
                    is(0));
 
-        assertThat(toggle.value(),
+        assertThat(toggle.getValue(),
                    is(0));
     }
 }

@@ -50,12 +50,12 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable, Timeab
      *
      * @return the timer's duration scale unit
      */
-    public TimeUnit durationUnit() {
+    public TimeUnit getDurationUnit() {
         return durationUnit;
     }
 
     @Override
-    public TimeUnit rateUnit() {
+    public TimeUnit getRateUnit() {
         return rateUnit;
     }
 
@@ -86,11 +86,11 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable, Timeab
      * @throws Exception if {@code event} throws an {@link Exception}
      */
     public <T> T time(Callable<T> event) throws Exception {
-        final long startTime = clock.tick();
+        final long startTime = clock.getTick();
         try {
             return event.call();
         } finally {
-            update(clock.tick() - startTime);
+            update(clock.getTick() - startTime);
         }
     }
 
@@ -104,28 +104,28 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable, Timeab
     }
 
     @Override
-    public long count() {
-        return histogram.count();
+    public long getCount() {
+        return histogram.getCount();
     }
 
     @Override
-    public double fifteenMinuteRate() {
-        return meter.fifteenMinuteRate();
+    public double getFifteenMinuteRate() {
+        return meter.getFifteenMinuteRate();
     }
 
     @Override
-    public double fiveMinuteRate() {
-        return meter.fiveMinuteRate();
+    public double getFiveMinuteRate() {
+        return meter.getFiveMinuteRate();
     }
 
     @Override
-    public double meanRate() {
-        return meter.meanRate();
+    public double getMeanRate() {
+        return meter.getMeanRate();
     }
 
     @Override
-    public double oneMinuteRate() {
-        return meter.oneMinuteRate();
+    public double getOneMinuteRate() {
+        return meter.getOneMinuteRate();
     }
 
     /**
@@ -134,8 +134,8 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable, Timeab
      * @return the longest recorded duration
      */
     @Override
-    public double max() {
-        return convertFromNS(histogram.max());
+    public double getMax() {
+        return convertFromNS(histogram.getMax());
     }
 
     /**
@@ -144,8 +144,8 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable, Timeab
      * @return the shortest recorded duration
      */
     @Override
-    public double min() {
-        return convertFromNS(histogram.min());
+    public double getMin() {
+        return convertFromNS(histogram.getMin());
     }
 
     /**
@@ -154,8 +154,8 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable, Timeab
      * @return the arithmetic mean of all recorded durations
      */
     @Override
-    public double mean() {
-        return convertFromNS(histogram.mean());
+    public double getMean() {
+        return convertFromNS(histogram.getMean());
     }
 
     /**
@@ -164,8 +164,8 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable, Timeab
      * @return the standard deviation of all recorded durations
      */
     @Override
-    public double stdDev() {
-        return convertFromNS(histogram.stdDev());
+    public double getStdDev() {
+        return convertFromNS(histogram.getStdDev());
     }
 
     /**
@@ -174,8 +174,8 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable, Timeab
      * @return the sum of all recorded durations
      */
     @Override
-    public double sum() {
-        return convertFromNS(histogram.sum());
+    public double getSum() {
+        return convertFromNS(histogram.getSum());
     }
 
     @Override
@@ -189,8 +189,18 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable, Timeab
     }
 
     @Override
-    public String eventType() {
-        return meter.eventType();
+    public String getEventType() {
+        return meter.getEventType();
+    }
+
+    @Override
+    public void stop() {
+        meter.stop();
+    }
+
+    @Override
+    public <T> void processWith(MetricProcessor<T> processor, MetricName name, T context) throws Exception {
+        processor.processTimer(name, this, context);
     }
 
     private void update(long duration) {
@@ -202,15 +212,5 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable, Timeab
 
     private double convertFromNS(double ns) {
         return ns / TimeUnit.NANOSECONDS.convert(1, durationUnit);
-    }
-
-    @Override
-    public void stop() {
-        meter.stop();
-    }
-
-    @Override
-    public <T> void processWith(MetricProcessor<T> processor, MetricName name, T context) throws Exception {
-        processor.processTimer(name, this, context);
     }
 }

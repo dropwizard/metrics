@@ -21,13 +21,13 @@ public class TimerContext {
     TimerContext(Timeable timer, Clock clock) {
         this.timer = timer;
         this.clock = clock;
-        this.startTime = clock.tick();
+        this.startTime = clock.getTick();
     }
 
     /**
      * Stops recording the elapsed time and updates the timer.
      */
     public void stop() {
-        timer.update(clock.tick() - startTime, TimeUnit.NANOSECONDS);
+        timer.update(clock.getTick() - startTime, TimeUnit.NANOSECONDS);
     }
 }

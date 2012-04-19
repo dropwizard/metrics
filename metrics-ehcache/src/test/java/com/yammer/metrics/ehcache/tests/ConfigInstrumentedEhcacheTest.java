@@ -37,7 +37,7 @@ public class ConfigInstrumentedEhcacheTest {
                                             TimeUnit.MILLISECONDS,
                                             TimeUnit.SECONDS);
 
-        assertThat(gets.count(), is(1L));
+        assertThat(gets.getCount(), is(1L));
 
     }
 
@@ -52,7 +52,7 @@ public class ConfigInstrumentedEhcacheTest {
                                             TimeUnit.MILLISECONDS,
                                             TimeUnit.SECONDS);
 
-        assertThat(puts.count(), is(1L));
+        assertThat(puts.getCount(), is(1L));
 
     }
 

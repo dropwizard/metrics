@@ -21,7 +21,7 @@ public class PercentGaugeTest {
             }
         };
 
-        assertThat(gauge.value(),
+        assertThat(gauge.getValue(),
                    is(50.0));
     }
 
@@ -39,7 +39,7 @@ public class PercentGaugeTest {
             }
         };
         
-        assertThat(gauge.value(),
+        assertThat(gauge.getValue(),
                    is(Double.NaN));
     }
 }

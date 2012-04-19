@@ -10,6 +10,7 @@
 
     <artifactId>metrics-annotation</artifactId>
     <name>Metrics Annotations</name>
+    <packaging>bundle</packaging>
     <description>
         A dependency-less package of just the annotations used by other Metrics modules.
     </description>

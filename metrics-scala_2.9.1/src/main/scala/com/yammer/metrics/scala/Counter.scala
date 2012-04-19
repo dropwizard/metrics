@@ -22,7 +22,7 @@ class Counter(metric: com.yammer.metrics.core.Counter) {
   /**
    * Returns the current count.
    */
-  def count = metric.count
+  def count = metric.getCount
 
   /**
    * Resets the counter to 0.
