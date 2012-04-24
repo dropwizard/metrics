@@ -11,6 +11,24 @@
         Yammer's Metrics library.
     </description>
     <url>http://metrics.codahale.com/</url>
+   	<repositories>
+	    <repository>
+             <id>ds-master</id>
+             <url>http://nexus.ds.chalybs.net/content/groups/master</url>
+        </repository>
+        <repository>
+		    <id>repo.codahale.com</id>
+		    <url>http://repo.codahale.com</url>
+		  </repository>
+		<!--repository>
+			<id>sonatype-nexus-snapshots</id>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+		</repository>
+		<repository>
+            <id>sonatype-nexus-staging</id>
+            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository-->
+    </repositories>
 
     <modules>
         <module>metrics-annotation</module>

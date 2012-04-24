@@ -4,6 +4,7 @@ import com.yammer.metrics.core.*;
 import com.yammer.metrics.reporting.JmxReporter;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A set of factory methods for creating centrally registered metric instances.
@@ -58,6 +59,21 @@ public class Metrics {
     }
 
     /**
+     * Given a new gauge Long value, registers it under the given metric name.
+     *
+     * @param metricName the name of the metric
+     * @param value    the gauge value
+     * @return {@code ValueGauge}
+     */
+    public static ValueGauge newGauge(MetricName metricName,
+                                        Long metricValue) {
+	   
+        ValueGauge gauge = (ValueGauge) DEFAULT_REGISTRY.newGauge(metricName, new ValueGauge());
+		gauge.set(metricValue);
+		return gauge;
+    }
+
+   	/**
      * Given a new {@link com.yammer.metrics.core.Gauge}, registers it under the given metric name.
      *
      * @param metricName the name of the metric

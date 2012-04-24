@@ -301,12 +301,14 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
 
     @Override
     public void processGauge(MetricName name, Gauge<?> gauge, Long epoch) throws IOException {
-        sendObjToGraphite(epoch, sanitizeName(name), "value", gauge.value());
+	    //sendObjToGraphite(epoch, sanitizeName(name), "value", gauge.value());
+	    //Remove the string "value" . by Yongjun Rong
+        sendObjToGraphite(epoch, sanitizeName(name), "", gauge.value());
     }
 
     @Override
     public void processCounter(MetricName name, Counter counter, Long epoch) throws IOException {
-        sendInt(epoch, sanitizeName(name), "count", counter.count());
+        sendInt(epoch, sanitizeName(name), "", counter.count());
     }
 
     @Override
