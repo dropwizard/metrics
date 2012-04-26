@@ -32,7 +32,7 @@ public class SigarMetrics implements CanRegisterGauges {
 
     public void registerGauges(MetricsRegistry registry) {
         registry.newGauge(getClass(), "pid", new Gauge<Long>() {
-          public Long value() {
+          public Long getValue() {
             return pid();
           }
         });     

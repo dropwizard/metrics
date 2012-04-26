@@ -55,12 +55,12 @@ public class CpuMetrics extends AbstractSigarMetric {
 
     public void registerGauges(MetricsRegistry registry) {
         registry.newGauge(getClass(), "total-cores", new Gauge<Integer>() {
-            public Integer value() {
+            public Integer getValue() {
                 return totalCoreCount();
             }
         });
         registry.newGauge(getClass(), "physical-cpus", new Gauge<Integer>() {
-            public Integer value() {
+            public Integer getValue() {
                 return physicalCpuCount();
             }
         });

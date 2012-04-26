@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 
 import static org.junit.Assert.assertThat;
 
@@ -24,8 +25,8 @@ public class MemoryMetricsTest {
     }
     
     @Test
-    public void usedMemoryIsLessThanTotalMemory() throws Exception {
-        assertThat(mm.mem().used(), is(lessThan(mm.mem().total())));
+    public void usedMemoryIsLessThanOrEqualToTotalMemory() throws Exception {
+        assertThat(mm.mem().used(), is(lessThanOrEqualTo(mm.mem().total())));
     }
 
     @Test
@@ -39,13 +40,13 @@ public class MemoryMetricsTest {
     }
     
     @Test
-    public void usedSwapIsLessThanTotalSwap() throws Exception {
-        assertThat(mm.swap().used(), is(lessThan(mm.swap().total())));
+    public void usedSwapIsLessThanOrEqualToTotalSwap() throws Exception {
+        assertThat(mm.swap().used(), is(lessThanOrEqualTo(mm.swap().total())));
     }
 
     @Test
-    public void freeSwapIsLessThanTotalSwap() throws Exception {
-        assertThat(mm.swap().free(), is(lessThan(mm.swap().total())));
+    public void freeSwapIsLessThanOrEqualToTotalSwap() throws Exception {
+        assertThat(mm.swap().free(), is(lessThanOrEqualTo(mm.swap().total())));
     }
 
     @Test
