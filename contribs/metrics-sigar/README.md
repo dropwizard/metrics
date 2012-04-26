@@ -39,7 +39,7 @@ Currently the following data can be collected:
 
 ## Usage ##
 
-1. Add a dependency on metrics-sigar to your project:
+ 1. Add a dependency on metrics-sigar to your project:
 
         <dependency>
             <groupId>com.yammer.metrics</groupId>
@@ -47,12 +47,10 @@ Currently the following data can be collected:
             <version>${metricsVersion}</version>
         </dependency>
 
-2. Download the Sigar native libraries. 
-
-    * If downloading manually, download the Sigar binary package from SourceForge [here](http://sourceforge.net/projects/sigar/files/sigar/1.6/). 
-
-    * If you want to automate it in your build script, add the following dependency to your project and add a task to unzip the jar. (Note: This jar is missing the Windows libraries.)
-
+ 2. Download the Sigar native libraries. 
+    * If downloading manually, download the Sigar binary package from SourceForge [here](http://sourceforge.net/projects/sigar/files/sigar/1.6/). This package includes libs for most OSes and architectures.
+    * If you want to automate it in your build script, add the following dependency to your project and add a task to unzip the jar. (Note: This jar only contains libs for Linux x86/x64, Solaris x64 and OS X x64)
+    
             <dependency>
                 <groupId>org.fusesource</groupId>
                 <artifactId>sigar</artifactId>
@@ -60,26 +58,28 @@ Currently the following data can be collected:
                 <classifier>native</classifier>
             </dependency>
 
-3. Make sure Sigar can find its native libs at runtime. Either:
-
+ 3. Make sure Sigar can find its native libs at runtime. Either:
     * Ensure the libs are in the same directory as `sigar.jar`, or
-
     * Set the system property `-Dorg.hyperic.sigar.path=<directory containing native libs>`
 
-4. You're ready to use metrics-sigar! 
-
+ 4. You're ready to use metrics-sigar! 
     * Use the `SigarMetrics` singleton object directly for detailed data:
-
+    
             SigarMetrics sm = SigarMetrics.getInstance();
-
     * Optionally expose the most useful data as `Gauge`s:
-
+    
             SigarMetrics.getInstance().registerGauges();
 
 ## Acknowledgements ##
 
 This module makes use of [Hyperic Sigar](http://support.hyperic.com/display/SIGAR/Home) ([Github link](https://github.com/hyperic/sigar)) under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
+## TODO ##
+
+* Port more of the Sigar API
+* Sigar seems to consistently give an incorrect value for the number of CPUs. Try to find a workaround.
+* Support more fine-grained registration of gauges.
+
 ## Notes ##
 
-Sigar has a few wrinkles and may return crazy values for some metrics, depending on your platform. Still, hopefully better than nothing!
+Sigar has a few wrinkles and may return crazy values for some metrics, depending on your platform. Still, hopefully better than nothing! Issues and pull requests welcome.
