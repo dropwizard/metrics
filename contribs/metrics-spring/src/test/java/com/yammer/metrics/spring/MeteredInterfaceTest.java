@@ -38,13 +38,21 @@ public class MeteredInterfaceTest {
     @Test
     public void testTimedMethod() {
         Assert.assertTrue(ctx.getBean(MeteredInterface.class).timedMethod());
+<<<<<<< HEAD:metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredInterfaceTest.java
+        Assert.assertTrue(ctx.getBean(MetricsRegistry.class).allMetrics().isEmpty());
+=======
         Assert.assertTrue(ctx.getBean(MetricsRegistry.class).getAllMetrics().isEmpty());
+>>>>>>> upstream/master:contribs/metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredInterfaceTest.java
     }
 
     @Test
     public void testMeteredMethod() {
         Assert.assertTrue(ctx.getBean(MeteredInterface.class).meteredMethod());
+<<<<<<< HEAD:metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredInterfaceTest.java
+        Assert.assertTrue(ctx.getBean(MetricsRegistry.class).allMetrics().isEmpty());
+=======
         Assert.assertTrue(ctx.getBean(MetricsRegistry.class).getAllMetrics().isEmpty());
+>>>>>>> upstream/master:contribs/metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredInterfaceTest.java
     }
 
     @Test(expected=BogusException.class)
@@ -52,10 +60,18 @@ public class MeteredInterfaceTest {
     	try {
     		ctx.getBean(MeteredInterface.class).exceptionMeteredMethod();
     	} catch (Throwable t) {
+<<<<<<< HEAD:metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredInterfaceTest.java
+    		Assert.assertTrue(ctx.getBean(MetricsRegistry.class).allMetrics().isEmpty());
+=======
     		Assert.assertTrue(ctx.getBean(MetricsRegistry.class).getAllMetrics().isEmpty());
+>>>>>>> upstream/master:contribs/metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredInterfaceTest.java
     		throw t;
     	}
     	Assert.fail();
     }
 
+<<<<<<< HEAD:metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredInterfaceTest.java
 }
+=======
+}
+>>>>>>> upstream/master:contribs/metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredInterfaceTest.java

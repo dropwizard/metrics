@@ -43,7 +43,11 @@ public class MeteredClassTest {
 	@Before
 	@SuppressWarnings(value = "unchecked")
 	public void init() {
+<<<<<<< HEAD:metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
+		Map<MetricName, Metric> metrics = metricsRegistry.allMetrics();
+=======
 		Map<MetricName, Metric> metrics = metricsRegistry.getAllMetrics();
+>>>>>>> upstream/master:contribs/metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
 
 		gaugedField = (Gauge<Object>) metrics.get(new MetricName(MeteredClass.class, "gaugedField"));
 		gaugedMethod = (Gauge<Object>) metrics.get(new MetricName(MeteredClass.class, "gaugedMethod"));
@@ -57,6 +61,15 @@ public class MeteredClassTest {
 
 	@Test
 	public void gauges() {
+<<<<<<< HEAD:metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
+		assertEquals(999, gaugedField.value());
+		assertEquals(999, gaugedMethod.value());
+
+		meteredClass.setGaugedField(1000);
+
+		assertEquals(1000, gaugedField.value());
+		assertEquals(1000, gaugedMethod.value());
+=======
 		assertEquals(999, gaugedField.getValue());
 		assertEquals(999, gaugedMethod.getValue());
 
@@ -64,14 +77,22 @@ public class MeteredClassTest {
 
 		assertEquals(1000, gaugedField.getValue());
 		assertEquals(1000, gaugedMethod.getValue());
+>>>>>>> upstream/master:contribs/metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
 	}
 
 	@Test
 	public void timedMethod() throws Throwable {
+<<<<<<< HEAD:metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
+		assertEquals(0, timedMethod.count());
+
+		meteredClass.timedMethod(false);
+		assertEquals(1, timedMethod.count());
+=======
 		assertEquals(0, timedMethod.getCount());
 
 		meteredClass.timedMethod(false);
 		assertEquals(1, timedMethod.getCount());
+>>>>>>> upstream/master:contribs/metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
 
 		// count increments even when the method throws an exception
 		try {
@@ -80,24 +101,43 @@ public class MeteredClassTest {
 		} catch (Throwable e) {
 			assertTrue(e instanceof BogusException);
 		}
+<<<<<<< HEAD:metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
+		assertEquals(2, timedMethod.count());
+=======
 		assertEquals(2, timedMethod.getCount());
+>>>>>>> upstream/master:contribs/metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
 	}
 
 	@Test
 	public void meteredMethod() throws Throwable {
+<<<<<<< HEAD:metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
+		assertEquals(0, meteredMethod.count());
+
+		meteredClass.meteredMethod();
+		assertEquals(1, meteredMethod.count());
+=======
 		assertEquals(0, meteredMethod.getCount());
 
 		meteredClass.meteredMethod();
 		assertEquals(1, meteredMethod.getCount());
+>>>>>>> upstream/master:contribs/metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
 	}
 
 	@Test
 	public void exceptionMeteredMethod() throws Throwable {
+<<<<<<< HEAD:metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
+		assertEquals(0, exceptionMeteredMethod.count());
+
+		// doesn't throw an exception
+		meteredClass.exceptionMeteredMethod(null);
+		assertEquals(0, exceptionMeteredMethod.count());
+=======
 		assertEquals(0, exceptionMeteredMethod.getCount());
 
 		// doesn't throw an exception
 		meteredClass.exceptionMeteredMethod(null);
 		assertEquals(0, exceptionMeteredMethod.getCount());
+>>>>>>> upstream/master:contribs/metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
 
 		// throws the wrong exception
 		try {
@@ -106,7 +146,11 @@ public class MeteredClassTest {
 		} catch (Throwable t) {
 			assertTrue(t instanceof RuntimeException);
 		}
+<<<<<<< HEAD:metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
+		assertEquals(0, exceptionMeteredMethod.count());
+=======
 		assertEquals(0, exceptionMeteredMethod.getCount());
+>>>>>>> upstream/master:contribs/metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
 
 		// throws the right exception
 		try {
@@ -115,11 +159,26 @@ public class MeteredClassTest {
 		} catch (Throwable t) {
 			assertTrue(t instanceof BogusException);
 		}
+<<<<<<< HEAD:metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
+		assertEquals(1, exceptionMeteredMethod.count());
+=======
 		assertEquals(1, exceptionMeteredMethod.getCount());
+>>>>>>> upstream/master:contribs/metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
 	}
 
 	@Test
 	public void triplyMeteredMethod() throws Throwable {
+<<<<<<< HEAD:metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
+		assertEquals(0, triple_Metered.count());
+		assertEquals(0, triple_Timed.count());
+		assertEquals(0, triple_ExceptionMetered.count());
+
+		// doesn't throw an exception
+		meteredClass.triplyMeteredMethod(false);
+		assertEquals(1, triple_Metered.count());
+		assertEquals(1, triple_Timed.count());
+		assertEquals(0, triple_ExceptionMetered.count());
+=======
 		assertEquals(0, triple_Metered.getCount());
 		assertEquals(0, triple_Timed.getCount());
 		assertEquals(0, triple_ExceptionMetered.getCount());
@@ -129,6 +188,7 @@ public class MeteredClassTest {
 		assertEquals(1, triple_Metered.getCount());
 		assertEquals(1, triple_Timed.getCount());
 		assertEquals(0, triple_ExceptionMetered.getCount());
+>>>>>>> upstream/master:contribs/metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
 
 		// throws an exception
 		try {
@@ -137,8 +197,16 @@ public class MeteredClassTest {
 		} catch (Throwable t) {
 			assertTrue(t instanceof BogusException);
 		}
+<<<<<<< HEAD:metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java
+		assertEquals(2, triple_Metered.count());
+		assertEquals(2, triple_Timed.count());
+		assertEquals(1, triple_ExceptionMetered.count());
+	}
+}
+=======
 		assertEquals(2, triple_Metered.getCount());
 		assertEquals(2, triple_Timed.getCount());
 		assertEquals(1, triple_ExceptionMetered.getCount());
 	}
 }
+>>>>>>> upstream/master:contribs/metrics-spring/src/test/java/com/yammer/metrics/spring/MeteredClassTest.java

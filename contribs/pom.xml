@@ -23,6 +23,7 @@
         <module>metrics-graphite</module>
         <module>metrics-guice</module>
         <module>metrics-spring</module>
+        <module>metrics-statsd</module>
         <module>metrics-web</module>
         <module>metrics-sigar</module>
     </modules>
