@@ -109,27 +109,27 @@ public class MemoryMetrics extends AbstractSigarMetric {
 
     public void registerGauges(MetricsRegistry registry) {
         registry.newGauge(getClass(), "memory-free", new Gauge<Long>() {
-            public Long value() {
+            public Long getValue() {
                 return mem().free();
             }
         });
         registry.newGauge(getClass(), "memory-actual-free", new Gauge<Long>() {
-            public Long value() {
+            public Long getValue() {
                 return mem().actualFree();
             }
         });
         registry.newGauge(getClass(), "swap-free", new Gauge<Long>() {
-            public Long value() {
+            public Long getValue() {
                 return swap().free();
             }
         });
         registry.newGauge(getClass(), "swap-pages-in", new Gauge<Long>() {
-            public Long value() {
+            public Long getValue() {
                 return swap().pagesIn();
             }
         });
         registry.newGauge(getClass(), "swap-pages-out", new Gauge<Long>() {
-            public Long value() {
+            public Long getValue() {
                 return swap().pagesOut();
             }
         });
