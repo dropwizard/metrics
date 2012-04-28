@@ -457,6 +457,10 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     private void registerBean(MetricName name, MetricMBean bean, ObjectName objectName)
             throws MBeanRegistrationException, OperationsException {
+
+        if ( server.isRegistered(objectName) ){
+            server.unregisterMBean(objectName);
+        }
         server.registerMBean(bean, objectName);
         registeredBeans.put(name, objectName);
     }
