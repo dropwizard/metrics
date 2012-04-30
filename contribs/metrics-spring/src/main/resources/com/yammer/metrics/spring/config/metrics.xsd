@@ -1,40 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.yammer.com/schema/metrics"
-            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:beans="http://www.springframework.org/schema/beans"
-            targetNamespace="http://www.yammer.com/schema/metrics"
-            elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xsd:schema xmlns="http://www.yammer.com/schema/metrics" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:beans="http://www.springframework.org/schema/beans" targetNamespace="http://www.yammer.com/schema/metrics"
+  elementFormDefault="qualified" attributeFormDefault="unqualified">
 
-    <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+  <xsd:import namespace="http://www.springframework.org/schema/beans" />
 
-    <xsd:element name="annotation-driven">
-        <xsd:complexType>
-            <xsd:attribute name="metrics-registry" type="xsd:string" use="optional"/>
-            <xsd:attribute name="health-check-registry" type="xsd:string" use="optional"/>
-            <xsd:attribute name="scope" type="xsd:string" use="optional"/>
-            <xsd:attribute name="expose-proxy" type="xsd:boolean" use="optional"/>
-            <xsd:attribute name="proxy-target-class" type="xsd:boolean" use="optional"/>
-        </xsd:complexType>
-    </xsd:element>
+  <xsd:element name="annotation-driven">
+    <xsd:complexType>
+      <xsd:attribute name="metrics-registry" type="xsd:string" use="optional" />
+      <xsd:attribute name="health-check-registry" type="xsd:string" use="optional" />
+      <xsd:attribute name="scope" type="xsd:string" use="optional" />
+      <xsd:attribute name="expose-proxy" type="xsd:boolean" use="optional" />
+      <xsd:attribute name="proxy-target-class" type="xsd:boolean" use="optional" />
+    </xsd:complexType>
+  </xsd:element>
 
-    <xsd:element name="metrics-registry">
-        <xsd:complexType>
-            <xsd:attribute name="id" type="xsd:string" use="required"/>
-            <xsd:attribute name="clock" type="xsd:string" use="optional"/>
-        </xsd:complexType>
-    </xsd:element>
+  <xsd:element name="metrics-registry">
+    <xsd:complexType>
+      <xsd:attribute name="id" type="xsd:string" use="required" />
+      <xsd:attribute name="clock" type="xsd:string" use="optional" />
+    </xsd:complexType>
+  </xsd:element>
 
-    <xsd:element name="health-check-registry">
-        <xsd:complexType>
-            <xsd:attribute name="id" type="xsd:string" use="required"/>
-        </xsd:complexType>
-    </xsd:element>
+  <xsd:element name="health-check-registry">
+    <xsd:complexType>
+      <xsd:attribute name="id" type="xsd:string" use="required" />
+    </xsd:complexType>
+  </xsd:element>
 
-    <xsd:element name="jmx-reporter">
-        <xsd:complexType>
-            <xsd:attribute name="id" type="xsd:string" use="optional"/>
-            <xsd:attribute name="metrics-registry" type="xsd:string" use="required"/>
-        </xsd:complexType>
-    </xsd:element>
+  <xsd:element name="jmx-reporter">
+    <xsd:complexType>
+      <xsd:attribute name="id" type="xsd:string" use="optional" />
+      <xsd:attribute name="metrics-registry" type="xsd:string" use="required" />
+    </xsd:complexType>
+  </xsd:element>
 
+  <xsd:element name="graphite-reporter">
+    <xsd:complexType>
+      <xsd:attribute name="id" type="xsd:string" use="optional" />
+      <xsd:attribute name="host" type="xsd:string" use="required">
+        <xsd:annotation>
+          <xsd:documentation>The graphite server name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="port" type="xsd:int" use="required">
+        <xsd:annotation>
+          <xsd:documentation>The graphite server port</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="period" type="xsd:int" use="required">
+        <xsd:annotation>
+          <xsd:documentation>The time period to report to graphite, correlated to the timeUnit attribute which
+            determines the unit for this value
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="timeUnit" type="xsd:string" use="required">
+        <xsd:annotation>
+          <xsd:documentation>
+            a enumerated value from java.util.concurrent.TimeUnit (case insensitive), correlated with
+            the period attribute
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="metrics-registry" type="xsd:string" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>A reference to the metrics registry bean id, if none is provided a default instance will be
+            created
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="autoStart" type="xsd:boolean" use="optional" default="true">
+        <xsd:annotation>
+          <xsd:documentation>determines weather the reporter is automatically started when context is loaded (note that
+            if this is set to false then timeUnit and period attributes are ignored)
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="prefix" type="xsd:string" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>an optional prefix to the graphite entry</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="predicate" type="xsd:string" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>a reference to a predicate bean name</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
 </xsd:schema>
