@@ -8,6 +8,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
+import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.spring.GraphiteReporterFactory;
 
 /**
@@ -54,9 +55,7 @@ public class GraphiteReporterBeanDefinitionParser extends AbstractSingleBeanDefi
     if (StringUtils.hasText(registry)) {
       builder.addConstructorArgReference(registry);
     } else {
-      parserContext.getReaderContext().error("Attribute 'metrics-registry' must not be empty",
-          element);
-      return;
+      builder.addConstructorArgValue(new MetricsRegistry());
     }
 
     final String host = element.getAttribute(HOST_ATTRIBUTE);
