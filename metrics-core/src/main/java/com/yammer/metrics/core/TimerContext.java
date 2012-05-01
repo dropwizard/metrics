@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
  * @see Timer#time()
  */
 public class TimerContext {
-    private final Timer timer;
+    private final Timeable timer;
     private final Clock clock;
     private final long startTime;
 
@@ -18,7 +18,7 @@ public class TimerContext {
      *
      * @param timer the {@link Timer} to report the elapsed time to
      */
-    TimerContext(Timer timer, Clock clock) {
+    TimerContext(Timeable timer, Clock clock) {
         this.timer = timer;
         this.clock = clock;
         this.startTime = clock.getTick();
