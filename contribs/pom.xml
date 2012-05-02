@@ -22,6 +22,7 @@
         <module>metrics-ganglia</module>
         <module>metrics-graphite</module>
         <module>metrics-guice</module>
+        <module>metrics-hibernate</module>
         <module>metrics-spring</module>
         <module>metrics-web</module>
         <module>metrics-sigar</module>
