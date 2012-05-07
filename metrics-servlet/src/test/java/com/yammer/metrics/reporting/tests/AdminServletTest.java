@@ -42,7 +42,7 @@ public class AdminServletTest {
 
     @Before
     public void setUp() throws Exception {
-        when(context.getContextPath()).thenReturn("/context");
+        when(request.getContextPath()).thenReturn("/context");
 
         when(config.getServletContext()).thenReturn(context);
 
