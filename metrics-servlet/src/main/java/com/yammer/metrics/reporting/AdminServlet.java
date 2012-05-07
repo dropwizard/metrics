@@ -80,7 +80,7 @@ public class AdminServlet extends HttpServlet {
         pingServlet.init(config);
         threadDumpServlet.init(config);
 
-        final ServletContext context = config.getServletContext();
+        //final ServletContext context = config.getServletContext();
         this.metricsUri = getParam(config.getInitParameter("metrics-uri"), this.metricsUri);
         this.pingUri = getParam(config.getInitParameter("ping-uri"), this.pingUri);
         this.threadsUri = getParam(config.getInitParameter("threads-uri"), this.threadsUri);
