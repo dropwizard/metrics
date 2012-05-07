@@ -6,19 +6,18 @@ import com.yammer.metrics.sigar.SigarMetrics;
 
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThan;
-
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
 
-public class UlimitMetricsTest {
-    private final UlimitMetrics um = SigarMetrics.getInstance().ulimit();
+public class UlimitMetricsTest extends CheckSigarLoadsOk {
 
     @Test
     public void openFilesLimitIsGreaterThanZero() throws Exception {
-        assertThat(um.ulimit().openFiles(), is(greaterThan(0L)));
+        // skip this test on Windows platforms
+        assumeThat(System.getProperty("os.name").toLowerCase(), not(containsString("windows")));
+
+        assertThat(SigarMetrics.getInstance().ulimit().ulimit().openFiles(), is(greaterThan(0L)));
     }
+
 }
