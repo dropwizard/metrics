@@ -25,6 +25,7 @@
         <module>metrics-spring</module>
         <module>metrics-web</module>
         <module>metrics-sigar</module>
+        <module>metrics-statsd</module>
     </modules>
 
     <build>
