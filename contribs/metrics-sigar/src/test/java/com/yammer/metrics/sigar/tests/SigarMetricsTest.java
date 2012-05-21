@@ -9,7 +9,7 @@ import static org.hamcrest.Matchers.is;
 
 import static org.junit.Assert.assertThat;
 
-public class SigarMetricsTest {
+public class SigarMetricsTest extends CheckSigarLoadsOk {
 
     @Test
     public void pidIsGreaterThanZero() throws Exception {
