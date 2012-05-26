@@ -46,7 +46,7 @@ public class AdminServletModuleTest {
 
   @Test
   public void shouldProvideValidJsonForMetrics() throws Exception {
-    final String url = "http://127.0.0.1:" + localPort + AdminServlet.DEFAULT_METRICS_URI;
+    final String url = "http://127.0.0.1:" + localPort + AdminServletModule.DEFAULT_PATH + AdminServlet.DEFAULT_METRICS_URI;
 
     final AsyncHttpClient client = new AsyncHttpClient();
     final Response response = client.prepareGet(url).execute().get();
