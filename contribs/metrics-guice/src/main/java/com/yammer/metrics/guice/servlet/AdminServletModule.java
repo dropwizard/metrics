@@ -49,32 +49,41 @@ import com.google.inject.servlet.ServletModule;
  * </pre>
  */
 public class AdminServletModule extends ServletModule {
+
+    public static final String DEFAULT_PATH = "/metrics";
+
     private final JsonFactory jsonFactory;
     private final String healthcheckUri;
     private final String metricsUri;
     private final String pingUri;
     private final String threadsUri;
+    private final String path;
 
-    public AdminServletModule() {
-        this(null, AdminServlet.DEFAULT_HEALTHCHECK_URI, AdminServlet.DEFAULT_METRICS_URI,
+  public AdminServletModule() {
+        this(null, DEFAULT_PATH, AdminServlet.DEFAULT_HEALTHCHECK_URI, AdminServlet.DEFAULT_METRICS_URI,
              AdminServlet.DEFAULT_PING_URI, AdminServlet.DEFAULT_THREADS_URI);
     }
 
     public AdminServletModule(JsonFactory jsonFactory) {
-        this(jsonFactory, AdminServlet.DEFAULT_HEALTHCHECK_URI, AdminServlet.DEFAULT_METRICS_URI,
+        this(jsonFactory, DEFAULT_PATH, AdminServlet.DEFAULT_HEALTHCHECK_URI, AdminServlet.DEFAULT_METRICS_URI,
              AdminServlet.DEFAULT_PING_URI, AdminServlet.DEFAULT_THREADS_URI);
     }
 
     public AdminServletModule(String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
-        this(null, healthcheckUri, metricsUri, pingUri, threadsUri);
+        this(null, DEFAULT_PATH, healthcheckUri, metricsUri, pingUri, threadsUri);
     }
 
     public AdminServletModule(JsonFactory jsonFactory, String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
+      this(jsonFactory, DEFAULT_PATH, healthcheckUri, metricsUri, pingUri, threadsUri);
+    }
+
+    public AdminServletModule(JsonFactory jsonFactory, String path, String healthcheckUri, String metricsUri, String pingUri, String threadsUri) {
         this.jsonFactory = jsonFactory;
         this.healthcheckUri = healthcheckUri;
         this.metricsUri = metricsUri;
         this.pingUri = pingUri;
         this.threadsUri = threadsUri;
+        this.path = path;
     }
 
     @Override
@@ -88,6 +97,6 @@ public class AdminServletModule extends ServletModule {
         bind(String.class).annotatedWith(Names.named("AdminServlet.THREADS_URI")).toInstance(threadsUri);
         bind(AdminServlet.class).toProvider(AdminServletProvider.class).asEagerSingleton();
 
-        serve(healthcheckUri, metricsUri, pingUri, threadsUri).with(AdminServlet.class);
+        serve(path + "/*").with(AdminServlet.class);
     }
 }
