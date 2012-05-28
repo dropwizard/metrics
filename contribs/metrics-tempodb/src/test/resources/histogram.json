@@ -1,0 +1,37 @@
+{
+  "t" : "1970-01-04T13:08+0100",
+  "data" : [ {
+    "key" : "com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=histogram.count",
+    "v" : 0.0
+  }, {
+    "key" : "com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=histogram.min",
+    "v" : 0.0
+  }, {
+    "key" : "com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=histogram.max",
+    "v" : 0.0
+  }, {
+    "key" : "com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=histogram.mean",
+    "v" : 0.0
+  }, {
+    "key" : "com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=histogram.stddev",
+    "v" : 0.0
+  }, {
+    "key" : "com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=histogram.sum",
+    "v" : 0.0
+  }, {
+    "key" : "com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=histogram.75th",
+    "v" : 0.0
+  }, {
+    "key" : "com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=histogram.95th",
+    "v" : 0.0
+  }, {
+    "key" : "com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=histogram.98th",
+    "v" : 0.0
+  }, {
+    "key" : "com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=histogram.99th",
+    "v" : 0.0
+  }, {
+    "key" : "com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=histogram.999th",
+    "v" : 0.0
+  } ]
+}
