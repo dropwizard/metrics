@@ -1,0 +1,7 @@
+{
+  "t" : "1970-01-04T13:08+0100",
+  "data" : [ {
+    "key" : "com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=counter.count",
+    "v" : 0.0
+  } ]
+}
