@@ -1,0 +1,21 @@
+{
+	"t": "1970-01-04T13:08+0100",
+	"data": [
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=counter.count","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.count","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.mean","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.1m","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.5m","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.15m","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.75th","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.95th","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.98th","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.99th","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.999th","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.min","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.max","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.mean","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.stddev","v":0.0},
+		{"key":"com.yammer.metrics.reporting.tempodb:type=TempoDbReporterTest,name=timer.sum","v":0.0}
+	]
+}
