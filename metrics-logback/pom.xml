@@ -13,7 +13,7 @@
     <packaging>bundle</packaging>
 
     <properties>
-        <logback.version>1.0.0</logback.version>
+        <logback.version>1.0.3</logback.version>
     </properties>
 
     <dependencies>
