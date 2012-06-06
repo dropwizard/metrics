@@ -34,20 +34,20 @@ public class InstrumentedEhcacheTest {
 
         cache.put(new Element("woo", "whee"));
 
-        final Timer gets = Metrics.newTimer(Cache.class,
-                                            "get",
-                                            "test",
-                                            TimeUnit.MILLISECONDS,
-                                            TimeUnit.SECONDS);
+        final Timer gets = Metrics.defaultRegistry().newTimer(Cache.class,
+                                                              "get",
+                                                              "test",
+                                                              TimeUnit.MILLISECONDS,
+                                                              TimeUnit.SECONDS);
 
         assertThat(gets.getCount(),
                    is(1L));
 
-        final Timer puts = Metrics.newTimer(Cache.class,
-                                            "put",
-                                            "test",
-                                            TimeUnit.MILLISECONDS,
-                                            TimeUnit.SECONDS);
+        final Timer puts = Metrics.defaultRegistry().newTimer(Cache.class,
+                                                              "put",
+                                                              "test",
+                                                              TimeUnit.MILLISECONDS,
+                                                              TimeUnit.SECONDS);
 
         assertThat(puts.getCount(),
                    is(1L));

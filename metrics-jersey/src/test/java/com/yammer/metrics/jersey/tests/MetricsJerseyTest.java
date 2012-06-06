@@ -39,7 +39,7 @@ public class MetricsJerseyTest extends JerseyTest {
         assertThat(resource().path("timed").get(String.class),
                    is("yay"));
 
-        final Timer timer = Metrics.newTimer(InstrumentedResource.class, "timed");
+        final Timer timer = Metrics.defaultRegistry().newTimer(InstrumentedResource.class, "timed");
         assertThat(timer.getCount(),
                    is(1L));
     }
@@ -49,14 +49,14 @@ public class MetricsJerseyTest extends JerseyTest {
         assertThat(resource().path("metered").get(String.class),
                    is("woo"));
 
-        final Meter meter = Metrics.newMeter(InstrumentedResource.class, "metered", "blah", TimeUnit.SECONDS);
+        final Meter meter = Metrics.defaultRegistry().newMeter(InstrumentedResource.class, "metered", "blah", TimeUnit.SECONDS);
         assertThat(meter.getCount(),
                    is(1L));
     }
 
     @Test
     public void exceptionMeteredMethodsAreExceptionMetered() {
-        final Meter meter = Metrics.newMeter(InstrumentedResource.class, "exceptionMeteredExceptions", "blah", TimeUnit.SECONDS);
+        final Meter meter = Metrics.defaultRegistry().newMeter(InstrumentedResource.class, "exceptionMeteredExceptions", "blah", TimeUnit.SECONDS);
         
         assertThat(resource().path("exception-metered").get(String.class),
                    is("fuh"));
