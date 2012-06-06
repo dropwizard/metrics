@@ -1,4 +1,4 @@
-package com.yammer.metrics.reporting;
+package com.yammer.metrics.servlet;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.MetricsRegistry;

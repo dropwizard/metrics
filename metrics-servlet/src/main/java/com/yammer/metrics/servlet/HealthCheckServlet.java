@@ -1,4 +1,4 @@
-package com.yammer.metrics.reporting;
+package com.yammer.metrics.servlet;
 
 import com.yammer.metrics.HealthChecks;
 import com.yammer.metrics.core.HealthCheck;
@@ -18,7 +18,7 @@ import java.util.Map;
  * and prints the results as a {@code text/plain} entity. Only responds to {@code GET} requests.
  * <p/>
  * If the servlet context has an attribute named
- * {@code com.yammer.metrics.reporting.HealthCheckServlet.registry} which is a
+ * {@code com.yammer.metrics.servlet.HealthCheckServlet.registry} which is a
  * {@link HealthCheckRegistry} instance, {@link HealthCheckServlet} will use it instead of
  * {@link HealthChecks}.
  */

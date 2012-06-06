@@ -1,10 +1,10 @@
-package com.yammer.metrics.reporting.tests;
+package com.yammer.metrics.servlet.tests;
 
 import com.yammer.metrics.core.Clock;
 import com.yammer.metrics.core.Gauge;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.VirtualMachineMetrics;
-import com.yammer.metrics.reporting.MetricsServlet;
+import com.yammer.metrics.servlet.MetricsServlet;
 import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
@@ -138,7 +138,7 @@ public class MetricsServletTest {
         servlet.service(request, response);
 
         assertThat(json.toString(),
-                   is("{\"com.yammer.metrics.reporting.tests.MetricsServletTest\":" +
+                   is("{\"com.yammer.metrics.servlet.tests.MetricsServletTest\":" +
                               "{\"gauge\":{\"type\":\"gauge\",\"value\":22.2}}}"));
     }
 
@@ -149,7 +149,7 @@ public class MetricsServletTest {
         servlet.service(request, response);
 
         assertThat(json.toString(),
-                   is("{\"com.yammer.metrics.reporting.tests.MetricsServletTest\":" +
+                   is("{\"com.yammer.metrics.servlet.tests.MetricsServletTest\":" +
                               "{\"counter\":{\"type\":\"counter\",\"count\":12}}}"));
     }
 
@@ -160,7 +160,7 @@ public class MetricsServletTest {
         servlet.service(request, response);
 
         assertThat(json.toString(),
-                   is("{\"com.yammer.metrics.reporting.tests.MetricsServletTest\":" +
+                   is("{\"com.yammer.metrics.servlet.tests.MetricsServletTest\":" +
                               "{\"histogram\":{\"type\":\"histogram\",\"count\":1,\"min\":12.0," +
                               "\"max\":12.0,\"mean\":12.0,\"std_dev\":0.0,\"median\":12.0," +
                               "\"p75\":12.0,\"p95\":12.0,\"p98\":12.0,\"p99\":12.0,\"p999\":12.0}}}"));
@@ -176,7 +176,7 @@ public class MetricsServletTest {
         servlet.service(request, response);
 
         assertThat(json.toString(),
-                   is("{\"com.yammer.metrics.reporting.tests.MetricsServletTest\":" +
+                   is("{\"com.yammer.metrics.servlet.tests.MetricsServletTest\":" +
                               "{\"meter\":{\"type\":\"meter\",\"event_type\":\"things\"," +
                               "\"unit\":\"seconds\",\"count\":12,\"mean\":1200000.0," +
                               "\"m1\":0.0,\"m5\":0.0,\"m15\":0.0}}}"));
@@ -191,7 +191,7 @@ public class MetricsServletTest {
         servlet.service(request, response);
 
         assertThat(json.toString(),
-                   is("{\"com.yammer.metrics.reporting.tests.MetricsServletTest\":{\"timer\":" +
+                   is("{\"com.yammer.metrics.servlet.tests.MetricsServletTest\":{\"timer\":" +
                               "{\"type\":\"timer\",\"duration\":{\"unit\":\"milliseconds\"," +
                               "\"min\":100.0,\"max\":100.0,\"mean\":100.0,\"std_dev\":0.0," +
                               "\"median\":100.0,\"p75\":100.0,\"p95\":100.0,\"p98\":100.0," +

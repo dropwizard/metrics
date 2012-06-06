@@ -1,5 +1,6 @@
-package com.yammer.metrics.reporting;
+package com.yammer.metrics.ganglia;
 
+import com.yammer.metrics.ganglia.GangliaMessageBuilder;
 import org.junit.Test;
 
 import java.net.SocketException;

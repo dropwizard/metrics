@@ -1,6 +1,6 @@
-package com.yammer.metrics.reporting.tests;
+package com.yammer.metrics.servlet.tests;
 
-import com.yammer.metrics.reporting.*;
+import com.yammer.metrics.servlet.*;
 import org.junit.Before;
 import org.junit.Test;
 

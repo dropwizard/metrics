@@ -1,4 +1,4 @@
-package com.yammer.metrics.reporting;
+package com.yammer.metrics.servlet;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  * requests.
  * <p/>
  * If the servlet context has an attribute named
- * {@code com.yammer.metrics.reporting.MetricsServlet.registry} which is a
+ * {@code com.yammer.metrics.servlet.MetricsServlet.registry} which is a
  * {@link MetricsRegistry} instance, {@link MetricsServlet} will use it instead of {@link Metrics}.
  * <p/>
  * {@link MetricsServlet} also takes an initialization parameter, {@code show-jvm-metrics}, which

@@ -1,6 +1,6 @@
-package com.yammer.metrics.reporting.tests;
+package com.yammer.metrics.servlet.tests;
 
-import com.yammer.metrics.reporting.PingServlet;
+import com.yammer.metrics.servlet.PingServlet;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;

@@ -1,4 +1,4 @@
-package com.yammer.metrics.reporting;
+package com.yammer.metrics.ganglia;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

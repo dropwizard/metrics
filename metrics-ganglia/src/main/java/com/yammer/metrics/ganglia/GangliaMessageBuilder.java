@@ -1,4 +1,4 @@
-package com.yammer.metrics.reporting;
+package com.yammer.metrics.ganglia;
 
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;

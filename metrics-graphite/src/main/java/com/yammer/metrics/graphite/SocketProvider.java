@@ -1,4 +1,4 @@
-package com.yammer.metrics.reporting;
+package com.yammer.metrics.graphite;
 
 import java.net.Socket;
 
