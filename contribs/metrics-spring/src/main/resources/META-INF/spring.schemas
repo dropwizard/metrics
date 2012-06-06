@@ -1,1 +1,1 @@
-http\://www.yammer.com/schema/metrics/metrics.xsd=com/yammer/metrics/spring/config/metrics.xsd
+http\://www.example.com/schema/metrics/metrics.xsd=com/example/metrics/spring/config/metrics.xsd

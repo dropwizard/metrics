@@ -1,1 +1,1 @@
-http\://www.yammer.com/schema/metrics=com.yammer.metrics.spring.config.MetricsNamespaceHandler
+http\://www.example.com/schema/metrics=com.example.metrics.spring.config.MetricsNamespaceHandler
