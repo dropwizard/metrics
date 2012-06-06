@@ -14,9 +14,9 @@ powerful toolkit of ways to measure the behavior of critical components
 
 .. __: https://www.yammer.com
 
-With modules for common libraries like **Guice**, **Jetty**, **Log4j**, **Apache HttpClient**,
-**Ehcache**, **Logback**, **Spring** and reporting backends like **Ganglia** and **Graphite**,
-Metrics provides you with full-stack visibility.
+With modules for common libraries like **Jetty**, **Logback**, **Log4j**, **Apache HttpClient**,
+**Ehcache**, **JDBI**, **Jersey** and reporting backends like **Ganglia** and **Graphite**, Metrics
+provides you with full-stack visibility.
 
 .. toctree::
    :maxdepth: 1
