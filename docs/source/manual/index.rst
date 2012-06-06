@@ -15,7 +15,6 @@ User Manual
     ehcache
     ganglia
     graphite
-    guice
     httpclient
     jdbi
     jersey
@@ -24,6 +23,5 @@ User Manual
     logback
     scala
     servlet
-    spring
     webapps
 
