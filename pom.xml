@@ -13,10 +13,11 @@
     <url>http://metrics.codahale.com/</url>
 
     <modules>
-        <module>contribs</module>
         <module>metrics-annotation</module>
         <module>metrics-core</module>
         <module>metrics-ehcache</module>
+        <module>metrics-ganglia</module>
+        <module>metrics-graphite</module>
         <module>metrics-httpclient</module>
         <module>metrics-jdbi</module>
         <module>metrics-jersey</module>
@@ -25,6 +26,7 @@
         <module>metrics-logback</module>
         <module>metrics-scala_2.9.1</module>
         <module>metrics-servlet</module>
+        <module>metrics-web</module>
     </modules>
 
     <properties>
