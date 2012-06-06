@@ -1,4 +1,4 @@
-package com.yammer.metrics.guice.tests;
+package com.exampe.metrics.guice.tests;
 
 import java.util.Set;
 
@@ -8,7 +8,7 @@ import com.yammer.metrics.core.Gauge;
 import com.yammer.metrics.core.Metric;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.guice.InstrumentationModule;
+import com.example.metrics.guice.InstrumentationModule;
 
 import org.junit.After;
 import org.junit.Before;

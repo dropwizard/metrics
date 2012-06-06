@@ -1,4 +1,4 @@
-package com.yammer.metrics.guice.tests;
+package com.exampe.metrics.guice.tests;
 
 import com.yammer.metrics.annotation.Metered;
 import com.yammer.metrics.annotation.Timed;

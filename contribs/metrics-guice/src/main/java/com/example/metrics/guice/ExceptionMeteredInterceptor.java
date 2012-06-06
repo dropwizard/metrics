@@ -1,6 +1,6 @@
-package com.yammer.metrics.guice;
+package com.example.metrics.guice;
 
-import com.yammer.metrics.annotation.Metered;
+import com.yammer.metrics.annotation.ExceptionMetered;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
@@ -12,33 +12,49 @@ import java.lang.reflect.Method;
 /**
  * A method interceptor which creates a meter for the declaring class with the given name (or the
  * method's name, if none was provided), and which measures the rate at which the annotated method
- * is invoked.
+ * throws exceptions of a given type.
  */
-class MeteredInterceptor implements MethodInterceptor {
+class ExceptionMeteredInterceptor implements MethodInterceptor {
     static MethodInterceptor forMethod(MetricsRegistry metricsRegistry, Class<?> klass, Method method) {
-        final Metered annotation = method.getAnnotation(Metered.class);
+        final ExceptionMetered annotation = method.getAnnotation(ExceptionMetered.class);
         if (annotation != null) {
             final String group = MetricName.chooseGroup(annotation.group(), klass);
             final String type = MetricName.chooseType(annotation.type(), klass);
-            final String name = MetricName.chooseName(annotation.name(), method);            
+            final String name = determineName(annotation, method);
             final MetricName metricName = new MetricName(group, type, name);
             final Meter meter = metricsRegistry.newMeter(metricName,
                                                                annotation.eventType(),
                                                                annotation.rateUnit());
-            return new MeteredInterceptor(meter);
+            return new ExceptionMeteredInterceptor(meter, annotation.cause());
         }
         return null;
     }
 
-    private final Meter meter;
+    private static String determineName(ExceptionMetered annotation, Method method) {
+        if (annotation.name().isEmpty()) {
+            return method.getName() + ExceptionMetered.DEFAULT_NAME_SUFFIX;
+        } else {
+            return annotation.name();
+        }
+    }
 
-    private MeteredInterceptor(Meter meter) {
+    private final Meter meter;
+    private final Class<? extends Throwable> klass;
+
+    private ExceptionMeteredInterceptor(Meter meter, Class<? extends Throwable> klass) {
         this.meter = meter;
+        this.klass = klass;
     }
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        meter.mark();
-        return invocation.proceed();
+        try {
+            return invocation.proceed();
+        } catch (Throwable t) {
+            if (klass.isAssignableFrom(t.getClass())) {
+                meter.mark();
+            }
+            throw t;
+        }
     }
 }

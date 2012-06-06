@@ -1,4 +1,4 @@
-package com.yammer.metrics.guice;
+package com.example.metrics.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
