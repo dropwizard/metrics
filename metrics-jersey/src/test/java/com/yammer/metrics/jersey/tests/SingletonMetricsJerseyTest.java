@@ -40,7 +40,7 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
     protected AppDescriptor configure() {
         this.registry = new MetricsRegistry();
 
-        DefaultResourceConfig config = new DefaultResourceConfig();
+        final DefaultResourceConfig config = new DefaultResourceConfig();
         config.getSingletons().add(new InstrumentedResourceMethodDispatchAdapter(registry));
         config.getClasses().add(InstrumentedResource.class);
 
@@ -51,7 +51,7 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
     public void registryIsNotDefault() {
         final Timer timer1 = registry.newTimer(InstrumentedResource.class, "timed");
         final Timer timer2 = registry.newTimer(InstrumentedResource.class, "timed");
-        final Timer timer3 = Metrics.newTimer(InstrumentedResource.class, "timed");
+        final Timer timer3 = Metrics.defaultRegistry().newTimer(InstrumentedResource.class, "timed");
 
         assertThat(timer1, sameInstance(timer2));
         assertThat(timer1, not(sameInstance(timer3)));

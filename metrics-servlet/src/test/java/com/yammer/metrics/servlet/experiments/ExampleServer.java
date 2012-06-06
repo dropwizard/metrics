@@ -1,6 +1,7 @@
 package com.yammer.metrics.servlet.experiments;
 
 import com.yammer.metrics.core.Gauge;
+import com.yammer.metrics.core.MetricsRegistry;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -15,10 +16,11 @@ import com.yammer.metrics.jetty.InstrumentedSelectChannelConnector;
 import com.yammer.metrics.servlet.AdminServlet;
 
 public class ExampleServer {
-    private static final Counter COUNTER_1 = Metrics.newCounter(ExampleServer.class, "wah", "doody");
-    private static final Counter COUNTER_2 = Metrics.newCounter(ExampleServer.class, "woo");
+    private static final MetricsRegistry REGISTRY = Metrics.defaultRegistry();
+    private static final Counter COUNTER_1 = REGISTRY.newCounter(ExampleServer.class, "wah", "doody");
+    private static final Counter COUNTER_2 = REGISTRY.newCounter(ExampleServer.class, "woo");
     static {
-        Metrics.newGauge(ExampleServer.class, "boo", new Gauge<Integer>() {
+        Metrics.defaultRegistry().newGauge(ExampleServer.class, "boo", new Gauge<Integer>() {
             @Override
             public Integer getValue() {
                 throw new RuntimeException("asplode!");
