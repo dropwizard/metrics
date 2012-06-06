@@ -1,11 +1,11 @@
-package com.yammer.metrics.guice.tests;
+package com.exampe.metrics.guice.tests;
 
 import org.junit.Test;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.yammer.metrics.annotation.Timed;
-import com.yammer.metrics.guice.InstrumentationModule;
+import com.example.metrics.guice.InstrumentationModule;
 import com.yammer.metrics.reporting.JmxReporter;
 
 import static org.hamcrest.Matchers.is;

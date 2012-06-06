@@ -1,4 +1,4 @@
-package com.yammer.metrics.guice;
+package com.example.metrics.guice;
 
 import com.yammer.metrics.annotation.Timed;
 import com.yammer.metrics.core.MetricName;
@@ -9,7 +9,6 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.TimeUnit;
 
 /**
  * A method interceptor which creates a timer for the declaring class with the given name (or the
