@@ -1,12 +1,9 @@
-package com.yammer.metrics.sigar;
+package com.example.metrics.sigar;
 
 import java.util.List;
 import java.util.ArrayList;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Gauge;
 import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.util.PercentGauge;
 
 import org.hyperic.sigar.FileSystemUsage;
 import org.hyperic.sigar.Sigar;

@@ -1,18 +1,15 @@
-package com.yammer.metrics.sigar.tests;
+package com.example.metrics.sigar.tests;
 
 import java.io.File;
 import java.util.List;
 
-import com.yammer.metrics.sigar.FilesystemMetrics;
-import com.yammer.metrics.sigar.FilesystemMetrics.FileSystem;
-import com.yammer.metrics.sigar.SigarMetrics;
+import com.example.metrics.sigar.FilesystemMetrics;
+import com.example.metrics.sigar.FilesystemMetrics.FileSystem;
+import com.example.metrics.sigar.SigarMetrics;
 
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 

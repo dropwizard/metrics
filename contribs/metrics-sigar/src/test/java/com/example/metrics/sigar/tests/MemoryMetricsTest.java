@@ -1,14 +1,10 @@
-package com.yammer.metrics.sigar.tests;
+package com.example.metrics.sigar.tests;
 
-import com.yammer.metrics.sigar.MemoryMetrics;
-import com.yammer.metrics.sigar.MemoryMetrics.MainMemory;
-import com.yammer.metrics.sigar.MemoryMetrics.SwapSpace;
-import com.yammer.metrics.sigar.SigarMetrics;
+import com.example.metrics.sigar.MemoryMetrics;
+import com.example.metrics.sigar.SigarMetrics;
 
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;

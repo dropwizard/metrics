@@ -1,4 +1,4 @@
-package com.yammer.metrics.sigar;
+package com.example.metrics.sigar;
 
 import com.yammer.metrics.core.MetricsRegistry;
 

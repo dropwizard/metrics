@@ -1,8 +1,8 @@
-package com.yammer.metrics.sigar.tests;
+package com.example.metrics.sigar.tests;
 
-import com.yammer.metrics.sigar.CpuMetrics;
-import com.yammer.metrics.sigar.CpuMetrics.CpuTime;
-import com.yammer.metrics.sigar.SigarMetrics;
+import com.example.metrics.sigar.CpuMetrics;
+import com.example.metrics.sigar.CpuMetrics.CpuTime;
+import com.example.metrics.sigar.SigarMetrics;
 
 import org.junit.Test;
 
