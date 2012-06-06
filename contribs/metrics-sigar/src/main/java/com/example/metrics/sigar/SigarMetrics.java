@@ -1,4 +1,4 @@
-package com.yammer.metrics.sigar;
+package com.example.metrics.sigar;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Gauge;
