@@ -1,12 +1,6 @@
 .idea
 .settings
-lib_managed
-project/boot
 target
-META-INF
-project/plugins/project/
-project/plugins/src_managed/
-docs/build
 .classpath
 .project
 bin
