@@ -1,7 +1,7 @@
-package com.yammer.metrics.reporting.tests;
+package com.yammer.metrics.servlet.tests;
 
 import com.yammer.metrics.core.VirtualMachineMetrics;
-import com.yammer.metrics.reporting.ThreadDumpServlet;
+import com.yammer.metrics.servlet.ThreadDumpServlet;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;

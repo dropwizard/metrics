@@ -1,6 +1,10 @@
-package com.yammer.metrics.reporting;
+package com.yammer.metrics.ganglia;
 
 import com.yammer.metrics.core.*;
+import com.yammer.metrics.ganglia.GangliaMessage;
+import com.yammer.metrics.ganglia.GangliaMessageBuilder;
+import com.yammer.metrics.ganglia.GangliaReporter;
+import com.yammer.metrics.reporting.AbstractPollingReporter;
 import com.yammer.metrics.reporting.tests.AbstractPollingReporterTest;
 import com.yammer.metrics.core.MetricPredicate;
 import org.apache.commons.io.IOUtils;

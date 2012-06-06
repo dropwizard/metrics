@@ -1,5 +1,6 @@
-package com.yammer.metrics.reporting;
+package com.yammer.metrics.ganglia;
 
+import com.yammer.metrics.ganglia.GangliaMessage;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;

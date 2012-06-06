@@ -1,4 +1,4 @@
-package com.yammer.metrics.reporting;
+package com.yammer.metrics.servlet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

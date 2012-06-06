@@ -1,8 +1,8 @@
-package com.yammer.metrics.reporting.tests;
+package com.yammer.metrics.servlet.tests;
 
 import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.core.HealthCheckRegistry;
-import com.yammer.metrics.reporting.HealthCheckServlet;
+import com.yammer.metrics.servlet.HealthCheckServlet;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;

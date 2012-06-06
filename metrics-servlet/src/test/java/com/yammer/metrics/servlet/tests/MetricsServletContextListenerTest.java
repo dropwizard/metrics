@@ -1,8 +1,8 @@
-package com.yammer.metrics.reporting.tests;
+package com.yammer.metrics.servlet.tests;
 
 import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.reporting.MetricsServlet;
-import com.yammer.metrics.reporting.MetricsServletContextListener;
+import com.yammer.metrics.servlet.MetricsServlet;
+import com.yammer.metrics.servlet.MetricsServletContextListener;
 import org.junit.Test;
 
 import javax.servlet.ServletContext;

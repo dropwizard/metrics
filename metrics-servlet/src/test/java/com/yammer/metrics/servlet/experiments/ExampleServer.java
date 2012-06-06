@@ -12,7 +12,7 @@ import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.jetty.InstrumentedHandler;
 import com.yammer.metrics.jetty.InstrumentedQueuedThreadPool;
 import com.yammer.metrics.jetty.InstrumentedSelectChannelConnector;
-import com.yammer.metrics.reporting.AdminServlet;
+import com.yammer.metrics.servlet.AdminServlet;
 
 public class ExampleServer {
     private static final Counter COUNTER_1 = Metrics.newCounter(ExampleServer.class, "wah", "doody");

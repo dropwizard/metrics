@@ -1,8 +1,11 @@
-package com.yammer.metrics.reporting;
+package com.yammer.metrics.graphite;
 
 import com.yammer.metrics.core.Clock;
 import com.yammer.metrics.core.MetricPredicate;
 import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.graphite.GraphiteReporter;
+import com.yammer.metrics.graphite.SocketProvider;
+import com.yammer.metrics.reporting.AbstractPollingReporter;
 import com.yammer.metrics.reporting.tests.AbstractPollingReporterTest;
 
 import java.io.OutputStream;
