@@ -20,7 +20,8 @@ v3.0.0-SNAPSHOT
 * Upgraded to JDBI 2.34.
 * Upgraded to Ehcache 2.5.2.
 * Upgraded to Jackson 2.0.2.
-* Upgraded ot Jetty 8.1.4.
+* Upgraded to Jetty 8.1.4.
+* Upgraded to SLF4J 1.6.5.
 * Changed package names in ``metrics-ganglia``, ``metrics-graphite``, and ``metrics-servlet``.
 * Removed ``metrics-guice`` and ``metrics-spring``.
 
