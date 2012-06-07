@@ -12,6 +12,10 @@
     <name>Metrics Servlet</name>
     <packaging>bundle</packaging>
 
+    <properties>
+        <jackson.version>2.0.2</jackson.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.yammer.metrics</groupId>
@@ -25,8 +29,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
