@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
  * increment a counter signalling a thread has died and print out the name and stack trace of the
  * thread.
  * <p/>
- * This makes it easy to build alerts on unexpected Thread deaths and fine grained used quickens
+ * This makes it easy to build alerts on unexpected Thread deaths and fine-grained use quickens
  * debugging in production.
  * <p/>
  * You can also set a DeathRattleExceptionHandler as the default exception handler on all threads,
