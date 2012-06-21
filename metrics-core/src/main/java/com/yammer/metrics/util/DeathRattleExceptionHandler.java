@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * Usage is straightforward:
  * <p/>
  * <pre><code>
- * final Counter c = Metrics.newCounter(MyRunnable.class, "thread-deaths");
+ * Counter c = Metrics.newCounter(MyRunnable.class, "thread-deaths");
  * Thread.UncaughtExceptionHandler exHandler = new DeathRattleExceptionHandler(c);
  * final Thread myThread = new Thread(myRunnable, "MyRunnable");
  * myThread.setUncaughtExceptionHandler(exHandler);
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * Setting the global default exception handler should be done first, like so:
  * <p/>
  * <pre><code>
- * final Counter c = Metrics.newCounter(MyMainClass.class, "unhandled-thread-deaths");
+ * Counter c = Metrics.newCounter(MyMainClass.class, "unhandled-thread-deaths");
  * Thread.UncaughtExceptionHandler ohNoIDidntKnowAboutThis = new DeathRattleExceptionHandler(c);
  * Thread.setDefaultUncaughtExceptionHandler(ohNoIDidntKnowAboutThis);
  * </code></pre>
