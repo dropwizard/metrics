@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  * A timer metric which aggregates timing durations and provides duration statistics, plus
  * throughput statistics via {@link Meter}.
  */
-public class Timer implements Metered, Stoppable, Sampling, Summarizable {
+public class Timer extends ObservableMetric<TimerListener> implements Metered, Stoppable, Sampling, Summarizable {
 
     private final TimeUnit durationUnit, rateUnit;
     private final Meter meter;
@@ -25,8 +25,8 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      * @param durationUnit the scale unit for this timer's duration metrics
      * @param rateUnit     the scale unit for this timer's rate metrics
      */
-    Timer(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit) {
-        this(tickThread, durationUnit, rateUnit, Clock.defaultClock());
+    Timer(MetricName name, ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit) {
+        this(name, tickThread, durationUnit, rateUnit, Clock.defaultClock());
     }
 
     /**
@@ -37,10 +37,11 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      * @param rateUnit     the scale unit for this timer's rate metrics
      * @param clock        the clock used to calculate duration
      */
-    Timer(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
+    Timer(MetricName name, ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
+    	super(name);
         this.durationUnit = durationUnit;
         this.rateUnit = rateUnit;
-        this.meter = new Meter(tickThread, "calls", rateUnit, clock);
+        this.meter = new Meter(name, tickThread, "calls", rateUnit, clock);
         this.clock = clock;
         clear();
     }
@@ -74,6 +75,7 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
      */
     public void update(long duration, TimeUnit unit) {
         update(unit.toNanos(duration));
+        notifyListenersOnUpdate(duration, unit);
     }
 
     /**
@@ -209,6 +211,12 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
             meter.mark();
         }
     }
+
+    private void notifyListenersOnUpdate(long duration, TimeUnit unit) {
+		for(TimerListener l : getListenersIterable()) {
+			l.onUpdate(this, duration, unit);
+		}
+	}
 
     private double convertFromNS(double ns) {
         return ns / TimeUnit.NANOSECONDS.convert(1, durationUnit);

@@ -5,10 +5,11 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * An incrementing and decrementing counter metric.
  */
-public class Counter implements Metric {
+public class Counter extends ObservableMetric<CounterListener> implements Metric {
     private final AtomicLong count;
 
-    Counter() {
+    Counter(MetricName name) {
+    	super(name);
         this.count = new AtomicLong(0);
     }
 
@@ -26,9 +27,10 @@ public class Counter implements Metric {
      */
     public void inc(long n) {
         count.addAndGet(n);
+        notifyListenersOnUpdate(n);
     }
 
-    /**
+	/**
      * Decrement the counter by one.
      */
     public void dec() {
@@ -42,6 +44,7 @@ public class Counter implements Metric {
      */
     public void dec(long n) {
         count.addAndGet(0 - n);
+        notifyListenersOnUpdate(0 - n);
     }
 
     /**
@@ -58,10 +61,23 @@ public class Counter implements Metric {
      */
     public void clear() {
         count.set(0);
+        notifyListenersOnClear();
     }
 
     @Override
     public <T> void processWith(MetricProcessor<T> processor, MetricName name, T context) throws Exception {
         processor.processCounter(name, this, context);
     }
+
+    private void notifyListenersOnUpdate(long n) {
+		for(CounterListener l : getListenersIterable()) {
+			l.onUpdate(this, n);
+		}
+	}
+
+    private void notifyListenersOnClear() {
+		for(CounterListener l : getListenersIterable()) {
+			l.onClear(this);
+		}
+	}
 }

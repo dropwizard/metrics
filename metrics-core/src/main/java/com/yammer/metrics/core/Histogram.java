@@ -16,7 +16,8 @@ import static java.lang.Math.sqrt;
  * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately computing running
  *      variance</a>
  */
-public class Histogram implements Metric, Sampling, Summarizable {
+public class Histogram extends ObservableMetric<HistogramListener> implements Metric, Sampling, Summarizable {
+
     private static final int DEFAULT_SAMPLE_SIZE = 1028;
     private static final double DEFAULT_ALPHA = 0.015;
 
@@ -77,7 +78,16 @@ public class Histogram implements Metric, Sampling, Summarizable {
      * @param type the type of sample to use
      */
     Histogram(SampleType type) {
-        this(type.newSample());
+        this(null, type.newSample());
+    }
+
+    /**
+     * Creates a new {@link Histogram} with the given sample type.
+     *
+     * @param type the type of sample to use
+     */
+    Histogram(MetricName name, SampleType type) {
+        this(name, type.newSample());
     }
 
     /**
@@ -85,7 +95,8 @@ public class Histogram implements Metric, Sampling, Summarizable {
      *
      * @param sample the sample to create a histogram from
      */
-    Histogram(Sample sample) {
+    Histogram(MetricName name, Sample sample) {
+    	super(name);
         this.sample = sample;
         clear();
     }
@@ -100,6 +111,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
         min.set(Long.MAX_VALUE);
         sum.set(0);
         variance.set(new double[]{-1, 0});
+        notifyListenersOnClear();
     }
 
     /**
@@ -123,6 +135,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
         setMin(value);
         sum.getAndAdd(value);
         updateVariance(value);
+        notifyListenersOnUpdate(value);
     }
 
     /**
@@ -239,6 +252,18 @@ public class Histogram implements Metric, Sampling, Summarizable {
             }
         }
     }
+
+    private void notifyListenersOnUpdate(long value) {
+		for(HistogramListener l : getListenersIterable()) {
+			l.onUpdate(this, value);
+		}
+	}
+
+    private void notifyListenersOnClear() {
+		for(HistogramListener l : getListenersIterable()) {
+			l.onClear(this);
+		}
+	}
 
     @Override
     public <T> void processWith(MetricProcessor<T> processor, MetricName name, T context) throws Exception {
