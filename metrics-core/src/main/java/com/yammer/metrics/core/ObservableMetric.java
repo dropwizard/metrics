@@ -5,7 +5,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Base abstraction of a {@link Metric} that can be observed and have listeners
- * registered for change events. All methods are protected or package protected
+ * registered for change events. Most methods are protected or package protected
  * as they are meant to be called from the subclass or from the
  * {@link MetricListenersRegistry}.
  * 
@@ -23,16 +23,16 @@ public abstract class ObservableMetric<L> {
 		this.listeners = new CopyOnWriteArrayList<L>();
 	}
 
+	public MetricName getName() {
+		return name;
+	}
+
 	protected Iterable<L> getListenersIterable() {
 		return listeners;
 	}
 
 	void addListener(final L listener) {
 		listeners.add(listener);
-	}
-
-	MetricName getName() {
-		return name;
 	}
 
 	void removeAllListeners() {
