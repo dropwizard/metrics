@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * from Hadoop.
  */
 public class GangliaReporter extends AbstractPollingReporter implements MetricProcessor<String> {
-    /* for use as units parameter to sendMetricData() */
+    /* for use as metricType parameter to sendMetricData() */
     public static final String GANGLIA_INT_TYPE = "int32";
     public static final String GANGLIA_DOUBLE_TYPE = "double";
     public static final String GANGLIA_STRING_TYPE = "string";
