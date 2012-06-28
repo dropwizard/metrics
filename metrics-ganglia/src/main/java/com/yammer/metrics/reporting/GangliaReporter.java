@@ -246,7 +246,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
         super(metricsRegistry, "ganglia-reporter");
         this.gangliaMessageBuilder = gangliaMessageBuilder;
         this.groupPrefix = groupPrefix + "_";
-        this.hostLabel = buildDefaultHostLabel();
+        this.hostLabel = getDefaultHostLabel();
         this.predicate = predicate;
         this.compressPackageNames = compressPackageNames;
         this.vm = vm;
@@ -303,7 +303,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
                 .addInt(128)// metric_id = metadata_msg
                 .addString(hostName)// hostname
                 .addString(metricName)// metric name
-                .addInt(hostName == getHostLabel() ? 0 : 1)// spoof = True/1
+                .addInt(hostName.equals(getHostLabel()) ? 0 : 1)// spoof = True/1
                 .addString(metricType)// metric type
                 .addString(metricName)// metric name
                 .addString(units)// units
@@ -450,7 +450,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
         }
     }
 
-    private String buildDefaultHostLabel() {
+    String getDefaultHostLabel() {
         try {
             final InetAddress addr = InetAddress.getLocalHost();
             return addr.getHostAddress() + ":" + addr.getHostName();
