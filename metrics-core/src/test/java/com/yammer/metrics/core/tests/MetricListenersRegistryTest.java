@@ -55,8 +55,8 @@ public class MetricListenersRegistryTest {
 		StoppableCounterListener stoppableListener = mock(StoppableCounterListener.class);
 		CounterListener listener = mock(CounterListener.class);
 
-		mlRegistry.addMetricListener(stoppableListener);
-		mlRegistry.addMetricListener(listener);
+		mlRegistry.addListener(stoppableListener);
+		mlRegistry.addListener(listener);
 
 		mlRegistry.shutdown();
 
@@ -73,7 +73,7 @@ public class MetricListenersRegistryTest {
 		CounterListener listener = mock(CounterListener.class);
 		when(listener.getMetricPredicate()).thenReturn(MetricPredicate.ALL);
 
-		mlRegistry.addMetricListener(listener);
+		mlRegistry.addListener(listener);
 
 		counter0.inc(10);
 		verify(listener).onUpdate(counter0, 10);
@@ -91,7 +91,7 @@ public class MetricListenersRegistryTest {
 		verify(listener).onClear(counter1);
 
 		// remove listener
-		mlRegistry.removeMetricListener(listener);
+		mlRegistry.removeListener(listener);
 		counter0.clear();
 		verify(listener, times(1)).onClear(counter0);
 	}
@@ -124,7 +124,7 @@ public class MetricListenersRegistryTest {
 		verify(listener).onClear(histogram1);
 
 		// remove listener
-		mlRegistry.removeMetricListener(listener);
+		mlRegistry.removeListener(listener);
 		histogram0.clear();
 		verify(listener, times(1)).onClear(histogram0);
 	}
@@ -140,7 +140,7 @@ public class MetricListenersRegistryTest {
 		MeterListener listener = mock(MeterListener.class);
 		when(listener.getMetricPredicate()).thenReturn(MetricPredicate.ALL);
 
-		mlRegistry.addMetricListener(listener);
+		mlRegistry.addListener(listener);
 
 		meter0.mark(10);
 		verify(listener).onMark(meter0, 10);
@@ -152,7 +152,7 @@ public class MetricListenersRegistryTest {
 		verify(listener).onMark(meter1, 1);
 
 		// remove listener
-		mlRegistry.removeMetricListener(listener);
+		mlRegistry.removeListener(listener);
 		meter0.mark();
 
 		// only one call
@@ -170,7 +170,7 @@ public class MetricListenersRegistryTest {
 		TimerListener listener = mock(TimerListener.class);
 		when(listener.getMetricPredicate()).thenReturn(MetricPredicate.ALL);
 
-		mlRegistry.addMetricListener(listener);
+		mlRegistry.addListener(listener);
 
 		timer0.update(10, TimeUnit.MILLISECONDS);
 		verify(listener).onUpdate(timer0, 10, TimeUnit.MILLISECONDS);
@@ -182,7 +182,7 @@ public class MetricListenersRegistryTest {
 		verify(listener).onUpdate(timer1, 1, TimeUnit.SECONDS);
 
 		// remove listener
-		mlRegistry.removeMetricListener(listener);
+		mlRegistry.removeListener(listener);
 		timer0.update(10, TimeUnit.MILLISECONDS);
 
 		// only one call
@@ -206,7 +206,7 @@ public class MetricListenersRegistryTest {
 			}
 		});
 
-		mlRegistry.addMetricListener(listener);
+		mlRegistry.addListener(listener);
 
 		counter0.inc(10);
 		meter0.mark();
@@ -233,7 +233,7 @@ public class MetricListenersRegistryTest {
 		when(listener.getMetricPredicate()).thenReturn(MetricPredicate.ALL);
 
 		// this will fail to add the listener to a non-counter metric
-		mlRegistry.addMetricListener(listener);
+		mlRegistry.addListener(listener);
 	}
 
 	@Test
@@ -247,7 +247,7 @@ public class MetricListenersRegistryTest {
 		CounterListener listener = mock(CounterListener.class);
 		when(listener.getMetricPredicate()).thenReturn(MetricPredicate.ALL);
 
-		mlRegistry.addMetricListener(listener);
+		mlRegistry.addListener(listener);
 
 		// remove metric, removes all listeners too
 		mRegistry.removeMetric(name);

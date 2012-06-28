@@ -39,21 +39,21 @@ public class MetricListenersRegistry implements MetricsRegistryListener {
 		timerListeners = new CopyOnWriteArraySet<TimerListener>();
 	}
 
-	public void addMetricListener(final CounterListener counterListener) {
-		addMetricListener(Counter.class, counterListener, counterListeners);
+	public void addListener(final CounterListener counterListener) {
+		addListener(Counter.class, counterListener, counterListeners);
 	}
 
 	public void addMetricListener(final HistogramListener histogramListener) {
-		addMetricListener(Histogram.class, histogramListener,
+		addListener(Histogram.class, histogramListener,
 				histogramListeners);
 	}
 
-	public void addMetricListener(final MeterListener meterListener) {
-		addMetricListener(Meter.class, meterListener, meterListeners);
+	public void addListener(final MeterListener meterListener) {
+		addListener(Meter.class, meterListener, meterListeners);
 	}
 
-	public void addMetricListener(final TimerListener timerListener) {
-		addMetricListener(Timer.class, timerListener, timerListeners);
+	public void addListener(final TimerListener timerListener) {
+		addListener(Timer.class, timerListener, timerListeners);
 	}
 
 	@Override
@@ -81,20 +81,20 @@ public class MetricListenersRegistry implements MetricsRegistryListener {
 		}
 	}
 
-	public void removeMetricListener(final CounterListener counterListener) {
-		removeMetricListener(counterListener, counterListeners);
+	public void removeListener(final CounterListener counterListener) {
+		removeListener(counterListener, counterListeners);
 	}
 
-	public void removeMetricListener(final HistogramListener histogramListener) {
-		removeMetricListener(histogramListener, histogramListeners);
+	public void removeListener(final HistogramListener histogramListener) {
+		removeListener(histogramListener, histogramListeners);
 	}
 
-	public void removeMetricListener(final MeterListener meterListener) {
-		removeMetricListener(meterListener, meterListeners);
+	public void removeListener(final MeterListener meterListener) {
+		removeListener(meterListener, meterListeners);
 	}
 
-	public void removeMetricListener(final TimerListener timerListener) {
-		removeMetricListener(timerListener, timerListeners);
+	public void removeListener(final TimerListener timerListener) {
+		removeListener(timerListener, timerListeners);
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class MetricListenersRegistry implements MetricsRegistryListener {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <M extends Metric, L extends MetricListener> void addMetricListener(
+	private <M extends Metric, L extends MetricListener> void addListener(
 			final Class<M> metricType, final L metricListener,
 			final Set<L> metricListeners) {
 
@@ -160,7 +160,7 @@ public class MetricListenersRegistry implements MetricsRegistryListener {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <L extends MetricListener> void removeMetricListener(
+	private <L extends MetricListener> void removeListener(
 			final L metricListener, final Set<L> metricListeners) {
 
 		if (!metricListeners.remove(metricListener)) {
