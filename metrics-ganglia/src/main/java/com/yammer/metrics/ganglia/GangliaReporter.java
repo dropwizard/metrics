@@ -298,7 +298,18 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
         sendMetricData(getHostLabel(), metricType, metricName, metricValue, groupName, units);
     }
 
-    /* allow subclasses to override more message behavior */
+    /**
+     * allow subclasses to send UDP metrics directly, unchecked.
+     * <b>note:</b> hostName <u>must</u> be in the format IP:HOST
+     * (ex: 127.0.0.0:my.host.name) or ganglia will drop the packet.
+     * no parameters are permitted to be null.
+     *
+     * @param hostName IP:HOST formatted string
+     * @param metricType "int32", "double", "float", etc
+     * @param metricName name of metric
+     * @param groupName correlates with ganglia cluster names.
+     * @param units unit of measure.  empty string is OK.
+     */
     protected void sendMetricData(String hostName, String metricType, String metricName, String metricValue, String groupName, String units) throws IOException {
         this.gangliaMessageBuilder.newMessage()
                 .addInt(128)// metric_id = metadata_msg
