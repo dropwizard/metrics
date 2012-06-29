@@ -5,8 +5,8 @@ package com.yammer.metrics.core;
  * stopped.
  */
 public interface Stoppable {
-	/**
-	 * Stop the instance.
-	 */
-	void stop();
+    /**
+     * Stop the instance.
+     */
+    void stop();
 }

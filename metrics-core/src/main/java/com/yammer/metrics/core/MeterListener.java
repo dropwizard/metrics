@@ -5,15 +5,14 @@ package com.yammer.metrics.core;
  */
 public interface MeterListener extends MetricListener {
 
-	/**
-	 * Called after any of the mark events, {@link Meter#mark()} or
-	 * {@link Meter#mark(long)}.
-	 * 
-	 * @param meter
-	 *            the {@link Meter} whose state has changed
-	 * @param n
-	 *            the number of events that have been marked on the
-	 *            {@link Meter}
-	 */
-	void onMark(Meter meter, long n);
+    /**
+     * Called after any of the mark events, {@link Meter#mark()} or
+     * {@link Meter#mark(long)}.
+     * 
+     * @param meter
+     *        the {@link Meter} whose state has changed
+     * @param n
+     *        the number of events that have been marked on the {@link Meter}
+     */
+    void onMark(Meter meter, long n);
 }

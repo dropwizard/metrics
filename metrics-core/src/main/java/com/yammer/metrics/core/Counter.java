@@ -9,7 +9,7 @@ public class Counter extends ObservableMetric<CounterListener> implements Metric
     private final AtomicLong count;
 
     Counter(MetricName name) {
-    	super(name);
+        super(name);
         this.count = new AtomicLong(0);
     }
 
@@ -30,7 +30,7 @@ public class Counter extends ObservableMetric<CounterListener> implements Metric
         notifyListenersOnUpdate(n);
     }
 
-	/**
+    /**
      * Decrement the counter by one.
      */
     public void dec() {

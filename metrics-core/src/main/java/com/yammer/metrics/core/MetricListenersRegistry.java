@@ -13,183 +13,182 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class MetricListenersRegistry implements MetricsRegistryListener {
 
-	private static final int EXPECTED_METRIC_COUNT = 1024;
+    private static final int EXPECTED_METRIC_COUNT = 1024;
 
-	private final ConcurrentMap<MetricName, Metric> metrics;
+    private final ConcurrentMap<MetricName, Metric> metrics;
 
-	private final Set<CounterListener> counterListeners;
+    private final Set<CounterListener> counterListeners;
 
-	private final Set<HistogramListener> histogramListeners;
+    private final Set<HistogramListener> histogramListeners;
 
-	private final Set<MeterListener> meterListeners;
+    private final Set<MeterListener> meterListeners;
 
-	private final Set<TimerListener> timerListeners;
+    private final Set<TimerListener> timerListeners;
 
-	/**
-	 * Default constructor. After instantiation, this should be registered with
-	 * {@link MetricsRegistry#addListener(MetricsRegistryListener)}.
-	 */
-	public MetricListenersRegistry() {
-		metrics = new ConcurrentHashMap<MetricName, Metric>(
-				EXPECTED_METRIC_COUNT);
+    /**
+     * Default constructor. After instantiation, this should be registered with
+     * {@link MetricsRegistry#addListener(MetricsRegistryListener)}.
+     */
+    public MetricListenersRegistry() {
+        metrics = new ConcurrentHashMap<MetricName, Metric>(
+                EXPECTED_METRIC_COUNT);
 
-		counterListeners = new CopyOnWriteArraySet<CounterListener>();
-		histogramListeners = new CopyOnWriteArraySet<HistogramListener>();
-		meterListeners = new CopyOnWriteArraySet<MeterListener>();
-		timerListeners = new CopyOnWriteArraySet<TimerListener>();
-	}
+        counterListeners = new CopyOnWriteArraySet<CounterListener>();
+        histogramListeners = new CopyOnWriteArraySet<HistogramListener>();
+        meterListeners = new CopyOnWriteArraySet<MeterListener>();
+        timerListeners = new CopyOnWriteArraySet<TimerListener>();
+    }
 
-	public void addListener(final CounterListener counterListener) {
-		addListener(Counter.class, counterListener, counterListeners);
-	}
+    public void addListener(final CounterListener counterListener) {
+        addListener(Counter.class, counterListener, counterListeners);
+    }
 
-	public void addMetricListener(final HistogramListener histogramListener) {
-		addListener(Histogram.class, histogramListener,
-				histogramListeners);
-	}
+    public void addListener(final MeterListener meterListener) {
+        addListener(Meter.class, meterListener, meterListeners);
+    }
 
-	public void addListener(final MeterListener meterListener) {
-		addListener(Meter.class, meterListener, meterListeners);
-	}
+    public void addListener(final TimerListener timerListener) {
+        addListener(Timer.class, timerListener, timerListeners);
+    }
 
-	public void addListener(final TimerListener timerListener) {
-		addListener(Timer.class, timerListener, timerListeners);
-	}
+    public void addMetricListener(final HistogramListener histogramListener) {
+        addListener(Histogram.class, histogramListener, histogramListeners);
+    }
 
-	@Override
-	public void onMetricAdded(final MetricName name, final Metric metric) {
+    @Override
+    public void onMetricAdded(final MetricName name, final Metric metric) {
 
-		metrics.put(name, metric);
+        metrics.put(name, metric);
 
-		if (metric instanceof Counter) {
-			onMetricAdded(name, metric, counterListeners);
-		} else if (metric instanceof Histogram) {
-			onMetricAdded(name, metric, histogramListeners);
-		} else if (metric instanceof Meter) {
-			onMetricAdded(name, metric, meterListeners);
-		} else if (metric instanceof Timer) {
-			onMetricAdded(name, metric, timerListeners);
-		}
-	}
+        if (metric instanceof Counter) {
+            onMetricAdded(name, metric, counterListeners);
+        } else if (metric instanceof Histogram) {
+            onMetricAdded(name, metric, histogramListeners);
+        } else if (metric instanceof Meter) {
+            onMetricAdded(name, metric, meterListeners);
+        } else if (metric instanceof Timer) {
+            onMetricAdded(name, metric, timerListeners);
+        }
+    }
 
-	@Override
-	public void onMetricRemoved(final MetricName name) {
+    @Override
+    public void onMetricRemoved(final MetricName name) {
 
-		Metric metric = metrics.get(name);
-		if (metric instanceof ObservableMetric<?>) {
-			((ObservableMetric<?>) metric).removeAllListeners();
-		}
-	}
+        Metric metric = metrics.get(name);
+        if (metric instanceof ObservableMetric<?>) {
+            ((ObservableMetric<?>) metric).removeAllListeners();
+        }
+    }
 
-	public void removeListener(final CounterListener counterListener) {
-		removeListener(counterListener, counterListeners);
-	}
+    public void removeListener(final CounterListener counterListener) {
+        removeListener(counterListener, counterListeners);
+    }
 
-	public void removeListener(final HistogramListener histogramListener) {
-		removeListener(histogramListener, histogramListeners);
-	}
+    public void removeListener(final HistogramListener histogramListener) {
+        removeListener(histogramListener, histogramListeners);
+    }
 
-	public void removeListener(final MeterListener meterListener) {
-		removeListener(meterListener, meterListeners);
-	}
+    public void removeListener(final MeterListener meterListener) {
+        removeListener(meterListener, meterListeners);
+    }
 
-	public void removeListener(final TimerListener timerListener) {
-		removeListener(timerListener, timerListeners);
-	}
+    public void removeListener(final TimerListener timerListener) {
+        removeListener(timerListener, timerListeners);
+    }
 
-	/**
-	 * Shut down all stoppable listeners. Allows them to cleanup thread pools,
-	 * open connections, etc.
-	 */
-	public void shutdown() {
-		shutdownListeners(counterListeners);
-		shutdownListeners(histogramListeners);
-		shutdownListeners(meterListeners);
-		shutdownListeners(timerListeners);
-	}
+    /**
+     * Shut down all stoppable listeners. Allows them to cleanup thread pools,
+     * open connections, etc.
+     */
+    public void shutdown() {
+        shutdownListeners(counterListeners);
+        shutdownListeners(histogramListeners);
+        shutdownListeners(meterListeners);
+        shutdownListeners(timerListeners);
+    }
 
-	@SuppressWarnings("unchecked")
-	private <M extends Metric, L extends MetricListener> void addListener(
-			final Class<M> metricType, final L metricListener,
-			final Set<L> metricListeners) {
+    @SuppressWarnings("unchecked")
+    private <M extends Metric, L extends MetricListener> void addListener(
+            final Class<M> metricType, final L metricListener,
+            final Set<L> metricListeners) {
 
-		if (!metricListeners.add(metricListener)) {
-			// already registered
-			return;
-		}
+        if (!metricListeners.add(metricListener)) {
+            // already registered
+            return;
+        }
 
-		// add listener to existing metrics that match the MetricPredicate
-		for (Entry<MetricName, Metric> entry : metrics.entrySet()) {
+        // add listener to existing metrics that match the MetricPredicate
+        for (Entry<MetricName, Metric> entry : metrics.entrySet()) {
 
-			MetricName name = entry.getKey();
-			Metric metric = entry.getValue();
+            MetricName name = entry.getKey();
+            Metric metric = entry.getValue();
 
-			if (metricListener.getMetricPredicate().matches(name, metric)) {
+            if (metricListener.getMetricPredicate().matches(name, metric)) {
 
-				// sanity check of the listener's MetricPredicate
-				if (metric instanceof ObservableMetric<?>
-						&& metricType.isAssignableFrom(metric.getClass())) {
-					((ObservableMetric<L>) metric).addListener(metricListener);
-				} else {
-					// something is wrong in the listener's MetricsPredicate
-					throw new IllegalStateException(
-							"Cannot register a listener since the MetricPredicate is not strict enough against checking for the right metric type. "
-									+ "For example, a CounterListener's MetricPredicate should not match a Meter. "
-									+ "Please double check the MetricPredicate returned from the listener class: "
-									+ metricListener.getClass());
-				}
-			}
-		}
-	}
+                // sanity check of the listener's MetricPredicate
+                if (metric instanceof ObservableMetric<?>
+                        && metricType.isAssignableFrom(metric.getClass())) {
+                    ((ObservableMetric<L>) metric).addListener(metricListener);
+                } else {
+                    // something is wrong in the listener's MetricsPredicate
+                    throw new IllegalStateException(
+                            "Cannot register a listener since the MetricPredicate is not strict enough against checking for the right metric type. "
+                                    + "For example, a CounterListener's MetricPredicate should not match a Meter. "
+                                    + "Please double check the MetricPredicate returned from the listener class: "
+                                    + metricListener.getClass());
+                }
+            }
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	private <L extends MetricListener> void onMetricAdded(
-			final MetricName name, final Metric metric,
-			final Set<L> metricListeners) {
+    @SuppressWarnings("unchecked")
+    private <L extends MetricListener> void onMetricAdded(
+            final MetricName name, final Metric metric,
+            final Set<L> metricListeners) {
 
-		if (!(metric instanceof ObservableMetric<?>)) {
-			return;
-		}
+        if (!(metric instanceof ObservableMetric<?>)) {
+            return;
+        }
 
-		// add existing listeners to new metric
-		for (L l : metricListeners) {
-			if (l.getMetricPredicate().matches(name, metric)) {
-				((ObservableMetric<L>) metric).addListener(l);
-			}
-		}
-	}
+        // add existing listeners to new metric
+        for (L l : metricListeners) {
+            if (l.getMetricPredicate().matches(name, metric)) {
+                ((ObservableMetric<L>) metric).addListener(l);
+            }
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	private <L extends MetricListener> void removeListener(
-			final L metricListener, final Set<L> metricListeners) {
+    @SuppressWarnings("unchecked")
+    private <L extends MetricListener> void removeListener(
+            final L metricListener, final Set<L> metricListeners) {
 
-		if (!metricListeners.remove(metricListener)) {
-			// never existed anyways
-			return;
-		}
+        if (!metricListeners.remove(metricListener)) {
+            // never existed anyways
+            return;
+        }
 
-		// remove listener from existing metrics that match the MetricPredicate
-		for (Entry<MetricName, Metric> entry : metrics.entrySet()) {
+        // remove listener from existing metrics that match the MetricPredicate
+        for (Entry<MetricName, Metric> entry : metrics.entrySet()) {
 
-			MetricName name = entry.getKey();
-			Metric metric = entry.getValue();
+            MetricName name = entry.getKey();
+            Metric metric = entry.getValue();
 
-			if (metricListener.getMetricPredicate().matches(name, metric)) {
-				if (metric instanceof ObservableMetric<?>) {
-					((ObservableMetric<L>) metric)
-							.removeListener(metricListener);
-				}
-			}
-		}
-	}
+            if (metricListener.getMetricPredicate().matches(name, metric)) {
+                if (metric instanceof ObservableMetric<?>) {
+                    ((ObservableMetric<L>) metric)
+                            .removeListener(metricListener);
+                }
+            }
+        }
+    }
 
-	private <L extends MetricListener> void shutdownListeners(
-			final Set<L> listeners) {
+    private <L extends MetricListener> void shutdownListeners(
+            final Set<L> listeners) {
 
-		for (L listener : listeners) {
-			if (listener instanceof Stoppable) {
-				((Stoppable) listener).stop();
-			}
-		}
-	}
+        for (L listener : listeners) {
+            if (listener instanceof Stoppable) {
+                ((Stoppable) listener).stop();
+            }
+        }
+    }
 }
