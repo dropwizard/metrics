@@ -96,7 +96,7 @@ public class Histogram extends ObservableMetric<HistogramListener> implements Me
      * @param sample the sample to create a histogram from
      */
     Histogram(MetricName name, Sample sample) {
-    	super(name);
+        super(name);
         this.sample = sample;
         clear();
     }
