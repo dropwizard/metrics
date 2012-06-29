@@ -70,14 +70,14 @@ public class Counter extends ObservableMetric<CounterListener> implements Metric
     }
 
     private void notifyListenersOnUpdate(long n) {
-		for(CounterListener l : getListenersIterable()) {
-			l.onUpdate(this, n);
-		}
-	}
+        for (CounterListener l : getListenersIterable()) {
+            l.onUpdate(this, n);
+        }
+    }
 
     private void notifyListenersOnClear() {
-		for(CounterListener l : getListenersIterable()) {
-			l.onClear(this);
-		}
-	}
+        for (CounterListener l : getListenersIterable()) {
+            l.onClear(this);
+        }
+    }
 }

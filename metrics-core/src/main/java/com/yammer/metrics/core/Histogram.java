@@ -253,20 +253,20 @@ public class Histogram extends ObservableMetric<HistogramListener> implements Me
         }
     }
 
-    private void notifyListenersOnUpdate(long value) {
-		for(HistogramListener l : getListenersIterable()) {
-			l.onUpdate(this, value);
-		}
-	}
-
-    private void notifyListenersOnClear() {
-		for(HistogramListener l : getListenersIterable()) {
-			l.onClear(this);
-		}
-	}
-
     @Override
     public <T> void processWith(MetricProcessor<T> processor, MetricName name, T context) throws Exception {
         processor.processHistogram(name, this, context);
+    }
+    
+    private void notifyListenersOnUpdate(long value) {
+        for (HistogramListener l : getListenersIterable()) {
+            l.onUpdate(this, value);
+        }
+    }
+
+    private void notifyListenersOnClear() {
+        for (HistogramListener l : getListenersIterable()) {
+            l.onClear(this);
+        }
     }
 }

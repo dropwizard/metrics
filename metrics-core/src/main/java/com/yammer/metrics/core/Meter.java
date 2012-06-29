@@ -37,7 +37,7 @@ public class Meter extends ObservableMetric<MeterListener> implements Metered, S
      * @param clock      the clock to use for the meter ticks
      */
     Meter(MetricName name, ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit, Clock clock) {
-    	super(name);
+        super(name);
         this.rateUnit = rateUnit;
         this.eventType = eventType;
         this.future = tickThread.scheduleAtFixedRate(new Runnable() {
@@ -130,10 +130,10 @@ public class Meter extends ObservableMetric<MeterListener> implements Metered, S
     }
 
     private void notifyListenersOnMark(long n) {
-		for(MeterListener l : getListenersIterable()) {
-			l.onMark(this, n);
-		}
-	}
+        for (MeterListener l : getListenersIterable()) {
+            l.onMark(this, n);
+        }
+    }
 
     private double convertNsRate(double ratePerNs) {
         return ratePerNs * (double) rateUnit.toNanos(1);

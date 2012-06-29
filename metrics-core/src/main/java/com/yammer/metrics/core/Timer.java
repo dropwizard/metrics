@@ -38,7 +38,7 @@ public class Timer extends ObservableMetric<TimerListener> implements Metered, S
      * @param clock        the clock used to calculate duration
      */
     Timer(MetricName name, ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
-    	super(name);
+        super(name);
         this.durationUnit = durationUnit;
         this.rateUnit = rateUnit;
         this.meter = new Meter(name, tickThread, "calls", rateUnit, clock);
@@ -213,10 +213,10 @@ public class Timer extends ObservableMetric<TimerListener> implements Metered, S
     }
 
     private void notifyListenersOnUpdate(long duration, TimeUnit unit) {
-		for(TimerListener l : getListenersIterable()) {
-			l.onUpdate(this, duration, unit);
-		}
-	}
+        for (TimerListener l : getListenersIterable()) {
+            l.onUpdate(this, duration, unit);
+        }
+    }
 
     private double convertFromNS(double ns) {
         return ns / TimeUnit.NANOSECONDS.convert(1, durationUnit);
