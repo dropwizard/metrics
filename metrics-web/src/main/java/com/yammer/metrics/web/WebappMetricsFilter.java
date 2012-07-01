@@ -28,7 +28,6 @@ public abstract class WebappMetricsFilter implements Filter {
     private Counter activeRequests;
     private Timer requestTimer;
 
-
     /**
      * Creates a new instance of the filter.
      *
@@ -47,23 +46,28 @@ public abstract class WebappMetricsFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         final MetricsRegistry metricsRegistry = getMetricsFactory(filterConfig);
+        final String groupName =
+                getInitParameter("name.group", getClass().getPackage().getName(), filterConfig);
+        final String typeName =
+                getInitParameter("name.type", getClass().getSimpleName(), filterConfig);
 
         this.metersByStatusCode = new ConcurrentHashMap<Integer, Meter>(meterNamesByStatusCode
                 .size());
         for (Entry<Integer, String> entry : meterNamesByStatusCode.entrySet()) {
             metersByStatusCode.put(entry.getKey(),
-                    metricsRegistry.newMeter(WebappMetricsFilter.class,
-                            entry.getValue(),
+                    metricsRegistry.newMeter(
+                            new MetricName(groupName, typeName, entry.getValue()),
                             "responses",
                             TimeUnit.SECONDS));
         }
-        this.otherMeter = metricsRegistry.newMeter(WebappMetricsFilter.class,
-                otherMetricName,
+        this.otherMeter = metricsRegistry.newMeter(
+                new MetricName(groupName, typeName, otherMetricName),
                 "responses",
                 TimeUnit.SECONDS);
-        this.activeRequests = metricsRegistry.newCounter(WebappMetricsFilter.class, "activeRequests");
-        this.requestTimer = metricsRegistry.newTimer(WebappMetricsFilter.class,
-                "requests",
+        this.activeRequests = metricsRegistry.newCounter(
+                new MetricName(groupName, typeName, "activeRequests"));
+        this.requestTimer = metricsRegistry.newTimer(
+                new MetricName(groupName, typeName, "requests"),
                 TimeUnit.MILLISECONDS,
                 TimeUnit.SECONDS);
 
@@ -79,6 +83,16 @@ public abstract class WebappMetricsFilter implements Filter {
             metricsRegistry = Metrics.defaultRegistry();
         }
         return metricsRegistry;
+    }
+
+    private String getInitParameter(String key, String defaultValue, FilterConfig filterConfig) {
+
+        final String value = filterConfig.getInitParameter(key);
+        if (value == null || value.trim().isEmpty()) {
+            return defaultValue;
+        } else {
+            return value;
+        }
     }
 
     @Override

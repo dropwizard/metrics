@@ -10,6 +10,15 @@ import java.util.Map;
  * <filter>
  *     <filter-name>webappMetricsFilter</filter-name>
  *     <filter-class>com.yammer.metrics.web.DefaultWebappMetricsFilter</filter-class>
+ *     <!-- init params are optional -->
+ *     <init-param>
+ *         <param-name>name.group</param-name>
+ *         <param-value>com.mycompany</param-value>
+ *     </init-param>
+ *     <init-param>
+ *         <param-name>name.type</param-name>
+ *         <param-value>http</param-value>
+ *     </init-param>
  * </filter>
  * <filter-mapping>
  *     <filter-name>webappMetricsFilter</filter-name>
