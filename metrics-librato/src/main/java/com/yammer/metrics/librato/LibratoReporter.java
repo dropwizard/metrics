@@ -79,8 +79,7 @@ public class LibratoReporter extends AbstractPollingReporter implements MetricPr
         try {
             batch.post(builder, source, TimeUnit.MILLISECONDS.toSeconds(Clock.defaultClock().getTime()));
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.info("Librato post failed: ", e);
+            LOG.error("Librato post failed: ", e);
         }
     }
 
@@ -98,7 +97,7 @@ public class LibratoReporter extends AbstractPollingReporter implements MetricPr
                     try {
                         metric.processWith(this, subEntry.getKey(), batch);
                     } catch (Exception e) {
-                        LOG.error("Error reporting regular metrics:", e);
+                        LOG.error("Error processing regular metrics:", e);
                     }
                 }
             }
