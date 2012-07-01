@@ -234,11 +234,8 @@ public class LibratoReporter extends AbstractPollingReporter implements MetricPr
      * @param builder a LibratoReporter.Builder
      * @param interval the interval at which the metrics are to be reporter
      * @param unit the timeunit for interval
-     *
-     * the timeout is set to be almost as long as the interval, thus allowing excessive time for publishing in most
-     * cases without causing a hung http request to prevent further metrics from being published
      */
     public static void enable(Builder builder, long interval, TimeUnit unit) {
-        builder.setTimeout((long)Math.floor(interval * .9), unit).build().start(interval, unit);
+        builder.build().start(interval, unit);
     }
 }
