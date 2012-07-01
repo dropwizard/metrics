@@ -11,7 +11,7 @@ import java.util.Map;
  *
  * See http://dev.librato.com/v1/post/metrics for why some fields are optional
  */
-public class MultiSampleGaugeMeasurement implements GaugeMeasurement {
+public class MultiSampleGaugeMeasurement implements Measurement {
     private final String name;
     private final Number count;
     private final Number sum;

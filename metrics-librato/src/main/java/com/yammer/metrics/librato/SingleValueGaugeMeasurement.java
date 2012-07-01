@@ -11,7 +11,7 @@ import java.util.Map;
  *
  * See http://dev.librato.com/v1/post/metrics for an explanation of basic vs multi-sample gauge
  */
-public class SingleValueGaugeMeasurement implements GaugeMeasurement {
+public class SingleValueGaugeMeasurement implements Measurement {
 
     private final String name;
     private final Number reading;
