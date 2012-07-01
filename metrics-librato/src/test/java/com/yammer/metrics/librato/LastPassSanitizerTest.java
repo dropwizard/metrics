@@ -31,6 +31,5 @@ public class LastPassSanitizerTest {
         assertFalse(sanitized.contains("("));
         assertFalse(sanitized.contains(")"));
         assertFalse(sanitized.contains("*"));
-        System.out.println(sanitized);
     }
 }

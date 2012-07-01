@@ -89,17 +89,14 @@ public class LibratoBatch {
         resultJson.put("gauges", gaugeData);
         postPortion(builder, resultJson);
         LOG.debug("Posted %d measurements", counter);
-        System.out.println(String.format("Posted %d measurements", counter));
     }
 
     private void postPortion(AsyncHttpClient.BoundRequestBuilder builder, Map<String, Object> chunk) {
         try {
             String chunkStr = mapper.writeValueAsString(chunk);
-            System.out.println(chunkStr);
             builder.setBody(chunkStr);
             Future<Response> response = builder.execute();
             Response result = response.get(timeout, timeoutUnit);
-            System.out.println(result.getStatusCode());
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("Unable to post to Librato API", e);
