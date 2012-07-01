@@ -64,8 +64,8 @@ public class LibratoUtil {
         public String apply(String name);
     }
 
-    private static Pattern disallowed = Pattern.compile("([^A-Za-z0-9.:-_]|[\\[\\]])");
-    private static int LENGTH_LIMIT = 256;
+    private static final Pattern disallowed = Pattern.compile("([^A-Za-z0-9.:-_]|[\\[\\]])");
+    private static final int LENGTH_LIMIT = 256;
 
     /**
      * Metric names restrictions are described <a href="http://dev.librato.com/v1/metrics">here</a>.
