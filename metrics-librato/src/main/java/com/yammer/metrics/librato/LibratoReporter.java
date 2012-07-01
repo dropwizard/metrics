@@ -169,52 +169,105 @@ public class LibratoReporter extends AbstractPollingReporter implements MetricPr
             this.source = source;
         }
 
+        /**
+         * publish to a custom URL (for internal testing)
+         * @param apiUrl custom API endpoint to use
+         * @return itself
+         */
         public Builder setApiUrl(String apiUrl) {
             this.apiUrl = apiUrl;
             return this;
         }
 
+        /**
+         * set the HTTP timeout for a publishing attempt
+         * @param timeout duration to expect a response
+         * @param timeoutUnit unit for duration
+         * @return itself
+         */
         public Builder setTimeout(long timeout, TimeUnit timeoutUnit) {
             this.timeout = timeout;
             this.timeoutUnit = timeoutUnit;
             return this;
         }
 
+        /**
+         * Specify a custom name for this reporter
+         * @param name the name to be used
+         * @return itself
+         */
         public Builder setName(String name) {
             this.name = name;
             return this;
         }
 
+        /**
+         * Use a custom sanitizer. All metric names are run through a sanitizer to ensure validity before being sent
+         * along. Librato places some restrictions on the characters allowed in keys, so all keys are ultimately run
+         * through LibratoUtil.lastPassSanitizer. Specifying an additional sanitizer (that runs before lastPassSanitizer)
+         * allows the user to customize what they want done about invalid characters and excessively long metric names.
+         * @param sanitizer the custom sanitizer to use  (defaults to a noop sanitizer).
+         * @return itself
+         */
         public Builder setSanitizer(LibratoUtil.Sanitizer sanitizer) {
             this.sanitizer = sanitizer;
             return this;
         }
 
+        /**
+         * override default MetricsRegistry
+         * @param registry registry to be used
+         * @return itself
+         */
         public Builder setRegistry(MetricsRegistry registry) {
             this.registry = registry;
             return this;
         }
 
+        /**
+         * Filter the metrics that this particular reporter publishes
+         * @param predicate the predicate by which the metrics are to be filtered
+         * @return itself
+         */
         public Builder setPredicate(MetricPredicate predicate) {
             this.predicate = predicate;
             return this;
         }
 
+        /**
+         * use a custom clock
+         * @param clock to be used
+         * @return itself
+         */
         public Builder setClock(Clock clock) {
             this.clock = clock;
             return this;
         }
 
+        /**
+         * use a custom instance of VirtualMachineMetrics
+         * @param vm the instance to use
+         * @return itself
+         */
         public Builder setVm(VirtualMachineMetrics vm) {
             this.vm = vm;
             return this;
         }
 
+        /**
+         * turn on/off reporting of VM internal metrics (if, for example, you already get those elsewhere)
+         * @param reportVmMetrics true (report) or false (don't report)
+         * @return itself
+         */
         public Builder setReportVmMetrics(boolean reportVmMetrics) {
             this.reportVmMetrics = reportVmMetrics;
             return this;
         }
 
+        /**
+         * Build the LibratoReporter as configured by this Builder
+         * @return a fully configured LibratoReporter
+         */
         public LibratoReporter build() {
             return new LibratoReporter(new Realm.RealmBuilder().setPrincipal(username).setPassword(token).build(),
                     apiUrl, name, sanitizer, source, timeout, timeoutUnit,
