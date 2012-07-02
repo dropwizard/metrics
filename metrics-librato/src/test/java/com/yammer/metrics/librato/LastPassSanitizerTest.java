@@ -1,7 +1,8 @@
 package com.yammer.metrics.librato;
 
-import org.junit.Before;
 import org.junit.Test;
+
+import java.util.*;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -19,17 +20,34 @@ public class LastPassSanitizerTest {
     @Test
     public void testRemovingIllegalMethods() throws Exception {
         LibratoUtil.Sanitizer sanitizer = LibratoUtil.lastPassSanitizer;
-        String testString = "ccaaaaaaaaaa$$$aaaaaaa$aaaaaaaaaaaaa$aaaaaaaaaaaaaaa[aaaaaaaa][aaaaaaaaaaa(aaaaa**aaaa(((aaaaaaaaa++++aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab";
-        String sanitized = sanitizer.apply(testString);
+        String important = "reallyclutchinfo";
+
+        List<String> illegalCharacters = new ArrayList<String>();
+        illegalCharacters.add("$");
+        illegalCharacters.add("]");
+        illegalCharacters.add("[");
+        illegalCharacters.add("*");
+        illegalCharacters.add("+");
+
+        StringBuilder testStringBuilder = new StringBuilder();
+
+        testStringBuilder.append("com.less.important.nonunique.prefix.");
+
+        for (int i = 0; i < 16; i++) {
+            Collections.shuffle(illegalCharacters);
+            testStringBuilder.append(important);
+            testStringBuilder.append(illegalCharacters.get(0));
+        }
+
+        String key = testStringBuilder.toString();
+
+        String sanitized = sanitizer.apply(key);
 
         assertEquals(256, sanitized.length());
-        assertEquals("a", sanitized.substring(0, 1));
-        assertEquals("b", sanitized.substring(255, 256));
-        assertFalse(sanitized.contains("["));
-        assertFalse(sanitized.contains("]"));
-        assertFalse(sanitized.contains("$"));
-        assertFalse(sanitized.contains("("));
-        assertFalse(sanitized.contains(")"));
-        assertFalse(sanitized.contains("*"));
+        assertEquals("reallyclutchinfo", sanitized.substring(0, 16));
+        assertEquals("reallyclutchinfo", sanitized.substring(240, 256));
+        for (String illegalCharacter : illegalCharacters) {
+            assertFalse("Key still contains illegal character " + illegalCharacter, sanitized.contains(illegalCharacter));
+        }
     }
 }
