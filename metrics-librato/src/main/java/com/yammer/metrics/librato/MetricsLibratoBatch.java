@@ -21,7 +21,7 @@ public class MetricsLibratoBatch extends LibratoBatch {
     }
 
     public void addSummarizable(String name, Summarizable summarizable) {
-        // TODO: I bet sum_squares can also be calculated, but I'm too fucking tired for wikipedia right now
+        // TODO: add sum_squares if/when Summarizble exposes it
         addMeasurement(new MultiSampleGaugeMeasurement(name, summarizable.getMax(), summarizable.getMin(), summarizable.getSum() / summarizable.getMean(), summarizable.getSum(), null));
     }
 
