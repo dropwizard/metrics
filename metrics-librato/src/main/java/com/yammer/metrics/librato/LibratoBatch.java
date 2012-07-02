@@ -1,21 +1,14 @@
 package com.yammer.metrics.librato;
 
 import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Realm;
 import com.ning.http.client.Response;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * User: mihasya
@@ -65,7 +58,10 @@ public class LibratoBatch {
         List<Map<String, Object>> counterData = new ArrayList<Map<String, Object>>();
 
         int counter = 0;
-        for (Measurement measurement : measurements) {
+
+        Iterator<Measurement> measurementIterator = measurements.iterator();
+        while (measurementIterator.hasNext()) {
+            Measurement measurement = measurementIterator.next();
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("name", measurement.getName());
             data.putAll(measurement.toMap());
@@ -75,7 +71,7 @@ public class LibratoBatch {
                 gaugeData.add(data);
             }
             counter++;
-            if (counter % postBatchSize == 0) {
+            if (counter % postBatchSize == 0 || !measurementIterator.hasNext()) {
                 resultJson.put("counters", counterData);
                 resultJson.put("gauges", gaugeData);
                 postPortion(builder , resultJson);
@@ -85,9 +81,6 @@ public class LibratoBatch {
                 counterData = new ArrayList<Map<String, Object>>();
             }
         }
-        resultJson.put("counters", counterData);
-        resultJson.put("gauges", gaugeData);
-        postPortion(builder, resultJson);
         LOG.debug("Posted %d measurements", counter);
     }
 
@@ -98,7 +91,6 @@ public class LibratoBatch {
             Future<Response> response = builder.execute();
             Response result = response.get(timeout, timeoutUnit);
         } catch (Exception e) {
-            e.printStackTrace();
             LOG.error("Unable to post to Librato API", e);
         }
     }
