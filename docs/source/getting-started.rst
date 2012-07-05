@@ -39,12 +39,16 @@ of pending jobs in a queue:
 
 .. code-block:: java
 
-    Metrics.newGauge(QueueManager.class, "pending-jobs", new Gauge<Integer>() {
-        @Override
-        public Integer value() {
-            return queue.size();
-        }
-    });
+    public class QueueManager {
+        private Queue queue;
+
+        Metrics.newGauge(QueueManager.class, "pending-jobs", new Gauge<Integer>() {
+            @Override
+            public Integer value() {
+                return queue.size();
+            }
+        });
+    }
 
 Every time this gauge is measured, it will return the number of jobs in the queue.
 
