@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Metrics {
     private static final MetricsRegistry DEFAULT_REGISTRY = new MetricsRegistry();
+    private static final MetricListenersRegistry DEFAULT_LISTENERS_REGISTRY = new MetricListenersRegistry();
     private static final Thread SHUTDOWN_HOOK = new Thread() {
         public void run() {
             JmxReporter.shutdownDefault();
@@ -19,6 +20,7 @@ public class Metrics {
     static {
         JmxReporter.startDefault(DEFAULT_REGISTRY);
         Runtime.getRuntime().addShutdownHook(SHUTDOWN_HOOK);
+        DEFAULT_REGISTRY.addListener(DEFAULT_LISTENERS_REGISTRY);
     }
 
     private Metrics() { /* unused */ }
@@ -334,11 +336,21 @@ public class Metrics {
     }
 
     /**
+     * Returns the (static) default listeners registry.
+     *
+     * @return the metric listeners registry
+     */
+    public static MetricListenersRegistry defaultListenersRegistry() {
+        return DEFAULT_LISTENERS_REGISTRY;
+    }
+
+    /**
      * Shuts down all thread pools for the default registry.
      */
     public static void shutdown() {
         try {
             DEFAULT_REGISTRY.shutdown();
+            DEFAULT_LISTENERS_REGISTRY.shutdown();
             JmxReporter.shutdownDefault();
             Runtime.getRuntime().removeShutdownHook(SHUTDOWN_HOOK);
         } catch (IllegalStateException ignored) {}

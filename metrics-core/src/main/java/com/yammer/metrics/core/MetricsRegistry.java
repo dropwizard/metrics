@@ -112,7 +112,7 @@ public class MetricsRegistry {
      * @return a new {@link Counter}
      */
     public Counter newCounter(MetricName metricName) {
-        return getOrAdd(metricName, new Counter());
+        return getOrAdd(metricName, new Counter(metricName));
     }
 
     /**
@@ -182,7 +182,7 @@ public class MetricsRegistry {
     public Histogram newHistogram(MetricName metricName,
                                   boolean biased) {
         return getOrAdd(metricName,
-                        new Histogram(biased ? SampleType.BIASED : SampleType.UNIFORM));
+                        new Histogram(metricName, biased ? SampleType.BIASED : SampleType.UNIFORM));
     }
 
     /**
@@ -237,7 +237,7 @@ public class MetricsRegistry {
         if (existingMetric != null) {
             return (Meter) existingMetric;
         }
-        return getOrAdd(metricName, new Meter(newMeterTickThreadPool(), eventType, unit, clock));
+        return getOrAdd(metricName, new Meter(metricName, newMeterTickThreadPool(), eventType, unit, clock));
     }
 
     /**
@@ -318,7 +318,7 @@ public class MetricsRegistry {
             return (Timer) existingMetric;
         }
         return getOrAdd(metricName,
-                        new Timer(newMeterTickThreadPool(), durationUnit, rateUnit, clock));
+                        new Timer(metricName, newMeterTickThreadPool(), durationUnit, rateUnit, clock));
     }
 
     /**

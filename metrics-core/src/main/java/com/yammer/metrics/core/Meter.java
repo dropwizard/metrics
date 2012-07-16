@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @see <a href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average">EMA</a>
  */
-public class Meter implements Metered, Stoppable {
+public class Meter extends ObservableMetric<MeterListener> implements Metered, Stoppable {
     private static final long INTERVAL = 5; // seconds
 
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
@@ -36,7 +36,8 @@ public class Meter implements Metered, Stoppable {
      * @param rateUnit   the rate unit of the new meter
      * @param clock      the clock to use for the meter ticks
      */
-    Meter(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit, Clock clock) {
+    Meter(MetricName name, ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit, Clock clock) {
+        super(name);
         this.rateUnit = rateUnit;
         this.eventType = eventType;
         this.future = tickThread.scheduleAtFixedRate(new Runnable() {
@@ -85,6 +86,7 @@ public class Meter implements Metered, Stoppable {
         m1Rate.update(n);
         m5Rate.update(n);
         m15Rate.update(n);
+        notifyListenersOnMark(n);
     }
 
     @Override
@@ -125,6 +127,12 @@ public class Meter implements Metered, Stoppable {
     @Override
     public <T> void processWith(MetricProcessor<T> processor, MetricName name, T context) throws Exception {
         processor.processMeter(name, this, context);
+    }
+
+    private void notifyListenersOnMark(long n) {
+        for (MeterListener l : getListenersIterable()) {
+            l.onMark(this, n);
+        }
     }
 
     private double convertNsRate(double ratePerNs) {
