@@ -76,7 +76,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
      *
      * @param type the type of sample to use
      */
-    Histogram(SampleType type) {
+    protected Histogram(SampleType type) {
         this(type.newSample());
     }
 
@@ -85,7 +85,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
      *
      * @param sample the sample to create a histogram from
      */
-    Histogram(Sample sample) {
+    protected Histogram(Sample sample) {
         this.sample = sample;
         clear();
     }

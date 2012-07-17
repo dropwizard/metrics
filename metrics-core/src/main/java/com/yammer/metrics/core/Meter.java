@@ -36,7 +36,7 @@ public class Meter implements Metered, Stoppable {
      * @param rateUnit   the rate unit of the new meter
      * @param clock      the clock to use for the meter ticks
      */
-    Meter(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit, Clock clock) {
+    protected Meter(ScheduledExecutorService tickThread, String eventType, TimeUnit rateUnit, Clock clock) {
         this.rateUnit = rateUnit;
         this.eventType = eventType;
         this.future = tickThread.scheduleAtFixedRate(new Runnable() {
