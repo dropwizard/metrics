@@ -69,7 +69,7 @@ public abstract class WebappMetricsFilter implements Filter {
 
     }
 
-    private MetricsRegistry getMetricsFactory(FilterConfig filterConfig) {
+    protected MetricsRegistry getMetricsFactory(FilterConfig filterConfig) {
         final MetricsRegistry metricsRegistry;
 
         final Object o = filterConfig.getServletContext().getAttribute(this.registryAttribute);

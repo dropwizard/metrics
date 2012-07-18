@@ -3,6 +3,7 @@ package com.yammer.metrics.servlet.tests;
 import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.core.HealthCheckRegistry;
 import com.yammer.metrics.servlet.HealthCheckServlet;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.*;
 
 public class HealthCheckServletTest {
     private final HealthCheckRegistry registry = mock(HealthCheckRegistry.class);
-    private final HealthCheckServlet servlet = new HealthCheckServlet(registry);
+    private final HealthCheckServlet servlet = new HealthCheckServlet();
     private final SortedMap<String, HealthCheck.Result> results = new TreeMap<String, HealthCheck.Result>();
 
     private final HttpServletRequest request = mock(HttpServletRequest.class);
@@ -45,6 +46,13 @@ public class HealthCheckServletTest {
     public void returnsNotImplementedIfNoHealthChecksAreRegistered() throws Exception {
         results.clear();
 
+        final ServletContext context = mock(ServletContext.class);
+        when(context.getAttribute(HealthCheckServlet.REGISTRY_ATTRIBUTE)).thenReturn(registry);
+
+        final ServletConfig config = mock(ServletConfig.class);
+        when(config.getServletContext()).thenReturn(context);
+
+        servlet.init(config);
         servlet.service(request, response);
 
         assertThat(output.toString().replaceAll("\r\n", "\n"),
@@ -59,6 +67,13 @@ public class HealthCheckServletTest {
         results.put("one", HealthCheck.Result.healthy());
         results.put("two", HealthCheck.Result.healthy("msg"));
 
+        final ServletContext context = mock(ServletContext.class);
+        when(context.getAttribute(HealthCheckServlet.REGISTRY_ATTRIBUTE)).thenReturn(registry);
+
+        final ServletConfig config = mock(ServletConfig.class);
+        when(config.getServletContext()).thenReturn(context);
+
+        servlet.init(config);
         servlet.service(request, response);
 
         assertThat(output.toString(),
@@ -87,6 +102,13 @@ public class HealthCheckServletTest {
         results.put("one", HealthCheck.Result.unhealthy("msg"));
         results.put("two", HealthCheck.Result.unhealthy(ex));
 
+        final ServletContext context = mock(ServletContext.class);
+        when(context.getAttribute(HealthCheckServlet.REGISTRY_ATTRIBUTE)).thenReturn(registry);
+
+        final ServletConfig config = mock(ServletConfig.class);
+        when(config.getServletContext()).thenReturn(context);
+
+        servlet.init(config);
         servlet.service(request, response);
 
         assertThat(output.toString().replaceAll("\r\n", "\n"),
