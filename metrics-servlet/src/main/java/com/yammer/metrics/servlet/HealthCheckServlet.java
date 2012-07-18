@@ -1,8 +1,10 @@
 package com.yammer.metrics.servlet;
 
 import com.yammer.metrics.HealthChecks;
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.core.HealthCheckRegistry;
+import com.yammer.metrics.core.MetricsRegistry;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -32,26 +34,22 @@ public class HealthCheckServlet extends HttpServlet {
     private HealthCheckRegistry registry;
 
     /**
-     * Creates a new {@link HealthCheckServlet} with the given {@link HealthCheckRegistry}.
-     *
-     * @param registry    a {@link HealthCheckRegistry}
-     */
-    public HealthCheckServlet(HealthCheckRegistry registry) {
-        this.registry = registry;
-    }
-
-    /**
-     * Creates a new {@link HealthCheckServlet} with the default {@link HealthCheckRegistry}.
+     * Creates a new {@link HealthCheckServlet}.
      */
     public HealthCheckServlet() {
-        this(HealthChecks.defaultRegistry());
     }
 
     @Override
     public void init(ServletConfig config) throws ServletException {
+        this.registry = getHealthCheckRegistryFactory(config);
+    }
+
+    protected HealthCheckRegistry getHealthCheckRegistryFactory(ServletConfig config) {
         final Object o = config.getServletContext().getAttribute(REGISTRY_ATTRIBUTE);
         if (o instanceof HealthCheckRegistry) {
-            this.registry = (HealthCheckRegistry) o;
+            return (HealthCheckRegistry) o;
+        } else {
+            return HealthChecks.defaultRegistry();
         }
     }
 

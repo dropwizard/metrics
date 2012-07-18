@@ -103,7 +103,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
      */
     public MetricsServlet() {
         this(Clock.defaultClock(), VirtualMachineMetrics.getInstance(),
-             Metrics.defaultRegistry(), DEFAULT_JSON_FACTORY, true);
+             DEFAULT_JSON_FACTORY, true);
     }
 
     /**
@@ -113,7 +113,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
      */
     public MetricsServlet(boolean showJvmMetrics) {
         this(Clock.defaultClock(), VirtualMachineMetrics.getInstance(),
-             Metrics.defaultRegistry(), DEFAULT_JSON_FACTORY, showJvmMetrics);
+             DEFAULT_JSON_FACTORY, showJvmMetrics);
     }
 
     /**
@@ -121,18 +121,15 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
      *
      * @param clock             the clock used for the current time
      * @param vm                a {@link VirtualMachineMetrics} instance
-     * @param registry          a {@link MetricsRegistry}
      * @param factory           a {@link JsonFactory}
      * @param showJvmMetrics    whether or not JVM-level metrics will be included in the output
      */
     public MetricsServlet(Clock clock,
                           VirtualMachineMetrics vm,
-                          MetricsRegistry registry,
                           JsonFactory factory,
                           boolean showJvmMetrics) {
         this.clock = clock;
         this.vm = vm;
-        this.registry = registry;
         this.factory = factory;
         this.showJvmMetrics = showJvmMetrics;
     }
@@ -145,14 +142,20 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
             this.factory = (JsonFactory) factory;
         }
 
-        final Object o = config.getServletContext().getAttribute(REGISTRY_ATTRIBUTE);
-        if (o instanceof MetricsRegistry) {
-            this.registry = (MetricsRegistry) o;
-        }
+        this.registry = getMetricsFactory(config);
 
         final String showJvmMetricsParam = config.getInitParameter(SHOW_JVM_METRICS);
         if (showJvmMetricsParam != null) {
             this.showJvmMetrics = Boolean.parseBoolean(showJvmMetricsParam);
+        }
+    }
+
+    protected MetricsRegistry getMetricsFactory(ServletConfig config) {
+        final Object o = config.getServletContext().getAttribute(REGISTRY_ATTRIBUTE);
+        if (o instanceof MetricsRegistry) {
+            return (MetricsRegistry) o;
+        } else {
+            return Metrics.defaultRegistry();
         }
     }
 

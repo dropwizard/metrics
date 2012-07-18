@@ -383,9 +383,19 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
      * @param registry    a {@link MetricsRegistry}
      */
     public JmxReporter(MetricsRegistry registry) {
+        this(registry, ManagementFactory.getPlatformMBeanServer());
+    }
+
+    /**
+     * Creates a new {@link JmxReporter} for the given registry and MBeanServer.
+     *
+     * @param registry    a {@link MetricsRegistry}
+     * @param server      a MBeanServer to register with
+     */
+    public JmxReporter(MetricsRegistry registry, MBeanServer server) {
         super(registry);
         this.registeredBeans = new ConcurrentHashMap<MetricName, ObjectName>(100);
-        this.server = ManagementFactory.getPlatformMBeanServer();
+        this.server = server;
     }
 
     @Override

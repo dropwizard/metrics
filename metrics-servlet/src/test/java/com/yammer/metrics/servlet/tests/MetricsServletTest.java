@@ -12,6 +12,8 @@ import com.yammer.metrics.servlet.MetricsServlet;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,16 +33,24 @@ public class MetricsServletTest {
     private final MetricsRegistry registry = new MetricsRegistry(clock);
     private final JsonFactory factory = mock(JsonFactory.class);
 
+    private final ServletContext context = mock(ServletContext.class);
+    private final ServletConfig config = mock(ServletConfig.class);
     private final HttpServletRequest request = mock(HttpServletRequest.class);
     private final HttpServletResponse response = mock(HttpServletResponse.class);
     private final ServletOutputStream output = mock(ServletOutputStream.class);
-    private final MetricsServlet servlet = new MetricsServlet(clock, vm, registry, factory, false);
+    private final MetricsServlet servlet = new MetricsServlet(clock, vm, factory, false);
 
     private final ByteArrayOutputStream json = new ByteArrayOutputStream();
 
     @Before
     public void setUp() throws Exception {
         when(clock.getTime()).thenReturn(12345678L);
+
+        when(config.getServletContext()).thenReturn(context);
+
+        when(context.getAttribute(MetricsServlet.JSON_FACTORY_ATTRIBUTE)).thenReturn(null);
+        when(context.getAttribute(MetricsServlet.SHOW_JVM_METRICS)).thenReturn(null);
+        when(context.getAttribute(MetricsServlet.REGISTRY_ATTRIBUTE)).thenReturn(registry);
 
         when(request.getMethod()).thenReturn("GET");
 
@@ -49,6 +59,8 @@ public class MetricsServletTest {
         final JsonGenerator generator = new JsonFactory(new ObjectMapper()).createJsonGenerator(json,
                                                                                                 JsonEncoding.UTF8);
         when(factory.createJsonGenerator(output, JsonEncoding.UTF8)).thenReturn(generator);
+
+        servlet.init(config);
     }
 
     @Test
@@ -108,7 +120,8 @@ public class MetricsServletTest {
 
         when(vm.getBufferPoolStats()).thenReturn(bufferPoolStats);
 
-        final MetricsServlet servlet = new MetricsServlet(clock, vm, registry, factory, true);
+        final MetricsServlet servlet = new MetricsServlet(clock, vm, factory, true);
+        servlet.init(config);
 
         servlet.service(request, response);
 
