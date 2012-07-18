@@ -5,11 +5,12 @@ import com.yammer.metrics.stats.Sample;
 import com.yammer.metrics.stats.Snapshot;
 import com.yammer.metrics.stats.UniformSample;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.Math.sqrt;
-
 /**
  * A metric which calculates the distribution of a value.
  *
@@ -49,16 +50,28 @@ public class Histogram implements Metric, Sampling, Summarizable {
 
         public abstract Sample newSample();
     }
-
-    /**
-     * Cache arrays for the variance calculation, so as to avoid memory allocation.
-     */
-    private static class ArrayCache extends ThreadLocal<double[]> {
-        @Override
-        protected double[] initialValue() {
-            return new double[2];
-        }
+    
+    private static class ArrayCache{
+    	private final Map<Long, double[]> cache;
+    	
+    	private ArrayCache(){
+    		cache = new ConcurrentHashMap<Long, double[]>();
+    	}
+    	
+    	public double[] get(Thread thread){
+    		double[] values = cache.get(thread.getId());
+    		if(values == null){
+    			values = new double[2];
+    		}
+    		return values;
+    	}
+    	
+    	public void put(Thread thread, double[] values){
+    		cache.put(thread.getId(), values);
+    	}
     }
+    
+    
 
     private final Sample sample;
     private final AtomicLong min = new AtomicLong();
@@ -217,8 +230,9 @@ public class Histogram implements Metric, Sampling, Summarizable {
     private void updateVariance(long value) {
         boolean done = false;
         while (!done) {
+        	Thread thread = Thread.currentThread();
             final double[] oldValues = variance.get();
-            final double[] newValues = arrayCache.get();
+            final double[] newValues = arrayCache.get(thread);
             if (oldValues[0] == -1) {
                 newValues[0] = value;
                 newValues[1] = 0;
@@ -235,7 +249,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
             done = variance.compareAndSet(oldValues, newValues);
             if (done) {
                 // recycle the old array into the cache
-                arrayCache.set(oldValues);
+                arrayCache.put(thread,oldValues);
             }
         }
     }
