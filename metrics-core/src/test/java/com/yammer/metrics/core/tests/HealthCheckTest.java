@@ -63,6 +63,20 @@ public class HealthCheckTest {
     }
 
     @Test
+    public void canHaveHealthyResultsWithFormattedMessages() throws Exception {
+        final Result result = Result.healthy("foo %s", "bar");
+
+        assertThat(result.isHealthy(),
+                    is(true));
+        
+        assertThat(result.getMessage(),
+                    is("foo bar"));
+
+        assertThat(result.getError(),
+                    is(nullValue()));
+    }
+
+    @Test
     public void canHaveUnhealthyResults() throws Exception {
         final Result result = Result.unhealthy("bad");
 
@@ -74,6 +88,20 @@ public class HealthCheckTest {
 
         assertThat(result.getError(),
                    is(nullValue()));
+    }
+
+    @Test
+    public void canHaveUnhealthyResultsWithFormattedMessages() throws Exception {
+        final Result result = Result.unhealthy("foo %s %d", "bar", 123);
+
+        assertThat(result.isHealthy(),
+                    is(false));
+        
+        assertThat(result.getMessage(),
+                    is("foo bar 123"));
+
+        assertThat(result.getError(),
+                    is(nullValue()));
     }
 
     @Test
