@@ -4,6 +4,29 @@
 Release Notes
 #############
 
+.. _rel-2.1.3:
+
+v2.1.3-SNAPSHOT
+===============
+
+* Upgraded to Apache HttpClient 4.2.1.
+* Changed ``InstrumentedClientConnManager`` to extend ``PoolingClientConnectionManager`` instead of
+  the deprecated ``ThreadSafeClientConnManager``.
+
+.. _rel-2.1.2:
+
+v2.1.2: Apr 11 2012
+===================
+
+* Fixed double-registration in ``metrics-guice``.
+
+.. _rel-2.1.1:
+
+v2.1.1: Mar 13 2012
+===================
+
+* Fixed instrumentation of all usages of ``InstrumentedHttpClient``.
+
 .. _rel-2.1.0:
 
 v2.1.0: Mar 12 2012
