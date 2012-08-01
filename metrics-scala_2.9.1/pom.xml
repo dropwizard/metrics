@@ -27,10 +27,16 @@
             <version>${scala.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.codahale</groupId>
-            <artifactId>simplespec_${scala.version}</artifactId>
-            <version>0.5.2</version>
+            <groupId>com.simple</groupId>
+            <artifactId>simplespec_2.9.1</artifactId>
+            <version>0.6.0</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
