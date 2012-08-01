@@ -1,7 +1,7 @@
 package com.yammer.metrics.scala.tests
 
 import org.junit.Test
-import com.codahale.simplespec.Spec
+import com.simple.simplespec.Spec
 import com.yammer.metrics.Metrics
 import com.yammer.metrics.scala.Timer
 
