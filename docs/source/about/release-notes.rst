@@ -13,6 +13,7 @@ v2.1.3-SNAPSHOT
 * Changed ``InstrumentedClientConnManager`` to extend ``PoolingClientConnectionManager`` instead of
   the deprecated ``ThreadSafeClientConnManager``.
 * Fixed a bug in ``ExponentiallyDecayingSample`` with long periods of inactivity.
+* Fixed problems with re-registering metrics in JMX.
 
 .. _rel-2.1.2:
 
