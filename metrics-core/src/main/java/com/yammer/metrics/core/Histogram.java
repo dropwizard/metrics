@@ -50,16 +50,6 @@ public class Histogram implements Metric, Sampling, Summarizable {
         public abstract Sample newSample();
     }
 
-    /**
-     * Cache arrays for the variance calculation, so as to avoid memory allocation.
-     */
-    private static class ArrayCache extends ThreadLocal<double[]> {
-        @Override
-        protected double[] initialValue() {
-            return new double[2];
-        }
-    }
-
     private final Sample sample;
     private final AtomicLong min = new AtomicLong();
     private final AtomicLong max = new AtomicLong();
@@ -69,7 +59,6 @@ public class Histogram implements Metric, Sampling, Summarizable {
     private final AtomicReference<double[]> variance =
             new AtomicReference<double[]>(new double[]{-1, 0}); // M, S
     private final AtomicLong count = new AtomicLong();
-    private final ArrayCache arrayCache = new ArrayCache();
 
     /**
      * Creates a new {@link Histogram} with the given sample type.
@@ -215,10 +204,9 @@ public class Histogram implements Metric, Sampling, Summarizable {
     }
 
     private void updateVariance(long value) {
-        boolean done = false;
-        while (!done) {
+        while (true) {
             final double[] oldValues = variance.get();
-            final double[] newValues = arrayCache.get();
+            final double[] newValues = new double[2];
             if (oldValues[0] == -1) {
                 newValues[0] = value;
                 newValues[1] = 0;
@@ -232,10 +220,8 @@ public class Histogram implements Metric, Sampling, Summarizable {
                 newValues[0] = newM;
                 newValues[1] = newS;
             }
-            done = variance.compareAndSet(oldValues, newValues);
-            if (done) {
-                // recycle the old array into the cache
-                arrayCache.set(oldValues);
+            if (variance.compareAndSet(oldValues, newValues)) {
+                return;
             }
         }
     }
