@@ -12,6 +12,7 @@ v2.1.3-SNAPSHOT
 * Upgraded to Apache HttpClient 4.2.1.
 * Changed ``InstrumentedClientConnManager`` to extend ``PoolingClientConnectionManager`` instead of
   the deprecated ``ThreadSafeClientConnManager``.
+* Fixed a bug in ``ExponentiallyDecayingSample`` with long periods of inactivity.
 
 .. _rel-2.1.2:
 
