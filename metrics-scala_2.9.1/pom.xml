@@ -40,13 +40,6 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>repo.codahale.com</id>
-            <url>http://repo.codahale.com</url>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
