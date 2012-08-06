@@ -10,12 +10,10 @@ v3.0.0-SNAPSHOT
 ===============
 
 * Added ``AdminServlet#setServiceName()``.
-* Fixed a bug in ``ExponentiallyDecayingSample`` for long periods of inactivity.
 * Switched all getters to the standard ``#getValue()``.
 * Use the full metric name in ``CsvReporter``.
 * Made ``DefaultWebappMetricsFilter``'s registry configurable.
 * Switched to ``HttpServletRequest#getContextPath()`` in ``AdminServlet``.
-* Upgraded to HttpClient 4.2.
 * Upgraded to Logback 1.0.3.
 * Upgraded to Log4j 1.2.17.
 * Upgraded to JDBI 2.34.
@@ -25,6 +23,20 @@ v3.0.0-SNAPSHOT
 * Upgraded to SLF4J 1.6.5.
 * Changed package names in ``metrics-ganglia``, ``metrics-graphite``, and ``metrics-servlet``.
 * Removed ``metrics-guice`` and ``metrics-spring``.
+
+.. _rel-2.1.3:
+
+v2.1.3: Aug 06 2012
+===================
+
+* Upgraded to Apache HttpClient 4.2.1.
+* Changed ``InstrumentedClientConnManager`` to extend ``PoolingClientConnectionManager`` instead of
+  the deprecated ``ThreadSafeClientConnManager``.
+* Fixed a bug in ``ExponentiallyDecayingSample`` with long periods of inactivity.
+* Fixed problems with re-registering metrics in JMX.
+* Added support for ``DnsResolver`` instances to ``InstrumentedClientConnManager``.
+* Added support for formatted health check error messages.
+>>>>>>> 2.x-maintenance
 
 .. _rel-2.1.2:
 
