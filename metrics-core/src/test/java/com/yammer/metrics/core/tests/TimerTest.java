@@ -4,38 +4,26 @@ import com.yammer.metrics.core.Clock;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.stats.Snapshot;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public class TimerTest {
-    private MetricsRegistry registry;
-    private Timer timer;
+    private final MetricsRegistry registry = new MetricsRegistry(new Clock() {
+        // a mock clock that increments its ticker by 50msec per call
+        private long val = 0;
 
-    @Before
-    public void setUp() throws Exception {
-        this.registry = new MetricsRegistry(new Clock() {
-            // a mock clock that increments its ticker by 50msec per call
-            private long val = 0;
-
-            @Override
-            public long getTick() {
-                return val += 50000000;
-            }
-        });
-        this.timer = registry.newTimer(TimerTest.class, "timer");
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        registry.shutdown();
-    }
+        @Override
+        public long getTick() {
+            return val += 50000000;
+        }
+    });
+    private final Timer timer = registry.newTimer(TimerTest.class, "timer");
 
     @Test
     public void hasADurationUnit() throws Exception {
