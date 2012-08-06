@@ -36,7 +36,6 @@ v2.1.3: Aug 06 2012
 * Fixed problems with re-registering metrics in JMX.
 * Added support for ``DnsResolver`` instances to ``InstrumentedClientConnManager``.
 * Added support for formatted health check error messages.
->>>>>>> 2.x-maintenance
 
 .. _rel-2.1.2:
 
