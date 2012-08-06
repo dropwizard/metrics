@@ -6,14 +6,16 @@ Release Notes
 
 .. _rel-2.1.3:
 
-v2.1.3-SNAPSHOT
-===============
+v2.1.3: Aug 06 2012
+===================
 
 * Upgraded to Apache HttpClient 4.2.1.
 * Changed ``InstrumentedClientConnManager`` to extend ``PoolingClientConnectionManager`` instead of
   the deprecated ``ThreadSafeClientConnManager``.
 * Fixed a bug in ``ExponentiallyDecayingSample`` with long periods of inactivity.
 * Fixed problems with re-registering metrics in JMX.
+* Added support for ``DnsResolver`` instances to ``InstrumentedClientConnManager``.
+* Added support for formatted health check error messages.
 
 .. _rel-2.1.2:
 
