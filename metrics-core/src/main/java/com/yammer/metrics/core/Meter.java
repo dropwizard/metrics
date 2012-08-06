@@ -86,7 +86,6 @@ public class Meter implements Metered {
         final long age = newTick - oldTick;
         if (age > TICK_INTERVAL && lastTick.compareAndSet(oldTick, newTick)) {
             final long requiredTicks = age / TICK_INTERVAL;
-            System.out.println("requiredTicks = " + requiredTicks);
             for (long i = 0; i < requiredTicks; i++) {
                 tick();
             }
