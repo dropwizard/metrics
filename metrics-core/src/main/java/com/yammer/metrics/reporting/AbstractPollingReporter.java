@@ -2,14 +2,42 @@ package com.yammer.metrics.reporting;
 
 import com.yammer.metrics.core.MetricsRegistry;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An abstract base class for all reporter implementations which periodically poll registered
  * metrics (e.g., to send the data to another service).
  */
 public abstract class AbstractPollingReporter extends AbstractReporter implements Runnable {
+    /**
+     * A simple named thread factory.
+     */
+    private static class NamedThreadFactory implements ThreadFactory {
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        private NamedThreadFactory(String name) {
+            final SecurityManager s = System.getSecurityManager();
+            this.group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+            this.namePrefix = "metrics-" + name + "-thread-";
+        }
+
+        @Override
+        public Thread newThread(Runnable r) {
+            final Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
+            t.setDaemon(true);
+            if (t.getPriority() != Thread.NORM_PRIORITY) {
+                t.setPriority(Thread.NORM_PRIORITY);
+            }
+            return t;
+        }
+    }
+
     private final ScheduledExecutorService executor;
 
     /**
@@ -22,7 +50,7 @@ public abstract class AbstractPollingReporter extends AbstractReporter implement
      */
     protected AbstractPollingReporter(MetricsRegistry registry, String name) {
         super(registry);
-        this.executor = registry.newScheduledThreadPool(1, name);
+        this.executor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name));
     }
 
     /**
@@ -35,23 +63,14 @@ public abstract class AbstractPollingReporter extends AbstractReporter implement
         executor.scheduleWithFixedDelay(this, period, period, unit);
     }
 
-    /**
-     * Shuts down the reporter polling, waiting the specific amount of time for any current polls to
-     * complete.
-     *
-     * @param timeout    the maximum time to wait
-     * @param unit       the unit for {@code timeout}
-     * @throws InterruptedException if interrupted while waiting
-     */
-    public void shutdown(long timeout, TimeUnit unit) throws InterruptedException {
-        executor.shutdown();
-        executor.awaitTermination(timeout, unit);
-    }
-
     @Override
     public void shutdown() {
         executor.shutdown();
-        super.shutdown();
+        try {
+            executor.awaitTermination(1, TimeUnit.SECONDS);
+        } catch (InterruptedException ignored) {
+            // do nothing
+        }
     }
 
     /**

@@ -4,8 +4,6 @@ import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricProcessor;
 import com.yammer.metrics.core.MetricsRegistry;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
@@ -14,19 +12,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class CounterTest {
-    private MetricsRegistry registry;
-    private Counter counter;
-
-    @Before
-    public void setUp() throws Exception {
-        this.registry = new MetricsRegistry();
-        this.counter = registry.newCounter(CounterTest.class, "counter");
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        registry.shutdown();
-    }
+    private final MetricsRegistry registry = new MetricsRegistry();
+    private final Counter counter = registry.newCounter(CounterTest.class, "counter");
 
     @Test
     public void startsAtZero() throws Exception {

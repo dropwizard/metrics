@@ -4,14 +4,13 @@ import com.yammer.metrics.core.Histogram.SampleType;
 import com.yammer.metrics.stats.Snapshot;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
  * A timer metric which aggregates timing durations and provides duration statistics, plus
  * throughput statistics via {@link Meter}.
  */
-public class Timer implements Metered, Stoppable, Sampling, Summarizable {
+public class Timer implements Metered, Sampling, Summarizable {
 
     private final TimeUnit durationUnit, rateUnit;
     private final Meter meter;
@@ -21,26 +20,14 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
     /**
      * Creates a new {@link Timer}.
      *
-     * @param tickThread   background thread for updating the rates
-     * @param durationUnit the scale unit for this timer's duration metrics
-     * @param rateUnit     the scale unit for this timer's rate metrics
-     */
-    Timer(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit) {
-        this(tickThread, durationUnit, rateUnit, Clock.defaultClock());
-    }
-
-    /**
-     * Creates a new {@link Timer}.
-     *
-     * @param tickThread   background thread for updating the rates
      * @param durationUnit the scale unit for this timer's duration metrics
      * @param rateUnit     the scale unit for this timer's rate metrics
      * @param clock        the clock used to calculate duration
      */
-    Timer(ScheduledExecutorService tickThread, TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
+    Timer(TimeUnit durationUnit, TimeUnit rateUnit, Clock clock) {
         this.durationUnit = durationUnit;
         this.rateUnit = rateUnit;
-        this.meter = new Meter(tickThread, "calls", rateUnit, clock);
+        this.meter = new Meter("calls", rateUnit, clock);
         this.clock = clock;
         clear();
     }
@@ -191,11 +178,6 @@ public class Timer implements Metered, Stoppable, Sampling, Summarizable {
     @Override
     public String getEventType() {
         return meter.getEventType();
-    }
-
-    @Override
-    public void stop() {
-        meter.stop();
     }
 
     @Override

@@ -5,8 +5,6 @@ import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricProcessor;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.stats.Snapshot;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.closeTo;
@@ -16,19 +14,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class HistogramTest {
-    private MetricsRegistry registry;
-    private Histogram histogram;
-
-    @Before
-    public void setUp() throws Exception {
-        this.registry = new MetricsRegistry();
-        this.histogram = registry.newHistogram(HistogramTest.class, "histogram", false);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        registry.shutdown();
-    }
+    private final MetricsRegistry registry = new MetricsRegistry();
+    private final Histogram histogram = registry.newHistogram(HistogramTest.class, "histogram", false);
 
     @Test
     public void anEmptyHistogram() throws Exception {
