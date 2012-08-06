@@ -32,6 +32,21 @@ public abstract class HealthCheck {
         }
 
         /**
+         * Returns a healthy {@link Result} with a formatted message.
+         *
+         * Message formatting follows the same rules as 
+         * {@link String#format(String, Object...)}.
+         *
+         * @param message a message format
+         * @param args    the arguments apply to the message format
+         * @return a healthy {@link Result} with an additional message
+         * @see String#format(String, Object...)
+         */
+        public static Result healthy(String message, Object... args) {
+            return healthy(String.format(message, args));
+        }
+
+        /**
          * Returns an unhealthy {@link Result} with the given message.
          *
          * @param message    an informative message describing how the health check failed
@@ -39,6 +54,21 @@ public abstract class HealthCheck {
          */
         public static Result unhealthy(String message) {
             return new Result(false, message, null);
+        }
+
+        /**
+         * Returns an unhealthy {@link Result} with a formatted message.
+         *
+         * Message formatting follows the same rules as 
+         * {@link String#format(String, Object...)}.
+         *
+         * @param message a message format
+         * @param args    the arguments apply to the message format
+         * @return an unhealthy {@link Result} with an additional message
+         * @see String#format(String, Object...)
+         */
+        public static Result unhealthy(String message, Object... args) {
+            return unhealthy(String.format(message, args));
         }
 
         /**
