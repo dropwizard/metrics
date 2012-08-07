@@ -1,16 +1,17 @@
 package com.yammer.metrics.core;
 
+import com.yammer.metrics.annotation.ExceptionMetered;
+
 import java.lang.reflect.Method;
 
 /**
  * A value class encapsulating a metric's owning class and name.
  */
 public class MetricName implements Comparable<MetricName> {
-    private final String group;
+    private final String domain;
     private final String type;
     private final String name;
     private final String scope;
-    private final String mBeanName;
 
     /**
      * Creates a new {@link MetricName} without a scope.
@@ -25,12 +26,12 @@ public class MetricName implements Comparable<MetricName> {
     /**
      * Creates a new {@link MetricName} without a scope.
      *
-     * @param group the group to which the {@link Metric} belongs
+     * @param domain the domain to which the {@link Metric} belongs
      * @param type  the type to which the {@link Metric} belongs
      * @param name  the name of the {@link Metric}
      */
-    public MetricName(String group, String type, String name) {
-        this(group, type, name, null);
+    public MetricName(String domain, String type, String name) {
+        this(domain, type, name, null);
     }
 
     /**
@@ -41,8 +42,8 @@ public class MetricName implements Comparable<MetricName> {
      * @param scope the scope of the {@link Metric}
      */
     public MetricName(Class<?> klass, String name, String scope) {
-        this(klass.getPackage() == null ? "" : klass.getPackage().getName(),
-             klass.getSimpleName().replaceAll("\\$$", ""),
+        this(getPackageName(klass),
+             getClassName(klass),
              name,
              scope);
     }
@@ -50,47 +51,32 @@ public class MetricName implements Comparable<MetricName> {
     /**
      * Creates a new {@link MetricName} without a scope.
      *
-     * @param group the group to which the {@link Metric} belongs
+     * @param domain the domain to which the {@link Metric} belongs
      * @param type  the type to which the {@link Metric} belongs
      * @param name  the name of the {@link Metric}
      * @param scope the scope of the {@link Metric}
      */
-    public MetricName(String group, String type, String name, String scope) {
-        this(group, type, name, scope, createMBeanName(group, type, name, scope));
-    }
-
-    /**
-     * Creates a new {@link MetricName} without a scope.
-     *
-     * @param group     the group to which the {@link Metric} belongs
-     * @param type      the type to which the {@link Metric} belongs
-     * @param name      the name of the {@link Metric}
-     * @param scope     the scope of the {@link Metric}
-     * @param mBeanName the 'ObjectName', represented as a string, to use when registering the
-     *                  MBean.
-     */
-    public MetricName(String group, String type, String name, String scope, String mBeanName) {
-        if (group == null || type == null) {
-            throw new IllegalArgumentException("Both group and type need to be specified");
+    public MetricName(String domain, String type, String name, String scope) {
+        if (domain == null || type == null) {
+            throw new IllegalArgumentException("Both domain and type need to be specified");
         }
         if (name == null) {
             throw new IllegalArgumentException("Name needs to be specified");
         }
-        this.group = group;
+        this.domain = domain;
         this.type = type;
         this.name = name;
         this.scope = scope;
-        this.mBeanName = mBeanName;
     }
 
     /**
-     * Returns the group to which the {@link Metric} belongs. For class-based metrics, this will be
+     * Returns the domain to which the {@link Metric} belongs. For class-based metrics, this will be
      * the package name of the {@link Class} to which the {@link Metric} belongs.
      *
-     * @return the group to which the {@link Metric} belongs
+     * @return the domain to which the {@link Metric} belongs
      */
-    public String getGroup() {
-        return group;
+    public String getDomain() {
+        return domain;
     }
 
     /**
@@ -130,90 +116,113 @@ public class MetricName implements Comparable<MetricName> {
         return scope != null;
     }
 
-    /**
-     * Returns the MBean name for the {@link Metric} identified by this metric name.
-     *
-     * @return the MBean name
-     */
-    public String getMBeanName() {
-        return mBeanName;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         final MetricName that = (MetricName) o;
-        return mBeanName.equals(that.mBeanName);
+        return domain.equals(that.domain) &&
+                name.equals(that.name) &&
+                type.equals(that.type) &&
+                (scope == null ? that.scope == null : scope.equals(that.scope));
     }
 
     @Override
     public int hashCode() {
-        return mBeanName.hashCode();
+        int result = domain.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + (scope != null ? scope.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
-        return mBeanName;
+        return domain + '.' + type + '.' + name + (scope == null ? "" : '.' + scope);
     }
 
     @Override
     public int compareTo(MetricName o) {
-        return mBeanName.compareTo(o.mBeanName);
+        int result = domain.compareTo(o.domain);
+        if (result != 0) {
+            return result;
+        }
+
+        result = type.compareTo(o.type);
+        if (result != 0) {
+            return result;
+        }
+
+        result = name.compareTo(o.name);
+        if (result != 0) {
+            return result;
+        }
+
+        if (scope == null) {
+            if (o.scope != null) {
+                return -1;
+            }
+            return 0;
+        }
+
+        if (o.scope != null) {
+            return scope.compareTo(o.scope);
+        }
+        return 1;
     }
 
-    private static String createMBeanName(String group, String type, String name, String scope) {
-        final StringBuilder nameBuilder = new StringBuilder();
-        nameBuilder.append(group);
-        nameBuilder.append(":type=");
-        nameBuilder.append(type);
-        if (scope != null) {
-            nameBuilder.append(",scope=");
-            nameBuilder.append(scope);
-        }
-        if (name.length() > 0) {
-            nameBuilder.append(",name=");
-            nameBuilder.append(name);
-        }
-        return nameBuilder.toString();
+    private static String getPackageName(Class<?> klass) {
+        return klass.getPackage() == null ? "" : klass.getPackage().getName();
     }
 
-    /**
-     * If the group is empty, use the package name of the given class. Otherwise use group
-     * @param group The group to use by default
-     * @param klass The class being tracked
-     * @return a group for the metric
-     */
-    public static String chooseGroup(String group, Class<?> klass) {
-        if(group == null || group.isEmpty()) {
-            group = klass.getPackage() == null ? "" : klass.getPackage().getName();
-        }
-        return group;
+    private static String getClassName(Class<?> klass) {
+        return klass.getSimpleName().replaceAll("\\$$", "");
     }
 
-    /**
-     * If the type is empty, use the simple name of the given class. Otherwise use type
-     * @param type The type to use by default
-     * @param klass The class being tracked
-     * @return a type for the metric
-     */
-    public static String chooseType(String type, Class<?> klass) {
+    private static String chooseDomain(String domain, Class<?> klass) {
+        if(domain == null || domain.isEmpty()) {
+            domain = getPackageName(klass);
+        }
+        return domain;
+    }
+
+    private static String chooseType(String type, Class<?> klass) {
         if(type == null || type.isEmpty()) {
-            type = klass.getSimpleName().replaceAll("\\$$", ""); 
+            type = getClassName(klass);
         }
         return type;
     }
 
-    /**
-     * If name is empty, use the name of the given method. Otherwise use name
-     * @param name The name to use by default
-     * @param method The method being tracked
-     * @return a name for the metric
-     */
-    public static String chooseName(String name, Method method) {
+    private static String chooseName(String name, Method method) {
         if(name == null || name.isEmpty()) {
             name = method.getName();
         }
         return name;
+    }
+
+    public static MetricName forTimedMethod(Class<?> klass, Method method, com.yammer.metrics.annotation.Timed annotation) {
+        return new MetricName(chooseDomain(annotation.group(), klass),
+                              chooseType(annotation.type(), klass),
+                              chooseName(annotation.name(), method));
+    }
+
+    public static MetricName forMeteredMethod(Class<?> klass, Method method, com.yammer.metrics.annotation.Metered annotation) {
+        return new MetricName(chooseDomain(annotation.group(), klass),
+                              chooseType(annotation.type(), klass),
+                              chooseName(annotation.name(), method));
+    }
+
+    public static MetricName forGaugeMethod(Class<?> klass, Method method, com.yammer.metrics.annotation.Gauge annotation) {
+        return new MetricName(chooseDomain(annotation.group(), klass),
+                              chooseType(annotation.type(), klass),
+                              chooseName(annotation.name(), method));
+    }
+
+    public static MetricName forExceptionMeteredMethod(Class<?> klass, Method method, com.yammer.metrics.annotation.ExceptionMetered annotation) {
+        return new MetricName(chooseDomain(annotation.group(), klass),
+                              chooseType(annotation.type(), klass),
+                              annotation.name() == null || annotation.name().isEmpty() ?
+                                      method.getName() + ExceptionMetered.DEFAULT_NAME_SUFFIX :
+                                      annotation.name());
     }
 }

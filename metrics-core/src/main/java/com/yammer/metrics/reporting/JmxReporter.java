@@ -394,11 +394,27 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
     public void onMetricAdded(MetricName name, Metric metric) {
         if (metric != null) {
             try {
-                dispatcher.dispatch(metric, name, this, new Context(name, new ObjectName(name.getMBeanName())));
+                dispatcher.dispatch(metric, name, this, new Context(name, createObjectName(name)));
             } catch (Exception e) {
                 LOGGER.warn("Error processing {}", name, e);
             }
         }
+    }
+
+    private ObjectName createObjectName(MetricName name) throws MalformedObjectNameException {
+        final StringBuilder nameBuilder = new StringBuilder();
+        nameBuilder.append(name.getDomain());
+        nameBuilder.append(":type=");
+        nameBuilder.append(name.getType());
+        if (name.hasScope()) {
+            nameBuilder.append(",scope=");
+            nameBuilder.append(name.getScope());
+        }
+        if (!name.getName().isEmpty()) {
+            nameBuilder.append(",name=");
+            nameBuilder.append(name);
+        }
+        return new ObjectName(nameBuilder.toString());
     }
 
     @Override

@@ -287,7 +287,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
 
     protected String sanitizeName(MetricName name) {
         final StringBuilder sb = new StringBuilder()
-                .append(name.getGroup())
+                .append(name.getDomain())
                 .append('.')
                 .append(name.getType())
                 .append('.');
