@@ -3,6 +3,7 @@ package com.yammer.metrics.ganglia;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.reporting.AbstractPollingReporter;
+import com.yammer.metrics.reporting.MetricDispatcher;
 import com.yammer.metrics.stats.Snapshot;
 import com.yammer.metrics.core.MetricPredicate;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
     private final MetricPredicate predicate;
     private final VirtualMachineMetrics vm;
     private final Locale locale = Locale.US;
+    private final MetricDispatcher dispatcher = new MetricDispatcher();
     private String hostLabel;
     private String groupPrefix = "";
     private boolean compressPackageNames;
@@ -266,7 +268,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
                 final Metric metric = subEntry.getValue();
                 if (metric != null) {
                     try {
-                        metric.processWith(this, subEntry.getKey(), null);
+                        dispatcher.dispatch(subEntry.getValue(), subEntry.getKey(), this, null);
                     } catch (Exception ignored) {
                         LOG.error("Error printing regular metrics:", ignored);
                     }

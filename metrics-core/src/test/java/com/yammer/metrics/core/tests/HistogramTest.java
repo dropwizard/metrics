@@ -1,8 +1,6 @@
 package com.yammer.metrics.core.tests;
 
 import com.yammer.metrics.core.Histogram;
-import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricProcessor;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.stats.Snapshot;
 import org.junit.Test;
@@ -10,8 +8,6 @@ import org.junit.Test;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 public class HistogramTest {
     private final MetricsRegistry registry = new MetricsRegistry();
@@ -109,17 +105,5 @@ public class HistogramTest {
         assertThat("the histogram has 1000 values",
                    snapshot.size(),
                    is(1000));
-    }
-
-    @SuppressWarnings("unchecked")
-    @Test
-    public void isProcessedAsAHistogram() throws Exception {
-        final MetricName name = new MetricName(HistogramTest.class, "histogram");
-        final Object context = new Object();
-        final MetricProcessor<Object> processor = mock(MetricProcessor.class);
-
-        histogram.processWith(processor, name, context);
-
-        verify(processor).processHistogram(name, histogram, context);
     }
 }

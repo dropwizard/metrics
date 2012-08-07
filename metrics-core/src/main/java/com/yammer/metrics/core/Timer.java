@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
  * throughput statistics via {@link Meter}.
  */
 public class Timer implements Metered, Sampling, Summarizable {
-
     private final TimeUnit durationUnit, rateUnit;
     private final Meter meter;
     private final Histogram histogram = new Histogram(SampleType.BIASED);
@@ -178,11 +177,6 @@ public class Timer implements Metered, Sampling, Summarizable {
     @Override
     public String getEventType() {
         return meter.getEventType();
-    }
-
-    @Override
-    public <T> void processWith(MetricProcessor<T> processor, MetricName name, T context) throws Exception {
-        processor.processTimer(name, this, context);
     }
 
     private void update(long duration) {

@@ -22,9 +22,4 @@ public abstract class Gauge<T> implements Metric {
      * @return the metric's current value
      */
     public abstract T getValue();
-
-    @Override
-    public <U> void processWith(MetricProcessor<U> processor, MetricName name, U context) throws Exception {
-        processor.processGauge(name, this, context);
-    }
 }
