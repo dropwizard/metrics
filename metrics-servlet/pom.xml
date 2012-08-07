@@ -12,10 +12,6 @@
     <name>Metrics Servlet</name>
     <packaging>bundle</packaging>
 
-    <properties>
-        <jackson.version>2.0.2</jackson.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.yammer.metrics</groupId>
