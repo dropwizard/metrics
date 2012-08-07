@@ -296,7 +296,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
                         try {
                             dispatcher.dispatch(subEntry.getValue(), subEntry.getKey(), this, new Context(json, showFullSamples));
                         } catch (Exception e) {
-                            LOGGER.warn("Error writing out {}", subEntry.getKey(), e);
+                            LOGGER.warn("Error writing out " + subEntry.getKey(), e);
                         }
                     }
                 }
