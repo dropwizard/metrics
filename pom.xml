@@ -37,6 +37,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <servlet.version>2.5</servlet.version>
         <slf4j.version>1.6.5</slf4j.version>
+        <jackson.version>2.0.5</jackson.version>
     </properties>
 
     <developers>
