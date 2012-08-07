@@ -396,7 +396,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
             try {
                 dispatcher.dispatch(metric, name, this, new Context(name, createObjectName(name)));
             } catch (Exception e) {
-                LOGGER.warn("Error processing {}", name, e);
+                LOGGER.warn("Error processing " + name, e);
             }
         }
     }
@@ -490,9 +490,9 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
             // This is often thrown when the process is shutting down. An application with lots of
             // metrics will often begin unregistering metrics *after* JMX itself has cleared,
             // resulting in a huge dump of exceptions as the process is exiting.
-            LOGGER.trace("Error unregistering {}", name, e);
+            LOGGER.trace("Error unregistering " + name, e);
         } catch (MBeanRegistrationException e) {
-            LOGGER.debug("Error unregistering {}", name, e);
+            LOGGER.debug("Error unregistering " + name, e);
         }
     }
 }
