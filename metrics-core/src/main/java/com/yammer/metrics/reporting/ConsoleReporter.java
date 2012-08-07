@@ -123,6 +123,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements
             final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT,
                                                                      DateFormat.MEDIUM,
                                                                      locale);
+            final MetricDispatcher dispatcher = new MetricDispatcher();
             format.setTimeZone(timeZone);
             final String dateTime = format.format(new Date(clock.getTime()));
             out.print(dateTime);
@@ -139,7 +140,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements
                     out.print("  ");
                     out.print(subEntry.getKey().getName());
                     out.println(':');
-                    subEntry.getValue().processWith(this, subEntry.getKey(), out);
+                    dispatcher.dispatch(subEntry.getValue(), subEntry.getKey(), this, out);
                     out.println();
                 }
                 out.println();

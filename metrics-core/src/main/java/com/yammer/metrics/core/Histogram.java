@@ -88,7 +88,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
         max.set(Long.MIN_VALUE);
         min.set(Long.MAX_VALUE);
         sum.set(0);
-        variance.set(new double[]{-1, 0});
+        variance.set(new double[]{ -1, 0 });
     }
 
     /**
@@ -224,10 +224,5 @@ public class Histogram implements Metric, Sampling, Summarizable {
                 return;
             }
         }
-    }
-
-    @Override
-    public <T> void processWith(MetricProcessor<T> processor, MetricName name, T context) throws Exception {
-        processor.processHistogram(name, this, context);
     }
 }

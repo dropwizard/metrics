@@ -145,6 +145,7 @@ public class CsvReporter extends AbstractPollingReporter implements
     public void run() {
         final long time = TimeUnit.MILLISECONDS.toSeconds(clock.getTime() - startTime);
         final Set<Entry<MetricName, Metric>> metrics = getMetricsRegistry().getAllMetrics().entrySet();
+        final MetricDispatcher dispatcher = new MetricDispatcher();
         try {
             for (Entry<MetricName, Metric> entry : metrics) {
                 final MetricName metricName = entry.getKey();
@@ -160,7 +161,7 @@ public class CsvReporter extends AbstractPollingReporter implements
                         }
 
                     };
-                    metric.processWith(this, entry.getKey(), context);
+                    dispatcher.dispatch(entry.getValue(), entry.getKey(), this, context);
                 }
             }
         } catch (Exception e) {

@@ -59,9 +59,4 @@ public class Counter implements Metric {
     public void clear() {
         count.set(0);
     }
-
-    @Override
-    public <T> void processWith(MetricProcessor<T> processor, MetricName name, T context) throws Exception {
-        processor.processCounter(name, this, context);
-    }
 }

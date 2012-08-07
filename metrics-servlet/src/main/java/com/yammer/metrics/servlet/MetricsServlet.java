@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
+import com.yammer.metrics.reporting.MetricDispatcher;
 import com.yammer.metrics.stats.Snapshot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -284,6 +285,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
     }
 
     public void writeRegularMetrics(JsonGenerator json, String classPrefix, boolean showFullSamples) throws IOException {
+        final MetricDispatcher dispatcher = new MetricDispatcher();
         for (Map.Entry<String, SortedMap<MetricName, Metric>> entry : registry.getGroupedMetrics().entrySet()) {
             if (classPrefix == null || entry.getKey().startsWith(classPrefix)) {
                 json.writeFieldName(entry.getKey());
@@ -292,10 +294,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
                     for (Map.Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
                         json.writeFieldName(subEntry.getKey().getName());
                         try {
-                            subEntry.getValue()
-                                    .processWith(this,
-                                                 subEntry.getKey(),
-                                                 new Context(json, showFullSamples));
+                            dispatcher.dispatch(subEntry.getValue(), subEntry.getKey(), this, new Context(json, showFullSamples));
                         } catch (Exception e) {
                             LOGGER.warn("Error writing out {}", subEntry.getKey(), e);
                         }

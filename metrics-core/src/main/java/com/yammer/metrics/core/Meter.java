@@ -125,11 +125,6 @@ public class Meter implements Metered {
         return m1Rate.getRate(rateUnit);
     }
 
-    @Override
-    public <T> void processWith(MetricProcessor<T> processor, MetricName name, T context) throws Exception {
-        processor.processMeter(name, this, context);
-    }
-
     private double convertNsRate(double ratePerNs) {
         return ratePerNs * (double) rateUnit.toNanos(1);
     }

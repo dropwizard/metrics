@@ -20,6 +20,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
     private final Map<MetricName, ObjectName> registeredBeans;
     private final MBeanServer server;
+    private final MetricDispatcher dispatcher;
 
     // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
@@ -386,13 +387,14 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         super(registry);
         this.registeredBeans = new ConcurrentHashMap<MetricName, ObjectName>(100);
         this.server = ManagementFactory.getPlatformMBeanServer();
+        this.dispatcher = new MetricDispatcher();
     }
 
     @Override
     public void onMetricAdded(MetricName name, Metric metric) {
         if (metric != null) {
             try {
-                metric.processWith(this, name, new Context(name, new ObjectName(name.getMBeanName())));
+                dispatcher.dispatch(metric, name, this, new Context(name, new ObjectName(name.getMBeanName())));
             } catch (Exception e) {
                 LOGGER.warn("Error processing {}", name, e);
             }

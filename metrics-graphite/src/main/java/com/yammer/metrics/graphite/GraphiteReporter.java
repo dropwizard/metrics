@@ -3,6 +3,7 @@ package com.yammer.metrics.graphite;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.reporting.AbstractPollingReporter;
+import com.yammer.metrics.reporting.MetricDispatcher;
 import com.yammer.metrics.stats.Snapshot;
 import com.yammer.metrics.core.MetricPredicate;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
     protected final String prefix;
     protected final MetricPredicate predicate;
     protected final Locale locale = Locale.US;
+    protected final MetricDispatcher dispatcher = new MetricDispatcher();
     protected final Clock clock;
     protected final SocketProvider socketProvider;
     protected final VirtualMachineMetrics vm;
@@ -245,7 +247,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
                 final Metric metric = subEntry.getValue();
                 if (metric != null) {
                     try {
-                        metric.processWith(this, subEntry.getKey(), epoch);
+                        dispatcher.dispatch(subEntry.getValue(), subEntry.getKey(), this, epoch);
                     } catch (Exception ignored) {
                         LOG.error("Error printing regular metrics:", ignored);
                     }
