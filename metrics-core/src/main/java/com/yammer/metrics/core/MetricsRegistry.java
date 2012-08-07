@@ -348,7 +348,7 @@ public class MetricsRegistry {
         final SortedMap<String, SortedMap<MetricName, Metric>> groups =
                 new TreeMap<String, SortedMap<MetricName, Metric>>();
         for (Map.Entry<MetricName, Metric> entry : metrics.entrySet()) {
-            final String qualifiedTypeName = entry.getKey().getGroup() + "." + entry.getKey()
+            final String qualifiedTypeName = entry.getKey().getDomain() + "." + entry.getKey()
                                                                                     .getType();
             if (predicate.matches(entry.getKey(), entry.getValue())) {
                 final String scopedName;

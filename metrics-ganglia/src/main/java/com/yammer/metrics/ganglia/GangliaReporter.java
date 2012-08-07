@@ -461,7 +461,7 @@ public class GangliaReporter extends AbstractPollingReporter implements MetricPr
         if (name == null) {
             return "";
         }
-        final String qualifiedTypeName = name.getGroup() + "." + name.getType() + "." + name.getName();
+        final String qualifiedTypeName = name.getDomain() + "." + name.getType() + "." + name.getName();
         final String metricName = name.hasScope() ? qualifiedTypeName + '.' + name.getScope() : qualifiedTypeName;
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < metricName.length(); i++) {

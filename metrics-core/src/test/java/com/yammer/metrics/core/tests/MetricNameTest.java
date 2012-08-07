@@ -7,11 +7,11 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 public class MetricNameTest {
-    private final MetricName name = new MetricName("group", "type", "name", "scope", "bean");
+    private final MetricName name = new MetricName("group", "type", "name", "scope");
 
     @Test
     public void hasAGroup() throws Exception {
-        assertThat(name.getGroup(),
+        assertThat(name.getDomain(),
                    is("group"));
     }
 
@@ -37,15 +37,9 @@ public class MetricNameTest {
     }
 
     @Test
-    public void hasAnMBeanName() throws Exception {
-        assertThat(name.getMBeanName(),
-                   is("bean"));
-    }
-
-    @Test
     public void isHumanReadable() throws Exception {
         assertThat(name.toString(),
-                   is("bean"));
+                   is("group.type.name.scope"));
     }
 
     @Test
@@ -53,7 +47,7 @@ public class MetricNameTest {
         final MetricName simple = new MetricName(MetricNameTest.class, "name");
         
         assertThat("it uses the package name as the group",
-                   simple.getGroup(),
+                   simple.getDomain(),
                    is("com.yammer.metrics.core.tests"));
 
         assertThat("it uses the class name as the type",
@@ -67,10 +61,6 @@ public class MetricNameTest {
         assertThat("it has a name",
                    simple.getName(),
                    is("name"));
-
-        assertThat("it has an MBean name",
-                   simple.getMBeanName(),
-                   is("com.yammer.metrics.core.tests:type=MetricNameTest,name=name"));
     }
 
     @Test
@@ -78,7 +68,7 @@ public class MetricNameTest {
         final MetricName scoped = new MetricName(MetricNameTest.class, "name", "scope");
 
         assertThat("it uses the package name as the group",
-                   scoped.getGroup(),
+                   scoped.getDomain(),
                    is("com.yammer.metrics.core.tests"));
 
         assertThat("it uses the class name as the type",
@@ -92,10 +82,6 @@ public class MetricNameTest {
         assertThat("it has a name",
                    scoped.getName(),
                    is("name"));
-
-        assertThat("it has an MBean name",
-                   scoped.getMBeanName(),
-                   is("com.yammer.metrics.core.tests:type=MetricNameTest,scope=scope,name=name"));
     }
 
     @Test
@@ -110,15 +96,15 @@ public class MetricNameTest {
                    is(not(equalTo((Object) ""))));
         
         assertThat(name,
-                   is(equalTo(new MetricName("group", "type", "name", "scope", "bean"))));
+                   is(equalTo(new MetricName("group", "type", "name", "scope"))));
     }
 
     @Test
     public void hasAWorkingHashCodeImplementation() throws Exception {
-        assertThat(new MetricName("group", "type", "name", "scope", "bean").hashCode(),
-                   is(equalTo(new MetricName("group", "type", "name", "scope", "bean").hashCode())));
+        assertThat(new MetricName("group", "type", "name", "scope").hashCode(),
+                   is(equalTo(new MetricName("group", "type", "name", "scope").hashCode())));
         
-        assertThat(new MetricName("group", "type", "name", "scope", "bean").hashCode(),
-                   is(not(equalTo(new MetricName("group", "type", "name", "scope", "bean2").hashCode()))));
+        assertThat(new MetricName("group", "type", "name", "scope").hashCode(),
+                   is(not(equalTo(new MetricName("group", "type", "name", "scope2").hashCode()))));
     }
 }
