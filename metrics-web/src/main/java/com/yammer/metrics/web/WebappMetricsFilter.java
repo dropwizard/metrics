@@ -113,7 +113,7 @@ public abstract class WebappMetricsFilter implements Filter {
     }
 
     private static class StatusExposingServletResponse extends HttpServletResponseWrapper {
-	// The Servlet spec says: calling setStatus is optional, if no status is set, the default is 200.
+        // The Servlet spec says: calling setStatus is optional, if no status is set, the default is 200.
         private int httpStatus = 200;
 
         public StatusExposingServletResponse(HttpServletResponse response) {
