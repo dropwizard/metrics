@@ -25,9 +25,11 @@ public class TimerContext {
     }
 
     /**
-     * Stops recording the elapsed time and updates the timer.
+     * Stops recording the elapsed time, updates the timer and returns the elapsed time
      */
-    public void stop() {
-        timer.update(clock.getTick() - startTime, TimeUnit.NANOSECONDS);
+    public long stop() {
+        final long elapsedNanos = clock.getTick() - startTime;
+        timer.update(elapsedNanos, TimeUnit.NANOSECONDS);
+        return elapsedNanos;
     }
 }
