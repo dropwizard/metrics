@@ -412,7 +412,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
         if (!name.getName().isEmpty()) {
             nameBuilder.append(",name=");
-            nameBuilder.append(name);
+            nameBuilder.append(name.getName());
         }
         return new ObjectName(nameBuilder.toString());
     }
