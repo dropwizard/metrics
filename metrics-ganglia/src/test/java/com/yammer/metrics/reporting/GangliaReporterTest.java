@@ -65,7 +65,7 @@ public class GangliaReporterTest extends AbstractPollingReporterTest {
                                                              messageBuilder,
                                                              VirtualMachineMetrics.getInstance()) {
             @Override
-            String getHostLabel() {
+            String getDefaultHostLabel() {
                 return "localhost";
             }
 
