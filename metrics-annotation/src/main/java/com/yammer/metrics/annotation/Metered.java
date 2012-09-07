@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * {@code #fancyName(String)} method is invoked, the meter will be marked.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 public @interface Metered {
     /**
      * The group of the timer.
