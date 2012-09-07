@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  * "exceptions". The meter will be marked every time an exception is thrown.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 public @interface ExceptionMetered {
     /**
      * The default suffix for meter names.
