@@ -4,6 +4,7 @@ import com.yammer.metrics.core.HealthCheck.Result;
 
 import java.util.Collections;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,6 +44,15 @@ public class HealthCheckRegistry {
     }
 
     /**
+     * Returns a set of names of all registered {@link HealthCheck} instances
+     *
+     * @return a set of names
+     */
+    public Set<String> getRegisteredNames() {
+        return Collections.unmodifiableSet(healthChecks.keySet());
+    }
+
+    /**
      * Runs the registered health checks and returns a map of the results.
      *
      * @return a map of the health check results
@@ -50,9 +60,29 @@ public class HealthCheckRegistry {
     public SortedMap<String, Result> runHealthChecks() {
         final SortedMap<String, Result> results = new TreeMap<String, Result>();
         for (Entry<String, HealthCheck> entry : healthChecks.entrySet()) {
-            final Result result = entry.getValue().execute();
-            results.put(entry.getKey(), result);
+            results.put(entry.getKey(), runHealthCheck(entry.getValue()));
         }
         return Collections.unmodifiableSortedMap(results);
     }
+
+    /**
+     * Runs HealthCheck registered under the parameter name
+     *
+     * @param name the name of the {@link HealthCheck} instance
+     * @return health check result
+     */
+    public Result runHealthCheck(String name) {
+        return runHealthCheck(healthChecks.get(name));
+    }
+
+    /**
+     * Runs provided HealthCheck
+     *
+     * @param healthCheck the {@link HealthCheck} instance
+     * @return health check result
+     */
+    private Result runHealthCheck(HealthCheck healthCheck) {
+        return healthCheck.execute();
+    }
+
 }
