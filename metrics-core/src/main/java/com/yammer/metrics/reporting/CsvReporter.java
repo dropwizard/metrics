@@ -4,6 +4,8 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.stats.Snapshot;
 import com.yammer.metrics.core.MetricPredicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,6 +23,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class CsvReporter extends AbstractPollingReporter implements
                                                          MetricProcessor<CsvReporter.Context> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CsvReporter.class);
 
     /**
      * Enables the CSV reporter for the default metrics registry, and causes it to write to files in
@@ -244,7 +248,11 @@ public class CsvReporter extends AbstractPollingReporter implements
             super.shutdown();
         } finally {
             for (PrintStream out : streamMap.values()) {
-                out.close();
+                try {
+                    out.close();
+                } catch (Throwable t) {
+                    LOGGER.warn("Failed to close stream", t);
+                }
             }
         }
     }
