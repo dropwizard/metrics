@@ -326,36 +326,6 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         }
     }
 
-    private static JmxReporter INSTANCE;
-
-    /**
-     * Starts the default instance of {@link JmxReporter}.
-     *
-     * @param registry    the {@link MetricsRegistry} to report from
-     */
-    public static void startDefault(MetricsRegistry registry) {
-        INSTANCE = new JmxReporter(registry);
-        INSTANCE.start();
-    }
-
-    /**
-     * Returns the default instance of {@link JmxReporter} if it has been started.
-     *
-     * @return The default instance or null if the default is not used
-     */
-    public static JmxReporter getDefault() {
-        return INSTANCE;
-    }
-
-    /**
-     * Stops the default instance of {@link JmxReporter}.
-     */
-    public static void shutdownDefault() {
-        if (INSTANCE != null) {
-            INSTANCE.shutdown();
-        }
-    }
-
     static final class Context {
         private final MetricName metricName;
         private final ObjectName objectName;
