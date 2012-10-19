@@ -13,6 +13,7 @@ public class MetricsRegistry {
     private final Clock clock;
     private final ConcurrentMap<MetricName, Metric> metrics;
     private final List<MetricsRegistryListener> listeners;
+    private final String name;
 
     /**
      * Creates a new {@link MetricsRegistry}.
@@ -22,11 +23,31 @@ public class MetricsRegistry {
     }
 
     /**
+     * Creates a new {@link MetricsRegistry} with the given name.
+     *
+     * @param name    the name of the registry
+     */
+    public MetricsRegistry(String name) {
+        this(name, Clock.defaultClock());
+    }
+
+    /**
      * Creates a new {@link MetricsRegistry} with the given {@link Clock} instance.
      *
      * @param clock    a {@link Clock} instance
      */
     public MetricsRegistry(Clock clock) {
+        this(null, clock);
+    }
+
+    /**
+     * Creates a new {@link MetricsRegistry} with the given name and {@link Clock} instance.
+     *
+     * @param name     the name of the registry
+     * @param clock    a {@link Clock} instance
+     */
+    public MetricsRegistry(String name, Clock clock) {
+        this.name = name;
         this.clock = clock;
         this.metrics = newMetricsMap();
         this.listeners = new CopyOnWriteArrayList<MetricsRegistryListener>();
@@ -482,5 +503,9 @@ public class MetricsRegistry {
         for (MetricsRegistryListener listener : listeners) {
             listener.onMetricAdded(name, metric);
         }
+    }
+
+    public String getName() {
+        return name;
     }
 }
