@@ -342,6 +342,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
         sendFloat(epoch, sanitizedName, "max", metric.getMax());
         sendFloat(epoch, sanitizedName, "mean", metric.getMean());
         sendFloat(epoch, sanitizedName, "stddev", metric.getStdDev());
+        sendFloat(epoch, sanitizedName, "sum", metric.getSum());
     }
 
     protected void sendSampling(long epoch, String sanitizedName, Sampling metric) throws IOException {

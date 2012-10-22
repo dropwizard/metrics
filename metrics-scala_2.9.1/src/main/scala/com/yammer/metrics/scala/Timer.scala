@@ -64,6 +64,11 @@ class Timer(metric: com.yammer.metrics.core.Timer) {
   def stdDev = metric.getStdDev
 
   /**
+   * Returns the sum of all recorded values.
+   */
+  def sum = metric.getSum
+
+  /**
    * Returns a snapshot of the values in the timer's sample.
    */
   def snapshot = metric.getSnapshot
