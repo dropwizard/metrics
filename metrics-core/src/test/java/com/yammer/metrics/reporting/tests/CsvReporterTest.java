@@ -31,8 +31,8 @@ public class CsvReporterTest extends AbstractPollingReporterTest {
 
     @Override
     public String[] expectedHistogramResult() {
-        return new String[]{"# time,min,max,mean,median,stddev,95%,99%,99.9%",
-                            "5,1.0,3.0,2.0,0.4995,1.5,0.9499499999999999,0.98999,0.998999\n"};
+        return new String[]{"# time,min,max,mean,median,stddev,95%,99%,99.9%,sum",
+                            "5,1.0,3.0,2.0,0.4995,1.5,0.9499499999999999,0.98999,0.998999,4.0\n"};
     }
 
     @Override
@@ -43,8 +43,8 @@ public class CsvReporterTest extends AbstractPollingReporterTest {
 
     @Override
     public String[] expectedTimerResult() {
-        return new String[]{"# time,min,max,mean,median,stddev,95%,99%,99.9%",
-                            "5,1.0,3.0,2.0,0.4995,1.5,0.9499499999999999,0.98999,0.998999\n"};
+        return new String[]{"# time,min,max,mean,median,stddev,95%,99%,99.9%,sum",
+                            "5,1.0,3.0,2.0,0.4995,1.5,0.9499499999999999,0.98999,0.998999,4.0\n"};
     }
 
     @Override

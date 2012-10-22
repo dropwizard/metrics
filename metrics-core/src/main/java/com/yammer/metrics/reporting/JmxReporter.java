@@ -159,6 +159,8 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
 
         double getStdDev();
 
+        double getSum();
+
         double get50thPercentile();
 
         double get75thPercentile();
@@ -217,6 +219,11 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         @Override
         public double getStdDev() {
             return metric.getStdDev();
+        }
+
+        @Override
+        public double getSum() {
+            return metric.getSum();
         }
 
         @Override
@@ -293,6 +300,11 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         @Override
         public double getStdDev() {
             return metric.getStdDev();
+        }
+
+        @Override
+        public double getSum() {
+            return metric.getSum();
         }
 
         @Override

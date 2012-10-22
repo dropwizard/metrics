@@ -191,6 +191,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements
         stream.printf(locale, "               max = %2.2f\n", histogram.getMax());
         stream.printf(locale, "              mean = %2.2f\n", histogram.getMean());
         stream.printf(locale, "            stddev = %2.2f\n", histogram.getStdDev());
+        stream.printf(locale, "               sum = %2.2f\n", histogram.getSum());
         stream.printf(locale, "            median = %2.2f\n", snapshot.getMedian());
         stream.printf(locale, "              75%% <= %2.2f\n", snapshot.get75thPercentile());
         stream.printf(locale, "              95%% <= %2.2f\n", snapshot.get95thPercentile());
@@ -208,6 +209,7 @@ public class ConsoleReporter extends AbstractPollingReporter implements
         stream.printf(locale, "               max = %2.2f%s\n", timer.getMax(), durationUnit);
         stream.printf(locale, "              mean = %2.2f%s\n", timer.getMean(), durationUnit);
         stream.printf(locale, "            stddev = %2.2f%s\n", timer.getStdDev(), durationUnit);
+        stream.printf(locale, "               sum = %2.2f%s\n", timer.getSum(), durationUnit);
         stream.printf(locale, "            median = %2.2f%s\n", snapshot.getMedian(), durationUnit);
         stream.printf(locale, "              75%% <= %2.2f%s\n", snapshot.get75thPercentile(), durationUnit);
         stream.printf(locale, "              95%% <= %2.2f%s\n", snapshot.get95thPercentile(), durationUnit);

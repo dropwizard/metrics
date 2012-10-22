@@ -186,6 +186,7 @@ public abstract class AbstractPollingReporterTest {
         when(summarizable.getMax()).thenReturn(3d);
         when(summarizable.getMean()).thenReturn(2d);
         when(summarizable.getStdDev()).thenReturn(1.5d);
+        when(summarizable.getSum()).thenReturn(4d);
     }
 
     static void setupMeteredMock(Metered metered) {
