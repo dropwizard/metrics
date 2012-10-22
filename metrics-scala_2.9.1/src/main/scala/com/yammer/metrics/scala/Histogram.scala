@@ -55,6 +55,11 @@ class Histogram(metric: com.yammer.metrics.core.Histogram) {
   def stdDev = metric.getStdDev
 
   /**
+   * Returns the sum of all recorded values.
+   */
+  def sum = metric.getSum
+
+  /**
    * Returns a snapshot of the values in the histogram's sample.
    */
   def snapshot = metric.getSnapshot
