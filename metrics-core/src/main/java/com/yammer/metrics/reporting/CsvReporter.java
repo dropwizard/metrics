@@ -214,9 +214,14 @@ public class CsvReporter extends AbstractPollingReporter implements
 
     @Override
     public void processTimer(MetricName name, Timer timer, Context context) throws IOException {
-        final PrintStream stream = context.getStream("# time,min,max,mean,median,stddev,95%,99%,99.9%");
+        final PrintStream stream = context.getStream("# time,count,1 min rate,mean rate,5 min rate,15 min rate,min,max,mean,median,stddev,95%,99%,99.9%");
         final Snapshot snapshot = timer.getSnapshot();
         stream.append(new StringBuilder()
+                              .append(timer.getCount()).append(',')
+                              .append(timer.getOneMinuteRate()).append(',')
+                              .append(timer.getMeanRate()).append(',')
+                              .append(timer.getFiveMinuteRate()).append(',')
+                              .append(timer.getFifteenMinuteRate()).append(',')
                               .append(timer.getMin()).append(',')
                               .append(timer.getMax()).append(',')
                               .append(timer.getMean()).append(',')

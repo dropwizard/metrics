@@ -43,8 +43,8 @@ public class CsvReporterTest extends AbstractPollingReporterTest {
 
     @Override
     public String[] expectedTimerResult() {
-        return new String[]{"# time,min,max,mean,median,stddev,95%,99%,99.9%",
-                            "5,1.0,3.0,2.0,0.4995,1.5,0.9499499999999999,0.98999,0.998999\n"};
+        return new String[]{"# time,count,1 min rate,mean rate,5 min rate,15 min rate,min,max,mean,median,stddev,95%,99%,99.9%",
+                            "5,1,1.0,2.0,5.0,15.0,1.0,3.0,2.0,0.4995,1.5,0.9499499999999999,0.98999,0.998999\n"};
     }
 
     @Override
