@@ -182,6 +182,21 @@ public class Metrics {
 
     /**
      * Creates a new non-biased {@link com.yammer.metrics.core.Histogram} and registers it under the
+     * given class, name, and scope.
+     *
+     * @param klass      the class which owns the metric
+     * @param name       the name of the metric
+     * @param sampleSize the number of observations to keep in sliding window
+     * @return a new {@link com.yammer.metrics.core.Histogram}
+     */
+    public static Histogram newHistogram(Class<?> klass,
+                                         String name,
+                                         int sampleSize) {
+        return DEFAULT_REGISTRY.newHistogram(klass, name, sampleSize);
+    }
+
+    /**
+     * Creates a new non-biased {@link com.yammer.metrics.core.Histogram} and registers it under the
      * given metric name.
      *
      * @param metricName the name of the metric
