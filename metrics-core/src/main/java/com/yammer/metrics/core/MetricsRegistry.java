@@ -1,6 +1,7 @@
 package com.yammer.metrics.core;
 
 import com.yammer.metrics.core.Histogram.SampleType;
+import com.yammer.metrics.stats.UniformSample;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -158,6 +159,19 @@ public class MetricsRegistry {
     }
 
     /**
+     * Creates a new non-biased {@link Histogram} and registers it under the given class and name.
+     *
+     * @param klass the class which owns the metric
+     * @param name  the name of the metric
+     * @return a new {@link Histogram}
+     */
+    public Histogram newHistogram(Class<?> klass,
+                                  String name,
+                                  int sampleSize) {
+        return newHistogram(createName(klass, name, null), sampleSize);
+    }
+
+    /**
      * Creates a new non-biased {@link Histogram} and registers it under the given class, name, and
      * scope.
      *
@@ -182,7 +196,19 @@ public class MetricsRegistry {
     public Histogram newHistogram(MetricName metricName,
                                   boolean biased) {
         return getOrAdd(metricName,
-                        new Histogram(biased ? SampleType.BIASED : SampleType.UNIFORM));
+                new Histogram(biased ? SampleType.BIASED : SampleType.UNIFORM));
+    }
+
+    /**
+     * Creates a new {@link Histogram} and registers it under the given metric name.
+     *
+     * @param metricName the name of the metric
+     * @param sampleSize how many samples to consider
+     * @return a new {@link Histogram}
+     */
+    public Histogram newHistogram(MetricName metricName,
+                                  int sampleSize) {
+        return getOrAdd(metricName, new Histogram(new UniformSample(sampleSize)));
     }
 
     /**
@@ -318,7 +344,7 @@ public class MetricsRegistry {
             return (Timer) existingMetric;
         }
         return getOrAdd(metricName,
-                        new Timer(newMeterTickThreadPool(), durationUnit, rateUnit, clock));
+                new Timer(newMeterTickThreadPool(), durationUnit, rateUnit, clock));
     }
 
     /**
