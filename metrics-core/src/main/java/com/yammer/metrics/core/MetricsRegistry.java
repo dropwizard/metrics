@@ -431,7 +431,7 @@ public class MetricsRegistry {
             return (Timer) existingMetric;
         }
         return getOrAdd(metricName,
-                new Timer(durationUnit, rateUnit, clock));
+                        new Timer(durationUnit, rateUnit, clock));
     }
 
     /**
