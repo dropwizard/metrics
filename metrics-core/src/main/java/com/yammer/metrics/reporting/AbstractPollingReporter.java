@@ -32,7 +32,7 @@ public abstract class AbstractPollingReporter extends AbstractReporter implement
      * @param unit      the unit for {@code period}
      */
     public void start(long period, TimeUnit unit) {
-        executor.scheduleWithFixedDelay(this, period, period, unit);
+        executor.scheduleAtFixedRate(this, period, period, unit);
     }
 
     /**
