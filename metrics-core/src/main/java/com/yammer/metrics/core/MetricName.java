@@ -67,10 +67,7 @@ public class MetricName implements Comparable<MetricName> {
         this.domain = domain;
         this.type = type;
         this.name = name;
-	    if (scope == null)
-		    this.scope = defaultScope;
-	    else
-		    this.scope = scope;
+	    this.scope = scope;
     }
 
     /**
@@ -230,22 +227,5 @@ public class MetricName implements Comparable<MetricName> {
                                       annotation.name());
     }
 
-	/**
-	 *  Set the default scope.
-	 *  Most obvious usage is to set the scope to the localhost name, or the application name.
-	 * @param scope
-	 */
-	public static void setDefaultScope(String scope)
-	{
-		 defaultScope = scope;
-	}
-
-	/**
-	 *  Return the default scope.
-	 */
-	public static String getDefaultScope()
-	{
-		return defaultScope;
-	}
 
 }
