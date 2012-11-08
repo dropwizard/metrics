@@ -1,6 +1,8 @@
 package com.yammer.metrics.core;
 
 import com.yammer.metrics.core.Histogram.SampleType;
+import com.yammer.metrics.stats.ExponentiallyDecayingSample;
+import com.yammer.metrics.stats.UniformSample;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -202,6 +204,98 @@ public class MetricsRegistry {
                                   boolean biased) {
         return getOrAdd(metricName,
                         new Histogram(biased ? SampleType.BIASED : SampleType.UNIFORM));
+    }
+
+    /**
+     * Creates a new Uniform {@link Histogram} and registers it under the given class and name.
+     *
+     * @param klass      the class which owns the metric
+     * @param name       the name of the metric
+     * @param sampleSize the number of observations to consider when calculating metrics
+     * @return a new {@link Histogram}
+     */
+    public Histogram newUniformHistogram(Class<?> klass,
+                                  String name,
+                                  int sampleSize) {
+        return newUniformHistogram(klass, name, null, sampleSize);
+    }
+
+    /**
+     * Creates a new Uniform {@link Histogram} and registers it under the given class, name, and scope.
+     *
+     * @param klass      the class which owns the metric
+     * @param name       the name of the metric
+     * @param scope      the scope of the metric
+     * @param sampleSize the number of observations to consider when calculating metrics
+     * @return a new {@link Histogram}
+     */
+    public Histogram newUniformHistogram(Class<?> klass,
+                                  String name,
+                                  String scope,
+                                  int sampleSize) {
+        return newUniformHistogram(createName(klass, name, scope), sampleSize);
+    }
+
+
+    /**
+     * Creates a new Uniform {@link Histogram} and registers it under the given metric name.
+     *
+     * @param metricName the name of the metric
+     * @param sampleSize the number of observations to consider when calculating metrics
+     * @return a new {@link Histogram}
+     */
+    public Histogram newUniformHistogram(MetricName metricName,
+                                         int sampleSize) {
+        return getOrAdd(metricName, new Histogram(new UniformSample(sampleSize)));
+    }
+
+    /**
+     * Creates a new Biased {@link Histogram} and registers it under the given class and name.
+     *
+     * @param klass      the class which owns the metric
+     * @param name       the name of the metric
+     * @param sampleSize the number of observations to consider when calculating metrics
+     * @param alpha      the exponential coefficient determining forward decay
+     * @return a new {@link Histogram}
+     */
+    public Histogram newBiasedHistogram(Class<?> klass,
+                                         String name,
+                                         int sampleSize,
+                                         double alpha) {
+        return newBiasedHistogram(klass, name, null, sampleSize, alpha);
+    }
+
+    /**
+     * Creates a new Uniform {@link Histogram} and registers it under the given class, name, and scope.
+     *
+     * @param klass      the class which owns the metric
+     * @param name       the name of the metric
+     * @param scope      the scope of the metric
+     * @param sampleSize the number of observations to consider when calculating metrics
+     * @param alpha      the exponential coefficient determining forward decay
+     * @return a new {@link Histogram}
+     */
+    public Histogram newBiasedHistogram(Class<?> klass,
+                                         String name,
+                                         String scope,
+                                         int sampleSize,
+                                         double alpha) {
+        return newBiasedHistogram(createName(klass, name, scope), sampleSize, alpha);
+    }
+
+
+    /**
+     * Creates a new Uniform {@link Histogram} and registers it under the given metric name.
+     *
+     * @param metricName the name of the metric
+     * @param sampleSize the number of observations to consider when calculating metrics
+     * @param alpha      the exponential coefficient determining forward decay
+     * @return a new {@link Histogram}
+     */
+    public Histogram newBiasedHistogram(MetricName metricName,
+                                         int sampleSize,
+                                         double alpha) {
+        return getOrAdd(metricName, new Histogram(new ExponentiallyDecayingSample(sampleSize, alpha)));
     }
 
     /**
