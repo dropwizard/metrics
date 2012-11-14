@@ -24,6 +24,13 @@ v3.0.0-SNAPSHOT
 * Changed package names in ``metrics-ganglia``, ``metrics-graphite``, and ``metrics-servlet``.
 * Removed ``metrics-guice`` and ``metrics-spring``.
 
+.. _rel-2.1.4:
+
+v2.1.4: Nov 15 2012
+===================
+
+* Added OSGi bundling manifests.
+
 .. _rel-2.1.3:
 
 v2.1.3: Aug 06 2012
