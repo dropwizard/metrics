@@ -4,6 +4,13 @@
 Release Notes
 #############
 
+.. _rel-2.1.4:
+
+v2.1.4-SNAPSHOT
+===============
+
+* Added OSGi bundling manifests.
+
 .. _rel-2.1.3:
 
 v2.1.3: Aug 06 2012
