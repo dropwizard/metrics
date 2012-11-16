@@ -1,12 +1,12 @@
 package com.yammer.metrics.guice.servlet;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.reporting.*;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import java.util.Set;
 

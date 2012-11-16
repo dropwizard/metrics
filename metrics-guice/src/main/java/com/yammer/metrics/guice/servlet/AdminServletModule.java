@@ -1,10 +1,9 @@
 package com.yammer.metrics.guice.servlet;
 
-import com.yammer.metrics.reporting.AdminServlet;
-import org.codehaus.jackson.JsonFactory;
-
+import com.fasterxml.jackson.core.JsonFactory;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
+import com.yammer.metrics.reporting.AdminServlet;
 
 /**
  * A guice servlet module that registers the {@link AdminServlet} via guice and also configures all
