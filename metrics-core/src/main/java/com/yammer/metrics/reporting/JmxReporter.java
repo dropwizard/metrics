@@ -156,6 +156,8 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         double getMax();
 
         double getMean();
+        
+        double getSum();
 
         double getStdDev();
 
@@ -212,6 +214,11 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         @Override
         public double getMean() {
             return metric.getMean();
+        }
+        
+        @Override
+        public double getSum() {
+        	return metric.getSum();
         }
 
         @Override
@@ -288,6 +295,11 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         @Override
         public double getMean() {
             return metric.getMean();
+        }
+        
+        @Override
+        public double getSum() {
+        	return metric.getSum();
         }
 
         @Override
