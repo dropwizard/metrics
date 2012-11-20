@@ -4,6 +4,14 @@
 Release Notes
 #############
 
+.. _rel-2.2.0:
+
+v2.2.0-SNAPSHOT
+===============
+
+* Removed all OSGi bundling. This will be back in 3.0.
+* Added ``InstrumentedSslSelectChannelConnector`` and ``InstrumentedSslSocketConnector``.
+
 .. _rel-2.1.5:
 
 v2.1.5: Nov 19 2012
