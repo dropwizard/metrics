@@ -19,6 +19,8 @@ v2.2.0-SNAPSHOT
 * Upgraded to Spring 3.1.3.
 * Upgraded to Jetty 8.1.8.
 * Upgraded to SLF4J 1.7.2.
+* Replaced usage of ``Unsafe`` in ``InstrumentedResourceMethodDispatchProvider`` with type erasure
+  trickery.
 
 .. _rel-2.1.5:
 
