@@ -16,6 +16,7 @@ v2.2.0-SNAPSHOT
 * Upgraded to Jersey 1.15.
 * Upgraded to Log4j 1.2.17.
 * Upgraded to Logback 1.0.7.
+* Upgraded to Spring 3.1.3.
 
 .. _rel-2.1.5:
 
