@@ -13,6 +13,7 @@ v2.2.0-SNAPSHOT
 * Added ``InstrumentedSslSelectChannelConnector`` and ``InstrumentedSslSocketConnector``.
 * Upgraded to Ehcache 2.6.2.
 * Upgraded to Apache HttpClient 4.2.2.
+* Upgraded to Jersey 1.15.
 
 .. _rel-2.1.5:
 
