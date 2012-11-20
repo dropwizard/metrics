@@ -11,6 +11,7 @@ v2.2.0-SNAPSHOT
 
 * Removed all OSGi bundling. This will be back in 3.0.
 * Added ``InstrumentedSslSelectChannelConnector`` and ``InstrumentedSslSocketConnector``.
+* Upgraded to Ehcache 2.6.2.
 
 .. _rel-2.1.5:
 
