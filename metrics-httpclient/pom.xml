@@ -10,7 +10,6 @@
 
     <artifactId>metrics-httpclient</artifactId>
     <name>Metrics HttpClient Support</name>
-    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>

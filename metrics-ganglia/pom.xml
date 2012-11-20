@@ -10,7 +10,6 @@
 
     <artifactId>metrics-ganglia</artifactId>
     <name>Metrics Ganglia Support</name>
-    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>

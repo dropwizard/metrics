@@ -10,7 +10,6 @@
 
     <artifactId>metrics-servlet</artifactId>
     <name>Metrics Servlet</name>
-    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>

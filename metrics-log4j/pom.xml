@@ -10,7 +10,6 @@
 
     <artifactId>metrics-log4j</artifactId>
     <name>Metrics Log4j Support</name>
-    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>

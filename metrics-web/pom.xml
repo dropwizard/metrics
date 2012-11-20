@@ -10,7 +10,6 @@
 
     <artifactId>metrics-web</artifactId>
     <name>Metrics Web Application Support</name>
-    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>

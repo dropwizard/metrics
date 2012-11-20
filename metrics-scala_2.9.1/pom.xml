@@ -10,7 +10,6 @@
 
     <artifactId>metrics-scala_2.9.1</artifactId>
     <name>Metrics for Scala ${scala.version}</name>
-    <packaging>bundle</packaging>
 
     <properties>
         <scala.version>2.9.1</scala.version>

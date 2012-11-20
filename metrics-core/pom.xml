@@ -10,7 +10,6 @@
 
     <artifactId>metrics-core</artifactId>
     <name>Metrics Core Library</name>
-    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>

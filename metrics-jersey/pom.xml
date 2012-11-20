@@ -10,7 +10,6 @@
 
     <artifactId>metrics-jersey</artifactId>
     <name>Metrics Jersey Support</name>
-    <packaging>bundle</packaging>
     <description>
         A set of class providing Metrics integration for Jersey, the reference JAX-RS
         implementation.

@@ -10,7 +10,6 @@
 
     <artifactId>metrics-graphite</artifactId>
     <name>Metrics Graphite Support</name>
-    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
