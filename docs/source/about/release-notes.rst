@@ -14,6 +14,7 @@ v2.2.0-SNAPSHOT
 * Upgraded to Ehcache 2.6.2.
 * Upgraded to Apache HttpClient 4.2.2.
 * Upgraded to Jersey 1.15.
+* Upgraded to Log4j 1.2.17.
 
 .. _rel-2.1.5:
 
