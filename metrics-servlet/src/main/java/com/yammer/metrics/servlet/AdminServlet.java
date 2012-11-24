@@ -35,7 +35,7 @@ public class AdminServlet extends HttpServlet {
     public static final String DEFAULT_THREADS_URI = "/threads";
     private static final String CONTENT_TYPE = "text/html";
 
-    private final HealthCheckServlet healthCheckServlet;
+    private HealthCheckServlet healthCheckServlet;
     private final MetricsServlet metricsServlet;
     private final PingServlet pingServlet;
     private final ThreadDumpServlet threadDumpServlet;
@@ -74,6 +74,15 @@ public class AdminServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
+        String healthCheckServletClassName = "com.yammer.metrics.servlet.HealthCheckServlet";
+        try {
+            healthCheckServletClassName = getParam("healthcheck-servlet-class", healthCheckServletClassName);
+            Class healthCheckServletClass = Class.forName(healthCheckServletClassName);
+            healthCheckServlet = (com.yammer.metrics.servlet.HealthCheckServlet) healthCheckServletClass.newInstance();
+        } catch (Exception cause) {
+            String message = String.format("Unable to create HealthCheckServlet instance for class '%s', using default's one", healthCheckServletClassName);
+            log(message, cause);
+        }
         healthCheckServlet.init(config);
         metricsServlet.init(config);
         pingServlet.init(config);
