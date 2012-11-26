@@ -9,6 +9,7 @@ import java.lang.management.ManagementFactory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import static javax.management.ObjectName.quote;
 
 /**
  * A reporter which exposes application metric as JMX MBeans.
@@ -377,18 +378,18 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         final StringBuilder nameBuilder = new StringBuilder();
         nameBuilder.append(name.getDomain());
         nameBuilder.append(":type=");
-        nameBuilder.append(name.getType());
+        nameBuilder.append(quote(name.getType()));
         if (name.hasScope()) {
             nameBuilder.append(",scope=");
-            nameBuilder.append(name.getScope());
+            nameBuilder.append(quote(name.getScope()));
         }
         if (!name.getName().isEmpty()) {
             nameBuilder.append(",name=");
-            nameBuilder.append(name.getName());
+            nameBuilder.append(quote(name.getName()));
         }
         if (registryName != null) {
             nameBuilder.append(",registry=");
-            nameBuilder.append(registryName);
+            nameBuilder.append(quote(registryName));
         }
         return new ObjectName(nameBuilder.toString());
     }
