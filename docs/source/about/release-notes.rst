@@ -11,6 +11,7 @@ v2.2.0-SNAPSHOT
 
 * Removed all OSGi bundling. This will be back in 3.0.
 * Added ``InstrumentedSslSelectChannelConnector`` and ``InstrumentedSslSocketConnector``.
+* Made all metric names JMX-safe.
 * Upgraded to Ehcache 2.6.2.
 * Upgraded to Apache HttpClient 4.2.2.
 * Upgraded to Jersey 1.15.
