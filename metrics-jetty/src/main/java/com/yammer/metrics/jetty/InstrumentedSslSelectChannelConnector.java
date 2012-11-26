@@ -5,7 +5,6 @@ import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.io.Connection;
 import org.eclipse.jetty.server.bio.SocketConnector;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
@@ -58,7 +57,8 @@ public class InstrumentedSslSelectChannelConnector extends SslSelectChannelConne
     }
 
     public InstrumentedSslSelectChannelConnector(MetricsRegistry registry,
-                                                 int port, SslContextFactory factory) {
+                                                 int port,
+                                                 SslContextFactory factory) {
         super(factory);
         setPort(port);
         this.duration = registry.newTimer(SslSelectChannelConnector.class,
@@ -85,10 +85,6 @@ public class InstrumentedSslSelectChannelConnector extends SslSelectChannelConne
                                                "active-connections",
                                                Integer.toString(port));
 
-    }
-
-    public InstrumentedSslSelectChannelConnector(SslContextFactory contextFactory, int port) {
-        this(contextFactory, Metrics.defaultRegistry(), port);
     }
 
     public InstrumentedSslSelectChannelConnector(SslContextFactory contextFactory, MetricsRegistry registry, int port) {
