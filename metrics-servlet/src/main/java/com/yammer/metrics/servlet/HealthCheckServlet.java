@@ -61,40 +61,51 @@ public class HealthCheckServlet extends HttpServlet {
         final Map<String, HealthCheck.Result> results = registry.runHealthChecks();
         resp.setContentType(CONTENT_TYPE);
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
-        final PrintWriter writer = resp.getWriter();
         if (results.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
-            writer.println("! No health checks registered.");
+        } else if (isAllHealthy(results)) {
+            resp.setStatus(HttpServletResponse.SC_OK);
         } else {
-            if (isAllHealthy(results)) {
-                resp.setStatus(HttpServletResponse.SC_OK);
-            } else {
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            }
-            for (Map.Entry<String, HealthCheck.Result> entry : results.entrySet()) {
-                final HealthCheck.Result result = entry.getValue();
-                if (result.isHealthy()) {
-                    if (result.getMessage() != null) {
-                        writer.format("* %s: OK\n  %s\n", entry.getKey(), result.getMessage());
-                    } else {
-                        writer.format("* %s: OK\n", entry.getKey());
-                    }
-                } else {
-                    if (result.getMessage() != null) {
-                        writer.format("! %s: ERROR\n!  %s\n", entry.getKey(), result.getMessage());
-                    }
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+        final PrintWriter writer = resp.getWriter();
+        render(writer, results);
+        writer.close();
+    }
 
-                    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
-                    final Throwable error = result.getError();
-                    if (error != null) {
-                        writer.println();
-                        error.printStackTrace(writer);
-                        writer.println();
-                    }
+    /**
+     * Override this method to customize the health check status report.
+     *
+     * @param writer Response writer closed after the call to this method, so do not close.
+     * @param results All the check results to render.
+     */
+    protected void render(PrintWriter writer, Map<String, HealthCheck.Result> results) {
+        if (results.isEmpty()) {
+            writer.println("! No health checks registered.");
+            return;
+        }
+        for (Map.Entry<String, HealthCheck.Result> entry : results.entrySet()) {
+            final HealthCheck.Result result = entry.getValue();
+            if (result.isHealthy()) {
+                if (result.getMessage() != null) {
+                    writer.format("* %s: OK\n  %s\n", entry.getKey(), result.getMessage());
+                } else {
+                    writer.format("* %s: OK\n", entry.getKey());
+                }
+            } else {
+                if (result.getMessage() != null) {
+                    writer.format("! %s: ERROR\n!  %s\n", entry.getKey(), result.getMessage());
+                }
+
+                @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+                final Throwable error = result.getError();
+                if (error != null) {
+                    writer.println();
+                    error.printStackTrace(writer);
+                    writer.println();
                 }
             }
         }
-        writer.close();
     }
 
     private static boolean isAllHealthy(Map<String, HealthCheck.Result> results) {
