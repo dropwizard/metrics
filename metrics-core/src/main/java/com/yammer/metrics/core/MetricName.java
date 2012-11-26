@@ -1,5 +1,6 @@
 package com.yammer.metrics.core;
 
+import javax.management.ObjectName;
 import java.lang.reflect.Method;
 
 /**
@@ -164,16 +165,16 @@ public class MetricName implements Comparable<MetricName> {
 
     private static String createMBeanName(String group, String type, String name, String scope) {
         final StringBuilder nameBuilder = new StringBuilder();
-        nameBuilder.append(group);
+        nameBuilder.append(ObjectName.quote(group));
         nameBuilder.append(":type=");
-        nameBuilder.append(type);
+        nameBuilder.append(ObjectName.quote(type));
         if (scope != null) {
             nameBuilder.append(",scope=");
-            nameBuilder.append(scope);
+            nameBuilder.append(ObjectName.quote(scope));
         }
         if (name.length() > 0) {
             nameBuilder.append(",name=");
-            nameBuilder.append(name);
+            nameBuilder.append(ObjectName.quote(name));
         }
         return nameBuilder.toString();
     }
