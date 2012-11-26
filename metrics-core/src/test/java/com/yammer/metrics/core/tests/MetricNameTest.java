@@ -70,7 +70,7 @@ public class MetricNameTest {
 
         assertThat("it has an MBean name",
                    simple.getMBeanName(),
-                   is("com.yammer.metrics.core.tests:type=MetricNameTest,name=name"));
+                   is("\"com.yammer.metrics.core.tests\":type=\"MetricNameTest\",name=\"name\""));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class MetricNameTest {
 
         assertThat("it has an MBean name",
                    scoped.getMBeanName(),
-                   is("com.yammer.metrics.core.tests:type=MetricNameTest,scope=scope,name=name"));
+                   is("\"com.yammer.metrics.core.tests\":type=\"MetricNameTest\",scope=\"scope\",name=\"name\""));
     }
 
     @Test
