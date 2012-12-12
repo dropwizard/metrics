@@ -208,7 +208,6 @@ public class CsvReporter extends AbstractPollingReporter implements
                               .append(snapshot.get99thPercentile()).append(',')
                               .append(snapshot.get999thPercentile()).toString())
                 .println();
-        stream.println();
         stream.flush();
     }
 
