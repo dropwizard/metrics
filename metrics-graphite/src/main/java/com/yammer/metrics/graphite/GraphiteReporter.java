@@ -36,6 +36,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
     protected final VirtualMachineMetrics vm;
     protected Writer writer;
     public boolean printVMMetrics = true;
+    public String jvmMetricsName = "jvm";
 
     /**
      * Enables the graphite reporter to send data for the default metrics registry to graphite
@@ -88,7 +89,21 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
      * @param prefix          the string which is prepended to all metric names
      */
     public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix) {
-        enable(metricsRegistry, period, unit, host, port, prefix, MetricPredicate.ALL);
+      enable(metricsRegistry, period, unit, host, port, prefix, "jvm", MetricPredicate.ALL);
+    }
+    /**
+     * Enables the graphite reporter to send data to graphite server with the specified period.
+     *
+     * @param metricsRegistry the metrics registry
+     * @param period          the period between successive outputs
+     * @param unit            the time unit of {@code period}
+     * @param host            the host name of graphite server (carbon-cache agent)
+     * @param port            the port number on which the graphite server is listening
+     * @param prefix          the string which is prepended to all metric names
+     * @param jvmMetricsName  the string which prefixes jvmMetrics
+     */
+    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix, String jvmMetricsName) {
+        enable(metricsRegistry, period, unit, host, port, prefix, jvmMetricsName, MetricPredicate.ALL);
     }
 
     /**
@@ -102,7 +117,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
      * @param prefix          the string which is prepended to all metric names
      * @param predicate       filters metrics to be reported
      */
-    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix, MetricPredicate predicate) {
+    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix, String jvmMetricsName, MetricPredicate predicate) {
         try {
             final GraphiteReporter reporter = new GraphiteReporter(metricsRegistry,
                                                                    prefix,
@@ -110,10 +125,15 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
                                                                    new DefaultSocketProvider(host,
                                                                                              port),
                                                                    Clock.defaultClock());
+            reporter.setJvmMetricsName(jvmMetricsName);
             reporter.start(period, unit);
         } catch (Exception e) {
             LOG.error("Error creating/starting Graphite reporter:", e);
         }
+    }
+
+    private void setJvmMetricsName(String jvmMetricsName) {
+        this.jvmMetricsName = jvmMetricsName;
     }
 
     /**
@@ -355,23 +375,23 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
     }
 
     protected void printVmMetrics(long epoch) {
-        sendFloat(epoch, "jvm.memory", "heap_usage", vm.getHeapUsage());
-        sendFloat(epoch, "jvm.memory", "non_heap_usage", vm.getNonHeapUsage());
+        sendFloat(epoch, jvmMetricsName + ".memory", "heap_usage", vm.getHeapUsage());
+        sendFloat(epoch, jvmMetricsName + ".memory", "non_heap_usage", vm.getNonHeapUsage());
         for (Entry<String, Double> pool : vm.getMemoryPoolUsage().entrySet()) {
-            sendFloat(epoch, "jvm.memory.memory_pool_usages", sanitizeString(pool.getKey()), pool.getValue());
+            sendFloat(epoch, jvmMetricsName + ".memory.memory_pool_usages", sanitizeString(pool.getKey()), pool.getValue());
         }
 
-        sendInt(epoch, "jvm", "daemon_thread_count", vm.getDaemonThreadCount());
-        sendInt(epoch, "jvm", "thread_count", vm.getThreadCount());
-        sendInt(epoch, "jvm", "uptime", vm.getUptime());
-        sendFloat(epoch, "jvm", "fd_usage", vm.getFileDescriptorUsage());
+        sendInt(epoch, jvmMetricsName, "daemon_thread_count", vm.getDaemonThreadCount());
+        sendInt(epoch, jvmMetricsName, "thread_count", vm.getThreadCount());
+        sendInt(epoch, jvmMetricsName, "uptime", vm.getUptime());
+        sendFloat(epoch, jvmMetricsName, "fd_usage", vm.getFileDescriptorUsage());
 
         for (Entry<State, Double> entry : vm.getThreadStatePercentages().entrySet()) {
-            sendFloat(epoch, "jvm.thread-states", entry.getKey().toString().toLowerCase(), entry.getValue());
+            sendFloat(epoch, jvmMetricsName + ".thread-states", entry.getKey().toString().toLowerCase(), entry.getValue());
         }
 
         for (Entry<String, VirtualMachineMetrics.GarbageCollectorStats> entry : vm.getGarbageCollectors().entrySet()) {
-            final String name = "jvm.gc." + sanitizeString(entry.getKey());
+            final String name = jvmMetricsName + ".gc." + sanitizeString(entry.getKey());
             sendInt(epoch, name, "time", entry.getValue().getTime(TimeUnit.MILLISECONDS));
             sendInt(epoch, name, "runs", entry.getValue().getRuns());
         }
