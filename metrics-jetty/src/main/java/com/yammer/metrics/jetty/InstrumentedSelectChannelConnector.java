@@ -12,9 +12,9 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class InstrumentedSelectChannelConnector extends SelectChannelConnector {
-    private final Timer duration;
-    private final Meter accepts, connects, disconnects;
-    private final Counter connections;
+    private Timer duration;
+    private Meter accepts, connects, disconnects;
+    private Counter connections;
 
     public InstrumentedSelectChannelConnector(int port) {
         this(Metrics.defaultRegistry(), port);
@@ -24,29 +24,16 @@ public class InstrumentedSelectChannelConnector extends SelectChannelConnector {
                                               int port) {
         super();
         setPort(port);
-        this.duration = registry.newTimer(SelectChannelConnector.class,
-                                          "connection-duration",
-                                          Integer.toString(port),
-                                          TimeUnit.MILLISECONDS,
-                                          TimeUnit.SECONDS);
-        this.accepts = registry.newMeter(SelectChannelConnector.class,
-                                         "accepts",
-                                         Integer.toString(port),
-                                         "connections",
-                                         TimeUnit.SECONDS);
-        this.connects = registry.newMeter(SelectChannelConnector.class,
-                                          "connects",
-                                          Integer.toString(port),
-                                          "connections",
-                                          TimeUnit.SECONDS);
-        this.disconnects = registry.newMeter(SelectChannelConnector.class,
-                                             "disconnects",
-                                             Integer.toString(port),
-                                             "connections",
-                                             TimeUnit.SECONDS);
-        this.connections = registry.newCounter(SelectChannelConnector.class,
-                                               "active-connections",
-                                               Integer.toString(port));
+        registerMetrics(registry, port);
+    }
+
+    public InstrumentedSelectChannelConnector() {
+    }
+
+    @Override
+    public void setPort(int port) {
+        super.setPort(port);
+        registerMetrics(Metrics.defaultRegistry(), port);
     }
 
     @Override
@@ -69,5 +56,32 @@ public class InstrumentedSelectChannelConnector extends SelectChannelConnector {
         final long duration = System.currentTimeMillis() - connection.getTimeStamp();
         this.duration.update(duration, TimeUnit.MILLISECONDS);
         connections.dec();
+    }
+
+    private void registerMetrics(MetricsRegistry registry,
+                                 int port) {
+        this.duration = registry.newTimer(SelectChannelConnector.class,
+                "connection-duration",
+                Integer.toString(port),
+                TimeUnit.MILLISECONDS,
+                TimeUnit.SECONDS);
+        this.accepts = registry.newMeter(SelectChannelConnector.class,
+                "accepts",
+                Integer.toString(port),
+                "connections",
+                TimeUnit.SECONDS);
+        this.connects = registry.newMeter(SelectChannelConnector.class,
+                "connects",
+                Integer.toString(port),
+                "connections",
+                TimeUnit.SECONDS);
+        this.disconnects = registry.newMeter(SelectChannelConnector.class,
+                "disconnects",
+                Integer.toString(port),
+                "connections",
+                TimeUnit.SECONDS);
+        this.connections = registry.newCounter(SelectChannelConnector.class,
+                "active-connections",
+                Integer.toString(port));
     }
 }
