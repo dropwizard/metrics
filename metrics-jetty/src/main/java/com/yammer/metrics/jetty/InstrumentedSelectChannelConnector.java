@@ -12,9 +12,10 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class InstrumentedSelectChannelConnector extends SelectChannelConnector {
-    private final Timer duration;
-    private final Meter accepts, connects, disconnects;
-    private final Counter connections;
+    private Timer duration;
+    private Meter accepts, connects, disconnects;
+    private Counter connections;
+    private final MetricsRegistry registry;
 
     public InstrumentedSelectChannelConnector(int port) {
         this(Metrics.defaultRegistry(), port);
@@ -24,29 +25,41 @@ public class InstrumentedSelectChannelConnector extends SelectChannelConnector {
                                               int port) {
         super();
         setPort(port);
+        this.registry = registry;
+    }
+
+    public InstrumentedSelectChannelConnector() {
+        registry = Metrics.defaultRegistry();
+    }
+
+    @Override
+    protected void doStart() throws Exception {
+        super.doStart();
+
+        int port = getPort();
         this.duration = registry.newTimer(SelectChannelConnector.class,
-                                          "connection-duration",
-                                          Integer.toString(port),
-                                          TimeUnit.MILLISECONDS,
-                                          TimeUnit.SECONDS);
+                "connection-duration",
+                Integer.toString(port),
+                TimeUnit.MILLISECONDS,
+                TimeUnit.SECONDS);
         this.accepts = registry.newMeter(SelectChannelConnector.class,
-                                         "accepts",
-                                         Integer.toString(port),
-                                         "connections",
-                                         TimeUnit.SECONDS);
+                "accepts",
+                Integer.toString(port),
+                "connections",
+                TimeUnit.SECONDS);
         this.connects = registry.newMeter(SelectChannelConnector.class,
-                                          "connects",
-                                          Integer.toString(port),
-                                          "connections",
-                                          TimeUnit.SECONDS);
+                "connects",
+                Integer.toString(port),
+                "connections",
+                TimeUnit.SECONDS);
         this.disconnects = registry.newMeter(SelectChannelConnector.class,
-                                             "disconnects",
-                                             Integer.toString(port),
-                                             "connections",
-                                             TimeUnit.SECONDS);
+                "disconnects",
+                Integer.toString(port),
+                "connections",
+                TimeUnit.SECONDS);
         this.connections = registry.newCounter(SelectChannelConnector.class,
-                                               "active-connections",
-                                               Integer.toString(port));
+                "active-connections",
+                Integer.toString(port));
     }
 
     @Override
