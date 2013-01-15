@@ -15,6 +15,7 @@ public class InstrumentedSelectChannelConnector extends SelectChannelConnector {
     private Timer duration;
     private Meter accepts, connects, disconnects;
     private Counter connections;
+    private final MetricsRegistry registry;
 
     public InstrumentedSelectChannelConnector(int port) {
         this(Metrics.defaultRegistry(), port);
@@ -24,42 +25,18 @@ public class InstrumentedSelectChannelConnector extends SelectChannelConnector {
                                               int port) {
         super();
         setPort(port);
-        registerMetrics(registry, port);
+        this.registry = registry;
     }
 
     public InstrumentedSelectChannelConnector() {
+        registry = Metrics.defaultRegistry();
     }
 
     @Override
-    public void setPort(int port) {
-        super.setPort(port);
-        registerMetrics(Metrics.defaultRegistry(), port);
-    }
+    protected void doStart() throws Exception {
+        super.doStart();
 
-    @Override
-    public void accept(int acceptorID) throws IOException {
-        super.accept(acceptorID);
-        accepts.mark();
-    }
-
-    @Override
-    protected void connectionOpened(Connection connection) {
-        connections.inc();
-        super.connectionOpened(connection);
-        connects.mark();
-    }
-
-    @Override
-    protected void connectionClosed(Connection connection) {
-        super.connectionClosed(connection);
-        disconnects.mark();
-        final long duration = System.currentTimeMillis() - connection.getTimeStamp();
-        this.duration.update(duration, TimeUnit.MILLISECONDS);
-        connections.dec();
-    }
-
-    private void registerMetrics(MetricsRegistry registry,
-                                 int port) {
+        int port = getPort();
         this.duration = registry.newTimer(SelectChannelConnector.class,
                 "connection-duration",
                 Integer.toString(port),
@@ -83,5 +60,27 @@ public class InstrumentedSelectChannelConnector extends SelectChannelConnector {
         this.connections = registry.newCounter(SelectChannelConnector.class,
                 "active-connections",
                 Integer.toString(port));
+    }
+
+    @Override
+    public void accept(int acceptorID) throws IOException {
+        super.accept(acceptorID);
+        accepts.mark();
+    }
+
+    @Override
+    protected void connectionOpened(Connection connection) {
+        connections.inc();
+        super.connectionOpened(connection);
+        connects.mark();
+    }
+
+    @Override
+    protected void connectionClosed(Connection connection) {
+        super.connectionClosed(connection);
+        disconnects.mark();
+        final long duration = System.currentTimeMillis() - connection.getTimeStamp();
+        this.duration.update(duration, TimeUnit.MILLISECONDS);
+        connections.dec();
     }
 }
