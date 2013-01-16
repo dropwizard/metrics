@@ -378,20 +378,28 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
         final StringBuilder nameBuilder = new StringBuilder();
         nameBuilder.append(name.getDomain());
         nameBuilder.append(":type=");
-        nameBuilder.append(quote(name.getType()));
+        nameBuilder.append(quoteIfNecessary(name.getType()));
         if (name.hasScope()) {
             nameBuilder.append(",scope=");
-            nameBuilder.append(quote(name.getScope()));
+            nameBuilder.append(quoteIfNecessary(name.getScope()));
         }
         if (!name.getName().isEmpty()) {
             nameBuilder.append(",name=");
-            nameBuilder.append(quote(name.getName()));
+            nameBuilder.append(quoteIfNecessary(name.getName()));
         }
         if (registryName != null) {
             nameBuilder.append(",registry=");
-            nameBuilder.append(quote(registryName));
+            nameBuilder.append(quoteIfNecessary(registryName));
         }
         return new ObjectName(nameBuilder.toString());
+    }
+
+    private static String quoteIfNecessary(final String objectName) {
+        if (objectName.matches(".*[\n\\\\\"*?].*")) {
+            return quote(objectName);
+        } else {
+            return objectName;
+        }
     }
 
     @Override
