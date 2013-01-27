@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -268,7 +269,7 @@ public class JsonReporter extends AbstractPollingReporter implements
             .append(constructJsonKeyValuePair("1 min rate", timer.getOneMinuteRate())).append(',')
             .append(constructJsonKeyValuePair("mean rate", timer.getMeanRate())).append(',')
             .append(constructJsonKeyValuePair("5 min rate", timer.getFiveMinuteRate())).append(',')
-            .append(constructJsonKeyValuePair("15 min rate", timer.getFifteenMinuteRate()))
+            .append(constructJsonKeyValuePair("15 min rate", timer.getFifteenMinuteRate())).append(',')
             .append(constructJsonKeyValuePair("min", timer.getMin())).append(',')
             .append(constructJsonKeyValuePair("max", timer.getMax())).append(',')
             .append(constructJsonKeyValuePair("mean", timer.getMean())).append(',')
@@ -313,7 +314,7 @@ public class JsonReporter extends AbstractPollingReporter implements
    }
 
    private String constructJsonKeyValuePair(final String key, final Object value) {
-      return String.format("\"%s\":\"%s\"", key, value.toString());
+      return MessageFormat.format("\"{0}\":\"{1}\"", key, value.toString());
    }
 
    private File obtainMetricFile(final MetricName metricName) {
@@ -334,7 +335,7 @@ public class JsonReporter extends AbstractPollingReporter implements
       if ((newFile.isFile() && newFile.canWrite())) {
          final PrintStream stream = new PrintStream(new FileOutputStream(newFile));
 
-         stream.print(writtenMetric.replaceAll("\\}\\]\\{", "\\},\\{"));
+         stream.print(writtenMetric.replaceAll("}]\\{", "},{"));
          stream.flush();
          stream.close();
       }

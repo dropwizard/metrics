@@ -49,7 +49,7 @@ public class JsonReporterTest extends AbstractPollingReporterTest {
 
    @Override
    public String[] expectedTimerResult() {
-      return new String[]{"[{\"time\":\"5\", \"count\":\"1\",\"1 min rate\":\"1.0\",\"mean rate\":\"2.0\",\"5 min rate\":\"5.0\",\"15 min rate\":\"15.0\"\"min\":\"1.0\",\"max\":\"3.0\",\"mean\":\"2.0\",\"median\":\"0.4995\",\"stddev\":\"1.5\",\"95%\":\"0.9499499999999999\",\"99%\":\"0.98999\",\"99.9%\":\"0.998999\"}]"};
+      return new String[]{"[{\"time\":\"5\", \"count\":\"1\",\"1 min rate\":\"1.0\",\"mean rate\":\"2.0\",\"5 min rate\":\"5.0\",\"15 min rate\":\"15.0\",\"min\":\"1.0\",\"max\":\"3.0\",\"mean\":\"2.0\",\"median\":\"0.4995\",\"stddev\":\"1.5\",\"95%\":\"0.9499499999999999\",\"99%\":\"0.98999\",\"99.9%\":\"0.998999\"}]"};
    }
 
    @Override
