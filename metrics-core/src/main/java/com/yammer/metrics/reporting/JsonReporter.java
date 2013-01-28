@@ -22,10 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.text.MessageFormat;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -33,32 +31,33 @@ import java.util.concurrent.TimeUnit;
 /**
  * A reporter which periodically appends data from each metric to a metric-specific JSON file in
  * an output directory. The data has a CSV-type structure, which makes it easier to load it into various
- * charting tools/libraries (ie.:AmCharts).
+ * charting tools/libraries (ie.: AmCharts JS library).
  */
 public class JsonReporter extends AbstractPollingReporter implements
       MetricProcessor<JsonReporter.Context> {
+
+   private static final Logger LOGGER = LoggerFactory.getLogger(JsonReporter.class);
+
+   private static final String CLOSING_JSON_BRACES = "}]";
+   private static final String OPENING_JSON_BRACES = "[{";
 
    /**
     * The context used to output metrics.
     */
    public interface Context {
       /**
-       * Returns an open {@link java.io.PrintStream} for the metric already written
-       * to it.
+       * Returns a {@link java.lang.StringBuilder} for the metric already
+       * written appended to it.
        *
-       * @return an open {@link java.io.PrintStream}
+       * @return an open {@link java.lang.StringBuilder}
        * @throws java.io.IOException if there is an error opening the writer or writing to it
        */
-      PrintStream getStream() throws IOException;
-
-      InputStream openStreamToWrittenMetric() throws IOException;
+      StringBuilder getBuilder() throws IOException;
    }
-
-   private static final Logger LOGGER = LoggerFactory.getLogger(JsonReporter.class);
 
    private final MetricPredicate predicate;
    private final File outputDir;
-   private final Map<MetricName, PrintStream> streamMap;
+   private final Map<MetricName, StringBuilder> builderMap;
    private final Clock clock;
    private long startTime;
 
@@ -70,7 +69,7 @@ public class JsonReporter extends AbstractPollingReporter implements
     * @param period    the period between successive outputs
     * @param unit      the time unit of {@code period}
     */
-   public static void enable(File outputDir, long period, TimeUnit unit) {
+   public static void enable(final File outputDir, final long period, final TimeUnit unit) {
       enable(Metrics.defaultRegistry(), outputDir, period, unit);
    }
 
@@ -83,7 +82,10 @@ public class JsonReporter extends AbstractPollingReporter implements
     * @param period          the period between successive outputs
     * @param unit            the time unit of {@code period}
     */
-   public static void enable(MetricsRegistry metricsRegistry, File outputDir, long period, TimeUnit unit) {
+   public static void enable(final MetricsRegistry metricsRegistry,
+                             final File outputDir,
+                             final long period,
+                             final TimeUnit unit) {
       final JsonReporter reporter = new JsonReporter(metricsRegistry, outputDir);
       reporter.start(period, unit);
    }
@@ -97,7 +99,7 @@ public class JsonReporter extends AbstractPollingReporter implements
     * @param metricsRegistry the {@link com.yammer.metrics.core.MetricsRegistry} containing the metrics this reporter
     *                        will report
     */
-   public JsonReporter(MetricsRegistry metricsRegistry, File outputDir) {
+   public JsonReporter(final MetricsRegistry metricsRegistry, final File outputDir) {
       this(metricsRegistry, MetricPredicate.ALL, outputDir);
    }
 
@@ -112,9 +114,9 @@ public class JsonReporter extends AbstractPollingReporter implements
     *                        before being written to files
     * @param outputDir       the directory to which files will be written
     */
-   public JsonReporter(MetricsRegistry metricsRegistry,
-                       MetricPredicate predicate,
-                       File outputDir) {
+   public JsonReporter(final MetricsRegistry metricsRegistry,
+                       final MetricPredicate predicate,
+                       final File outputDir) {
       this(metricsRegistry, predicate, outputDir, Clock.defaultClock());
    }
 
@@ -130,87 +132,48 @@ public class JsonReporter extends AbstractPollingReporter implements
     * @param outputDir       the directory to which files will be written
     * @param clock           the clock used to measure time
     */
-   public JsonReporter(MetricsRegistry metricsRegistry,
-                       MetricPredicate predicate,
-                       File outputDir,
-                       Clock clock) {
+   public JsonReporter(final MetricsRegistry metricsRegistry,
+                       final MetricPredicate predicate,
+                       final File outputDir,
+                       final Clock clock) {
       super(metricsRegistry, "json-reporter");
       if (outputDir.exists() && !outputDir.isDirectory()) {
          throw new IllegalArgumentException(outputDir + " is not a directory");
       }
       this.outputDir = outputDir;
       this.predicate = predicate;
-      this.streamMap = Collections.synchronizedMap(new HashMap<MetricName, PrintStream>());
+      this.builderMap = new HashMap<MetricName, StringBuilder>();
       this.startTime = 0L;
       this.clock = clock;
-   }
-
-   /**
-    * Returns an opened {@link java.io.PrintStream} for the given {@link com.yammer.metrics.core.MetricName} which outputs data
-    * to a metric-specific {@code .json} file in the output directory.
-    *
-    * @param metricName the name of the metric
-    * @return an opened {@link java.io.PrintStream} specific to {@code metricName}
-    * @throws java.io.IOException if there is an error opening the stream
-    */
-   protected PrintStream createStreamForMetric(final MetricName metricName) throws IOException {
-      final File newFile = obtainMetricFile(metricName);
-      if ((newFile.isFile() && newFile.canRead()) || newFile.createNewFile()) {
-         return new PrintStream(new FileOutputStream(newFile));
-      }
-
-      throw new IOException("Unable to create a new file " + newFile);
-   }
-
-   /**
-    * Returns an opened {@link java.io.InputStream} for the given {@link com.yammer.metrics.core.MetricName} which
-    * consumes the content from a metric-specific {@code .json} file in the output directory.
-    *
-    * @param metricName the name of the metric
-    * @return an opened {@link java.io.InputStream} specific to {@code metricName}
-    * @throws java.io.IOException if there is an error opening the stream
-    */
-   protected InputStream getInputStream(final MetricName metricName) throws IOException {
-      final File newFile = obtainMetricFile(metricName);
-
-      if ((newFile.isFile() && newFile.canRead())) {
-         return newFile.toURI().toURL().openStream();
-      }
-
-      throw new IOException("Unable to create a new file " + newFile);
    }
 
    @Override
    public void run() {
       final long time = TimeUnit.MILLISECONDS.toSeconds(clock.getTime() - startTime);
-      final Set<Entry<MetricName, Metric>> metrics = getMetricsRegistry().getAllMetrics().entrySet();
+
+      final Set<Map.Entry<MetricName, Metric>> metrics = getMetricsRegistry().getAllMetrics().entrySet();
       final MetricDispatcher dispatcher = new MetricDispatcher();
       try {
-         for (Entry<MetricName, Metric> entry : metrics) {
+         for (Map.Entry<MetricName, Metric> entry : metrics) {
             final MetricName metricName = entry.getKey();
             final Metric metric = entry.getValue();
             if (predicate.matches(metricName, metric)) {
+
                final Context context = new Context() {
                   @Override
-                  public PrintStream getStream() throws IOException {
-                     final PrintStream stream = getPrintStream(metricName);
-
-                     stream
-                           .append(new StringBuilder()
-                                 .append("{")
-                                 .append(constructJsonKeyValuePair("time", time)).append(", ").toString());
-
-                     return stream;
+                  public StringBuilder getBuilder() throws IOException {
+                     return getStringBuilder(metricName);
                   }
-
-                  @Override
-                  public InputStream openStreamToWrittenMetric() throws IOException {
-                     return getInputStream(metricName);
-                  }
-
                };
+
+               final StringBuilder builder = context.getBuilder();
+               builder
+                     .append(OPENING_JSON_BRACES)
+                     .append(constructJsonKeyValuePair("time", time))
+                     .append(",");
+
                dispatcher.dispatch(metric, metricName, this, context);
-               cleanseWrittenMetricJson(metricName, context);
+               dumpUpdatedMetric(metricName, builder.toString());
             }
          }
       } catch (Exception e) {
@@ -219,35 +182,32 @@ public class JsonReporter extends AbstractPollingReporter implements
    }
 
    @Override
-   public void processCounter(MetricName metricName, Counter counter, Context context) throws IOException {
-
-      final PrintStream stream = context.getStream();
-      stream.append(new StringBuilder()
+   public void processCounter(final MetricName metricName, final Counter counter, final Context context) throws IOException {
+      final StringBuilder builder = context.getBuilder();
+      builder
             .append(constructJsonKeyValuePair("count", counter.getCount()))
-            .append("}]")).toString();
-      stream.flush();
+            .append(CLOSING_JSON_BRACES);
    }
 
    @Override
-   public void processMeter(MetricName name, Metered meter, Context context) throws IOException {
+   public void processMeter(final MetricName metricName, final Metered meter, final Context context) throws IOException {
 
-      final PrintStream stream = context.getStream();
-      stream
-            .append(new StringBuilder()
-                  .append(constructJsonKeyValuePair("count", meter.getCount())).append(',')
-                  .append(constructJsonKeyValuePair("1 min rate", meter.getOneMinuteRate())).append(',')
-                  .append(constructJsonKeyValuePair("mean rate", meter.getMeanRate())).append(',')
-                  .append(constructJsonKeyValuePair("5 min rate", meter.getFiveMinuteRate())).append(',')
-                  .append(constructJsonKeyValuePair("15 min rate", meter.getFifteenMinuteRate()))
-                  .append("}]")).toString();
-      stream.flush();
+      final StringBuilder builder = context.getBuilder();
+      builder
+            .append(constructJsonKeyValuePair("count", meter.getCount())).append(',')
+            .append(constructJsonKeyValuePair("1 min rate", meter.getOneMinuteRate())).append(',')
+            .append(constructJsonKeyValuePair("mean rate", meter.getMeanRate())).append(',')
+            .append(constructJsonKeyValuePair("5 min rate", meter.getFiveMinuteRate())).append(',')
+            .append(constructJsonKeyValuePair("15 min rate", meter.getFifteenMinuteRate()))
+            .append(CLOSING_JSON_BRACES);
    }
 
    @Override
-   public void processHistogram(MetricName name, Histogram histogram, Context context) throws IOException {
-      final PrintStream stream = context.getStream();
+   public void processHistogram(MetricName metricName, Histogram histogram, Context context) throws IOException {
+
+      final StringBuilder builder = context.getBuilder();
       final Snapshot snapshot = histogram.getSnapshot();
-      stream.append(new StringBuilder()
+      builder
             .append(constructJsonKeyValuePair("min", histogram.getMin())).append(',')
             .append(constructJsonKeyValuePair("max", histogram.getMax())).append(',')
             .append(constructJsonKeyValuePair("mean", histogram.getMean())).append(',')
@@ -256,18 +216,17 @@ public class JsonReporter extends AbstractPollingReporter implements
             .append(constructJsonKeyValuePair("95%", snapshot.get95thPercentile())).append(',')
             .append(constructJsonKeyValuePair("99%", snapshot.get99thPercentile())).append(',')
             .append(constructJsonKeyValuePair("99.9%", snapshot.get999thPercentile()))
-            .append("}]")).toString();
-      stream.flush();
+            .append(CLOSING_JSON_BRACES);
    }
 
    @Override
-   public void processTimer(MetricName name, Timer timer, Context context) throws IOException {
-      final PrintStream stream = context.getStream();
+   public void processTimer(final MetricName metricName, final Timer timer, final Context context) throws IOException {
+      final StringBuilder builder = context.getBuilder();
       final Snapshot snapshot = timer.getSnapshot();
-      stream.append(new StringBuilder()
+      builder
             .append(constructJsonKeyValuePair("count", timer.getCount())).append(',')
             .append(constructJsonKeyValuePair("1 min rate", timer.getOneMinuteRate())).append(',')
-            .append(constructJsonKeyValuePair("mean rate", timer.getMeanRate())).append(',')
+            .append(constructJsonKeyValuePair("mean rate", timer.getMean())).append(',')
             .append(constructJsonKeyValuePair("5 min rate", timer.getFiveMinuteRate())).append(',')
             .append(constructJsonKeyValuePair("15 min rate", timer.getFifteenMinuteRate())).append(',')
             .append(constructJsonKeyValuePair("min", timer.getMin())).append(',')
@@ -278,18 +237,16 @@ public class JsonReporter extends AbstractPollingReporter implements
             .append(constructJsonKeyValuePair("95%", snapshot.get95thPercentile())).append(',')
             .append(constructJsonKeyValuePair("99%", snapshot.get99thPercentile())).append(',')
             .append(constructJsonKeyValuePair("99.9%", snapshot.get999thPercentile()))
-            .append("}]")).toString();
-      stream.flush();
+            .append(CLOSING_JSON_BRACES);
    }
 
    @Override
-   public void processGauge(MetricName name, Gauge<?> gauge, Context context) throws IOException {
-      final PrintStream stream = context.getStream();
+   public void processGauge(final MetricName metricName, final Gauge<?> gauge, final Context context) throws IOException {
+      final StringBuilder builder = context.getBuilder();
 
-      stream.append(new StringBuilder()
+      builder
             .append(constructJsonKeyValuePair("value", gauge.getValue()))
-            .append("}]")).toString();
-      stream.flush();
+            .append(CLOSING_JSON_BRACES);
    }
 
    @Override
@@ -303,9 +260,9 @@ public class JsonReporter extends AbstractPollingReporter implements
       try {
          super.shutdown();
       } finally {
-         for (final PrintStream stream : streamMap.values()) {
+         for (final StringBuilder builder : builderMap.values()) {
             try {
-               stream.close();
+               builder.setLength(0);
             } catch (Throwable t) {
                LOGGER.warn("Failed to close writer", t);
             }
@@ -318,40 +275,53 @@ public class JsonReporter extends AbstractPollingReporter implements
    }
 
    private File obtainMetricFile(final MetricName metricName) {
-      final String filename = String.format("%s.json", metricName.toString());
+      final String filename = String.format("%s.json", metricName.getName());
 
       return new File(outputDir, filename);
    }
 
-   private void cleanseWrittenMetricJson(final MetricName metricName, final Context context) throws IOException {
-      final InputStream metricInputStream = context.openStreamToWrittenMetric();
-      if (metricInputStream.available() == 0) {
-         return;
-      }
 
-      final String writtenMetric = new Scanner(metricInputStream).useDelimiter("\\A").next();
+   private void dumpUpdatedMetric(final MetricName metricName, final String updatedMetric) throws IOException {
       final File newFile = obtainMetricFile(metricName);
+      if (newFile.createNewFile() || (newFile.isFile() && newFile.canWrite())) {
 
-      if ((newFile.isFile() && newFile.canWrite())) {
          final PrintStream stream = new PrintStream(new FileOutputStream(newFile));
+         final String cleansedUpdatedMetric = updatedMetric.replaceAll("\\}\\]\\[\\{", "\\},\\{");
 
-         stream.print(writtenMetric.replaceAll("}]\\{", "},{"));
+         stream.print(cleansedUpdatedMetric);
          stream.flush();
          stream.close();
       }
    }
 
-   private PrintStream getPrintStream(final MetricName metricName)
-         throws IOException {
+   private StringBuilder getStringBuilder(final MetricName metricName) throws IOException {
 
-      PrintStream stream = streamMap.get(metricName);
-
-      if (stream == null) {
-         stream = createStreamForMetric(metricName);
-         stream.print("[");
-         streamMap.put(metricName, stream);
+      StringBuilder builder;
+      synchronized (builderMap) {
+         builder = builderMap.get(metricName);
+         if (builder == null) {
+            builder = new StringBuilder();
+            builderMap.put(metricName, builder);
+         } else if (builder.length() == 0) {
+            builder.append(loadedMetricFromFile(metricName));
+         }
       }
 
-      return stream;
+      return builder;
+   }
+
+   private String loadedMetricFromFile(final MetricName metricName) throws IOException {
+
+      final File newFile = obtainMetricFile(metricName);
+      if (!newFile.createNewFile() && !(newFile.isFile() && newFile.canRead())) {
+         throw new IOException("Unable to create a new file " + newFile);
+      }
+
+      final InputStream stream = newFile.toURI().toURL().openStream();
+      if (stream.available() == 0) {
+         return "";
+      }
+
+      return new Scanner(stream).useDelimiter("\\Z").next();
    }
 }
