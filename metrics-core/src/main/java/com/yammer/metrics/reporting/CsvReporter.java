@@ -139,10 +139,11 @@ public class CsvReporter extends AbstractPollingReporter implements
      */
     protected PrintStream createStreamForMetric(MetricName metricName) throws IOException {
         final File newFile = new File(outputDir, metricName.toString() + ".csv");
-        if (newFile.createNewFile()) {
+        if ((newFile.isFile() && newFile.canRead()) || newFile.createNewFile()) {
             return new PrintStream(new FileOutputStream(newFile));
         }
-        throw new IOException("Unable to create " + newFile);
+
+        throw new IOException("Unable to create a new file " + newFile);
     }
 
     @Override
