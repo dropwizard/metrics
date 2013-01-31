@@ -19,6 +19,14 @@ import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.stats.Snapshot;
 
+/**
+ * Metrics reporter class for logging metrics values to a SLF4J {@link Logger} periodically, similar to how {@link ConsoleReporter}
+ * or {@link CsvReporter} function, but using the SLF4J framework instead. It also supports specifying a {@link Marker} instance that
+ * can be used by custom appenders and filters for the bound logging toolkit to further process metrics reports. 
+ * 
+ * @author Andrew McDaniel - https://github.com/mrmcd
+ *
+ */
 public class SLF4JReporter extends AbstractPollingReporter implements
 		MetricProcessor<Logger> {
 	
@@ -26,6 +34,15 @@ public class SLF4JReporter extends AbstractPollingReporter implements
 	private Marker reportingMarker;
 	private MetricPredicate predicate;
 	
+	/**
+	 * Construct a new SLF4J reporter. 
+	 * 
+	 * @param registry  Metrics registry to report from.  
+	 * @param name Name of the reporter. 
+	 * @param reportingLogger SLF4J {@link Logger} instance to send metrics reports to  
+	 * @param reportingMarker SLF4J {@link Marker} instance to log with metrics class, or null if none. 
+	 * @param predicate Predicate used to filter out which {@link Metric} instances to report.
+	 */
 	public SLF4JReporter(MetricsRegistry registry, String name, Logger reportingLogger, Marker reportingMarker, MetricPredicate predicate) {
 		super(registry, name);
 		this.reportingLogger = reportingLogger;
@@ -33,10 +50,24 @@ public class SLF4JReporter extends AbstractPollingReporter implements
 		this.predicate = predicate;		
 	}
 	
+	/**
+	 * Construct a new reporter class with no {@link Marker} and the {@link MetricPredicate#ALL} predicate. Will report from 
+	 * the default registry.
+	 *  
+	 * @param name Name of the reporter instance. 
+	 * @param reportingLogger SLF4J {@link Logger} instance to report to. 
+	 */
 	public SLF4JReporter(String name, Logger reportingLogger){
 		this(Metrics.defaultRegistry(), name, reportingLogger, null, MetricPredicate.ALL);
 	}
 	
+	/**
+	 * Construct a new reporter for metrics in the default registry and filtered using the {@link MetricPredicate#ALL}.
+	 *  
+	 * @param name Name of the reporter instance. 
+	 * @param reportingLogger SLF4J {@link Logger} instance to report to.
+	 * @param reportingMarker SLF4J {@link Marker} instance to log with metrics class.
+	 */
 	public SLF4JReporter(String name, Logger reportingLogger, Marker reportingMarker){
 		this(Metrics.defaultRegistry(), name, reportingLogger, reportingMarker, MetricPredicate.ALL);
 	}
