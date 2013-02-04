@@ -94,8 +94,8 @@ public class SLF4JReporter extends AbstractPollingReporter implements
 	@Override
 	public void processMeter(MetricName name, Metered meter, Logger context)
 			throws Exception {
-		Object[] values = { name.getDomain() , name.getScope() , name.getName() , meter.getCount() , meter.getEventType() , meter.getRateUnit() , meter.getMeanRate() , meter.getOneMinuteRate() , meter.getFiveMinuteRate() , meter.getFifteenMinuteRate() };
-		context.info(reportingMarker, "type=METER , domain={} , scope={} , name={} , count={} , event_type={} , rate_unit={} , mean_rate={} , 1_min_rate={} , 5_min_rate={} , 15_min_rate={}", values);		
+		Object[] values = { name.getDomain() , name.getScope() , name.getType() , name.getName() , meter.getCount() , meter.getEventType() , meter.getRateUnit() , meter.getMeanRate() , meter.getOneMinuteRate() , meter.getFiveMinuteRate() , meter.getFifteenMinuteRate() };
+		context.info(reportingMarker, "type=METER , domain={} , scope={} , type={} , name={} , count={} , event_type={} , rate_unit={} , mean_rate={} , 1_min_rate={} , 5_min_rate={} , 15_min_rate={}", values);		
 	}
 
 
@@ -103,8 +103,8 @@ public class SLF4JReporter extends AbstractPollingReporter implements
 	@Override
 	public void processCounter(MetricName name, Counter counter, Logger context)
 			throws Exception {
-		Object[] values = { name.getDomain() , name.getScope() , name.getName() , counter.getCount() };
-		context.info(reportingMarker, "type=COUNTER , domain={} , scope={} , name={} , count={} ", values);
+		Object[] values = { name.getDomain() , name.getScope() , name.getType() , name.getName() , counter.getCount() };
+		context.info(reportingMarker, "type=COUNTER , domain={} , scope={} , type={} , name={} , count={} ", values);
 	}
 
 
@@ -112,8 +112,8 @@ public class SLF4JReporter extends AbstractPollingReporter implements
 	@Override
 	public void processHistogram(MetricName name, Histogram histogram, Logger context) throws Exception {		
 		final Snapshot snapshot = histogram.getSnapshot();
-		Object[] values = { name.getDomain() , name.getScope() , name.getName(), histogram.getMin(), histogram.getMax(), histogram.getMean(), histogram.getStdDev(), snapshot.getMedian(), snapshot.get75thPercentile(), snapshot.get95thPercentile(), snapshot.get99thPercentile(), snapshot.get999thPercentile() };
-		context.info(reportingMarker, "type=HISTOGRAM , domain={} , scope={} , name={} , min={} , max={} , mean={} , stddev={} , median={} , 75_pct={}, 95_pct={} , 99_pct={} , 99_9_pct={}", values);
+		Object[] values = { name.getDomain() , name.getScope() , name.getType() , name.getName(), histogram.getMin(), histogram.getMax(), histogram.getMean(), histogram.getStdDev(), snapshot.getMedian(), snapshot.get75thPercentile(), snapshot.get95thPercentile(), snapshot.get99thPercentile(), snapshot.get999thPercentile() };
+		context.info(reportingMarker, "type=HISTOGRAM , domain={} , scope={} , type={} , name={} , min={} , max={} , mean={} , stddev={} , median={} , 75_pct={}, 95_pct={} , 99_pct={} , 99_9_pct={}", values);
 	}
 
 
@@ -122,8 +122,8 @@ public class SLF4JReporter extends AbstractPollingReporter implements
 	public void processTimer(MetricName name, Timer timer, Logger context)
 			throws Exception {
 		final Snapshot snapshot = timer.getSnapshot();
-		Object[] values = { name.getDomain() , name.getScope() , name.getName(), timer.getDurationUnit(), timer.getMin(), timer.getMax(), timer.getMean(), timer.getStdDev(), snapshot.getMedian(), snapshot.get75thPercentile(), snapshot.get95thPercentile(), snapshot.get99thPercentile(), snapshot.get999thPercentile() , timer.getRateUnit() , timer.getMeanRate() , timer.getOneMinuteRate() , timer.getFiveMinuteRate() , timer.getFifteenMinuteRate() };
-		context.info(reportingMarker, "type=TIMER , domain={} , scope={} , name={} , time_unit={} , min={} , max={} , mean={} , stddev={} , median={} , 75_pct={}, 95_pct={} , 99_pct={} , 99_9_pct={} , rate_unit={} , mean_rate={} , 1_min_rate={} , 5_min_rate={} , 15_min_rate={}", values);		
+		Object[] values = { name.getDomain() , name.getScope() , name.getType() , name.getName(), timer.getDurationUnit(), timer.getMin(), timer.getMax(), timer.getMean(), timer.getStdDev(), snapshot.getMedian(), snapshot.get75thPercentile(), snapshot.get95thPercentile(), snapshot.get99thPercentile(), snapshot.get999thPercentile() , timer.getRateUnit() , timer.getMeanRate() , timer.getOneMinuteRate() , timer.getFiveMinuteRate() , timer.getFifteenMinuteRate() };
+		context.info(reportingMarker, "type=TIMER , domain={} , scope={} , type={} , name={} , time_unit={} , min={} , max={} , mean={} , stddev={} , median={} , 75_pct={}, 95_pct={} , 99_pct={} , 99_9_pct={} , rate_unit={} , mean_rate={} , 1_min_rate={} , 5_min_rate={} , 15_min_rate={}", values);		
 	}
 
 
@@ -131,8 +131,8 @@ public class SLF4JReporter extends AbstractPollingReporter implements
 	@Override
 	public void processGauge(MetricName name, Gauge<?> gauge, Logger context)
 			throws Exception {
-		Object[] values = { name.getDomain() , name.getScope() , name.getName() , gauge.getValue() };
-		context.info(reportingMarker, "type=GAUGE , domain={} , scope={} ,  name={} , value={} ", values);
+		Object[] values = { name.getDomain() , name.getScope() , name.getType() , name.getName() , gauge.getValue() };
+		context.info(reportingMarker, "type=GAUGE , domain={} , scope={} , type={} ,  name={} , value={} ", values);
 	}
 
 }
