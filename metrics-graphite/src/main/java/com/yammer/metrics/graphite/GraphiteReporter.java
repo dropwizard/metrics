@@ -195,7 +195,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
 
         if (prefix != null) {
             // Pre-append the "." so that we don't need to make anything conditional later.
-            this.prefix = prefix + ".";
+            this.prefix = sanitizeString(prefix) + ".";
         } else {
             this.prefix = "";
         }
