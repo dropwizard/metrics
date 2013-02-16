@@ -155,7 +155,7 @@ public class MetricName implements Comparable<MetricName> {
 
     @Override
     public String toString() {
-        return mBeanName;
+        return group + '.' + type + '.' + name + (scope == null ? "" : '.' + scope);
     }
 
     @Override
