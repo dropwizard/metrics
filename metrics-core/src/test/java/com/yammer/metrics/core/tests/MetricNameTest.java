@@ -45,7 +45,7 @@ public class MetricNameTest {
     @Test
     public void isHumanReadable() throws Exception {
         assertThat(name.toString(),
-                   is("bean"));
+                   is("group.type.name.scope"));
     }
 
     @Test
