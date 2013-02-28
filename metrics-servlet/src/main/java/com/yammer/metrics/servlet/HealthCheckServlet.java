@@ -1,17 +1,22 @@
 package com.yammer.metrics.servlet;
 
-import com.yammer.metrics.HealthChecks;
-import com.yammer.metrics.core.HealthCheck;
-import com.yammer.metrics.core.HealthCheckRegistry;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.yammer.metrics.HealthChecks;
+import com.yammer.metrics.core.HealthCheck;
+import com.yammer.metrics.core.HealthCheck.Result;
+import com.yammer.metrics.core.HealthCheckRegistry;
 
 /**
  * An HTTP servlet which runs the health checks registered with a given {@link HealthCheckRegistry}
@@ -27,7 +32,8 @@ public class HealthCheckServlet extends HttpServlet {
      * The attribute name of the {@link HealthCheckRegistry} instance in the servlet context.
      */
     public static final String REGISTRY_ATTRIBUTE = HealthCheckServlet.class.getName() + ".registry";
-    private static final String CONTENT_TYPE = "text/plain";
+    public static final String DEFAULT_CONTENT_TYPE = "text/plain";
+    public static final String JSON_CONTENT_TYPE = "application/json";
 
     private HealthCheckRegistry registry;
 
@@ -57,11 +63,24 @@ public class HealthCheckServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req,
-                         HttpServletResponse resp) throws ServletException, IOException {
+            HttpServletResponse resp) throws ServletException, IOException {
         final Map<String, HealthCheck.Result> results = registry.runHealthChecks();
-        resp.setContentType(CONTENT_TYPE);
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
         final PrintWriter writer = resp.getWriter();
+        if ("application/json".equals(req.getHeader("Accept"))) {
+            renderJsonResponse(req, resp, results, writer);
+        } else {
+            renderDefaultResponse(req, resp, results, writer);
+        }
+        return;
+    }
+
+    /**
+     * Renders the default plaintext response.
+     */
+    private void renderDefaultResponse(HttpServletRequest req, HttpServletResponse resp, 
+    		final Map<String, Result> results, PrintWriter writer) throws ServletException, IOException {
+		resp.setContentType(DEFAULT_CONTENT_TYPE);
         if (results.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
             writer.println("! No health checks registered.");
@@ -94,6 +113,48 @@ public class HealthCheckServlet extends HttpServlet {
                 }
             }
         }
+        writer.close();
+    }
+
+    /**
+     * Renders a JSON array of serialized {@link Result} status objects.
+     */
+    private void renderJsonResponse(HttpServletRequest req, HttpServletResponse resp, 
+            final Map<String, Result> results, PrintWriter writer) throws ServletException, IOException {
+        resp.setContentType(JSON_CONTENT_TYPE);
+        JsonFactory jsonFactory = new JsonFactory();
+        JsonGenerator g = jsonFactory.createJsonGenerator(writer);
+        if (results.isEmpty()) {
+            resp.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
+        } else {
+            g.writeStartArray();
+            if (isAllHealthy(results)) {
+                resp.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+
+            for (Map.Entry<String, HealthCheck.Result> entry : results.entrySet()) {
+                g.writeStartObject();
+                final HealthCheck.Result result = entry.getValue();
+                g.writeStringField("name", entry.getKey());
+                g.writeBooleanField("healthy", result.isHealthy());
+                g.writeStringField("message", result.getMessage());
+
+                @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+                final Throwable error = result.getError();
+                if (error != null) {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter errorWriter = new PrintWriter(sw);
+                    error.printStackTrace(errorWriter);
+                    g.writeStringField("error", sw.toString());
+                }
+                g.writeEndObject();
+                g.flush();
+            }
+            g.writeEndArray();
+        }
+        g.close();
         writer.close();
     }
 
