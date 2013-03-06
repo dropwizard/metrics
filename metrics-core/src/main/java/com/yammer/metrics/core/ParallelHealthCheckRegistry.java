@@ -1,9 +1,6 @@
 package com.yammer.metrics.core;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -13,13 +10,13 @@ import java.util.concurrent.*;
 public class ParallelHealthCheckRegistry implements HealthCheckRegistry{
     private final ConcurrentMap<String, HealthCheck> healthChecks = new ConcurrentHashMap<String, HealthCheck>();
     private final ExecutorService executor;
+    private final long timeout;
+    private final TimeUnit timeUnit;
 
-    public ParallelHealthCheckRegistry(ExecutorService executor){
+    public ParallelHealthCheckRegistry(ExecutorService executor, long timeout, TimeUnit timeUnit){
         this.executor = executor;
-    }
-
-    public ParallelHealthCheckRegistry(){
-        this(Executors.newFixedThreadPool(5));
+        this.timeout = timeout;
+        this.timeUnit = timeUnit;
     }
 
     @Override public void register(HealthCheck healthCheck) {
@@ -47,9 +44,9 @@ public class ParallelHealthCheckRegistry implements HealthCheckRegistry{
         SortedMap<String, HealthCheck.Result> results = new TreeMap<String, HealthCheck.Result>();
         for(Map.Entry<String, Future<HealthCheck.Result>> result : futureResults.entrySet()){
             try {
-                results.put(result.getKey(), result.getValue().get());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+                results.put(result.getKey(), result.getValue().get(timeout, timeUnit));
+            } catch (Exception e){
+                results.put(result.getKey(), HealthCheck.Result.unhealthy(e));
             }
         }
 

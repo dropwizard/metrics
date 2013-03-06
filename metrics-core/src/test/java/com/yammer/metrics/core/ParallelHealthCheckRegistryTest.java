@@ -2,17 +2,23 @@ package com.yammer.metrics.core;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ParallelHealthCheckRegistryTest {
-    private final ParallelHealthCheckRegistry registry = new ParallelHealthCheckRegistry();
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ParallelHealthCheckRegistry registry = new ParallelHealthCheckRegistry(executor, 10, TimeUnit.MILLISECONDS);
 
     private final HealthCheck hc1 = mock(HealthCheck.class);
     private final HealthCheck hc2 = mock(HealthCheck.class);
@@ -54,5 +60,22 @@ public class ParallelHealthCheckRegistryTest {
 
         assertThat(results,
                 hasEntry("hc2", r2));
+    }
+
+    @Test(timeout = 2000)
+    public void healthCheckShouldBeUnhealthyWhenExecutionExceedsTimeout(){
+        HealthCheck healthCheck = mock(HealthCheck.class);
+        when(healthCheck.getName()).thenReturn("slowCheck");
+        when(healthCheck.execute()).thenAnswer(new Answer<Object>() {
+            @SuppressWarnings("InfiniteLoopStatement") @Override public Object answer(InvocationOnMock invocation) throws Throwable {
+                while(true){}
+            }
+        });
+
+        registry.register(healthCheck);
+
+        final Map<String,HealthCheck.Result> results = registry.runHealthChecks();
+
+        assertThat(results.get("slowCheck").getError(), instanceOf(TimeoutException.class));
     }
 }
