@@ -1,12 +1,13 @@
 package com.yammer.metrics;
 
 import com.yammer.metrics.core.HealthCheckRegistry;
+import com.yammer.metrics.core.SequentialHealthCheckRegistry;
 
 /**
  * A default health check registry.
  */
 public class HealthChecks {
-    private static final HealthCheckRegistry DEFAULT_REGISTRY = new HealthCheckRegistry();
+    private static final HealthCheckRegistry DEFAULT_REGISTRY = new SequentialHealthCheckRegistry();
 
     private HealthChecks() { /* unused */ }
 

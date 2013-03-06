@@ -1,7 +1,7 @@
 package com.yammer.metrics.core.tests;
 
 import com.yammer.metrics.core.HealthCheck;
-import com.yammer.metrics.core.HealthCheckRegistry;
+import com.yammer.metrics.core.SequentialHealthCheckRegistry;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,9 +14,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class HealthCheckRegistryTest {
-    private final HealthCheckRegistry registry = new HealthCheckRegistry();
-    
+public class SequentialHealthCheckRegistryTest {
+    private final SequentialHealthCheckRegistry registry = new SequentialHealthCheckRegistry();
+
     private final HealthCheck hc1 = mock(HealthCheck.class);
     private final HealthCheck hc2 = mock(HealthCheck.class);
 
@@ -27,7 +27,7 @@ public class HealthCheckRegistryTest {
     public void setUp() throws Exception {
         when(hc1.getName()).thenReturn("hc1");
         when(hc1.execute()).thenReturn(r1);
-        
+
         when(hc2.getName()).thenReturn("hc2");
         when(hc2.execute()).thenReturn(r2);
 
