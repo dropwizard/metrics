@@ -27,7 +27,6 @@
         <module>metrics-jetty</module>
         <module>metrics-log4j</module>
         <module>metrics-logback</module>
-        <module>metrics-scala_2.9.1</module>
         <module>metrics-servlet</module>
         <module>metrics-web</module>
     </modules>
