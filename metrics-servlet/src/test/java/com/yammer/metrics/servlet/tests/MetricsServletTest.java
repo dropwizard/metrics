@@ -40,7 +40,7 @@ public class MetricsServletTest {
 
     @Before
     public void setUp() throws Exception {
-        when(clock.getTime()).thenReturn(12345678L);
+        when(clock.time()).thenReturn(12345678L);
 
         when(request.getMethod()).thenReturn("GET");
 
@@ -53,33 +53,33 @@ public class MetricsServletTest {
 
     @Test
     public void generatesVirtualMachineMetrics() throws Exception {
-        when(vm.getName()).thenReturn("vm");
-        when(vm.getVersion()).thenReturn("version");
-        when(vm.getTotalInit()).thenReturn(1.0);
-        when(vm.getTotalUsed()).thenReturn(2.0);
-        when(vm.getTotalMax()).thenReturn(3.0);
-        when(vm.getTotalCommitted()).thenReturn(4.0);
-        when(vm.getHeapInit()).thenReturn(5.0);
-        when(vm.getHeapUsed()).thenReturn(6.0);
-        when(vm.getHeapMax()).thenReturn(7.0);
-        when(vm.getHeapCommitted()).thenReturn(8.0);
+        when(vm.name()).thenReturn("vm");
+        when(vm.version()).thenReturn("version");
+        when(vm.totalInit()).thenReturn(1.0);
+        when(vm.totalUsed()).thenReturn(2.0);
+        when(vm.totalMax()).thenReturn(3.0);
+        when(vm.totalCommitted()).thenReturn(4.0);
+        when(vm.heapInit()).thenReturn(5.0);
+        when(vm.heapUsed()).thenReturn(6.0);
+        when(vm.heapMax()).thenReturn(7.0);
+        when(vm.heapCommitted()).thenReturn(8.0);
 
         final Map<String, Double> pools = new TreeMap<String, Double>();
         pools.put("one", 100.0);
         pools.put("two", 200.0);
-        when(vm.getMemoryPoolUsage()).thenReturn(pools);
+        when(vm.memoryPoolUsage()).thenReturn(pools);
 
-        when(vm.getDaemonThreadCount()).thenReturn(300);
-        when(vm.getThreadCount()).thenReturn(400);
+        when(vm.daemonThreadCount()).thenReturn(300);
+        when(vm.threadCount()).thenReturn(400);
 
-        when(vm.getHeapUsage()).thenReturn(34.0);
-        when(vm.getNonHeapUsage()).thenReturn(37.0);
-        when(vm.getUptime()).thenReturn(9991L);
-        when(vm.getFileDescriptorUsage()).thenReturn(0.222);
+        when(vm.heapUsage()).thenReturn(34.0);
+        when(vm.nonHeapUsage()).thenReturn(37.0);
+        when(vm.uptime()).thenReturn(9991L);
+        when(vm.fileDescriptorUsage()).thenReturn(0.222);
 
         final Map<Thread.State, Double> threads = new TreeMap<Thread.State, Double>();
         threads.put(Thread.State.BLOCKED, 0.33);
-        when(vm.getThreadStatePercentages()).thenReturn(threads);
+        when(vm.threadStatePercentages()).thenReturn(threads);
 
         final Map<String, VirtualMachineMetrics.GarbageCollectorStats> gcs =
                 new TreeMap<String, VirtualMachineMetrics.GarbageCollectorStats>();
@@ -88,7 +88,7 @@ public class MetricsServletTest {
         when(gc.getTime(TimeUnit.MILLISECONDS)).thenReturn(40L);
         when(gc.getRuns()).thenReturn(20L);
         gcs.put("one", gc);
-        when(vm.getGarbageCollectors()).thenReturn(gcs);
+        when(vm.garbageCollectors()).thenReturn(gcs);
 
         final VirtualMachineMetrics.BufferPoolStats direct = mock(VirtualMachineMetrics.BufferPoolStats.class);
         when(direct.getCount()).thenReturn(1L);
@@ -130,7 +130,7 @@ public class MetricsServletTest {
     public void generatesGauges() throws Exception {
         registry.newGauge(MetricsServletTest.class, "gauge", new Gauge<Double>() {
             @Override
-            public Double getValue() {
+            public Double value() {
                 return 22.2;
             }
         });
@@ -168,7 +168,7 @@ public class MetricsServletTest {
 
     @Test
     public void generatesMeters() throws Exception {
-        when(clock.getTick()).thenReturn(100000L, 110000L);
+        when(clock.tick()).thenReturn(100000L, 110000L);
 
         registry.newMeter(MetricsServletTest.class, "meter", "things", TimeUnit.SECONDS)
                 .mark(12);
@@ -184,7 +184,7 @@ public class MetricsServletTest {
 
     @Test
     public void generatesTimers() throws Exception {
-        when(clock.getTick()).thenReturn(100000L, 110000L);
+        when(clock.tick()).thenReturn(100000L, 110000L);
 
         registry.newTimer(MetricsServletTest.class, "timer").update(100, TimeUnit.MILLISECONDS);
 

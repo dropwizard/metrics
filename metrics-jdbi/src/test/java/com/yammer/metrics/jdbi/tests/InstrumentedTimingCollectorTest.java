@@ -39,7 +39,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name,
                    is(new MetricName(getClass(), "updatesTimerForSqlObjects")));
-        assertThat(timer.getMax(),
+        assertThat(timer.max(),
                    is(closeTo(1000.0, 1)));
     }
 
@@ -58,7 +58,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name,
                    is(new MetricName(getClass(), "SELECT_1")));
-        assertThat(timer.getMax(),
+        assertThat(timer.max(),
                    is(closeTo(1000.0, 1)));
     }
 
@@ -76,7 +76,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name,
                    is(new MetricName("sql", "raw", "SELECT_1")));
-        assertThat(timer.getMax(),
+        assertThat(timer.max(),
                    is(closeTo(2000.0, 1)));
     }
 
@@ -93,7 +93,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name,
                    is(new MetricName("sql", "empty", "")));
-        assertThat(timer.getMax(),
+        assertThat(timer.max(),
                    is(closeTo(2000.0, 1)));
     }
 
@@ -111,7 +111,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name,
                    is(new MetricName("sql", "raw", "don_t_know_what_it_is_but_it_s_not_SQL")));
-        assertThat(timer.getMax(),
+        assertThat(timer.max(),
                    is(closeTo(3000.0, 1)));
     }
 
@@ -131,7 +131,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name,
                    is(new MetricName(getClass(), "updatesTimerForContextClass")));
-        assertThat(timer.getMax(),
+        assertThat(timer.max(),
                    is(closeTo(3000.0, 1)));
     }
 
@@ -151,7 +151,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name,
                    is(new MetricName("foo", "bar", "updatesTimerForTemplateFile")));
-        assertThat(timer.getMax(),
+        assertThat(timer.max(),
                    is(closeTo(4000.0, 1)));
     }
 
@@ -171,7 +171,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name,
                    is(new MetricName("my-group", "updatesTimerForContextGroupAndName", "")));
-        assertThat(timer.getMax(),
+        assertThat(timer.max(),
                    is(closeTo(4000.0, 1)));
     }
 
@@ -192,7 +192,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name,
                    is(new MetricName("my-group", "my-type", "updatesTimerForContextGroupTypeAndName")));
-        assertThat(timer.getMax(),
+        assertThat(timer.max(),
                    is(closeTo(5000.0, 1)));
     }
 
@@ -212,7 +212,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name,
                    is(new MetricName("jdbi", getClass().getSimpleName(), "updatesTimerForShortSqlObjectStrategy")));
-        assertThat(timer.getMax(),
+        assertThat(timer.max(),
                    is(closeTo(1000.0, 1)));
     }
 
@@ -232,7 +232,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name,
                    is(new MetricName("jdbi", getClass().getSimpleName(), "updatesTimerForShortContextClassStrategy")));
-        assertThat(timer.getMax(),
+        assertThat(timer.max(),
                    is(closeTo(3000.0, 1)));
     }
 }

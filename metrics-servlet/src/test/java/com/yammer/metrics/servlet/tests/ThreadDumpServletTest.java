@@ -35,7 +35,7 @@ public class ThreadDumpServletTest {
         final InOrder inOrder = inOrder(response, output, vm);
         inOrder.verify(response).setStatus(200);
         inOrder.verify(response).setContentType("text/plain");
-        inOrder.verify(vm).getThreadDump(output);
+        inOrder.verify(vm).threadDump(output);
         inOrder.verify(output).close();
     }
 }

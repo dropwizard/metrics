@@ -43,7 +43,7 @@ public class ThreadDumpServlet extends HttpServlet {
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
         final OutputStream output = resp.getOutputStream();
         try {
-            vm.getThreadDump(output);
+            vm.threadDump(output);
         } finally {
             output.close();
         }

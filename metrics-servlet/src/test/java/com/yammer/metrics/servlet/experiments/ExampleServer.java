@@ -22,7 +22,7 @@ public class ExampleServer {
     static {
         Metrics.defaultRegistry().newGauge(ExampleServer.class, "boo", new Gauge<Integer>() {
             @Override
-            public Integer getValue() {
+            public Integer value() {
                 throw new RuntimeException("asplode!");
             }
         });

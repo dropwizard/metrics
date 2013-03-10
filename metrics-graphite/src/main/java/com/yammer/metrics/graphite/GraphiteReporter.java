@@ -3,7 +3,6 @@ package com.yammer.metrics.graphite;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
 import com.yammer.metrics.reporting.AbstractPollingReporter;
-import com.yammer.metrics.reporting.MetricDispatcher;
 import com.yammer.metrics.stats.Snapshot;
 import com.yammer.metrics.core.MetricPredicate;
 import org.slf4j.Logger;
@@ -30,7 +29,6 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
     protected final String prefix;
     protected final MetricPredicate predicate;
     protected final Locale locale = Locale.US;
-    protected final MetricDispatcher dispatcher = new MetricDispatcher();
     protected final Clock clock;
     protected final SocketProvider socketProvider;
     protected final VirtualMachineMetrics vm;
@@ -209,7 +207,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
             socket = this.socketProvider.get();
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
-            final long epoch = clock.getTime() / 1000;
+            final long epoch = clock.time() / 1000;
             if (this.printVMMetrics) {
                 printVmMetrics(epoch);
             }
@@ -241,13 +239,12 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
     }
 
     protected void printRegularMetrics(final Long epoch) {
-        for (Entry<String,SortedMap<MetricName,Metric>> entry : getMetricsRegistry().getGroupedMetrics(
-                predicate).entrySet()) {
+        for (Entry<String,SortedMap<MetricName,Metric>> entry : getMetricsRegistry().groupedMetrics(predicate).entrySet()) {
             for (Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
                 final Metric metric = subEntry.getValue();
                 if (metric != null) {
                     try {
-                        dispatcher.dispatch(subEntry.getValue(), subEntry.getKey(), this, epoch);
+                        metric.processWith(this, subEntry.getKey(), epoch);
                     } catch (Exception ignored) {
                         LOG.error("Error printing regular metrics:", ignored);
                     }
@@ -287,7 +284,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
 
     protected String sanitizeName(MetricName name) {
         final StringBuilder sb = new StringBuilder()
-                .append(name.getDomain())
+                .append(name.getGroup())
                 .append('.')
                 .append(name.getType())
                 .append('.');
@@ -304,22 +301,22 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
 
     @Override
     public void processGauge(MetricName name, Gauge<?> gauge, Long epoch) throws IOException {
-        sendObjToGraphite(epoch, sanitizeName(name), "value", gauge.getValue());
+        sendObjToGraphite(epoch, sanitizeName(name), "value", gauge.value());
     }
 
     @Override
     public void processCounter(MetricName name, Counter counter, Long epoch) throws IOException {
-        sendInt(epoch, sanitizeName(name), "count", counter.getCount());
+        sendInt(epoch, sanitizeName(name), "count", counter.count());
     }
 
     @Override
     public void processMeter(MetricName name, Metered meter, Long epoch) throws IOException {
         final String sanitizedName = sanitizeName(name);
-        sendInt(epoch, sanitizedName, "count", meter.getCount());
-        sendFloat(epoch, sanitizedName, "meanRate", meter.getMeanRate());
-        sendFloat(epoch, sanitizedName, "1MinuteRate", meter.getOneMinuteRate());
-        sendFloat(epoch, sanitizedName, "5MinuteRate", meter.getFiveMinuteRate());
-        sendFloat(epoch, sanitizedName, "15MinuteRate", meter.getFifteenMinuteRate());
+        sendInt(epoch, sanitizedName, "count", meter.count());
+        sendFloat(epoch, sanitizedName, "meanRate", meter.meanRate());
+        sendFloat(epoch, sanitizedName, "1MinuteRate", meter.oneMinuteRate());
+        sendFloat(epoch, sanitizedName, "5MinuteRate", meter.fiveMinuteRate());
+        sendFloat(epoch, sanitizedName, "15MinuteRate", meter.fifteenMinuteRate());
     }
 
     @Override
@@ -338,10 +335,10 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
     }
 
     protected void sendSummarizable(long epoch, String sanitizedName, Summarizable metric) throws IOException {
-        sendFloat(epoch, sanitizedName, "min", metric.getMin());
-        sendFloat(epoch, sanitizedName, "max", metric.getMax());
-        sendFloat(epoch, sanitizedName, "mean", metric.getMean());
-        sendFloat(epoch, sanitizedName, "stddev", metric.getStdDev());
+        sendFloat(epoch, sanitizedName, "min", metric.min());
+        sendFloat(epoch, sanitizedName, "max", metric.max());
+        sendFloat(epoch, sanitizedName, "mean", metric.mean());
+        sendFloat(epoch, sanitizedName, "stddev", metric.stdDev());
     }
 
     protected void sendSampling(long epoch, String sanitizedName, Sampling metric) throws IOException {
@@ -355,22 +352,22 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
     }
 
     protected void printVmMetrics(long epoch) {
-        sendFloat(epoch, "jvm.memory", "heap_usage", vm.getHeapUsage());
-        sendFloat(epoch, "jvm.memory", "non_heap_usage", vm.getNonHeapUsage());
-        for (Entry<String, Double> pool : vm.getMemoryPoolUsage().entrySet()) {
+        sendFloat(epoch, "jvm.memory", "heap_usage", vm.heapUsage());
+        sendFloat(epoch, "jvm.memory", "non_heap_usage", vm.nonHeapUsage());
+        for (Entry<String, Double> pool : vm.memoryPoolUsage().entrySet()) {
             sendFloat(epoch, "jvm.memory.memory_pool_usages", sanitizeString(pool.getKey()), pool.getValue());
         }
 
-        sendInt(epoch, "jvm", "daemon_thread_count", vm.getDaemonThreadCount());
-        sendInt(epoch, "jvm", "thread_count", vm.getThreadCount());
-        sendInt(epoch, "jvm", "uptime", vm.getUptime());
-        sendFloat(epoch, "jvm", "fd_usage", vm.getFileDescriptorUsage());
+        sendInt(epoch, "jvm", "daemon_thread_count", vm.daemonThreadCount());
+        sendInt(epoch, "jvm", "thread_count", vm.threadCount());
+        sendInt(epoch, "jvm", "uptime", vm.uptime());
+        sendFloat(epoch, "jvm", "fd_usage", vm.fileDescriptorUsage());
 
-        for (Entry<State, Double> entry : vm.getThreadStatePercentages().entrySet()) {
+        for (Entry<State, Double> entry : vm.threadStatePercentages().entrySet()) {
             sendFloat(epoch, "jvm.thread-states", entry.getKey().toString().toLowerCase(), entry.getValue());
         }
 
-        for (Entry<String, VirtualMachineMetrics.GarbageCollectorStats> entry : vm.getGarbageCollectors().entrySet()) {
+        for (Entry<String, VirtualMachineMetrics.GarbageCollectorStats> entry : vm.garbageCollectors().entrySet()) {
             final String name = "jvm.gc." + sanitizeString(entry.getKey());
             sendInt(epoch, name, "time", entry.getValue().getTime(TimeUnit.MILLISECONDS));
             sendInt(epoch, name, "runs", entry.getValue().getRuns());
