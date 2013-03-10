@@ -18,6 +18,7 @@
     <modules>
         <module>metrics-annotation</module>
         <module>metrics-core</module>
+        <module>metrics-healthchecks</module>
         <module>metrics-ehcache</module>
         <module>metrics-ganglia</module>
         <module>metrics-graphite</module>
