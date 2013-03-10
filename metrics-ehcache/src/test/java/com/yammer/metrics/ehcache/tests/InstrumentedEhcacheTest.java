@@ -1,7 +1,7 @@
 package com.yammer.metrics.ehcache.tests;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.MetricRegistry;
+import com.yammer.metrics.Timer;
 import com.yammer.metrics.ehcache.InstrumentedEhcache;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -11,21 +11,20 @@ import net.sf.ehcache.config.CacheConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
-
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static com.yammer.metrics.MetricRegistry.name;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class InstrumentedEhcacheTest {
     private static final CacheManager MANAGER = CacheManager.create();
 
+    private final MetricRegistry registry = new MetricRegistry("cache");
     private Ehcache cache;
 
     @Before
     public void setUp() throws Exception {
         final Cache c = new Cache(new CacheConfiguration("test", 100));
         MANAGER.addCache(c);
-        this.cache = InstrumentedEhcache.instrument(c);
+        this.cache = InstrumentedEhcache.instrument(registry, c);
     }
 
     @Test
@@ -34,22 +33,14 @@ public class InstrumentedEhcacheTest {
 
         cache.put(new Element("woo", "whee"));
 
-        final Timer gets = Metrics.defaultRegistry().newTimer(Cache.class,
-                                                              "get",
-                                                              "test",
-                                                              TimeUnit.MILLISECONDS,
-                                                              TimeUnit.SECONDS);
+        final Timer gets = registry.timer(name(Cache.class, "test", "gets"));
 
-        assertThat(gets.count(),
-                   is(1L));
+        assertThat(gets.getCount())
+                .isEqualTo(1);
 
-        final Timer puts = Metrics.defaultRegistry().newTimer(Cache.class,
-                                                              "put",
-                                                              "test",
-                                                              TimeUnit.MILLISECONDS,
-                                                              TimeUnit.SECONDS);
+        final Timer puts = registry.timer(name(Cache.class, "test", "puts"));
 
-        assertThat(puts.count(),
-                   is(1L));
+        assertThat(puts.getCount())
+                .isEqualTo(1);
     }
 }
