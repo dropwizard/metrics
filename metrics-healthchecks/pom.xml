@@ -10,7 +10,7 @@
         <version>3.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>metrics-core</artifactId>
-    <name>Metrics Core Library</name>
+    <artifactId>metrics-healthchecks</artifactId>
+    <name>Metrics Health Checks</name>
     <packaging>bundle</packaging>
 </project>
