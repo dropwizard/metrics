@@ -5,25 +5,20 @@ import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.Meter;
+import com.yammer.metrics.MetricRegistry;
+import com.yammer.metrics.Timer;
 import com.yammer.metrics.jersey.InstrumentedResourceMethodDispatchAdapter;
 import com.yammer.metrics.jersey.tests.resources.InstrumentedResource;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static com.yammer.metrics.MetricRegistry.name;
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown;
 
 /**
  * Tests importing {@link InstrumentedResourceMethodDispatchAdapter} as a singleton
@@ -34,11 +29,11 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
         Logger.getLogger("com.sun.jersey").setLevel(Level.OFF);
     }
 
-    private MetricsRegistry registry;
+    private MetricRegistry registry;
 
     @Override
     protected AppDescriptor configure() {
-        this.registry = new MetricsRegistry();
+        this.registry = new MetricRegistry("test");
 
         final DefaultResourceConfig config = new DefaultResourceConfig();
         config.getSingletons().add(new InstrumentedResourceMethodDispatchAdapter(registry));
@@ -48,54 +43,47 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void registryIsNotDefault() {
-        final Timer timer1 = registry.newTimer(InstrumentedResource.class, "timed");
-        final Timer timer2 = registry.newTimer(InstrumentedResource.class, "timed");
-        final Timer timer3 = Metrics.defaultRegistry().newTimer(InstrumentedResource.class, "timed");
-
-        assertThat(timer1, sameInstance(timer2));
-        assertThat(timer1, not(sameInstance(timer3)));
-    }
-
-    @Test
     public void timedMethodsAreTimed() {
-        assertThat(resource().path("timed").get(String.class),
-                   is("yay"));
+        assertThat(resource().path("timed").get(String.class))
+                .isEqualTo("yay");
 
-        final Timer timer = registry.newTimer(InstrumentedResource.class, "timed");
-        assertThat(timer.count(),
-                   is(1L));
+        final Timer timer = registry.timer(name(InstrumentedResource.class, "timed"));
+
+        assertThat(timer.getCount())
+                .isEqualTo(1);
     }
 
     @Test
     public void meteredMethodsAreMetered() {
-        assertThat(resource().path("metered").get(String.class),
-                   is("woo"));
+        assertThat(resource().path("metered").get(String.class))
+                .isEqualTo("woo");
 
-        final Meter meter = registry.newMeter(InstrumentedResource.class, "metered", "blah", TimeUnit.SECONDS);
-        assertThat(meter.count(),
-                   is(1L));
+        final Meter meter = registry.meter(name(InstrumentedResource.class, "metered"));
+        assertThat(meter.getCount())
+                .isEqualTo(1);
     }
 
     @Test
     public void exceptionMeteredMethodsAreExceptionMetered() {
-        final Meter meter = registry.newMeter(InstrumentedResource.class, "exceptionMeteredExceptions", "blah", TimeUnit.SECONDS);
-        
-        assertThat(resource().path("exception-metered").get(String.class),
-                   is("fuh"));
+        final Meter meter = registry.meter(name(InstrumentedResource.class,
+                                                "exceptionMetered",
+                                                "exceptions"));
 
-        assertThat(meter.count(),
-                   is(0L));
+        assertThat(resource().path("exception-metered").get(String.class))
+                .isEqualTo("fuh");
+
+        assertThat(meter.getCount())
+                .isZero();
         
         try {
             resource().path("exception-metered").queryParam("splode", "true").get(String.class);
-            fail("should have thrown a MappableContainerException, but didn't");
+            failBecauseExceptionWasNotThrown(MappableContainerException.class);
         } catch (MappableContainerException e) {
-            assertThat(e.getCause(),
-                       is(instanceOf(IOException.class)));
+            assertThat(e.getCause())
+                    .isInstanceOf(IOException.class);
         }
 
-        assertThat(meter.count(),
-                   is(1L));
+        assertThat(meter.getCount())
+                .isEqualTo(1);
     }
 }
