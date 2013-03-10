@@ -9,6 +9,28 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * A registry of metric instances.
  */
 public class MetricRegistry {
+    public static String name(String name, String... names) {
+        final StringBuilder builder = new StringBuilder();
+        append(builder, name);
+        for (String s : names) {
+            append(builder, s);
+        }
+        return builder.toString();
+    }
+
+    public static String name(Class<?> klass, String... names) {
+        return name(klass.getCanonicalName(), names);
+    }
+
+    private static void append(StringBuilder builder, String part) {
+        if (part != null && !part.isEmpty()) {
+            if (builder.length() > 0) {
+                builder.append('.');
+            }
+            builder.append(part);
+        }
+    }
+
     private final Clock clock;
     private final ConcurrentMap<String, Metric> metrics;
     private final List<MetricRegistryListener> listeners;
