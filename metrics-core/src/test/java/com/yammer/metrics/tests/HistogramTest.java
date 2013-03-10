@@ -17,23 +17,31 @@ public class HistogramTest {
         assertThat(histogram.getCount())
                 .isEqualTo(0L);
 
-        assertThat(histogram.getMax()).isEqualTo(0.0, offset(0.0001));
+        assertThat(histogram.getMax())
+                .isEqualTo(0);
 
-        assertThat(histogram.getMin()).isEqualTo(0.0, offset(0.0001));
+        assertThat(histogram.getMin())
+                .isEqualTo(0);
 
-        assertThat(histogram.getMean()).isEqualTo(0.0, offset(0.0001));
+        assertThat(histogram.getMean())
+                .isEqualTo(0.0, offset(0.0001));
 
-        assertThat(histogram.getStdDev()).isEqualTo(0.0, offset(0.0001));
+        assertThat(histogram.getStdDev())
+                .isEqualTo(0.0, offset(0.0001));
 
-        assertThat(histogram.getSum()).isEqualTo(0.0, offset(0.0001));
+        assertThat(histogram.getSum())
+                .isEqualTo(0);
 
         final Snapshot snapshot = histogram.getSnapshot();
 
-        assertThat(snapshot.getMedian()).isEqualTo(0.0, offset(0.0001));
+        assertThat(snapshot.getMedian())
+                .isEqualTo(0.0, offset(0.0001));
 
-        assertThat(snapshot.get75thPercentile()).isEqualTo(0.0, offset(0.0001));
+        assertThat(snapshot.get75thPercentile())
+                .isEqualTo(0.0, offset(0.0001));
 
-        assertThat(snapshot.get99thPercentile()).isEqualTo(0.0, offset(0.0001));
+        assertThat(snapshot.get99thPercentile())
+                .isEqualTo(0.0, offset(0.0001));
 
         assertThat(snapshot.size())
                 .isEqualTo(0);
@@ -48,15 +56,20 @@ public class HistogramTest {
         assertThat(histogram.getCount())
                 .isEqualTo(1000L);
 
-        assertThat(histogram.getMax()).isEqualTo(1000.0, offset(0.0001));
+        assertThat(histogram.getMax())
+                .isEqualTo(1000);
 
-        assertThat(histogram.getMin()).isEqualTo(1.0, offset(0.0001));
+        assertThat(histogram.getMin())
+                .isEqualTo(1);
 
-        assertThat(histogram.getMean()).isEqualTo(500.5, offset(0.0001));
+        assertThat(histogram.getMean())
+                .isEqualTo(500.5, offset(0.0001));
 
-        assertThat(histogram.getStdDev()).isEqualTo(288.8194360957494, offset(0.0001));
+        assertThat(histogram.getStdDev())
+                .isEqualTo(288.8194360957494, offset(0.0001));
 
-        assertThat(histogram.getSum()).isEqualTo(500500, offset(0.1));
+        assertThat(histogram.getSum())
+                .isEqualTo(500500);
 
         final Snapshot snapshot = histogram.getSnapshot();
 

@@ -9,14 +9,14 @@ public interface Summarizable {
      *
      * @return the largest recorded value
      */
-    double getMax();
+    long getMax();
 
     /**
      * Returns the smallest recorded value.
      *
      * @return the smallest recorded value
      */
-    double getMin();
+    long getMin();
 
     /**
      * Returns the arithmetic mean of all recorded values.
@@ -37,6 +37,5 @@ public interface Summarizable {
      *
      * @return the sum of all recorded values
      */
-    double getSum();
-
+    long getSum();
 }

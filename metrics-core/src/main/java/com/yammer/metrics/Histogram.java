@@ -89,22 +89,22 @@ public class Histogram implements Metric, Sampling, Summarizable {
      * @see com.yammer.metrics.Summarizable#max()
      */
     @Override
-    public double getMax() {
+    public long getMax() {
         if (getCount() > 0) {
             return max.get();
         }
-        return 0.0;
+        return 0;
     }
 
     /* (non-Javadoc)
      * @see com.yammer.metrics.Summarizable#min()
      */
     @Override
-    public double getMin() {
+    public long getMin() {
         if (getCount() > 0) {
             return min.get();
         }
-        return 0.0;
+        return 0;
     }
 
     /* (non-Javadoc)
@@ -133,8 +133,8 @@ public class Histogram implements Metric, Sampling, Summarizable {
      * @see com.yammer.metrics.Summarizable#sum()
      */
     @Override
-    public double getSum() {
-        return (double) sum.get();
+    public long getSum() {
+        return sum.get();
     }
 
     @Override
