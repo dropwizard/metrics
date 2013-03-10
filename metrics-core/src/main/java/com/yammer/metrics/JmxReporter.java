@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.management.*;
-import java.util.Hashtable;
 
 // TODO: 3/10/13 <coda> -- write tests
 // TODO: 3/10/13 <coda> -- write docs
@@ -433,15 +432,11 @@ public class JmxReporter {
         }
 
         private ObjectName createName(String type, String name) {
-            final Hashtable<String, String> props = new Hashtable<String, String>();
-            props.put("type", type);
-            props.put("name", name);
             try {
-                return new ObjectName(this.name, props);
+                return new ObjectName(this.name, "name", name);
             } catch (MalformedObjectNameException e) {
-                props.put("name", ObjectName.quote(name));
                 try {
-                    return new ObjectName(this.name, props);
+                    return new ObjectName(this.name, "name", ObjectName.quote(name));
                 } catch (MalformedObjectNameException e1) {
                     LOGGER.warn("Unable to register {} {}", type, name, e1);
                     throw new RuntimeException(e1);
