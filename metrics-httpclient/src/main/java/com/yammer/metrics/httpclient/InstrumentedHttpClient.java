@@ -1,7 +1,6 @@
 package com.yammer.metrics.httpclient;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.MetricRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.ConnectionReuseStrategy;
@@ -17,25 +16,22 @@ import org.apache.http.protocol.HttpRequestExecutor;
 public class InstrumentedHttpClient extends DefaultHttpClient {
     private final Log log = LogFactory.getLog(getClass());
 
-    private final MetricsRegistry registry;
+    private final MetricRegistry registry;
 
-    public InstrumentedHttpClient(MetricsRegistry registry,
+    public InstrumentedHttpClient(MetricRegistry registry,
                                   InstrumentedClientConnManager manager,
                                   HttpParams params) {
         super(manager, params);
         this.registry = registry;
     }
 
-    public InstrumentedHttpClient(InstrumentedClientConnManager manager, HttpParams params) {
-        this(Metrics.defaultRegistry(), manager, params);
+    public InstrumentedHttpClient(MetricRegistry registry,
+                                  HttpParams params) {
+        this(registry, new InstrumentedClientConnManager(registry), params);
     }
 
-    public InstrumentedHttpClient(HttpParams params) {
-        this(new InstrumentedClientConnManager(), params);
-    }
-
-    public InstrumentedHttpClient() {
-        this(null);
+    public InstrumentedHttpClient(MetricRegistry registry) {
+        this(registry, new InstrumentedClientConnManager(registry), null);
     }
 
     @Override

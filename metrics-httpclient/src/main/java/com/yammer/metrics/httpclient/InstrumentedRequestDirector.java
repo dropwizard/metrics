@@ -1,8 +1,7 @@
 package com.yammer.metrics.httpclient;
 
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+import com.yammer.metrics.MetricRegistry;
+import com.yammer.metrics.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.http.*;
 import org.apache.http.client.*;
@@ -16,6 +15,8 @@ import org.apache.http.protocol.HttpProcessor;
 import org.apache.http.protocol.HttpRequestExecutor;
 
 import java.io.IOException;
+
+import static com.yammer.metrics.MetricRegistry.name;
 
 class InstrumentedRequestDirector extends DefaultRequestDirector {
     private final static String GET = "GET", POST = "POST", HEAD = "HEAD", PUT = "PUT",
@@ -34,7 +35,7 @@ class InstrumentedRequestDirector extends DefaultRequestDirector {
     private final Timer patchTimer;
     private final Timer otherTimer;
 
-    InstrumentedRequestDirector(MetricsRegistry registry,
+    InstrumentedRequestDirector(MetricRegistry registry,
                                 Log log,
                                 HttpRequestExecutor requestExec,
                                 ClientConnectionManager conman,
@@ -61,22 +62,22 @@ class InstrumentedRequestDirector extends DefaultRequestDirector {
               proxyAuthStrategy,
               userTokenHandler,
               params);
-        getTimer = registry.newTimer(HttpClient.class, "get-requests");
-        postTimer = registry.newTimer(HttpClient.class, "post-requests");
-        headTimer = registry.newTimer(HttpClient.class, "head-requests");
-        putTimer = registry.newTimer(HttpClient.class, "put-requests");
-        deleteTimer = registry.newTimer(HttpClient.class, "delete-requests");
-        optionsTimer = registry.newTimer(HttpClient.class, "options-requests");
-        traceTimer = registry.newTimer(HttpClient.class, "trace-requests");
-        connectTimer = registry.newTimer(HttpClient.class, "connect-requests");
-        moveTimer = registry.newTimer(HttpClient.class, "move-requests");
-        patchTimer = registry.newTimer(HttpClient.class, "patch-requests");
-        otherTimer = registry.newTimer(HttpClient.class, "other-requests");
+        getTimer = registry.timer(name(HttpClient.class, "get-requests"));
+        postTimer = registry.timer(name(HttpClient.class, "post-requests"));
+        headTimer = registry.timer(name(HttpClient.class, "head-requests"));
+        putTimer = registry.timer(name(HttpClient.class, "put-requests"));
+        deleteTimer = registry.timer(name(HttpClient.class, "delete-requests"));
+        optionsTimer = registry.timer(name(HttpClient.class, "options-requests"));
+        traceTimer = registry.timer(name(HttpClient.class, "trace-requests"));
+        connectTimer = registry.timer(name(HttpClient.class, "connect-requests"));
+        moveTimer = registry.timer(name(HttpClient.class, "move-requests"));
+        patchTimer = registry.timer(name(HttpClient.class, "patch-requests"));
+        otherTimer = registry.timer(name(HttpClient.class, "other-requests"));
     }
 
     @Override
     public HttpResponse execute(HttpHost target, HttpRequest request, HttpContext context) throws HttpException, IOException {
-        final TimerContext timerContext = timer(request).time();
+        final Timer.Context timerContext = timer(request).time();
         try {
             return super.execute(target, request, context);
         } finally {
