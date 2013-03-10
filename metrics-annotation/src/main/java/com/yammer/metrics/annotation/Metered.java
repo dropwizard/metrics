@@ -4,14 +4,13 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.concurrent.TimeUnit;
 
 /**
- * An annotation for marking a method of a Guice-provided object as metered.
+ * An annotation for marking a method of an annotated object as metered.
  * <p/>
  * Given a method like this:
  * <pre><code>
- *     \@Metered(name = "fancyName", eventType = "namings", rateUnit = TimeUnit.SECONDS)
+ *     \@Metered(name = "fancyName")
  *     public String fancyName(String name) {
  *         return "Sir Captain " + name;
  *     }
@@ -24,27 +23,13 @@ import java.util.concurrent.TimeUnit;
 @Target(ElementType.METHOD)
 public @interface Metered {
     /**
-     * The group of the timer.
-     */
-    String group() default "";
-
-    /**
-     * The type of the timer.
-     */
-    String type() default "";
-
-    /**
      * The name of the meter.
      */
     String name() default "";
 
     /**
-     * The name of the type of events the meter is measuring.
+     * If {@code true}, use the given name an as absolute name. If {@code false}, use the given name
+     * relative to the annotated class.
      */
-    String eventType() default "calls";
-
-    /**
-     * The time unit of the meter's rate.
-     */
-    TimeUnit rateUnit() default TimeUnit.SECONDS;
+    boolean absolute() default false;
 }

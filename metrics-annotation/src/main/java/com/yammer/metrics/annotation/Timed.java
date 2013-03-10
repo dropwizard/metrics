@@ -4,15 +4,13 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.concurrent.TimeUnit;
 
 /**
- * An annotation for marking a method of a Guice-provided object as timed.
+ * An annotation for marking a method of an annotated object as timed.
  * <p/>
  * Given a method like this:
  * <pre><code>
- *     \@Timed(name = "fancyName", rateUnit = TimeUnit.SECONDS, durationUnit =
- * TimeUnit.MICROSECONDS)
+ *     \@Timed(name = "fancyName")
  *     public String fancyName(String name) {
  *         return "Sir Captain " + name;
  *     }
@@ -25,27 +23,13 @@ import java.util.concurrent.TimeUnit;
 @Target(ElementType.METHOD)
 public @interface Timed {
     /**
-     * The group of the timer.
-     */
-    String group() default "";
-
-    /**
-     * The type of the timer.
-     */
-    String type() default "";
-
-    /**
      * The name of the timer.
      */
     String name() default "";
 
     /**
-     * The time unit of the timer's rate.
+     * If {@code true}, use the given name an as absolute name. If {@code false}, use the given name
+     * relative to the annotated class.
      */
-    TimeUnit rateUnit() default TimeUnit.SECONDS;
-
-    /**
-     * The time unit of the timer's duration.
-     */
-    TimeUnit durationUnit() default TimeUnit.MILLISECONDS;
+    boolean absolute() default false;
 }
