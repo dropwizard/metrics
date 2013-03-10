@@ -24,12 +24,12 @@
         <dependency>
             <groupId>com.yammer.metrics</groupId>
             <artifactId>metrics-core</artifactId>
-            <version>${project.version}</version>
+            <version>2.2.0</version>
         </dependency>
         <dependency>
             <groupId>com.yammer.metrics</groupId>
             <artifactId>metrics-annotation</artifactId>
-            <version>${project.version}</version>
+            <version>2.2.0</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
