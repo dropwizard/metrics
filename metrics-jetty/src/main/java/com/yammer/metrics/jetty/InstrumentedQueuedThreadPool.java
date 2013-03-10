@@ -27,13 +27,13 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
         });
         registry.newGauge(QueuedThreadPool.class, "active-threads", new Gauge<Integer>() {
             @Override
-            public Integer getValue() {
+            public Integer value() {
                 return getThreads();
             }
         });
         registry.newGauge(QueuedThreadPool.class, "idle-threads", new Gauge<Integer>() {
             @Override
-            public Integer getValue() {
+            public Integer value() {
                 return getIdleThreads();
             }
         });

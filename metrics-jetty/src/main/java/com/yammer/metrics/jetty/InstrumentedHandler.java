@@ -84,72 +84,72 @@ public class InstrumentedHandler extends HandlerWrapper {
         registry.newGauge(underlying.getClass(), "percent-4xx-1m", new RatioGauge() {
             @Override
             protected double getNumerator() {
-                return responses[3].getOneMinuteRate();
+                return responses[3].oneMinuteRate();
             }
 
             @Override
             protected double getDenominator() {
-                return requests.getOneMinuteRate();
+                return requests.oneMinuteRate();
             }
         });
 
         registry.newGauge(underlying.getClass(), "percent-4xx-5m", new RatioGauge() {
             @Override
             protected double getNumerator() {
-                return responses[3].getFiveMinuteRate();
+                return responses[3].fiveMinuteRate();
             }
 
             @Override
             protected double getDenominator() {
-                return requests.getFiveMinuteRate();
+                return requests.fiveMinuteRate();
             }
         });
 
         registry.newGauge(underlying.getClass(), "percent-4xx-15m", new RatioGauge() {
             @Override
             protected double getNumerator() {
-                return responses[3].getFifteenMinuteRate();
+                return responses[3].fifteenMinuteRate();
             }
 
             @Override
             protected double getDenominator() {
-                return requests.getFifteenMinuteRate();
+                return requests.fifteenMinuteRate();
             }
         });
 
         registry.newGauge(underlying.getClass(), "percent-5xx-1m", new RatioGauge() {
             @Override
             protected double getNumerator() {
-                return responses[4].getOneMinuteRate();
+                return responses[4].oneMinuteRate();
             }
 
             @Override
             protected double getDenominator() {
-                return requests.getOneMinuteRate();
+                return requests.oneMinuteRate();
             }
         });
 
         registry.newGauge(underlying.getClass(), "percent-5xx-5m", new RatioGauge() {
             @Override
             protected double getNumerator() {
-                return responses[4].getFiveMinuteRate();
+                return responses[4].fiveMinuteRate();
             }
 
             @Override
             protected double getDenominator() {
-                return requests.getFiveMinuteRate();
+                return requests.fiveMinuteRate();
             }
         });
 
         registry.newGauge(underlying.getClass(), "percent-5xx-15m", new RatioGauge() {
             @Override
             protected double getNumerator() {
-                return responses[4].getFifteenMinuteRate();
+                return responses[4].fifteenMinuteRate();
             }
 
             @Override
             protected double getDenominator() {
-                return requests.getFifteenMinuteRate();
+                return requests.fifteenMinuteRate();
             }
         });
 

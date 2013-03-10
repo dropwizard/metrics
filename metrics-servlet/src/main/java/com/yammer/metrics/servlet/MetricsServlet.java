@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.*;
-import com.yammer.metrics.reporting.MetricDispatcher;
 import com.yammer.metrics.stats.Snapshot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,30 +188,30 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
             json.writeFieldName("vm");
             json.writeStartObject();
             {
-                json.writeStringField("name", vm.getName());
-                json.writeStringField("version", vm.getVersion());
+                json.writeStringField("name", vm.name());
+                json.writeStringField("version", vm.version());
             }
             json.writeEndObject();
 
             json.writeFieldName("memory");
             json.writeStartObject();
             {
-                json.writeNumberField("totalInit", vm.getTotalInit());
-                json.writeNumberField("totalUsed", vm.getTotalUsed());
-                json.writeNumberField("totalMax", vm.getTotalMax());
-                json.writeNumberField("totalCommitted", vm.getTotalCommitted());
+                json.writeNumberField("totalInit", vm.totalInit());
+                json.writeNumberField("totalUsed", vm.totalUsed());
+                json.writeNumberField("totalMax", vm.totalMax());
+                json.writeNumberField("totalCommitted", vm.totalCommitted());
 
-                json.writeNumberField("heapInit", vm.getHeapInit());
-                json.writeNumberField("heapUsed", vm.getHeapUsed());
-                json.writeNumberField("heapMax", vm.getHeapMax());
-                json.writeNumberField("heapCommitted", vm.getHeapCommitted());
+                json.writeNumberField("heapInit", vm.heapInit());
+                json.writeNumberField("heapUsed", vm.heapUsed());
+                json.writeNumberField("heapMax", vm.heapMax());
+                json.writeNumberField("heapCommitted", vm.heapCommitted());
 
-                json.writeNumberField("heap_usage", vm.getHeapUsage());
-                json.writeNumberField("non_heap_usage", vm.getNonHeapUsage());
+                json.writeNumberField("heap_usage", vm.heapUsage());
+                json.writeNumberField("non_heap_usage", vm.nonHeapUsage());
                 json.writeFieldName("memory_pool_usages");
                 json.writeStartObject();
                 {
-                    for (Map.Entry<String, Double> pool : vm.getMemoryPoolUsage().entrySet()) {
+                    for (Map.Entry<String, Double> pool : vm.memoryPoolUsage().entrySet()) {
                         json.writeNumberField(pool.getKey(), pool.getValue());
                     }
                 }
@@ -247,16 +246,16 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
             }
 
 
-            json.writeNumberField("daemon_thread_count", vm.getDaemonThreadCount());
-            json.writeNumberField("thread_count", vm.getThreadCount());
-            json.writeNumberField("current_time", clock.getTime());
-            json.writeNumberField("uptime", vm.getUptime());
-            json.writeNumberField("fd_usage", vm.getFileDescriptorUsage());
+            json.writeNumberField("daemon_thread_count", vm.daemonThreadCount());
+            json.writeNumberField("thread_count", vm.threadCount());
+            json.writeNumberField("current_time", clock.time());
+            json.writeNumberField("uptime", vm.uptime());
+            json.writeNumberField("fd_usage", vm.fileDescriptorUsage());
 
             json.writeFieldName("thread-states");
             json.writeStartObject();
             {
-                for (Map.Entry<Thread.State, Double> entry : vm.getThreadStatePercentages()
+                for (Map.Entry<Thread.State, Double> entry : vm.threadStatePercentages()
                                                                .entrySet()) {
                     json.writeNumberField(entry.getKey().toString().toLowerCase(),
                                           entry.getValue());
@@ -267,7 +266,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
             json.writeFieldName("garbage-collectors");
             json.writeStartObject();
             {
-                for (Map.Entry<String, VirtualMachineMetrics.GarbageCollectorStats> entry : vm.getGarbageCollectors()
+                for (Map.Entry<String, VirtualMachineMetrics.GarbageCollectorStats> entry : vm.garbageCollectors()
                                                                                               .entrySet()) {
                     json.writeFieldName(entry.getKey());
                     json.writeStartObject();
@@ -285,8 +284,8 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
     }
 
     public void writeRegularMetrics(JsonGenerator json, String classPrefix, boolean showFullSamples) throws IOException {
-        final MetricDispatcher dispatcher = new MetricDispatcher();
-        for (Map.Entry<String, SortedMap<MetricName, Metric>> entry : registry.getGroupedMetrics().entrySet()) {
+        final Context context = new Context(json, showFullSamples);
+        for (Map.Entry<String, SortedMap<MetricName, Metric>> entry : registry.groupedMetrics().entrySet()) {
             if (classPrefix == null || entry.getKey().startsWith(classPrefix)) {
                 json.writeFieldName(entry.getKey());
                 json.writeStartObject();
@@ -294,7 +293,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
                     for (Map.Entry<MetricName, Metric> subEntry : entry.getValue().entrySet()) {
                         json.writeFieldName(subEntry.getKey().getName());
                         try {
-                            dispatcher.dispatch(subEntry.getValue(), subEntry.getKey(), this, new Context(json, showFullSamples));
+                            subEntry.getValue().processWith(this, subEntry.getKey(), context);
                         } catch (Exception e) {
                             LOGGER.warn("Error writing out " + subEntry.getKey(), e);
                         }
@@ -311,7 +310,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
         json.writeStartObject();
         {
             json.writeStringField("type", "histogram");
-            json.writeNumberField("count", histogram.getCount());
+            json.writeNumberField("count", histogram.count());
             writeSummarizable(histogram, json);
             writeSampling(histogram, json);
 
@@ -328,7 +327,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
         json.writeStartObject();
         {
             json.writeStringField("type", "counter");
-            json.writeNumberField("count", counter.getCount());
+            json.writeNumberField("count", counter.count());
         }
         json.writeEndObject();
     }
@@ -350,7 +349,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
         json.writeStartObject();
         {
             json.writeStringField("type", "meter");
-            json.writeStringField("event_type", meter.getEventType());
+            json.writeStringField("event_type", meter.eventType());
             writeMeteredFields(meter, json);
         }
         json.writeEndObject();
@@ -365,7 +364,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
             json.writeFieldName("duration");
             json.writeStartObject();
             {
-                json.writeStringField("unit", timer.getDurationUnit().toString().toLowerCase());
+                json.writeStringField("unit", timer.durationUnit().toString().toLowerCase());
                 writeSummarizable(timer, json);
                 writeSampling(timer, json);
                 if (context.showFullSamples) {
@@ -386,7 +385,7 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
 
     private static Object evaluateGauge(Gauge<?> gauge) {
         try {
-            return gauge.getValue();
+            return gauge.value();
         } catch (RuntimeException e) {
             LOGGER.warn("Error evaluating gauge", e);
             return "error reading gauge: " + e.getMessage();
@@ -394,10 +393,10 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
     }
 
     private static void writeSummarizable(Summarizable metric, JsonGenerator json) throws IOException {
-        json.writeNumberField("min", metric.getMin());
-        json.writeNumberField("max", metric.getMax());
-        json.writeNumberField("mean", metric.getMean());
-        json.writeNumberField("std_dev", metric.getStdDev());
+        json.writeNumberField("min", metric.min());
+        json.writeNumberField("max", metric.max());
+        json.writeNumberField("mean", metric.mean());
+        json.writeNumberField("std_dev", metric.stdDev());
     }
 
     private static void writeSampling(Sampling metric, JsonGenerator json) throws IOException {
@@ -411,11 +410,11 @@ public class MetricsServlet extends HttpServlet implements MetricProcessor<Metri
     }
 
     private static void writeMeteredFields(Metered metered, JsonGenerator json) throws IOException {
-        json.writeStringField("unit", metered.getRateUnit().toString().toLowerCase());
-        json.writeNumberField("count", metered.getCount());
-        json.writeNumberField("mean", metered.getMeanRate());
-        json.writeNumberField("m1", metered.getOneMinuteRate());
-        json.writeNumberField("m5", metered.getFiveMinuteRate());
-        json.writeNumberField("m15", metered.getFifteenMinuteRate());
+        json.writeStringField("unit", metered.rateUnit().toString().toLowerCase());
+        json.writeNumberField("count", metered.count());
+        json.writeNumberField("mean", metered.meanRate());
+        json.writeNumberField("m1", metered.oneMinuteRate());
+        json.writeNumberField("m5", metered.fiveMinuteRate());
+        json.writeNumberField("m15", metered.fifteenMinuteRate());
     }
 }
