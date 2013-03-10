@@ -106,7 +106,7 @@ public class Timer implements Metered, Sampling, Summarizable {
      * @return the longest recorded duration
      */
     @Override
-    public double getMax() {
+    public long getMax() {
         return histogram.getMax();
     }
 
@@ -116,7 +116,7 @@ public class Timer implements Metered, Sampling, Summarizable {
      * @return the shortest recorded duration
      */
     @Override
-    public double getMin() {
+    public long getMin() {
         return histogram.getMin();
     }
 
@@ -146,7 +146,7 @@ public class Timer implements Metered, Sampling, Summarizable {
      * @return the sum of all recorded durations
      */
     @Override
-    public double getSum() {
+    public long getSum() {
         return histogram.getSum();
     }
 

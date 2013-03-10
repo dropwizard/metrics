@@ -29,29 +29,40 @@ public class TimerTest {
         assertThat(timer.getCount())
                 .isZero();
 
-        assertThat(timer.getMax()).isEqualTo(0.0, offset(0.001));
+        assertThat(timer.getMax())
+                .isEqualTo(0);
 
-        assertThat(timer.getMin()).isEqualTo(0.0, offset(0.001));
+        assertThat(timer.getMin())
+                .isEqualTo(0);
 
-        assertThat(timer.getMean()).isEqualTo(0.0, offset(0.001));
+        assertThat(timer.getMean())
+                .isEqualTo(0.0, offset(0.001));
 
-        assertThat(timer.getStdDev()).isEqualTo(0.0, offset(0.001));
+        assertThat(timer.getStdDev())
+                .isEqualTo(0.0, offset(0.001));
 
         final Snapshot snapshot = timer.getSnapshot();
 
-        assertThat(snapshot.getMedian()).isEqualTo(0.0, offset(0.001));
+        assertThat(snapshot.getMedian())
+                .isEqualTo(0.0, offset(0.001));
 
-        assertThat(snapshot.get75thPercentile()).isEqualTo(0.0, offset(0.001));
+        assertThat(snapshot.get75thPercentile())
+                .isEqualTo(0.0, offset(0.001));
 
-        assertThat(snapshot.get99thPercentile()).isEqualTo(0.0, offset(0.001));
+        assertThat(snapshot.get99thPercentile())
+                .isEqualTo(0.0, offset(0.001));
 
-        assertThat(timer.getMeanRate()).isEqualTo(0.0, offset(0.001));
+        assertThat(timer.getMeanRate())
+                .isEqualTo(0.0, offset(0.001));
 
-        assertThat(timer.getOneMinuteRate()).isEqualTo(0.0, offset(0.001));
+        assertThat(timer.getOneMinuteRate())
+                .isEqualTo(0.0, offset(0.001));
 
-        assertThat(timer.getFiveMinuteRate()).isEqualTo(0.0, offset(0.001));
+        assertThat(timer.getFiveMinuteRate())
+                .isEqualTo(0.0, offset(0.001));
 
-        assertThat(timer.getFifteenMinuteRate()).isEqualTo(0.0, offset(0.001));
+        assertThat(timer.getFifteenMinuteRate())
+                .isEqualTo(0.0, offset(0.001));
 
         assertThat(timer.getSnapshot().size())
                 .isZero();
@@ -68,21 +79,28 @@ public class TimerTest {
         assertThat(timer.getCount())
                 .isEqualTo(5);
 
-        assertThat(timer.getMax()).isEqualTo(4e7, offset(0.001));
+        assertThat(timer.getMax())
+                .isEqualTo(40000000);
 
-        assertThat(timer.getMin()).isEqualTo(1e7, offset(0.001));
+        assertThat(timer.getMin())
+                .isEqualTo(10000000);
 
-        assertThat(timer.getMean()).isEqualTo(2.4e7, offset(0.001));
+        assertThat(timer.getMean())
+                .isEqualTo(24000000, offset(0.001));
 
-        assertThat(timer.getStdDev()).isEqualTo(1.14e7, offset(10000.0));
+        assertThat(timer.getStdDev())
+                .isEqualTo(11400000, offset(10000.0));
 
         final Snapshot snapshot = timer.getSnapshot();
 
-        assertThat(snapshot.getMedian()).isEqualTo(2e7, offset(0.001));
+        assertThat(snapshot.getMedian())
+                .isEqualTo(20000000, offset(0.001));
 
-        assertThat(snapshot.get75thPercentile()).isEqualTo(3.5e7, offset(0.001));
+        assertThat(snapshot.get75thPercentile())
+                .isEqualTo(35000000, offset(0.001));
 
-        assertThat(snapshot.get99thPercentile()).isEqualTo(4e7, offset(0.001));
+        assertThat(snapshot.get99thPercentile())
+                .isEqualTo(40000000, offset(0.001));
 
         assertThat(timer.getSnapshot().getValues())
                 .containsOnly(10000000, 20000000, 20000000, 30000000, 40000000);
@@ -112,7 +130,8 @@ public class TimerTest {
         assertThat(value)
                 .isEqualTo("one");
 
-        assertThat(timer.getMax()).isEqualTo(5e7, offset(0.001));
+        assertThat(timer.getMax())
+                .isEqualTo(50000000);
     }
 
     @Test
@@ -122,6 +141,7 @@ public class TimerTest {
         assertThat(timer.getCount())
                 .isEqualTo(1);
 
-        assertThat(timer.getMax()).isEqualTo(5e7, offset(0.001));
+        assertThat(timer.getMax())
+                .isEqualTo(50000000);
     }
 }
