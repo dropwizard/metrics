@@ -1,7 +1,9 @@
 package com.yammer.metrics.web;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.*;
+import com.yammer.metrics.Counter;
+import com.yammer.metrics.Meter;
+import com.yammer.metrics.MetricRegistry;
+import com.yammer.metrics.Timer;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
@@ -11,7 +13,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
+
+import static com.yammer.metrics.MetricRegistry.name;
 
 /**
  * {@link Filter} implementation which captures request information and a breakdown of the response
@@ -32,13 +35,15 @@ public abstract class WebappMetricsFilter implements Filter {
     /**
      * Creates a new instance of the filter.
      *
-     * @param registryAttribute the attribute used to look up the metrics registry in the servlet context
+     * @param registryAttribute      the attribute used to look up the metrics registry in the
+     *                               servlet context
      * @param meterNamesByStatusCode A map, keyed by status code, of meter names that we are
      *                               interested in.
      * @param otherMetricName        The name used for the catch-all meter.
      */
-    public WebappMetricsFilter(String registryAttribute, Map<Integer, String> meterNamesByStatusCode,
-                               String otherMetricName) {
+    protected WebappMetricsFilter(String registryAttribute,
+                                  Map<Integer, String> meterNamesByStatusCode,
+                                  String otherMetricName) {
         this.registryAttribute = registryAttribute;
         this.otherMetricName = otherMetricName;
         this.meterNamesByStatusCode = meterNamesByStatusCode;
@@ -46,37 +51,32 @@ public abstract class WebappMetricsFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        final MetricsRegistry metricsRegistry = getMetricsFactory(filterConfig);
+        final MetricRegistry metricsRegistry = getMetricsFactory(filterConfig);
 
         this.metersByStatusCode = new ConcurrentHashMap<Integer, Meter>(meterNamesByStatusCode
                 .size());
         for (Entry<Integer, String> entry : meterNamesByStatusCode.entrySet()) {
             metersByStatusCode.put(entry.getKey(),
-                    metricsRegistry.newMeter(WebappMetricsFilter.class,
-                            entry.getValue(),
-                            "responses",
-                            TimeUnit.SECONDS));
+                    metricsRegistry.meter(name(WebappMetricsFilter.class, entry.getValue())));
         }
-        this.otherMeter = metricsRegistry.newMeter(WebappMetricsFilter.class,
-                otherMetricName,
-                "responses",
-                TimeUnit.SECONDS);
-        this.activeRequests = metricsRegistry.newCounter(WebappMetricsFilter.class, "activeRequests");
-        this.requestTimer = metricsRegistry.newTimer(WebappMetricsFilter.class,
-                "requests",
-                TimeUnit.MILLISECONDS,
-                TimeUnit.SECONDS);
+        this.otherMeter = metricsRegistry.meter(name(WebappMetricsFilter.class,
+                                                     otherMetricName));
+        this.activeRequests = metricsRegistry.counter(name(WebappMetricsFilter.class,
+                                                           "activeRequests"));
+        this.requestTimer = metricsRegistry.timer(name(WebappMetricsFilter.class,
+                                                       "requests"));
 
     }
 
-    private MetricsRegistry getMetricsFactory(FilterConfig filterConfig) {
-        final MetricsRegistry metricsRegistry;
+    private MetricRegistry getMetricsFactory(FilterConfig filterConfig) {
+        final MetricRegistry metricsRegistry;
 
         final Object o = filterConfig.getServletContext().getAttribute(this.registryAttribute);
-        if (o instanceof MetricsRegistry) {
-            metricsRegistry = (MetricsRegistry) o;
+        if (o instanceof MetricRegistry) {
+            metricsRegistry = (MetricRegistry) o;
         } else {
-            metricsRegistry = Metrics.defaultRegistry();
+            // TODO: 3/10/13 <coda> -- figure out how to coordinate on registry names
+            metricsRegistry = new MetricRegistry("web");
         }
         return metricsRegistry;
     }
@@ -93,7 +93,7 @@ public abstract class WebappMetricsFilter implements Filter {
         final StatusExposingServletResponse wrappedResponse =
                 new StatusExposingServletResponse((HttpServletResponse) response);
         activeRequests.inc();
-        final TimerContext context = requestTimer.time();
+        final Timer.Context context = requestTimer.time();
         try {
             chain.doFilter(request, wrappedResponse);
         } finally {
