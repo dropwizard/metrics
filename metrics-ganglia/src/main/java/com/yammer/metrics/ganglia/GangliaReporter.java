@@ -139,7 +139,7 @@ public class GangliaReporter extends AbstractPollingReporter {
     private void reportCounter(String name, Counter counter) {
         final String group = group(name);
         try {
-            announce(name, group, counter.getCount(), "");
+            announce(name(name, "count"), group, counter.getCount(), "");
         } catch (GangliaException e) {
             LOGGER.warn("Unable to report counter {}", name, e);
         }
