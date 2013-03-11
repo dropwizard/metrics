@@ -12,6 +12,7 @@ public class MetricName implements Comparable<MetricName> {
     private final String type;
     private final String name;
     private final String scope;
+	static private String defaultScope;
 
     /**
      * Creates a new {@link MetricName} without a scope.
@@ -66,7 +67,7 @@ public class MetricName implements Comparable<MetricName> {
         this.domain = domain;
         this.type = type;
         this.name = name;
-        this.scope = scope;
+	    this.scope = scope;
     }
 
     /**
@@ -225,4 +226,6 @@ public class MetricName implements Comparable<MetricName> {
                                       method.getName() + ExceptionMetered.DEFAULT_NAME_SUFFIX :
                                       annotation.name());
     }
+
+
 }

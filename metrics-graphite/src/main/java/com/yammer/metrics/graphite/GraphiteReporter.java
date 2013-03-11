@@ -27,8 +27,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class GraphiteReporter extends AbstractPollingReporter implements MetricProcessor<Long> {
     private static final Logger LOG = LoggerFactory.getLogger(GraphiteReporter.class);
-    protected final String prefix;
-    protected final MetricPredicate predicate;
+	protected String prefix;
+	protected String suffix;
+	protected final MetricPredicate predicate;
     protected final Locale locale = Locale.US;
     protected final MetricDispatcher dispatcher = new MetricDispatcher();
     protected final Clock clock;
@@ -46,8 +47,8 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
      * @param host   the host name of graphite server (carbon-cache agent)
      * @param port   the port number on which the graphite server is listening
      */
-    public static void enable(long period, TimeUnit unit, String host, int port) {
-        enable(Metrics.defaultRegistry(), period, unit, host, port);
+    public static GraphiteReporter enable(long period, TimeUnit unit, String host, int port) {
+	    return enable(Metrics.defaultRegistry(), period, unit, host, port);
     }
 
     /**
@@ -60,8 +61,8 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
      * @param host            the host name of graphite server (carbon-cache agent)
      * @param port            the port number on which the graphite server is listening
      */
-    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port) {
-        enable(metricsRegistry, period, unit, host, port, null);
+    public static GraphiteReporter enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port) {
+	    return enable(metricsRegistry, period, unit, host, port, null);
     }
 
     /**
@@ -73,8 +74,8 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
      * @param port   the port number on which the graphite server is listening
      * @param prefix the string which is prepended to all metric names
      */
-    public static void enable(long period, TimeUnit unit, String host, int port, String prefix) {
-        enable(Metrics.defaultRegistry(), period, unit, host, port, prefix);
+    public static GraphiteReporter enable(long period, TimeUnit unit, String host, int port, String prefix) {
+	    return enable(Metrics.defaultRegistry(), period, unit, host, port, prefix);
     }
 
     /**
@@ -87,8 +88,8 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
      * @param port            the port number on which the graphite server is listening
      * @param prefix          the string which is prepended to all metric names
      */
-    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix) {
-        enable(metricsRegistry, period, unit, host, port, prefix, MetricPredicate.ALL);
+    public static GraphiteReporter enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix) {
+        return enable(metricsRegistry, period, unit, host, port, prefix, MetricPredicate.ALL);
     }
 
     /**
@@ -102,7 +103,7 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
      * @param prefix          the string which is prepended to all metric names
      * @param predicate       filters metrics to be reported
      */
-    public static void enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix, MetricPredicate predicate) {
+    public static GraphiteReporter enable(MetricsRegistry metricsRegistry, long period, TimeUnit unit, String host, int port, String prefix, MetricPredicate predicate) {
         try {
             final GraphiteReporter reporter = new GraphiteReporter(metricsRegistry,
                                                                    prefix,
@@ -111,8 +112,10 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
                                                                                              port),
                                                                    Clock.defaultClock());
             reporter.start(period, unit);
+	        return reporter;
         } catch (Exception e) {
             LOG.error("Error creating/starting Graphite reporter:", e);
+	        return null;
         }
     }
 
@@ -202,7 +205,47 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
         this.predicate = predicate;
     }
 
-    @Override
+	public String getPrefix()
+	{
+		return prefix;
+	}
+
+	public void setPrefix(String prefix)
+	{
+		this.prefix = prefix;
+		// Pre-append the "." so that we don't need to make anything conditional later.
+		if (prefix != null && !prefix.endsWith("."))
+		{
+			this.prefix = prefix+".";
+		}
+	}
+
+	public String getSuffix()
+	{
+		return suffix;
+	}
+
+	public void setSuffix(String suffix)
+	{
+		this.suffix = suffix;
+		// Pre-append the "." so that we don't need to make anything conditional later.
+		if (suffix != null && !prefix.endsWith("."))
+		{
+			this.suffix = "."+suffix;
+		}
+	}
+
+	public boolean isPrintVMMetrics()
+	{
+		return printVMMetrics;
+	}
+
+	public void setPrintVMMetrics(boolean printVMMetrics)
+	{
+		this.printVMMetrics = printVMMetrics;
+	}
+
+	@Override
     public void run() {
         Socket socket = null;
         try {
@@ -274,7 +317,10 @@ public class GraphiteReporter extends AbstractPollingReporter implements MetricP
                 writer.write(prefix);
             }
             writer.write(sanitizeString(name));
-            writer.write('.');
+	        if (!suffix.isEmpty()) {
+		        writer.write(suffix);
+	        }
+	        writer.write('.');
             writer.write(value);
             writer.write(' ');
             writer.write(Long.toString(timestamp));
