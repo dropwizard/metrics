@@ -1,6 +1,5 @@
 package com.yammer.metrics.jdbi.strategies;
 
-import com.yammer.metrics.core.MetricName;
 import org.skife.jdbi.v2.StatementContext;
 
 import java.util.ArrayList;
@@ -19,13 +18,11 @@ public abstract class DelegatingStatementNameStrategy implements StatementNameSt
     }
 
     @Override
-    public MetricName getStatementName(StatementContext statementContext) {
-        if (strategies != null) {
-            for (StatementNameStrategy strategy : strategies) {
-                final MetricName statementName = strategy.getStatementName(statementContext);
-                if (statementName != null) {
-                    return statementName;
-                }
+    public String getStatementName(StatementContext statementContext) {
+        for (StatementNameStrategy strategy : strategies) {
+            final String statementName = strategy.getStatementName(statementContext);
+            if (statementName != null) {
+                return statementName;
             }
         }
 

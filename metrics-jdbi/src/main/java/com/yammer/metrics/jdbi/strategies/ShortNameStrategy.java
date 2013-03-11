@@ -1,11 +1,12 @@
 package com.yammer.metrics.jdbi.strategies;
 
-import com.yammer.metrics.core.MetricName;
 import org.skife.jdbi.v2.StatementContext;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import static com.yammer.metrics.MetricRegistry.name;
 
 /**
  * Assembles all JDBI stats under a common prefix (passed in at constructor time). Stats are grouped
@@ -30,7 +31,7 @@ public final class ShortNameStrategy extends DelegatingStatementNameStrategy {
 
     private final class ShortContextClassStrategy implements StatementNameStrategy {
         @Override
-        public MetricName getStatementName(StatementContext statementContext) {
+        public String getStatementName(StatementContext statementContext) {
             final Object classObj = statementContext.getAttribute(NameStrategies.STATEMENT_CLASS);
             final Object nameObj = statementContext.getAttribute(NameStrategies.STATEMENT_NAME);
 
@@ -50,16 +51,16 @@ public final class ShortNameStrategy extends DelegatingStatementNameStrategy {
 
             final String oldClassName = shortClassNames.putIfAbsent(shortName, className);
             if (oldClassName == null || oldClassName.equals(className)) {
-                return StatementName.getJmxSafeName(baseJmxName, shortName, statementName);
+                return name(baseJmxName, shortName, statementName);
             } else {
-                return StatementName.getJmxSafeName(baseJmxName, className, statementName);
+                return name(baseJmxName, className, statementName);
             }
         }
     }
 
     private final class ShortSqlObjectStrategy implements StatementNameStrategy {
         @Override
-        public MetricName getStatementName(StatementContext statementContext) {
+        public String getStatementName(StatementContext statementContext) {
             final Class<?> clazz = statementContext.getSqlObjectType();
             final Method method = statementContext.getSqlObjectMethod();
             if (clazz != null && method != null) {
@@ -75,9 +76,9 @@ public final class ShortNameStrategy extends DelegatingStatementNameStrategy {
 
                 final String oldClassName = shortClassNames.putIfAbsent(shortName, className);
                 if (oldClassName == null || oldClassName.equals(className)) {
-                    return StatementName.getJmxSafeName(baseJmxName, shortName, statementName);
+                    return name(baseJmxName, shortName, statementName);
                 } else {
-                    return StatementName.getJmxSafeName(baseJmxName, className, statementName);
+                    return name(baseJmxName, className, statementName);
                 }
             }
             return null;

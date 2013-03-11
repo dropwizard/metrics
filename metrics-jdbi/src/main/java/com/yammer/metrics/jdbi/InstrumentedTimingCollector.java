@@ -1,8 +1,7 @@
 package com.yammer.metrics.jdbi;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.MetricRegistry;
+import com.yammer.metrics.Timer;
 import com.yammer.metrics.jdbi.strategies.SmartNameStrategy;
 import com.yammer.metrics.jdbi.strategies.StatementNameStrategy;
 import org.skife.jdbi.v2.StatementContext;
@@ -15,32 +14,17 @@ import java.util.concurrent.TimeUnit;
  * method names for millisecond-precision timers.
  */
 public class InstrumentedTimingCollector implements TimingCollector {
-    private final MetricsRegistry registry;
+    private final MetricRegistry registry;
     private final StatementNameStrategy statementNameStrategy;
-    private final TimeUnit durationUnit;
-    private final TimeUnit rateUnit;
 
-    public InstrumentedTimingCollector() {
-        this(Metrics.defaultRegistry());
+    public InstrumentedTimingCollector(MetricRegistry registry) {
+        this(registry, new SmartNameStrategy());
     }
 
-    public InstrumentedTimingCollector(MetricsRegistry registry) {
-        this(registry, new SmartNameStrategy(), TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-    }
-
-    public InstrumentedTimingCollector(MetricsRegistry registry,
+    public InstrumentedTimingCollector(MetricRegistry registry,
                                        StatementNameStrategy statementNameStrategy) {
-        this(registry, statementNameStrategy, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
-    }
-
-    public InstrumentedTimingCollector(MetricsRegistry registry,
-                                       StatementNameStrategy statementNameStrategy,
-                                       TimeUnit durationUnit,
-                                       TimeUnit rateUnit) {
         this.registry = registry;
         this.statementNameStrategy = statementNameStrategy;
-        this.durationUnit = durationUnit;
-        this.rateUnit = rateUnit;
     }
 
     @Override
@@ -50,8 +34,6 @@ public class InstrumentedTimingCollector implements TimingCollector {
     }
 
     private Timer getTimer(StatementContext ctx) {
-        return registry.newTimer(statementNameStrategy.getStatementName(ctx),
-                                 durationUnit,
-                                 rateUnit);
+        return registry.timer(statementNameStrategy.getStatementName(ctx));
     }
 }
