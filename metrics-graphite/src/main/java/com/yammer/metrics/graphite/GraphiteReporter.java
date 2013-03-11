@@ -122,7 +122,10 @@ public class GraphiteReporter extends AbstractPollingReporter {
     }
 
     private void reportGauge(String name, Gauge gauge, long timestamp) throws IOException {
-        graphite.write(prefix(name), format(gauge.getValue()), timestamp);
+        final String value = format(gauge.getValue());
+        if (value != null) {
+            graphite.write(prefix(name), value, timestamp);
+        }
     }
 
     private String format(Object o) {
@@ -139,7 +142,7 @@ public class GraphiteReporter extends AbstractPollingReporter {
         } else if (o instanceof Long) {
             return format(((Long) o).longValue());
         }
-        return String.valueOf(o);
+        return null;
     }
 
     private String prefix(String... components) {

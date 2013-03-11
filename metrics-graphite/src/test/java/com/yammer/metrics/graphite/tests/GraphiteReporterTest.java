@@ -31,7 +31,7 @@ public class GraphiteReporterTest {
     }
 
     @Test
-    public void reportsStringGaugeValues() throws Exception {
+    public void doesNotReportStringGaugeValues() throws Exception {
         reporter.report(map("gauge", gauge("value")),
                         this.<Counter>map(),
                         this.<Histogram>map(),
@@ -40,7 +40,7 @@ public class GraphiteReporterTest {
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
-        inOrder.verify(graphite).write("prefix.gauge", "value", timestamp);
+        inOrder.verify(graphite, never()).write("prefix.gauge", "value", timestamp);
         inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
