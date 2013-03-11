@@ -45,13 +45,4 @@ public class CounterTest {
         assertThat(counter.getCount())
                 .isEqualTo(-12);
     }
-
-    @Test
-    public void isZeroAfterBeingCleared() throws Exception {
-        counter.inc(3);
-        counter.clear();
-
-        assertThat(counter.getCount())
-                .isZero();
-    }
 }

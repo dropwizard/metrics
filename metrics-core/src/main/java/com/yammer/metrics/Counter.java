@@ -52,11 +52,4 @@ public class Counter implements Metric {
     public long getCount() {
         return count.get();
     }
-
-    /**
-     * Resets the counter to 0.
-     */
-    public void clear() {
-        count.set(0);
-    }
 }
