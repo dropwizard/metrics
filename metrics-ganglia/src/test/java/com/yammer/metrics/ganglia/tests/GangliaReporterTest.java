@@ -118,7 +118,7 @@ public class GangliaReporterTest {
                         this.<Meter>map(),
                         this.<Timer>map());
 
-        verify(ganglia).announce("test.counter", "100", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("test.counter.count", "100", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
         verifyNoMoreInteractions(ganglia);
     }
 
