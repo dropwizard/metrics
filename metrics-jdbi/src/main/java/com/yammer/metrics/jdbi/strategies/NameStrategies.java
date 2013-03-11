@@ -1,12 +1,13 @@
 package com.yammer.metrics.jdbi.strategies;
 
-import com.yammer.metrics.core.MetricName;
 import org.skife.jdbi.v2.ClasspathStatementLocator;
 import org.skife.jdbi.v2.StatementContext;
 
 import java.lang.reflect.Method;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.yammer.metrics.MetricRegistry.name;
 
 public final class NameStrategies {
     public static final StatementNameStrategy CHECK_EMPTY = new CheckEmptyStrategy();
@@ -19,12 +20,12 @@ public final class NameStrategies {
     /**
      * An empty SQL statement.
      */
-    private static final MetricName EMPTY_SQL = new MetricName("sql", "empty", "");
+    private static final String EMPTY_SQL = "sql.empty";
 
     /**
      * Unknown SQL.
      */
-    static final MetricName UNKNOWN_SQL = new MetricName("sql", "unknown", "");
+    static final String UNKNOWN_SQL = "sql.unknown";
 
     /**
      * Context attribute name for the metric class.
@@ -46,8 +47,8 @@ public final class NameStrategies {
      */
     public static final String STATEMENT_NAME = "_metric_name";
 
-    private static MetricName forRawSql(String rawSql) {
-        return StatementName.getJmxSafeName("sql", "raw", rawSql);
+    private static String forRawSql(String rawSql) {
+        return name("sql", "raw", rawSql);
     }
 
     static final class CheckEmptyStrategy implements StatementNameStrategy {
@@ -55,7 +56,7 @@ public final class NameStrategies {
         }
 
         @Override
-        public MetricName getStatementName(StatementContext statementContext) {
+        public String getStatementName(StatementContext statementContext) {
             final String rawSql = statementContext.getRawSql();
 
             if (rawSql == null || rawSql.length() == 0) {
@@ -70,7 +71,7 @@ public final class NameStrategies {
         }
 
         @Override
-        public MetricName getStatementName(StatementContext statementContext) {
+        public String getStatementName(StatementContext statementContext) {
             final String rawSql = statementContext.getRawSql();
 
             if (ClasspathStatementLocator.looksLikeSql(rawSql)) {
@@ -85,7 +86,7 @@ public final class NameStrategies {
         }
 
         @Override
-        public MetricName getStatementName(StatementContext statementContext) {
+        public String getStatementName(StatementContext statementContext) {
             final String rawSql = statementContext.getRawSql();
 
             // Is it using the template loader?
@@ -98,7 +99,7 @@ public final class NameStrategies {
 
             final String group = rawSql.substring(0, colon);
             final String name = rawSql.substring(colon + 1);
-            return StatementName.getJmxSafeName(group, name, "");
+            return name(group, name);
         }
     }
 
@@ -107,7 +108,7 @@ public final class NameStrategies {
         }
 
         @Override
-        public MetricName getStatementName(StatementContext statementContext) {
+        public String getStatementName(StatementContext statementContext) {
             final Class<?> clazz = statementContext.getSqlObjectType();
             final Method method = statementContext.getSqlObjectMethod();
             if (clazz != null) {
@@ -116,7 +117,7 @@ public final class NameStrategies {
                 final String group = clazz.getPackage().getName();
                 final String name = clazz.getSimpleName();
                 final String type = method == null ? rawSql : method.getName();
-                return StatementName.getJmxSafeName(group, name, type);
+                return name(group, name, type);
             }
             return null;
         }
@@ -127,7 +128,7 @@ public final class NameStrategies {
         }
 
         @Override
-        public MetricName getStatementName(StatementContext statementContext) {
+        public String getStatementName(StatementContext statementContext) {
             final Object classObj = statementContext.getAttribute(STATEMENT_CLASS);
             final Object nameObj = statementContext.getAttribute(STATEMENT_NAME);
 
@@ -143,9 +144,9 @@ public final class NameStrategies {
                 return null;
             }
 
-            return StatementName.getJmxSafeName(className.substring(0, dotPos),
-                                                className.substring(dotPos + 1),
-                                                statementName);
+            return name(className.substring(0, dotPos),
+                        className.substring(dotPos + 1),
+                        statementName);
         }
     }
 
@@ -159,7 +160,7 @@ public final class NameStrategies {
         }
 
         @Override
-        public MetricName getStatementName(StatementContext statementContext) {
+        public String getStatementName(StatementContext statementContext) {
             final Object groupObj = statementContext.getAttribute(STATEMENT_GROUP);
             final Object typeObj = statementContext.getAttribute(STATEMENT_TYPE);
             final Object nameObj = statementContext.getAttribute(STATEMENT_NAME);
@@ -176,14 +177,14 @@ public final class NameStrategies {
                 if (matcher.matches()) {
                     final String groupName = matcher.group(1);
                     final String typeName = matcher.group(2);
-                    return StatementName.getJmxSafeName(groupName, typeName, statementName);
+                    return name(groupName, typeName, statementName);
                 }
 
-                return StatementName.getJmxSafeName(group, statementName, "");
+                return name(group, statementName, "");
             } else {
                 final String type = (String) typeObj;
 
-                return StatementName.getJmxSafeName(group, type, statementName);
+                return name(group, type, statementName);
             }
         }
     }
