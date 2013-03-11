@@ -8,12 +8,12 @@ import java.net.SocketException;
  * Builder for creating Ganglia messages. Note, this builder is not thread safe (the message buffer
  * is reused between messages)
  */
-class GangliaMessageBuilder {
+public class GangliaMessageBuilder {
     private final InetSocketAddress inetSocketAddress;
     private final byte[] buffer = new byte[1500];
     private final DatagramSocket datagramSocket;
 
-    GangliaMessageBuilder(String hostName, int port) throws SocketException {
+    public GangliaMessageBuilder(String hostName, int port) throws SocketException {
         this.inetSocketAddress = new InetSocketAddress(hostName, port);
         this.datagramSocket = new DatagramSocket();
     }
