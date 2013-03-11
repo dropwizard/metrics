@@ -43,6 +43,15 @@ public class HealthCheckRegistry {
     }
 
     /**
+     * Returns a set of the names of all registered health checks.
+     *
+     * @return the names of all registered health checks
+     */
+    public SortedSet<String> getNames() {
+        return Collections.unmodifiableSortedSet(new TreeSet<String>(healthChecks.keySet()));
+    }
+
+    /**
      * Runs the registered health checks and returns a map of the results.
      *
      * @return a map of the health check results
