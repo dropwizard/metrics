@@ -6,12 +6,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
+import java.util.Set;
 
 import static com.yammer.metrics.core.HealthCheck.Result;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class HealthCheckRegistryTest {
@@ -57,5 +61,24 @@ public class HealthCheckRegistryTest {
 
         assertThat(results,
                    hasEntry("hc2", r2));
+    }
+
+    @Test
+    public void runsNamedHealthCheck() throws Exception {
+
+        registry.runHealthCheck("hc2");
+
+        verify(hc2.execute());
+
+    }
+
+    @Test
+    public void getsRegisteredNames() throws Exception {
+
+        Set<String> registeredNames = registry.getRegisteredNames();
+
+        assertThat(registeredNames.size(), is(2));
+        assertThat(registeredNames, hasItems("hc1", "hc2"));
+
     }
 }
