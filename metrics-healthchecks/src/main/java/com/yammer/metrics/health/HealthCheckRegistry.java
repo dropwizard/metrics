@@ -51,6 +51,14 @@ public class HealthCheckRegistry {
         return Collections.unmodifiableSortedSet(new TreeSet<String>(healthChecks.keySet()));
     }
 
+    public HealthCheck.Result runHealthCheck(String name) {
+        final HealthCheck healthCheck = healthChecks.get(name);
+        if (healthCheck == null) {
+            throw new NoSuchElementException("No health check named " + name + " exists");
+        }
+        return healthCheck.execute();
+    }
+
     /**
      * Runs the registered health checks and returns a map of the results.
      *
