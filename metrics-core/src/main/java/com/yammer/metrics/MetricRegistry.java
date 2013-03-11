@@ -165,6 +165,10 @@ public class MetricRegistry {
         return name;
     }
 
+    public SortedSet<String> getNames() {
+        return Collections.unmodifiableSortedSet(new TreeSet<String>(metrics.keySet()));
+    }
+
     public SortedMap<String, Gauge> getGauges() {
         return getMetrics(Gauge.class);
     }
