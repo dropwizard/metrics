@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
-    <!-- I don't care that Scala bytecode is weird. -->
-    <Class name="~com.yammer.metrics.scala\.[^.]+"/>
-
     <!-- Don't tell me about servlets and serialization. -->
     <Match>
         <Class name="~com\.yammer\.metrics\.servlet\..*Servlet"/>
