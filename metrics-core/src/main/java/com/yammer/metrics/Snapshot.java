@@ -1,8 +1,6 @@
 package com.yammer.metrics;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
 
 import static java.lang.Math.floor;
@@ -147,19 +145,18 @@ public class Snapshot {
     }
 
     /**
-     * Writes the values of the sample to the given file.
+     * Writes the values of the sample to the given stream.
      *
-     * @param output the file to which the values will be written
-     * @throws IOException if there is an error writing the values
+     * @param output an output stream
      */
-    public void dump(File output) throws IOException {
-        final PrintWriter writer = new PrintWriter(output);
+    public void dump(OutputStream output) {
+        final PrintWriter out = new PrintWriter(output);
         try {
-            for (double value : values) {
-                writer.printf("%f\n", value);
+            for (long value : values) {
+                out.printf("%d%n", value);
             }
         } finally {
-            writer.close();
+            out.close();
         }
     }
 }
