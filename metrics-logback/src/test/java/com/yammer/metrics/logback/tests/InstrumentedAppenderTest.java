@@ -3,18 +3,15 @@ package com.yammer.metrics.logback.tests;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
-import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.Meter;
+import com.yammer.metrics.MetricRegistry;
 import com.yammer.metrics.logback.InstrumentedAppender;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static com.yammer.metrics.MetricRegistry.name;
+import static org.mockito.Mockito.*;
 
 public class InstrumentedAppenderTest {
     private Meter all, trace, debug, info, warn, error;
@@ -33,13 +30,13 @@ public class InstrumentedAppenderTest {
         this.event = mock(ILoggingEvent.class);
         when(event.getLevel()).thenReturn(Level.INFO);
 
-        final MetricsRegistry registry = mock(MetricsRegistry.class);
-        when(registry.newMeter(Appender.class, "all", "statements", TimeUnit.SECONDS)).thenReturn(all);
-        when(registry.newMeter(Appender.class, "trace", "statements", TimeUnit.SECONDS)).thenReturn(trace);
-        when(registry.newMeter(Appender.class, "debug", "statements", TimeUnit.SECONDS)).thenReturn(debug);
-        when(registry.newMeter(Appender.class, "info", "statements", TimeUnit.SECONDS)).thenReturn(info);
-        when(registry.newMeter(Appender.class, "warn", "statements", TimeUnit.SECONDS)).thenReturn(warn);
-        when(registry.newMeter(Appender.class, "error", "statements", TimeUnit.SECONDS)).thenReturn(error);
+        final MetricRegistry registry = mock(MetricRegistry.class);
+        when(registry.meter(name(Appender.class, "all"))).thenReturn(all);
+        when(registry.meter(name(Appender.class, "trace"))).thenReturn(trace);
+        when(registry.meter(name(Appender.class, "debug"))).thenReturn(debug);
+        when(registry.meter(name(Appender.class, "info"))).thenReturn(info);
+        when(registry.meter(name(Appender.class, "warn"))).thenReturn(warn);
+        when(registry.meter(name(Appender.class, "error"))).thenReturn(error);
 
         this.instrumented = new InstrumentedAppender(registry);
         instrumented.start();
