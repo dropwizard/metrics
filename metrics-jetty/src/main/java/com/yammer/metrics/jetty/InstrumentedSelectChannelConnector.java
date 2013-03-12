@@ -1,52 +1,42 @@
 package com.yammer.metrics.jetty;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Counter;
-import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.*;
 import org.eclipse.jetty.io.Connection;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import static com.yammer.metrics.MetricRegistry.name;
+
 public class InstrumentedSelectChannelConnector extends SelectChannelConnector {
     private final Timer duration;
     private final Meter accepts, connects, disconnects;
     private final Counter connections;
+    private final Clock clock;
 
-    public InstrumentedSelectChannelConnector(int port) {
-        this(Metrics.defaultRegistry(), port);
-    }
-
-    public InstrumentedSelectChannelConnector(MetricsRegistry registry,
-                                              int port) {
+    public InstrumentedSelectChannelConnector(MetricRegistry registry,
+                                              int port,
+                                              Clock clock) {
         super();
+        this.clock = clock;
         setPort(port);
-        this.duration = registry.newTimer(SelectChannelConnector.class,
-                                          "connection-duration",
-                                          Integer.toString(port),
-                                          TimeUnit.MILLISECONDS,
-                                          TimeUnit.SECONDS);
-        this.accepts = registry.newMeter(SelectChannelConnector.class,
-                                         "accepts",
-                                         Integer.toString(port),
-                                         "connections",
-                                         TimeUnit.SECONDS);
-        this.connects = registry.newMeter(SelectChannelConnector.class,
-                                          "connects",
-                                          Integer.toString(port),
-                                          "connections",
-                                          TimeUnit.SECONDS);
-        this.disconnects = registry.newMeter(SelectChannelConnector.class,
-                                             "disconnects",
-                                             Integer.toString(port),
-                                             "connections",
-                                             TimeUnit.SECONDS);
-        this.connections = registry.newCounter(SelectChannelConnector.class,
-                                               "active-connections",
-                                               Integer.toString(port));
+
+        this.duration = registry.timer(name(SelectChannelConnector.class,
+                                            Integer.toString(port),
+                                            "connection-duration"));
+        this.accepts = registry.meter(name(SelectChannelConnector.class,
+                                           Integer.toString(port),
+                                           "accepts"));
+        this.connects = registry.meter(name(SelectChannelConnector.class,
+                                            Integer.toString(port),
+                                            "connects"));
+        this.disconnects = registry.meter(name(SelectChannelConnector.class,
+                                               Integer.toString(port),
+                                               "disconnects"));
+        this.connections = registry.counter(name(SelectChannelConnector.class,
+                                                 Integer.toString(port),
+                                                 "active-connections"));
     }
 
     @Override
@@ -66,7 +56,7 @@ public class InstrumentedSelectChannelConnector extends SelectChannelConnector {
     protected void connectionClosed(Connection connection) {
         super.connectionClosed(connection);
         disconnects.mark();
-        final long duration = System.currentTimeMillis() - connection.getTimeStamp();
+        final long duration = clock.getTime() - connection.getTimeStamp();
         this.duration.update(duration, TimeUnit.MILLISECONDS);
         connections.dec();
     }
