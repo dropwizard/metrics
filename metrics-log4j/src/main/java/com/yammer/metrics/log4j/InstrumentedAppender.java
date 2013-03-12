@@ -27,7 +27,6 @@ public class InstrumentedAppender extends AppenderSkeleton {
     }
 
     public InstrumentedAppender(MetricRegistry registry, String name) {
-        super();
         this.all = registry.meter(name(Appender.class, name, "all"));
         this.trace = registry.meter(name(Appender.class, name, "trace"));
         this.debug = registry.meter(name(Appender.class, name, "debug"));
