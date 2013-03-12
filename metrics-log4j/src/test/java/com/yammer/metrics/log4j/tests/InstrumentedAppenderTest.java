@@ -1,7 +1,7 @@
 package com.yammer.metrics.log4j.tests;
 
-import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.Meter;
+import com.yammer.metrics.MetricRegistry;
 import com.yammer.metrics.log4j.InstrumentedAppender;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
@@ -9,8 +9,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
-
+import static com.yammer.metrics.MetricRegistry.name;
 import static org.mockito.Mockito.*;
 
 public class InstrumentedAppenderTest {
@@ -31,14 +30,14 @@ public class InstrumentedAppenderTest {
         this.event = mock(LoggingEvent.class);
         when(event.getLevel()).thenReturn(Level.INFO);
 
-        final MetricsRegistry registry = mock(MetricsRegistry.class);
-        when(registry.newMeter(Appender.class, "all", "statements", TimeUnit.SECONDS)).thenReturn(all);
-        when(registry.newMeter(Appender.class, "trace", "statements", TimeUnit.SECONDS)).thenReturn(trace);
-        when(registry.newMeter(Appender.class, "debug", "statements", TimeUnit.SECONDS)).thenReturn(debug);
-        when(registry.newMeter(Appender.class, "info", "statements", TimeUnit.SECONDS)).thenReturn(info);
-        when(registry.newMeter(Appender.class, "warn", "statements", TimeUnit.SECONDS)).thenReturn(warn);
-        when(registry.newMeter(Appender.class, "error", "statements", TimeUnit.SECONDS)).thenReturn(error);
-        when(registry.newMeter(Appender.class, "fatal", "statements", TimeUnit.SECONDS)).thenReturn(fatal);
+        final MetricRegistry registry = mock(MetricRegistry.class);
+        when(registry.meter(name(Appender.class, "all"))).thenReturn(all);
+        when(registry.meter(name(Appender.class, "trace"))).thenReturn(trace);
+        when(registry.meter(name(Appender.class, "debug"))).thenReturn(debug);
+        when(registry.meter(name(Appender.class, "info"))).thenReturn(info);
+        when(registry.meter(name(Appender.class, "warn"))).thenReturn(warn);
+        when(registry.meter(name(Appender.class, "error"))).thenReturn(error);
+        when(registry.meter(name(Appender.class, "fatal"))).thenReturn(fatal);
 
         this.instrumented = new InstrumentedAppender(registry);
     }
