@@ -6,9 +6,7 @@ import com.yammer.metrics.httpclient.InstrumentedHttpClient;
 import org.apache.http.client.HttpClient;
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class InstrumentedHttpClientTest {
     private final MetricRegistry registry = new MetricRegistry("test");
@@ -17,7 +15,7 @@ public class InstrumentedHttpClientTest {
     @Test
     public void hasAnInstrumentedConnectionManager() throws Exception {
 
-        assertThat(client.getConnectionManager(),
-                   is(instanceOf(InstrumentedClientConnManager.class)));
+        assertThat(client.getConnectionManager())
+                .isInstanceOf(InstrumentedClientConnManager.class);
     }
 }
