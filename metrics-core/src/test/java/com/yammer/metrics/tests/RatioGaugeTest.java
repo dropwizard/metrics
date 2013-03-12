@@ -3,8 +3,7 @@ package com.yammer.metrics.tests;
 import com.yammer.metrics.RatioGauge;
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class RatioGaugeTest {
     @Test
@@ -16,8 +15,8 @@ public class RatioGaugeTest {
             }
         };
 
-        assertThat(regular.getValue(),
-                   is(0.5));
+        assertThat(regular.getValue())
+                .isEqualTo(0.5);
     }
 
     @Test
@@ -29,8 +28,8 @@ public class RatioGaugeTest {
             }
         };
 
-        assertThat(divByZero.getValue(),
-                   is(Double.NaN));
+        assertThat(divByZero.getValue())
+                .isNaN();
     }
 
     @Test
@@ -41,9 +40,9 @@ public class RatioGaugeTest {
                 return Ratio.of(10, Double.POSITIVE_INFINITY);
             }
         };
-        
-        assertThat(infinite.getValue(),
-                   is(Double.NaN));
+
+        assertThat(infinite.getValue())
+                .isNaN();
     }
 
     @Test
@@ -54,8 +53,8 @@ public class RatioGaugeTest {
                 return Ratio.of(10, Double.NaN);
             }
         };
-        
-        assertThat(nan.getValue(),
-                   is(Double.NaN));
+
+        assertThat(nan.getValue())
+                .isNaN();
     }
 }
