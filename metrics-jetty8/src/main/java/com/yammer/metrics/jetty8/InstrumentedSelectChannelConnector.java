@@ -1,4 +1,4 @@
-package com.yammer.metrics.jetty;
+package com.yammer.metrics.jetty8;
 
 import com.yammer.metrics.*;
 import org.eclipse.jetty.io.Connection;

@@ -1,45 +1,48 @@
-package com.yammer.metrics.jetty;
+package com.yammer.metrics.jetty8;
 
 import com.yammer.metrics.*;
 import org.eclipse.jetty.io.Connection;
-import org.eclipse.jetty.server.bio.SocketConnector;
+import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import static com.yammer.metrics.MetricRegistry.name;
 
-public class InstrumentedSocketConnector extends SocketConnector {
+public class InstrumentedSslSelectChannelConnector extends SslSelectChannelConnector {
     private final Timer duration;
     private final Meter accepts, connects, disconnects;
     private final Counter connections;
     private final Clock clock;
 
-    public InstrumentedSocketConnector(MetricRegistry registry,
-                                       int port,
-                                       Clock clock) {
-        super();
+    public InstrumentedSslSelectChannelConnector(MetricRegistry registry,
+                                                 int port,
+                                                 SslContextFactory factory,
+                                                 Clock clock) {
+        super(factory);
         this.clock = clock;
         setPort(port);
-        this.duration = registry.timer(name(SocketConnector.class,
+        this.duration = registry.timer(name(SslSelectChannelConnector.class,
                                             Integer.toString(port),
                                             "connection-duration"));
-        this.accepts = registry.meter(name(SocketConnector.class,
+        this.accepts = registry.meter(name(SslSelectChannelConnector.class,
                                            Integer.toString(port),
                                            "accepts"));
-        this.connects = registry.meter(name(SocketConnector.class,
+        this.connects = registry.meter(name(SslSelectChannelConnector.class,
                                             Integer.toString(port),
                                             "connects"));
-        this.disconnects = registry.meter(name(SocketConnector.class,
+        this.disconnects = registry.meter(name(SslSelectChannelConnector.class,
                                                Integer.toString(port),
                                                "disconnects"));
-        this.connections = registry.counter(name(SocketConnector.class,
+        this.connections = registry.counter(name(SslSelectChannelConnector.class,
                                                  Integer.toString(port),
                                                  "active-connections"));
+
     }
 
     @Override
-    public void accept(int acceptorID) throws IOException, InterruptedException {
+    public void accept(int acceptorID) throws IOException {
         super.accept(acceptorID);
         accepts.mark();
     }
