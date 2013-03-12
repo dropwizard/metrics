@@ -1,39 +1,31 @@
 package com.yammer.metrics.jetty;
 
-import com.yammer.metrics.util.RatioGauge;
+import com.yammer.metrics.Gauge;
+import com.yammer.metrics.MetricRegistry;
+import com.yammer.metrics.RatioGauge;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Gauge;
-import com.yammer.metrics.core.MetricsRegistry;
+import static com.yammer.metrics.MetricRegistry.name;
 
 public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
-    public InstrumentedQueuedThreadPool() {
-        this(Metrics.defaultRegistry());
-    }
-
-    public InstrumentedQueuedThreadPool(MetricsRegistry registry) {
+    public InstrumentedQueuedThreadPool(MetricRegistry registry) {
         super();
-        registry.newGauge(QueuedThreadPool.class, "percent-idle", new RatioGauge() {
+        registry.register(name(QueuedThreadPool.class, "percent-idle"), new RatioGauge() {
             @Override
-            protected double getNumerator() {
-                return getIdleThreads();
+            protected Ratio getRatio() {
+                return Ratio.of(getIdleThreads(),
+                                getThreads());
             }
-
+        });
+        registry.register(name(QueuedThreadPool.class, "active-threads"), new Gauge<Integer>() {
             @Override
-            protected double getDenominator() {
+            public Integer getValue() {
                 return getThreads();
             }
         });
-        registry.newGauge(QueuedThreadPool.class, "active-threads", new Gauge<Integer>() {
+        registry.register(name(QueuedThreadPool.class, "idle-threads"), new Gauge<Integer>() {
             @Override
-            public Integer value() {
-                return getThreads();
-            }
-        });
-        registry.newGauge(QueuedThreadPool.class, "idle-threads", new Gauge<Integer>() {
-            @Override
-            public Integer value() {
+            public Integer getValue() {
                 return getIdleThreads();
             }
         });
