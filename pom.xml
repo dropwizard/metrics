@@ -30,8 +30,8 @@
         <module>metrics-jvm</module>
         <module>metrics-log4j</module>
         <module>metrics-logback</module>
+        <module>metrics-servlet</module>
         <module>metrics-servlets</module>
-        <module>metrics-web</module>
     </modules>
 
     <properties>
