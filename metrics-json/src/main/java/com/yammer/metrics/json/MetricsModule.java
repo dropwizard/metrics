@@ -15,7 +15,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class MetricsModule extends Module {
-    private static final Version VERSION = new Version(3, 0, 0, "", "com.yammer.metrics", "metrics-json");
+    static final Version VERSION = new Version(3, 0, 0, "", "com.yammer.metrics", "metrics-json");
 
     private static class GaugeSerializer extends StdSerializer<Gauge> {
         private GaugeSerializer() {
