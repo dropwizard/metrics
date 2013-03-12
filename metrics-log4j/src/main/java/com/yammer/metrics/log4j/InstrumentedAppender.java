@@ -15,13 +15,17 @@ import java.util.concurrent.TimeUnit;
  * the total number of statements being logged.
  */
 public class InstrumentedAppender extends AppenderSkeleton {
-    private final Meter all;
-    private final Meter trace;
-    private final Meter debug;
-    private final Meter info;
-    private final Meter warn;
-    private final Meter error;
-    private final Meter fatal;
+    private final MetricsRegistry metricsRegistry;
+
+    private String scope;
+
+    private Meter all;
+    private Meter trace;
+    private Meter debug;
+    private Meter info;
+    private Meter warn;
+    private Meter error;
+    private Meter fatal;
 
     public InstrumentedAppender() {
         this(Metrics.defaultRegistry());
@@ -29,13 +33,18 @@ public class InstrumentedAppender extends AppenderSkeleton {
 
     public InstrumentedAppender(MetricsRegistry registry) {
         super();
-        this.all = registry.newMeter(Appender.class, "all", "statements", TimeUnit.SECONDS);
-        this.trace = registry.newMeter(Appender.class, "trace", "statements", TimeUnit.SECONDS);
-        this.debug = registry.newMeter(Appender.class, "debug", "statements", TimeUnit.SECONDS);
-        this.info = registry.newMeter(Appender.class, "info", "statements", TimeUnit.SECONDS);
-        this.warn = registry.newMeter(Appender.class, "warn", "statements", TimeUnit.SECONDS);
-        this.error = registry.newMeter(Appender.class, "error", "statements", TimeUnit.SECONDS);
-        this.fatal = registry.newMeter(Appender.class, "fatal", "statements", TimeUnit.SECONDS);
+        this.metricsRegistry = registry;
+    }
+
+    @Override
+    public void activateOptions() {
+        this.all = newMeter("all");
+        this.trace = newMeter("trace");
+        this.debug = newMeter("debug");
+        this.info = newMeter("info");
+        this.warn = newMeter("warn");
+        this.error = newMeter("error");
+        this.fatal = newMeter("fatal");
     }
 
     @Override
@@ -71,5 +80,33 @@ public class InstrumentedAppender extends AppenderSkeleton {
     @Override
     public boolean requiresLayout() {
         return false;
+    }
+
+    /**
+     * Sets the scope for the metrics name, default: {@code null}.
+     *
+     * @param scope The scope.
+     */
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    /**
+     * Creates a new meter and registers it under the following metrics name.
+     *
+     * <ol>
+     *     <li><b>Group:</b> {@code "org.apache.log4j"}</li>
+     *     <li><b>Type:</b> {@code "Appender"}</li>
+     *     <li><b>Scope:</b> The scope set via {@link #setScope(String)}.</li>
+     *     <li><b>Name:</b> The specified name.</li>
+     * </ol>
+     *
+     * @param name The name.
+     * @return The meter.
+     */
+    private Meter newMeter(String name) {
+        return (this.scope != null)
+                ? this.metricsRegistry.newMeter(Appender.class, name, this.scope, "statements", TimeUnit.SECONDS)
+                : this.metricsRegistry.newMeter(Appender.class, name, "statements", TimeUnit.SECONDS);
     }
 }

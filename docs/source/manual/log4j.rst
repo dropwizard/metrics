@@ -36,3 +36,12 @@ Or you can add it via Log4j's XML configuration:
             <appender-ref ref="metrics"/>
         </root>
     </log4j:configuration>
+
+If you want to use multiple instrumented appenders in your Log4j configuration, you can give each
+appender an individual scope with the parameter "Scope":
+
+.. code-block:: xml
+
+    <appender name="metrics" class="com.yammer.metrics.log4j.InstrumentedAppender">
+        <param name="Scope" value="someScope"/>
+    </appender>
