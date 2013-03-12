@@ -1,4 +1,4 @@
-package com.yammer.metrics.jetty;
+package com.yammer.metrics.jetty8;
 
 import com.yammer.metrics.Gauge;
 import com.yammer.metrics.MetricRegistry;

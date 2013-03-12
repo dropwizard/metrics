@@ -1,41 +1,39 @@
-package com.yammer.metrics.jetty;
+package com.yammer.metrics.jetty8;
 
 import com.yammer.metrics.*;
 import org.eclipse.jetty.io.Connection;
-import org.eclipse.jetty.server.ssl.SslSocketConnector;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.server.nio.BlockingChannelConnector;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import static com.yammer.metrics.MetricRegistry.name;
 
-public class InstrumentedSslSocketConnector extends SslSocketConnector {
+public class InstrumentedBlockingChannelConnector extends BlockingChannelConnector {
     private final Timer duration;
     private final Meter accepts, connects, disconnects;
     private final Counter connections;
     private final Clock clock;
 
-    public InstrumentedSslSocketConnector(MetricRegistry registry,
-                                          int port,
-                                          SslContextFactory factory,
-                                          Clock clock) {
-        super(factory);
+    public InstrumentedBlockingChannelConnector(MetricRegistry registry,
+                                                int port,
+                                                Clock clock) {
+        super();
         this.clock = clock;
         setPort(port);
-        this.duration = registry.timer(name(SslSocketConnector.class,
+        this.duration = registry.timer(name(BlockingChannelConnector.class,
                                             Integer.toString(port),
                                             "connection-duration"));
-        this.accepts = registry.meter(name(SslSocketConnector.class,
+        this.accepts = registry.meter(name(BlockingChannelConnector.class,
                                            Integer.toString(port),
                                            "accepts"));
-        this.connects = registry.meter(name(SslSocketConnector.class,
+        this.connects = registry.meter(name(BlockingChannelConnector.class,
                                             Integer.toString(port),
                                             "connects"));
-        this.disconnects = registry.meter(name(SslSocketConnector.class,
+        this.disconnects = registry.meter(name(BlockingChannelConnector.class,
                                                Integer.toString(port),
                                                "disconnects"));
-        this.connections = registry.counter(name(SslSocketConnector.class,
+        this.connections = registry.counter(name(BlockingChannelConnector.class,
                                                  Integer.toString(port),
                                                  "active-connections"));
     }
