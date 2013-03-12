@@ -13,7 +13,9 @@ import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.*;
 
-public class InstrumentedAppenderTest {
+public class InstrumentedAppenderWithScopeTest {
+    private static final String SAMPLE_SCOPE = "sampleScope";
+
     private Meter all, trace, debug, info, warn, error, fatal;
     private LoggingEvent event;
     private InstrumentedAppender instrumented;
@@ -27,25 +29,26 @@ public class InstrumentedAppenderTest {
         this.warn = mock(Meter.class);
         this.error = mock(Meter.class);
         this.fatal = mock(Meter.class);
-        
+
         this.event = mock(LoggingEvent.class);
         when(event.getLevel()).thenReturn(Level.INFO);
 
         final MetricsRegistry registry = mock(MetricsRegistry.class);
-        when(registry.newMeter(Appender.class, "all", "statements", TimeUnit.SECONDS)).thenReturn(all);
-        when(registry.newMeter(Appender.class, "trace", "statements", TimeUnit.SECONDS)).thenReturn(trace);
-        when(registry.newMeter(Appender.class, "debug", "statements", TimeUnit.SECONDS)).thenReturn(debug);
-        when(registry.newMeter(Appender.class, "info", "statements", TimeUnit.SECONDS)).thenReturn(info);
-        when(registry.newMeter(Appender.class, "warn", "statements", TimeUnit.SECONDS)).thenReturn(warn);
-        when(registry.newMeter(Appender.class, "error", "statements", TimeUnit.SECONDS)).thenReturn(error);
-        when(registry.newMeter(Appender.class, "fatal", "statements", TimeUnit.SECONDS)).thenReturn(fatal);
+        when(registry.newMeter(Appender.class, "all", SAMPLE_SCOPE, "statements", TimeUnit.SECONDS)).thenReturn(all);
+        when(registry.newMeter(Appender.class, "trace", SAMPLE_SCOPE, "statements", TimeUnit.SECONDS)).thenReturn(trace);
+        when(registry.newMeter(Appender.class, "debug", SAMPLE_SCOPE, "statements", TimeUnit.SECONDS)).thenReturn(debug);
+        when(registry.newMeter(Appender.class, "info", SAMPLE_SCOPE, "statements", TimeUnit.SECONDS)).thenReturn(info);
+        when(registry.newMeter(Appender.class, "warn", SAMPLE_SCOPE, "statements", TimeUnit.SECONDS)).thenReturn(warn);
+        when(registry.newMeter(Appender.class, "error", SAMPLE_SCOPE, "statements", TimeUnit.SECONDS)).thenReturn(error);
+        when(registry.newMeter(Appender.class, "fatal", SAMPLE_SCOPE, "statements", TimeUnit.SECONDS)).thenReturn(fatal);
 
         this.instrumented = new InstrumentedAppender(registry);
+        this.instrumented.setScope(SAMPLE_SCOPE);
         this.instrumented.activateOptions(); // lifecycle method usually called by the log4j framework
     }
 
     @Test
-    public void metersTraceEvents() throws Exception {
+    public void metersTraceEventsWithScope() throws Exception {
         when(event.getLevel()).thenReturn(Level.TRACE);
         instrumented.doAppend(event);
 
@@ -54,7 +57,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void metersDebugEvents() throws Exception {
+    public void metersDebugEventsWithScope() throws Exception {
         when(event.getLevel()).thenReturn(Level.DEBUG);
         instrumented.doAppend(event);
 
@@ -63,7 +66,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void metersInfoEvents() throws Exception {
+    public void metersInfoEventsWithScope() throws Exception {
         when(event.getLevel()).thenReturn(Level.INFO);
         instrumented.doAppend(event);
 
@@ -72,7 +75,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void metersWarnEvents() throws Exception {
+    public void metersWarnEventsWithScope() throws Exception {
         when(event.getLevel()).thenReturn(Level.WARN);
         instrumented.doAppend(event);
 
@@ -81,7 +84,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void metersErrorEvents() throws Exception {
+    public void metersErrorEventsWithScope() throws Exception {
         when(event.getLevel()).thenReturn(Level.ERROR);
         instrumented.doAppend(event);
 
@@ -90,7 +93,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void metersFatalEvents() throws Exception {
+    public void metersFatalEventsWithScope() throws Exception {
         when(event.getLevel()).thenReturn(Level.FATAL);
         instrumented.doAppend(event);
 
