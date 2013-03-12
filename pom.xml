@@ -25,7 +25,7 @@
         <module>metrics-httpclient</module>
         <module>metrics-jdbi</module>
         <module>metrics-jersey</module>
-        <module>metrics-jetty</module>
+        <module>metrics-jetty8</module>
         <module>metrics-jvm</module>
         <module>metrics-log4j</module>
         <module>metrics-logback</module>
