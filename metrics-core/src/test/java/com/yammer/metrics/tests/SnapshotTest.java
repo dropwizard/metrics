@@ -3,6 +3,7 @@ package com.yammer.metrics.tests;
 import com.yammer.metrics.Snapshot;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,5 +108,15 @@ public class SnapshotTest {
 
         assertThat(other.getValues())
                 .containsOnly(1, 2, 3, 4, 5);
+    }
+
+    @Test
+    public void dumpsToAStream() throws Exception {
+        final ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        snapshot.dump(output);
+
+        assertThat(output.toString())
+                .isEqualTo(String.format("1%n2%n3%n4%n5%n"));
     }
 }
