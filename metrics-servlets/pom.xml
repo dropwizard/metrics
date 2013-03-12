@@ -8,7 +8,7 @@
         <version>3.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>metrics-servlet</artifactId>
+    <artifactId>metrics-servlets</artifactId>
     <name>Metrics Servlet</name>
     <packaging>bundle</packaging>
 
