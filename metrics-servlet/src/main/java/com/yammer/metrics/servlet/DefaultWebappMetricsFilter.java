@@ -1,15 +1,15 @@
-package com.yammer.metrics.web;
+package com.yammer.metrics.servlet;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Implementation of the {@link WebappMetricsFilter} which provides a default set of response codes
- * to capture information about. <p>Use it in your web.xml like this:</p>
+ * to capture information about. <p>Use it in your servlet.xml like this:</p>
  * <pre>{@code
  * <filter>
  *     <filter-name>webappMetricsFilter</filter-name>
- *     <filter-class>com.yammer.metrics.web.DefaultWebappMetricsFilter</filter-class>
+ *     <filter-class>com.yammer.metrics.servlet.DefaultWebappMetricsFilter</filter-class>
  * </filter>
  * <filter-mapping>
  *     <filter-name>webappMetricsFilter</filter-name>
