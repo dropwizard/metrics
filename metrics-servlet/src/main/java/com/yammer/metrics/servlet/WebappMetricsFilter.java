@@ -1,4 +1,4 @@
-package com.yammer.metrics.web;
+package com.yammer.metrics.servlet;
 
 import com.yammer.metrics.Counter;
 import com.yammer.metrics.Meter;
@@ -76,7 +76,7 @@ public abstract class WebappMetricsFilter implements Filter {
             metricsRegistry = (MetricRegistry) o;
         } else {
             // TODO: 3/10/13 <coda> -- figure out how to coordinate on registry names
-            metricsRegistry = new MetricRegistry("web");
+            metricsRegistry = new MetricRegistry("servlet");
         }
         return metricsRegistry;
     }
