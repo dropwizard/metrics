@@ -10,7 +10,7 @@
         <version>3.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>metrics-web</artifactId>
+    <artifactId>metrics-servlet</artifactId>
     <name>Metrics Web Application Support</name>
     <packaging>bundle</packaging>
 
