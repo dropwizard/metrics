@@ -9,9 +9,4 @@
         <Class name="com.yammer.metrics.log4j.InstrumentedAppender"/>
         <Bug code="SF"/>
     </Match>
-
-    <!-- yes, this is fucked -->
-    <Match>
-        <Class name="com.yammer.metrics.jvm.VirtualMachineMetrics"/>
-    </Match>
 </FindBugsFilter>
