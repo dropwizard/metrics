@@ -29,6 +29,19 @@ public class MetricsModuleTest {
     }
 
     @Test
+    public void serializesGaugesThatThrowExceptions() throws Exception {
+        final Gauge<Integer> gauge = new Gauge<Integer>() {
+            @Override
+            public Integer getValue() {
+                throw new IllegalArgumentException("poops");
+            }
+        };
+
+        assertThat(mapper.writeValueAsString(gauge))
+                .isEqualTo("{\"error\":\"java.lang.IllegalArgumentException: poops\"}");
+    }
+
+    @Test
     public void serializesCounters() throws Exception {
         final Counter counter = mock(Counter.class);
         when(counter.getCount()).thenReturn(100L);
