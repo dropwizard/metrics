@@ -89,8 +89,8 @@ public class ConsoleReporter extends AbstractPollingReporter {
 
     private void printHistogram(Histogram histogram) {
         output.printf(locale, "             count = %d%n", histogram.getCount());
-        output.printf(locale, "               min = %2.2f%n", histogram.getMin());
-        output.printf(locale, "               max = %2.2f%n", histogram.getMax());
+        output.printf(locale, "               min = %d%n", histogram.getMin());
+        output.printf(locale, "               max = %d%n", histogram.getMax());
         output.printf(locale, "              mean = %2.2f%n", histogram.getMean());
         output.printf(locale, "            stddev = %2.2f%n", histogram.getStdDev());
         printSnapshot(histogram.getSnapshot());
@@ -99,8 +99,8 @@ public class ConsoleReporter extends AbstractPollingReporter {
     private void printTimer(Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
         printMetered(timer);
-        output.printf(locale, "               min = %2.2f%n", timer.getMin());
-        output.printf(locale, "               max = %2.2f%n", timer.getMax());
+        output.printf(locale, "               min = %d%n", timer.getMin());
+        output.printf(locale, "               max = %d%n", timer.getMax());
         output.printf(locale, "              mean = %2.2f%n", timer.getMean());
         output.printf(locale, "            stddev = %2.2f%n", timer.getStdDev());
         printSnapshot(snapshot);
