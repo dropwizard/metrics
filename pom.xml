@@ -40,6 +40,7 @@
         <servlet.version>2.5</servlet.version>
         <slf4j.version>1.7.2</slf4j.version>
         <jackson.version>2.1.4</jackson.version>
+        <jetty8.version>8.1.9.v20130131</jetty8.version>
     </properties>
 
     <developers>
