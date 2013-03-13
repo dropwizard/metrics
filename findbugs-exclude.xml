@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
-    <!-- Don't tell me about servlets and serialization. -->
+    <!-- yes, I know these switches will fall though... to the end of the method -->
     <Match>
-        <Class name="~com\.yammer\.metrics\.servlet\..*Servlet"/>
-        <Bug code="Se"/>
+        <Class name="com.yammer.metrics.logback.InstrumentedAppender"/>
+        <Bug code="SF"/>
+    </Match>
+    <Match>
+        <Class name="com.yammer.metrics.log4j.InstrumentedAppender"/>
+        <Bug code="SF"/>
+    </Match>
+
+    <!-- yes, this is fucked -->
+    <Match>
+        <Class name="com.yammer.metrics.jvm.VirtualMachineMetrics"/>
     </Match>
 </FindBugsFilter>
