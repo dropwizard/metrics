@@ -3,10 +3,8 @@ package com.yammer.metrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
@@ -16,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class CsvReporter extends AbstractPollingReporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(CsvReporter.class);
+    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private final File directory;
     private final Locale locale;
@@ -149,7 +148,7 @@ public class CsvReporter extends AbstractPollingReporter {
             final File file = new File(directory, sanitize(name) + ".csv");
             final boolean fileAlreadyExists = file.exists();
             if (fileAlreadyExists || file.createNewFile()) {
-                final PrintWriter out = new PrintWriter(new FileOutputStream(file, true));
+                final PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file, true), UTF_8));
                 try {
                     if (!fileAlreadyExists) {
                         out.println("t," + header);
