@@ -4,6 +4,9 @@ import com.yammer.metrics.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.data.MapEntry.entry;
 import static org.mockito.Mockito.*;
@@ -240,5 +243,29 @@ public class MetricRegistryTest {
 
         assertThat(registry.getNames())
                 .containsOnly("gauge", "counter", "histogram", "meter", "timer");
+    }
+
+    @Test
+    public void registersMultipleMetrics() throws Exception {
+        final Map<String, Metric> metrics = new HashMap<String, Metric>();
+        metrics.put("gauge", gauge);
+        metrics.put("counter", counter);
+
+        registry.registerAll(metrics);
+
+        assertThat(registry.getNames())
+                .containsOnly("gauge", "counter");
+    }
+
+    @Test
+    public void registersMultipleMetricsWithAPrefix() throws Exception {
+        final Map<String, Metric> metrics = new HashMap<String, Metric>();
+        metrics.put("gauge", gauge);
+        metrics.put("counter", counter);
+
+        registry.registerAll("my", metrics);
+
+        assertThat(registry.getNames())
+                .containsOnly("my.gauge", "my.counter");
     }
 }
