@@ -229,4 +229,16 @@ public class MetricRegistryTest {
         assertThat(registry.getTimers())
                 .contains(entry("timer", timer));
     }
+
+    @Test
+    public void hasASetOfRegisteredMetricNames() throws Exception {
+        registry.register("gauge", gauge);
+        registry.register("counter", counter);
+        registry.register("histogram", histogram);
+        registry.register("meter", meter);
+        registry.register("timer", timer);
+
+        assertThat(registry.getNames())
+                .containsOnly("gauge", "counter", "histogram", "meter", "timer");
+    }
 }
