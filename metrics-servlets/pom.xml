@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-servlets</artifactId>
-    <name>Metrics Servlet</name>
+    <name>Metrics Utility Servlets</name>
     <packaging>bundle</packaging>
 
     <dependencies>

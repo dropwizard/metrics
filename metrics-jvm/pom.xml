@@ -11,7 +11,9 @@
     </parent>
 
     <artifactId>metrics-jvm</artifactId>
-    
+    <name>Metrics JVM Instrumentation</name>
+    <packaging>bundle</packaging>
+
     <dependencies>
         <dependency>
             <groupId>com.yammer.metrics</groupId>
