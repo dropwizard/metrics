@@ -16,5 +16,7 @@ Things What Need Doing
 * Add javadocs for pretty much everything
 * Do integration testing w/ Ganglia
 * Do integration testing w/ Graphite
+* Figure out a consistent builder API for complicated reporter constructor (no more accordion
+  constructors).
 
 Do you see something here which is near and dear to your heart? WELL COME ON DOWN.
