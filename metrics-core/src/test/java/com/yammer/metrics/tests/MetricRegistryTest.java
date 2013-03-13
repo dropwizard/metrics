@@ -247,9 +247,15 @@ public class MetricRegistryTest {
 
     @Test
     public void registersMultipleMetrics() throws Exception {
-        final Map<String, Metric> metrics = new HashMap<String, Metric>();
-        metrics.put("gauge", gauge);
-        metrics.put("counter", counter);
+        final MetricSet metrics = new MetricSet() {
+            @Override
+            public Map<String, Metric> getMetrics() {
+                final Map<String, Metric> metrics = new HashMap<String, Metric>();
+                metrics.put("gauge", gauge);
+                metrics.put("counter", counter);
+                return metrics;
+            }
+        };
 
         registry.registerAll(metrics);
 
@@ -259,9 +265,15 @@ public class MetricRegistryTest {
 
     @Test
     public void registersMultipleMetricsWithAPrefix() throws Exception {
-        final Map<String, Metric> metrics = new HashMap<String, Metric>();
-        metrics.put("gauge", gauge);
-        metrics.put("counter", counter);
+        final MetricSet metrics = new MetricSet() {
+            @Override
+            public Map<String, Metric> getMetrics() {
+                final Map<String, Metric> metrics = new HashMap<String, Metric>();
+                metrics.put("gauge", gauge);
+                metrics.put("counter", counter);
+                return metrics;
+            }
+        };
 
         registry.registerAll("my", metrics);
 
