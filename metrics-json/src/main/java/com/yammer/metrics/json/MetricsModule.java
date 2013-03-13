@@ -26,9 +26,14 @@ public class MetricsModule extends Module {
         public void serialize(Gauge gauge,
                               JsonGenerator json,
                               SerializerProvider provider) throws IOException {
-            final Object value = gauge.getValue();
             json.writeStartObject();
-            json.writeObjectField("value", value);
+            final Object value;
+            try {
+                value = gauge.getValue();
+                json.writeObjectField("value", value);
+            } catch (RuntimeException e) {
+                json.writeObjectField("error", e.toString());
+            }
             json.writeEndObject();
         }
     }
