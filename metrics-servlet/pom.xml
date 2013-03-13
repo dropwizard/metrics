@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>metrics-servlet</artifactId>
-    <name>Metrics Web Application Support</name>
+    <name>Metrics Servlet Support</name>
     <packaging>bundle</packaging>
 
     <dependencies>
