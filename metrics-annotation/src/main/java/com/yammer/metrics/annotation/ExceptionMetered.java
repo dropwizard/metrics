@@ -20,9 +20,6 @@ import java.lang.annotation.Target;
  * {@code #fancyName(String)} throws an exception of type {@code cause} (or a subclass), the meter
  * will be marked.
  * <p/>
- * By default, the annotation default to capturing all exceptions (subclasses of {@link Exception})
- * and will use the default event-type of "exceptions".
- * <p/>
  * A name for the metric can be specified as an annotation parameter, otherwise, the metric will be
  * named based on the method name.
  * <p/>
@@ -34,8 +31,8 @@ import java.lang.annotation.Target;
  *     }
  * </code></pre>
  * <p/>
- * A meter named {@code fancyNameExceptionMetric} will be created with event-type named
- * "exceptions". The meter will be marked every time an exception is thrown.
+ * A meter named {@code fancyName.exceptions} will be created and marked every time an exception is
+ * thrown.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
