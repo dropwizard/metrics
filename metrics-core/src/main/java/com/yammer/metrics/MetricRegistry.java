@@ -186,30 +186,65 @@ public class MetricRegistry {
         listeners.remove(listener);
     }
 
+    /**
+     * Returns the registry's name.
+     *
+     * @return the registry's name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns a set of the names of all the metrics in the registry.
+     *
+     * @return the names of all the metrics
+     */
     public SortedSet<String> getNames() {
         return Collections.unmodifiableSortedSet(new TreeSet<String>(metrics.keySet()));
     }
 
+    /**
+     * Returns a map of all the gauges in the registry and their names.
+     *
+     * @return all the gauges in the registry
+     */
     public SortedMap<String, Gauge> getGauges() {
         return getMetrics(Gauge.class);
     }
 
+    /**
+     * Returns a map of all the counters in the registry and their names.
+     *
+     * @return all the counters in the registry
+     */
     public SortedMap<String, Counter> getCounters() {
         return getMetrics(Counter.class);
     }
 
+    /**
+     * Returns a map of all the histograms in the registry and their names.
+     *
+     * @return all the histograms in the registry
+     */
     public SortedMap<String, Histogram> getHistograms() {
         return getMetrics(Histogram.class);
     }
 
+    /**
+     * Returns a map of all the meters in the registry and their names.
+     *
+     * @return all the meters in the registry
+     */
     public SortedMap<String, Meter> getMeters() {
         return getMetrics(Meter.class);
     }
 
+    /**
+     * Returns a map of all the timers in the registry and their names.
+     *
+     * @return all the timers in the registry
+     */
     public SortedMap<String, Timer> getTimers() {
         return getMetrics(Timer.class);
     }
