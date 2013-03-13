@@ -82,6 +82,31 @@ public class MetricRegistry {
     }
 
     /**
+     * Given a map of metric names to metrics, registers them.
+     *
+     * @param metrics    a map of metric names to metrics
+     * @param <T>        the type of the metrics
+     * @throws IllegalArgumentException if any of the names are already registered
+     */
+    public <T extends Metric> void registerAll(Map<String, T> metrics) throws IllegalArgumentException {
+        registerAll(null, metrics);
+    }
+
+    /**
+     * Given a map of metric names to metrics, registers them using a prefix.
+     *
+     * @param prefix     the prefix for all the names
+     * @param metrics    a map of metric names to metrics
+     * @param <T>        the type of the metrics
+     * @throws IllegalArgumentException if any of the names are already registered
+     */
+    public <T extends Metric> void registerAll(String prefix, Map<String, T> metrics) throws IllegalArgumentException {
+        for (Map.Entry<String, T> entry : metrics.entrySet()) {
+            register(name(prefix, entry.getKey()), entry.getValue());
+        }
+    }
+
+    /**
      * Creates a new {@link Counter} and registers it under the given name.
      *
      * @param name the name of the metric
