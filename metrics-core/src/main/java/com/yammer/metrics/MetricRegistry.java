@@ -9,6 +9,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * A registry of metric instances.
  */
 public class MetricRegistry {
+    /**
+     * Concatenates elements to form a dotted name, eliding any null values or empty strings.
+     *
+     * @param name     the first element of the name
+     * @param names    the remaining elements of the name
+     * @return {@code name} and {@code names} concatenated by periods
+     */
     public static String name(String name, String... names) {
         final StringBuilder builder = new StringBuilder();
         append(builder, name);
@@ -18,8 +25,16 @@ public class MetricRegistry {
         return builder.toString();
     }
 
+    /**
+     * Concatenates a class name and elements to form a dotted name, eliding any null values or
+     * empty strings.
+     *
+     * @param klass    the first element of the name
+     * @param names    the remaining elements of the name
+     * @return {@code klass} and {@code names} concatenated by periods
+     */
     public static String name(Class<?> klass, String... names) {
-        return name(klass.getCanonicalName(), names);
+        return name(klass.getName(), names);
     }
 
     private static void append(StringBuilder builder, String part) {

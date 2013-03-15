@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.yammer.metrics.MetricRegistry.name;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.data.MapEntry.entry;
 import static org.mockito.Mockito.*;
@@ -279,5 +280,42 @@ public class MetricRegistryTest {
 
         assertThat(registry.getNames())
                 .containsOnly("my.gauge", "my.counter");
+    }
+
+    @Test
+    public void concatenatesStringsToFormADottedName() throws Exception {
+        assertThat(name("one", "two", "three"))
+                .isEqualTo("one.two.three");
+    }
+
+    @Test
+    public void elidesNullValuesFromNames() throws Exception {
+        assertThat(name("one", null, "three"))
+                .isEqualTo("one.three");
+    }
+
+    @Test
+    public void elidesEmptyStringsFromNames() throws Exception {
+        assertThat(name("one", "", "three"))
+                .isEqualTo("one.three");
+    }
+
+    @Test
+    public void concatenatesClassNamesWithStringsToFormADottedName() throws Exception {
+        assertThat(name(MetricRegistryTest.class, "one", "two"))
+                .isEqualTo("com.yammer.metrics.tests.MetricRegistryTest.one.two");
+    }
+
+    @Test
+    public void concatenatesClassesWithoutCanonicalNamesWithStrings() throws Exception {
+        final Gauge<String> g = new Gauge<String>() {
+            @Override
+            public String getValue() {
+                return null;
+            }
+        };
+
+        assertThat(name(g.getClass(), "one", "two"))
+                .isEqualTo("com.yammer.metrics.tests.MetricRegistryTest$3.one.two");
     }
 }
