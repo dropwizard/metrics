@@ -10,8 +10,9 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
 
-// TODO: 3/12/13 <coda> -- test and document CsvReporter
-
+/**
+ * A reporter which creates a comma-separated values file of the measurements for each metric.
+ */
 public class CsvReporter extends AbstractPollingReporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(CsvReporter.class);
     private static final Charset UTF_8 = Charset.forName("UTF-8");
