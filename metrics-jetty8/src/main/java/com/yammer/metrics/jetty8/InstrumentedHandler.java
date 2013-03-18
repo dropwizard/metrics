@@ -43,33 +43,45 @@ public class InstrumentedHandler extends HandlerWrapper {
     private final ContinuationListener listener;
 
     /**
-     * Create a new instrumented handler using a given metrics registry.
+     * Create a new instrumented handler using a given metrics registry. The name of the metric
+     * will be derived from the class of the Handler.
      *
      * @param registry the registry for the metrics
      * @param underlying the handler about which metrics will be collected
      */
     public InstrumentedHandler(MetricRegistry registry, Handler underlying) {
-        super();
-        this.dispatches = registry.timer(name(underlying.getClass(), "dispatches"));
-        this.requests = registry.meter(name(underlying.getClass(), "requests"));
-        this.resumes = registry.meter(name(underlying.getClass(), "resumes"));
-        this.suspends = registry.meter(name(underlying.getClass(), "suspends"));
-        this.expires = registry.meter(name(underlying.getClass(), "expires"));
+    	this(registry, underlying, underlying.getClass());
+    }
 
-        this.activeRequests = registry.counter(name(underlying.getClass(), "active-requests"));
-        this.activeSuspendedRequests = registry.counter(name(underlying.getClass(),
+    /**
+     * Create a new instrumented handler using a given metrics registry and a custom prefix.
+     *
+     * @param registry the registry for the metrics
+     * @param underlying the handler about which metrics will be collected
+     * @param prefix the prefix to use for the metrics names
+     */    
+    public InstrumentedHandler(MetricRegistry registry, Handler underlying, String prefix) {
+        super();
+        this.dispatches = registry.timer(name(prefix, "dispatches"));
+        this.requests = registry.meter(name(prefix, "requests"));
+        this.resumes = registry.meter(name(prefix, "resumes"));
+        this.suspends = registry.meter(name(prefix, "suspends"));
+        this.expires = registry.meter(name(prefix, "expires"));
+
+        this.activeRequests = registry.counter(name(prefix, "active-requests"));
+        this.activeSuspendedRequests = registry.counter(name(prefix,
                                                              "active-suspended-requests"));
-        this.activeDispatches = registry.counter(name(underlying.getClass(), "active-dispatches"));
+        this.activeDispatches = registry.counter(name(prefix, "active-dispatches"));
 
         this.responses = new Meter[]{
-                registry.meter(name(underlying.getClass(), "1xx-responses")), // 1xx
-                registry.meter(name(underlying.getClass(), "2xx-responses")), // 2xx
-                registry.meter(name(underlying.getClass(), "3xx-responses")), // 3xx
-                registry.meter(name(underlying.getClass(), "4xx-responses")), // 4xx
-                registry.meter(name(underlying.getClass(), "5xx-responses"))  // 5xx
+                registry.meter(name(prefix, "1xx-responses")), // 1xx
+                registry.meter(name(prefix, "2xx-responses")), // 2xx
+                registry.meter(name(prefix, "3xx-responses")), // 3xx
+                registry.meter(name(prefix, "4xx-responses")), // 4xx
+                registry.meter(name(prefix, "5xx-responses"))  // 5xx
         };
 
-        registry.register(name(underlying.getClass(), "percent-4xx-1m"), new RatioGauge() {
+        registry.register(name(prefix, "percent-4xx-1m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[3].getOneMinuteRate(),
@@ -77,7 +89,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        registry.register(name(underlying.getClass(), "percent-4xx-5m"), new RatioGauge() {
+        registry.register(name(prefix, "percent-4xx-5m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[3].getFiveMinuteRate(),
@@ -85,7 +97,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        registry.register(name(underlying.getClass(), "percent-4xx-15m"), new RatioGauge() {
+        registry.register(name(prefix, "percent-4xx-15m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[3].getFifteenMinuteRate(),
@@ -93,7 +105,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        registry.register(name(underlying.getClass(), "percent-5xx-1m"), new RatioGauge() {
+        registry.register(name(prefix, "percent-5xx-1m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[4].getOneMinuteRate(),
@@ -101,7 +113,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        registry.register(name(underlying.getClass(), "percent-5xx-5m"), new RatioGauge() {
+        registry.register(name(prefix, "percent-5xx-5m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[4].getFiveMinuteRate(),
@@ -109,7 +121,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        registry.register(name(underlying.getClass(), "percent-5xx-15m"), new RatioGauge() {
+        registry.register(name(prefix, "percent-5xx-15m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[4].getFifteenMinuteRate(),
@@ -133,16 +145,16 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         };
 
-        this.getRequests = registry.timer(name(underlying.getClass(), "get-requests"));
-        this.postRequests = registry.timer(name(underlying.getClass(), "post-requests"));
-        this.headRequests = registry.timer(name(underlying.getClass(), "head-requests"));
-        this.putRequests = registry.timer(name(underlying.getClass(), "put-requests"));
-        this.deleteRequests = registry.timer(name(underlying.getClass(), "delete-requests"));
-        this.optionsRequests = registry.timer(name(underlying.getClass(), "options-requests"));
-        this.traceRequests = registry.timer(name(underlying.getClass(), "trace-requests"));
-        this.connectRequests = registry.timer(name(underlying.getClass(), "connect-requests"));
-        this.patchRequests = registry.timer(name(underlying.getClass(), "patch-requests"));
-        this.otherRequests = registry.timer(name(underlying.getClass(), "other-requests"));
+        this.getRequests = registry.timer(name(prefix, "get-requests"));
+        this.postRequests = registry.timer(name(prefix, "post-requests"));
+        this.headRequests = registry.timer(name(prefix, "head-requests"));
+        this.putRequests = registry.timer(name(prefix, "put-requests"));
+        this.deleteRequests = registry.timer(name(prefix, "delete-requests"));
+        this.optionsRequests = registry.timer(name(prefix, "options-requests"));
+        this.traceRequests = registry.timer(name(prefix, "trace-requests"));
+        this.connectRequests = registry.timer(name(prefix, "connect-requests"));
+        this.patchRequests = registry.timer(name(prefix, "patch-requests"));
+        this.otherRequests = registry.timer(name(prefix, "other-requests"));
 
         setHandler(underlying);
     }
