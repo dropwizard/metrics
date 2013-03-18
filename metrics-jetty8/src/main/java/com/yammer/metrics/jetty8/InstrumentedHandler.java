@@ -50,7 +50,7 @@ public class InstrumentedHandler extends HandlerWrapper {
      * @param underlying the handler about which metrics will be collected
      */
     public InstrumentedHandler(MetricRegistry registry, Handler underlying) {
-    	this(registry, underlying, underlying.getClass());
+    	this(registry, underlying, underlying.getClass().getName());
     }
 
     /**
