@@ -31,14 +31,16 @@ public class CsvReporter extends AbstractPollingReporter {
      * @param registry the {@link MetricRegistry} containing the metrics this reporter will report
      * @param directory the directory in which CSV files will be created
      * @param locale    the locale to use for formatting
+     * @param filter    the metric filter to match
      */
     public CsvReporter(MetricRegistry registry,
                        File directory,
                        Locale locale,
                        TimeUnit rateUnit,
                        TimeUnit durationUnit,
-                       Clock clock) {
-        super(registry, "csv-reporter");
+                       Clock clock,
+                       MetricFilter filter) {
+        super(registry, "csv-reporter", filter);
         this.directory = directory;
         this.locale = locale;
         this.clock = clock;

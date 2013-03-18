@@ -28,7 +28,8 @@ public class ConsoleReporterTest {
                                                                  clock,
                                                                  TimeZone.getTimeZone("PST"),
                                                                  TimeUnit.SECONDS,
-                                                                 TimeUnit.MILLISECONDS);
+                                                                 TimeUnit.MILLISECONDS,
+                                                                 MetricFilter.ALL);
 
     @Before
     public void setUp() throws Exception {

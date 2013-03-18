@@ -20,7 +20,9 @@ public class AbstractPollingReporterTest {
 
     private final MetricRegistry registry = new MetricRegistry("test");
     private final Reporter underlying = mock(Reporter.class);
-    private final AbstractPollingReporter reporter = new AbstractPollingReporter(registry, "example") {
+    private final AbstractPollingReporter reporter = new AbstractPollingReporter(registry,
+                                                                                 "example",
+                                                                                 MetricFilter.ALL) {
         @Override
         public void report(SortedMap<String, Gauge> gauges,
                            SortedMap<String, Counter> counters,
