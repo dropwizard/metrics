@@ -202,5 +202,4 @@ public class CsvReporterTest {
         map.put(name, metric);
         return map;
     }
-
 }
