@@ -67,6 +67,8 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
         public void dispatch(Object resource, HttpContext httpContext) {
             try {
                 underlying.dispatch(resource, httpContext);
+            } catch (Error e) {
+                throw e;
             } catch (Throwable e) {
                 if (exceptionClass.isAssignableFrom(e.getClass()) ||
                         (e.getCause() != null && exceptionClass.isAssignableFrom(e.getCause().getClass()))) {
