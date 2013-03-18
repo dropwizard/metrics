@@ -335,9 +335,9 @@ public class JmxReporter {
                 final ObjectName objectName = createName("counters", name);
                 mBeanServer.registerMBean(new JmxCounter(counter, objectName), objectName);
             } catch (InstanceAlreadyExistsException e) {
-                LOGGER.debug("Unable to register gauge", e);
+                LOGGER.debug("Unable to register counter", e);
             } catch (JMException e) {
-                LOGGER.warn("Unable to register gauge", e);
+                LOGGER.warn("Unable to register counter", e);
             }
         }
 
