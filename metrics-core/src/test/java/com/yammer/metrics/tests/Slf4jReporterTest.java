@@ -18,10 +18,11 @@ public class Slf4jReporterTest {
     private final Marker marker = mock(Marker.class);
     private final MetricRegistry registry = mock(MetricRegistry.class);
     private final Slf4jReporter reporter = new Slf4jReporter(registry,
-                                                               logger,
-                                                               marker,
-                                                               TimeUnit.SECONDS,
-                                                               TimeUnit.MILLISECONDS);
+                                                             logger,
+                                                             marker,
+                                                             TimeUnit.SECONDS,
+                                                             TimeUnit.MILLISECONDS,
+                                                             MetricFilter.ALL);
 
     @Test
     public void reportsGaugeValues() throws Exception {

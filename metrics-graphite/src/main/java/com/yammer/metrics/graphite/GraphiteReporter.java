@@ -25,8 +25,9 @@ public class GraphiteReporter extends AbstractPollingReporter {
                             Clock clock,
                             String prefix,
                             TimeUnit rateUnit,
-                            TimeUnit durationUnit) {
-        super(registry, "graphite-reporter");
+                            TimeUnit durationUnit,
+                            MetricFilter filter) {
+        super(registry, "graphite-reporter", filter);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;

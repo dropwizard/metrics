@@ -23,7 +23,8 @@ public class GraphiteReporterTest {
                                                                    clock,
                                                                    "prefix",
                                                                    TimeUnit.SECONDS,
-                                                                   TimeUnit.MILLISECONDS);
+                                                                   TimeUnit.MILLISECONDS,
+                                                                   MetricFilter.ALL);
 
     @Before
     public void setUp() throws Exception {

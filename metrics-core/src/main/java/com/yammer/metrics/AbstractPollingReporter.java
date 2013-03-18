@@ -35,15 +35,18 @@ public abstract class AbstractPollingReporter implements Reporter {
 
     private final MetricRegistry registry;
     private final ScheduledExecutorService executor;
+    private final MetricFilter filter;
 
     /**
      * Creates a new {@link AbstractPollingReporter} instance.
      *
-     * @param registry the {@link MetricRegistry} containing the metrics this reporter will report
+     * @param registry the {@link com.yammer.metrics.MetricRegistry} containing the metrics this reporter will report
      * @param name     the reporter's name
+     * @param filter   the filter for which metrics to report
      */
-    protected AbstractPollingReporter(MetricRegistry registry, String name) {
+    protected AbstractPollingReporter(MetricRegistry registry, String name, MetricFilter filter) {
         this.registry = registry;
+        this.filter = filter;
         this.executor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name));
     }
 
@@ -57,11 +60,11 @@ public abstract class AbstractPollingReporter implements Reporter {
         executor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                report(registry.getGauges(),
-                       registry.getCounters(),
-                       registry.getHistograms(),
-                       registry.getMeters(),
-                       registry.getTimers());
+                report(registry.getGauges(filter),
+                       registry.getCounters(filter),
+                       registry.getHistograms(filter),
+                       registry.getMeters(filter),
+                       registry.getTimers(filter));
             }
         }, period, period, unit);
     }

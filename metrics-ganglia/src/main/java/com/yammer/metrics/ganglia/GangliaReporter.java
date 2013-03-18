@@ -31,8 +31,9 @@ public class GangliaReporter extends AbstractPollingReporter {
                            int tMax,
                            int dMax,
                            TimeUnit rateUnit,
-                           TimeUnit durationUnit) {
-        super(registry, "ganglia-reporter");
+                           TimeUnit durationUnit,
+                           MetricFilter filter) {
+        super(registry, "ganglia-reporter", filter);
         this.ganglia = ganglia;
         this.tMax = tMax;
         this.dMax = dMax;

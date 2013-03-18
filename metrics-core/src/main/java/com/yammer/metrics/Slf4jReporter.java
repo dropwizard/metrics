@@ -25,29 +25,21 @@ public class Slf4jReporter extends AbstractPollingReporter {
     /**
      * Construct a new SLF4J reporter.
      *
-     * @param registry Metrics registry to report from.
-     * @param logger   SLF4J {@link Logger} instance to send metrics reports to
-     */
-    public Slf4jReporter(MetricRegistry registry, Logger logger) {
-        this(registry, logger, null, TimeUnit.SECONDS, TimeUnit.SECONDS);
-    }
-
-    /**
-     * Construct a new SLF4J reporter.
-     *
      * @param registry     Metrics registry to report from.
      * @param logger       SLF4J {@link Logger} instance to send metrics reports to
      * @param marker       SLF4J {@link Marker} instance to log with metrics class, or null if
      *                     none.
      * @param rateUnit     the unit to which rates will be converted
      * @param durationUnit the unit to which durations will be converted
+     * @param filter       the metric filter to match
      */
     public Slf4jReporter(MetricRegistry registry,
                          Logger logger,
                          Marker marker,
                          TimeUnit rateUnit,
-                         TimeUnit durationUnit) {
-        super(registry, "logger-reporter");
+                         TimeUnit durationUnit,
+                         MetricFilter filter) {
+        super(registry, "logger-reporter", filter);
         this.logger = logger;
         this.marker = marker;
         this.rateFactor = rateUnit.toSeconds(1);
