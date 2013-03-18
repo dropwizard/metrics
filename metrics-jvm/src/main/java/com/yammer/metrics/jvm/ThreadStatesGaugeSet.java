@@ -82,10 +82,8 @@ public class ThreadStatesGaugeSet implements MetricSet {
         final ThreadInfo[] allThreads = threads.getThreadInfo(threads.getAllThreadIds());
         int count = 0;
         for (ThreadInfo info : allThreads) {
-            if (info != null) {
-                if (info.getThreadState() == state) {
-                    count++;
-                }
+            if (info != null && info.getThreadState() == state) {
+                count++;
             }
         }
         return count;
