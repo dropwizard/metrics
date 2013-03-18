@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.management.*;
 
-// TODO: 3/10/13 <coda> -- write tests
-// TODO: 3/10/13 <coda> -- write docs
-
+/**
+ * A reporter which listens for new metrics and exposes them as namespaced MBeans.
+ */
 public class JmxReporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(JmxReporter.class);
 
@@ -22,7 +22,7 @@ public class JmxReporter {
     private abstract static class AbstractBean implements MetricMBean {
         private final ObjectName objectName;
 
-        protected AbstractBean(ObjectName objectName) {
+        AbstractBean(ObjectName objectName) {
             this.objectName = objectName;
         }
 
@@ -79,9 +79,9 @@ public class JmxReporter {
     public interface JmxHistogramMBean extends MetricMBean {
         long getCount();
 
-        double getMin();
+        long getMin();
 
-        double getMax();
+        long getMax();
 
         double getMean();
 
@@ -128,12 +128,12 @@ public class JmxReporter {
         }
 
         @Override
-        public double getMin() {
+        public long getMin() {
             return metric.getMin();
         }
 
         @Override
-        public double getMax() {
+        public long getMax() {
             return metric.getMax();
         }
 
@@ -247,12 +247,12 @@ public class JmxReporter {
         }
 
         @Override
-        public double getMin() {
+        public long getMin() {
             return metric.getMin();
         }
 
         @Override
-        public double getMax() {
+        public long getMax() {
             return metric.getMax();
         }
 
@@ -313,9 +313,7 @@ public class JmxReporter {
                 mBeanServer.registerMBean(new JmxGauge(gauge, objectName), objectName);
             } catch (InstanceAlreadyExistsException e) {
                 LOGGER.debug("Unable to register gauge", e);
-            } catch (MBeanRegistrationException e) {
-                LOGGER.warn("Unable to register gauge", e);
-            } catch (NotCompliantMBeanException e) {
+            } catch (JMException e) {
                 LOGGER.warn("Unable to register gauge", e);
             }
         }
@@ -338,9 +336,7 @@ public class JmxReporter {
                 mBeanServer.registerMBean(new JmxCounter(counter, objectName), objectName);
             } catch (InstanceAlreadyExistsException e) {
                 LOGGER.debug("Unable to register gauge", e);
-            } catch (MBeanRegistrationException e) {
-                LOGGER.warn("Unable to register gauge", e);
-            } catch (NotCompliantMBeanException e) {
+            } catch (JMException e) {
                 LOGGER.warn("Unable to register gauge", e);
             }
         }
@@ -363,9 +359,7 @@ public class JmxReporter {
                 mBeanServer.registerMBean(new JmxHistogram(histogram, objectName), objectName);
             } catch (InstanceAlreadyExistsException e) {
                 LOGGER.debug("Unable to register histogram", e);
-            } catch (MBeanRegistrationException e) {
-                LOGGER.warn("Unable to register histogram", e);
-            } catch (NotCompliantMBeanException e) {
+            } catch (JMException e) {
                 LOGGER.warn("Unable to register histogram", e);
             }
         }
@@ -388,9 +382,7 @@ public class JmxReporter {
                 mBeanServer.registerMBean(new JmxMeter(meter, objectName), objectName);
             } catch (InstanceAlreadyExistsException e) {
                 LOGGER.debug("Unable to register meter", e);
-            } catch (MBeanRegistrationException e) {
-                LOGGER.warn("Unable to register meter", e);
-            } catch (NotCompliantMBeanException e) {
+            } catch (JMException e) {
                 LOGGER.warn("Unable to register meter", e);
             }
         }
@@ -413,9 +405,7 @@ public class JmxReporter {
                 mBeanServer.registerMBean(new JmxTimer(timer, objectName), objectName);
             } catch (InstanceAlreadyExistsException e) {
                 LOGGER.debug("Unable to register timer", e);
-            } catch (MBeanRegistrationException e) {
-                LOGGER.warn("Unable to register timer", e);
-            } catch (NotCompliantMBeanException e) {
+            } catch (JMException e) {
                 LOGGER.warn("Unable to register timer", e);
             }
         }
@@ -448,15 +438,27 @@ public class JmxReporter {
     private final MetricRegistry registry;
     private final MetricRegistryListener listener;
 
+    /**
+     * Creates a new {@link JmxReporter}.
+     *
+     * @param mBeanServer    the platform's {@link MBeanServer}
+     * @param registry       the registry containing the metrics to report
+     */
     public JmxReporter(MBeanServer mBeanServer, MetricRegistry registry) {
         this.registry = registry;
         this.listener = new JmxListener(mBeanServer, registry.getName());
     }
 
+    /**
+     * Starts the reporter.
+     */
     public void start() {
         registry.addListener(listener);
     }
 
+    /**
+     * Stops the reporter.
+     */
     public void stop() {
         registry.removeListener(listener);
     }
