@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.entry;
+import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.mockito.Mockito.*;
 
 public class JmxReporterTest {
@@ -21,7 +22,7 @@ public class JmxReporterTest {
     private final String name = UUID.randomUUID().toString().replaceAll("[{\\-}]", "");
     private final MetricRegistry registry = spy(new MetricRegistry(name));
 
-    private final JmxReporter reporter = new JmxReporter(mBeanServer, registry);
+    private final JmxReporter reporter = new JmxReporter(mBeanServer, registry, MetricFilter.ALL);
 
     private final Gauge gauge = mock(Gauge.class);
     private final Counter counter = mock(Counter.class);
@@ -189,6 +190,18 @@ public class JmxReporterTest {
                 .contains(entry("98thPercentile", 8.0e8))
                 .contains(entry("99thPercentile", 9.0e8))
                 .contains(entry("999thPercentile", 10.0e8));
+    }
+
+    @Test
+    public void cleansUpAfterItselfWhenStopped() throws Exception {
+        reporter.stop();
+
+        try {
+            getAttributes("gauge", "Value");
+            failBecauseExceptionWasNotThrown(InstanceNotFoundException.class);
+        } catch (InstanceNotFoundException e) {
+
+        }
     }
 
     private AttributeList getAttributes(String name, String... attributeNames) throws JMException {
