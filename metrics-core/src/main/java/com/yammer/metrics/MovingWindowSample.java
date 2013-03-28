@@ -5,10 +5,19 @@ import java.util.concurrent.atomic.AtomicLongArray;
 
 import static java.lang.Math.min;
 
+/**
+ * A {@link Sample} implementation backed by a moving window that stores the last {@code N}
+ * measurements.
+ */
 public class MovingWindowSample implements Sample {
     private final AtomicLongArray window;
     private final AtomicLong index;
 
+    /**
+     * Creates a new {@link MovingWindowSample} which stores the last {@code size} measurements.
+     *
+     * @param size the number of measurements to store
+     */
     public MovingWindowSample(int size) {
         this.window = new AtomicLongArray(size);
         this.index = new AtomicLong();
