@@ -19,19 +19,18 @@ public class AbstractPollingReporterTest {
     private final Timer timer = mock(Timer.class);
 
     private final MetricRegistry registry = new MetricRegistry("test");
-    private final Reporter underlying = mock(Reporter.class);
-    private final AbstractPollingReporter reporter = new AbstractPollingReporter(registry,
-                                                                                 "example",
-                                                                                 MetricFilter.ALL) {
-        @Override
-        public void report(SortedMap<String, Gauge> gauges,
-                           SortedMap<String, Counter> counters,
-                           SortedMap<String, Histogram> histograms,
-                           SortedMap<String, Meter> meters,
-                           SortedMap<String, Timer> timers) {
-            underlying.report(gauges, counters, histograms, meters, timers);
-        }
-    };
+    private final AbstractPollingReporter reporter = spy(
+            new AbstractPollingReporter(registry, "example", MetricFilter.ALL) {
+                @Override
+                public void report(SortedMap<String, Gauge> gauges,
+                                   SortedMap<String, Counter> counters,
+                                   SortedMap<String, Histogram> histograms,
+                                   SortedMap<String, Meter> meters,
+                                   SortedMap<String, Timer> timers) {
+                    // nothing doing!
+                }
+            }
+    );
 
     @Before
     public void setUp() throws Exception {
@@ -51,7 +50,7 @@ public class AbstractPollingReporterTest {
 
     @Test
     public void pollsPeriodically() throws Exception {
-        verify(underlying, timeout(250).times(2)).report(
+        verify(reporter, timeout(250).times(2)).report(
                 map("gauge", gauge),
                 map("counter", counter),
                 map("histogram", histogram),
