@@ -40,15 +40,6 @@ public class Meter implements Metered {
     }
 
     /**
-     * Updates the moving averages.
-     */
-    void tick() {
-        m1Rate.tick();
-        m5Rate.tick();
-        m15Rate.tick();
-    }
-
-    /**
      * Mark the occurrence of an event.
      */
     public void mark() {
@@ -75,7 +66,9 @@ public class Meter implements Metered {
         if (age > TICK_INTERVAL && lastTick.compareAndSet(oldTick, newTick)) {
             final long requiredTicks = age / TICK_INTERVAL;
             for (long i = 0; i < requiredTicks; i++) {
-                tick();
+                m1Rate.tick();
+                m5Rate.tick();
+                m15Rate.tick();
             }
         }
     }
