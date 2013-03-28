@@ -9,7 +9,17 @@ import static java.lang.Double.isNaN;
  * If the denominator is zero, not a number, or infinite, the resulting ratio is not a number.
  */
 public abstract class RatioGauge implements Gauge<Double> {
+    /**
+     * A ratio of one quantity to another.
+     */
     public static class Ratio {
+        /**
+         * Creates a new ratio with the given numerator and denominator.
+         *
+         * @param numerator      the numerator of the ratio
+         * @param denominator    the denominator of the ratio
+         * @return {@code numerator:denominator}
+         */
         public static Ratio of(double numerator, double denominator) {
             return new Ratio(numerator, denominator);
         }
@@ -22,12 +32,23 @@ public abstract class RatioGauge implements Gauge<Double> {
             this.denominator = denominator;
         }
 
+        /**
+         * Returns the ratio, which is either a {@code double} between 0 and 1 (inclusive) or
+         * {@code NaN}.
+         *
+         * @return the ratio
+         */
         public double getValue() {
             final double d = denominator;
             if (isNaN(d) || isInfinite(d) || d == 0) {
                 return Double.NaN;
             }
             return numerator / d;
+        }
+
+        @Override
+        public String toString() {
+            return numerator + ":" + denominator;
         }
     }
 
