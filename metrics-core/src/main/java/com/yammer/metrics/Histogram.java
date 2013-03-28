@@ -76,9 +76,6 @@ public class Histogram implements Metric, Sampling, Summarizable {
         return count.get();
     }
 
-    /* (non-Javadoc)
-     * @see com.yammer.metrics.Summarizable#max()
-     */
     @Override
     public long getMax() {
         if (getCount() > 0) {
@@ -87,9 +84,6 @@ public class Histogram implements Metric, Sampling, Summarizable {
         return 0;
     }
 
-    /* (non-Javadoc)
-     * @see com.yammer.metrics.Summarizable#min()
-     */
     @Override
     public long getMin() {
         if (getCount() > 0) {
@@ -98,9 +92,6 @@ public class Histogram implements Metric, Sampling, Summarizable {
         return 0;
     }
 
-    /* (non-Javadoc)
-     * @see com.yammer.metrics.Summarizable#mean()
-     */
     @Override
     public double getMean() {
         if (getCount() > 0) {
@@ -109,9 +100,6 @@ public class Histogram implements Metric, Sampling, Summarizable {
         return 0.0;
     }
 
-    /* (non-Javadoc)
-     * @see com.yammer.metrics.Summarizable#stdDev()
-     */
     @Override
     public double getStdDev() {
         if (getCount() > 0) {
@@ -120,9 +108,6 @@ public class Histogram implements Metric, Sampling, Summarizable {
         return 0.0;
     }
 
-    /* (non-Javadoc)
-     * @see com.yammer.metrics.Summarizable#sum()
-     */
     @Override
     public long getSum() {
         return sum.get();
