@@ -75,7 +75,6 @@ public abstract class WebappMetricsFilter implements Filter {
         if (o instanceof MetricRegistry) {
             metricsRegistry = (MetricRegistry) o;
         } else {
-            // TODO: 3/10/13 <coda> -- figure out how to coordinate on registry names
             metricsRegistry = new MetricRegistry("servlet");
         }
         return metricsRegistry;
