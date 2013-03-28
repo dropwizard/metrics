@@ -12,8 +12,6 @@ import javax.ws.rs.ext.Provider;
  */
 @Provider
 public class InstrumentedResourceMethodDispatchAdapter implements ResourceMethodDispatchAdapter {
-    // TODO: 3/10/13 <coda> -- figure out how to coordinate on registry names
-
     private final MetricRegistry registry;
 
     /**
