@@ -7,6 +7,14 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 public class RatioGaugeTest {
     @Test
+    public void ratiosAreHumanReadable() throws Exception {
+        final RatioGauge.Ratio ratio = RatioGauge.Ratio.of(100, 200);
+
+        assertThat(ratio.toString())
+                .isEqualTo("100.0:200.0");
+    }
+
+    @Test
     public void calculatesTheRatioOfTheNumeratorToTheDenominator() throws Exception {
         final RatioGauge regular = new RatioGauge() {
             @Override
