@@ -1,5 +1,6 @@
 package com.yammer.metrics;
 
+import java.util.SortedMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -12,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @see ConsoleReporter
  */
-public abstract class AbstractPollingReporter implements Reporter {
+public abstract class AbstractPollingReporter {
     /**
      * A simple named thread factory.
      */
@@ -46,7 +47,8 @@ public abstract class AbstractPollingReporter implements Reporter {
     /**
      * Creates a new {@link AbstractPollingReporter} instance.
      *
-     * @param registry the {@link com.yammer.metrics.MetricRegistry} containing the metrics this reporter will report
+     * @param registry the {@link com.yammer.metrics.MetricRegistry} containing the metrics this
+     *                 reporter will report
      * @param name     the reporter's name
      * @param filter   the filter for which metrics to report
      */
@@ -86,4 +88,19 @@ public abstract class AbstractPollingReporter implements Reporter {
             // do nothing
         }
     }
+
+    /**
+     * Called periodically by the polling thread. Subclasses should report all the given metrics.
+     *
+     * @param gauges     all of the gauges in the registry
+     * @param counters   all of the counters in the registry
+     * @param histograms all of the histograms in the registry
+     * @param meters     all of the meters in the registry
+     * @param timers     all of the timers in the registry
+     */
+    public abstract void report(SortedMap<String, Gauge> gauges,
+                                SortedMap<String, Counter> counters,
+                                SortedMap<String, Histogram> histograms,
+                                SortedMap<String, Meter> meters,
+                                SortedMap<String, Timer> timers);
 }
