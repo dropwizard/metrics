@@ -6,6 +6,12 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * The abstract base class for all polling reporters (i.e., reporters which process a registry's
+ * metrics periodically).
+ *
+ * @see ConsoleReporter
+ */
 public abstract class AbstractPollingReporter implements Reporter {
     /**
      * A simple named thread factory.
@@ -69,6 +75,9 @@ public abstract class AbstractPollingReporter implements Reporter {
         }, period, period, unit);
     }
 
+    /**
+     * Stops the reporter and shuts down its thread of execution.
+     */
     public void stop() {
         executor.shutdown();
         try {
