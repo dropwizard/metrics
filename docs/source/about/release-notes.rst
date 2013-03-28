@@ -24,6 +24,32 @@ v3.0.0-SNAPSHOT
 * Changed package names in ``metrics-ganglia``, ``metrics-graphite``, and ``metrics-servlet``.
 * Removed ``metrics-guice`` and ``metrics-spring``.
 
+.. _rel-2.2.0:
+
+v2.2.0: Nov 26 2012
+===================
+
+* Removed all OSGi bundling. This will be back in 3.0.
+* Added ``InstrumentedSslSelectChannelConnector`` and ``InstrumentedSslSocketConnector``.
+* Made all metric names JMX-safe.
+* Upgraded to Ehcache 2.6.2.
+* Upgraded to Apache HttpClient 4.2.2.
+* Upgraded to Jersey 1.15.
+* Upgraded to Log4j 1.2.17.
+* Upgraded to Logback 1.0.7.
+* Upgraded to Spring 3.1.3.
+* Upgraded to Jetty 8.1.8.
+* Upgraded to SLF4J 1.7.2.
+* Replaced usage of ``Unsafe`` in ``InstrumentedResourceMethodDispatchProvider`` with type erasure
+  trickery.
+
+.. _rel-2.1.5:
+
+v2.1.5: Nov 19 2012
+===================
+
+* Upgraded to Jackson 2.1.1.
+
 .. _rel-2.1.4:
 
 v2.1.4: Nov 15 2012
