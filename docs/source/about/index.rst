@@ -11,4 +11,3 @@ About Metrics
 
     contributors
     release-notes
-    todos
