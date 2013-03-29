@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="false"
-	monitoring="autodetect" dynamicConfig="true">
+         xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="false"
+         monitoring="autodetect" dynamicConfig="true">
 
-	<!--<cache name="test-config"-->
-		<!--maxElementsInMemory="30"-->
-		<!--eternal="false"-->
-		<!--overflowToDisk="false" -->
-		<!--timeToIdleSeconds="1000" -->
-		<!--timeToLiveSeconds="3600"-->
-		<!--memoryStoreEvictionPolicy="LFU" -->
-		<!--transactionalMode="off">-->
+    <!--<cache name="test-config"-->
+    <!--maxElementsInMemory="30"-->
+    <!--eternal="false"-->
+    <!--overflowToDisk="false" -->
+    <!--timeToIdleSeconds="1000" -->
+    <!--timeToLiveSeconds="3600"-->
+    <!--memoryStoreEvictionPolicy="LFU" -->
+    <!--transactionalMode="off">-->
 
-        <!--<cacheDecoratorFactory class="com.yammer.metrics.ehcache.InstrumentedEhcacheFactory" />-->
+    <!--<cacheDecoratorFactory class="com.yammer.metrics.ehcache.InstrumentedEhcacheFactory" />-->
 
     <!--</cache>-->
 
-	<defaultCache 
-		maxElementsInMemory="10000" 
-		eternal="false"
-		overflowToDisk="false" 
-		timeToIdleSeconds="120" 
-		timeToLiveSeconds="120"
-		diskPersistent="false" 
-		diskExpiryThreadIntervalSeconds="120" />
+    <defaultCache
+            maxElementsInMemory="10000"
+            eternal="false"
+            overflowToDisk="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"/>
 
 </ehcache>

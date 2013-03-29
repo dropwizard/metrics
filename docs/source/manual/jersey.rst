@@ -31,11 +31,11 @@ This is done by adding ``com.yammer.metrics.jersey`` as the value for the ``com.
 
 .. code-block:: xml
 
-	<servlet>
-		<servlet-name>Test Servlet</servlet-name>
-		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-		<init-param>
-			<param-name>com.sun.jersey.config.property.packages</param-name>
-			<param-value>your.jersey.resources;com.yammer.metrics.jersey</param-value>
-		</init-param>
-	</servlet>
+    <servlet>
+        <servlet-name>Test Servlet</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>your.jersey.resources;com.yammer.metrics.jersey</param-value>
+        </init-param>
+    </servlet>
