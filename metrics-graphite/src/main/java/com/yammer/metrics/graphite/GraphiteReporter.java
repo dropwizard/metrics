@@ -19,20 +19,14 @@ public class GraphiteReporter extends AbstractPollingReporter {
     private final double rateFactor;
     private final double durationFactor;
 
+    private GraphiteReporter(Builder builder) {
+        super(builder.registry, "graphite-reporter", builder.filter);
 
-    public GraphiteReporter(MetricRegistry registry,
-                            Graphite graphite,
-                            Clock clock,
-                            String prefix,
-                            TimeUnit rateUnit,
-                            TimeUnit durationUnit,
-                            MetricFilter filter) {
-        super(registry, "graphite-reporter", filter);
-        this.graphite = graphite;
-        this.clock = clock;
-        this.prefix = prefix;
-        this.rateFactor = rateUnit.toSeconds(1);
-        this.durationFactor = 1.0 / durationUnit.toNanos(1);
+        this.graphite = builder.graphite;
+        this.clock = builder.clock;
+        this.prefix = builder.prefix;
+        this.rateFactor = builder.rateUnit.toSeconds(1);
+        this.durationFactor = 1.0 / builder.durationUnit.toNanos(1);
     }
 
     @Override
@@ -158,5 +152,78 @@ public class GraphiteReporter extends AbstractPollingReporter {
         // the Carbon plaintext format is pretty underspecified, but it seems like it just wants
         // US-formatted digits
         return String.format(Locale.US, "%2.2f", v);
+    }
+
+    public static class Builder {
+        private MetricRegistry registry;
+        private Graphite graphite;
+        private Clock clock = Clock.defaultClock();
+        private String prefix = "";
+        private TimeUnit rateUnit = TimeUnit.SECONDS;
+        private TimeUnit durationUnit = TimeUnit.MILLISECONDS;
+        private MetricFilter filter;
+
+        public Builder(Graphite graphite, MetricRegistry registry, MetricFilter filter) {
+            if(graphite == null) {
+                throw new IllegalArgumentException("Graphite cannot be null.");
+            }
+
+            this.graphite = graphite;
+            this.registry = registry;
+            this.filter = filter;
+        }
+
+        /**
+         * Builds a new {@link GraphiteReporter}.
+         *
+         * @return an instance of the configured GraphiteReporter
+         */
+        public GraphiteReporter build() {
+            return new GraphiteReporter(this);
+        }
+
+        /**
+         * Sets the prefix to use. Default value is an empty string
+         *
+         * @param val the prefix
+         * @return
+         */
+        public Builder prefix(String val) {
+            prefix = val;
+            return this;
+        }
+
+        /**
+         * Sets the {@link Clock} type to use. Default value is Clock.getDefaultClock()
+         *
+         * @param val the {@link Clock} instance
+         * @return
+         */
+        public Builder clock(Clock val) {
+            clock = val;
+            return this;
+        }
+
+        /**
+         * Sets the rate unit. Default value is TimeUnit.SECONDS
+         *
+         * @param val the {@link TimeUnit}
+         * @return
+         */
+        public Builder rateUnit(TimeUnit val) {
+            rateUnit = val;
+            return this;
+        }
+
+        /**
+         * Sets the duration unit. Default value is TimeUnit.MILLISECONDS
+         *
+         * @param val the {@link TimeUnit}
+         * @return
+         */
+        public Builder durationUnit(TimeUnit val) {
+            durationUnit = val;
+            return this;
+        }
     }
 }

@@ -18,13 +18,12 @@ public class GraphiteReporterTest {
     private final Clock clock = mock(Clock.class);
     private final Graphite graphite = mock(Graphite.class);
     private final MetricRegistry registry = mock(MetricRegistry.class);
-    private final GraphiteReporter reporter = new GraphiteReporter(registry,
-                                                                   graphite,
-                                                                   clock,
-                                                                   "prefix",
-                                                                   TimeUnit.SECONDS,
-                                                                   TimeUnit.MILLISECONDS,
-                                                                   MetricFilter.ALL);
+    private final GraphiteReporter reporter = new GraphiteReporter.Builder(graphite, registry, MetricFilter.ALL).
+                                                                   clock(clock).
+                                                                   prefix("prefix").
+                                                                   rateUnit(TimeUnit.SECONDS).
+                                                                   durationUnit(TimeUnit.MILLISECONDS).
+                                                                   build();
 
     @Before
     public void setUp() throws Exception {
