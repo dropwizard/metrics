@@ -32,13 +32,12 @@ public class CsvReporterTest {
 
         this.dataDirectory = folder.newFolder();
 
-        this.reporter = new CsvReporter(registry,
-                                        dataDirectory,
-                                        Locale.US,
-                                        TimeUnit.SECONDS,
-                                        TimeUnit.MILLISECONDS,
-                                        clock,
-                                        MetricFilter.ALL);
+        this.reporter = new CsvReporter.Builder(dataDirectory, registry, MetricFilter.ALL).
+                                        locale(Locale.US).
+                                        rateUnit(TimeUnit.SECONDS).
+                                        durationUnit(TimeUnit.MILLISECONDS).
+                                        clock(clock).
+                                        build();
     }
 
     @Test
