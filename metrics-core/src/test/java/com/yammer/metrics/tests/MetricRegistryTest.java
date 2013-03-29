@@ -276,10 +276,37 @@ public class MetricRegistryTest {
             }
         };
 
-        registry.registerAll("my", metrics);
+        registry.register("my", metrics);
 
         assertThat(registry.getNames())
                 .containsOnly("my.gauge", "my.counter");
+    }
+
+    @Test
+    public void registersRecursiveMetricSets() throws Exception {
+        final MetricSet inner = new MetricSet() {
+            @Override
+            public Map<String, Metric> getMetrics() {
+                final Map<String, Metric> metrics = new HashMap<String, Metric>();
+                metrics.put("gauge", gauge);
+                return metrics;
+            }
+        };
+
+        final MetricSet outer = new MetricSet() {
+            @Override
+            public Map<String, Metric> getMetrics() {
+                final Map<String, Metric> metrics = new HashMap<String, Metric>();
+                metrics.put("inner", inner);
+                metrics.put("counter", counter);
+                return metrics;
+            }
+        };
+
+        registry.register("my", outer);
+
+        assertThat(registry.getNames())
+                .containsOnly("my.inner.gauge", "my.counter");
     }
 
     @Test
@@ -316,6 +343,6 @@ public class MetricRegistryTest {
         };
 
         assertThat(name(g.getClass(), "one", "two"))
-                .isEqualTo("com.yammer.metrics.tests.MetricRegistryTest$3.one.two");
+                .isEqualTo("com.yammer.metrics.tests.MetricRegistryTest$5.one.two");
     }
 }
