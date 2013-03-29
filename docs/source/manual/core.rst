@@ -8,44 +8,42 @@ Metrics Core
 
 The central library for Metrics is ``metrics-core``, which provides some basic functionality:
 
+* Metric :ref:`registries <man-core-registries>`.
 * The five metric types: :ref:`man-core-gauges`, :ref:`man-core-counters`,
   :ref:`man-core-histograms`, :ref:`man-core-meters`, and :ref:`man-core-timers`.
-* :ref:`man-core-healthchecks`
 * Reporting metrics values via :ref:`JMX <man-core-reporters-jmx>`, the
-  :ref:`console <man-core-reporters-console>`, and :ref:`CSV <man-core-reporters-csv>` files.
+  :ref:`console <man-core-reporters-console>`, :ref:`CSV <man-core-reporters-csv>` files, and
+  :ref:`SLF4J loggers <man-core-reporters-slf4j>`.
 
-All metrics are created via either the ``Metrics`` class or a ``MetricsRegistry``. If your
-application is running alongside other applications in a single JVM instance (e.g., multiple WARs
-deployed to an application server), you should use per-application ``MetricsRegistry`` instances. If
-your application is the sole occupant of the JVM instance (e.g., a Dropwizard_ application), feel
-free to use the ``static`` factory methods on ``Metrics``.
+.. _man-core-registries:
 
-.. _Dropwizard: http://dropwizard.codahale.com/
+Metric Registries
+=================
 
-For this documentation, we'll assume you're using ``Metrics``, but the interfaces are much the same.
+The starting point for Metrics is the ``MetricRegistry`` class, which is a collection of all the
+metrics for your application (or a subset of your application). If your application is running
+alongside other applications in a single JVM instance (e.g., multiple WARs deployed to an
+application server), you should use per-application ``MetricRegistry`` instances with different
+names.
 
 .. _man-core-names:
 
 Metric Names
 ============
 
-Each metric has a unique *metric name*, which consists of four pieces of information:
+Each metric has a unique *name*, which is a simple dotted name, like ``com.example.Queue.size``.
+This flexibility allows you to encode a wide variety of context directly into a metric's name. If
+you have two instances of ``com.example.Queue``, you can give them more specific:
+``com.example.Queue.requests.size`` vs. ``com.example.Queue.responses.size``, for example.
 
-Group
-  The top-level grouping of the metric. When a metric belongs to a class, this defaults to the
-  class's *package name* (e.g., ``com.example.proj.auth``).
-Type
-  The second-level grouping of the metric. When a metric belongs to a class, this defaults to the
-  class's *name* (e.g., ``SessionStore``).
-Name
-  A short name describing the metric's purpose (e.g., ``session-count``).
-Scope
-  An optional name describing the metric's scope. Useful for when you have multiple instances of a
-  class.
+``MetricRegistry`` has a set of static helper methods for easily creating names:
 
-The factory methods on ``Metrics`` and ``MetricsRegistry`` will accept either class/name,
-class/name/scope, or ``MetricName`` instances with arbitrary inputs.
+.. code-block:: java
 
+    MetricRegistry.name(Queue.class, "requests", "size")
+    MetricRegistry.name(Queue.class, "responses", "size")
+
+These methods will also elide any ``null`` values, allowing for easy optional scopes.
 
 .. _man-core-gauges:
 
@@ -58,9 +56,9 @@ has a value which is maintained by a third-party library, you can easily expose 
 
 .. code-block:: java
 
-    Metrics.newGauge(SessionStore.class, "cache-evictions", new Gauge<Integer>() {
+    registry.register(name(SessionStore.class, "cache-evictions"), new Gauge<Integer>() {
         @Override
-        public Integer value() {
+        public Integer getValue() {
             return cache.getEvictionsCount();
         }
     });
@@ -74,14 +72,15 @@ JMX Gauges
 ----------
 
 Given that many third-party library often expose metrics only via JMX, Metrics provides the
-``JmxGauge`` class, which takes the object name of a JMX MBean and the name of an attribute and
-produces a gauge implementation which returns the value of that attribute:
+``JmxAttributeGauge`` class, which takes the object name of a JMX MBean and the name of an attribute
+and produces a gauge implementation which returns the value of that attribute:
 
 .. code-block:: java
 
-    Metrics.newGauge(SessionStore.class, "cache-evictions",
-                     new JmxGauge("net.sf.ehcache:type=Cache,scope=sessions,name=eviction-count", "Value"));
+    registry.register(name(SessionStore.class, "cache-evictions"),
+                     new JmxAttributeGauge("net.sf.ehcache:type=Cache,scope=sessions,name=eviction-count", "Value"));
 
+.. _man-core-gauges-ratio:
 
 Ratio Gauges
 ------------
@@ -99,22 +98,52 @@ A ratio gauge is a simple way to create a gauge which is the ratio between two n
             this.calls = calls;
         }
 
-        public double getNumerator() {
-            return hits.oneMinuteRate();
-        }
-
-        public double getDenominator() {
-            return calls.oneMinuteRate();
+        @Override
+        public Ratio getValue() {
+            return Ratio.of(hits.oneMinuteRate(),
+                            calls.oneMinuteRate());
         }
     }
 
-This custom gauge returns the ratio of cache hits to misses using a meter and a timer.
+This gauge returns the ratio of cache hits to misses using a meter and a timer.
 
-Percent Gauges
---------------
+.. _man-core-gauges-cached:
 
-A percent gauge is a ratio gauge where the result is normalized to a value between 0 and 100. It has
-the same interface as a ratio gauge.
+Cached Gauges
+-------------
+
+A cached gauge allows for a more efficient reporting of values which are expensive to calculate:
+
+.. code-block:: java
+
+    registry.register(name(Cache.class, cache.getName(), "size"),
+                      new CachedGauge<Long>(10, TimeUnit.MINUTES) {
+                          @Override
+                          protected Long loadValue() {
+                              // assume this does something which takes a long time
+                              return cache.getSize();
+                          }
+                      });
+
+.. _man-core-gauges-derivative:
+
+Derivative Gauges
+-----------------
+
+A derivative gauge allows you to derive values from other gauges' values:
+
+.. code-block:: java
+
+    public class CacheSizeGauge extends DerivativeGauge<CacheStats, Long> {
+        public CacheSizeGauge(Gauge<CacheStats> statsGauge) {
+            super(statsGauge);
+        }
+
+        @Override
+        protected Long transform(CacheStats stats) {
+            return stats.getSize();
+        }
+    }
 
 .. _man-core-counters:
 
@@ -125,7 +154,7 @@ A counter is a simple incrementing and decrementing 64-bit integer:
 
 .. code-block:: java
 
-    final Counter evictions = Metrics.newCounter(SessionStore.class, "cache-evictions");
+    final Counter evictions = registry.counter(name(SessionStore.class, "cache-evictions"));
     evictions.inc();
     evictions.inc(3);
     evictions.dec();
@@ -143,7 +172,7 @@ returned by a search:
 
 .. code-block:: java
 
-    final Histogram resultCounts = Metrics.newHistogram(ProductDAO.class, "result-counts");
+    final Histogram resultCounts = registry.histogram(name(ProductDAO.class, "result-counts");
     resultCounts.update(results.size());
 
 ``Histogram`` metrics allow you to measure not just easy things like the min, mean, max, and
@@ -161,36 +190,43 @@ sample which is statistically representative of the data stream as a whole, we c
 easily calculate quantiles which are valid approximations of the actual quantiles. This technique is
 called **reservoir sampling**.
 
-Metrics provides two types of histograms: :ref:`uniform <man-core-histograms-uniform>`
-and :ref:`biased <man-core-histograms-biased>`.
+Metrics provides a number of different ``Sample`` implementations, each of which is useful.
 
 .. _man-core-histograms-uniform:
 
-Uniform Histograms
-------------------
+Uniform Samples
+---------------
 
-A uniform histogram produces quantiles which are valid for the entirely of the histogram's lifetime.
-It will return a median value, for example, which is the median of all the values the histogram has
-ever been updated with. It does this by using an algorithm called `Vitter's R`__), which randomly
-selects values for the sample with linearly-decreasing probability.
+A histogram with a uniform sample  produces quantiles which are valid for the entirely of the
+histogram's lifetime. It will return a median value, for example, which is the median of all the
+values the histogram has ever been updated with. It does this by using an algorithm called
+`Vitter's R`__), which randomly selects values for the sample with linearly-decreasing probability.
 
 .. __: http://www.cs.umd.edu/~samir/498/vitter.pdf
 
 Use a uniform histogram when you're interested in long-term measurements. Don't use one where you'd
 want to know if the distribution of the underlying data stream has changed recently.
 
-.. _man-core-histograms-biased:
+.. _man-core-histograms-exponential:
 
-Biased Histograms
------------------
+Exponentially Decaying Samples
+------------------------------
 
-A biased histogram produces quantiles which are representative of (roughly) the last five minutes of
-data. It does so by using a `forward-decaying priority sample`__ with an exponential weighting
-towards newer data. Unlike the uniform histogram, a biased histogram represents **recent data**,
-allowing you to know very quickly if the distribution of the data has changed.
-:ref:`man-core-timers` use biased histograms.
+A histogram with an exponentially decaying sample produces quantiles which are representative of
+(roughly) the last five minutes of data. It does so by using a `forward-decaying priority sample`__
+with an exponential weighting towards newer data. Unlike the uniform histogram, a biased histogram
+represents **recent data**, allowing you to know very quickly if the distribution of the data has
+changed. :ref:`man-core-timers` use histograms with exponentially decaying samples.
 
 .. __: http://www.research.att.com/people/Cormode_Graham/library/publications/CormodeShkapenyukSrivastavaXu09.pdf
+
+.. _man-core-histograms-moving:
+
+Moving Window Samples
+---------------------
+
+A histogram with a moving window sample produces quantiles which are representative of the past
+``N`` measurements.
 
 .. _man-core-meters:
 
@@ -201,16 +237,9 @@ A meter measures the *rate* at which a set of events occur:
 
 .. code-block:: java
 
-    final Meter getRequests = Metrics.newMeter(WebProxy.class, "get-requests", "requests", TimeUnit.SECONDS);
+    final Meter getRequests = registry.meter(name(WebProxy.class, "get-requests", "requests"));
     getRequests.mark();
     getRequests.mark(requests.size());
-
-A meter requires two additional pieces of information besides the name: the **event type** and the
-**rate unit**. The event type simply describes the type of events which the meter is measuring. In
-the above case, the meter is measuring proxied requests, and so its event type is ``"requests"``.
-The rate unit is the unit of time denominating the rate. In the above case, the meter is measuring
-the number of requests in each second, and so its rate unit is ``SECONDS``. When combined, the meter
-is measuring requests per second.
 
 Meters measure the rate of the events in a few different ways. The *mean* rate is the average rate
 of events. It's generally useful for trivia, but as it represents the total rate for your
@@ -233,89 +262,22 @@ a :ref:`meter <man-core-meters>` of the rate of its occurrence.
 
 .. code-block:: java
 
-    final Timer timer = Metrics.newTimer(WebProxy.class, "get-requests", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+    final Timer timer = registry.timer(name(WebProxy.class, "get-requests"));
 
-    final TimerContext context = timer.time();
+    final Timer.Context context = timer.time();
     try {
         // handle request
     } finally {
         context.stop();
     }
 
-A timer requires two additional pieces of information besides the name: the **duration unit** and
-the **rate unit**. The duration unit is the unit of time in which the durations of events will be
-measured. In the above example, the duration unit is ``MILLISECONDS``, meaning the timed event's
-duration will be measured in milliseconds. The rate unit in the above example is ``SECONDS``,
-meaning the rate of the timed event is measured in calls/sec.
-
 .. note::
 
-    Regardless of the display duration unit of a timer, elapsed time for its events is measured
-    internally in nanoseconds, using Java's high-precision ``System.nanoTime()`` method.
+    Elapsed times for it events are measured internally in nanoseconds, using Java's high-precision
+    ``System.nanoTime()`` method. Its precision and accuracy vary depending on operating system and
+    hardware.
 
-.. _man-core-healthchecks:
 
-Health Checks
-=============
-
-Metrics also provides you with a consistent, unified way of performing application health checks. A
-health check is basically a small self-test which your application performs to verify that a
-specific component or responsibility is performing correctly.
-
-To create a health check, extend the ``HealthCheck`` class:
-
-.. code-block:: java
-
-    public class DatabaseHealthCheck extends HealthCheck {
-        private final Database database;
-
-        public DatabaseHealthCheck(Database database) {
-            super("database");
-            this.database = database;
-        }
-
-        @Override
-        protected Result check() throws Exception {
-            if (database.ping()) {
-                return Result.healthy();
-            }
-            return Result.unhealthy("Can't ping database");
-        }
-    }
-
-In this example, we've created a health check for a ``Database`` class on which our application
-depends. Our fictitious ``Database`` class has a ``#ping()`` method, which executes a safe test
-query (e.g., ``SELECT 1``). ``#ping()`` returns ``true`` if the query returns the expected result,
-returns ``false`` if it returns something else, and throws an exception if things have gone
-seriously wrong.
-
-Our ``DatabaseHealthCheck``, then, takes a ``Database`` instance and in its ``#check()`` method,
-attempts to ping the database. If it can, it returns a **healthy** result. If it can't, it returns
-an **unhealthy** result.
-
-.. note::
-
-    Exceptions thrown inside a health check's ``#check()`` method are automatically caught and
-    turned into unhealthy results with the full stack trace.
-
-To register a health check, either use the ``HealthChecks`` singleton or a ``HealthCheckRegistry``
-instance:
-
-.. code-block:: java
-
-    HealthChecks.register(new DatabaseHealthCheck(database));
-
-You can also run the set of registered health checks:
-
-.. code-block:: java
-
-    for (Entry<String, Result> entry : HealthChecks.run().entrySet()) {
-        if (entry.getValue().isHealthy()) {
-            System.out.println(entry.getKey() + ": PASS");
-        } else {
-            System.out.println(entry.getKey() + ": FAIL");
-        }
-    }
 
 .. _man-core-reporters:
 
@@ -323,16 +285,16 @@ Reporters
 =========
 
 Reporters are the way that your application exports all the measurements being made by its metrics.
-``metrics-core`` comes with three ways of exporting your metrics:
-:ref:`JMX <man-core-reporters-jmx>`, :ref:`console <man-core-reporters-console>`, and
-:ref:`CSV <man-core-reporters-csv>`.
+``metrics-core`` comes with four ways of exporting your metrics:
+:ref:`JMX <man-core-reporters-jmx>`, :ref:`console <man-core-reporters-console>`,
+:ref:`SLF4J <man-core-reporters-slf4j>`, and :ref:`CSV <man-core-reporters-csv>`.
 
 .. _man-core-reporters-jmx:
 
 JMX
 ---
 
-By default, Metrics always registers your metrics as JMX MBeans. To explore this you can use
+With ``JmxReporter``, you can expose your metrics as JMX MBeans. To explore this you can use
 VisualVM__ (which ships with most JDKs as ``jvisualvm``) with the VisualVM-MBeans plugins installed
 or JConsole (which ships with most JDKs as ``jconsole``):
 
@@ -346,9 +308,11 @@ or JConsole (which ships with most JDKs as ``jconsole``):
     If you double-click any of the metric properties, VisualVM will start graphing the data for that
     property. Sweet, eh?
 
-Reporting via JMX is always enabled, but we don't recommend that you try to gather metrics from your
-production environment. JMX's RPC API is fragile and bonkers. For development purposes and browsing,
-though, it can be very useful.
+.. warning::
+
+    We don't recommend that you try to gather metrics from your production environment. JMX's RPC
+    API is fragile and bonkers. For development purposes and browsing, though, it can be very
+    useful.
 
 .. _man-core-reporters-console:
 
@@ -360,7 +324,7 @@ registered metrics to the console:
 
 .. code-block:: java
 
-    ConsoleReporter.enable(1, TimeUnit.SECONDS);
+    // TODO: waiting on builders
 
 .. _man-core-reporters-csv:
 
@@ -372,10 +336,21 @@ of ``.csv`` files in a given directory:
 
 .. code-block:: java
 
-    CsvReporter.enable(new File("work/measurements"), 1, TimeUnit.SECONDS);
+    // TODO: waiting on builders
 
 For each metric registered, a ``.csv`` file will be created, and every second its state will be
 written to it as a new row.
+
+.. _man-core-reporters-slf4j:
+
+SLF4J
+-----
+
+It's also possible to log metrics to an SLF4J logger:
+
+.. code-block:: java
+
+    // TODO: waiting on builders
 
 .. _man-core-reporters-other:
 
@@ -384,7 +359,7 @@ Other Reporters
 
 Metrics has other reporter implementations, too:
 
-* :ref:`MetricsServlet <manual-servlet>` is a servlet which not only exposes your metrics as a JSON
+* :ref:`MetricsServlet <manual-servlets>` is a servlet which not only exposes your metrics as a JSON
   object, but it also runs your health checks, performs thread dumps, and exposes valuable JVM-level
   and OS-level information.
 * :ref:`GangliaReporter <manual-ganglia>` allows you to constantly stream metrics data to your
