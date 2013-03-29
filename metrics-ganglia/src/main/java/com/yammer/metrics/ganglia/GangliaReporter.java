@@ -15,6 +15,11 @@ import java.util.concurrent.TimeUnit;
 
 import static com.yammer.metrics.MetricRegistry.name;
 
+/**
+ * A reporter which announces metric values to a Ganglia cluster.
+ *
+ * @see <a href="http://ganglia.sourceforge.net/">Ganglia Monitoring System</a>
+ */
 public class GangliaReporter extends AbstractPollingReporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(GangliaReporter.class);
 
@@ -26,6 +31,17 @@ public class GangliaReporter extends AbstractPollingReporter {
     private final int tMax;
     private final int dMax;
 
+    /**
+     * Creates a new {@link GangliaReporter}.
+     *
+     * @param registry        the registry to report
+     * @param ganglia         a {@link GMetric} instance for the Ganglia cluster
+     * @param tMax            the time in seconds between polling
+     * @param dMax            the time in seconds after which the data should be considered unmonitored
+     * @param rateUnit        the time unit to use for rates
+     * @param durationUnit    the time unit to use for durations
+     * @param filter          a filter for metrics
+     */
     public GangliaReporter(MetricRegistry registry,
                            GMetric ganglia,
                            int tMax,
