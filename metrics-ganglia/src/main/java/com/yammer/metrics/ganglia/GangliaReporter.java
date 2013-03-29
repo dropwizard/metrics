@@ -26,21 +26,16 @@ public class GangliaReporter extends AbstractPollingReporter {
     private final int tMax;
     private final int dMax;
 
-    public GangliaReporter(MetricRegistry registry,
-                           GMetric ganglia,
-                           int tMax,
-                           int dMax,
-                           TimeUnit rateUnit,
-                           TimeUnit durationUnit,
-                           MetricFilter filter) {
-        super(registry, "ganglia-reporter", filter);
-        this.ganglia = ganglia;
-        this.tMax = tMax;
-        this.dMax = dMax;
-        this.rateFactor = rateUnit.toSeconds(1);
-        this.rateUnit = calculateRateUnit(rateUnit);
-        this.durationFactor = 1.0 / durationUnit.toNanos(1);
-        this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
+    private GangliaReporter(Builder builder) {
+        super(builder.registry, "ganglia-reporter", builder.filter);
+
+        this.ganglia = builder.ganglia;
+        this.tMax = builder.tMax;
+        this.dMax = builder.dMax;
+        this.rateFactor = builder.rateUnit.toSeconds(1);
+        this.rateUnit = calculateRateUnit(builder.rateUnit);
+        this.durationFactor = 1.0 / builder.durationUnit.toNanos(1);
+        this.durationUnit = builder.durationUnit.toString().toLowerCase(Locale.US);
     }
 
     private String calculateRateUnit(TimeUnit unit) {
@@ -203,5 +198,78 @@ public class GangliaReporter extends AbstractPollingReporter {
             return "";
         }
         return name.substring(0, i);
+    }
+
+    public static class Builder {
+        private MetricRegistry registry;
+        private GMetric ganglia;
+        private int tMax;
+        private int dMax;
+        private TimeUnit rateUnit = TimeUnit.SECONDS;
+        private TimeUnit durationUnit = TimeUnit.MILLISECONDS;
+        private MetricFilter filter;
+
+        public Builder(GMetric ganglia, MetricRegistry registry, MetricFilter filter) {
+            if(ganglia == null) {
+                throw new IllegalArgumentException("GMetric cannot be null.");
+            }
+
+            this.ganglia = ganglia;
+            this.registry = registry;
+            this.filter = filter;
+        }
+
+        /**
+         * Builds a new {@link GangliaReporter}.
+         *
+         * @return an instance of the configured GangliaReporter
+         */
+        public GangliaReporter build() {
+            return new GangliaReporter(this);
+        }
+
+        /**
+         * Sets the tMax value
+         *
+         * @param val integer representing the tMax value
+         * @return
+         */
+        public Builder tMax(int val) {
+            tMax = val;
+            return this;
+        }
+
+        /**
+         * Sets the dMax value
+         *
+         * @param val integer representing the dMax value
+         * @return
+         */
+        public Builder dMax(int val) {
+            dMax = val;
+            return this;
+        }
+
+        /**
+         * Sets the rate unit. Default value is TimeUnit.SECONDS
+         *
+         * @param val the {@link TimeUnit}
+         * @return
+         */
+        public Builder rateUnit(TimeUnit val) {
+            rateUnit = val;
+            return this;
+        }
+
+        /**
+         * Sets the duration unit. Default value is TimeUnit.MILLISECONDS
+         *
+         * @param val the {@link TimeUnit}
+         * @return
+         */
+        public Builder durationUnit(TimeUnit val) {
+            durationUnit = val;
+            return this;
+        }
     }
 }

@@ -16,13 +16,12 @@ import static org.mockito.Mockito.*;
 public class GangliaReporterTest {
     private final GMetric ganglia = mock(GMetric.class);
     private final MetricRegistry registry = mock(MetricRegistry.class);
-    private final GangliaReporter reporter = new GangliaReporter(registry,
-                                                                 ganglia,
-                                                                 60,
-                                                                 0,
-                                                                 TimeUnit.SECONDS,
-                                                                 TimeUnit.MILLISECONDS,
-                                                                 MetricFilter.ALL);
+    private final GangliaReporter reporter = new GangliaReporter.Builder(ganglia, registry,MetricFilter.ALL).
+                                                                 tMax(60).
+                                                                 dMax(0).
+                                                                 rateUnit(TimeUnit.SECONDS).
+                                                                 durationUnit(TimeUnit.MILLISECONDS).
+                                                                 build();
 
     @Test
     public void reportsStringGaugeValues() throws Exception {
