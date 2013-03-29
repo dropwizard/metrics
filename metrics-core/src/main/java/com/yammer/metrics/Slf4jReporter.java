@@ -3,6 +3,7 @@ package com.yammer.metrics;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.SortedMap;
@@ -22,30 +23,15 @@ public class Slf4jReporter extends AbstractPollingReporter {
     private final double rateFactor;
     private final String rateUnit;
 
-    /**
-     * Construct a new SLF4J reporter.
-     *
-     * @param registry     Metrics registry to report from.
-     * @param logger       SLF4J {@link Logger} instance to send metrics reports to
-     * @param marker       SLF4J {@link Marker} instance to log with metrics class, or null if
-     *                     none.
-     * @param rateUnit     the unit to which rates will be converted
-     * @param durationUnit the unit to which durations will be converted
-     * @param filter       the metric filter to match
-     */
-    public Slf4jReporter(MetricRegistry registry,
-                         Logger logger,
-                         Marker marker,
-                         TimeUnit rateUnit,
-                         TimeUnit durationUnit,
-                         MetricFilter filter) {
-        super(registry, "logger-reporter", filter);
-        this.logger = logger;
-        this.marker = marker;
-        this.rateFactor = rateUnit.toSeconds(1);
-        this.rateUnit = "events/" + calculateRateUnit(rateUnit);
-        this.durationFactor = 1.0 / durationUnit.toNanos(1);
-        this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
+    private Slf4jReporter(Builder builder) {
+        super(builder.registry, "slf4j-reporter", builder.filter);
+
+        this.logger = builder.logger;
+        this.marker = builder.marker;
+        this.rateFactor = builder.rateUnit.toSeconds(1);
+        this.rateUnit = "events/" + calculateRateUnit(builder.rateUnit);
+        this.durationFactor = 1.0 / builder.durationUnit.toNanos(1);
+        this.durationUnit = builder.durationUnit.toString().toLowerCase(Locale.US);
     }
 
     @Override
@@ -143,4 +129,66 @@ public class Slf4jReporter extends AbstractPollingReporter {
         final String s = unit.toString().toLowerCase(Locale.US);
         return s.substring(0, s.length() - 1);
     }
+
+    public static class Builder {
+        private MetricRegistry registry;
+        private Logger logger;
+        private Marker marker;
+        private TimeUnit rateUnit = TimeUnit.SECONDS;
+        private TimeUnit durationUnit = TimeUnit.MILLISECONDS;
+        private MetricFilter filter;
+
+        public Builder(Logger logger, MetricRegistry registry, MetricFilter filter) {
+            if(logger == null) {
+                throw new IllegalArgumentException("Logger cannot be null.");
+            }
+
+            this.logger = logger;
+            this.registry = registry;
+            this.filter = filter;
+        }
+
+        /**
+         * Builds a new {@link Slf4jReporter}.
+         *
+         * @return an instance of the configured Slf4jReporter
+         */
+        public Slf4jReporter build() {
+            return new Slf4jReporter(this);
+        }
+
+        /**
+         * Sets SLF4J {@link Marker} instance to log with metrics class, or null if none.
+         *
+         * @param val the {@link Marker} instance
+         * @return
+         */
+        public Builder marker(Marker val) {
+            marker = val;
+            return this;
+        }
+
+        /**
+         * Sets the rate unit. Default value is TimeUnit.SECONDS
+         *
+         * @param val the {@link TimeUnit}
+         * @return
+         */
+        public Builder rateUnit(TimeUnit val) {
+            rateUnit = val;
+            return this;
+        }
+
+        /**
+         * Sets the duration unit. Default value is TimeUnit.MILLISECONDS
+         *
+         * @param val the {@link TimeUnit}
+         * @return
+         */
+        public Builder durationUnit(TimeUnit val) {
+            durationUnit = val;
+            return this;
+        }
+    }
+
 }
