@@ -17,21 +17,24 @@ public class InstrumentedHttpClient extends DefaultHttpClient {
     private final Log log = LogFactory.getLog(getClass());
 
     private final MetricRegistry registry;
+    private final String name;
 
     public InstrumentedHttpClient(MetricRegistry registry,
                                   InstrumentedClientConnManager manager,
-                                  HttpParams params) {
+                                  HttpParams params,
+                                  String name) {
         super(manager, params);
         this.registry = registry;
+        this.name = name;
     }
 
     public InstrumentedHttpClient(MetricRegistry registry,
                                   HttpParams params) {
-        this(registry, new InstrumentedClientConnManager(registry), params);
+        this(registry, new InstrumentedClientConnManager(registry), params, null);
     }
 
     public InstrumentedHttpClient(MetricRegistry registry) {
-        this(registry, new InstrumentedClientConnManager(registry), null);
+        this(registry, new InstrumentedClientConnManager(registry), null, null);
     }
 
     @Override
@@ -49,6 +52,7 @@ public class InstrumentedHttpClient extends DefaultHttpClient {
                                                           HttpParams params) {
         return new InstrumentedRequestDirector(
                 registry,
+                name,
                 log,
                 requestExec,
                 conman,

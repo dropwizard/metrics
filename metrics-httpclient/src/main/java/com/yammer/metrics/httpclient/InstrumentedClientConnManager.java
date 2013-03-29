@@ -30,16 +30,17 @@ public class InstrumentedClientConnManager extends PoolingClientConnectionManage
                                          SchemeRegistry registry,
                                          long connTTL,
                                          TimeUnit connTTLTimeUnit) {
-        this(metricsRegistry, registry, connTTL, connTTLTimeUnit, new SystemDefaultDnsResolver());
+        this(metricsRegistry, registry, connTTL, connTTLTimeUnit, new SystemDefaultDnsResolver(), null);
     }
 
     public InstrumentedClientConnManager(MetricRegistry metricsRegistry,
                                          SchemeRegistry schemeRegistry,
                                          long connTTL,
                                          TimeUnit connTTLTimeUnit,
-                                         DnsResolver dnsResolver) {
+                                         DnsResolver dnsResolver,
+                                         String name) {
         super(schemeRegistry, connTTL, connTTLTimeUnit, dnsResolver);
-        metricsRegistry.register(name(ClientConnectionManager.class, "available-connections"),
+        metricsRegistry.register(name(ClientConnectionManager.class, name, "available-connections"),
                                  new Gauge<Integer>() {
                                      @Override
                                      public Integer getValue() {
@@ -47,7 +48,7 @@ public class InstrumentedClientConnManager extends PoolingClientConnectionManage
                                          return getTotalStats().getAvailable();
                                      }
                                  });
-        metricsRegistry.register(name(ClientConnectionManager.class, "leased-connections"),
+        metricsRegistry.register(name(ClientConnectionManager.class, name, "leased-connections"),
                                  new Gauge<Integer>() {
                                      @Override
                                      public Integer getValue() {
@@ -55,7 +56,7 @@ public class InstrumentedClientConnManager extends PoolingClientConnectionManage
                                          return getTotalStats().getLeased();
                                      }
                                  });
-        metricsRegistry.register(name(ClientConnectionManager.class, "max-connections"),
+        metricsRegistry.register(name(ClientConnectionManager.class, name, "max-connections"),
                                  new Gauge<Integer>() {
                                      @Override
                                      public Integer getValue() {
@@ -63,7 +64,7 @@ public class InstrumentedClientConnManager extends PoolingClientConnectionManage
                                          return getTotalStats().getMax();
                                      }
                                  });
-        metricsRegistry.register(name(ClientConnectionManager.class, "pending-connections"),
+        metricsRegistry.register(name(ClientConnectionManager.class, name, "pending-connections"),
                                  new Gauge<Integer>() {
                                      @Override
                                      public Integer getValue() {
