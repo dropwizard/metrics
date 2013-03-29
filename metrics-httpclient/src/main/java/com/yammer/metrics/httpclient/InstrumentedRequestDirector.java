@@ -36,6 +36,7 @@ class InstrumentedRequestDirector extends DefaultRequestDirector {
     private final Timer otherTimer;
 
     InstrumentedRequestDirector(MetricRegistry registry,
+                                String name,
                                 Log log,
                                 HttpRequestExecutor requestExec,
                                 ClientConnectionManager conman,
@@ -62,17 +63,17 @@ class InstrumentedRequestDirector extends DefaultRequestDirector {
               proxyAuthStrategy,
               userTokenHandler,
               params);
-        getTimer = registry.timer(name(HttpClient.class, "get-requests"));
-        postTimer = registry.timer(name(HttpClient.class, "post-requests"));
-        headTimer = registry.timer(name(HttpClient.class, "head-requests"));
-        putTimer = registry.timer(name(HttpClient.class, "put-requests"));
-        deleteTimer = registry.timer(name(HttpClient.class, "delete-requests"));
-        optionsTimer = registry.timer(name(HttpClient.class, "options-requests"));
-        traceTimer = registry.timer(name(HttpClient.class, "trace-requests"));
-        connectTimer = registry.timer(name(HttpClient.class, "connect-requests"));
-        moveTimer = registry.timer(name(HttpClient.class, "move-requests"));
-        patchTimer = registry.timer(name(HttpClient.class, "patch-requests"));
-        otherTimer = registry.timer(name(HttpClient.class, "other-requests"));
+        getTimer = registry.timer(name(HttpClient.class, name, "get-requests"));
+        postTimer = registry.timer(name(HttpClient.class, name, "post-requests"));
+        headTimer = registry.timer(name(HttpClient.class, name, "head-requests"));
+        putTimer = registry.timer(name(HttpClient.class, name, "put-requests"));
+        deleteTimer = registry.timer(name(HttpClient.class, name, "delete-requests"));
+        optionsTimer = registry.timer(name(HttpClient.class, name, "options-requests"));
+        traceTimer = registry.timer(name(HttpClient.class, name, "trace-requests"));
+        connectTimer = registry.timer(name(HttpClient.class, name, "connect-requests"));
+        moveTimer = registry.timer(name(HttpClient.class, name, "move-requests"));
+        patchTimer = registry.timer(name(HttpClient.class, name, "patch-requests"));
+        otherTimer = registry.timer(name(HttpClient.class, name, "other-requests"));
     }
 
     @Override
