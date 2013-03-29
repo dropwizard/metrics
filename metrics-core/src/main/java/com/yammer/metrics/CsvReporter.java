@@ -25,29 +25,16 @@ public class CsvReporter extends AbstractPollingReporter {
     private final double rateFactor;
     private final String rateUnit;
 
-    /**
-     * Creates a new {@link CsvReporter} instance.
-     *
-     * @param registry the {@link MetricRegistry} containing the metrics this reporter will report
-     * @param directory the directory in which CSV files will be created
-     * @param locale    the locale to use for formatting
-     * @param filter    the metric filter to match
-     */
-    public CsvReporter(MetricRegistry registry,
-                       File directory,
-                       Locale locale,
-                       TimeUnit rateUnit,
-                       TimeUnit durationUnit,
-                       Clock clock,
-                       MetricFilter filter) {
-        super(registry, "csv-reporter", filter);
-        this.directory = directory;
-        this.locale = locale;
-        this.clock = clock;
-        this.rateFactor = rateUnit.toSeconds(1);
-        this.rateUnit = calculateRateUnit(rateUnit);
-        this.durationFactor = 1.0 / durationUnit.toNanos(1);
-        this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
+    private CsvReporter(Builder builder) {
+        super(builder.registry, "csv-reporter", builder.filter);
+
+        this.directory = builder.directory;
+        this.locale = builder.locale;
+        this.clock = builder.clock;
+        this.rateFactor = builder.rateUnit.toSeconds(1);
+        this.rateUnit = calculateRateUnit(builder.rateUnit);
+        this.durationFactor = 1.0 / builder.durationUnit.toNanos(1);
+        this.durationUnit = builder.durationUnit.toString().toLowerCase(Locale.US);
     }
 
     @Override
@@ -174,4 +161,78 @@ public class CsvReporter extends AbstractPollingReporter {
     protected String sanitize(String name) {
         return name;
     }
+
+    public static class Builder {
+        private MetricRegistry registry;
+        private File directory;
+        private Locale locale = Locale.US;
+        private Clock clock = Clock.defaultClock();
+        private TimeUnit rateUnit = TimeUnit.SECONDS;
+        private TimeUnit durationUnit = TimeUnit.MILLISECONDS;
+        private MetricFilter filter;
+
+        public Builder(File directory, MetricRegistry registry, MetricFilter filter) {
+            if(directory == null) {
+                throw new IllegalArgumentException("Directory cannot be null.");
+            }
+
+            this.directory = directory;
+            this.registry = registry;
+            this.filter = filter;
+        }
+
+        /**
+         * Builds a new {@link CsvReporter}.
+         *
+         * @return an instance of the configured CsvReporter
+         */
+        public CsvReporter build() {
+            return new CsvReporter(this);
+        }
+
+        /**
+         * Sets the {@link Clock} type to use. Default value is Clock.getDefaultClock()
+         *
+         * @param val the {@link Clock} instance
+         * @return
+         */
+        public Builder locale(Locale val) {
+            locale = val;
+            return this;
+        }
+
+        /**
+         * Sets the {@link Clock} type to use. Default value is Clock.getDefaultClock()
+         *
+         * @param val the {@link Clock} instance
+         * @return
+         */
+        public Builder clock(Clock val) {
+            clock = val;
+            return this;
+        }
+
+        /**
+         * Sets the rate unit. Default value is TimeUnit.SECONDS
+         *
+         * @param val the {@link TimeUnit}
+         * @return
+         */
+        public Builder rateUnit(TimeUnit val) {
+            rateUnit = val;
+            return this;
+        }
+
+        /**
+         * Sets the duration unit. Default value is TimeUnit.MILLISECONDS
+         *
+         * @param val the {@link TimeUnit}
+         * @return
+         */
+        public Builder durationUnit(TimeUnit val) {
+            durationUnit = val;
+            return this;
+        }
+    }
+
 }

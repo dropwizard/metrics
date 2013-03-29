@@ -20,38 +20,20 @@ public class ConsoleReporter extends AbstractPollingReporter {
     private final double rateFactor;
     private final String rateUnit;
 
-    /**
-     * Creates a new {@link ConsoleReporter}.
-     *
-     * @param registry        the registry containing the metrics to report
-     * @param output          the print stream to be written to
-     * @param locale          the local in which data should be formatted
-     * @param clock           a clock
-     * @param timeZone        the time zone in which dates should be presented
-     * @param rateUnit        the unit in which rates should be presented
-     * @param durationUnit    the unit in which durations should be presented
-     * @param filter          the metric filter to match
-     */
-    public ConsoleReporter(MetricRegistry registry,
-                           PrintStream output,
-                           Locale locale,
-                           Clock clock,
-                           TimeZone timeZone,
-                           TimeUnit rateUnit,
-                           TimeUnit durationUnit,
-                           MetricFilter filter) {
-        super(registry, "console-reporter", filter);
-        this.output = output;
-        this.locale = locale;
-        this.clock = clock;
+    private ConsoleReporter(Builder builder) {
+        super(builder.registry, "console-reporter", builder.filter);
+
+        output = builder.output;
+        locale = builder.locale;
+        clock = builder.clock;
         this.dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT,
                                                          DateFormat.MEDIUM,
                                                          locale);
-        dateFormat.setTimeZone(timeZone);
-        this.rateFactor = rateUnit.toSeconds(1);
-        this.rateUnit = calculateRateUnit(rateUnit);
-        this.durationFactor = 1.0 / durationUnit.toNanos(1);
-        this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
+        dateFormat.setTimeZone(builder.timeZone);
+        this.rateFactor = builder.rateUnit.toSeconds(1);
+        this.rateUnit = calculateRateUnit(builder.rateUnit);
+        this.durationFactor = 1.0 / builder.durationUnit.toNanos(1);
+        this.durationUnit = builder.durationUnit.toString().toLowerCase(Locale.US);
     }
 
     @Override
@@ -176,5 +158,96 @@ public class ConsoleReporter extends AbstractPollingReporter {
     private String calculateRateUnit(TimeUnit unit) {
         final String s = unit.toString().toLowerCase(Locale.US);
         return s.substring(0, s.length() - 1);
+    }
+
+    public static class Builder {
+        private MetricRegistry registry;
+        private PrintStream output = System.out;
+        private Locale locale = Locale.US;
+        private Clock clock = Clock.defaultClock();
+        private TimeZone timeZone = TimeZone.getTimeZone("GMT");
+        private TimeUnit rateUnit = TimeUnit.SECONDS;
+        private TimeUnit durationUnit = TimeUnit.MILLISECONDS;
+        private MetricFilter filter;
+
+        public Builder(MetricRegistry registry, MetricFilter filter) {
+            this.registry = registry;
+            this.filter = filter;
+        }
+
+        /**
+         * Builds a new {@link ConsoleReporter}.
+         *
+         * @return an instance of the configured ConsoleReporter
+         */
+        public ConsoleReporter build() {
+            return new ConsoleReporter(this);
+        }
+
+        /**
+         * Sets the {@link PrintStream} to use. Default value is System.out
+         *
+         * @param val the {@link PrintStream}
+         * @return
+         */
+        public Builder output(PrintStream val) {
+            output = val;
+            return this;
+        }
+
+        /**
+         * Sets the {@link Clock} type to use. Default value is Clock.getDefaultClock()
+         *
+         * @param val the {@link Clock} instance
+         * @return
+         */
+        public Builder locale(Locale val) {
+            locale = val;
+            return this;
+        }
+
+        /**
+         * Sets the {@link Clock} type to use. Default value is Clock.getDefaultClock()
+         *
+         * @param val the {@link Clock} instance
+         * @return
+         */
+        public Builder clock(Clock val) {
+            clock = val;
+            return this;
+        }
+
+        /**
+         * Sets the time zone. Default value is set to GMT
+         *
+         * @param val the {@link TimeUnit}
+         * @return
+         */
+        public Builder timeZone(TimeZone val) {
+            timeZone = val;
+            return this;
+        }
+
+        /**
+         * Sets the rate unit. Default value is TimeUnit.SECONDS
+         *
+         * @param val the {@link TimeUnit}
+         * @return
+         */
+        public Builder rateUnit(TimeUnit val) {
+            rateUnit = val;
+            return this;
+        }
+
+        /**
+         * Sets the duration unit. Default value is TimeUnit.MILLISECONDS
+         *
+         * @param val the {@link TimeUnit}
+         * @return
+         */
+        public Builder durationUnit(TimeUnit val) {
+            durationUnit = val;
+            return this;
+        }
     }
 }
