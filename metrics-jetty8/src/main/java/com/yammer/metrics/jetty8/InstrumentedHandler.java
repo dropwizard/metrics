@@ -18,8 +18,8 @@ import static com.yammer.metrics.MetricRegistry.name;
 import static org.eclipse.jetty.http.HttpMethods.*;
 
 /**
- * A Jetty {@link Handler} which records various metrics about an underlying
- * {@link Handler} instance.
+ * A Jetty {@link Handler} which records various metrics about an underlying {@link Handler}
+ * instance.
  */
 public class InstrumentedHandler extends HandlerWrapper {
     private static final String PATCH = "PATCH";
@@ -43,23 +43,23 @@ public class InstrumentedHandler extends HandlerWrapper {
     private final ContinuationListener listener;
 
     /**
-     * Create a new instrumented handler using a given metrics registry. The name of the metric
-     * will be derived from the class of the Handler.
+     * Create a new instrumented handler using a given metrics registry. The name of the metric will
+     * be derived from the class of the Handler.
      *
-     * @param registry the registry for the metrics
+     * @param registry   the registry for the metrics
      * @param underlying the handler about which metrics will be collected
      */
     public InstrumentedHandler(MetricRegistry registry, Handler underlying) {
-    	this(registry, underlying, name(underlying.getClass()));
+        this(registry, underlying, name(underlying.getClass()));
     }
 
     /**
      * Create a new instrumented handler using a given metrics registry and a custom prefix.
      *
-     * @param registry the registry for the metrics
+     * @param registry   the registry for the metrics
      * @param underlying the handler about which metrics will be collected
-     * @param prefix the prefix to use for the metrics names
-     */    
+     * @param prefix     the prefix to use for the metrics names
+     */
     public InstrumentedHandler(MetricRegistry registry, Handler underlying, String prefix) {
         super();
         this.dispatches = registry.timer(name(prefix, "dispatches"));
