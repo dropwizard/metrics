@@ -41,6 +41,12 @@ public class GraphiteTest {
     }
 
     @Test
+    public void measuresFailures() throws Exception {
+        assertThat(graphite.getFailures())
+                .isZero();
+    }
+
+    @Test
     public void disconnectsFromGraphite() throws Exception {
         graphite.connect();
         graphite.close();
@@ -63,7 +69,7 @@ public class GraphiteTest {
     @Test
     public void writesValuesToGraphite() throws Exception {
         graphite.connect();
-        graphite.write("name", "value", 100);
+        graphite.send("name", "value", 100);
 
         assertThat(output.toString())
                 .isEqualTo("name value 100\n");
@@ -72,7 +78,7 @@ public class GraphiteTest {
     @Test
     public void sanitizesNames() throws Exception {
         graphite.connect();
-        graphite.write("name woo", "value", 100);
+        graphite.send("name woo", "value", 100);
 
         assertThat(output.toString())
                 .isEqualTo("name-woo value 100\n");
@@ -81,7 +87,7 @@ public class GraphiteTest {
     @Test
     public void sanitizesValues() throws Exception {
         graphite.connect();
-        graphite.write("name", "value woo", 100);
+        graphite.send("name", "value woo", 100);
 
         assertThat(output.toString())
                 .isEqualTo("name value-woo 100\n");
