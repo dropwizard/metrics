@@ -85,11 +85,26 @@ public class GangliaReporter extends AbstractPollingReporter {
 
             final Snapshot snapshot = timer.getSnapshot();
             announce(name(name, "p50"), group, snapshot.getMedian() * durationFactor, durationUnit);
-            announce(name(name, "p75"), group, snapshot.get75thPercentile() * durationFactor, durationUnit);
-            announce(name(name, "p95"), group, snapshot.get95thPercentile() * durationFactor, durationUnit);
-            announce(name(name, "p98"), group, snapshot.get98thPercentile() * durationFactor, durationUnit);
-            announce(name(name, "p99"), group, snapshot.get99thPercentile() * durationFactor, durationUnit);
-            announce(name(name, "p999"), group, snapshot.get999thPercentile() * durationFactor, durationUnit);
+            announce(name(name, "p75"),
+                     group,
+                     snapshot.get75thPercentile() * durationFactor,
+                     durationUnit);
+            announce(name(name, "p95"),
+                     group,
+                     snapshot.get95thPercentile() * durationFactor,
+                     durationUnit);
+            announce(name(name, "p98"),
+                     group,
+                     snapshot.get98thPercentile() * durationFactor,
+                     durationUnit);
+            announce(name(name, "p99"),
+                     group,
+                     snapshot.get99thPercentile() * durationFactor,
+                     durationUnit);
+            announce(name(name, "p999"),
+                     group,
+                     snapshot.get999thPercentile() * durationFactor,
+                     durationUnit);
 
             reportMetered(name, timer, group, "calls");
         } catch (GangliaException e) {
