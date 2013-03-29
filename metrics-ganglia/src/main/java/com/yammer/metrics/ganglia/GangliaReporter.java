@@ -15,6 +15,11 @@ import java.util.concurrent.TimeUnit;
 
 import static com.yammer.metrics.MetricRegistry.name;
 
+/**
+ * A reporter which announces metric values to a Ganglia cluster.
+ *
+ * @see <a href="http://ganglia.sourceforge.net/">Ganglia Monitoring System</a>
+ */
 public class GangliaReporter extends AbstractPollingReporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(GangliaReporter.class);
 
