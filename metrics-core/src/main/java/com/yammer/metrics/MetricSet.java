@@ -6,9 +6,8 @@ import java.util.Map;
  * A set of named metrics.
  *
  * @see MetricRegistry#registerAll(MetricSet)
- * @see MetricRegistry#registerAll(String,MetricSet)
  */
-public interface MetricSet {
+public interface MetricSet extends Metric {
     /**
      * A map of metric names to metrics.
      *
