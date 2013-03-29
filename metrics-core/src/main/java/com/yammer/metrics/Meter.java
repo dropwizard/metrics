@@ -33,7 +33,7 @@ public class Meter implements Metered {
      *
      * @param clock      the clock to use for the meter ticks
      */
-    Meter(Clock clock) {
+    public Meter(Clock clock) {
         this.clock = clock;
         this.startTime = this.clock.getTick();
         this.lastTick = new AtomicLong(startTime);

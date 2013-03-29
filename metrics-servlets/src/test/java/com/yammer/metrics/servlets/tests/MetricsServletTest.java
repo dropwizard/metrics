@@ -1,8 +1,6 @@
 package com.yammer.metrics.servlets.tests;
 
-import com.yammer.metrics.Clock;
-import com.yammer.metrics.Gauge;
-import com.yammer.metrics.MetricRegistry;
+import com.yammer.metrics.*;
 import com.yammer.metrics.servlets.MetricsServlet;
 import org.eclipse.jetty.testing.ServletTester;
 import org.junit.Before;
@@ -16,7 +14,7 @@ import static org.mockito.Mockito.when;
 
 public class MetricsServletTest extends AbstractServletTest {
     private final Clock clock = mock(Clock.class);
-    private final MetricRegistry registry = new MetricRegistry("test", clock);
+    private final MetricRegistry registry = new MetricRegistry("test");
 
     @Override
     protected void setUp(ServletTester tester) {
@@ -36,8 +34,8 @@ public class MetricsServletTest extends AbstractServletTest {
         });
         registry.counter("c").inc();
         registry.histogram("h").update(1);
-        registry.meter("m").mark();
-        registry.timer("t").update(1, TimeUnit.SECONDS);
+        registry.register("m", new Meter(clock)).mark();
+        registry.register("t", new Timer(clock)).update(1, TimeUnit.SECONDS);
 
         request.setMethod("GET");
         request.setURI("/metrics");
