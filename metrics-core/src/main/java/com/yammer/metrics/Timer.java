@@ -24,7 +24,7 @@ public class Timer implements Metered, Sampling, Summarizable {
      *
      * @param clock        the clock used to calculate duration
      */
-    Timer(Clock clock) {
+    public Timer(Clock clock) {
         this.meter = new Meter(clock);
         this.clock = clock;
     }
