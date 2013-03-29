@@ -277,7 +277,14 @@ a :ref:`meter <man-core-meters>` of the rate of its occurrence.
     ``System.nanoTime()`` method. Its precision and accuracy vary depending on operating system and
     hardware.
 
+.. _man-core-sets:
 
+Metric Sets
+===========
+
+Metrics can also be grouped together into reusable metric sets using the ``MetricSet`` interface.
+This allows library authors to provide a single entry point for the instrumentation of a wide
+variety of functionality.
 
 .. _man-core-reporters:
 
