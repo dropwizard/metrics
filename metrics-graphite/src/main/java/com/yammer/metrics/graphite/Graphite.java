@@ -17,6 +17,7 @@ public class Graphite implements Closeable {
 
     private Socket socket;
     private Writer writer;
+    private int failures;
 
     public Graphite(InetSocketAddress address, SocketFactory socketFactory) {
         this.address = address;
@@ -33,13 +34,23 @@ public class Graphite implements Closeable {
     }
 
     public void write(String name, String value, long timestamp) throws IOException {
-        writer.write(sanitize(name));
-        writer.write(' ');
-        writer.write(sanitize(value));
-        writer.write(' ');
-        writer.write(Long.toString(timestamp));
-        writer.write('\n');
-        writer.flush();
+        try {
+            writer.write(sanitize(name));
+            writer.write(' ');
+            writer.write(sanitize(value));
+            writer.write(' ');
+            writer.write(Long.toString(timestamp));
+            writer.write('\n');
+            writer.flush();
+            this.failures = 0;
+        } catch (IOException e) {
+            failures++;
+            throw e;
+        }
+    }
+
+    public int getFailures() {
+        return failures;
     }
 
     @Override
