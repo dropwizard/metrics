@@ -34,13 +34,14 @@ public class GangliaReporter extends AbstractPollingReporter {
     /**
      * Creates a new {@link GangliaReporter}.
      *
-     * @param registry        the registry to report
-     * @param ganglia         a {@link GMetric} instance for the Ganglia cluster
-     * @param tMax            the time in seconds between polling
-     * @param dMax            the time in seconds after which the data should be considered unmonitored
-     * @param rateUnit        the time unit to use for rates
-     * @param durationUnit    the time unit to use for durations
-     * @param filter          a filter for metrics
+     * @param registry     the registry to report
+     * @param ganglia      a {@link GMetric} instance for the Ganglia cluster
+     * @param tMax         the time in seconds between polling
+     * @param dMax         the time in seconds after which the data should be considered
+     *                     unmonitored
+     * @param rateUnit     the time unit to use for rates
+     * @param durationUnit the time unit to use for durations
+     * @param filter       a filter for metrics
      */
     public GangliaReporter(MetricRegistry registry,
                            GMetric ganglia,
@@ -101,11 +102,26 @@ public class GangliaReporter extends AbstractPollingReporter {
 
             final Snapshot snapshot = timer.getSnapshot();
             announce(name(name, "p50"), group, snapshot.getMedian() * durationFactor, durationUnit);
-            announce(name(name, "p75"), group, snapshot.get75thPercentile() * durationFactor, durationUnit);
-            announce(name(name, "p95"), group, snapshot.get95thPercentile() * durationFactor, durationUnit);
-            announce(name(name, "p98"), group, snapshot.get98thPercentile() * durationFactor, durationUnit);
-            announce(name(name, "p99"), group, snapshot.get99thPercentile() * durationFactor, durationUnit);
-            announce(name(name, "p999"), group, snapshot.get999thPercentile() * durationFactor, durationUnit);
+            announce(name(name, "p75"),
+                     group,
+                     snapshot.get75thPercentile() * durationFactor,
+                     durationUnit);
+            announce(name(name, "p95"),
+                     group,
+                     snapshot.get95thPercentile() * durationFactor,
+                     durationUnit);
+            announce(name(name, "p98"),
+                     group,
+                     snapshot.get98thPercentile() * durationFactor,
+                     durationUnit);
+            announce(name(name, "p99"),
+                     group,
+                     snapshot.get99thPercentile() * durationFactor,
+                     durationUnit);
+            announce(name(name, "p999"),
+                     group,
+                     snapshot.get999thPercentile() * durationFactor,
+                     durationUnit);
 
             reportMetered(name, timer, group, "calls");
         } catch (GangliaException e) {
