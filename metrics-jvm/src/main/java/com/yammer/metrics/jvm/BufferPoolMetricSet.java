@@ -1,5 +1,6 @@
 package com.yammer.metrics.jvm;
 
+import com.yammer.metrics.JmxAttributeGauge;
 import com.yammer.metrics.Metric;
 import com.yammer.metrics.MetricSet;
 
