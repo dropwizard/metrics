@@ -6,12 +6,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.entry;
+import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -71,5 +73,29 @@ public class HealthCheckRegistryTest {
 
         assertThat(results)
                 .containsKey("hc2");
+    }
+
+    @Test
+    public void hasASetOfHealthCheckNames() throws Exception {
+        assertThat(registry.getNames())
+                .containsOnly("hc1", "hc2");
+    }
+
+    @Test
+    public void runsHealthChecksByName() throws Exception {
+        assertThat(registry.runHealthCheck("hc1"))
+                .isEqualTo(r1);
+    }
+
+    @Test
+    public void doesNotRunNonexistentHealthChecks() throws Exception {
+        try {
+            registry.runHealthCheck("what");
+            failBecauseExceptionWasNotThrown(NoSuchElementException.class);
+        } catch (NoSuchElementException e) {
+            assertThat(e.getMessage())
+                    .isEqualTo("No health check named what exists");
+        }
+
     }
 }
