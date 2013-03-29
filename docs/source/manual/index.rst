@@ -22,6 +22,8 @@ User Manual
     jetty
     log4j
     logback
+    jvm
+    json
     servlets
     servlet
 
