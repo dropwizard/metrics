@@ -15,7 +15,7 @@ Instrumenting Ehcache
 
     final Cache c = new Cache(new CacheConfiguration("test", 100));
     MANAGER.addCache(c);
-    this.cache = InstrumentedEhcache.instrument(c);
+    this.cache = InstrumentedEhcache.instrument(registry, c);
 
 Instrumenting an ``Ehcache`` instance creates gauges for all of the Ehcache-provided statistics:
 
@@ -63,14 +63,5 @@ Instrumenting an ``Ehcache`` instance creates gauges for all of the Ehcache-prov
 
 It also adds full timers for the cache's ``get`` and ``put`` methods.
 
-The metrics are all scoped to the cache's name.
-
-Configuring via XML
-===================
-
-If you're using an ``ehcache.xml`` to configure your cache, you can instrument it by using
-``InstrumentedEhcacheFactory``:
-
-.. code-block:: xml
-
-    <cacheDecoratorFactory class="com.yammer.metrics.ehcache.InstrumentedEhcacheFactory" />
+The metrics are all scoped to the cache's class and name, so a ``Cache`` instance named ``users``
+would have metric names like ``net.sf.ehcache.Cache.users.get``, etc.
