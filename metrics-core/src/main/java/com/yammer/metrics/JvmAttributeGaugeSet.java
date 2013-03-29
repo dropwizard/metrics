@@ -1,8 +1,4 @@
-package com.yammer.metrics.jvm;
-
-import com.yammer.metrics.Gauge;
-import com.yammer.metrics.Metric;
-import com.yammer.metrics.MetricSet;
+package com.yammer.metrics;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;

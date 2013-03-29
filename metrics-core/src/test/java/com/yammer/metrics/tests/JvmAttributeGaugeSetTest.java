@@ -1,7 +1,7 @@
-package com.yammer.metrics.jvm.tests;
+package com.yammer.metrics.tests;
 
 import com.yammer.metrics.Gauge;
-import com.yammer.metrics.jvm.JvmAttributeGaugeSet;
+import com.yammer.metrics.JvmAttributeGaugeSet;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,6 +1,6 @@
-package com.yammer.metrics.jvm.tests;
+package com.yammer.metrics.tests;
 
-import com.yammer.metrics.jvm.JmxAttributeGauge;
+import com.yammer.metrics.JmxAttributeGauge;
 import org.junit.Test;
 
 import javax.management.AttributeNotFoundException;
