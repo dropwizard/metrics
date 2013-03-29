@@ -118,7 +118,8 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
         cache.setSampledStatisticsEnabled(true);
         cache.setStatisticsAccuracy(Statistics.STATISTICS_ACCURACY_NONE);
 
-        registry.register(name(cache.getClass(), cache.getName(), "hits"),
+        final String prefix = name(cache.getClass(), cache.getName());
+        registry.register(name(prefix, "hits"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -126,7 +127,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "in-memory-hits"),
+        registry.register(name(prefix, "in-memory-hits"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -134,7 +135,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "off-heap-hits"),
+        registry.register(name(prefix, "off-heap-hits"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -142,7 +143,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "on-disk-hits"),
+        registry.register(name(prefix, "on-disk-hits"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -150,7 +151,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "misses"),
+        registry.register(name(prefix, "misses"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -158,7 +159,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "in-memory-misses"),
+        registry.register(name(prefix, "in-memory-misses"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -166,7 +167,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "off-heap-misses"),
+        registry.register(name(prefix, "off-heap-misses"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -174,7 +175,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "on-disk-misses"),
+        registry.register(name(prefix, "on-disk-misses"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -182,7 +183,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "objects"),
+        registry.register(name(prefix, "objects"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -190,7 +191,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "in-memory-objects"),
+        registry.register(name(prefix, "in-memory-objects"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -198,7 +199,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "off-heap-objects"),
+        registry.register(name(prefix, "off-heap-objects"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -206,7 +207,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "on-disk-objects"),
+        registry.register(name(prefix, "on-disk-objects"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -214,7 +215,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "mean-get-time"),
+        registry.register(name(prefix, "mean-get-time"),
                           new Gauge<Float>() {
                               @Override
                               public Float getValue() {
@@ -222,7 +223,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "mean-search-time"),
+        registry.register(name(prefix, "mean-search-time"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -230,7 +231,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "eviction-count"),
+        registry.register(name(prefix, "eviction-count"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -238,7 +239,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "searches-per-second"),
+        registry.register(name(prefix, "searches-per-second"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -246,7 +247,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "writer-queue-size"),
+        registry.register(name(prefix, "writer-queue-size"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -254,7 +255,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(cache.getClass(), cache.getName(), "accuracy"),
+        registry.register(name(prefix, "accuracy"),
                           new Gauge<String>() {
                               @Override
                               public String getValue() {
