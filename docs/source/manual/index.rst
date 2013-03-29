@@ -12,6 +12,7 @@ User Manual
     :maxdepth: 1
 
     core
+    healthchecks
     ehcache
     ganglia
     graphite
@@ -21,7 +22,6 @@ User Manual
     jetty
     log4j
     logback
-    scala
+    servlets
     servlet
-    webapps
 
