@@ -23,9 +23,14 @@ Just add the ``metrics-core`` library as a dependency:
         <dependency>
             <groupId>com.yammer.metrics</groupId>
             <artifactId>metrics-core</artifactId>
-            <version>3.0.0</version>
+            <version>${metrics.version}</version>
         </dependency>
     </dependencies>
+
+.. note::
+
+    Make sure you have a ``metrics.version`` property declared in your POM with the current version,
+    which is |release|.
 
 Now it's time to add some metrics to your application!
 
@@ -279,8 +284,13 @@ To use this servlet, include the ``metrics-servlets`` module as a dependency:
     <dependency>
         <groupId>com.yammer.metrics</groupId>
         <artifactId>metrics-servlets</artifactId>
-        <version>3.0.0</version>
+        <version>${metrics.version}</version>
     </dependency>
+
+.. note::
+
+    Make sure you have a ``metrics.version`` property declared in your POM with the current version,
+    which is |release|.
 
 From there on, you can map the servlet to whatever path you see fit.
 
