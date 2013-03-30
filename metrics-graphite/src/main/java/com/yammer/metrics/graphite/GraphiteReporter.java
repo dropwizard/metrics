@@ -181,23 +181,33 @@ public class GraphiteReporter extends AbstractPollingReporter {
         return String.format(Locale.US, "%2.2f", v);
     }
 
-    public static class Builder {
+    /**
+     * Creates a {@link Builder} used to construct the GraphiteReporter
+     *
+     * @param graphite the {@link Graphite} client
+     * @param registry the registry to report
+     * @return a {@link Builder}
+     */
+    public static Builder fromRegistry(Graphite graphite, MetricRegistry registry) {
+        return new Builder(graphite, registry);
+    }
+
+    public static final class Builder {
         private MetricRegistry registry;
         private Graphite graphite;
         private Clock clock = Clock.defaultClock();
         private String prefix = "";
         private TimeUnit rateUnit = TimeUnit.SECONDS;
         private TimeUnit durationUnit = TimeUnit.MILLISECONDS;
-        private MetricFilter filter;
+        private MetricFilter filter = MetricFilter.ALL;
 
-        public Builder(Graphite graphite, MetricRegistry registry, MetricFilter filter) {
+        private Builder(Graphite graphite, MetricRegistry registry) {
             if(graphite == null) {
                 throw new IllegalArgumentException("Graphite cannot be null.");
             }
 
             this.graphite = graphite;
             this.registry = registry;
-            this.filter = filter;
         }
 
         /**
@@ -215,7 +225,7 @@ public class GraphiteReporter extends AbstractPollingReporter {
          * @param val the prefix
          * @return
          */
-        public Builder prefix(String val) {
+        public Builder setPrefix(String val) {
             prefix = val;
             return this;
         }
@@ -226,7 +236,7 @@ public class GraphiteReporter extends AbstractPollingReporter {
          * @param val the {@link Clock} instance
          * @return
          */
-        public Builder clock(Clock val) {
+        public Builder setClock(Clock val) {
             clock = val;
             return this;
         }
@@ -237,7 +247,7 @@ public class GraphiteReporter extends AbstractPollingReporter {
          * @param val the {@link TimeUnit}
          * @return
          */
-        public Builder rateUnit(TimeUnit val) {
+        public Builder convertRatesTo(TimeUnit val) {
             rateUnit = val;
             return this;
         }
@@ -248,7 +258,7 @@ public class GraphiteReporter extends AbstractPollingReporter {
          * @param val the {@link TimeUnit}
          * @return
          */
-        public Builder durationUnit(TimeUnit val) {
+        public Builder convertDurationsTo(TimeUnit val) {
             durationUnit = val;
             return this;
         }

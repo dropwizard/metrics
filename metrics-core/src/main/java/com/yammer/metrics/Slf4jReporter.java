@@ -130,22 +130,32 @@ public class Slf4jReporter extends AbstractPollingReporter {
         return s.substring(0, s.length() - 1);
     }
 
-    public static class Builder {
+    /**
+     * Creates a {@link Builder} used to construct the Slf4jReporter
+     *
+     * @param logger the logger to report to
+     * @param registry the registry to report
+     * @return a {@link Builder}
+     */
+    public static Builder fromRegistry(Logger logger, MetricRegistry registry) {
+        return new Builder(logger, registry);
+    }
+
+    public static final class Builder {
         private MetricRegistry registry;
         private Logger logger;
         private Marker marker;
         private TimeUnit rateUnit = TimeUnit.SECONDS;
         private TimeUnit durationUnit = TimeUnit.MILLISECONDS;
-        private MetricFilter filter;
+        private MetricFilter filter = MetricFilter.ALL;
 
-        public Builder(Logger logger, MetricRegistry registry, MetricFilter filter) {
+        private Builder(Logger logger, MetricRegistry registry) {
             if(logger == null) {
                 throw new IllegalArgumentException("Logger cannot be null.");
             }
 
             this.logger = logger;
             this.registry = registry;
-            this.filter = filter;
         }
 
         /**
@@ -163,7 +173,7 @@ public class Slf4jReporter extends AbstractPollingReporter {
          * @param val the {@link Marker} instance
          * @return
          */
-        public Builder marker(Marker val) {
+        public Builder setMarker(Marker val) {
             marker = val;
             return this;
         }
@@ -174,7 +184,7 @@ public class Slf4jReporter extends AbstractPollingReporter {
          * @param val the {@link TimeUnit}
          * @return
          */
-        public Builder rateUnit(TimeUnit val) {
+        public Builder convertRatesTo(TimeUnit val) {
             rateUnit = val;
             return this;
         }
@@ -185,7 +195,7 @@ public class Slf4jReporter extends AbstractPollingReporter {
          * @param val the {@link TimeUnit}
          * @return
          */
-        public Builder durationUnit(TimeUnit val) {
+        public Builder convertDurationsTo(TimeUnit val) {
             durationUnit = val;
             return this;
         }

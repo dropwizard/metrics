@@ -17,10 +17,10 @@ public class Slf4jReporterTest {
     private final Logger logger = mock(Logger.class);
     private final Marker marker = mock(Marker.class);
     private final MetricRegistry registry = mock(MetricRegistry.class);
-    private final Slf4jReporter reporter = new Slf4jReporter.Builder(logger, registry, MetricFilter.ALL).
-                                                             marker(marker).
-                                                             rateUnit(TimeUnit.SECONDS).
-                                                             durationUnit(TimeUnit.MILLISECONDS).
+    private final Slf4jReporter reporter = Slf4jReporter.fromRegistry(logger, registry).
+                                                             setMarker(marker).
+                                                             convertRatesTo(TimeUnit.SECONDS).
+                                                             convertDurationsTo(TimeUnit.MILLISECONDS).
                                                              build();
 
     @Test

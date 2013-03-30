@@ -162,23 +162,33 @@ public class CsvReporter extends AbstractPollingReporter {
         return name;
     }
 
-    public static class Builder {
+    /**
+     * Creates a {@link Builder} used to construct the CsvReporter
+     *
+     * @param directory the directory to write the csv to
+     * @param registry the registry to report
+     * @return a {@link Builder}
+     */
+    public static Builder fromRegistry(File directory, MetricRegistry registry) {
+        return new Builder(directory, registry);
+    }
+
+    public static final class Builder {
         private MetricRegistry registry;
         private File directory;
         private Locale locale = Locale.US;
         private Clock clock = Clock.defaultClock();
         private TimeUnit rateUnit = TimeUnit.SECONDS;
         private TimeUnit durationUnit = TimeUnit.MILLISECONDS;
-        private MetricFilter filter;
+        private MetricFilter filter = MetricFilter.ALL;
 
-        public Builder(File directory, MetricRegistry registry, MetricFilter filter) {
+        private Builder(File directory, MetricRegistry registry) {
             if(directory == null) {
                 throw new IllegalArgumentException("Directory cannot be null.");
             }
 
             this.directory = directory;
             this.registry = registry;
-            this.filter = filter;
         }
 
         /**
@@ -196,7 +206,7 @@ public class CsvReporter extends AbstractPollingReporter {
          * @param val the {@link Clock} instance
          * @return
          */
-        public Builder locale(Locale val) {
+        public Builder setLocale(Locale val) {
             locale = val;
             return this;
         }
@@ -207,7 +217,7 @@ public class CsvReporter extends AbstractPollingReporter {
          * @param val the {@link Clock} instance
          * @return
          */
-        public Builder clock(Clock val) {
+        public Builder setClock(Clock val) {
             clock = val;
             return this;
         }
@@ -218,7 +228,7 @@ public class CsvReporter extends AbstractPollingReporter {
          * @param val the {@link TimeUnit}
          * @return
          */
-        public Builder rateUnit(TimeUnit val) {
+        public Builder convertRatesTo(TimeUnit val) {
             rateUnit = val;
             return this;
         }
@@ -229,7 +239,7 @@ public class CsvReporter extends AbstractPollingReporter {
          * @param val the {@link TimeUnit}
          * @return
          */
-        public Builder durationUnit(TimeUnit val) {
+        public Builder convertDurationsTo(TimeUnit val) {
             durationUnit = val;
             return this;
         }

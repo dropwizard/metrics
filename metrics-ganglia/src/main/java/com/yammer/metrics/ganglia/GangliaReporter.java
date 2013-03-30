@@ -220,23 +220,33 @@ public class GangliaReporter extends AbstractPollingReporter {
         return name.substring(0, i);
     }
 
-    public static class Builder {
+    /**
+     * Creates a {@link Builder} used to construct the GangliaReporter
+     *
+     * @param ganglia a {@link GMetric} instance for the Ganglia cluster
+     * @param registry the registry to report
+     * @return a {@link Builder}
+     */
+    public static Builder fromRegistry(GMetric ganglia, MetricRegistry registry) {
+        return new Builder(ganglia, registry);
+    }
+
+    public static final class Builder {
         private MetricRegistry registry;
         private GMetric ganglia;
         private int tMax;
         private int dMax;
         private TimeUnit rateUnit = TimeUnit.SECONDS;
         private TimeUnit durationUnit = TimeUnit.MILLISECONDS;
-        private MetricFilter filter;
+        private MetricFilter filter = MetricFilter.ALL;
 
-        public Builder(GMetric ganglia, MetricRegistry registry, MetricFilter filter) {
+        private Builder(GMetric ganglia, MetricRegistry registry) {
             if(ganglia == null) {
                 throw new IllegalArgumentException("GMetric cannot be null.");
             }
 
             this.ganglia = ganglia;
             this.registry = registry;
-            this.filter = filter;
         }
 
         /**
@@ -254,7 +264,7 @@ public class GangliaReporter extends AbstractPollingReporter {
          * @param val integer representing the tMax value
          * @return
          */
-        public Builder tMax(int val) {
+        public Builder setTMax(int val) {
             tMax = val;
             return this;
         }
@@ -265,7 +275,7 @@ public class GangliaReporter extends AbstractPollingReporter {
          * @param val integer representing the dMax value
          * @return
          */
-        public Builder dMax(int val) {
+        public Builder setDMax(int val) {
             dMax = val;
             return this;
         }
@@ -276,7 +286,7 @@ public class GangliaReporter extends AbstractPollingReporter {
          * @param val the {@link TimeUnit}
          * @return
          */
-        public Builder rateUnit(TimeUnit val) {
+        public Builder convertRatesTo(TimeUnit val) {
             rateUnit = val;
             return this;
         }
@@ -287,7 +297,7 @@ public class GangliaReporter extends AbstractPollingReporter {
          * @param val the {@link TimeUnit}
          * @return
          */
-        public Builder durationUnit(TimeUnit val) {
+        public Builder convertDurationsTo(TimeUnit val) {
             durationUnit = val;
             return this;
         }

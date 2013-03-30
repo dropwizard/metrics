@@ -160,7 +160,17 @@ public class ConsoleReporter extends AbstractPollingReporter {
         return s.substring(0, s.length() - 1);
     }
 
-    public static class Builder {
+    /**
+     * Creates a {@link Builder} used to construct the ConsoleReporter
+     *
+     * @param registry the registry to report
+     * @return a {@link Builder}
+     */
+    public static Builder fromRegistry(MetricRegistry registry) {
+       return new Builder(registry);
+    }
+
+    public static final class Builder {
         private MetricRegistry registry;
         private PrintStream output = System.out;
         private Locale locale = Locale.US;
@@ -168,11 +178,10 @@ public class ConsoleReporter extends AbstractPollingReporter {
         private TimeZone timeZone = TimeZone.getTimeZone("GMT");
         private TimeUnit rateUnit = TimeUnit.SECONDS;
         private TimeUnit durationUnit = TimeUnit.MILLISECONDS;
-        private MetricFilter filter;
+        private MetricFilter filter = MetricFilter.ALL;
 
-        public Builder(MetricRegistry registry, MetricFilter filter) {
+        private Builder(MetricRegistry registry) {
             this.registry = registry;
-            this.filter = filter;
         }
 
         /**
@@ -190,7 +199,7 @@ public class ConsoleReporter extends AbstractPollingReporter {
          * @param val the {@link PrintStream}
          * @return
          */
-        public Builder output(PrintStream val) {
+        public Builder outputTo(PrintStream val) {
             output = val;
             return this;
         }
@@ -201,7 +210,7 @@ public class ConsoleReporter extends AbstractPollingReporter {
          * @param val the {@link Clock} instance
          * @return
          */
-        public Builder locale(Locale val) {
+        public Builder setLocale(Locale val) {
             locale = val;
             return this;
         }
@@ -212,7 +221,7 @@ public class ConsoleReporter extends AbstractPollingReporter {
          * @param val the {@link Clock} instance
          * @return
          */
-        public Builder clock(Clock val) {
+        public Builder setClock(Clock val) {
             clock = val;
             return this;
         }
@@ -223,7 +232,7 @@ public class ConsoleReporter extends AbstractPollingReporter {
          * @param val the {@link TimeUnit}
          * @return
          */
-        public Builder timeZone(TimeZone val) {
+        public Builder setTimeZone(TimeZone val) {
             timeZone = val;
             return this;
         }
@@ -234,7 +243,7 @@ public class ConsoleReporter extends AbstractPollingReporter {
          * @param val the {@link TimeUnit}
          * @return
          */
-        public Builder rateUnit(TimeUnit val) {
+        public Builder convertRatesTo(TimeUnit val) {
             rateUnit = val;
             return this;
         }
@@ -245,7 +254,7 @@ public class ConsoleReporter extends AbstractPollingReporter {
          * @param val the {@link TimeUnit}
          * @return
          */
-        public Builder durationUnit(TimeUnit val) {
+        public Builder convertDurationsTo(TimeUnit val) {
             durationUnit = val;
             return this;
         }

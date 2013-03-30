@@ -22,13 +22,13 @@ public class ConsoleReporterTest {
     private final Clock clock = mock(Clock.class);
     private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     private final PrintStream output = new PrintStream(bytes);
-    private final ConsoleReporter reporter = new ConsoleReporter.Builder(registry, MetricFilter.ALL).
-                                                                 output(output).
-                                                                 locale(Locale.US).
-                                                                 clock(clock).
-                                                                 timeZone(TimeZone.getTimeZone("PST")).
-                                                                 rateUnit(TimeUnit.SECONDS).
-                                                                 durationUnit(TimeUnit.MILLISECONDS).
+    private final ConsoleReporter reporter = ConsoleReporter.fromRegistry(registry).
+                                                                 outputTo(output).
+                                                                 setLocale(Locale.US).
+                                                                 setClock(clock).
+                                                                 setTimeZone(TimeZone.getTimeZone("PST")).
+                                                                 convertRatesTo(TimeUnit.SECONDS).
+                                                                 convertDurationsTo(TimeUnit.MILLISECONDS).
                                                                  build();
 
     @Before
