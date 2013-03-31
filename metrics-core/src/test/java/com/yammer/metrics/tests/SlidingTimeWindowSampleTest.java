@@ -1,7 +1,7 @@
 package com.yammer.metrics.tests;
 
 import com.yammer.metrics.Clock;
-import com.yammer.metrics.TimeSlidingWindowSample;
+import com.yammer.metrics.SlidingTimeWindowSample;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -10,9 +10,9 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TimeSlidingWindowSampleTest {
+public class SlidingTimeWindowSampleTest {
     private final Clock clock = mock(Clock.class);
-    private final TimeSlidingWindowSample sample = new TimeSlidingWindowSample(10, TimeUnit.NANOSECONDS, clock);
+    private final SlidingTimeWindowSample sample = new SlidingTimeWindowSample(10, TimeUnit.NANOSECONDS, clock);
 
     @Test
     public void storesMeasurementsWithDuplicateTicks() throws Exception {
