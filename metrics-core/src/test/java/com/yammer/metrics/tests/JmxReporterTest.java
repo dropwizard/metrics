@@ -22,7 +22,10 @@ public class JmxReporterTest {
     private final String name = UUID.randomUUID().toString().replaceAll("[{\\-}]", "");
     private final MetricRegistry registry = spy(new MetricRegistry(name));
 
-    private final JmxReporter reporter = new JmxReporter(mBeanServer, registry, MetricFilter.ALL);
+    private final JmxReporter reporter = JmxReporter.forRegistry(registry)
+                                                    .registerWith(mBeanServer)
+                                                    .filter(MetricFilter.ALL)
+                                                    .build();
 
     private final Gauge gauge = mock(Gauge.class);
     private final Counter counter = mock(Counter.class);

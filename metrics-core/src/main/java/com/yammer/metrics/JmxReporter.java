@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.management.*;
+import java.lang.management.ManagementFactory;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -11,6 +12,61 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * A reporter which listens for new metrics and exposes them as namespaced MBeans.
  */
 public class JmxReporter {
+    /**
+     * Returns a new {@link Builder} for {@link JmxReporter}.
+     *
+     * @param registry the registry to report
+     * @return a {@link Builder} instance for a {@link JmxReporter}
+     */
+    public static Builder forRegistry(MetricRegistry registry) {
+        return new Builder(registry);
+    }
+
+    /**
+     * A builder for {@link CsvReporter} instances. Defaults to using the default MBean server and
+     * not filtering metrics.
+     */
+    public static class Builder {
+        private final MetricRegistry registry;
+        private MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        private MetricFilter filter = MetricFilter.ALL;
+
+        private Builder(MetricRegistry registry) {
+            this.registry = registry;
+        }
+
+        /**
+         * Register MBeans with the given {@link MBeanServer}.
+         *
+         * @param mBeanServer     an {@link MBeanServer}
+         * @return {@code this}
+         */
+        public Builder registerWith(MBeanServer mBeanServer) {
+            this.mBeanServer = mBeanServer;
+            return this;
+        }
+
+        /**
+         * Only report metrics which match the given filter.
+         *
+         * @param filter a {@link MetricFilter}
+         * @return {@code this}
+         */
+        public Builder filter(MetricFilter filter) {
+            this.filter = filter;
+            return this;
+        }
+
+        /**
+         * Builds a {@link JmxReporter} with the given properties.
+         *
+         * @return a {@link JmxReporter}
+         */
+        public JmxReporter build() {
+            return new JmxReporter(mBeanServer, registry, filter);
+        }
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JmxReporter.class);
 
     // CHECKSTYLE:OFF
@@ -482,14 +538,7 @@ public class JmxReporter {
     private final MetricRegistry registry;
     private final JmxListener listener;
 
-    /**
-     * Creates a new {@link JmxReporter}.
-     *
-     * @param mBeanServer    the platform's {@link javax.management.MBeanServer}
-     * @param registry       the registry containing the metrics to report
-     * @param filter         the metric filter to match
-     */
-    public JmxReporter(MBeanServer mBeanServer, MetricRegistry registry, MetricFilter filter) {
+    private JmxReporter(MBeanServer mBeanServer, MetricRegistry registry, MetricFilter filter) {
         this.registry = registry;
         this.listener = new JmxListener(mBeanServer, registry.getName(), filter);
     }
