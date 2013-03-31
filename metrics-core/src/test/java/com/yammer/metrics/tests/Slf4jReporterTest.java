@@ -17,12 +17,13 @@ public class Slf4jReporterTest {
     private final Logger logger = mock(Logger.class);
     private final Marker marker = mock(Marker.class);
     private final MetricRegistry registry = mock(MetricRegistry.class);
-    private final Slf4jReporter reporter = new Slf4jReporter(registry,
-                                                             logger,
-                                                             marker,
-                                                             TimeUnit.SECONDS,
-                                                             TimeUnit.MILLISECONDS,
-                                                             MetricFilter.ALL);
+    private final Slf4jReporter reporter = Slf4jReporter.forRegistry(registry)
+                                                        .outputTo(logger)
+                                                        .markWith(marker)
+                                                        .convertRatesTo(TimeUnit.SECONDS)
+                                                        .convertDurationsTo(TimeUnit.MILLISECONDS)
+                                                        .filter(MetricFilter.ALL)
+                                                        .build();
 
     @Test
     public void reportsGaugeValues() throws Exception {
