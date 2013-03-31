@@ -18,13 +18,11 @@ public class UniformSample implements Sample {
     private final AtomicLongArray values;
 
     /**
-     * Creates a new uniform sample of 1028 elements, which offers a 99.9% confidence level with a
-     * 5% margin of error assuming a normal distribution.
-     *
-     * @return a new {@link UniformSample}
+     * Creates a new {@link UniformSample} of 1028 elements, which offers a 99.9% confidence level
+     * with a 5% margin of error assuming a normal distribution.
      */
-    public static UniformSample create() {
-        return new UniformSample(DEFAULT_SAMPLE_SIZE);
+    public UniformSample() {
+        this(DEFAULT_SAMPLE_SIZE);
     }
 
     /**
