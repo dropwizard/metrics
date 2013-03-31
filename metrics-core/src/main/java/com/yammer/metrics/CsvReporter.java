@@ -14,6 +14,122 @@ import java.util.concurrent.TimeUnit;
  * A reporter which creates a comma-separated values file of the measurements for each metric.
  */
 public class CsvReporter extends AbstractPollingReporter {
+    /**
+     * Returns a new {@link Builder} for {@link CsvReporter}.
+     *
+     * @param registry the registry to report
+     * @return a {@link Builder} instance for a {@link CsvReporter}
+     */
+    public static Builder forRegistry(MetricRegistry registry) {
+        return new Builder(registry);
+    }
+
+    /**
+     * A builder for {@link CsvReporter} instances. Defaults to using the default locale, writing to
+     * the current directory, converting rates to events/second, converting durations to
+     * milliseconds, and not filtering metrics.
+     */
+    public static class Builder {
+        private final MetricRegistry registry;
+        private File directory;
+        private Locale locale;
+        private TimeUnit rateUnit;
+        private TimeUnit durationUnit;
+        private Clock clock;
+        private MetricFilter filter;
+
+        private Builder(MetricRegistry registry) {
+            this.registry = registry;
+            this.directory = new File(".");
+            this.locale = Locale.getDefault();
+            this.rateUnit = TimeUnit.SECONDS;
+            this.durationUnit = TimeUnit.MILLISECONDS;
+            this.clock = Clock.defaultClock();
+            this.filter = MetricFilter.ALL;
+        }
+
+        /**
+         * Create {@code .csv} files in the given directory.
+         *
+         * @param directory a directory
+         * @return {@code this}
+         */
+        public Builder outputTo(File directory) {
+            this.directory = directory;
+            return this;
+        }
+
+        /**
+         * Format numbers for the given {@link Locale}.
+         *
+         * @param locale a {@link Locale}
+         * @return {@code this}
+         */
+        public Builder formatFor(Locale locale) {
+            this.locale = locale;
+            return this;
+        }
+
+        /**
+         * Convert rates to the given time unit.
+         *
+         * @param rateUnit a unit of time
+         * @return {@code this}
+         */
+        public Builder convertRatesTo(TimeUnit rateUnit) {
+            this.rateUnit = rateUnit;
+            return this;
+        }
+
+        /**
+         * Convert durations to the given time unit.
+         *
+         * @param durationUnit a unit of time
+         * @return {@code this}
+         */
+        public Builder convertDurationsTo(TimeUnit durationUnit) {
+            this.durationUnit = durationUnit;
+            return this;
+        }
+
+        /**
+         * Use the given {@link Clock} instance for the time.
+         *
+         * @param clock a {@link Clock} instance
+         * @return {@code this}
+         */
+        public Builder withClock(Clock clock) {
+            this.clock = clock;
+            return this;
+        }
+
+        /**
+         * Only report metrics which match the given filter.
+         *
+         * @param filter a {@link MetricFilter}
+         * @return {@code this}
+         */
+        public Builder filter(MetricFilter filter) {
+            this.filter = filter;
+            return this;
+        }
+
+        /**
+         * Builds a {@link CsvReporter} with the given properties.
+         *
+         * @return a {@link CsvReporter}
+         */
+        public CsvReporter build() {
+            return new CsvReporter(registry,
+                                   directory,
+                                   locale,
+                                   rateUnit,
+                                   durationUnit,
+                                   clock,
+                                   filter);
+        }
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CsvReporter.class);
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
@@ -25,21 +141,13 @@ public class CsvReporter extends AbstractPollingReporter {
     private final double rateFactor;
     private final String rateUnit;
 
-    /**
-     * Creates a new {@link CsvReporter} instance.
-     *
-     * @param registry the {@link MetricRegistry} containing the metrics this reporter will report
-     * @param directory the directory in which CSV files will be created
-     * @param locale    the locale to use for formatting
-     * @param filter    the metric filter to match
-     */
-    public CsvReporter(MetricRegistry registry,
-                       File directory,
-                       Locale locale,
-                       TimeUnit rateUnit,
-                       TimeUnit durationUnit,
-                       Clock clock,
-                       MetricFilter filter) {
+    private CsvReporter(MetricRegistry registry,
+                        File directory,
+                        Locale locale,
+                        TimeUnit rateUnit,
+                        TimeUnit durationUnit,
+                        Clock clock,
+                        MetricFilter filter) {
         super(registry, "csv-reporter", filter);
         this.directory = directory;
         this.locale = locale;
@@ -151,7 +259,7 @@ public class CsvReporter extends AbstractPollingReporter {
             final File file = new File(directory, sanitize(name) + ".csv");
             final boolean fileAlreadyExists = file.exists();
             if (fileAlreadyExists || file.createNewFile()) {
-                final PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file, true), UTF_8));
+                final PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file,true), UTF_8));
                 try {
                     if (!fileAlreadyExists) {
                         out.println("t," + header);
