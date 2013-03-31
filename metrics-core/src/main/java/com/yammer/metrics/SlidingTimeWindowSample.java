@@ -10,12 +10,15 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class SlidingTimeWindowSample implements Sample {
     // allow for this many duplicate ticks before overwriting measurements
-    private static final int COLLISION_BUFFER = 100;
+    private static final int COLLISION_BUFFER = 256;
+    // only trim on updating once every N
+    private static final int TRIM_THRESHOLD = 256;
 
     private final Clock clock;
     private final ConcurrentSkipListMap<Long, Long> measurements;
     private final long window;
     private final AtomicLong lastTick;
+    private final AtomicLong count;
 
     /**
      * Creates a new {@link SlidingTimeWindowSample} with the given window of time.
@@ -39,6 +42,7 @@ public class SlidingTimeWindowSample implements Sample {
         this.measurements = new ConcurrentSkipListMap<Long, Long>();
         this.window = windowUnit.toNanos(window) * COLLISION_BUFFER;
         this.lastTick = new AtomicLong();
+        this.count = new AtomicLong();
     }
 
     @Override
@@ -49,8 +53,10 @@ public class SlidingTimeWindowSample implements Sample {
 
     @Override
     public void update(long value) {
+        if (count.incrementAndGet() % TRIM_THRESHOLD == 0) {
+            trim();
+        }
         measurements.put(getTick(), value);
-        trim();
     }
 
     @Override
