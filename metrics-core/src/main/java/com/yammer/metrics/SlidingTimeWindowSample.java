@@ -5,10 +5,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * A {@link Sample} implementation which stores only the measurements made in the last {@code N}
- * seconds (or other time unit).
+ * A {@link Sample} implementation backed by a sliding window that stores only the measurements made
+ * in the last {@code N} seconds (or other time unit).
  */
-public class TimeSlidingWindowSample implements Sample {
+public class SlidingTimeWindowSample implements Sample {
     // allow for this many duplicate ticks before overwriting measurements
     private static final int COLLISION_BUFFER = 100;
 
@@ -18,23 +18,23 @@ public class TimeSlidingWindowSample implements Sample {
     private final AtomicLong lastTick;
 
     /**
-     * Creates a new {@link TimeSlidingWindowSample} with the given window of time.
+     * Creates a new {@link SlidingTimeWindowSample} with the given window of time.
      *
      * @param window     the window of time
      * @param windowUnit the unit of {@code window}
      */
-    public TimeSlidingWindowSample(long window, TimeUnit windowUnit) {
+    public SlidingTimeWindowSample(long window, TimeUnit windowUnit) {
         this(window, windowUnit, Clock.defaultClock());
     }
 
     /**
-     * Creates a new {@link TimeSlidingWindowSample} with the given clock and window of time.
+     * Creates a new {@link SlidingTimeWindowSample} with the given clock and window of time.
      *
      * @param window     the window of time
      * @param windowUnit the unit of {@code window}
      * @param clock      the {@link Clock} to use
      */
-    public TimeSlidingWindowSample(long window, TimeUnit windowUnit, Clock clock) {
+    public SlidingTimeWindowSample(long window, TimeUnit windowUnit, Clock clock) {
         this.clock = clock;
         this.measurements = new ConcurrentSkipListMap<Long, Long>();
         this.window = windowUnit.toNanos(window) * COLLISION_BUFFER;

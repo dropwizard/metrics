@@ -1,12 +1,12 @@
 package com.yammer.metrics.tests;
 
-import com.yammer.metrics.MovingWindowSample;
+import com.yammer.metrics.SlidingWindowSample;
 import org.junit.Test;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-public class MovingWindowSampleTest {
-    private final MovingWindowSample sample = new MovingWindowSample(3);
+public class SlidingWindowSampleTest {
+    private final SlidingWindowSample sample = new SlidingWindowSample(3);
 
     @Test
     public void handlesSmallSamples() throws Exception {
