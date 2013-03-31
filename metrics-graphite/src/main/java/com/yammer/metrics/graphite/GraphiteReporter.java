@@ -16,6 +16,111 @@ import java.util.concurrent.TimeUnit;
  * @see <a href="http://graphite.wikidot.com/">Graphite - Scalable Realtime Graphing</a>
  */
 public class GraphiteReporter extends AbstractPollingReporter {
+    /**
+     * Returns a new {@link Builder} for {@link GraphiteReporter}.
+     *
+     * @param registry the registry to report
+     * @return a {@link Builder} instance for a {@link GraphiteReporter}
+     */
+    public static Builder forRegistry(MetricRegistry registry) {
+        return new Builder(registry);
+    }
+
+    /**
+     * A builder for {@link GraphiteReporter} instances. Defaults to not using a prefix, using the
+     * default clock, converting rates to events/second, converting durations to milliseconds, and
+     * not filtering metrics.
+     */
+    public static class Builder {
+        private MetricRegistry registry;
+        private Clock clock;
+        private String prefix;
+        private TimeUnit rateUnit;
+        private TimeUnit durationUnit;
+        private MetricFilter filter;
+
+        private Builder(MetricRegistry registry) {
+            this.registry = registry;
+            this.clock = Clock.defaultClock();
+            this.prefix = null;
+            this.rateUnit = TimeUnit.SECONDS;
+            this.durationUnit = TimeUnit.MILLISECONDS;
+            this.filter = MetricFilter.ALL;
+        }
+
+        /**
+         * Use the given {@link Clock} instance for the time.
+         *
+         * @param clock a {@link Clock} instance
+         * @return {@code this}
+         */
+        public Builder withClock(Clock clock) {
+            this.clock = clock;
+            return this;
+        }
+
+        /**
+         * Prefix all metric names with the given string.
+         *
+         * @param prefix the prefix for all metric names
+         * @return {@code this}
+         */
+        public Builder prefixedWith(String prefix) {
+            this.prefix = prefix;
+            return this;
+        }
+
+        /**
+         * Convert rates to the given time unit.
+         *
+         * @param rateUnit a unit of time
+         * @return {@code this}
+         */
+        public Builder convertRatesTo(TimeUnit rateUnit) {
+            this.rateUnit = rateUnit;
+            return this;
+        }
+
+        /**
+         * Convert durations to the given time unit.
+         *
+         * @param durationUnit a unit of time
+         * @return {@code this}
+         */
+        public Builder convertDurationsTo(TimeUnit durationUnit) {
+            this.durationUnit = durationUnit;
+            return this;
+        }
+
+        /**
+         * Only report metrics which match the given filter.
+         *
+         * @param filter a {@link MetricFilter}
+         * @return {@code this}
+         */
+        public Builder filter(MetricFilter filter) {
+            this.filter = filter;
+            return this;
+        }
+
+        /**
+         * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
+         * given {@link Graphite} client.
+         *
+         * @param graphite a {@link Graphite} client
+         * @return a {@link GraphiteReporter}
+         */
+        public GraphiteReporter build(Graphite graphite) {
+            return new GraphiteReporter(registry,
+                                        graphite,
+                                        clock,
+                                        prefix,
+                                        rateUnit,
+                                        durationUnit,
+                                        filter);
+        }
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphiteReporter.class);
 
     private final Graphite graphite;
@@ -24,24 +129,13 @@ public class GraphiteReporter extends AbstractPollingReporter {
     private final double rateFactor;
     private final double durationFactor;
 
-    /**
-     * Creates a new reporter.
-     *
-     * @param registry     the registry to report
-     * @param graphite     the {@link Graphite} client
-     * @param clock        the clock to use for timestamps
-     * @param prefix       a prefix to be prepended to all metric names (can be {@code null})
-     * @param rateUnit     the time unit to use for rates
-     * @param durationUnit the time unit to use for durations
-     * @param filter       a filter for metrics
-     */
-    public GraphiteReporter(MetricRegistry registry,
-                            Graphite graphite,
-                            Clock clock,
-                            String prefix,
-                            TimeUnit rateUnit,
-                            TimeUnit durationUnit,
-                            MetricFilter filter) {
+    private GraphiteReporter(MetricRegistry registry,
+                             Graphite graphite,
+                             Clock clock,
+                             String prefix,
+                             TimeUnit rateUnit,
+                             TimeUnit durationUnit,
+                             MetricFilter filter) {
         super(registry, "graphite-reporter", filter);
         this.graphite = graphite;
         this.clock = clock;
