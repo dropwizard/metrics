@@ -24,11 +24,6 @@ public class SlidingWindowSample implements Sample {
     }
 
     @Override
-    public void clear() {
-        count.set(0);
-    }
-
-    @Override
     public int size() {
         return (int) min(count.get(), measurements.length());
     }

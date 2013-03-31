@@ -39,9 +39,9 @@ public class ExponentiallyDecayingSample implements Sample {
     private final ReentrantReadWriteLock lock;
     private final double alpha;
     private final int reservoirSize;
-    private final AtomicLong count = new AtomicLong(0);
+    private final AtomicLong count;
     private volatile long startTime;
-    private final AtomicLong nextScaleTime = new AtomicLong(0);
+    private final AtomicLong nextScaleTime;
     private final Clock clock;
 
     /**
@@ -68,20 +68,9 @@ public class ExponentiallyDecayingSample implements Sample {
         this.alpha = alpha;
         this.reservoirSize = reservoirSize;
         this.clock = clock;
-        clear();
-    }
-
-    @Override
-    public void clear() {
-        lockForRescale();
-        try {
-            values.clear();
-            count.set(0);
-            this.startTime = currentTimeInSeconds();
-            nextScaleTime.set(clock.getTick() + RESCALE_THRESHOLD);
-        } finally {
-            unlockForRescale();
-        }
+        this.count = new AtomicLong(0);
+        this.startTime = currentTimeInSeconds();
+        this.nextScaleTime = new AtomicLong(clock.getTick() + RESCALE_THRESHOLD);
     }
 
     @Override
@@ -101,9 +90,7 @@ public class ExponentiallyDecayingSample implements Sample {
      * @param timestamp the epoch timestamp of {@code value} in seconds
      */
     public void update(long value, long timestamp) {
-
         rescaleIfNeeded();
-
         lockForRegularUsage();
         try {
             final double priority = weight(timestamp - startTime) / ThreadLocalRandom.current()
@@ -123,8 +110,6 @@ public class ExponentiallyDecayingSample implements Sample {
         } finally {
             unlockForRegularUsage();
         }
-
-
     }
 
     private void rescaleIfNeeded() {
