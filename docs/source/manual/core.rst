@@ -220,13 +220,27 @@ changed. :ref:`man-core-timers` use histograms with exponentially decaying sampl
 
 .. __: http://www.research.att.com/people/Cormode_Graham/library/publications/CormodeShkapenyukSrivastavaXu09.pdf
 
-.. _man-core-histograms-moving:
+.. _man-core-histograms-sliding:
 
-Moving Window Samples
----------------------
+Sliding Window Samples
+----------------------
 
-A histogram with a moving window sample produces quantiles which are representative of the past
+A histogram with a sliding window sample produces quantiles which are representative of the past
 ``N`` measurements.
+
+.. _man-core-histograms-sliding-time:
+
+Sliding Time Window Samples
+---------------------------
+
+A histogram with a sliding time window sample produces quantiles which are strictly representative
+of the past ``N`` seconds (or other time period).
+
+.. warning::
+
+    While ``SlidingTimeWindowSample`` is easier to understand than ``ExponentiallyDecayingSample``,
+    it is not bounded in size, so using it to sample a high-frequency process can require a
+    significant amount of memory.
 
 .. _man-core-meters:
 
