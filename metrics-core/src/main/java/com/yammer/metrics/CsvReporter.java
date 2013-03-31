@@ -25,13 +25,11 @@ public class CsvReporter extends AbstractPollingReporter {
     }
 
     /**
-     * A builder for {@link CsvReporter} instances. Defaults to using the default locale, writing to
-     * the current directory, converting rates to events/second, converting durations to
-     * milliseconds, and not filtering metrics.
+     * A builder for {@link CsvReporter} instances. Defaults to using the default locale, converting
+     * rates to events/second, converting durations to milliseconds, and not filtering metrics.
      */
     public static class Builder {
         private final MetricRegistry registry;
-        private File directory;
         private Locale locale;
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
@@ -40,23 +38,11 @@ public class CsvReporter extends AbstractPollingReporter {
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
-            this.directory = new File(".");
             this.locale = Locale.getDefault();
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.clock = Clock.defaultClock();
             this.filter = MetricFilter.ALL;
-        }
-
-        /**
-         * Create {@code .csv} files in the given directory.
-         *
-         * @param directory a directory
-         * @return {@code this}
-         */
-        public Builder outputTo(File directory) {
-            this.directory = directory;
-            return this;
         }
 
         /**
@@ -115,11 +101,13 @@ public class CsvReporter extends AbstractPollingReporter {
         }
 
         /**
-         * Builds a {@link CsvReporter} with the given properties.
+         * Builds a {@link CsvReporter} with the given properties, writing {@code .csv} files to the
+         * given directory.
          *
+         * @param directory the directory in which the {@code .csv} files will be created
          * @return a {@link CsvReporter}
          */
-        public CsvReporter build() {
+        public CsvReporter build(File directory) {
             return new CsvReporter(registry,
                                    directory,
                                    locale,
