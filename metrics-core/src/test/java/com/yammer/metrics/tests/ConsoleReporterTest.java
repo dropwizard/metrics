@@ -22,14 +22,15 @@ public class ConsoleReporterTest {
     private final Clock clock = mock(Clock.class);
     private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     private final PrintStream output = new PrintStream(bytes);
-    private final ConsoleReporter reporter = new ConsoleReporter(registry,
-                                                                 output,
-                                                                 Locale.US,
-                                                                 clock,
-                                                                 TimeZone.getTimeZone("PST"),
-                                                                 TimeUnit.SECONDS,
-                                                                 TimeUnit.MILLISECONDS,
-                                                                 MetricFilter.ALL);
+    private final ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)
+                                                            .outputTo(output)
+                                                            .formattedFor(Locale.US)
+                                                            .withClock(clock)
+                                                            .formattedFor(TimeZone.getTimeZone("PST"))
+                                                            .convertRatesTo(TimeUnit.SECONDS)
+                                                            .convertDurationsTo(TimeUnit.MILLISECONDS)
+                                                            .filter(MetricFilter.ALL)
+                                                            .build();
 
     @Before
     public void setUp() throws Exception {
