@@ -1,7 +1,7 @@
 package com.yammer.metrics.tests;
 
 import com.yammer.metrics.Clock;
-import com.yammer.metrics.SampleType;
+import com.yammer.metrics.ExponentiallyDecayingSample;
 import com.yammer.metrics.Snapshot;
 import com.yammer.metrics.Timer;
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class TimerTest {
             return val += 50000000;
         }
     };
-    private final Timer timer = new Timer(SampleType.BIASED.newSample(), clock);
+    private final Timer timer = new Timer(ExponentiallyDecayingSample.create(), clock);
 
     @Test
     public void aBlankTimer() throws Exception {

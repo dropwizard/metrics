@@ -396,7 +396,7 @@ public class MetricRegistry {
         MetricBuilder<Histogram> HISTOGRAMS = new MetricBuilder<Histogram>() {
             @Override
             public Histogram newMetric() {
-                return new Histogram(SampleType.BIASED);
+                return new Histogram(ExponentiallyDecayingSample.create());
             }
 
             @Override

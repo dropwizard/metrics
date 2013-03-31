@@ -22,15 +22,6 @@ public class Histogram implements Metric, Sampling, Summarizable {
     private final AtomicLong count;
 
     /**
-     * Creates a new {@link Histogram} with the given sample type.
-     *
-     * @param type the type of sample to use
-     */
-    public Histogram(SampleType type) {
-        this(type.newSample());
-    }
-
-    /**
      * Creates a new {@link Histogram} with the given sample.
      *
      * @param sample the sample to create a histogram from
