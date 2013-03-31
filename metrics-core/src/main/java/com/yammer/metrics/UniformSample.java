@@ -34,11 +34,6 @@ public class UniformSample implements Sample {
      */
     public UniformSample(int reservoirSize) {
         this.values = new AtomicLongArray(reservoirSize);
-        clear();
-    }
-
-    @Override
-    public void clear() {
         for (int i = 0; i < values.length(); i++) {
             values.set(i, 0);
         }

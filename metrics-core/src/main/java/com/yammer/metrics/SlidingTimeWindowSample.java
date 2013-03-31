@@ -42,11 +42,6 @@ public class SlidingTimeWindowSample implements Sample {
     }
 
     @Override
-    public void clear() {
-        measurements.clear();
-    }
-
-    @Override
     public int size() {
         trim();
         return measurements.size();

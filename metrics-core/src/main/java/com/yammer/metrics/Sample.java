@@ -5,11 +5,6 @@ package com.yammer.metrics;
  */
 public interface Sample {
     /**
-     * Clears all recorded values.
-     */
-    void clear();
-
-    /**
      * Returns the number of values recorded.
      *
      * @return the number of values recorded
