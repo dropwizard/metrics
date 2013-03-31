@@ -11,4 +11,11 @@ constantly stream metric values to a Graphite_ server:
 
 .. code-block:: java
 
-    GraphiteReporter.enable(1, TimeUnit.MINUTES, "graphite.example.com", 2003);
+    final Graphite graphite = new Graphite(new InetSocketAddress("graphite.example.com", 2003));
+    final GraphiteReporter reporter = GraphiteReporter.forRegistry(registry)
+                                                      .prefixedWith("web1.example.com")
+                                                      .convertRatesTo(TimeUnit.SECONDS)
+                                                      .convertDurationsTo(TimeUnit.MILLISECONDS)
+                                                      .filter(MetricFilter.ALL)
+                                                      .build(graphite);
+    reporter.start(1, TimeUnit.MINUTES);
