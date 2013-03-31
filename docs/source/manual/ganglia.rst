@@ -11,4 +11,9 @@ constantly stream metric values to a Ganglia_ server:
 
 .. code-block:: java
 
-    GangliaReporter.enable(1, TimeUnit.MINUTES, "ganglia.example.com", 8649);
+    final GMetric ganglia = new GMetric("ganglia.example.com", 8649, UDPAddressingMode.MULTICAST, 1);
+    final GangliaReporter reporter = GangliaReporter.forRegistry(registry)
+                                                    .convertRatesTo(TimeUnit.SECONDS)
+                                                    .convertDurationsTo(TimeUnit.MILLISECONDS)
+                                                    .build(ganglia);
+    reporter.start(1, TimeUnit.MINUTES);
