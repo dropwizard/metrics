@@ -16,7 +16,7 @@ public class Timer implements Metered, Sampling, Summarizable {
      * Creates a new {@link Timer}.
      */
     public Timer() {
-        this(SampleType.BIASED.newSample());
+        this(ExponentiallyDecayingSample.create());
     }
 
     /**

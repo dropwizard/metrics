@@ -1,15 +1,15 @@
 package com.yammer.metrics.tests;
 
 import com.yammer.metrics.Histogram;
-import com.yammer.metrics.SampleType;
 import com.yammer.metrics.Snapshot;
+import com.yammer.metrics.UniformSample;
 import org.junit.Test;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
 
 public class HistogramTest {
-    private final Histogram histogram = new Histogram(SampleType.UNIFORM);
+    private final Histogram histogram = new Histogram(UniformSample.create());
 
     @Test
     public void anEmptyHistogram() throws Exception {
