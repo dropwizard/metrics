@@ -21,6 +21,106 @@ import static com.yammer.metrics.MetricRegistry.name;
  * @see <a href="http://ganglia.sourceforge.net/">Ganglia Monitoring System</a>
  */
 public class GangliaReporter extends AbstractPollingReporter {
+    /**
+     * Returns a new {@link Builder} for {@link GangliaReporter}.
+     *
+     * @param registry the registry to report
+     * @return a {@link Builder} instance for a {@link GangliaReporter}
+     */
+    public static Builder forRegistry(MetricRegistry registry) {
+        return new Builder(registry);
+    }
+
+    /**
+     * A builder for {@link CsvReporter} instances. Defaults to using a {@code tmax} of {@code 60},
+     * a {@code dmax} of {@code 0}, converting rates to events/second, converting durations to
+     * milliseconds, and not filtering metrics.
+     */
+    public static class Builder {
+        private final MetricRegistry registry;
+        private int tMax;
+        private int dMax;
+        private TimeUnit rateUnit;
+        private TimeUnit durationUnit;
+        private MetricFilter filter;
+
+        private Builder(MetricRegistry registry) {
+            this.registry = registry;
+            this.tMax = 60;
+            this.dMax = 0;
+            this.rateUnit = TimeUnit.SECONDS;
+            this.durationUnit = TimeUnit.MILLISECONDS;
+            this.filter = MetricFilter.ALL;
+        }
+
+        /**
+         * Use the given {@code tmax} value when announcing metrics.
+         *
+         * @param tMax the desired gmond {@code tmax} value
+         * @return {@code this}
+         */
+        public Builder withTMax(int tMax) {
+            this.tMax = tMax;
+            return this;
+        }
+
+        /**
+         * Use the given {@code dmax} value when announcing metrics.
+         *
+         * @param dMax the desired gmond {@code dmax} value
+         * @return {@code this}
+         */
+        public Builder withDMax(int dMax) {
+            this.dMax = dMax;
+            return this;
+        }
+
+        /**
+         * Convert rates to the given time unit.
+         *
+         * @param rateUnit a unit of time
+         * @return {@code this}
+         */
+        public Builder convertRatesTo(TimeUnit rateUnit) {
+            this.rateUnit = rateUnit;
+            return this;
+        }
+
+        /**
+         * Convert durations to the given time unit.
+         *
+         * @param durationUnit a unit of time
+         * @return {@code this}
+         */
+        public Builder convertDurationsTo(TimeUnit durationUnit) {
+            this.durationUnit = durationUnit;
+            return this;
+        }
+
+        /**
+         * Only report metrics which match the given filter.
+         *
+         * @param filter a {@link MetricFilter}
+         * @return {@code this}
+         */
+        public Builder filter(MetricFilter filter) {
+            this.filter = filter;
+            return this;
+        }
+
+        /**
+         * Builds a {@link GangliaReporter} with the given properties, announcing metrics to the
+         * given {@link GMetric} client.
+         *
+         * @param ganglia the client to use for announcing metrics
+         * @return a {@link GangliaReporter}
+         */
+        public GangliaReporter build(GMetric ganglia) {
+            return new GangliaReporter(registry,
+                                       ganglia, tMax, dMax, rateUnit, durationUnit, filter);
+        }
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(GangliaReporter.class);
 
     private final GMetric ganglia;
@@ -31,25 +131,13 @@ public class GangliaReporter extends AbstractPollingReporter {
     private final int tMax;
     private final int dMax;
 
-    /**
-     * Creates a new {@link GangliaReporter}.
-     *
-     * @param registry     the registry to report
-     * @param ganglia      a {@link GMetric} instance for the Ganglia cluster
-     * @param tMax         the time in seconds between polling
-     * @param dMax         the time in seconds after which the data should be considered
-     *                     unmonitored
-     * @param rateUnit     the time unit to use for rates
-     * @param durationUnit the time unit to use for durations
-     * @param filter       a filter for metrics
-     */
-    public GangliaReporter(MetricRegistry registry,
-                           GMetric ganglia,
-                           int tMax,
-                           int dMax,
-                           TimeUnit rateUnit,
-                           TimeUnit durationUnit,
-                           MetricFilter filter) {
+    private GangliaReporter(MetricRegistry registry,
+                            GMetric ganglia,
+                            int tMax,
+                            int dMax,
+                            TimeUnit rateUnit,
+                            TimeUnit durationUnit,
+                            MetricFilter filter) {
         super(registry, "ganglia-reporter", filter);
         this.ganglia = ganglia;
         this.tMax = tMax;
