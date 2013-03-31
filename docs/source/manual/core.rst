@@ -321,6 +321,13 @@ or JConsole (which ships with most JDKs as ``jconsole``):
     API is fragile and bonkers. For development purposes and browsing, though, it can be very
     useful.
 
+To report metrics via JMX:
+
+.. code-block:: java
+
+    final JmxReporter reporter = JmxReporter.forRegistry(registry).build();
+    reporter.start();
+
 .. _man-core-reporters-console:
 
 Console
@@ -331,7 +338,11 @@ registered metrics to the console:
 
 .. code-block:: java
 
-    // TODO: waiting on builders
+    final ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)
+                                                    .convertRatesTo(TimeUnit.SECONDS)
+                                                    .convertDurationsTo(TimeUnit.MILLISECONDS)
+                                                    .build();
+    reporter.start(1, TimeUnit.MINUTES);
 
 .. _man-core-reporters-csv:
 
@@ -343,7 +354,12 @@ of ``.csv`` files in a given directory:
 
 .. code-block:: java
 
-    // TODO: waiting on builders
+    final CsvReporter reporter = CsvReporter.forRegistry(registry)
+                                            .formatFor(Locale.US)
+                                            .convertRatesTo(TimeUnit.SECONDS)
+                                            .convertDurationsTo(TimeUnit.MILLISECONDS)
+                                            .build(new File("~/projects/data/"));
+    reporter.start(1, TimeUnit.SECONDS);
 
 For each metric registered, a ``.csv`` file will be created, and every second its state will be
 written to it as a new row.
@@ -357,7 +373,12 @@ It's also possible to log metrics to an SLF4J logger:
 
 .. code-block:: java
 
-    // TODO: waiting on builders
+    final Slf4jReporter reporter = Slf4jReporter.forRegistry(registry)
+                                                .outputTo(LoggerFactory.getLogger("com.example.metrics"))
+                                                .convertRatesTo(TimeUnit.SECONDS)
+                                                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                                                .build();
+    reporter.start(1, TimeUnit.MINUTES);
 
 .. _man-core-reporters-other:
 
