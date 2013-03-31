@@ -22,7 +22,7 @@ public class TimerTest {
             return val += 50000000;
         }
     };
-    private final Timer timer = new Timer(ExponentiallyDecayingSample.create(), clock);
+    private final Timer timer = new Timer(new ExponentiallyDecayingSample(), clock);
 
     @Test
     public void aBlankTimer() throws Exception {

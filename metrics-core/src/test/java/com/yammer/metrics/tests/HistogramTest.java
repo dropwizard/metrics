@@ -9,7 +9,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
 
 public class HistogramTest {
-    private final Histogram histogram = new Histogram(UniformSample.create());
+    private final Histogram histogram = new Histogram(new UniformSample());
 
     @Test
     public void anEmptyHistogram() throws Exception {
