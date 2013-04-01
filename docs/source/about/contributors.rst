@@ -21,6 +21,7 @@ Many, many thanks to:
 * `Cliff Moon <https://github.com/cliffmoon>`_
 * `Collin VanDyck <https://github.com/collinvandyck>`_
 * `Dag Liodden <https://github.com/daggerrz>`_
+* `Dale Wijnand <https://github.com/dwijnand>`_
 * `Dan Brown <https://github.com/jdanbrown>`_
 * `Dan Revel <https://github.com/nopolabs>`_
 * `Diwaker Gupta <https://github.com/maginatics>`_
@@ -52,6 +53,7 @@ Many, many thanks to:
 * `Niklas Konstenius <https://github.com/konnik>`_
 * `Paul Bloch <https://github.com/pbloch>`_
 * `Paul Brown <https://github.com/prb>`_
+* `Paul Doran <https://github.com/dorzey>`_
 * `Realbot <https://github.com/realbot>`_
 * `Robby Walker <https://github.com/robbywalker>`_
 * `Ryan Kennedy <https://github.com/ryankennedy>`_
@@ -60,6 +62,7 @@ Many, many thanks to:
 * `Sean Laurent <https://github.com/organicveggie>`_
 * `Shaneal Manek <https://github.com/smanek>`_
 * `Steven Schlansker <https://github.com/stevenschlansker>`_
+* `Stewart Allen <https://github.com/stewartoallen>`_
 * `Thomas Dudziak <https://github.com/tomdz>`_
 * `Tobias Lidskog <https://github.com/tobli>`_
 * `Yang Ye <https://github.com/yeyangever>`_
