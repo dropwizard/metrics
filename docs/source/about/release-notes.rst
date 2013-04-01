@@ -4,10 +4,10 @@
 Release Notes
 #############
 
-.. _rel-3.0.0:
+.. _rel-3.0.0-BETA1:
 
-v3.0.0-SNAPSHOT
-===============
+v3.0.0-BETA1: Apr 1 2013
+========================
 
 * Total overhaul of most of the core Metrics classes:
 
@@ -26,6 +26,7 @@ v3.0.0-SNAPSHOT
 * Renamed ``metrics-servlet`` to ``metrics-servlets``.
 * Renamed ``metrics-web`` to ``metrics-servlet``.
 * Renamed ``metrics-jetty`` to ``metrics-jetty8``.
+* Many more small changes!
 
 .. _rel-2.2.0:
 
