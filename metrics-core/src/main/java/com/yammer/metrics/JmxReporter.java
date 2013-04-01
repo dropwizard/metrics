@@ -5,8 +5,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.management.*;
 import java.lang.management.ManagementFactory;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A reporter which listens for new metrics and exposes them as namespaced MBeans.
@@ -29,10 +31,14 @@ public class JmxReporter {
     public static class Builder {
         private final MetricRegistry registry;
         private MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        private TimeUnit rateUnit;
+        private TimeUnit durationUnit;
         private MetricFilter filter = MetricFilter.ALL;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
+            this.rateUnit = TimeUnit.SECONDS;
+            this.durationUnit = TimeUnit.MILLISECONDS;
         }
 
         /**
@@ -43,6 +49,28 @@ public class JmxReporter {
          */
         public Builder registerWith(MBeanServer mBeanServer) {
             this.mBeanServer = mBeanServer;
+            return this;
+        }
+
+        /**
+         * Convert rates to the given time unit.
+         *
+         * @param rateUnit a unit of time
+         * @return {@code this}
+         */
+        public Builder convertRatesTo(TimeUnit rateUnit) {
+            this.rateUnit = rateUnit;
+            return this;
+        }
+
+        /**
+         * Convert durations to the given time unit.
+         *
+         * @param durationUnit a unit of time
+         * @return {@code this}
+         */
+        public Builder convertDurationsTo(TimeUnit durationUnit) {
+            this.durationUnit = durationUnit;
             return this;
         }
 
@@ -63,7 +91,7 @@ public class JmxReporter {
          * @return a {@link JmxReporter}
          */
         public JmxReporter build() {
-            return new JmxReporter(mBeanServer, registry, filter);
+            return new JmxReporter(mBeanServer, registry, filter, rateUnit, durationUnit);
         }
     }
 
@@ -248,15 +276,21 @@ public class JmxReporter {
         double getFiveMinuteRate();
 
         double getFifteenMinuteRate();
+
+        String getRateUnit();
     }
     //CHECKSTYLE:ON
 
     private static class JmxMeter extends AbstractBean implements JmxMeterMBean {
         private final Metered metric;
+        private final double rateFactor;
+        private final String rateUnit;
 
-        private JmxMeter(Metered metric, ObjectName objectName) {
+        private JmxMeter(Metered metric, ObjectName objectName, TimeUnit rateUnit) {
             super(objectName);
             this.metric = metric;
+            this.rateFactor = rateUnit.toSeconds(1);
+            this.rateUnit = "events/" + calculateRateUnit(rateUnit);
         }
 
         @Override
@@ -266,92 +300,136 @@ public class JmxReporter {
 
         @Override
         public double getMeanRate() {
-            return metric.getMeanRate();
+            return metric.getMeanRate() * rateFactor;
         }
 
         @Override
         public double getOneMinuteRate() {
-            return metric.getOneMinuteRate();
+            return metric.getOneMinuteRate() * rateFactor;
         }
 
         @Override
         public double getFiveMinuteRate() {
-            return metric.getFiveMinuteRate();
+            return metric.getFiveMinuteRate() * rateFactor;
         }
 
         @Override
         public double getFifteenMinuteRate() {
-            return metric.getFifteenMinuteRate();
+            return metric.getFifteenMinuteRate() * rateFactor;
+        }
+
+        @Override
+        public String getRateUnit() {
+            return rateUnit;
+        }
+
+        private String calculateRateUnit(TimeUnit unit) {
+            final String s = unit.toString().toLowerCase(Locale.US);
+            return s.substring(0, s.length() - 1);
         }
     }
 
     // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
-    public interface JmxTimerMBean extends JmxMeterMBean, JmxHistogramMBean {
+    public interface JmxTimerMBean extends JmxMeterMBean {
+        double getMin();
+
+        double getMax();
+
+        double getMean();
+
+        double getStdDev();
+
+        double get50thPercentile();
+
+        double get75thPercentile();
+
+        double get95thPercentile();
+
+        double get98thPercentile();
+
+        double get99thPercentile();
+
+        double get999thPercentile();
+
+        long[] values();
+        String getDurationUnit();
     }
     // CHECKSTYLE:ON
 
     static class JmxTimer extends JmxMeter implements JmxTimerMBean {
         private final Timer metric;
+        private final double durationFactor;
+        private final String durationUnit;
 
-        private JmxTimer(Timer metric, ObjectName objectName) {
-            super(metric, objectName);
+        private JmxTimer(Timer metric,
+                         ObjectName objectName,
+                         TimeUnit rateUnit,
+                         TimeUnit durationUnit) {
+            super(metric, objectName, rateUnit);
             this.metric = metric;
+            this.durationFactor = 1.0 / durationUnit.toNanos(1);
+            this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
         }
 
         @Override
         public double get50thPercentile() {
-            return metric.getSnapshot().getMedian();
+            return metric.getSnapshot().getMedian() * durationFactor;
         }
 
         @Override
-        public long getMin() {
-            return metric.getMin();
+        public double getMin() {
+            return metric.getMin() * durationFactor;
         }
 
         @Override
-        public long getMax() {
-            return metric.getMax();
+        public double getMax() {
+            return metric.getMax() * durationFactor;
         }
 
         @Override
         public double getMean() {
-            return metric.getMean();
+            return metric.getMean() * durationFactor;
         }
 
         @Override
         public double getStdDev() {
-            return metric.getStdDev();
+            return metric.getStdDev() * durationFactor;
         }
 
         @Override
         public double get75thPercentile() {
-            return metric.getSnapshot().get75thPercentile();
+            return metric.getSnapshot().get75thPercentile() * durationFactor;
         }
 
         @Override
         public double get95thPercentile() {
-            return metric.getSnapshot().get95thPercentile();
+            return metric.getSnapshot().get95thPercentile() * durationFactor;
         }
 
         @Override
         public double get98thPercentile() {
-            return metric.getSnapshot().get98thPercentile();
+            return metric.getSnapshot().get98thPercentile() * durationFactor;
         }
 
         @Override
         public double get99thPercentile() {
-            return metric.getSnapshot().get99thPercentile();
+            return metric.getSnapshot().get99thPercentile() * durationFactor;
         }
 
         @Override
         public double get999thPercentile() {
-            return metric.getSnapshot().get999thPercentile();
+            return metric.getSnapshot().get999thPercentile() * durationFactor;
         }
 
         @Override
         public long[] values() {
             return metric.getSnapshot().getValues();
+        }
+
+        @Override
+        public String getDurationUnit() {
+            return durationUnit;
         }
     }
 
@@ -359,12 +437,20 @@ public class JmxReporter {
         private final String name;
         private final MBeanServer mBeanServer;
         private final MetricFilter filter;
+        private final TimeUnit rateUnit;
+        private final TimeUnit durationUnit;
         private final Set<ObjectName> registered;
 
-        public JmxListener(MBeanServer mBeanServer, String name, MetricFilter filter) {
+        private JmxListener(MBeanServer mBeanServer,
+                            String name,
+                            MetricFilter filter,
+                            TimeUnit rateUnit,
+                            TimeUnit durationUnit) {
             this.mBeanServer = mBeanServer;
             this.name = name;
             this.filter = filter;
+            this.rateUnit = rateUnit;
+            this.durationUnit = durationUnit;
             this.registered = new CopyOnWriteArraySet<ObjectName>();
         }
 
@@ -457,7 +543,7 @@ public class JmxReporter {
             try {
                 if (filter.matches(name, meter)) {
                     final ObjectName objectName = createName("meters", name);
-                    mBeanServer.registerMBean(new JmxMeter(meter, objectName), objectName);
+                    mBeanServer.registerMBean(new JmxMeter(meter, objectName, rateUnit), objectName);
                     registered.add(objectName);
                 }
             } catch (InstanceAlreadyExistsException e) {
@@ -485,7 +571,7 @@ public class JmxReporter {
             try {
                 if (filter.matches(name, timer)) {
                     final ObjectName objectName = createName("timers", name);
-                    mBeanServer.registerMBean(new JmxTimer(timer, objectName), objectName);
+                    mBeanServer.registerMBean(new JmxTimer(timer, objectName, rateUnit, durationUnit), objectName);
                     registered.add(objectName);
                 }
             } catch (InstanceAlreadyExistsException e) {
@@ -538,9 +624,9 @@ public class JmxReporter {
     private final MetricRegistry registry;
     private final JmxListener listener;
 
-    private JmxReporter(MBeanServer mBeanServer, MetricRegistry registry, MetricFilter filter) {
+    private JmxReporter(MBeanServer mBeanServer, MetricRegistry registry, MetricFilter filter, TimeUnit rateUnit, TimeUnit durationUnit) {
         this.registry = registry;
-        this.listener = new JmxListener(mBeanServer, registry.getName(), filter);
+        this.listener = new JmxListener(mBeanServer, registry.getName(), filter, rateUnit, durationUnit);
     }
 
     /**
