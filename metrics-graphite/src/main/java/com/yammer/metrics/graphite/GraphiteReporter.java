@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @see <a href="http://graphite.wikidot.com/">Graphite - Scalable Realtime Graphing</a>
  */
-public class GraphiteReporter extends AbstractPollingReporter {
+public class GraphiteReporter extends ScheduledReporter {
     /**
      * Returns a new {@link Builder} for {@link GraphiteReporter}.
      *
@@ -126,8 +126,6 @@ public class GraphiteReporter extends AbstractPollingReporter {
     private final Graphite graphite;
     private final Clock clock;
     private final String prefix;
-    private final double rateFactor;
-    private final double durationFactor;
 
     private GraphiteReporter(MetricRegistry registry,
                              Graphite graphite,
@@ -136,12 +134,10 @@ public class GraphiteReporter extends AbstractPollingReporter {
                              TimeUnit rateUnit,
                              TimeUnit durationUnit,
                              MetricFilter filter) {
-        super(registry, "graphite-reporter", filter);
+        super(registry, "graphite-reporter", filter, rateUnit, durationUnit);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
-        this.rateFactor = rateUnit.toSeconds(1);
-        this.durationFactor = 1.0 / durationUnit.toNanos(1);
     }
 
     @Override
@@ -189,29 +185,29 @@ public class GraphiteReporter extends AbstractPollingReporter {
     private void reportTimer(String name, Timer timer, long timestamp) throws IOException {
         final Snapshot snapshot = timer.getSnapshot();
 
-        graphite.send(prefix(name, "max"), format(snapshot.getMax() * durationFactor), timestamp);
-        graphite.send(prefix(name, "mean"), format(snapshot.getMean() * durationFactor), timestamp);
-        graphite.send(prefix(name, "min"), format(snapshot.getMin() * durationFactor), timestamp);
+        graphite.send(prefix(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
+        graphite.send(prefix(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
+        graphite.send(prefix(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);
         graphite.send(prefix(name, "stddev"),
-                      format(snapshot.getStdDev() * durationFactor),
+                      format(convertDuration(snapshot.getStdDev())),
                       timestamp);
         graphite.send(prefix(name, "p50"),
-                      format(snapshot.getMedian() * durationFactor),
+                      format(convertDuration(snapshot.getMedian())),
                       timestamp);
         graphite.send(prefix(name, "p75"),
-                      format(snapshot.get75thPercentile() * durationFactor),
+                      format(convertDuration(snapshot.get75thPercentile())),
                       timestamp);
         graphite.send(prefix(name, "p95"),
-                      format(snapshot.get95thPercentile() * durationFactor),
+                      format(convertDuration(snapshot.get95thPercentile())),
                       timestamp);
         graphite.send(prefix(name, "p98"),
-                      format(snapshot.get98thPercentile() * durationFactor),
+                      format(convertDuration(snapshot.get98thPercentile())),
                       timestamp);
         graphite.send(prefix(name, "p99"),
-                      format(snapshot.get99thPercentile() * durationFactor),
+                      format(convertDuration(snapshot.get99thPercentile())),
                       timestamp);
         graphite.send(prefix(name, "p999"),
-                      format(snapshot.get999thPercentile() * durationFactor),
+                      format(convertDuration(snapshot.get999thPercentile())),
                       timestamp);
 
         reportMetered(name, timer, timestamp);
@@ -220,16 +216,16 @@ public class GraphiteReporter extends AbstractPollingReporter {
     private void reportMetered(String name, Metered meter, long timestamp) throws IOException {
         graphite.send(prefix(name, "count"), format(meter.getCount()), timestamp);
         graphite.send(prefix(name, "m1_rate"),
-                      format(meter.getOneMinuteRate() * rateFactor),
+                      format(convertRate(meter.getOneMinuteRate())),
                       timestamp);
         graphite.send(prefix(name, "m5_rate"),
-                      format(meter.getFiveMinuteRate() * rateFactor),
+                      format(convertRate(meter.getFiveMinuteRate())),
                       timestamp);
         graphite.send(prefix(name, "m15_rate"),
-                      format(meter.getFifteenMinuteRate() * rateFactor),
+                      format(convertRate(meter.getFifteenMinuteRate())),
                       timestamp);
         graphite.send(prefix(name, "mean_rate"),
-                      format(meter.getMeanRate() * rateFactor),
+                      format(convertRate(meter.getMeanRate())),
                       timestamp);
     }
 

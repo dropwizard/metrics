@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.*;
 
-public class AbstractPollingReporterTest {
+public class ScheduledReporterTest {
     private final Gauge gauge = mock(Gauge.class);
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
@@ -19,8 +19,12 @@ public class AbstractPollingReporterTest {
     private final Timer timer = mock(Timer.class);
 
     private final MetricRegistry registry = new MetricRegistry("test");
-    private final AbstractPollingReporter reporter = spy(
-            new AbstractPollingReporter(registry, "example", MetricFilter.ALL) {
+    private final ScheduledReporter reporter = spy(
+            new ScheduledReporter(registry,
+                                  "example",
+                                  MetricFilter.ALL,
+                                  TimeUnit.SECONDS,
+                                  TimeUnit.MILLISECONDS) {
                 @Override
                 public void report(SortedMap<String, Gauge> gauges,
                                    SortedMap<String, Counter> counters,

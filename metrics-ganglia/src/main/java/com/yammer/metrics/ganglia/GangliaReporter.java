@@ -8,7 +8,6 @@ import info.ganglia.gmetric4j.gmetric.GangliaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +19,7 @@ import static com.yammer.metrics.MetricRegistry.name;
  *
  * @see <a href="http://ganglia.sourceforge.net/">Ganglia Monitoring System</a>
  */
-public class GangliaReporter extends AbstractPollingReporter {
+public class GangliaReporter extends ScheduledReporter {
     /**
      * Returns a new {@link Builder} for {@link GangliaReporter}.
      *
@@ -124,10 +123,6 @@ public class GangliaReporter extends AbstractPollingReporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(GangliaReporter.class);
 
     private final GMetric ganglia;
-    private final double durationFactor;
-    private final String durationUnit;
-    private final double rateFactor;
-    private final String rateUnit;
     private final int tMax;
     private final int dMax;
 
@@ -138,19 +133,10 @@ public class GangliaReporter extends AbstractPollingReporter {
                             TimeUnit rateUnit,
                             TimeUnit durationUnit,
                             MetricFilter filter) {
-        super(registry, "ganglia-reporter", filter);
+        super(registry, "ganglia-reporter", filter, rateUnit, durationUnit);
         this.ganglia = ganglia;
         this.tMax = tMax;
         this.dMax = dMax;
-        this.rateFactor = rateUnit.toSeconds(1);
-        this.rateUnit = calculateRateUnit(rateUnit);
-        this.durationFactor = 1.0 / durationUnit.toNanos(1);
-        this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
-    }
-
-    private String calculateRateUnit(TimeUnit unit) {
-        final String s = unit.toString().toLowerCase(Locale.US);
-        return s.substring(0, s.length() - 1);
     }
 
     @Override
@@ -185,32 +171,32 @@ public class GangliaReporter extends AbstractPollingReporter {
         try {
             final Snapshot snapshot = timer.getSnapshot();
 
-            announce(name(name, "max"), group, snapshot.getMax() * durationFactor, durationUnit);
-            announce(name(name, "mean"), group, snapshot.getMean() * durationFactor, durationUnit);
-            announce(name(name, "min"), group, snapshot.getMin() * durationFactor, durationUnit);
-            announce(name(name, "stddev"), group, snapshot.getStdDev() * durationFactor, durationUnit);
+            announce(name(name, "max"), group, convertDuration(snapshot.getMax()), getDurationUnit());
+            announce(name(name, "mean"), group, convertDuration(snapshot.getMean()), getDurationUnit());
+            announce(name(name, "min"), group, convertDuration(snapshot.getMin()), getDurationUnit());
+            announce(name(name, "stddev"), group, convertDuration(snapshot.getStdDev()), getDurationUnit());
 
-            announce(name(name, "p50"), group, snapshot.getMedian() * durationFactor, durationUnit);
+            announce(name(name, "p50"), group, convertDuration(snapshot.getMedian()), getDurationUnit());
             announce(name(name, "p75"),
                      group,
-                     snapshot.get75thPercentile() * durationFactor,
-                     durationUnit);
+                     convertDuration(snapshot.get75thPercentile()),
+                     getDurationUnit());
             announce(name(name, "p95"),
                      group,
-                     snapshot.get95thPercentile() * durationFactor,
-                     durationUnit);
+                     convertDuration(snapshot.get95thPercentile()),
+                     getDurationUnit());
             announce(name(name, "p98"),
                      group,
-                     snapshot.get98thPercentile() * durationFactor,
-                     durationUnit);
+                     convertDuration(snapshot.get98thPercentile()),
+                     getDurationUnit());
             announce(name(name, "p99"),
                      group,
-                     snapshot.get99thPercentile() * durationFactor,
-                     durationUnit);
+                     convertDuration(snapshot.get99thPercentile()),
+                     getDurationUnit());
             announce(name(name, "p999"),
                      group,
-                     snapshot.get999thPercentile() * durationFactor,
-                     durationUnit);
+                     convertDuration(snapshot.get999thPercentile()),
+                     getDurationUnit());
 
             reportMetered(name, timer, group, "calls");
         } catch (GangliaException e) {
@@ -228,12 +214,12 @@ public class GangliaReporter extends AbstractPollingReporter {
     }
 
     private void reportMetered(String name, Metered meter, String group, String eventName) throws GangliaException {
-        final String unit = eventName + '/' + rateUnit;
+        final String unit = eventName + '/' + getRateUnit();
         announce(name(name, "count"), group, meter.getCount(), eventName);
-        announce(name(name, "m1_rate"), group, meter.getOneMinuteRate() * rateFactor, unit);
-        announce(name(name, "m5_rate"), group, meter.getFiveMinuteRate() * rateFactor, unit);
-        announce(name(name, "m15_rate"), group, meter.getFifteenMinuteRate() * rateFactor, unit);
-        announce(name(name, "mean_rate"), group, meter.getMeanRate() * rateFactor, unit);
+        announce(name(name, "m1_rate"), group, convertRate(meter.getOneMinuteRate()), unit);
+        announce(name(name, "m5_rate"), group, convertRate(meter.getFiveMinuteRate()), unit);
+        announce(name(name, "m15_rate"), group, convertRate(meter.getFifteenMinuteRate()), unit);
+        announce(name(name, "mean_rate"), group, convertRate(meter.getMeanRate()), unit);
     }
 
     private void reportHistogram(String name, Histogram histogram) {
