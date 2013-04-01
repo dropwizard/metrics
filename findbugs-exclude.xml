@@ -1,12 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
-    <!-- yes, I know these switches will fall though... to the end of the method -->
-    <Match>
-        <Class name="com.yammer.metrics.logback.InstrumentedAppender"/>
-        <Bug code="SF"/>
-    </Match>
-    <Match>
-        <Class name="com.yammer.metrics.log4j.InstrumentedAppender"/>
-        <Bug code="SF"/>
-    </Match>
+    <!-- clean as a whistle -->
 </FindBugsFilter>
