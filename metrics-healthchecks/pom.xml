@@ -13,4 +13,13 @@
     <artifactId>metrics-healthchecks</artifactId>
     <name>Metrics Health Checks</name>
     <packaging>bundle</packaging>
+    
+    <dependencies>
+        <dependency>
+            <groupId>com.yammer.metrics</groupId>
+            <artifactId>metrics-jvm</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
 </project>
