@@ -9,20 +9,23 @@ Release Notes
 v3.0.0-SNAPSHOT
 ===============
 
-* Added ``AdminServlet#setServiceName()``.
-* Switched all getters to the standard ``#getValue()``.
-* Use the full metric name in ``CsvReporter``.
-* Made ``DefaultWebappMetricsFilter``'s registry configurable.
-* Switched to ``HttpServletRequest#getContextPath()`` in ``AdminServlet``.
-* Upgraded to Logback 1.0.3.
-* Upgraded to Log4j 1.2.17.
-* Upgraded to JDBI 2.34.
-* Upgraded to Ehcache 2.5.2.
-* Upgraded to Jackson 2.0.2.
-* Upgraded to Jetty 8.1.4.
-* Upgraded to SLF4J 1.6.5.
-* Changed package names in ``metrics-ganglia``, ``metrics-graphite``, and ``metrics-servlet``.
-* Removed ``metrics-guice`` and ``metrics-spring``.
+* Total overhaul of most of the core Metrics classes:
+
+  * Metric names are now just dotted paths like ``com.example.Thing``, allowing for very flexible
+    scopes, etc.
+  * Meters and timers no longer have rate or duration units; those are properties of reporters.
+  * Reporter architecture has been radically simplified, fixing many bugs.
+  * Histograms and timers can take arbitrary reservoir implementations.
+  * Added sliding window reservoir implementations.
+  * Added ``MetricSet`` for sets of metrics.
+
+* Changed package names to be OSGi-compatible and added OSGi bundling.
+* Extracted JVM instrumentation to ``metrics-jvm``.
+* Extracted Jackson integration to ``metrics-json``.
+* Removed ``metrics-guice``, ``metrics-scala``, and ``metrics-spring``.
+* Renamed ``metrics-servlet`` to ``metrics-servlets``.
+* Renamed ``metrics-web`` to ``metrics-servlet``.
+* Renamed ``metrics-jetty`` to ``metrics-jetty8``.
 
 .. _rel-2.2.0:
 
