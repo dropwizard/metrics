@@ -8,7 +8,9 @@ Many, many thanks to:
 
 * `Alex Lambert <https://github.com/bifflabs>`_
 * `Basil James Whitehouse III <https://github.com/basil3whitehouse>`_
+* `Benjamin Gehrels <https://github.com/BGehrels>`_
 * `Bernardo Gomez Palacio <https://github.com/berngp>`_
+* `Brian Ehmann <https://github.com/codelotus>`_
 * `Brian Roberts <https://github.com/flicken>`_
 * `Bruce Mitchener <https://github.com/waywardmonkeys>`_
 * `C. Scott Andreas <https://github.com/cscotta>`_
@@ -19,6 +21,7 @@ Many, many thanks to:
 * `Cliff Moon <https://github.com/cliffmoon>`_
 * `Collin VanDyck <https://github.com/collinvandyck>`_
 * `Dag Liodden <https://github.com/daggerrz>`_
+* `Dan Brown <https://github.com/jdanbrown>`_
 * `Dan Revel <https://github.com/nopolabs>`_
 * `Diwaker Gupta <https://github.com/maginatics>`_
 * `Drew Stephens <https://github.com/dinomite>`_
@@ -41,6 +44,7 @@ Many, many thanks to:
 * `Matt Ryall <https://github.com/mattryall>`_
 * `Matthew Gilliard <https://github.com/mjg123>`_
 * `Matthew O'Connor <https://github.com/oconnor0>`_
+* `Mathijs Vogelzang <https://github.com/mathijs81>`_
 * `Mårten Gustafson <https://github.com/chids>`_
 * `Michał Minicki <https://github.com/martel>`_
 * `Neil Prosser <https://github.com/neilprosser>`_
@@ -58,3 +62,5 @@ Many, many thanks to:
 * `Steven Schlansker <https://github.com/stevenschlansker>`_
 * `Thomas Dudziak <https://github.com/tomdz>`_
 * `Tobias Lidskog <https://github.com/tobli>`_
+* `Yang Ye <https://github.com/yeyangever>`_
+* `Wolfgang Schell <https://github.com/jetztgradnet>`_
