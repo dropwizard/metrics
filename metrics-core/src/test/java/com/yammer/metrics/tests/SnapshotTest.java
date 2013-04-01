@@ -119,4 +119,60 @@ public class SnapshotTest {
         assertThat(output.toString())
                 .isEqualTo(String.format("1%n2%n3%n4%n5%n"));
     }
+
+    @Test
+    public void calculatesTheMinimumValue() throws Exception {
+        assertThat(snapshot.getMin())
+                .isEqualTo(1);
+    }
+
+    @Test
+    public void calculatesTheMaximumValue() throws Exception {
+        assertThat(snapshot.getMax())
+                .isEqualTo(5);
+    }
+
+    @Test
+    public void calculatesTheMeanValue() throws Exception {
+        assertThat(snapshot.getMean())
+                .isEqualTo(3.0);
+    }
+
+    @Test
+    public void calculatesTheStdDev() throws Exception {
+        assertThat(snapshot.getStdDev())
+                .isEqualTo(1.5811, offset(0.0001));
+    }
+
+    @Test
+    public void calculatesAMinOfZeroForAnEmptySnapshot() throws Exception {
+        final Snapshot snapshot = new Snapshot(new long[]{ });
+
+        assertThat(snapshot.getMin())
+                .isZero();
+    }
+
+    @Test
+    public void calculatesAMaxOfZeroForAnEmptySnapshot() throws Exception {
+        final Snapshot snapshot = new Snapshot(new long[]{ });
+
+        assertThat(snapshot.getMax())
+                .isZero();
+    }
+
+    @Test
+    public void calculatesAMeanOfZeroForAnEmptySnapshot() throws Exception {
+        final Snapshot snapshot = new Snapshot(new long[]{ });
+
+        assertThat(snapshot.getMean())
+                .isZero();
+    }
+
+    @Test
+    public void calculatesAStdDevOfZeroForAnEmptySnapshot() throws Exception {
+        final Snapshot snapshot = new Snapshot(new long[]{ });
+
+        assertThat(snapshot.getStdDev())
+                .isZero();
+    }
 }
