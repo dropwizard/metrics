@@ -53,6 +53,8 @@ public class InstrumentedAppender extends AppenderBase<ILoggingEvent> {
             case Level.ERROR_INT:
                 error.mark();
                 break;
+            default:
+                break;
         }
     }
 }

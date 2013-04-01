@@ -58,6 +58,8 @@ public class InstrumentedAppender extends AppenderSkeleton {
             case Level.FATAL_INT:
                 fatal.mark();
                 break;
+            default:
+                break;
         }
     }
 
