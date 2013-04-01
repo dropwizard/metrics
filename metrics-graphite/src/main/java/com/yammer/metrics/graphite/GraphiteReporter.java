@@ -32,7 +32,7 @@ public class GraphiteReporter extends AbstractPollingReporter {
      * not filtering metrics.
      */
     public static class Builder {
-        private MetricRegistry registry;
+        private final MetricRegistry registry;
         private Clock clock;
         private String prefix;
         private TimeUnit rateUnit;
