@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
-import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * supports specifying a {@link Marker} instance that can be used by custom appenders and filters
  * for the bound logging toolkit to further process metrics reports.
  */
-public class Slf4jReporter extends AbstractPollingReporter {
+public class Slf4jReporter extends ScheduledReporter {
     /**
      * Returns a new {@link Builder} for {@link Slf4jReporter}.
      *
@@ -115,10 +114,6 @@ public class Slf4jReporter extends AbstractPollingReporter {
 
     private final Logger logger;
     private final Marker marker;
-    private final double durationFactor;
-    private final String durationUnit;
-    private final double rateFactor;
-    private final String rateUnit;
 
     private Slf4jReporter(MetricRegistry registry,
                           Logger logger,
@@ -126,13 +121,9 @@ public class Slf4jReporter extends AbstractPollingReporter {
                           TimeUnit rateUnit,
                           TimeUnit durationUnit,
                           MetricFilter filter) {
-        super(registry, "logger-reporter", filter);
+        super(registry, "logger-reporter", filter, rateUnit, durationUnit);
         this.logger = logger;
         this.marker = marker;
-        this.rateFactor = rateUnit.toSeconds(1);
-        this.rateUnit = "events/" + calculateRateUnit(rateUnit);
-        this.durationFactor = 1.0 / durationUnit.toNanos(1);
-        this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
     }
 
     @Override
@@ -170,22 +161,22 @@ public class Slf4jReporter extends AbstractPollingReporter {
                             "rate_unit={}, duration_unit={}",
                     name,
                     timer.getCount(),
-                    snapshot.getMin() * durationFactor,
-                    snapshot.getMax() * durationFactor,
-                    snapshot.getMean() * durationFactor,
-                    snapshot.getStdDev() * durationFactor,
-                    snapshot.getMedian() * durationFactor,
-                    snapshot.get75thPercentile() * durationFactor,
-                    snapshot.get95thPercentile() * durationFactor,
-                    snapshot.get98thPercentile() * durationFactor,
-                    snapshot.get99thPercentile() * durationFactor,
-                    snapshot.get999thPercentile() * durationFactor,
-                    timer.getMeanRate() * rateFactor,
-                    timer.getOneMinuteRate() * rateFactor,
-                    timer.getFiveMinuteRate() * rateFactor,
-                    timer.getFifteenMinuteRate() * rateFactor,
-                    rateUnit,
-                    durationUnit);
+                    convertDuration(snapshot.getMin()),
+                    convertDuration(snapshot.getMax()),
+                    convertDuration(snapshot.getMean()),
+                    convertDuration(snapshot.getStdDev()),
+                    convertDuration(snapshot.getMedian()),
+                    convertDuration(snapshot.get75thPercentile()),
+                    convertDuration(snapshot.get95thPercentile()),
+                    convertDuration(snapshot.get98thPercentile()),
+                    convertDuration(snapshot.get99thPercentile()),
+                    convertDuration(snapshot.get999thPercentile()),
+                    convertRate(timer.getMeanRate()),
+                    convertRate(timer.getOneMinuteRate()),
+                    convertRate(timer.getFiveMinuteRate()),
+                    convertRate(timer.getFifteenMinuteRate()),
+                    getRateUnit(),
+                    getDurationUnit());
     }
 
     private void logMeter(String name, Meter meter) {
@@ -193,11 +184,11 @@ public class Slf4jReporter extends AbstractPollingReporter {
                     "type=METER, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
                     name,
                     meter.getCount(),
-                    meter.getMeanRate() * rateFactor,
-                    meter.getOneMinuteRate() * rateFactor,
-                    meter.getFiveMinuteRate() * rateFactor,
-                    meter.getFifteenMinuteRate() * rateFactor,
-                    rateUnit);
+                    convertRate(meter.getMeanRate()),
+                    convertRate(meter.getOneMinuteRate()),
+                    convertRate(meter.getFiveMinuteRate()),
+                    convertRate(meter.getFifteenMinuteRate()),
+                    getRateUnit());
     }
 
     private void logHistogram(String name, Histogram histogram) {
@@ -226,10 +217,8 @@ public class Slf4jReporter extends AbstractPollingReporter {
         logger.info(marker, "type=GAUGE, name={}, value={}", name, gauge.getValue());
     }
 
-    private String calculateRateUnit(TimeUnit unit) {
-        final String s = unit.toString().toLowerCase(Locale.US);
-        return s.substring(0, s.length() - 1);
+    @Override
+    protected String getRateUnit() {
+        return "events/" + super.getRateUnit();
     }
-
-
 }

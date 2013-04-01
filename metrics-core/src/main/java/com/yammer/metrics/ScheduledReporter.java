@@ -1,5 +1,6 @@
 package com.yammer.metrics;
 
+import java.util.Locale;
 import java.util.SortedMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -8,12 +9,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * The abstract base class for all polling reporters (i.e., reporters which process a registry's
+ * The abstract base class for all scheduled reporters (i.e., reporters which process a registry's
  * metrics periodically).
  *
  * @see ConsoleReporter
+ * @see CsvReporter
+ * @see Slf4jReporter
  */
-public abstract class AbstractPollingReporter {
+public abstract class ScheduledReporter {
     /**
      * A simple named thread factory.
      */
@@ -43,19 +46,31 @@ public abstract class AbstractPollingReporter {
     private final MetricRegistry registry;
     private final ScheduledExecutorService executor;
     private final MetricFilter filter;
+    private final double durationFactor;
+    private final String durationUnit;
+    private final double rateFactor;
+    private final String rateUnit;
 
     /**
-     * Creates a new {@link AbstractPollingReporter} instance.
+     * Creates a new {@link ScheduledReporter} instance.
      *
      * @param registry the {@link com.yammer.metrics.MetricRegistry} containing the metrics this
      *                 reporter will report
      * @param name     the reporter's name
      * @param filter   the filter for which metrics to report
      */
-    protected AbstractPollingReporter(MetricRegistry registry, String name, MetricFilter filter) {
+    protected ScheduledReporter(MetricRegistry registry,
+                                String name,
+                                MetricFilter filter,
+                                TimeUnit rateUnit,
+                                TimeUnit durationUnit) {
         this.registry = registry;
         this.filter = filter;
         this.executor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name));
+        this.rateFactor = rateUnit.toSeconds(1);
+        this.rateUnit = calculateRateUnit(rateUnit);
+        this.durationFactor = 1.0 / durationUnit.toNanos(1);
+        this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
     }
 
     /**
@@ -103,4 +118,25 @@ public abstract class AbstractPollingReporter {
                                 SortedMap<String, Histogram> histograms,
                                 SortedMap<String, Meter> meters,
                                 SortedMap<String, Timer> timers);
+
+    protected String getRateUnit() {
+        return rateUnit;
+    }
+
+    protected String getDurationUnit() {
+        return durationUnit;
+    }
+
+    protected double convertDuration(double duration) {
+        return duration * durationFactor;
+    }
+
+    protected double convertRate(double rate) {
+        return rate * rateFactor;
+    }
+
+    private String calculateRateUnit(TimeUnit unit) {
+        final String s = unit.toString().toLowerCase(Locale.US);
+        return s.substring(0, s.length() - 1);
+    }
 }

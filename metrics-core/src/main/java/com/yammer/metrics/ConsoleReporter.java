@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A reporter which outputs measurements to a {@link PrintStream}, like {@code System.out}.
  */
-public class ConsoleReporter extends AbstractPollingReporter {
+public class ConsoleReporter extends ScheduledReporter {
     /**
      * Returns a new {@link Builder} for {@link ConsoleReporter}.
      *
@@ -145,10 +145,6 @@ public class ConsoleReporter extends AbstractPollingReporter {
     private final Locale locale;
     private final Clock clock;
     private final DateFormat dateFormat;
-    private final double durationFactor;
-    private final String durationUnit;
-    private final double rateFactor;
-    private final String rateUnit;
 
     private ConsoleReporter(MetricRegistry registry,
                             PrintStream output,
@@ -158,7 +154,7 @@ public class ConsoleReporter extends AbstractPollingReporter {
                             TimeUnit rateUnit,
                             TimeUnit durationUnit,
                             MetricFilter filter) {
-        super(registry, "console-reporter", filter);
+        super(registry, "console-reporter", filter, rateUnit, durationUnit);
         this.output = output;
         this.locale = locale;
         this.clock = clock;
@@ -166,10 +162,6 @@ public class ConsoleReporter extends AbstractPollingReporter {
                                                          DateFormat.MEDIUM,
                                                          locale);
         dateFormat.setTimeZone(timeZone);
-        this.rateFactor = rateUnit.toSeconds(1);
-        this.rateUnit = calculateRateUnit(rateUnit);
-        this.durationFactor = 1.0 / durationUnit.toNanos(1);
-        this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
     }
 
     @Override
@@ -233,10 +225,10 @@ public class ConsoleReporter extends AbstractPollingReporter {
 
     private void printMeter(Meter meter) {
         output.printf(locale, "             count = %d%n", meter.getCount());
-        output.printf(locale, "         mean rate = %2.2f events/%s%n", meter.getMeanRate() * rateFactor, rateUnit);
-        output.printf(locale, "     1-minute rate = %2.2f events/%s%n", meter.getOneMinuteRate() * rateFactor, rateUnit);
-        output.printf(locale, "     5-minute rate = %2.2f events/%s%n", meter.getFiveMinuteRate() * rateFactor, rateUnit);
-        output.printf(locale, "    15-minute rate = %2.2f events/%s%n", meter.getFifteenMinuteRate() * rateFactor, rateUnit);
+        output.printf(locale, "         mean rate = %2.2f events/%s%n", convertRate(meter.getMeanRate()), getRateUnit());
+        output.printf(locale, "     1-minute rate = %2.2f events/%s%n", convertRate(meter.getOneMinuteRate()), getRateUnit());
+        output.printf(locale, "     5-minute rate = %2.2f events/%s%n", convertRate(meter.getFiveMinuteRate()), getRateUnit());
+        output.printf(locale, "    15-minute rate = %2.2f events/%s%n", convertRate(meter.getFifteenMinuteRate()), getRateUnit());
     }
 
     private void printCounter(Map.Entry<String, Counter> entry) {
@@ -265,21 +257,21 @@ public class ConsoleReporter extends AbstractPollingReporter {
     private void printTimer(Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
         output.printf(locale, "             count = %d%n", timer.getCount());
-        output.printf(locale, "         mean rate = %2.2f calls/%s%n", timer.getMeanRate() * rateFactor, rateUnit);
-        output.printf(locale, "     1-minute rate = %2.2f calls/%s%n", timer.getOneMinuteRate() * rateFactor, rateUnit);
-        output.printf(locale, "     5-minute rate = %2.2f calls/%s%n", timer.getFiveMinuteRate() * rateFactor, rateUnit);
-        output.printf(locale, "    15-minute rate = %2.2f calls/%s%n", timer.getFifteenMinuteRate() * rateFactor, rateUnit);
+        output.printf(locale, "         mean rate = %2.2f calls/%s%n", convertRate(timer.getMeanRate()), getRateUnit());
+        output.printf(locale, "     1-minute rate = %2.2f calls/%s%n", convertRate(timer.getOneMinuteRate()), getRateUnit());
+        output.printf(locale, "     5-minute rate = %2.2f calls/%s%n", convertRate(timer.getFiveMinuteRate()), getRateUnit());
+        output.printf(locale, "    15-minute rate = %2.2f calls/%s%n", convertRate(timer.getFifteenMinuteRate()), getRateUnit());
 
-        output.printf(locale, "               min = %2.2f %s%n", snapshot.getMin() * durationFactor, durationUnit);
-        output.printf(locale, "               max = %2.2f %s%n", snapshot.getMax() * durationFactor, durationUnit);
-        output.printf(locale, "              mean = %2.2f %s%n", snapshot.getMean() * durationFactor, durationUnit);
-        output.printf(locale, "            stddev = %2.2f %s%n", snapshot.getStdDev() * durationFactor, durationUnit);
-        output.printf(locale, "            median = %2.2f %s%n", snapshot.getMedian() * durationFactor, durationUnit);
-        output.printf(locale, "              75%% <= %2.2f %s%n", snapshot.get75thPercentile() * durationFactor, durationUnit);
-        output.printf(locale, "              95%% <= %2.2f %s%n", snapshot.get95thPercentile() * durationFactor, durationUnit);
-        output.printf(locale, "              98%% <= %2.2f %s%n", snapshot.get98thPercentile() * durationFactor, durationUnit);
-        output.printf(locale, "              99%% <= %2.2f %s%n", snapshot.get99thPercentile() * durationFactor, durationUnit);
-        output.printf(locale, "            99.9%% <= %2.2f %s%n", snapshot.get999thPercentile() * durationFactor, durationUnit);
+        output.printf(locale, "               min = %2.2f %s%n", convertDuration(snapshot.getMin()), getDurationUnit());
+        output.printf(locale, "               max = %2.2f %s%n", convertDuration(snapshot.getMax()), getDurationUnit());
+        output.printf(locale, "              mean = %2.2f %s%n", convertDuration(snapshot.getMean()), getDurationUnit());
+        output.printf(locale, "            stddev = %2.2f %s%n", convertDuration(snapshot.getStdDev()), getDurationUnit());
+        output.printf(locale, "            median = %2.2f %s%n", convertDuration(snapshot.getMedian()), getDurationUnit());
+        output.printf(locale, "              75%% <= %2.2f %s%n", convertDuration(snapshot.get75thPercentile()), getDurationUnit());
+        output.printf(locale, "              95%% <= %2.2f %s%n", convertDuration(snapshot.get95thPercentile()), getDurationUnit());
+        output.printf(locale, "              98%% <= %2.2f %s%n", convertDuration(snapshot.get98thPercentile()), getDurationUnit());
+        output.printf(locale, "              99%% <= %2.2f %s%n", convertDuration(snapshot.get99thPercentile()), getDurationUnit());
+        output.printf(locale, "            99.9%% <= %2.2f %s%n", convertDuration(snapshot.get999thPercentile()), getDurationUnit());
     }
 
     private void printWithBanner(String s, char c) {
@@ -289,10 +281,5 @@ public class ConsoleReporter extends AbstractPollingReporter {
             output.print(c);
         }
         output.println();
-    }
-
-    private String calculateRateUnit(TimeUnit unit) {
-        final String s = unit.toString().toLowerCase(Locale.US);
-        return s.substring(0, s.length() - 1);
     }
 }

@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A reporter which creates a comma-separated values file of the measurements for each metric.
  */
-public class CsvReporter extends AbstractPollingReporter {
+public class CsvReporter extends ScheduledReporter {
     /**
      * Returns a new {@link Builder} for {@link CsvReporter}.
      *
@@ -124,10 +124,6 @@ public class CsvReporter extends AbstractPollingReporter {
     private final File directory;
     private final Locale locale;
     private final Clock clock;
-    private final double durationFactor;
-    private final String durationUnit;
-    private final double rateFactor;
-    private final String rateUnit;
 
     private CsvReporter(MetricRegistry registry,
                         File directory,
@@ -136,14 +132,10 @@ public class CsvReporter extends AbstractPollingReporter {
                         TimeUnit durationUnit,
                         Clock clock,
                         MetricFilter filter) {
-        super(registry, "csv-reporter", filter);
+        super(registry, "csv-reporter", filter, rateUnit, durationUnit);
         this.directory = directory;
         this.locale = locale;
         this.clock = clock;
-        this.rateFactor = rateUnit.toSeconds(1);
-        this.rateUnit = calculateRateUnit(rateUnit);
-        this.durationFactor = 1.0 / durationUnit.toNanos(1);
-        this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
     }
 
     @Override
@@ -183,22 +175,22 @@ public class CsvReporter extends AbstractPollingReporter {
                "count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
                "%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,calls/%s,%s",
                timer.getCount(),
-               snapshot.getMax() * durationFactor,
-               snapshot.getMean() * durationFactor,
-               snapshot.getMin() * durationFactor,
-               snapshot.getStdDev() * durationFactor,
-               snapshot.getMedian() * durationFactor,
-               snapshot.get75thPercentile() * durationFactor,
-               snapshot.get95thPercentile() * durationFactor,
-               snapshot.get98thPercentile() * durationFactor,
-               snapshot.get99thPercentile() * durationFactor,
-               snapshot.get999thPercentile() * durationFactor,
-               timer.getMeanRate() * rateFactor,
-               timer.getOneMinuteRate() * rateFactor,
-               timer.getFiveMinuteRate() * rateFactor,
-               timer.getFifteenMinuteRate() * rateFactor,
-               rateUnit,
-               durationUnit);
+               convertDuration(snapshot.getMax()),
+               convertDuration(snapshot.getMean()),
+               convertDuration(snapshot.getMin()),
+               convertDuration(snapshot.getStdDev()),
+               convertDuration(snapshot.getMedian()),
+               convertDuration(snapshot.get75thPercentile()),
+               convertDuration(snapshot.get95thPercentile()),
+               convertDuration(snapshot.get98thPercentile()),
+               convertDuration(snapshot.get99thPercentile()),
+               convertDuration(snapshot.get999thPercentile()),
+               convertRate(timer.getMeanRate()),
+               convertRate(timer.getOneMinuteRate()),
+               convertRate(timer.getFiveMinuteRate()),
+               convertRate(timer.getFifteenMinuteRate()),
+               getRateUnit(),
+               getDurationUnit());
     }
 
     private void reportMeter(long timestamp, String name, Meter meter) {
@@ -207,11 +199,11 @@ public class CsvReporter extends AbstractPollingReporter {
                "count,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit",
                "%d,%f,%f,%f,%f,events/%s",
                meter.getCount(),
-               meter.getMeanRate() * rateFactor,
-               meter.getOneMinuteRate() * rateFactor,
-               meter.getFiveMinuteRate() * rateFactor,
-               meter.getFifteenMinuteRate() * rateFactor,
-               rateUnit);
+               convertRate(meter.getMeanRate()),
+               convertRate(meter.getOneMinuteRate()),
+               convertRate(meter.getFiveMinuteRate()),
+               convertRate(meter.getFifteenMinuteRate()),
+               getRateUnit());
     }
 
     private void reportHistogram(long timestamp, String name, Histogram histogram) {
@@ -260,11 +252,6 @@ public class CsvReporter extends AbstractPollingReporter {
         } catch (IOException e) {
             LOGGER.warn("Error writing to {}", name, e);
         }
-    }
-
-    private String calculateRateUnit(TimeUnit unit) {
-        final String s = unit.toString().toLowerCase(Locale.US);
-        return s.substring(0, s.length() - 1);
     }
 
     protected String sanitize(String name) {
