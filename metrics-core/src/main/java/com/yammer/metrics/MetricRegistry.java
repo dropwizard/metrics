@@ -396,7 +396,7 @@ public class MetricRegistry {
         MetricBuilder<Histogram> HISTOGRAMS = new MetricBuilder<Histogram>() {
             @Override
             public Histogram newMetric() {
-                return new Histogram(new ExponentiallyDecayingSample());
+                return new Histogram(new ExponentiallyDecayingReservoir());
             }
 
             @Override

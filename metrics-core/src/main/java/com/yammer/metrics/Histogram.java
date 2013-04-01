@@ -12,7 +12,7 @@ import static java.lang.Math.sqrt;
  *      variance</a>
  */
 public class Histogram implements Metric, Sampling, Summarizable {
-    private final Sample sample;
+    private final Reservoir reservoir;
     private final AtomicLong min;
     private final AtomicLong max;
     private final AtomicLong sum;
@@ -22,12 +22,12 @@ public class Histogram implements Metric, Sampling, Summarizable {
     private final AtomicLong count;
 
     /**
-     * Creates a new {@link Histogram} with the given sample.
+     * Creates a new {@link Histogram} with the given reservoir.
      *
-     * @param sample the sample to create a histogram from
+     * @param reservoir the reservoir to create a histogram from
      */
-    public Histogram(Sample sample) {
-        this.sample = sample;
+    public Histogram(Reservoir reservoir) {
+        this.reservoir = reservoir;
         this.min = new AtomicLong(Long.MAX_VALUE);
         this.max = new AtomicLong(Long.MIN_VALUE);
         this.sum = new AtomicLong(0);
@@ -51,7 +51,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
      */
     public void update(long value) {
         count.incrementAndGet();
-        sample.update(value);
+        reservoir.update(value);
         setMax(value);
         setMin(value);
         sum.getAndAdd(value);
@@ -106,7 +106,7 @@ public class Histogram implements Metric, Sampling, Summarizable {
 
     @Override
     public Snapshot getSnapshot() {
-        return sample.getSnapshot();
+        return reservoir.getSnapshot();
     }
 
     private double getVariance() {

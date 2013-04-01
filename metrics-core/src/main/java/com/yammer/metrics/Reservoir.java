@@ -1,9 +1,9 @@
 package com.yammer.metrics;
 
 /**
- * A statistically representative sample of a data stream.
+ * A statistically representative reservoir of a data stream.
  */
-public interface Sample {
+public interface Reservoir {
     /**
      * Returns the number of values recorded.
      *
@@ -12,16 +12,16 @@ public interface Sample {
     int size();
 
     /**
-     * Adds a new recorded value to the sample.
+     * Adds a new recorded value to the reservoir.
      *
      * @param value a new recorded value
      */
     void update(long value);
 
     /**
-     * Returns a snapshot of the sample's values.
+     * Returns a snapshot of the reservoir's values.
      *
-     * @return a snapshot of the sample's values
+     * @return a snapshot of the reservoir's values
      */
     Snapshot getSnapshot();
 }

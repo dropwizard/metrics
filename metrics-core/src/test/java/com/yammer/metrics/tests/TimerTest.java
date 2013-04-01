@@ -1,7 +1,8 @@
 package com.yammer.metrics.tests;
 
 import com.yammer.metrics.Clock;
-import com.yammer.metrics.ExponentiallyDecayingSample;
+import com.yammer.metrics.ExponentiallyDecayingReservoir;
+import com.yammer.metrics.ExponentiallyDecayingReservoir;
 import com.yammer.metrics.Snapshot;
 import com.yammer.metrics.Timer;
 import org.junit.Test;
@@ -22,7 +23,7 @@ public class TimerTest {
             return val += 50000000;
         }
     };
-    private final Timer timer = new Timer(new ExponentiallyDecayingSample(), clock);
+    private final Timer timer = new Timer(new ExponentiallyDecayingReservoir(), clock);
 
     @Test
     public void aBlankTimer() throws Exception {

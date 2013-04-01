@@ -17,7 +17,7 @@ public class Snapshot {
     /**
      * Create a new {@link Snapshot} with the given values.
      *
-     * @param values    an unordered set of values in the sample
+     * @param values    an unordered set of values in the reservoir
      */
     public Snapshot(Collection<Long> values) {
         final Object[] copy = values.toArray();
@@ -31,7 +31,7 @@ public class Snapshot {
     /**
      * Create a new {@link Snapshot} with the given values.
      *
-     * @param values    an unordered set of values in the sample
+     * @param values    an unordered set of values in the reservoir
      */
     public Snapshot(long[] values) {
         this.values = Arrays.copyOf(values, values.length);
@@ -141,7 +141,7 @@ public class Snapshot {
     }
 
     /**
-     * Writes the values of the sample to the given stream.
+     * Writes the values of the snapshot to the given stream.
      *
      * @param output an output stream
      */
