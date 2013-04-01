@@ -66,12 +66,11 @@ public class MetricsModule extends Module {
                               JsonGenerator json,
                               SerializerProvider provider) throws IOException {
             json.writeStartObject();
-            json.writeNumberField("count", histogram.getCount());
-            json.writeNumberField("max", histogram.getMax());
-            json.writeNumberField("mean", histogram.getMean());
-            json.writeNumberField("min", histogram.getMin());
-
             final Snapshot snapshot = histogram.getSnapshot();
+            json.writeNumberField("count", histogram.getCount());
+            json.writeNumberField("max", snapshot.getMax());
+            json.writeNumberField("mean", snapshot.getMean());
+            json.writeNumberField("min", snapshot.getMin());
             json.writeNumberField("p50", snapshot.getMedian());
             json.writeNumberField("p75", snapshot.get75thPercentile());
             json.writeNumberField("p95", snapshot.get95thPercentile());
@@ -83,7 +82,7 @@ public class MetricsModule extends Module {
                 json.writeObjectField("values", snapshot.getValues());
             }
 
-            json.writeNumberField("stddev", histogram.getStdDev());
+            json.writeNumberField("stddev", snapshot.getStdDev());
             json.writeEndObject();
         }
     }
@@ -136,12 +135,12 @@ public class MetricsModule extends Module {
                               JsonGenerator json,
                               SerializerProvider provider) throws IOException {
             json.writeStartObject();
-            json.writeNumberField("count", timer.getCount());
-            json.writeNumberField("max", timer.getMax() * durationFactor);
-            json.writeNumberField("mean", timer.getMean() * durationFactor);
-            json.writeNumberField("min", timer.getMin() * durationFactor);
-
             final Snapshot snapshot = timer.getSnapshot();
+            json.writeNumberField("count", timer.getCount());
+            json.writeNumberField("max", snapshot.getMax() * durationFactor);
+            json.writeNumberField("mean", snapshot.getMean() * durationFactor);
+            json.writeNumberField("min", snapshot.getMin() * durationFactor);
+
             json.writeNumberField("p50", snapshot.getMedian() * durationFactor);
             json.writeNumberField("p75", snapshot.get75thPercentile() * durationFactor);
             json.writeNumberField("p95", snapshot.get95thPercentile() * durationFactor);
@@ -158,7 +157,7 @@ public class MetricsModule extends Module {
                 json.writeObjectField("values", scaledValues);
             }
 
-            json.writeNumberField("stddev", timer.getStdDev() * durationFactor);
+            json.writeNumberField("stddev", snapshot.getStdDev() * durationFactor);
             json.writeNumberField("m15_rate", timer.getOneMinuteRate() * rateFactor);
             json.writeNumberField("m1_rate", timer.getFifteenMinuteRate() * rateFactor);
             json.writeNumberField("m5_rate", timer.getFiveMinuteRate() * rateFactor);

@@ -42,12 +42,12 @@ public class JmxReporterTest {
         when(counter.getCount()).thenReturn(100L);
 
         when(histogram.getCount()).thenReturn(1L);
-        when(histogram.getMax()).thenReturn(2L);
-        when(histogram.getMean()).thenReturn(3.0);
-        when(histogram.getMin()).thenReturn(4L);
-        when(histogram.getStdDev()).thenReturn(5.0);
 
         final Snapshot hSnapshot = mock(Snapshot.class);
+        when(hSnapshot.getMax()).thenReturn(2L);
+        when(hSnapshot.getMean()).thenReturn(3.0);
+        when(hSnapshot.getMin()).thenReturn(4L);
+        when(hSnapshot.getStdDev()).thenReturn(5.0);
         when(hSnapshot.getMedian()).thenReturn(6.0);
         when(hSnapshot.get75thPercentile()).thenReturn(7.0);
         when(hSnapshot.get95thPercentile()).thenReturn(8.0);
@@ -64,17 +64,16 @@ public class JmxReporterTest {
         when(meter.getFifteenMinuteRate()).thenReturn(5.0);
 
         when(timer.getCount()).thenReturn(1L);
-        when(timer.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));
-        when(timer.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));
-        when(timer.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
-        when(timer.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));
-
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
         when(timer.getFiveMinuteRate()).thenReturn(4.0);
         when(timer.getFifteenMinuteRate()).thenReturn(5.0);
 
         final Snapshot tSnapshot = mock(Snapshot.class);
+        when(tSnapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));
+        when(tSnapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));
+        when(tSnapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
+        when(tSnapshot.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));
         when(tSnapshot.getMedian()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(500));
         when(tSnapshot.get75thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(600));
         when(tSnapshot.get95thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(700));

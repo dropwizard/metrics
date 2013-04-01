@@ -183,12 +183,13 @@ public class GangliaReporter extends AbstractPollingReporter {
     private void reportTimer(String name, Timer timer) {
         final String group = group(name);
         try {
-            announce(name(name, "max"), group, timer.getMax() * durationFactor, durationUnit);
-            announce(name(name, "mean"), group, timer.getMean() * durationFactor, durationUnit);
-            announce(name(name, "min"), group, timer.getMin() * durationFactor, durationUnit);
-            announce(name(name, "stddev"), group, timer.getStdDev() * durationFactor, durationUnit);
-
             final Snapshot snapshot = timer.getSnapshot();
+
+            announce(name(name, "max"), group, snapshot.getMax() * durationFactor, durationUnit);
+            announce(name(name, "mean"), group, snapshot.getMean() * durationFactor, durationUnit);
+            announce(name(name, "min"), group, snapshot.getMin() * durationFactor, durationUnit);
+            announce(name(name, "stddev"), group, snapshot.getStdDev() * durationFactor, durationUnit);
+
             announce(name(name, "p50"), group, snapshot.getMedian() * durationFactor, durationUnit);
             announce(name(name, "p75"),
                      group,
@@ -241,11 +242,10 @@ public class GangliaReporter extends AbstractPollingReporter {
             final Snapshot snapshot = histogram.getSnapshot();
 
             announce(name(name, "count"), group, histogram.getCount(), "");
-            announce(name(name, "max"), group, histogram.getMax(), "");
-            announce(name(name, "mean"), group, histogram.getMean(), "");
-            announce(name(name, "min"), group, histogram.getMin(), "");
-            announce(name(name, "stddev"), group, histogram.getStdDev(), "");
-
+            announce(name(name, "max"), group, snapshot.getMax(), "");
+            announce(name(name, "mean"), group, snapshot.getMean(), "");
+            announce(name(name, "min"), group, snapshot.getMin(), "");
+            announce(name(name, "stddev"), group, snapshot.getStdDev(), "");
             announce(name(name, "p50"), group, snapshot.getMedian(), "");
             announce(name(name, "p75"), group, snapshot.get75thPercentile(), "");
             announce(name(name, "p95"), group, snapshot.get95thPercentile(), "");

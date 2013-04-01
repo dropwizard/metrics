@@ -37,7 +37,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name)
                 .isEqualTo(name(getClass(), "updatesTimerForSqlObjects"));
-        assertThat(timer.getMax())
+        assertThat(timer.getSnapshot().getMax())
                 .isEqualTo(1000000000);
     }
 
@@ -57,7 +57,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name)
                 .isEqualTo(name(getClass(), "SELECT 1"));
-        assertThat(timer.getMax())
+        assertThat(timer.getSnapshot().getMax())
                 .isEqualTo(1000000000);
     }
 
@@ -76,7 +76,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name)
                 .isEqualTo(name("sql", "raw", "SELECT 1"));
-        assertThat(timer.getMax())
+        assertThat(timer.getSnapshot().getMax())
                 .isEqualTo(2000000000);
     }
 
@@ -94,7 +94,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name)
                 .isEqualTo(name("sql", "empty"));
-        assertThat(timer.getMax())
+        assertThat(timer.getSnapshot().getMax())
                 .isEqualTo(2000000000);
     }
 
@@ -113,7 +113,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name)
                 .isEqualTo(name("sql", "raw", "don't know what it is but it's not SQL"));
-        assertThat(timer.getMax())
+        assertThat(timer.getSnapshot().getMax())
                 .isEqualTo(3000000000L);
     }
 
@@ -135,7 +135,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name)
                 .isEqualTo(name(getClass(), "updatesTimerForContextClass"));
-        assertThat(timer.getMax())
+        assertThat(timer.getSnapshot().getMax())
                 .isEqualTo(3000000000L);
     }
 
@@ -157,7 +157,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name)
                 .isEqualTo(name("foo", "bar", "updatesTimerForTemplateFile"));
-        assertThat(timer.getMax())
+        assertThat(timer.getSnapshot().getMax())
                 .isEqualTo(4000000000L);
     }
 
@@ -179,7 +179,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name)
                 .isEqualTo(name("my-group", "updatesTimerForContextGroupAndName", ""));
-        assertThat(timer.getMax())
+        assertThat(timer.getSnapshot().getMax())
                 .isEqualTo(4000000000L);
     }
 
@@ -202,7 +202,7 @@ public class InstrumentedTimingCollectorTest {
 
         assertThat(name)
                 .isEqualTo(name("my-group", "my-type", "updatesTimerForContextGroupTypeAndName"));
-        assertThat(timer.getMax())
+        assertThat(timer.getSnapshot().getMax())
                 .isEqualTo(5000000000L);
     }
 
@@ -226,7 +226,7 @@ public class InstrumentedTimingCollectorTest {
                 .isEqualTo(name("jdbi",
                                 getClass().getSimpleName(),
                                 "updatesTimerForShortSqlObjectStrategy"));
-        assertThat(timer.getMax())
+        assertThat(timer.getSnapshot().getMax())
                 .isEqualTo(1000000000);
     }
 
@@ -250,7 +250,7 @@ public class InstrumentedTimingCollectorTest {
                 .isEqualTo(name("jdbi",
                                 getClass().getSimpleName(),
                                 "updatesTimerForShortContextClassStrategy"));
-        assertThat(timer.getMax())
+        assertThat(timer.getSnapshot().getMax())
                 .isEqualTo(3000000000L);
     }
 }

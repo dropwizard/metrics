@@ -249,11 +249,11 @@ public class ConsoleReporter extends AbstractPollingReporter {
 
     private void printHistogram(Histogram histogram) {
         output.printf(locale, "             count = %d%n", histogram.getCount());
-        output.printf(locale, "               min = %d%n", histogram.getMin());
-        output.printf(locale, "               max = %d%n", histogram.getMax());
-        output.printf(locale, "              mean = %2.2f%n", histogram.getMean());
-        output.printf(locale, "            stddev = %2.2f%n", histogram.getStdDev());
         Snapshot snapshot = histogram.getSnapshot();
+        output.printf(locale, "               min = %d%n", snapshot.getMin());
+        output.printf(locale, "               max = %d%n", snapshot.getMax());
+        output.printf(locale, "              mean = %2.2f%n", snapshot.getMean());
+        output.printf(locale, "            stddev = %2.2f%n", snapshot.getStdDev());
         output.printf(locale, "            median = %2.2f%n", snapshot.getMedian());
         output.printf(locale, "              75%% <= %2.2f%n", snapshot.get75thPercentile());
         output.printf(locale, "              95%% <= %2.2f%n", snapshot.get95thPercentile());
@@ -270,10 +270,10 @@ public class ConsoleReporter extends AbstractPollingReporter {
         output.printf(locale, "     5-minute rate = %2.2f calls/%s%n", timer.getFiveMinuteRate() * rateFactor, rateUnit);
         output.printf(locale, "    15-minute rate = %2.2f calls/%s%n", timer.getFifteenMinuteRate() * rateFactor, rateUnit);
 
-        output.printf(locale, "               min = %2.2f %s%n", timer.getMin() * durationFactor, durationUnit);
-        output.printf(locale, "               max = %2.2f %s%n", timer.getMax() * durationFactor, durationUnit);
-        output.printf(locale, "              mean = %2.2f %s%n", timer.getMean() * durationFactor, durationUnit);
-        output.printf(locale, "            stddev = %2.2f %s%n", timer.getStdDev() * durationFactor, durationUnit);
+        output.printf(locale, "               min = %2.2f %s%n", snapshot.getMin() * durationFactor, durationUnit);
+        output.printf(locale, "               max = %2.2f %s%n", snapshot.getMax() * durationFactor, durationUnit);
+        output.printf(locale, "              mean = %2.2f %s%n", snapshot.getMean() * durationFactor, durationUnit);
+        output.printf(locale, "            stddev = %2.2f %s%n", snapshot.getStdDev() * durationFactor, durationUnit);
         output.printf(locale, "            median = %2.2f %s%n", snapshot.getMedian() * durationFactor, durationUnit);
         output.printf(locale, "              75%% <= %2.2f %s%n", snapshot.get75thPercentile() * durationFactor, durationUnit);
         output.printf(locale, "              95%% <= %2.2f %s%n", snapshot.get95thPercentile() * durationFactor, durationUnit);
