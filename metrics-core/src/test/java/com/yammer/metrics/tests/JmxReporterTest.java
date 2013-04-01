@@ -24,6 +24,8 @@ public class JmxReporterTest {
 
     private final JmxReporter reporter = JmxReporter.forRegistry(registry)
                                                     .registerWith(mBeanServer)
+                                                    .convertDurationsTo(TimeUnit.MILLISECONDS)
+                                                    .convertRatesTo(TimeUnit.SECONDS)
                                                     .filter(MetricFilter.ALL)
                                                     .build();
 
@@ -148,14 +150,16 @@ public class JmxReporterTest {
                                                        "MeanRate",
                                                        "OneMinuteRate",
                                                        "FiveMinuteRate",
-                                                       "FifteenMinuteRate");
+                                                       "FifteenMinuteRate",
+                                                       "RateUnit");
 
         assertThat(values(attributes))
                 .contains(entry("Count", 1L))
                 .contains(entry("MeanRate", 2.0))
                 .contains(entry("OneMinuteRate", 3.0))
                 .contains(entry("FiveMinuteRate", 4.0))
-                .contains(entry("FifteenMinuteRate", 5.0));
+                .contains(entry("FifteenMinuteRate", 5.0))
+                .contains(entry("RateUnit", "events/second"));
     }
 
     @Test
@@ -175,7 +179,9 @@ public class JmxReporterTest {
                                                        "95thPercentile",
                                                        "98thPercentile",
                                                        "99thPercentile",
-                                                       "999thPercentile");
+                                                       "999thPercentile",
+                                                       "RateUnit",
+                                                       "DurationUnit");
 
         assertThat(values(attributes))
                 .contains(entry("Count", 1L))
@@ -183,16 +189,18 @@ public class JmxReporterTest {
                 .contains(entry("OneMinuteRate", 3.0))
                 .contains(entry("FiveMinuteRate", 4.0))
                 .contains(entry("FifteenMinuteRate", 5.0))
-                .contains(entry("Max", 100000000L))
-                .contains(entry("Mean", 2.0e8))
-                .contains(entry("Min", 300000000L))
-                .contains(entry("StdDev", 4.0e8))
-                .contains(entry("50thPercentile", 5.0e8))
-                .contains(entry("75thPercentile", 6.0e8))
-                .contains(entry("95thPercentile", 7.0e8))
-                .contains(entry("98thPercentile", 8.0e8))
-                .contains(entry("99thPercentile", 9.0e8))
-                .contains(entry("999thPercentile", 10.0e8));
+                .contains(entry("Max", 100.0))
+                .contains(entry("Mean", 200.0))
+                .contains(entry("Min", 300.0))
+                .contains(entry("StdDev", 400.0))
+                .contains(entry("50thPercentile", 500.0))
+                .contains(entry("75thPercentile", 600.0))
+                .contains(entry("95thPercentile", 700.0))
+                .contains(entry("98thPercentile", 800.0))
+                .contains(entry("99thPercentile", 900.0))
+                .contains(entry("999thPercentile", 1000.0))
+                .contains(entry("RateUnit", "events/second"))
+                .contains(entry("DurationUnit", "milliseconds"));
     }
 
     @Test
