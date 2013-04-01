@@ -35,7 +35,7 @@ public class MetricsServletTest extends AbstractServletTest {
         registry.counter("c").inc();
         registry.histogram("h").update(1);
         registry.register("m", new Meter(clock)).mark();
-        registry.register("t", new Timer(new ExponentiallyDecayingSample(), clock))
+        registry.register("t", new Timer(new ExponentiallyDecayingReservoir(), clock))
                 .update(1, TimeUnit.SECONDS);
 
         request.setMethod("GET");

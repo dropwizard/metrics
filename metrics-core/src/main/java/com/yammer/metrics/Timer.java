@@ -49,28 +49,28 @@ public class Timer implements Metered, Sampling, Summarizable {
      * Creates a new {@link Timer}.
      */
     public Timer() {
-        this(new ExponentiallyDecayingSample());
+        this(new ExponentiallyDecayingReservoir());
     }
 
     /**
-     * Creates a new {@link Timer} that uses the given {@link Sample}.
+     * Creates a new {@link Timer} that uses the given {@link Reservoir}.
      *
-     * @param sample the {@link Sample} implementation the timer should use
+     * @param reservoir the {@link Reservoir} implementation the timer should use
      */
-    public Timer(Sample sample) {
-        this(sample, Clock.defaultClock());
+    public Timer(Reservoir reservoir) {
+        this(reservoir, Clock.defaultClock());
     }
 
     /**
-     * Creates a new {@link Timer} that uses the given {@link Sample} and {@link Clock}.
+     * Creates a new {@link Timer} that uses the given {@link Reservoir} and {@link Clock}.
      *
-     * @param sample the {@link Sample} implementation the timer should use
+     * @param reservoir the {@link Reservoir} implementation the timer should use
      * @param clock  the {@link Clock} implementation the timer should use
      */
-    public Timer(Sample sample, Clock clock) {
+    public Timer(Reservoir reservoir, Clock clock) {
         this.meter = new Meter(clock);
         this.clock = clock;
-        this.histogram = new Histogram(sample);
+        this.histogram = new Histogram(reservoir);
     }
 
     /**

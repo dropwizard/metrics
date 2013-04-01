@@ -186,21 +186,22 @@ works for small data sets, or batch processing systems, but not for high-through
 services.
 
 The solution for this is to sample the data as it goes through. By maintaining a small, manageable
-sample which is statistically representative of the data stream as a whole, we can quickly and
+reservoir which is statistically representative of the data stream as a whole, we can quickly and
 easily calculate quantiles which are valid approximations of the actual quantiles. This technique is
 called **reservoir sampling**.
 
-Metrics provides a number of different ``Sample`` implementations, each of which is useful.
+Metrics provides a number of different ``Reservoir`` implementations, each of which is useful.
 
 .. _man-core-histograms-uniform:
 
-Uniform Samples
----------------
+Uniform Reservoirs
+------------------
 
-A histogram with a uniform sample  produces quantiles which are valid for the entirely of the
+A histogram with a uniform reservoir produces quantiles which are valid for the entirely of the
 histogram's lifetime. It will return a median value, for example, which is the median of all the
 values the histogram has ever been updated with. It does this by using an algorithm called
-`Vitter's R`__), which randomly selects values for the sample with linearly-decreasing probability.
+`Vitter's R`__), which randomly selects values for the reservoir with linearly-decreasing
+probability.
 
 .. __: http://www.cs.umd.edu/~samir/498/vitter.pdf
 
@@ -209,38 +210,40 @@ want to know if the distribution of the underlying data stream has changed recen
 
 .. _man-core-histograms-exponential:
 
-Exponentially Decaying Samples
-------------------------------
+Exponentially Decaying Reservoirs
+---------------------------------
 
-A histogram with an exponentially decaying sample produces quantiles which are representative of
-(roughly) the last five minutes of data. It does so by using a `forward-decaying priority sample`__
-with an exponential weighting towards newer data. Unlike the uniform histogram, a biased histogram
-represents **recent data**, allowing you to know very quickly if the distribution of the data has
-changed. :ref:`man-core-timers` use histograms with exponentially decaying samples.
+A histogram with an exponentially decaying reservoir produces quantiles which are representative of
+(roughly) the last five minutes of data. It does so by using a
+`forward-decaying priority reservoir`__ with an exponential weighting towards newer data. Unlike the
+uniform reservoir, an exponentially decaying reservoir represents **recent data**, allowing you to
+know very quickly if the distribution of the data has changed. :ref:`man-core-timers` use histograms
+with exponentially decaying reservoirs by default.
 
 .. __: http://www.research.att.com/people/Cormode_Graham/library/publications/CormodeShkapenyukSrivastavaXu09.pdf
 
 .. _man-core-histograms-sliding:
 
-Sliding Window Samples
-----------------------
+Sliding Window Reservoirs
+-------------------------
 
-A histogram with a sliding window sample produces quantiles which are representative of the past
+A histogram with a sliding window reservoir produces quantiles which are representative of the past
 ``N`` measurements.
 
 .. _man-core-histograms-sliding-time:
 
-Sliding Time Window Samples
----------------------------
+Sliding Time Window Reservoirs
+------------------------------
 
-A histogram with a sliding time window sample produces quantiles which are strictly representative
-of the past ``N`` seconds (or other time period).
+A histogram with a sliding time window reservoir produces quantiles which are strictly
+representative of the past ``N`` seconds (or other time period).
 
 .. warning::
 
-    While ``SlidingTimeWindowSample`` is easier to understand than ``ExponentiallyDecayingSample``,
-    it is not bounded in size, so using it to sample a high-frequency process can require a
-    significant amount of memory.
+    While ``SlidingTimeWindowReservoir`` is easier to understand than
+    ``ExponentiallyDecayingReservoir``, it is not bounded in size, so using it to sample a
+    high-frequency process can require a significant amount of memory. Because it records every
+    measurement, it's also the slowest reservoir type.
 
 .. _man-core-meters:
 

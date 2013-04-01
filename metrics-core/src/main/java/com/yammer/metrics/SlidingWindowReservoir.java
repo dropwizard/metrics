@@ -6,19 +6,19 @@ import java.util.concurrent.atomic.AtomicLongArray;
 import static java.lang.Math.min;
 
 /**
- * A {@link Sample} implementation backed by a sliding window that stores the last {@code N}
+ * A {@link Reservoir} implementation backed by a sliding window that stores the last {@code N}
  * measurements.
  */
-public class SlidingWindowSample implements Sample {
+public class SlidingWindowReservoir implements Reservoir {
     private final AtomicLongArray measurements;
     private final AtomicLong count;
 
     /**
-     * Creates a new {@link SlidingWindowSample} which stores the last {@code size} measurements.
+     * Creates a new {@link SlidingWindowReservoir} which stores the last {@code size} measurements.
      *
      * @param size the number of measurements to store
      */
-    public SlidingWindowSample(int size) {
+    public SlidingWindowReservoir(int size) {
         this.measurements = new AtomicLongArray(size);
         this.count = new AtomicLong();
     }
