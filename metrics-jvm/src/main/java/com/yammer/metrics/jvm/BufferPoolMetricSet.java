@@ -3,6 +3,8 @@ package com.yammer.metrics.jvm;
 import com.yammer.metrics.JmxAttributeGauge;
 import com.yammer.metrics.Metric;
 import com.yammer.metrics.MetricSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
@@ -19,6 +21,7 @@ import static com.yammer.metrics.MetricRegistry.name;
  * These JMX objects are only available on Java 7 and above.
  */
 public class BufferPoolMetricSet implements MetricSet {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BufferPoolMetricSet.class);
     private static final String[] ATTRIBUTES = { "Count", "MemoryUsed", "TotalCapacity" };
     private static final String[] NAMES = { "count", "used", "capacity" };
     private static final String[] POOLS = { "direct", "mapped" };
@@ -42,7 +45,7 @@ public class BufferPoolMetricSet implements MetricSet {
                     gauges.put(name(pool, name),
                                new JmxAttributeGauge(mBeanServer, on, attribute));
                 } catch (JMException ignored) {
-
+                    LOGGER.debug("Unable to load buffer pool MBeans, possibly running on Java 6");
                 }
             }
         }
