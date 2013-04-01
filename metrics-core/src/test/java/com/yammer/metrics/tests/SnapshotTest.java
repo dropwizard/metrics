@@ -175,4 +175,12 @@ public class SnapshotTest {
         assertThat(snapshot.getStdDev())
                 .isZero();
     }
+
+    @Test
+    public void calculatesAStdDevOfZeroForASingletonSnapshot() throws Exception {
+        final Snapshot snapshot = new Snapshot(new long[]{ 1 });
+
+        assertThat(snapshot.getStdDev())
+                .isZero();
+    }
 }

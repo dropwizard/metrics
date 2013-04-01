@@ -187,7 +187,9 @@ public class Snapshot {
      * @return the standard value
      */
     public double getStdDev() {
-        if (values.length == 0) {
+        // two-pass algorithm for variance, avoids numeric overflow
+
+        if (values.length <= 1) {
             return 0;
         }
 

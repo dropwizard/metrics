@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
  * A timer metric which aggregates timing durations and provides duration statistics, plus
  * throughput statistics via {@link Meter}.
  */
-public class Timer implements Metered, Sampling, Summarizable {
+public class Timer implements Metered, Sampling {
     /**
      * A timing context.
      *
@@ -46,7 +46,8 @@ public class Timer implements Metered, Sampling, Summarizable {
     private final Clock clock;
 
     /**
-     * Creates a new {@link Timer}.
+     * Creates a new {@link Timer} using an {@link ExponentiallyDecayingReservoir} and the default
+     * {@link Clock}.
      */
     public Timer() {
         this(new ExponentiallyDecayingReservoir());
@@ -102,7 +103,7 @@ public class Timer implements Metered, Sampling, Summarizable {
     }
 
     /**
-     * Returns a timing {@link Context}, which measures an elapsed time in nanoseconds.
+     * Returns a new {@link Context}.
      *
      * @return a new {@link Context}
      * @see Context
@@ -136,59 +137,9 @@ public class Timer implements Metered, Sampling, Summarizable {
         return meter.getOneMinuteRate();
     }
 
-    /**
-     * Returns the longest recorded duration.
-     *
-     * @return the longest recorded duration
-     */
-    @Override
-    public long getMax() {
-        return histogram.getMax();
-    }
-
-    /**
-     * Returns the shortest recorded duration.
-     *
-     * @return the shortest recorded duration
-     */
-    @Override
-    public long getMin() {
-        return histogram.getMin();
-    }
-
-    /**
-     * Returns the arithmetic mean of all recorded durations.
-     *
-     * @return the arithmetic mean of all recorded durations
-     */
-    @Override
-    public double getMean() {
-        return histogram.getMean();
-    }
-
-    /**
-     * Returns the standard deviation of all recorded durations.
-     *
-     * @return the standard deviation of all recorded durations
-     */
-    @Override
-    public double getStdDev() {
-        return histogram.getStdDev();
-    }
-
-    /**
-     * Returns the sum of all recorded durations.
-     *
-     * @return the sum of all recorded durations
-     */
-    @Override
-    public long getSum() {
-        return histogram.getSum();
-    }
-
     @Override
     public Snapshot getSnapshot() {
-        return new Snapshot(histogram.getSnapshot().getValues());
+        return histogram.getSnapshot();
     }
 
     private void update(long duration) {

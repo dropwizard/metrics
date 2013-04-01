@@ -187,14 +187,14 @@ public class GraphiteReporter extends AbstractPollingReporter {
     }
 
     private void reportTimer(String name, Timer timer, long timestamp) throws IOException {
-        graphite.send(prefix(name, "max"), format(timer.getMax() * durationFactor), timestamp);
-        graphite.send(prefix(name, "mean"), format(timer.getMean() * durationFactor), timestamp);
-        graphite.send(prefix(name, "min"), format(timer.getMin() * durationFactor), timestamp);
-        graphite.send(prefix(name, "stddev"),
-                      format(timer.getStdDev() * durationFactor),
-                      timestamp);
-
         final Snapshot snapshot = timer.getSnapshot();
+
+        graphite.send(prefix(name, "max"), format(snapshot.getMax() * durationFactor), timestamp);
+        graphite.send(prefix(name, "mean"), format(snapshot.getMean() * durationFactor), timestamp);
+        graphite.send(prefix(name, "min"), format(snapshot.getMin() * durationFactor), timestamp);
+        graphite.send(prefix(name, "stddev"),
+                      format(snapshot.getStdDev() * durationFactor),
+                      timestamp);
         graphite.send(prefix(name, "p50"),
                       format(snapshot.getMedian() * durationFactor),
                       timestamp);
@@ -234,13 +234,12 @@ public class GraphiteReporter extends AbstractPollingReporter {
     }
 
     private void reportHistogram(String name, Histogram histogram, long timestamp) throws IOException {
-        graphite.send(prefix(name, "count"), format(histogram.getCount()), timestamp);
-        graphite.send(prefix(name, "max"), format(histogram.getMax()), timestamp);
-        graphite.send(prefix(name, "mean"), format(histogram.getMean()), timestamp);
-        graphite.send(prefix(name, "min"), format(histogram.getMin()), timestamp);
-        graphite.send(prefix(name, "stddev"), format(histogram.getStdDev()), timestamp);
-
         final Snapshot snapshot = histogram.getSnapshot();
+        graphite.send(prefix(name, "count"), format(histogram.getCount()), timestamp);
+        graphite.send(prefix(name, "max"), format(snapshot.getMax()), timestamp);
+        graphite.send(prefix(name, "mean"), format(snapshot.getMean()), timestamp);
+        graphite.send(prefix(name, "min"), format(snapshot.getMin()), timestamp);
+        graphite.send(prefix(name, "stddev"), format(snapshot.getStdDev()), timestamp);
         graphite.send(prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
         graphite.send(prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
         graphite.send(prefix(name, "p95"), format(snapshot.get95thPercentile()), timestamp);

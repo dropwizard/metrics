@@ -215,22 +215,22 @@ public class JmxReporter {
 
         @Override
         public long getMin() {
-            return metric.getMin();
+            return metric.getSnapshot().getMin();
         }
 
         @Override
         public long getMax() {
-            return metric.getMax();
+            return metric.getSnapshot().getMax();
         }
 
         @Override
         public double getMean() {
-            return metric.getMean();
+            return metric.getSnapshot().getMean();
         }
 
         @Override
         public double getStdDev() {
-            return metric.getStdDev();
+            return metric.getSnapshot().getStdDev();
         }
 
         @Override
@@ -379,22 +379,22 @@ public class JmxReporter {
 
         @Override
         public double getMin() {
-            return metric.getMin() * durationFactor;
+            return metric.getSnapshot().getMin() * durationFactor;
         }
 
         @Override
         public double getMax() {
-            return metric.getMax() * durationFactor;
+            return metric.getSnapshot().getMax() * durationFactor;
         }
 
         @Override
         public double getMean() {
-            return metric.getMean() * durationFactor;
+            return metric.getSnapshot().getMean() * durationFactor;
         }
 
         @Override
         public double getStdDev() {
-            return metric.getStdDev() * durationFactor;
+            return metric.getSnapshot().getStdDev() * durationFactor;
         }
 
         @Override
