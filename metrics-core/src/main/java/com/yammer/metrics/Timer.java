@@ -1,5 +1,6 @@
 package com.yammer.metrics;
 
+import java.io.Closeable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -8,6 +9,38 @@ import java.util.concurrent.TimeUnit;
  * throughput statistics via {@link Meter}.
  */
 public class Timer implements Metered, Sampling, Summarizable {
+    /**
+     * A timing context.
+     *
+     * @see Timer#time()
+     */
+    public static class Context implements Closeable {
+        private final Timer timer;
+        private final Clock clock;
+        private final long startTime;
+
+        private Context(Timer timer, Clock clock) {
+            this.timer = timer;
+            this.clock = clock;
+            this.startTime = clock.getTick();
+        }
+
+        /**
+         * Stops recording the elapsed time, updates the timer and returns the elapsed time in
+         * nanoseconds.
+         */
+        public long stop() {
+            final long elapsed = clock.getTick() - startTime;
+            timer.update(elapsed, TimeUnit.NANOSECONDS);
+            return elapsed;
+        }
+
+        @Override
+        public void close() {
+            stop();
+        }
+    }
+
     private final Meter meter;
     private final Histogram histogram;
     private final Clock clock;
@@ -162,33 +195,6 @@ public class Timer implements Metered, Sampling, Summarizable {
         if (duration >= 0) {
             histogram.update(duration);
             meter.mark();
-        }
-    }
-
-    /**
-     * A timing context.
-     *
-     * @see Timer#time()
-     */
-    public static class Context {
-        private final Timer timer;
-        private final Clock clock;
-        private final long startTime;
-
-        private Context(Timer timer, Clock clock) {
-            this.timer = timer;
-            this.clock = clock;
-            this.startTime = clock.getTick();
-        }
-
-        /**
-         * Stops recording the elapsed time, updates the timer and returns the elapsed time in
-         * nanoseconds.
-         */
-        public long stop() {
-            final long elapsedNanos = clock.getTick() - startTime;
-            timer.update(elapsedNanos, TimeUnit.NANOSECONDS);
-            return elapsedNanos;
         }
     }
 }
