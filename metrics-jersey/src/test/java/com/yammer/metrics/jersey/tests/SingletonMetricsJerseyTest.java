@@ -33,7 +33,7 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
 
     @Override
     protected AppDescriptor configure() {
-        this.registry = new MetricRegistry("test");
+        this.registry = new MetricRegistry();
 
         final DefaultResourceConfig config = new DefaultResourceConfig();
         config.getSingletons().add(new InstrumentedResourceMethodDispatchAdapter(registry));

@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 
 public class MetricsServletTest extends AbstractServletTest {
     private final Clock clock = mock(Clock.class);
-    private final MetricRegistry registry = new MetricRegistry("test");
+    private final MetricRegistry registry = new MetricRegistry();
 
     @Override
     protected void setUp(ServletTester tester) {
@@ -51,7 +51,6 @@ public class MetricsServletTest extends AbstractServletTest {
                 .isEqualTo(200);
         assertThat(response.getContent())
                 .isEqualTo("{" +
-                                   "\"name\":\"test\"," +
                                    "\"version\":\"3.0.0\"," +
                                    "\"gauges\":{" +
                                        "\"g1\":{\"value\":100}" +
@@ -80,7 +79,6 @@ public class MetricsServletTest extends AbstractServletTest {
                 .isEqualTo(200);
         assertThat(response.getContent())
                 .isEqualTo(String.format("{%n" +
-                                                 "  \"name\" : \"test\",%n" +
                                                  "  \"version\" : \"3.0.0\",%n" +
                                                  "  \"gauges\" : {%n" +
                                                  "    \"g1\" : {%n" +

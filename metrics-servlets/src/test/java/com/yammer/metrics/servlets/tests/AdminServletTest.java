@@ -10,7 +10,7 @@ import org.junit.Test;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class AdminServletTest extends AbstractServletTest {
-    private final MetricRegistry registry = new MetricRegistry("test");
+    private final MetricRegistry registry = new MetricRegistry();
     private final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
 
     @Override

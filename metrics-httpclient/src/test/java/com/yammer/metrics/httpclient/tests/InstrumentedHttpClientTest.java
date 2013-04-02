@@ -9,7 +9,7 @@ import org.junit.Test;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class InstrumentedHttpClientTest {
-    private final MetricRegistry registry = new MetricRegistry("test");
+    private final MetricRegistry registry = new MetricRegistry();
     private final HttpClient client = new InstrumentedHttpClient(registry);
 
     @Test

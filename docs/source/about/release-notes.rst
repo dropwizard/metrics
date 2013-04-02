@@ -4,6 +4,14 @@
 Release Notes
 #############
 
+.. _rel-3.0.0-BETA2:
+
+v3.0.0-BETA2-SNAPSHOT
+=====================
+
+* ``MetricRegistry`` no longer has a name.
+* ``JmxReporter`` takes an optional domain property to disambiguate multiple reporters.
+
 .. _rel-3.0.0-BETA1:
 
 v3.0.0-BETA1: Apr 1 2013

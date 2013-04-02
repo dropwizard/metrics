@@ -75,7 +75,7 @@ public abstract class WebappMetricsFilter implements Filter {
         if (o instanceof MetricRegistry) {
             metricsRegistry = (MetricRegistry) o;
         } else {
-            metricsRegistry = new MetricRegistry("servlet");
+            metricsRegistry = new MetricRegistry();
         }
         return metricsRegistry;
     }

@@ -40,14 +40,14 @@ The Registry
 ============
 
 The centerpiece of Metrics is the ``MetricRegistry`` class, which is the container for all your
-application's metrics. Go ahead and create a new one and give it a name:
+application's metrics. Go ahead and create a new one:
 
 .. code-block:: java
 
-    final MetricRegistry metrics = new MetricRegistry("example");
+    final MetricRegistry metrics = new MetricRegistry();
 
 You'll probably want to integrate this into your application's lifecycle (maybe using your
-dependency injection framework), but for now a ``static`` field is fine.
+dependency injection framework), but ``static`` field is fine.
 
 .. _gs-gauges:
 
@@ -87,7 +87,7 @@ for constructing these names:
 This will return a string with something like ``"com.example.QueueManager.jobs.size"``.
 
 For most queue and queue-like structures, you won't want to simply return ``queue.size()``. Most of
-``java.util`` and ``java.util.concurrent`` have implementations of ``#size()`` which are ``O(n)``,
+``java.util`` and ``java.util.concurrent`` have implementations of ``#size()`` which are **O(n)**,
 which means your gauge will be slow (potentially while holding a lock).
 
 .. _gs-counters:

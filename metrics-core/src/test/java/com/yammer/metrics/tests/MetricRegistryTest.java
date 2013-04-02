@@ -14,7 +14,7 @@ import static org.mockito.Mockito.*;
 
 public class MetricRegistryTest {
     private final MetricRegistryListener listener = mock(MetricRegistryListener.class);
-    private final MetricRegistry registry = new MetricRegistry("name");
+    private final MetricRegistry registry = new MetricRegistry();
     @SuppressWarnings("unchecked")
     private final Gauge<String> gauge = mock(Gauge.class);
     private final Counter counter = mock(Counter.class);
@@ -25,12 +25,6 @@ public class MetricRegistryTest {
     @Before
     public void setUp() throws Exception {
         registry.addListener(listener);
-    }
-
-    @Test
-    public void hasAName() throws Exception {
-        assertThat(registry.getName())
-                .isEqualTo("name");
     }
 
     @Test

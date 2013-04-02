@@ -34,11 +34,13 @@ public class JmxReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter = MetricFilter.ALL;
+        private String domain;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
+            this.domain = "metrics";
         }
 
         /**
@@ -85,13 +87,18 @@ public class JmxReporter {
             return this;
         }
 
+        public Builder inDomain(String domain) {
+            this.domain = domain;
+            return this;
+        }
+
         /**
          * Builds a {@link JmxReporter} with the given properties.
          *
          * @return a {@link JmxReporter}
          */
         public JmxReporter build() {
-            return new JmxReporter(mBeanServer, registry, filter, rateUnit, durationUnit);
+            return new JmxReporter(mBeanServer, domain, registry, filter, rateUnit, durationUnit);
         }
     }
 
@@ -624,9 +631,14 @@ public class JmxReporter {
     private final MetricRegistry registry;
     private final JmxListener listener;
 
-    private JmxReporter(MBeanServer mBeanServer, MetricRegistry registry, MetricFilter filter, TimeUnit rateUnit, TimeUnit durationUnit) {
+    private JmxReporter(MBeanServer mBeanServer,
+                        String domain,
+                        MetricRegistry registry,
+                        MetricFilter filter,
+                        TimeUnit rateUnit,
+                        TimeUnit durationUnit) {
         this.registry = registry;
-        this.listener = new JmxListener(mBeanServer, registry.getName(), filter, rateUnit, durationUnit);
+        this.listener = new JmxListener(mBeanServer, domain, filter, rateUnit, durationUnit);
     }
 
     /**

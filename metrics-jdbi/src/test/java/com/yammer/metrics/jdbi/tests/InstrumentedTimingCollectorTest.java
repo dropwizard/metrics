@@ -18,7 +18,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 public class InstrumentedTimingCollectorTest {
-    private final MetricRegistry registry = new MetricRegistry("test");
+    private final MetricRegistry registry = new MetricRegistry();
 
     @Test
     public void updatesTimerForSqlObjects() throws Exception {

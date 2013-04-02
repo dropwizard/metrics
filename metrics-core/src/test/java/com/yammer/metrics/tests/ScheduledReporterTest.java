@@ -18,7 +18,7 @@ public class ScheduledReporterTest {
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
 
-    private final MetricRegistry registry = new MetricRegistry("test");
+    private final MetricRegistry registry = new MetricRegistry();
     private final ScheduledReporter reporter = spy(
             new ScheduledReporter(registry,
                                   "example",
