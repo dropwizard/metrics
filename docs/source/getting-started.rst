@@ -246,8 +246,8 @@ To run all of the registered health checks:
         }
     }
 
-Metrics comes with a pre-built health check: ``DeadlockHealthCheck``, which uses Java's built-in
-thread deadlock detection to determine if any threads are deadlocked.
+Metrics comes with a pre-built health check: ``ThreadDeadlockHealthCheck``, which uses Java's
+built-in thread deadlock detection to determine if any threads are deadlocked.
 
 .. _gs-jmx:
 
