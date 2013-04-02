@@ -48,18 +48,11 @@ public class MetricRegistry {
 
     private final ConcurrentMap<String, Metric> metrics;
     private final List<MetricRegistryListener> listeners;
-    private final String name;
 
     /**
-     * Creates a new {@link MetricRegistry} with the given name.
-     *
-     * @param name the name of the registry
+     * Creates a new {@link MetricRegistry}.
      */
-    public MetricRegistry(String name) {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("A registry needs a name");
-        }
-        this.name = name;
+    public MetricRegistry() {
         this.metrics = new ConcurrentHashMap<String, Metric>();
         this.listeners = new CopyOnWriteArrayList<MetricRegistryListener>();
     }
@@ -176,15 +169,6 @@ public class MetricRegistry {
      */
     public void removeListener(MetricRegistryListener listener) {
         listeners.remove(listener);
-    }
-
-    /**
-     * Returns the registry's name.
-     *
-     * @return the registry's name
-     */
-    public String getName() {
-        return name;
     }
 
     /**

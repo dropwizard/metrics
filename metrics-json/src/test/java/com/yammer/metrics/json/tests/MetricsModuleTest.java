@@ -198,11 +198,10 @@ public class MetricsModuleTest {
 
     @Test
     public void serializesMetricRegistries() throws Exception {
-        final MetricRegistry registry = new MetricRegistry("metrics");
+        final MetricRegistry registry = new MetricRegistry();
 
         assertThat(mapper.writeValueAsString(registry))
                 .isEqualTo("{" +
-                                   "\"name\":\"metrics\"," +
                                    "\"version\":\"3.0.0\"," +
                                    "\"gauges\":{}," +
                                    "\"counters\":{}," +

@@ -20,7 +20,7 @@ import org.eclipse.jetty.util.thread.ThreadPool;
 import static com.yammer.metrics.MetricRegistry.name;
 
 public class ExampleServer {
-    private static final MetricRegistry REGISTRY = new MetricRegistry("example");
+    private static final MetricRegistry REGISTRY = new MetricRegistry();
     private static final Counter COUNTER_1 = REGISTRY.counter(name(ExampleServer.class,
                                                                    "wah",
                                                                    "doody"));

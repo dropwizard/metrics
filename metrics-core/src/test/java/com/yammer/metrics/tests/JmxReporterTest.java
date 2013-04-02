@@ -20,10 +20,11 @@ import static org.mockito.Mockito.*;
 public class JmxReporterTest {
     private final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
     private final String name = UUID.randomUUID().toString().replaceAll("[{\\-}]", "");
-    private final MetricRegistry registry = spy(new MetricRegistry(name));
+    private final MetricRegistry registry = spy(new MetricRegistry());
 
     private final JmxReporter reporter = JmxReporter.forRegistry(registry)
                                                     .registerWith(mBeanServer)
+                                                    .inDomain(name)
                                                     .convertDurationsTo(TimeUnit.MILLISECONDS)
                                                     .convertRatesTo(TimeUnit.SECONDS)
                                                     .filter(MetricFilter.ALL)

@@ -17,7 +17,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 public class InstrumentedEhcacheTest {
     private static final CacheManager MANAGER = CacheManager.create();
 
-    private final MetricRegistry registry = new MetricRegistry("cache");
+    private final MetricRegistry registry = new MetricRegistry();
     private Ehcache cache;
 
     @Before

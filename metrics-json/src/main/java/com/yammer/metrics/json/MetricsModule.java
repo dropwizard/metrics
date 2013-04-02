@@ -178,7 +178,6 @@ public class MetricsModule extends Module {
                               JsonGenerator json,
                               SerializerProvider provider) throws IOException {
             json.writeStartObject();
-            json.writeStringField("name", registry.getName());
             json.writeStringField("version", VERSION.toString());
             json.writeObjectField("gauges", registry.getGauges());
             json.writeObjectField("counters", registry.getCounters());
