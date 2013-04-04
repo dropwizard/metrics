@@ -4,6 +4,7 @@ import com.yammer.metrics.RatioGauge;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -33,12 +34,16 @@ public class FileDescriptorRatioGauge extends RatioGauge {
         try {
             return Ratio.of(invoke("getOpenFileDescriptorCount"),
                             invoke("getMaxFileDescriptorCount"));
-        } catch (ReflectiveOperationException e) {
+        } catch (NoSuchMethodException e) {
+            return Ratio.of(Double.NaN, Double.NaN);
+        } catch (IllegalAccessException e) {
+            return Ratio.of(Double.NaN, Double.NaN);
+        } catch (InvocationTargetException e) {
             return Ratio.of(Double.NaN, Double.NaN);
         }
     }
 
-    private long invoke(String name) throws ReflectiveOperationException {
+    private long invoke(String name) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         final Method method = os.getClass().getDeclaredMethod(name);
         method.setAccessible(true);
         return (Long) method.invoke(os);
