@@ -46,6 +46,11 @@ public class FileDescriptorRatioGaugeTest {
         private long getMaxFileDescriptorCount() {
             return 100;
         }
+
+        // overridden on Java 1.7; random crap on Java 1.6
+        public ObjectName getObjectName() {
+            return null;
+        }
     };
     private final FileDescriptorRatioGauge gauge = new FileDescriptorRatioGauge(os);
 
