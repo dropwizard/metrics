@@ -37,11 +37,6 @@ public class FileDescriptorRatioGaugeTest {
             return 0;
         }
 
-        @Override
-        public ObjectName getObjectName() {
-            return null;
-        }
-
         // these duplicate methods from UnixOperatingSystem
 
         private long getOpenFileDescriptorCount() {
