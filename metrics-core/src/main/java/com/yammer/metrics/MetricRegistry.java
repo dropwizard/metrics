@@ -278,7 +278,7 @@ public class MetricRegistry {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Metric> T getOrAdd(String name, MetricBuilder<T> builder) {
+    protected <T extends Metric> T getOrAdd(String name, MetricBuilder<T> builder) {
         final Metric metric = metrics.get(name);
         if (builder.isInstance(metric)) {
             return (T) metric;
@@ -364,7 +364,7 @@ public class MetricRegistry {
     /**
      * A quick and easy way of capturing the notion of default metrics.
      */
-    private interface MetricBuilder<T extends Metric> {
+    public interface MetricBuilder<T extends Metric> {
         MetricBuilder<Counter> COUNTERS = new MetricBuilder<Counter>() {
             @Override
             public Counter newMetric() {
