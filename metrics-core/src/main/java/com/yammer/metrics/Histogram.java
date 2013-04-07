@@ -1,7 +1,5 @@
 package com.yammer.metrics;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 /**
  * A metric which calculates the distribution of a value.
  *
@@ -10,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Histogram implements Metric, Sampling {
     private final Reservoir reservoir;
-    private final AtomicLong count;
+    private final LongAdder count;
 
     /**
      * Creates a new {@link Histogram} with the given reservoir.
@@ -19,7 +17,7 @@ public class Histogram implements Metric, Sampling {
      */
     public Histogram(Reservoir reservoir) {
         this.reservoir = reservoir;
-        this.count = new AtomicLong(0);
+        this.count = new LongAdder();
     }
 
     /**
@@ -37,7 +35,7 @@ public class Histogram implements Metric, Sampling {
      * @param value the length of the value
      */
     public void update(long value) {
-        count.incrementAndGet();
+        count.increment();
         reservoir.update(value);
     }
 
@@ -47,7 +45,7 @@ public class Histogram implements Metric, Sampling {
      * @return the number of values recorded
      */
     public long getCount() {
-        return count.get();
+        return count.sum();
     }
 
     @Override
