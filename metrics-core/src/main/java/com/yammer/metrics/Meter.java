@@ -16,7 +16,7 @@ public class Meter implements Metered {
     private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
     private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
 
-    private final AtomicLong count = new AtomicLong();
+    private final LongAdder count = new LongAdder();
     private final long startTime;
     private final AtomicLong lastTick;
     private final Clock clock;
@@ -53,7 +53,7 @@ public class Meter implements Metered {
      */
     public void mark(long n) {
         tickIfNecessary();
-        count.addAndGet(n);
+        count.add(n);
         m1Rate.update(n);
         m5Rate.update(n);
         m15Rate.update(n);
@@ -75,7 +75,7 @@ public class Meter implements Metered {
 
     @Override
     public long getCount() {
-        return count.get();
+        return count.sum();
     }
 
     @Override
