@@ -25,6 +25,7 @@
             <groupId>com.yammer.metrics</groupId>
             <artifactId>metrics-healthchecks</artifactId>
             <version>${project.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
