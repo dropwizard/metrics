@@ -9,8 +9,11 @@
     </parent>
 
     <artifactId>metrics-graphite</artifactId>
-    <name>Metrics Graphite Support</name>
+    <name>Graphite Integration for Metrics</name>
     <packaging>bundle</packaging>
+    <description>
+        A reporter for Metrics which announces measurements to a Graphite server.
+    </description>
 
     <dependencies>
         <dependency>

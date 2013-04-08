@@ -9,6 +9,12 @@
     </parent>
 
     <artifactId>metrics-core</artifactId>
-    <name>Metrics Core Library</name>
+    <name>Metrics Core</name>
     <packaging>bundle</packaging>
+    <description>
+        Metrics is a Java library which gives you unparalleled insight into what your code does in
+        production. Developed by Yammer to instrument their JVM-based backend services, Metrics
+        provides a powerful toolkit of ways to measure the behavior of critical components in your
+        production environment.
+    </description>
 </project>

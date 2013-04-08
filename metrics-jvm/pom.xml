@@ -9,8 +9,12 @@
     </parent>
 
     <artifactId>metrics-jvm</artifactId>
-    <name>Metrics JVM Instrumentation</name>
+    <name>JVM Integration for Metrics</name>
     <packaging>bundle</packaging>
+    <description>
+        A set of classes which allow you to monitor critical aspects of your Java Virtual Machine
+        using Metrics.
+    </description>
 
     <dependencies>
         <dependency>

@@ -9,8 +9,11 @@
     </parent>
 
     <artifactId>metrics-ehcache</artifactId>
-    <name>Metrics Ehcache Support</name>
+    <name>Metrics Integration for Ehcache</name>
     <packaging>bundle</packaging>
+    <description>
+        An Ehcache wrapper providing Metrics instrumentation of caches.
+    </description>
 
     <dependencies>
         <dependency>

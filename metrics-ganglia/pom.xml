@@ -9,8 +9,11 @@
     </parent>
 
     <artifactId>metrics-ganglia</artifactId>
-    <name>Metrics Ganglia Support</name>
+    <name>Ganglia Integration for Metrics</name>
     <packaging>bundle</packaging>
+    <description>
+        A reporter for Metrics which announces measurements to a Ganglia cluster.
+    </description>
 
     <dependencies>
         <dependency>

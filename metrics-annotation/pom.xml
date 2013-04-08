@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-annotation</artifactId>
-    <name>Metrics Annotations</name>
+    <name>Annotations for Metrics</name>
     <packaging>bundle</packaging>
     <description>
         A dependency-less package of just the annotations used by other Metrics modules.

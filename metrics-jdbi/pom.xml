@@ -9,8 +9,11 @@
     </parent>
 
     <artifactId>metrics-jdbi</artifactId>
-    <name>Metrics JDBI Support</name>
+    <name>Metrics Integration for JDBI</name>
     <packaging>bundle</packaging>
+    <description>
+        A JDBI wrapper providing Metrics instrumentation of query durations and rates.
+    </description>
 
     <dependencies>
         <dependency>

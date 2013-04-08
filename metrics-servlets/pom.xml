@@ -11,6 +11,10 @@
     <artifactId>metrics-servlets</artifactId>
     <name>Metrics Utility Servlets</name>
     <packaging>bundle</packaging>
+    <description>
+        A set of utility servlets for Metrics, allowing you to expose valuable information about
+        your production environment.
+    </description>
 
     <dependencies>
         <dependency>
