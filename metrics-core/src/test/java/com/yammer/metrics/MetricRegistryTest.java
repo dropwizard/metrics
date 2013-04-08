@@ -338,4 +338,23 @@ public class MetricRegistryTest {
         assertThat(name(g.getClass(), "one", "two"))
                 .isEqualTo("com.yammer.metrics.MetricRegistryTest$5.one.two");
     }
+
+    @Test
+    public void removesMetricsMatchingAFilter() throws Exception {
+        registry.timer("timer-1");
+        registry.timer("timer-2");
+        registry.histogram("histogram-1");
+
+        assertThat(registry.getNames()).contains("timer-1", "timer-2", "histogram-1");
+
+        registry.removeMatching(new MetricFilter() {
+            @Override
+            public boolean matches(String name, Metric metric) {
+                return name.endsWith("1");
+            }
+        });
+
+        assertThat(registry.getNames()).doesNotContain("timer-1", "histogram-1");
+        assertThat(registry.getNames()).contains("timer-2");
+    }
 }
