@@ -1,8 +1,11 @@
 package com.yammer.metrics;
 
-import java.io.*;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
 
 import static java.lang.Math.floor;
 
