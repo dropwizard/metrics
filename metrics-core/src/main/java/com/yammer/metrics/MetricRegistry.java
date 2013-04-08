@@ -158,6 +158,21 @@ public class MetricRegistry {
     }
 
     /**
+     * Removes all metrics which match the given filter.
+     *
+     * @param filter a filter
+     */
+    public void removeMatching(MetricFilter filter) {
+        final Iterator<Map.Entry<String, Metric>> iterator = metrics.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Map.Entry<String, Metric> entry = iterator.next();
+            if (filter.matches(entry.getKey(), entry.getValue())) {
+                iterator.remove();
+            }
+        }
+    }
+
+    /**
      * Adds a {@link MetricRegistryListener} to a collection of listeners that will be notified on
      * metric creation.  Listeners will be notified in the order in which they are added.
      * <p/>
