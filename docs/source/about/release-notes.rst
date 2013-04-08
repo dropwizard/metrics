@@ -11,6 +11,14 @@ v3.0.0-BETA2-SNAPSHOT
 
 * ``MetricRegistry`` no longer has a name.
 * ``JmxReporter`` takes an optional domain property to disambiguate multiple reporters.
+* Fixed Java 6 compatibility problem. (Also added Java 6 as a CI environment.)
+* Added ``MetricRegistryListener.Base``.
+* Switched ``Counter``, ``Meter``, and ``EWMA`` to use JSR133's ``LongAdder`` instead of
+  ``AtomicLong``, improving contended concurrency.
+* Added ``MetricRegistry#buildMap()``, allowing for custom map implementations in
+  ``MetricRegistry``.
+* Added ``MetricRegistry#removeMatching(MetricFilter)``.
+* Changed ``metrics-json`` to optionally depend on ``metrics-healthcheck``.
 
 .. _rel-3.0.0-BETA1:
 
