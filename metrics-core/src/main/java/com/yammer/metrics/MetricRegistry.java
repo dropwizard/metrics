@@ -151,10 +151,15 @@ public class MetricRegistry {
      *
      * @param filter the filter to match metrics to remove
      */
-    public synchronized void removeMatching(MetricFilter filter) {
-        for (String name : getNames()) {
-            if (filter.matches(name, metrics.get(name)))
-                remove(name);
+    public void removeMatching(MetricFilter filter) {
+        Iterator<String> namesIterator = metrics.keySet().iterator();
+        while (namesIterator.hasNext()) {
+            String name = namesIterator.next();
+            Metric metric = metrics.get(name);
+            if (metric != null && filter.matches(name, metric)) {
+                namesIterator.remove();
+                onMetricRemoved(name, metric);
+            }
         }
     }
 
