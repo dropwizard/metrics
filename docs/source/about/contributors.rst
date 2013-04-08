@@ -6,6 +6,7 @@ Contributors
 
 Many, many thanks to:
 
+* `Alan Woodward <https://github.com/romseygeek>`_
 * `Alex Lambert <https://github.com/bifflabs>`_
 * `Basil James Whitehouse III <https://github.com/basil3whitehouse>`_
 * `Benjamin Gehrels <https://github.com/BGehrels>`_
@@ -17,6 +18,7 @@ Many, many thanks to:
 * `Charles Care <https://github.com/ccare>`_
 * `Chris Birchall <https://github.com/cb372>`_
 * `Chris Burroughs <https://github.com/cburroughs>`_
+* `Christopher Swenson <https://github.com/swenson>`_
 * `Ciamac Moallemi <https://github.com/ciamac>`_
 * `Cliff Moon <https://github.com/cliffmoon>`_
 * `Collin VanDyck <https://github.com/collinvandyck>`_
