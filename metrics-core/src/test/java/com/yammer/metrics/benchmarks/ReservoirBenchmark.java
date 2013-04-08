@@ -2,9 +2,10 @@ package com.yammer.metrics.benchmarks;
 
 import com.google.caliper.Runner;
 import com.google.caliper.SimpleBenchmark;
-import com.yammer.metrics.*;
 import com.yammer.metrics.ExponentiallyDecayingReservoir;
+import com.yammer.metrics.SlidingTimeWindowReservoir;
 import com.yammer.metrics.SlidingWindowReservoir;
+import com.yammer.metrics.UniformReservoir;
 
 import java.util.concurrent.TimeUnit;
 

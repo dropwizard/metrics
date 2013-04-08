@@ -8,8 +8,8 @@
 
 package com.yammer.metrics;
 
-import java.util.concurrent.atomic.AtomicLong;
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicLong;
 
 // CHECKSTYLE:OFF
 /**
