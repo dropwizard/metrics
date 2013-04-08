@@ -147,6 +147,23 @@ public class MetricRegistry {
     }
 
     /**
+     * Removes all metrics that match the filter.
+     *
+     * @param filter the filter to match metrics to remove
+     */
+    public void removeMatching(MetricFilter filter) {
+        Iterator<String> namesIterator = metrics.keySet().iterator();
+        while (namesIterator.hasNext()) {
+            String name = namesIterator.next();
+            Metric metric = metrics.get(name);
+            if (metric != null && filter.matches(name, metric)) {
+                namesIterator.remove();
+                onMetricRemoved(name, metric);
+            }
+        }
+    }
+
+    /**
      * Adds a {@link MetricRegistryListener} to a collection of listeners that will be notified on
      * metric creation.  Listeners will be notified in the order in which they are added.
      * <p/>
