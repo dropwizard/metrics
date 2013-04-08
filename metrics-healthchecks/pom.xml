@@ -11,6 +11,10 @@
     <artifactId>metrics-healthchecks</artifactId>
     <name>Metrics Health Checks</name>
     <packaging>bundle</packaging>
+    <description>
+        An addition to Metrics which provides the ability to run application-specific health checks,
+        allowing you to check your application's heath in production.
+    </description>
     
     <dependencies>
         <dependency>

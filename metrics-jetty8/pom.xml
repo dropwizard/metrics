@@ -9,8 +9,12 @@
     </parent>
 
     <artifactId>metrics-jetty8</artifactId>
-    <name>Metrics Support for Jetty 8</name>
+    <name>Metrics Integration for Jetty 8</name>
     <packaging>bundle</packaging>
+    <description>
+        A set of extensions for Jetty 8 which provide instrumentation of thread pools, connector
+        metrics, and application latency and utilization.
+    </description>
 
     <dependencies>
         <dependency>

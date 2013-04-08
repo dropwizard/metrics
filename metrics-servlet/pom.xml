@@ -9,8 +9,11 @@
     </parent>
 
     <artifactId>metrics-servlet</artifactId>
-    <name>Metrics Servlet Support</name>
+    <name>Metrics Integration for Servlets</name>
     <packaging>bundle</packaging>
+    <description>
+        An instrumented filter for servlet environments.
+    </description>
 
     <dependencies>
         <dependency>

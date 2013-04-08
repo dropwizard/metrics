@@ -9,8 +9,11 @@
     </parent>
 
     <artifactId>metrics-json</artifactId>
-    <name>JSON Support for Metrics</name>
+    <name>Jackson Integration for Metrics</name>
     <packaging>bundle</packaging>
+    <description>
+        A set of Jackson modules which provide serializers for most Metrics classes.
+    </description>
 
     <dependencies>
         <dependency>
