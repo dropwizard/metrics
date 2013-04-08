@@ -53,8 +53,19 @@ public class MetricRegistry {
      * Creates a new {@link MetricRegistry}.
      */
     public MetricRegistry() {
-        this.metrics = new ConcurrentHashMap<String, Metric>();
+        this.metrics = buildMap();
         this.listeners = new CopyOnWriteArrayList<MetricRegistryListener>();
+    }
+
+    /**
+     * Creates a new {@link ConcurrentMap} implementation for use inside the registry. Override this
+     * to create a {@link MetricRegistry} with space- or time-bounded metric lifecycles, for
+     * example.
+     *
+     * @return a new {@link ConcurrentMap}
+     */
+    protected ConcurrentMap<String, Metric> buildMap() {
+        return new ConcurrentHashMap<String, Metric>();
     }
 
     /**
