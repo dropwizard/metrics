@@ -48,6 +48,7 @@ public class MetricRegistry {
 
     private final ConcurrentMap<String, Metric> metrics;
     private final List<MetricRegistryListener> listeners;
+    private final List<ExtendedMetricRegistryListener> extendedListeners;
 
     /**
      * Creates a new {@link MetricRegistry}.
@@ -55,6 +56,7 @@ public class MetricRegistry {
     public MetricRegistry() {
         this.metrics = new ConcurrentHashMap<String, Metric>();
         this.listeners = new CopyOnWriteArrayList<MetricRegistryListener>();
+        this.extendedListeners = new CopyOnWriteArrayList<ExtendedMetricRegistryListener>();
     }
 
     /**
@@ -156,7 +158,9 @@ public class MetricRegistry {
      */
     public void addListener(MetricRegistryListener listener) {
         listeners.add(listener);
-
+        if(listener instanceof ExtendedMetricRegistryListener)
+        	extendedListeners.add((ExtendedMetricRegistryListener) listener);
+        
         for (Map.Entry<String, Metric> entry : metrics.entrySet()) {
             notifyListenerOfAddedMetric(listener, entry.getValue(), entry.getKey());
         }
@@ -281,6 +285,7 @@ public class MetricRegistry {
     private <T extends Metric> T getOrAdd(String name, MetricBuilder<T> builder) {
         final Metric metric = metrics.get(name);
         if (builder.isInstance(metric)) {
+        	onMetricGet(name, metric);
             return (T) metric;
         } else if (metric == null) {
             try {
@@ -350,7 +355,29 @@ public class MetricRegistry {
             throw new IllegalArgumentException("Unknown metric type: " + metric.getClass());
         }
     }
+    
+    private void onMetricGet(String name, Metric metric) {
+        for (ExtendedMetricRegistryListener listener : extendedListeners) {
+        	notifyListenerOfGetMetric(listener,metric, name);
+        }
+    }
 
+    private void notifyListenerOfGetMetric(ExtendedMetricRegistryListener listener, Metric metric, String name) {
+        if (metric instanceof Gauge) {
+            listener.onGaugeGet(name, (Gauge<?>) metric);
+        } else if (metric instanceof Counter) {
+            listener.onCounterGet(name, (Counter) metric);
+        } else if (metric instanceof Histogram) {
+            listener.onHistogramGet(name, (Histogram) metric);
+        } else if (metric instanceof Meter) {
+            listener.onMeterGet(name, (Meter) metric);
+        } else if (metric instanceof Timer) {
+            listener.onTimerGet(name, (Timer) metric);
+        } else {
+            throw new IllegalArgumentException("Unknown metric type: " + metric.getClass());
+        }
+    }
+    
     private void registerAll(String prefix, MetricSet metrics) throws IllegalArgumentException {
         for (Map.Entry<String, Metric> entry : metrics.getMetrics().entrySet()) {
             if (entry.getValue() instanceof MetricSet) {
