@@ -163,11 +163,9 @@ public class MetricRegistry {
      * @param filter a filter
      */
     public void removeMatching(MetricFilter filter) {
-        final Iterator<Map.Entry<String, Metric>> iterator = metrics.entrySet().iterator();
-        while (iterator.hasNext()) {
-            final Map.Entry<String, Metric> entry = iterator.next();
+        for (Map.Entry<String, Metric> entry : metrics.entrySet()) {
             if (filter.matches(entry.getKey(), entry.getValue())) {
-                iterator.remove();
+                remove(entry.getKey());
             }
         }
     }
