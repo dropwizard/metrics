@@ -345,7 +345,8 @@ public class MetricRegistryTest {
         registry.timer("timer-2");
         registry.histogram("histogram-1");
 
-        assertThat(registry.getNames()).contains("timer-1", "timer-2", "histogram-1");
+        assertThat(registry.getNames())
+                .contains("timer-1", "timer-2", "histogram-1");
 
         registry.removeMatching(new MetricFilter() {
             @Override
@@ -354,7 +355,12 @@ public class MetricRegistryTest {
             }
         });
 
-        assertThat(registry.getNames()).doesNotContain("timer-1", "histogram-1");
-        assertThat(registry.getNames()).contains("timer-2");
+        assertThat(registry.getNames())
+                .doesNotContain("timer-1", "histogram-1");
+        assertThat(registry.getNames())
+                .contains("timer-2");
+
+        verify(listener).onTimerRemoved("timer-1");
+        verify(listener).onHistogramRemoved("histogram-1");
     }
 }
