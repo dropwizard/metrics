@@ -2,6 +2,9 @@ package com.yammer.metrics.httpclient;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.MetricsRegistry;
+import com.yammer.metrics.httpclient.strategies.ClassAndHttpMethodMetricNameStrategy;
+import com.yammer.metrics.httpclient.strategies.HttpClientMetricNameStrategy;
+import com.yammer.metrics.httpclient.strategies.MethodOnlyMetricNameStrategy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.ConnectionReuseStrategy;
@@ -18,24 +21,47 @@ public class InstrumentedHttpClient extends DefaultHttpClient {
     private final Log log = LogFactory.getLog(getClass());
 
     private final MetricsRegistry registry;
+    private final HttpClientMetricNameStrategy metricNameStrategy;
+
+    public InstrumentedHttpClient(MetricsRegistry registry,
+                                  InstrumentedClientConnManager manager,
+                                  HttpParams params,
+                                  HttpClientMetricNameStrategy metricNameStrategy) {
+        super(manager, params);
+        this.registry = registry;
+        this.metricNameStrategy = metricNameStrategy;
+    }
 
     public InstrumentedHttpClient(MetricsRegistry registry,
                                   InstrumentedClientConnManager manager,
                                   HttpParams params) {
-        super(manager, params);
-        this.registry = registry;
+        this(registry, manager, params, new ClassAndHttpMethodMetricNameStrategy());
     }
 
     public InstrumentedHttpClient(InstrumentedClientConnManager manager, HttpParams params) {
         this(Metrics.defaultRegistry(), manager, params);
     }
 
+    public InstrumentedHttpClient(InstrumentedClientConnManager manager,
+                                  HttpParams params,
+                                  HttpClientMetricNameStrategy metricNameStrategy) {
+        this(Metrics.defaultRegistry(), manager, params, metricNameStrategy);
+    }
+
     public InstrumentedHttpClient(HttpParams params) {
         this(new InstrumentedClientConnManager(), params);
     }
 
+    public InstrumentedHttpClient(HttpParams params, HttpClientMetricNameStrategy metricNameStrategy) {
+        this(new InstrumentedClientConnManager(), params, metricNameStrategy);
+    }
+
     public InstrumentedHttpClient() {
-        this(null);
+        this((HttpParams) null);
+    }
+
+    public InstrumentedHttpClient(HttpClientMetricNameStrategy metricNameStrategy) {
+        this(null, metricNameStrategy);
     }
 
     @Override
@@ -65,6 +91,7 @@ public class InstrumentedHttpClient extends DefaultHttpClient {
                 targetAuthStrategy,
                 proxyAuthStrategy,
                 userTokenHandler,
-                params);
+                params,
+                metricNameStrategy);
     }
 }
