@@ -254,7 +254,15 @@ built-in thread deadlock detection to determine if any threads are deadlocked.
 Reporting Via JMX
 =================
 
-All metrics are visible via **JConsole** or **VisualVM** (if you install the JConsole plugin):
+To report metrics via JMX:
+
+.. code-block:: java
+
+    final JmxReporter reporter = JmxReporter.forRegistry(registry).build();
+    reporter.start();
+
+Once the reporter is started, all of the metrics in the registry will become visible via
+**JConsole** or **VisualVM** (if you install the JConsole plugin):
 
 .. image:: metrics-visualvm.png
     :alt: Metrics exposed as JMX MBeans being viewed in VisualVM's MBeans browser
@@ -263,7 +271,6 @@ All metrics are visible via **JConsole** or **VisualVM** (if you install the JCo
 
     If you double-click any of the metric properties, VisualVM will start graphing the data for that
     property. Sweet, eh?
-
 
 .. _gs-http:
 
