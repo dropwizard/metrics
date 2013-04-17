@@ -29,5 +29,17 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
                 return getIdleThreads();
             }
         });
+
+        registry.register(name(QueuedThreadPool.class, "queue-size"),new Gauge<Integer>() {
+            @Override
+            public Integer getValue() {
+                return getQueue().size();
+            }
+        });
+    }
+
+    @Override
+    public void execute(Runnable job) {
+        super.execute(job);    //To change body of overridden methods use File | Settings | File Templates.
     }
 }
