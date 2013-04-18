@@ -15,3 +15,16 @@ opened.
 
 ``InstrumentedHttpClient`` is a ``HttpClient`` implementation which has per-HTTP method timers for
 HTTP requests.
+
+
+Metric naming strategies
+========================
+The default per-method metric naming and scoping strategy can be overridden by passing an implementation of
+``HttpClientMetricNameStrategy`` to the ``InstrumentedHttpClient`` constructor.
+
+A number of pre-rolled strategies
+are available e.g.:
+
+.. code-block:: java
+
+    HttpClient client = new InstrumentedHttpClient(registry, HttpClientMetricNameStrategies.HOST_AND_METHOD);
