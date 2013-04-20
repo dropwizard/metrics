@@ -9,6 +9,8 @@ Release Notes
 v3.0.0-BETA2-SNAPSHOT
 =====================
 
+* Metrics is now under the ``com.codahale.metrics`` package, with the corresponding changes in Maven
+  artifact groups. This should allow for an easier upgrade path without classpath conflicts.
 * ``MetricRegistry`` no longer has a name.
 * ``JmxReporter`` takes an optional domain property to disambiguate multiple reporters.
 * Fixed Java 6 compatibility problem. (Also added Java 6 as a CI environment.)
