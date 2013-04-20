@@ -20,13 +20,13 @@ public class InstrumentedHttpClient extends DefaultHttpClient {
     private final MetricsRegistry registry;
 
     public InstrumentedHttpClient(MetricsRegistry registry,
-                                  InstrumentedClientConnManager manager,
+                                  ClientConnectionManager manager,
                                   HttpParams params) {
         super(manager, params);
         this.registry = registry;
     }
 
-    public InstrumentedHttpClient(InstrumentedClientConnManager manager, HttpParams params) {
+    public InstrumentedHttpClient(ClientConnectionManager manager, HttpParams params) {
         this(Metrics.defaultRegistry(), manager, params);
     }
 
