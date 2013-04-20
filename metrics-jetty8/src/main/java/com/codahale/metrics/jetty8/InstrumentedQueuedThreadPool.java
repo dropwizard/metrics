@@ -29,5 +29,13 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
                 return getIdleThreads();
             }
         });
+        registry.register(name(QueuedThreadPool.class, "jobs"), new Gauge<Integer>() {
+            @Override
+            public Integer getValue() {
+                // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
+                // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.
+                return getQueue().size();
+            }
+        });
     }
 }
