@@ -12,7 +12,7 @@
     <!--memoryStoreEvictionPolicy="LFU" -->
     <!--transactionalMode="off">-->
 
-    <!--<cacheDecoratorFactory class="com.yammer.metrics.ehcache.InstrumentedEhcacheFactory" />-->
+    <!--<cacheDecoratorFactory class="com.codahalele.metrics.ehcache.InstrumentedEhcacheFactory" />-->
 
     <!--</cache>-->
 

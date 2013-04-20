@@ -153,7 +153,7 @@ doctest:
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
 less:
-	lessc --compress source/_themes/yammerdoc/less/yammerdoc.less > source/_themes/yammerdoc/static/yammerdoc.css
+	lessc --compress source/_themes/metrics/less/metrics.less > source/_themes/metrics/static/metrics.css
 
 upload: clean dirhtml
 	rsync -avz --delete --exclude=maven $(BUILDDIR)/dirhtml/ codahale.com:/home/codahale/metrics.codahale.com/
