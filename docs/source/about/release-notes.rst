@@ -21,6 +21,7 @@ v3.0.0-BETA2-SNAPSHOT
   ``MetricRegistry``.
 * Added ``MetricRegistry#removeMatching(MetricFilter)``.
 * Changed ``metrics-json`` to optionally depend on ``metrics-healthcheck``.
+* Upgraded to Jetty 8.1.10 for ``metrics-jetty8``.
 
 .. _rel-3.0.0-BETA1:
 
