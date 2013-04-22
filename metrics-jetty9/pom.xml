@@ -11,6 +11,12 @@
     </parent>
 
     <artifactId>metrics-jetty9</artifactId>
+    <name>Metrics Integration for Jetty 9</name>
+    <packaging>bundle</packaging>
+    <description>
+        A set of extensions for Jetty 9 which provide instrumentation of thread pools, connector
+        metrics, and application latency and utilization.
+    </description>
 
     <dependencies>
         <dependency>
