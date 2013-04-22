@@ -12,7 +12,7 @@ for the number of active requests, and a timer for request duration. You can use
 
     <filter>
         <filter-name>webappMetricsFilter</filter-name>
-        <filter-class>com.yammer.metrics.servlet.DefaultWebappMetricsFilter</filter-class>
+        <filter-class>com.codahale.metrics.servlet.DefaultWebappMetricsFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>webappMetricsFilter</filter-name>

@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.yammer.metrics</groupId>
+        <groupId>com.codahale.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>3.0.0-BETA2-SNAPSHOT</version>
+        <version>3.0.0-BETA3-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-core</artifactId>
@@ -13,8 +13,7 @@
     <packaging>bundle</packaging>
     <description>
         Metrics is a Java library which gives you unparalleled insight into what your code does in
-        production. Developed by Yammer to instrument their JVM-based backend services, Metrics
-        provides a powerful toolkit of ways to measure the behavior of critical components in your
-        production environment.
+        production. Metrics provides a powerful toolkit of ways to measure the behavior of critical
+        components in your production environment.
     </description>
 </project>
