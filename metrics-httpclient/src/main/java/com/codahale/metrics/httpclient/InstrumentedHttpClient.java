@@ -23,7 +23,7 @@ public class InstrumentedHttpClient extends DefaultHttpClient {
     private final HttpClientMetricNameStrategy metricNameStrategy;
 
     public InstrumentedHttpClient(MetricRegistry registry,
-                                  InstrumentedClientConnManager manager,
+                                  ClientConnectionManager manager,
                                   HttpParams params,
                                   String name,
                                   HttpClientMetricNameStrategy metricNameStrategy) {
