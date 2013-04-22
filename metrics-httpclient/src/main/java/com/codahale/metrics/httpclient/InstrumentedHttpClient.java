@@ -20,7 +20,7 @@ public class InstrumentedHttpClient extends DefaultHttpClient {
     private final String name;
 
     public InstrumentedHttpClient(MetricRegistry registry,
-                                  InstrumentedClientConnManager manager,
+                                  ClientConnectionManager manager,
                                   HttpParams params,
                                   String name) {
         super(manager, params);

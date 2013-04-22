@@ -18,7 +18,7 @@ import java.io.IOException;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-class InstrumentedRequestDirector extends DefaultRequestDirector {
+public class InstrumentedRequestDirector extends DefaultRequestDirector {
     private final static String GET = "GET", POST = "POST", HEAD = "HEAD", PUT = "PUT",
             OPTIONS = "OPTIONS", DELETE = "DELETE", TRACE = "TRACE",
             CONNECT = "CONNECT", MOVE = "MOVE", PATCH = "PATCH";
@@ -35,21 +35,21 @@ class InstrumentedRequestDirector extends DefaultRequestDirector {
     private final Timer patchTimer;
     private final Timer otherTimer;
 
-    InstrumentedRequestDirector(MetricRegistry registry,
-                                String name,
-                                Log log,
-                                HttpRequestExecutor requestExec,
-                                ClientConnectionManager conman,
-                                ConnectionReuseStrategy reustrat,
-                                ConnectionKeepAliveStrategy kastrat,
-                                HttpRoutePlanner rouplan,
-                                HttpProcessor httpProcessor,
-                                HttpRequestRetryHandler retryHandler,
-                                RedirectStrategy redirectStrategy,
-                                AuthenticationStrategy targetAuthStrategy,
-                                AuthenticationStrategy proxyAuthStrategy,
-                                UserTokenHandler userTokenHandler,
-                                HttpParams params) {
+    public InstrumentedRequestDirector(MetricRegistry registry,
+                                       String name,
+                                       Log log,
+                                       HttpRequestExecutor requestExec,
+                                       ClientConnectionManager conman,
+                                       ConnectionReuseStrategy reustrat,
+                                       ConnectionKeepAliveStrategy kastrat,
+                                       HttpRoutePlanner rouplan,
+                                       HttpProcessor httpProcessor,
+                                       HttpRequestRetryHandler retryHandler,
+                                       RedirectStrategy redirectStrategy,
+                                       AuthenticationStrategy targetAuthStrategy,
+                                       AuthenticationStrategy proxyAuthStrategy,
+                                       UserTokenHandler userTokenHandler,
+                                       HttpParams params) {
         super(log,
               requestExec,
               conman,
