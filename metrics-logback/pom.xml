@@ -16,7 +16,7 @@
     </description>
 
     <properties>
-        <logback.version>1.0.9</logback.version>
+        <logback.version>1.0.11</logback.version>
     </properties>
 
     <dependencies>
