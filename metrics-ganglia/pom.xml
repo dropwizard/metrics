@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.yammer.metrics</groupId>
+        <groupId>com.codahale.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>3.0.0-BETA2-SNAPSHOT</version>
+        <version>3.0.0-BETA3-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-ganglia</artifactId>
@@ -17,7 +17,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.yammer.metrics</groupId>
+            <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-core</artifactId>
             <version>${project.version}</version>
         </dependency>

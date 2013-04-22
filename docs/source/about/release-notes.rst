@@ -6,10 +6,13 @@ Release Notes
 
 .. _rel-3.0.0-BETA2:
 
-v3.0.0-BETA2-SNAPSHOT
-=====================
+v3.0.0-BETA2: Apr 22 2013
+=========================
 
+* Metrics is now under the ``com.codahale.metrics`` package, with the corresponding changes in Maven
+  artifact groups. This should allow for an easier upgrade path without classpath conflicts.
 * ``MetricRegistry`` no longer has a name.
+* Added ``metrics-jetty9`` for Jetty 9.
 * ``JmxReporter`` takes an optional domain property to disambiguate multiple reporters.
 * Fixed Java 6 compatibility problem. (Also added Java 6 as a CI environment.)
 * Added ``MetricRegistryListener.Base``.
@@ -19,11 +22,12 @@ v3.0.0-BETA2-SNAPSHOT
   ``MetricRegistry``.
 * Added ``MetricRegistry#removeMatching(MetricFilter)``.
 * Changed ``metrics-json`` to optionally depend on ``metrics-healthcheck``.
+* Upgraded to Jetty 8.1.10 for ``metrics-jetty8``.
 
 .. _rel-3.0.0-BETA1:
 
-v3.0.0-BETA1: Apr 1 2013
-========================
+v3.0.0-BETA1: Apr 01 2013
+=========================
 
 * Total overhaul of most of the core Metrics classes:
 

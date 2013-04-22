@@ -21,7 +21,7 @@ Just add the ``metrics-core`` library as a dependency:
 
     <dependencies>
         <dependency>
-            <groupId>com.yammer.metrics</groupId>
+            <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-core</artifactId>
             <version>${metrics.version}</version>
         </dependency>
@@ -288,7 +288,7 @@ To use this servlet, include the ``metrics-servlets`` module as a dependency:
 .. code-block:: xml
 
     <dependency>
-        <groupId>com.yammer.metrics</groupId>
+        <groupId>com.codahale.metrics</groupId>
         <artifactId>metrics-servlets</artifactId>
         <version>${metrics.version}</version>
     </dependency>

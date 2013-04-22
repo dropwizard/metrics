@@ -5,13 +5,13 @@
         <maven>3.0.0</maven>
     </prerequisites>
 
-    <groupId>com.yammer.metrics</groupId>
+    <groupId>com.codahale.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>3.0.0-BETA2-SNAPSHOT</version>
+    <version>3.0.0-BETA3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
-        Yammer's Metrics library.
+        The Metrics library.
     </description>
     <url>http://metrics.codahale.com/</url>
 
@@ -26,6 +26,7 @@
         <module>metrics-jdbi</module>
         <module>metrics-jersey</module>
         <module>metrics-jetty8</module>
+        <module>metrics-jetty9</module>
         <module>metrics-json</module>
         <module>metrics-jvm</module>
         <module>metrics-log4j</module>
@@ -40,7 +41,8 @@
         <servlet.version>2.5</servlet.version>
         <slf4j.version>1.7.5</slf4j.version>
         <jackson.version>2.1.4</jackson.version>
-        <jetty8.version>8.1.9.v20130131</jetty8.version>
+        <jetty8.version>8.1.10.v20130312</jetty8.version>
+        <jetty9.version>9.0.2.v20130417</jetty9.version>
     </properties>
 
     <developers>
@@ -63,7 +65,8 @@
         <connection>scm:git:git://github.com/codahale/metrics.git</connection>
         <developerConnection>scm:git:git@github.com:codahale/metrics.git</developerConnection>
         <url>http://github.com/codahale/metrics/</url>
-    </scm>
+      <tag>HEAD</tag>
+  </scm>
 
     <issueManagement>
         <system>github</system>
@@ -171,6 +174,16 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <version>2.3.7</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Import-Package><![CDATA[
+                            javax.servlet*;version="[2.5.0,4.0.0)",
+                            org.slf4j*;version="[1.6.0,2.0.0)",
+                            *
+                        ]]>
+                      </Import-Package>
+                    </instructions>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
