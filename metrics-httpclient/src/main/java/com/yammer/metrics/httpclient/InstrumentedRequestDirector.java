@@ -17,7 +17,7 @@ import org.apache.http.protocol.HttpRequestExecutor;
 
 import java.io.IOException;
 
-class InstrumentedRequestDirector extends DefaultRequestDirector {
+public class InstrumentedRequestDirector extends DefaultRequestDirector {
     private final static String GET = "GET", POST = "POST", HEAD = "HEAD", PUT = "PUT",
             OPTIONS = "OPTIONS", DELETE = "DELETE", TRACE = "TRACE",
             CONNECT = "CONNECT", MOVE = "MOVE", PATCH = "PATCH";
@@ -34,7 +34,7 @@ class InstrumentedRequestDirector extends DefaultRequestDirector {
     private final Timer patchTimer;
     private final Timer otherTimer;
 
-    InstrumentedRequestDirector(MetricsRegistry registry,
+    public InstrumentedRequestDirector(MetricsRegistry registry,
                                 Log log,
                                 HttpRequestExecutor requestExec,
                                 ClientConnectionManager conman,
