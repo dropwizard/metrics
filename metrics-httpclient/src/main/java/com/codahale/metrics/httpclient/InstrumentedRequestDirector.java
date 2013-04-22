@@ -16,15 +16,14 @@ import org.apache.http.protocol.HttpRequestExecutor;
 
 import java.io.IOException;
 
-import static com.codahale.metrics.MetricRegistry.name;
 
-class InstrumentedRequestDirector extends DefaultRequestDirector {
+public class InstrumentedRequestDirector extends DefaultRequestDirector {
 
     private final MetricRegistry registry;
     private final HttpClientMetricNameStrategy metricNameStrategy;
     private final String name;
 
-    InstrumentedRequestDirector(MetricRegistry registry,
+    public InstrumentedRequestDirector(MetricRegistry registry,
                                 String name,
                                 HttpClientMetricNameStrategy metricNameStrategy,
                                 Log log,
