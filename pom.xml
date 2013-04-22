@@ -7,7 +7,7 @@
 
     <groupId>com.codahale.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>3.0.0-BETA2</version>
+    <version>3.0.0-BETA3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
@@ -65,7 +65,7 @@
         <connection>scm:git:git://github.com/codahale/metrics.git</connection>
         <developerConnection>scm:git:git@github.com:codahale/metrics.git</developerConnection>
         <url>http://github.com/codahale/metrics/</url>
-      <tag>v3.0.0-BETA2</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <issueManagement>
