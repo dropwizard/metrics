@@ -102,6 +102,16 @@
             <div class="{%- if title == "Home" %}span12{%- else %}span9{%- endif %}" id="body">
                 {% block body %} {% endblock %}
             </div>
+        {%- if title == "Home" -%}
+        <div>
+        YourKit is kindly supporting the Metrics project with its full-featured Java Profiler.
+        YourKit, LLC
+        is the creator of innovative and intelligent tools for profiling Java and .NET
+        applications. Take a look at YourKit's leading software products:
+        <a href="http://www.yourkit.com/java/profiler/index.jsp">YourKit Java Profiler</a> and
+        <a href="http://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET Profiler</a>.
+        </div>
+        {%- endif -%}
         </div>
         <hr/>
         <footer>
