@@ -387,7 +387,7 @@ public class MetricRegistry implements MetricSet {
 
     @Override
     public Map<String, Metric> getMetrics() {
-        return metrics;
+        return Collections.unmodifiableMap(metrics);
     }
 
     /**
