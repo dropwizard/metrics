@@ -303,6 +303,14 @@ public class MetricRegistryTest {
     }
 
     @Test
+    public void registersMetricsFromAnotherRegistry() throws Exception {
+        MetricRegistry other = new MetricRegistry();
+        other.register("gauge", gauge);
+        registry.register("nested", other);
+        assertThat(registry.getNames()).containsOnly("nested.gauge");
+    }
+
+    @Test
     public void concatenatesStringsToFormADottedName() throws Exception {
         assertThat(name("one", "two", "three"))
                 .isEqualTo("one.two.three");

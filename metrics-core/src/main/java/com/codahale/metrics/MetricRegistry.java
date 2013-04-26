@@ -8,7 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * A registry of metric instances.
  */
-public class MetricRegistry {
+public class MetricRegistry implements MetricSet {
     /**
      * Concatenates elements to form a dotted name, eliding any null values or empty strings.
      *
@@ -383,6 +383,11 @@ public class MetricRegistry {
                 register(name(prefix, entry.getKey()), entry.getValue());
             }
         }
+    }
+
+    @Override
+    public Map<String, Metric> getMetrics() {
+        return Collections.unmodifiableMap(metrics);
     }
 
     /**
