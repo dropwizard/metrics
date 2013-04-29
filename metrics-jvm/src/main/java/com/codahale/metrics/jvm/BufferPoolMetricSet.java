@@ -27,9 +27,16 @@ public class BufferPoolMetricSet implements MetricSet {
     private static final String[] POOLS = { "direct", "mapped" };
 
     private final MBeanServer mBeanServer;
+    private final String mMetricNamePrefix;
 
     public BufferPoolMetricSet(MBeanServer mBeanServer) {
+        this(mBeanServer, null);
+    }
+
+    public BufferPoolMetricSet(MBeanServer mBeanServer, String mMetricNamePrefix) {
+        super();
         this.mBeanServer = mBeanServer;
+        this.mMetricNamePrefix = mMetricNamePrefix;
     }
 
     @Override
@@ -42,7 +49,7 @@ public class BufferPoolMetricSet implements MetricSet {
                 try {
                     final ObjectName on = new ObjectName("java.nio:type=BufferPool,name=" + pool);
                     mBeanServer.getMBeanInfo(on);
-                    gauges.put(name(pool, name),
+                    gauges.put(name(mMetricNamePrefix, pool, name),
                                new JmxAttributeGauge(mBeanServer, on, attribute));
                 } catch (JMException ignored) {
                     LOGGER.debug("Unable to load buffer pool MBeans, possibly running on Java 6");
