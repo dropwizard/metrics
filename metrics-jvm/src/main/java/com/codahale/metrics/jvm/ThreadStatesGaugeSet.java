@@ -20,12 +20,22 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class ThreadStatesGaugeSet implements MetricSet {
     private final ThreadMXBean threads;
     private final ThreadDeadlockDetector deadlockDetector;
+    private final String metricNamePrefix;
 
     /**
      * Creates a new set of gauges using the default MXBeans.
      */
     public ThreadStatesGaugeSet() {
-        this(ManagementFactory.getThreadMXBean(), new ThreadDeadlockDetector());
+        this(null);
+    }
+
+    /**
+     * Creates a new set of gauges using the default MXBeans.
+     * 
+     * @param metricNamePrefix prefix for metric names, can be <code>null</code>
+     */
+    public ThreadStatesGaugeSet(String metricNamePrefix) {
+        this(ManagementFactory.getThreadMXBean(), new ThreadDeadlockDetector(), metricNamePrefix);
     }
 
     /**
@@ -36,8 +46,23 @@ public class ThreadStatesGaugeSet implements MetricSet {
      */
     public ThreadStatesGaugeSet(ThreadMXBean threads,
                                 ThreadDeadlockDetector deadlockDetector) {
+        this(threads, deadlockDetector, null);
+    }
+    
+    /**
+     * Creates a new set of gauges using the given MXBean and detector.
+     *
+     * @param threads          a thread MXBean
+     * @param deadlockDetector a deadlock detector
+     * @param metricNamePrefix prefix for metric names, can be <code>null</code>
+     */
+    public ThreadStatesGaugeSet(ThreadMXBean threads, 
+                                ThreadDeadlockDetector deadlockDetector, 
+                                String metricNamePrefix) {
+        super();
         this.threads = threads;
         this.deadlockDetector = deadlockDetector;
+        this.metricNamePrefix = metricNamePrefix;
     }
 
     @Override
@@ -45,7 +70,7 @@ public class ThreadStatesGaugeSet implements MetricSet {
         final Map<String, Metric> gauges = new HashMap<String, Metric>();
 
         for (final Thread.State state : Thread.State.values()) {
-            gauges.put(name(state.toString().toLowerCase(), "count"),
+            gauges.put(name(metricNamePrefix, state.toString().toLowerCase(), "count"),
                        new Gauge<Object>() {
                            @Override
                            public Object getValue() {
@@ -54,21 +79,21 @@ public class ThreadStatesGaugeSet implements MetricSet {
                        });
         }
 
-        gauges.put("count", new Gauge<Integer>() {
+        gauges.put(name(metricNamePrefix, "count"), new Gauge<Integer>() {
             @Override
             public Integer getValue() {
                 return threads.getThreadCount();
             }
         });
 
-        gauges.put("daemon.count", new Gauge<Integer>() {
+        gauges.put(name(metricNamePrefix, "daemon.count"), new Gauge<Integer>() {
             @Override
             public Integer getValue() {
                 return threads.getDaemonThreadCount();
             }
         });
 
-        gauges.put("deadlocks", new Gauge<Set<String>>() {
+        gauges.put(name(metricNamePrefix, "deadlocks"), new Gauge<Set<String>>() {
             @Override
             public Set<String> getValue() {
                 return deadlockDetector.getDeadlockedThreads();

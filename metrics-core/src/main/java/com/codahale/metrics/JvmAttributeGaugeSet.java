@@ -7,38 +7,61 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 /**
  * A set of gauges for the JVM name, vendor, and uptime.
  */
 public class JvmAttributeGaugeSet implements MetricSet {
     private final RuntimeMXBean runtime;
+    private final String metricNamePrefix;
 
     /**
      * Creates a new set of gauges.
      */
     public JvmAttributeGaugeSet() {
-        this(ManagementFactory.getRuntimeMXBean());
+        this(ManagementFactory.getRuntimeMXBean(), null);
+    }
+
+    /**
+     * Creates a new set of gauges.
+     * 
+     * @param metricNamePrefix prefix for metric names, can be <code>null</code>
+     */
+    public JvmAttributeGaugeSet(String metricNamePrefix) {
+        this(ManagementFactory.getRuntimeMXBean(), metricNamePrefix);
     }
 
     /**
      * Creates a new set of gauges with the given {@link RuntimeMXBean}.
      */
     public JvmAttributeGaugeSet(RuntimeMXBean runtime) {
+        this(runtime, null);
+    }
+    
+    /**
+     * Creates a new set of gauges with the given {@link RuntimeMXBean}.
+     * 
+     * @param metricNamePrefix prefix for metric names, can be <code>null</code>
+     */
+    public JvmAttributeGaugeSet(RuntimeMXBean runtime, String metricNamePrefix) {
+        super();
         this.runtime = runtime;
+        this.metricNamePrefix = metricNamePrefix;
     }
 
     @Override
     public Map<String, Metric> getMetrics() {
         final Map<String, Metric> gauges = new HashMap<String, Metric>();
 
-        gauges.put("name", new Gauge<String>() {
+        gauges.put(name(metricNamePrefix, "name"), new Gauge<String>() {
             @Override
             public String getValue() {
                 return runtime.getName();
             }
         });
 
-        gauges.put("vendor", new Gauge<String>() {
+        gauges.put(name(metricNamePrefix, "vendor"), new Gauge<String>() {
             @Override
             public String getValue() {
                 return String.format(Locale.US,
@@ -50,7 +73,7 @@ public class JvmAttributeGaugeSet implements MetricSet {
             }
         });
 
-        gauges.put("uptime", new Gauge<Long>() {
+        gauges.put(name(metricNamePrefix, "uptime"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return runtime.getUptime();
