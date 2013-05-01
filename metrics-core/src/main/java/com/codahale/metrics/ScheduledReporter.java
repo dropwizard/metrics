@@ -83,11 +83,7 @@ public abstract class ScheduledReporter {
         executor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                report(registry.getGauges(filter),
-                       registry.getCounters(filter),
-                       registry.getHistograms(filter),
-                       registry.getMeters(filter),
-                       registry.getTimers(filter));
+                report();
             }
         }, period, period, unit);
     }
@@ -102,6 +98,17 @@ public abstract class ScheduledReporter {
         } catch (InterruptedException ignored) {
             // do nothing
         }
+    }
+
+    /**
+     * Report the current values of all metrics in the registry.
+     */
+    public void report() {
+        report(registry.getGauges(filter),
+               registry.getCounters(filter),
+               registry.getHistograms(filter),
+               registry.getMeters(filter),
+               registry.getTimers(filter));
     }
 
     /**
