@@ -9,7 +9,7 @@ public interface MetricRegistryListener extends EventListener {
     /**
      * A no-op implementation of {@link MetricRegistryListener}.
      */
-    public static abstract class Base implements MetricRegistryListener {
+    abstract class Base implements MetricRegistryListener {
         @Override
         public void onGaugeAdded(String name, Gauge<?> gauge) {
         }
