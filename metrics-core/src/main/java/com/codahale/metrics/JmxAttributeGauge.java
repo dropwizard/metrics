@@ -8,7 +8,11 @@ import java.lang.management.ManagementFactory;
 /**
  * A {@link Gauge} implementation which queries a {@link MBeanServer} for an attribute of an object.
  */
-public class JmxAttributeGauge implements Gauge<Object> {
+public class JmxAttributeGauge implements Gauge<Object>,NoCopyMetric {
+    /**
+   * 
+   */
+  private static final long serialVersionUID = -1054929768844472837L;
     private final MBeanServer mBeanServer;
     private final ObjectName objectName;
     private final String attributeName;

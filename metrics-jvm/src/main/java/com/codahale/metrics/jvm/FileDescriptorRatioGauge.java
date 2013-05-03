@@ -1,16 +1,20 @@
 package com.codahale.metrics.jvm;
 
-import com.codahale.metrics.RatioGauge;
-
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import com.codahale.metrics.NoCopyMetric;
+import com.codahale.metrics.RatioGauge;
+
 /**
  * A gauge for the ratio of used to total file descriptors.
  */
-public class FileDescriptorRatioGauge extends RatioGauge {
+public class FileDescriptorRatioGauge extends RatioGauge implements NoCopyMetric {
+    /**
+   * 
+   */
     private final OperatingSystemMXBean os;
 
     /**

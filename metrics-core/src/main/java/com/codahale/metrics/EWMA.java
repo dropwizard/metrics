@@ -1,5 +1,6 @@
 package com.codahale.metrics;
 
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.exp;
@@ -13,7 +14,11 @@ import static java.lang.Math.exp;
  *      Your Average Average</a>
  * @see <a href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average">EMA</a>
  */
-public class EWMA {
+public class EWMA implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6123523451074139965L;
     private static final int INTERVAL = 5;
     private static final double SECONDS_PER_MINUTE = 60.0;
     private static final int ONE_MINUTE = 1;

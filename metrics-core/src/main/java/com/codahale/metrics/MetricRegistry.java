@@ -1,6 +1,18 @@
 package com.codahale.metrics;
 
-import java.util.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -8,7 +20,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * A registry of metric instances.
  */
-public class MetricRegistry implements MetricSet {
+public class MetricRegistry implements MetricSet, Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 296864930175601093L;
+
     /**
      * Concatenates elements to form a dotted name, eliding any null values or empty strings.
      *
@@ -446,4 +463,51 @@ public class MetricRegistry implements MetricSet {
 
         boolean isInstance(Metric metric);
     }
+    
+    private void writeObject(ObjectOutputStream o)
+        throws IOException {
+        List<String> keys = new ArrayList<String>();
+        for (Map.Entry<String, Metric> e : metrics.entrySet()) {
+          if (!(e.getValue() instanceof NoCopyMetric)) {
+            keys.add(e.getKey());
+          }
+        }
+        o.writeObject(keys.size()); // need the count so we know how many to deserialize
+        for (String key : keys) {
+          Metric m = metrics.get(key);
+          if (!(m instanceof NoCopyMetric)) {
+            o.writeObject(key);
+            o.writeObject(m);
+          }
+        }
+      }
+      
+      private void readObject(ObjectInputStream o)
+        throws IOException, ClassNotFoundException {
+        Class<MetricRegistry> cl = MetricRegistry.class;
+        Field f;
+        try {
+          f = cl.getDeclaredField("listeners");
+          f.setAccessible(true);
+          f.set(this, new CopyOnWriteArrayList<MetricRegistryListener>());
+          f = cl.getDeclaredField("metrics");
+          f.setAccessible(true);
+          f.set(this, buildMap());
+        }
+        catch (SecurityException e) {
+        }
+        catch (NoSuchFieldException e) {
+        }
+        catch (IllegalArgumentException e) {
+        }
+        catch (IllegalAccessException e) {
+        }
+        int count = (Integer)o.readObject();
+        for (int i = 0; i < count; i++ ) {
+          String key = (String)o.readObject();
+          Metric value = (Metric)o.readObject();
+          metrics.put(key,value);
+        }
+       
+      }
 }
