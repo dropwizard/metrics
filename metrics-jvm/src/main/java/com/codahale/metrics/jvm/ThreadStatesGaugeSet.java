@@ -1,8 +1,6 @@
 package com.codahale.metrics.jvm;
 
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.Metric;
-import com.codahale.metrics.MetricSet;
+import static com.codahale.metrics.MetricRegistry.name;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
@@ -12,7 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static com.codahale.metrics.MetricRegistry.name;
+import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricSet;
+import com.codahale.metrics.NoCopyGauge;
 
 /**
  * A set of gauges for the number of threads in their various states and deadlock detection.
@@ -46,29 +46,29 @@ public class ThreadStatesGaugeSet implements MetricSet {
 
         for (final Thread.State state : Thread.State.values()) {
             gauges.put(name(state.toString().toLowerCase(), "count"),
-                       new Gauge<Object>() {
-                           @Override
+                       new NoCopyGauge<Object>() {
+                          @Override
                            public Object getValue() {
                                return getThreadCount(state);
                            }
                        });
         }
 
-        gauges.put("count", new Gauge<Integer>() {
+        gauges.put("count", new NoCopyGauge<Integer>() {
             @Override
             public Integer getValue() {
                 return threads.getThreadCount();
             }
         });
 
-        gauges.put("daemon.count", new Gauge<Integer>() {
+        gauges.put("daemon.count", new NoCopyGauge<Integer>() {
             @Override
             public Integer getValue() {
                 return threads.getDaemonThreadCount();
             }
         });
 
-        gauges.put("deadlocks", new Gauge<Set<String>>() {
+        gauges.put("deadlocks", new NoCopyGauge<Set<String>>() {
             @Override
             public Set<String> getValue() {
                 return deadlockDetector.getDeadlockedThreads();

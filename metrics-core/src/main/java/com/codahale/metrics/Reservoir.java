@@ -1,9 +1,11 @@
 package com.codahale.metrics;
 
+import java.io.Serializable;
+
 /**
  * A statistically representative reservoir of a data stream.
  */
-public interface Reservoir {
+public interface Reservoir extends Serializable {
     /**
      * Returns the number of values recorded.
      *
