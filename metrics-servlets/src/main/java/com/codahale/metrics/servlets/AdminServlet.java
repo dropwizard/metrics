@@ -29,7 +29,7 @@ public class AdminServlet extends HttpServlet {
             "    <li><a href=\"{6}{7}\">Healthcheck</a></li>\n" +
             "  </ul>\n" +
             "</body>\n" +
-            "</html>";
+            "</html>\n";
     private static final String CONTENT_TYPE = "text/html";
     private static final long serialVersionUID = -2850794040708785318L;
 
@@ -73,7 +73,7 @@ public class AdminServlet extends HttpServlet {
         resp.setContentType(CONTENT_TYPE);
         final PrintWriter writer = resp.getWriter();
         try {
-            writer.println(MessageFormat.format(TEMPLATE, path, metricsUri, path, pingUri, path,
+            writer.print(MessageFormat.format(TEMPLATE, path, metricsUri, path, pingUri, path,
                                                 threadsUri, path, healthcheckUri,
                                                 serviceName == null ? "" : " (" + serviceName + ")"));
         } finally {
