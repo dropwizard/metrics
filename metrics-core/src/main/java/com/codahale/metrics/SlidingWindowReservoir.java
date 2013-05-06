@@ -12,6 +12,7 @@ import static java.lang.Math.min;
 public class SlidingWindowReservoir implements Reservoir {
     private final AtomicLongArray measurements;
     private final AtomicLong count;
+    private final AtomicLong sequence;
 
     /**
      * Creates a new {@link SlidingWindowReservoir} which stores the last {@code size} measurements.
@@ -21,6 +22,7 @@ public class SlidingWindowReservoir implements Reservoir {
     public SlidingWindowReservoir(int size) {
         this.measurements = new AtomicLongArray(size);
         this.count = new AtomicLong();
+        this.sequence = new AtomicLong();
     }
 
     @Override
@@ -32,10 +34,15 @@ public class SlidingWindowReservoir implements Reservoir {
     public void update(long value) {
         final int i = (int) (count.getAndIncrement() % measurements.length());
         measurements.set(i, value);
+        sequence.incrementAndGet();
     }
 
     @Override
     public Snapshot getSnapshot() {
+        while(count.get() != sequence.get()) {
+            Thread.yield();
+        }
+
         final long[] values = new long[size()];
         for (int i = 0; i < values.length; i++) {
             values[i] = measurements.get(i);
