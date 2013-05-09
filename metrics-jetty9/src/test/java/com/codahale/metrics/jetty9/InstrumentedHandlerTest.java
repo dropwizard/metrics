@@ -36,6 +36,12 @@ public class InstrumentedHandlerTest {
     }
 
     @Test
+    public void hasAName() throws Exception {
+        assertThat(handler.getName())
+                .isEqualTo("handler");
+    }
+
+    @Test
     public void createsMetricsForTheHandler() throws Exception {
         final ContentResponse response = client.GET("http://localhost:" + connector.getLocalPort() + "/hello");
 
