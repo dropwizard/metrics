@@ -35,22 +35,24 @@ public class AdminServletTest extends AbstractServletTest {
         assertThat(response.getStatus())
                 .isEqualTo(200);
         assertThat(response.getContent())
-                .isEqualTo("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n" +
-                                   "        \"http://www.w3.org/TR/html4/loose.dtd\">\n" +
-                                   "<html>\n" +
-                                   "<head>\n" +
-                                   "  <title>Metrics</title>\n" +
-                                   "</head>\n" +
-                                   "<body>\n" +
-                                   "  <h1>Operational Menu</h1>\n" +
-                                   "  <ul>\n" +
-                                   "    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>\n" +
-                                   "    <li><a href=\"/context/admin/ping\">Ping</a></li>\n" +
-                                   "    <li><a href=\"/context/admin/threads\">Threads</a></li>\n" +
-                                   "    <li><a href=\"/context/admin/healthcheck\">Healthcheck</a></li>\n" +
-                                   "  </ul>\n" +
-                                   "</body>\n" +
-                                   "</html>\n");
+                .isEqualTo(String.format(
+                        "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n" +
+                                "        \"http://www.w3.org/TR/html4/loose.dtd\">%n" +
+                                "<html>%n" +
+                                "<head>%n" +
+                                "  <title>Metrics</title>%n" +
+                                "</head>%n" +
+                                "<body>%n" +
+                                "  <h1>Operational Menu</h1>%n" +
+                                "  <ul>%n" +
+                                "    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n" +
+                                "    <li><a href=\"/context/admin/ping\">Ping</a></li>%n" +
+                                "    <li><a href=\"/context/admin/threads\">Threads</a></li>%n" +
+                                "    <li><a href=\"/context/admin/healthcheck\">Healthcheck</a></li>%n" +
+                                "  </ul>%n" +
+                                "</body>%n" +
+                                "</html>%n"
+                ));
         assertThat(response.getContentType())
                 .isEqualTo("text/html;charset=ISO-8859-1");
     }
