@@ -14,22 +14,24 @@ public class AdminServlet extends HttpServlet {
     public static final String DEFAULT_METRICS_URI = "/metrics";
     public static final String DEFAULT_PING_URI = "/ping";
     public static final String DEFAULT_THREADS_URI = "/threads";
-    private static final String TEMPLATE = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n" +
-            "        \"http://www.w3.org/TR/html4/loose.dtd\">\n" +
-            "<html>\n" +
-            "<head>\n" +
-            "  <title>Metrics{8}</title>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "  <h1>Operational Menu{8}</h1>\n" +
-            "  <ul>\n" +
-            "    <li><a href=\"{0}{1}?pretty=true\">Metrics</a></li>\n" +
-            "    <li><a href=\"{2}{3}\">Ping</a></li>\n" +
-            "    <li><a href=\"{4}{5}\">Threads</a></li>\n" +
-            "    <li><a href=\"{6}{7}\">Healthcheck</a></li>\n" +
-            "  </ul>\n" +
-            "</body>\n" +
-            "</html>";
+    private static final String TEMPLATE = String.format(
+            "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n" +
+                    "        \"http://www.w3.org/TR/html4/loose.dtd\">%n" +
+                    "<html>%n" +
+                    "<head>%n" +
+                    "  <title>Metrics{8}</title>%n" +
+                    "</head>%n" +
+                    "<body>%n" +
+                    "  <h1>Operational Menu{8}</h1>%n" +
+                    "  <ul>%n" +
+                    "    <li><a href=\"{0}{1}?pretty=true\">Metrics</a></li>%n" +
+                    "    <li><a href=\"{2}{3}\">Ping</a></li>%n" +
+                    "    <li><a href=\"{4}{5}\">Threads</a></li>%n" +
+                    "    <li><a href=\"{6}{7}\">Healthcheck</a></li>%n" +
+                    "  </ul>%n" +
+                    "</body>%n" +
+                    "</html>"
+    );
     private static final String CONTENT_TYPE = "text/html";
     private static final long serialVersionUID = -2850794040708785318L;
 
