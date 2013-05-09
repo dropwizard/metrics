@@ -3,9 +3,11 @@ package com.codahale.metrics.jvm;
 import org.junit.Test;
 
 import javax.management.ObjectName;
+import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 
 @SuppressWarnings("UnusedDeclaration")
@@ -60,7 +62,10 @@ public class FileDescriptorRatioGaugeTest {
     }
 
     @Test
-    public void autoDetectsTheOperationSystemBean() throws Exception {
+    public void validateFileDescriptorRatioPresenceOnNixPlatforms() throws Exception {
+        OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+        assumeTrue(osBean instanceof com.sun.management.UnixOperatingSystemMXBean);
+        
         assertThat(new FileDescriptorRatioGauge().getValue())
                 .isGreaterThanOrEqualTo(0.0)
                 .isLessThanOrEqualTo(1.0);
