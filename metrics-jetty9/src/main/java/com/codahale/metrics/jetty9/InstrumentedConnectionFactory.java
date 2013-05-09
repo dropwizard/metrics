@@ -5,14 +5,16 @@ import org.eclipse.jetty.io.Connection;
 import org.eclipse.jetty.io.EndPoint;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.util.component.ContainerLifeCycle;
 
-public class InstrumentedConnectionFactory implements ConnectionFactory {
+public class InstrumentedConnectionFactory extends ContainerLifeCycle implements ConnectionFactory {
     private final ConnectionFactory connectionFactory;
     private final Timer timer;
 
     public InstrumentedConnectionFactory(ConnectionFactory connectionFactory, Timer timer) {
         this.connectionFactory = connectionFactory;
         this.timer = timer;
+        addBean(connectionFactory);
     }
 
     @Override

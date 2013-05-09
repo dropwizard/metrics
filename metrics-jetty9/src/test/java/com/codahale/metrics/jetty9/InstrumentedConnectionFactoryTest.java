@@ -4,6 +4,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -21,12 +22,12 @@ import java.io.PrintWriter;
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-public class InstrumentedConnectorTest {
+public class InstrumentedConnectionFactoryTest {
     private final MetricRegistry registry = new MetricRegistry();
     private final Server server = new Server();
-    private final InstrumentedConnector connector = new InstrumentedConnector(registry,
-                                                                              "one",
-                                                                              server);
+    private final ServerConnector connector =
+            new ServerConnector(server, new InstrumentedConnectionFactory(new HttpConnectionFactory(),
+                                                                          registry.timer("http.connections")));
     private final HttpClient client = new HttpClient();
 
     @Before
@@ -37,11 +38,8 @@ public class InstrumentedConnectorTest {
                                Request baseRequest,
                                HttpServletRequest request,
                                HttpServletResponse response) throws IOException, ServletException {
-                final PrintWriter writer = response.getWriter();
-                try {
+                try (PrintWriter writer = response.getWriter()) {
                     writer.println("OK");
-                } finally {
-                    writer.close();
                 }
             }
         });
@@ -68,7 +66,7 @@ public class InstrumentedConnectorTest {
 
         Thread.sleep(100); // make sure the connection is closed
 
-        final Timer timer = registry.timer(name(ServerConnector.class, "one", "connections"));
+        final Timer timer = registry.timer(name("http.connections"));
         assertThat(timer.getCount())
                 .isEqualTo(1);
     }
