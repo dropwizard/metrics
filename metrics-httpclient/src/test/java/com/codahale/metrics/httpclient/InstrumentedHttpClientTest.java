@@ -7,43 +7,35 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
 public class InstrumentedHttpClientTest {
-
-    @Mock
-    public HttpClientMetricNameStrategy metricNameStrategy;
-    @Mock
-    public MetricRegistryListener registryListener;
-
-    private MetricRegistry metricRegistry;
-    private HttpClient client;
+    private final HttpClientMetricNameStrategy metricNameStrategy =
+            mock(HttpClientMetricNameStrategy.class);
+    private final MetricRegistryListener registryListener =
+            mock(MetricRegistryListener.class);
+    private final MetricRegistry metricRegistry = new MetricRegistry();
+    private final HttpClient client =
+            new InstrumentedHttpClient(metricRegistry, metricNameStrategy);
 
     @Before
-    public void init() {
-        metricRegistry = new MetricRegistry();
+    public void setUp() throws Exception {
         metricRegistry.addListener(registryListener);
-        client = new InstrumentedHttpClient(metricRegistry, metricNameStrategy);
     }
 
     @Test
     public void registersExpectedMetricsGivenNameStrategy() throws Exception {
-        HttpGet get = new HttpGet("http://google.com?q=anything");
-        String metricName = "some.made.up.metric.name";
+        final HttpGet get = new HttpGet("http://example.com?q=anything");
+        final String metricName = "some.made.up.metric.name";
 
-        when(metricNameStrategy.getNameFor(anyString(), eq(get))).thenReturn(metricName);
+        when(metricNameStrategy.getNameFor(anyString(), eq(get)))
+                .thenReturn(metricName);
 
-        try {
-            client.execute(get);
-        } catch (Exception e) {
-        }
+        client.execute(get);
 
         verify(registryListener).onTimerAdded(eq(metricName), any(Timer.class));
     }
