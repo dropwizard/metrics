@@ -19,11 +19,10 @@ HTTP requests.
 
 Metric naming strategies
 ========================
-The default per-method metric naming and scoping strategy can be overridden by passing an implementation of
-``HttpClientMetricNameStrategy`` to the ``InstrumentedHttpClient`` constructor.
+The default per-method metric naming and scoping strategy can be overridden by passing an
+implementation of ``HttpClientMetricNameStrategy`` to the ``InstrumentedHttpClient`` constructor.
 
-A number of pre-rolled strategies
-are available e.g.:
+A number of pre-rolled strategies are available, e.g.:
 
 .. code-block:: java
 
