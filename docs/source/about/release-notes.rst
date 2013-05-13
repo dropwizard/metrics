@@ -19,6 +19,7 @@ v3.0.0-BETA3-SNAPSHOT
 * Added a strategy class for ``HttpClient`` metrics.
 * Upgraded to Jetty 9.0.3.
 * Upgraded to Jackson 2.2.1.
+* Upgraded to Ehcache 2.6.6.
 
 .. _rel-3.0.0-BETA2:
 
