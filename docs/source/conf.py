@@ -106,8 +106,7 @@ html_theme_options = {
     'landing_logo': u'metrics-hat.png',
     'landing_logo_width': u'200px',
     'github_page': u'https://github.com/codahale/metrics',
-    'mailing_list': u'https://groups.google.com/forum/#!forum/metrics-user',
-    'maven_site': u'http://metrics.codahale.com/maven/'
+    'mailing_list': u'https://groups.google.com/forum/#!forum/metrics-user'
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
