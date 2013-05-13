@@ -6,8 +6,8 @@ Release Notes
 
 .. _rel-3.0.0-BETA3:
 
-v3.0.0-BETA3-SNAPSHOT
-=====================
+v3.0.0-BETA3: May 13 2013
+=========================
 
 * Added ``ScheduledReporter#report()`` for manual reporting.
 * Fixed overly-grabby catches in ``HealthCheck`` and
