@@ -4,6 +4,19 @@
 Release Notes
 #############
 
+.. _rel-3.0.0-BETA3:
+
+v3.0.0-BETA3-SNAPSHOT
+=====================
+
+* Added ``ScheduledReporter#report()`` for manual reporting.
+* Fixed overly-grabby catches in ``HealthCheck`` and
+  ``InstrumentedResourceMethodDispatchProvider``.
+* Fixed phantom reads in ``SlidingWindowReservoir``.
+* Revamped ``metrics-jetty9``, removing ``InstrumentedConnector`` and improving
+  the API.
+* Fixed OSGi imports for ``sun.misc``.
+
 .. _rel-3.0.0-BETA2:
 
 v3.0.0-BETA2: Apr 22 2013
