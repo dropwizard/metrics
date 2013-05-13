@@ -40,7 +40,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <servlet.version>2.5</servlet.version>
         <slf4j.version>1.7.5</slf4j.version>
-        <jackson.version>2.1.4</jackson.version>
+        <jackson.version>2.2.1</jackson.version>
         <jetty8.version>8.1.10.v20130312</jetty8.version>
         <jetty9.version>9.0.3.v20130506</jetty9.version>
     </properties>
