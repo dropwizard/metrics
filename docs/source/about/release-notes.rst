@@ -16,6 +16,7 @@ v3.0.0-BETA3-SNAPSHOT
 * Revamped ``metrics-jetty9``, removing ``InstrumentedConnector`` and improving
   the API.
 * Fixed OSGi imports for ``sun.misc``.
+* Added a strategy class for ``HttpClient`` metrics.
 
 .. _rel-3.0.0-BETA2:
 
