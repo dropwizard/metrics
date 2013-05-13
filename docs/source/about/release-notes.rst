@@ -17,6 +17,7 @@ v3.0.0-BETA3-SNAPSHOT
   the API.
 * Fixed OSGi imports for ``sun.misc``.
 * Added a strategy class for ``HttpClient`` metrics.
+* Upgraded to Jetty 9.0.3.
 
 .. _rel-3.0.0-BETA2:
 
