@@ -4,7 +4,10 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.http.*;
-import org.apache.http.client.*;
+import org.apache.http.client.AuthenticationStrategy;
+import org.apache.http.client.HttpRequestRetryHandler;
+import org.apache.http.client.RedirectStrategy;
+import org.apache.http.client.UserTokenHandler;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.conn.routing.HttpRoutePlanner;
@@ -16,29 +19,27 @@ import org.apache.http.protocol.HttpRequestExecutor;
 
 import java.io.IOException;
 
-
 public class InstrumentedRequestDirector extends DefaultRequestDirector {
-
     private final MetricRegistry registry;
     private final HttpClientMetricNameStrategy metricNameStrategy;
     private final String name;
 
     public InstrumentedRequestDirector(MetricRegistry registry,
-                                String name,
-                                HttpClientMetricNameStrategy metricNameStrategy,
-                                Log log,
-                                HttpRequestExecutor requestExec,
-                                ClientConnectionManager conman,
-                                ConnectionReuseStrategy reustrat,
-                                ConnectionKeepAliveStrategy kastrat,
-                                HttpRoutePlanner rouplan,
-                                HttpProcessor httpProcessor,
-                                HttpRequestRetryHandler retryHandler,
-                                RedirectStrategy redirectStrategy,
-                                AuthenticationStrategy targetAuthStrategy,
-                                AuthenticationStrategy proxyAuthStrategy,
-                                UserTokenHandler userTokenHandler,
-                                HttpParams params) {
+                                       String name,
+                                       HttpClientMetricNameStrategy metricNameStrategy,
+                                       Log log,
+                                       HttpRequestExecutor requestExec,
+                                       ClientConnectionManager conman,
+                                       ConnectionReuseStrategy reustrat,
+                                       ConnectionKeepAliveStrategy kastrat,
+                                       HttpRoutePlanner rouplan,
+                                       HttpProcessor httpProcessor,
+                                       HttpRequestRetryHandler retryHandler,
+                                       RedirectStrategy redirectStrategy,
+                                       AuthenticationStrategy targetAuthStrategy,
+                                       AuthenticationStrategy proxyAuthStrategy,
+                                       UserTokenHandler userTokenHandler,
+                                       HttpParams params) {
         super(log,
               requestExec,
               conman,
