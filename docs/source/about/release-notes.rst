@@ -22,6 +22,7 @@ v3.0.0-BETA3-SNAPSHOT
 * Upgraded to Ehcache 2.6.6.
 * Upgraded to Logback 1.0.13.
 * Upgraded to HttpClient 4.2.5.
+* Upgraded to gmetric4j 1.0.3, which allows for host spoofing.
 
 .. _rel-3.0.0-BETA2:
 
