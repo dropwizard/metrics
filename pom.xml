@@ -42,7 +42,7 @@
         <slf4j.version>1.7.5</slf4j.version>
         <jackson.version>2.1.4</jackson.version>
         <jetty8.version>8.1.10.v20130312</jetty8.version>
-        <jetty9.version>9.0.2.v20130417</jetty9.version>
+        <jetty9.version>9.0.3.v20130506</jetty9.version>
     </properties>
 
     <developers>
