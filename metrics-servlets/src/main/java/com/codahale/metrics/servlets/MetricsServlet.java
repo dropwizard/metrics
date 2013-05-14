@@ -1,21 +1,24 @@
 package com.codahale.metrics.servlets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.json.MetricsModule;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
+
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.json.MetricsModule;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 public class MetricsServlet extends HttpServlet {
+    private static final String UTF_8 = "UTF-8";
     public static final String RATE_UNIT = MetricsServlet.class.getCanonicalName() + ".rateUnit";
     public static final String DURATION_UNIT = MetricsServlet.class.getCanonicalName() + ".durationUnit";
     public static final String SHOW_SAMPLES = MetricsServlet.class.getCanonicalName() + ".showSamples";
@@ -55,20 +58,53 @@ public class MetricsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse resp) throws ServletException, IOException {
+        final OutputStream output = resp.getOutputStream();
+        final ByteArrayOutputStream wrappedOutput = new ByteArrayOutputStream();
+
         resp.setContentType(CONTENT_TYPE);
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
-        resp.setStatus(HttpServletResponse.SC_OK);
 
-        final OutputStream output = resp.getOutputStream();
         try {
-            getWriter(req).writeValue(output, registry);
+            final boolean prettyPrint = Boolean.parseBoolean(req.getParameter("pretty"));
+            final String jsonpCallback = req.getParameter("callback");
+            
+            if (jsonpCallback != null) {
+                validateJsonpCallback(jsonpCallback);                
+                output.write(jsonpCallback.getBytes(UTF_8));
+                output.write("(".getBytes(UTF_8));
+            }
+
+            // We have to use a wrapped stream because the act of writing closes the provided stream.
+            getWriter(prettyPrint).writeValue(wrappedOutput, registry);
+            output.write(wrappedOutput.toByteArray());
+            
+            if (jsonpCallback != null) {
+                output.write(");".getBytes(UTF_8));
+            }
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } catch (RuntimeException e) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
             output.close();
+            wrappedOutput.close();
         }
     }
 
-    private ObjectWriter getWriter(HttpServletRequest request) {
-        final boolean prettyPrint = Boolean.parseBoolean(request.getParameter("pretty"));
+    private void validateJsonpCallback(final String jsonpCallback) {
+        // Ensure that the callback name doesn't contain injected code
+        if (jsonpCallback.matches(".*\\W.*")) {
+            throw new IllegalArgumentException("'callback' parameter contains illegal (non-word) characters");
+        }
+        
+        // Ensure that the callback name is a resonable method name
+        int length = jsonpCallback.length();
+        if (length < 1 || length > 64) {
+            throw new IllegalArgumentException("'callback' parameter length must be between 1 and 64 characters");
+        }
+    }
+
+    private ObjectWriter getWriter(boolean prettyPrint) {
         if (prettyPrint) {
             return mapper.writerWithDefaultPrettyPrinter();
         }

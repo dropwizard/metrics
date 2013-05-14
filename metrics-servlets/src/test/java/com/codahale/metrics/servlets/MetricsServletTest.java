@@ -1,15 +1,20 @@
 package com.codahale.metrics.servlets;
 
-import com.codahale.metrics.*;
+import static org.fest.assertions.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.jetty.testing.ServletTester;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
-
-import static org.fest.assertions.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.codahale.metrics.Clock;
+import com.codahale.metrics.ExponentiallyDecayingReservoir;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 
 public class MetricsServletTest extends AbstractServletTest {
     private final Clock clock = mock(Clock.class);
@@ -139,4 +144,44 @@ public class MetricsServletTest extends AbstractServletTest {
         assertThat(response.getContentType())
                 .isEqualTo("application/json");
     }
+    
+    @Test
+    public void validJsonpRequest() throws Exception {
+        request.setURI("/metrics?callback=A_x9");
+        processRequest();
+        System.err.println(response.getContent());
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(response.getContent()).matches("^A_x9(.*);$");
+        assertThat(response.getContentType()).isEqualTo("application/json");
+    }    
+
+    @Test
+    public void illegalJsonpRequest() throws Exception {
+        request.setURI("/metrics?callback=window.alert('hello');A_x9");
+        processRequest();
+        System.err.println(response.getContent());
+        assertThat(response.getStatus()).isEqualTo(500);
+        assertThat(response.getContent() == null);
+        assertThat(response.getContentType()).isEqualTo("application/json");
+    }    
+
+    @Test
+    public void illegalLongJsonpRequest() throws Exception {
+        request.setURI("/metrics?callback=0123456789012345678901234567890123456789012345678901234567890123456789012345678901234");
+        processRequest();
+        System.err.println(response.getContent());
+        assertThat(response.getStatus()).isEqualTo(500);
+        assertThat(response.getContent() == null);
+        assertThat(response.getContentType()).isEqualTo("application/json");
+    }    
+
+    @Test
+    public void illegalShortJsonpRequest() throws Exception {
+        request.setURI("/metrics?callback=");
+        processRequest();
+        System.err.println(response.getContent());
+        assertThat(response.getStatus()).isEqualTo(500);
+        assertThat(response.getContent() == null);
+        assertThat(response.getContentType()).isEqualTo("application/json");
+    }    
 }
