@@ -4,6 +4,13 @@
 Release Notes
 #############
 
+.. _rel-3.0.0-RC1:
+
+v3.0.0-RC1-SNAPSHOT
+===================
+
+* Reverted ``SlidingWindowReservoir`` to a synchronized implementation.
+
 .. _rel-3.0.0-BETA3:
 
 v3.0.0-BETA3: May 13 2013
