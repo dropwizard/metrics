@@ -28,31 +28,22 @@ public class SlidingWindowReservoir implements Reservoir {
 
     @Override
     public int size() {
-        // use count, not index, to prevent phantom reads
         return (int) min(count.get(), measurements.length());
     }
 
     @Override
     public void update(long value) {
-        // entry barrier
-        final long n = index.getAndIncrement();
-        final int idx = (int) (n % measurements.length());
-
-        // critical section
-        measurements.set(idx, value);
-
-        // exit barrier
-        while (true) {
-            // Only return once other writers (i.e., those who have already incremented index) have
-            // incremented count.
-            if (count.compareAndSet(n, n + 1)) {
-                return;
-            }
-        }
+        // first, get and increment the index
+        final int n = (int) (index.getAndIncrement() % measurements.length());
+        // second, set the measurement
+        measurements.set(n, value);
+        // third, increment the count of written measurements
+        count.incrementAndGet();
     }
 
     @Override
     public Snapshot getSnapshot() {
+        // use size, not index, to prevent phantom reads
         final long[] values = new long[size()];
         for (int i = 0; i < values.length; i++) {
             values[i] = measurements.get(i);
