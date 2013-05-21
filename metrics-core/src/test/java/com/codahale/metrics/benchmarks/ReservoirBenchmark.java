@@ -1,17 +1,17 @@
 package com.codahale.metrics.benchmarks;
 
-import com.google.caliper.Runner;
-import com.google.caliper.SimpleBenchmark;
 import com.codahale.metrics.ExponentiallyDecayingReservoir;
 import com.codahale.metrics.SlidingTimeWindowReservoir;
 import com.codahale.metrics.SlidingWindowReservoir;
 import com.codahale.metrics.UniformReservoir;
+import com.google.caliper.Benchmark;
+import com.google.caliper.runner.CaliperMain;
 
 import java.util.concurrent.TimeUnit;
 
-public class ReservoirBenchmark extends SimpleBenchmark {
+public class ReservoirBenchmark extends Benchmark {
     public static void main(String[] args) throws Exception {
-        new Runner().run(ReservoirBenchmark.class.getName());
+        CaliperMain.main(ReservoirBenchmark.class, args);
     }
 
     private final UniformReservoir uniform = new UniformReservoir();
