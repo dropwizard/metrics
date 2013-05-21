@@ -1,12 +1,12 @@
 package com.codahale.metrics.benchmarks;
 
-import com.google.caliper.Runner;
-import com.google.caliper.SimpleBenchmark;
 import com.codahale.metrics.Counter;
+import com.google.caliper.Benchmark;
+import com.google.caliper.runner.CaliperMain;
 
-public class CounterBenchmark extends SimpleBenchmark {
+public class CounterBenchmark extends Benchmark {
     public static void main(String[] args) throws Exception {
-        new Runner().run(CounterBenchmark.class.getName());
+        CaliperMain.main(CounterBenchmark.class, args);
     }
 
     private final Counter counter = new Counter();
