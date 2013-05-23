@@ -3,7 +3,7 @@ package com.codahale.metrics;
 /**
  * An object which maintains mean and exponentially-weighted rate.
  */
-public interface Metered extends Metric {
+public interface Metered extends Metric, Counting {
     /**
      * Returns the number of events which have been marked.
      *
