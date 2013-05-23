@@ -17,6 +17,7 @@
 
     <modules>
         <module>metrics-annotation</module>
+        <module>metrics-benchmarks</module>
         <module>metrics-core</module>
         <module>metrics-healthchecks</module>
         <module>metrics-ehcache</module>
@@ -114,12 +115,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.caliper</groupId>
-            <artifactId>caliper</artifactId>
-            <version>1.0-beta-1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
