@@ -6,7 +6,7 @@ package com.codahale.metrics;
  * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately computing running
  *      variance</a>
  */
-public class Histogram implements Metric, Sampling {
+public class Histogram implements Metric, Sampling, Counting {
     private final Reservoir reservoir;
     private final LongAdder count;
 
@@ -44,6 +44,7 @@ public class Histogram implements Metric, Sampling {
      *
      * @return the number of values recorded
      */
+    @Override
     public long getCount() {
         return count.sum();
     }
