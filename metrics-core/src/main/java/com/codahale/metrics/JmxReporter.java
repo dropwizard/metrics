@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.management.*;
 import java.lang.management.ManagementFactory;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
@@ -35,12 +37,16 @@ public class JmxReporter {
         private TimeUnit durationUnit;
         private MetricFilter filter = MetricFilter.ALL;
         private String domain;
+        private Map<String, TimeUnit> specificDurationUnits;
+        private Map<String, TimeUnit> specificRateUnits;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.domain = "metrics";
+            this.specificDurationUnits = Collections.emptyMap();
+            this.specificRateUnits = Collections.emptyMap();
         }
 
         /**
@@ -93,12 +99,36 @@ public class JmxReporter {
         }
 
         /**
+         * Use specific {@link TimeUnit}s for the duration of the metrics with these names.
+         *
+         * @param specificDurationUnits a map of metric names and specific {@link TimeUnits}
+         * @return {@code this}
+         */
+        public Builder specificDurationUnits(Map<String, TimeUnit> specificDurationUnits) {
+            this.specificDurationUnits = Collections.unmodifiableMap(specificDurationUnits);
+            return this;
+        }
+
+
+        /**
+         * Use specific {@link TimeUnit}s for the rate of the metrics with these names.
+         *
+         * @param specificRateUnits a map of metric names and specific {@link TimeUnits}
+         * @return {@code this}
+         */
+        public Builder specificRateUnits(Map<String, TimeUnit> specificRateUnits) {
+            this.specificRateUnits = Collections.unmodifiableMap(specificRateUnits);
+            return this;
+        }
+
+        /**
          * Builds a {@link JmxReporter} with the given properties.
          *
          * @return a {@link JmxReporter}
          */
         public JmxReporter build() {
-            return new JmxReporter(mBeanServer, domain, registry, filter, rateUnit, durationUnit);
+            MetricTimeUnits timeUnits = new MetricTimeUnits(rateUnit, durationUnit, specificRateUnits, specificDurationUnits);
+            return new JmxReporter(mBeanServer, domain, registry, filter, timeUnits);
         }
     }
 
@@ -444,20 +474,14 @@ public class JmxReporter {
         private final String name;
         private final MBeanServer mBeanServer;
         private final MetricFilter filter;
-        private final TimeUnit rateUnit;
-        private final TimeUnit durationUnit;
+        private final MetricTimeUnits timeUnits;
         private final Set<ObjectName> registered;
 
-        private JmxListener(MBeanServer mBeanServer,
-                            String name,
-                            MetricFilter filter,
-                            TimeUnit rateUnit,
-                            TimeUnit durationUnit) {
+        private JmxListener(MBeanServer mBeanServer, String name, MetricFilter filter, MetricTimeUnits timeUnits) {
             this.mBeanServer = mBeanServer;
             this.name = name;
             this.filter = filter;
-            this.rateUnit = rateUnit;
-            this.durationUnit = durationUnit;
+            this.timeUnits = timeUnits;
             this.registered = new CopyOnWriteArraySet<ObjectName>();
         }
 
@@ -550,7 +574,7 @@ public class JmxReporter {
             try {
                 if (filter.matches(name, meter)) {
                     final ObjectName objectName = createName("meters", name);
-                    mBeanServer.registerMBean(new JmxMeter(meter, objectName, rateUnit), objectName);
+                    mBeanServer.registerMBean(new JmxMeter(meter, objectName, timeUnits.rateFor(name)), objectName);
                     registered.add(objectName);
                 }
             } catch (InstanceAlreadyExistsException e) {
@@ -578,7 +602,7 @@ public class JmxReporter {
             try {
                 if (filter.matches(name, timer)) {
                     final ObjectName objectName = createName("timers", name);
-                    mBeanServer.registerMBean(new JmxTimer(timer, objectName, rateUnit, durationUnit), objectName);
+                    mBeanServer.registerMBean(new JmxTimer(timer, objectName, timeUnits.rateFor(name), timeUnits.durationFor(name)), objectName);
                     registered.add(objectName);
                 }
             } catch (InstanceAlreadyExistsException e) {
@@ -628,6 +652,31 @@ public class JmxReporter {
         }
     }
 
+    private static class MetricTimeUnits {
+        private final TimeUnit defaultRate;
+        private final TimeUnit defaultDuration;
+        private final Map<String, TimeUnit> rateOverrides;
+        private final Map<String, TimeUnit> durationOverrides;
+
+        MetricTimeUnits(TimeUnit defaultRate,
+                        TimeUnit defaultDuration,
+                        Map<String, TimeUnit> rateOverrides,
+                        Map<String, TimeUnit> durationOverrides) {
+            this.defaultRate = defaultRate;
+            this.defaultDuration = defaultDuration;
+            this.rateOverrides = rateOverrides;
+            this.durationOverrides = durationOverrides;
+        }
+
+        public TimeUnit durationFor(String name) {
+            return durationOverrides.containsKey(name) ? durationOverrides.get(name) : defaultDuration;
+        }
+
+        public TimeUnit rateFor(String name) {
+            return rateOverrides.containsKey(name) ? rateOverrides.get(name) : defaultRate;
+        }
+    }
+
     private final MetricRegistry registry;
     private final JmxListener listener;
 
@@ -635,10 +684,9 @@ public class JmxReporter {
                         String domain,
                         MetricRegistry registry,
                         MetricFilter filter,
-                        TimeUnit rateUnit,
-                        TimeUnit durationUnit) {
+                        MetricTimeUnits timeUnits) {
         this.registry = registry;
-        this.listener = new JmxListener(mBeanServer, domain, filter, rateUnit, durationUnit);
+        this.listener = new JmxListener(mBeanServer, domain, filter, timeUnits);
     }
 
     /**
