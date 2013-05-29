@@ -6,32 +6,53 @@ import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.SharedMetricRegistries;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
 /**
- * A Logback {@link AppenderBase} which has six meters, one for each logging level and one for the
- * total number of statements being logged.
+ * A Logback {@link Appender} which has six meters, one for each logging level and one for the total
+ * number of statements being logged. The meter names are the logging level names appended to the
+ * name of the appender.
  */
 public class InstrumentedAppender extends AppenderBase<ILoggingEvent> {
-    private final Meter all;
-    private final Meter trace;
-    private final Meter debug;
-    private final Meter info;
-    private final Meter warn;
-    private final Meter error;
+    private final MetricRegistry registry;
 
-    public InstrumentedAppender(MetricRegistry registry) {
-        this(registry, null);
+    private Meter all;
+    private Meter trace;
+    private Meter debug;
+    private Meter info;
+    private Meter warn;
+    private Meter error;
+
+    /**
+     * Create a new instrumented appender using the given registry name.
+     *
+     * @param registryName the name of the registry in {@link SharedMetricRegistries}
+     */
+    public InstrumentedAppender(String registryName) {
+        this(SharedMetricRegistries.getOrCreate(registryName));
     }
 
-    public InstrumentedAppender(MetricRegistry registry, String name) {
-        this.all = registry.meter(name(Appender.class, name, "all"));
-        this.trace = registry.meter(name(Appender.class, name, "trace"));
-        this.debug = registry.meter(name(Appender.class, name, "debug"));
-        this.info = registry.meter(name(Appender.class, name, "info"));
-        this.warn = registry.meter(name(Appender.class, name, "warn"));
-        this.error = registry.meter(name(Appender.class, name, "error"));
+    /**
+     * Create a new instrumented appender using the given registry.
+     *
+     * @param registry the metric registry
+     */
+    public InstrumentedAppender(MetricRegistry registry) {
+        this.registry = registry;
+        setName(Appender.class.getName());
+    }
+
+    @Override
+    public void start() {
+        this.all = registry.meter(name(getName(), "all"));
+        this.trace = registry.meter(name(getName(), "trace"));
+        this.debug = registry.meter(name(getName(), "debug"));
+        this.info = registry.meter(name(getName(), "info"));
+        this.warn = registry.meter(name(getName(), "warn"));
+        this.error = registry.meter(name(getName(), "error"));
+        super.start();
     }
 
     @Override
