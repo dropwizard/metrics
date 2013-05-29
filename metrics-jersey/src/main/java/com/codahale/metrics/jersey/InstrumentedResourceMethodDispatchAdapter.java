@@ -1,8 +1,9 @@
 package com.codahale.metrics.jersey;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.SharedMetricRegistries;
 import com.sun.jersey.spi.container.ResourceMethodDispatchAdapter;
 import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
-import com.codahale.metrics.MetricRegistry;
 
 import javax.ws.rs.ext.Provider;
 
@@ -15,11 +16,19 @@ public class InstrumentedResourceMethodDispatchAdapter implements ResourceMethod
     private final MetricRegistry registry;
 
     /**
-     * Construct a resource method dispatch adapter using the given
-     * metrics registry
-     * <p />
+     * Construct a resource method dispatch adapter using the given metrics registry name.
+     *
+     * @param registryName the name of a shared metric registry
+     */
+    public InstrumentedResourceMethodDispatchAdapter(String registryName) {
+        this(SharedMetricRegistries.getOrCreate(registryName));
+    }
+
+    /**
+     * Construct a resource method dispatch adapter using the given metrics registry.
+     * <p/>
      * When using this constructor, the {@link InstrumentedResourceMethodDispatchAdapter}
-     * should be added to a Jersey {@code ResourceConfig} as a singleton
+     * should be added to a Jersey {@code ResourceConfig} as a singleton.
      *
      * @param registry a {@link MetricRegistry}
      */
