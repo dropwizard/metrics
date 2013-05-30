@@ -37,8 +37,8 @@ MetricsServlet
 ``MetricsServlet`` exposes the state of the metrics in a particular registry as a JSON object.
 
 If the servlet context has an attributed named
-``com.codahale.metrics.servlets.MetricsServlet.registry`` which is a ``MetricsRegistry``,
-``MetricsServlet`` will use that instead of the default ``MetricsRegistry``.
+``com.codahale.metrics.servlets.MetricsServlet.registry`` which is a ``MetricRegistry``,
+``MetricsServlet`` will use that instead of the default ``MetricRegistry``.
 
 ``MetricsServlet`` also takes an initialization parameter, ``show-jvm-metrics``, which if ``"false"`` will
 disable the outputting of JVM-level information in the JSON object.
