@@ -134,7 +134,6 @@ public class InstrumentedHandler extends HandlerWrapper {
             public void onComplete(AsyncEvent event) throws IOException {
                 final HttpChannelState state = (HttpChannelState) event.getAsyncContext();
                 final Request request = state.getBaseRequest();
-                activeRequests.dec();
                 updateResponses(request);
                 if (!state.isDispatched()) {
                     activeSuspended.dec();
@@ -181,7 +180,6 @@ public class InstrumentedHandler extends HandlerWrapper {
                 }
                 activeSuspended.inc();
             } else if (state.isInitial()) {
-                activeRequests.dec();
                 requests.update(dispatched, TimeUnit.MILLISECONDS);
                 updateResponses(request);
             }
