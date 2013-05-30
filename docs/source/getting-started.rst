@@ -172,7 +172,7 @@ duration.
 
 .. code-block:: java
 
-    private final Timer responses = metrics.timer(name(RequestHandler.class, "responses");
+    private final Timer responses = metrics.timer(name(RequestHandler.class, "responses"));
 
     public String handleRequest(Request request, Response response) {
         final Timer.Context context = responses.time();
