@@ -6,10 +6,25 @@ Release Notes
 
 .. _rel-3.0.0-RC1:
 
-v3.0.0-RC1-SNAPSHOT
-===================
+v3.0.0-RC1: May 31 2013
+=======================
 
+* Added ``SharedMetricRegistries``, a singleton for sharing named metric registries.
+* Fixed XML configuration for ``metrics-ehcache``.
+* Fixed XML configuration for ``metrics-jersey``.
+* Fixed XML configuration for ``metrics-log4j``.
+* Fixed XML configuration for ``metrics-logback``.
+* Fixed a counting bug in ``metrics-jetty9``'s InstrumentedHandler.
+* Added ``MetricsContextListener`` to ``metrics-servlet``.
+* Added ``MetricsServletContextListener`` to ``metrics-servlets``.
+* Extracted the ``Counting`` interface.
 * Reverted ``SlidingWindowReservoir`` to a synchronized implementation.
+* Added the implementation version to the JAR manifests.
+* Made dependencies for all modules conform to Maven Enforcer's convergence rules.
+* Fixed ``Slf4jReporter``'s logging of 99th percentiles.
+* Added optional name prefixing to ``GraphiteReporter``.
+* Added metric-specific overrides of rate and duration units to ``JmxReporter``.
+* Documentation fixes.
 
 .. _rel-3.0.0-BETA3:
 
