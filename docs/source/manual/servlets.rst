@@ -65,3 +65,12 @@ AdminServlet
   * ``/metrics``: ``MetricsServlet``
   * ``/ping``: ``PingServlet``
   * ``/threads``: ``ThreadDumpServlet``
+
+MetricsServletContextListener
+===========
+
+``MetricsServletContextListener`` is a ServletContextListener that can be used to set up registries
+that are required by the ``AdminServlet``. It instantiates ``MetricRegistry`` and
+``HealthCheckRegistry``, and adds them to the ServletContext as attributes.
+
+
