@@ -37,8 +37,8 @@ MetricsServlet
 ``MetricsServlet`` exposes the state of the metrics in a particular registry as a JSON object.
 
 If the servlet context has an attributed named
-``com.codahale.metrics.servlets.MetricsServlet.registry`` which is a ``MetricRegistry``,
-``MetricsServlet`` will use that instead of the default ``MetricRegistry``.
+``com.codahale.metrics.servlets.MetricsServlet.registry`` which is a ``MetricsRegistry``,
+``MetricsServlet`` will use that instead of the default ``MetricsRegistry``.
 
 ``MetricsServlet`` also takes an initialization parameter, ``show-jvm-metrics``, which if ``"false"`` will
 disable the outputting of JVM-level information in the JSON object.
@@ -65,3 +65,12 @@ AdminServlet
   * ``/metrics``: ``MetricsServlet``
   * ``/ping``: ``PingServlet``
   * ``/threads``: ``ThreadDumpServlet``
+
+MetricsServletContextListener
+===========
+
+``MetricsServletContextListener`` is a ServletContextListener that can be used to set up registries
+that are required by the ``AdminServlet``. It instantiates ``MetricRegistry`` and
+``HealthCheckRegistry``, and adds them to the ServletContext as attributes.
+
+
