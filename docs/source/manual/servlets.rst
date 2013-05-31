@@ -67,7 +67,7 @@ AdminServlet
   * ``/threads``: ``ThreadDumpServlet``
 
 MetricsServletContextListener
-===========
+=============================
 
 ``MetricsServletContextListener`` is a ServletContextListener that can be used to set up registries
 that are required by the ``AdminServlet``. It instantiates ``MetricRegistry`` and
