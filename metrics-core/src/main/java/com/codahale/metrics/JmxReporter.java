@@ -101,7 +101,7 @@ public class JmxReporter {
         /**
          * Use specific {@link TimeUnit}s for the duration of the metrics with these names.
          *
-         * @param specificDurationUnits a map of metric names and specific {@link TimeUnits}
+         * @param specificDurationUnits a map of metric names and specific {@link TimeUnit}s
          * @return {@code this}
          */
         public Builder specificDurationUnits(Map<String, TimeUnit> specificDurationUnits) {
@@ -113,7 +113,7 @@ public class JmxReporter {
         /**
          * Use specific {@link TimeUnit}s for the rate of the metrics with these names.
          *
-         * @param specificRateUnits a map of metric names and specific {@link TimeUnits}
+         * @param specificRateUnits a map of metric names and specific {@link TimeUnit}s
          * @return {@code this}
          */
         public Builder specificRateUnits(Map<String, TimeUnit> specificRateUnits) {
@@ -127,7 +127,7 @@ public class JmxReporter {
          * @return a {@link JmxReporter}
          */
         public JmxReporter build() {
-            MetricTimeUnits timeUnits = new MetricTimeUnits(rateUnit, durationUnit, specificRateUnits, specificDurationUnits);
+            final MetricTimeUnits timeUnits = new MetricTimeUnits(rateUnit, durationUnit, specificRateUnits, specificDurationUnits);
             return new JmxReporter(mBeanServer, domain, registry, filter, timeUnits);
         }
     }
