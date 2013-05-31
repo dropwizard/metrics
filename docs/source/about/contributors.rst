@@ -15,6 +15,7 @@ Many, many thanks to:
 * `Brian Roberts <https://github.com/flicken>`_
 * `Bruce Mitchener <https://github.com/waywardmonkeys>`_
 * `C. Scott Andreas <https://github.com/cscotta>`_
+* `ceetav <https://github.com/ceetav>`_
 * `Charles Care <https://github.com/ccare>`_
 * `Chris Birchall <https://github.com/cb372>`_
 * `Chris Burroughs <https://github.com/cburroughs>`_
@@ -28,7 +29,9 @@ Many, many thanks to:
 * `Dan Revel <https://github.com/nopolabs>`_
 * `Diwaker Gupta <https://github.com/maginatics>`_
 * `Drew Stephens <https://github.com/dinomite>`_
+* `Edwin Shin <https://github.com/eddies>`_
 * `Eric Daigneault <https://github.com/Newtopian>`_
+* `Evan Jones <https://github.com/evanj>`_
 * `François Beausoleil <https://github.com/francois>`_
 * `Gerolf Seitz <https://github.com/seitz>`_
 * `Jackson Davis <https://github.com/jcdavis>`_
@@ -53,9 +56,11 @@ Many, many thanks to:
 * `Neil Prosser <https://github.com/neilprosser>`_
 * `Nick Telford <https://github.com/nicktelford>`_
 * `Niklas Konstenius <https://github.com/konnik>`_
+* `Pablo Fernandez <https://github.com/fernandezpablo85>`
 * `Paul Bloch <https://github.com/pbloch>`_
 * `Paul Brown <https://github.com/prb>`_
 * `Paul Doran <https://github.com/dorzey>`_
+* `Paul Sandwald <https://github.com/pcsanwald>`_
 * `Realbot <https://github.com/realbot>`_
 * `Robby Walker <https://github.com/robbywalker>`_
 * `Ryan Kennedy <https://github.com/ryankennedy>`_
