@@ -16,6 +16,7 @@ public class GangliaReporterTest {
     private final GMetric ganglia = mock(GMetric.class);
     private final MetricRegistry registry = mock(MetricRegistry.class);
     private final GangliaReporter reporter = GangliaReporter.forRegistry(registry)
+                                                            .prefixedWith("m")
                                                             .withTMax(60)
                                                             .withDMax(0)
                                                             .convertRatesTo(TimeUnit.SECONDS)
@@ -31,7 +32,7 @@ public class GangliaReporterTest {
                         this.<Meter>map(),
                         this.<Timer>map());
 
-        verify(ganglia).announce("gauge", "value", GMetricType.STRING, "", GMetricSlope.BOTH, 60, 0, "");
+        verify(ganglia).announce("m.gauge", "value", GMetricType.STRING, "", GMetricSlope.BOTH, 60, 0, "");
         verifyNoMoreInteractions(ganglia);
     }
 
@@ -43,7 +44,7 @@ public class GangliaReporterTest {
                         this.<Meter>map(),
                         this.<Timer>map());
 
-        verify(ganglia).announce("gauge", "1", GMetricType.INT8, "", GMetricSlope.BOTH, 60, 0, "");
+        verify(ganglia).announce("m.gauge", "1", GMetricType.INT8, "", GMetricSlope.BOTH, 60, 0, "");
         verifyNoMoreInteractions(ganglia);
     }
 
@@ -55,7 +56,7 @@ public class GangliaReporterTest {
                         this.<Meter>map(),
                         this.<Timer>map());
 
-        verify(ganglia).announce("gauge", "1", GMetricType.INT16, "", GMetricSlope.BOTH, 60, 0, "");
+        verify(ganglia).announce("m.gauge", "1", GMetricType.INT16, "", GMetricSlope.BOTH, 60, 0, "");
         verifyNoMoreInteractions(ganglia);
     }
 
@@ -67,7 +68,7 @@ public class GangliaReporterTest {
                         this.<Meter>map(),
                         this.<Timer>map());
 
-        verify(ganglia).announce("gauge", "1", GMetricType.INT32, "", GMetricSlope.BOTH, 60, 0, "");
+        verify(ganglia).announce("m.gauge", "1", GMetricType.INT32, "", GMetricSlope.BOTH, 60, 0, "");
         verifyNoMoreInteractions(ganglia);
     }
 
@@ -79,7 +80,7 @@ public class GangliaReporterTest {
                         this.<Meter>map(),
                         this.<Timer>map());
 
-        verify(ganglia).announce("gauge", "1", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "");
+        verify(ganglia).announce("m.gauge", "1", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "");
         verifyNoMoreInteractions(ganglia);
     }
 
@@ -91,7 +92,7 @@ public class GangliaReporterTest {
                         this.<Meter>map(),
                         this.<Timer>map());
 
-        verify(ganglia).announce("gauge", "1.0", GMetricType.FLOAT, "", GMetricSlope.BOTH, 60, 0, "");
+        verify(ganglia).announce("m.gauge", "1.0", GMetricType.FLOAT, "", GMetricSlope.BOTH, 60, 0, "");
         verifyNoMoreInteractions(ganglia);
     }
 
@@ -103,7 +104,7 @@ public class GangliaReporterTest {
                         this.<Meter>map(),
                         this.<Timer>map());
 
-        verify(ganglia).announce("gauge", "1.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "");
+        verify(ganglia).announce("m.gauge", "1.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "");
         verifyNoMoreInteractions(ganglia);
     }
 
@@ -118,7 +119,7 @@ public class GangliaReporterTest {
                         this.<Meter>map(),
                         this.<Timer>map());
 
-        verify(ganglia).announce("test.counter.count", "100", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.counter.count", "100", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
         verifyNoMoreInteractions(ganglia);
     }
 
@@ -147,17 +148,17 @@ public class GangliaReporterTest {
                         this.<Meter>map(),
                         this.<Timer>map());
 
-        verify(ganglia).announce("test.histogram.count", "1", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
-        verify(ganglia).announce("test.histogram.max", "2", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
-        verify(ganglia).announce("test.histogram.mean", "3.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
-        verify(ganglia).announce("test.histogram.min", "4", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
-        verify(ganglia).announce("test.histogram.stddev", "5.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
-        verify(ganglia).announce("test.histogram.p50", "6.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
-        verify(ganglia).announce("test.histogram.p75", "7.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
-        verify(ganglia).announce("test.histogram.p95", "8.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
-        verify(ganglia).announce("test.histogram.p98", "9.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
-        verify(ganglia).announce("test.histogram.p99", "10.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
-        verify(ganglia).announce("test.histogram.p999", "11.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.count", "1", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.max", "2", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.mean", "3.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.min", "4", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.stddev", "5.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.p50", "6.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.p75", "7.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.p95", "8.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.p98", "9.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.p99", "10.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.p999", "11.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
         verifyNoMoreInteractions(ganglia);
     }
 
@@ -176,11 +177,11 @@ public class GangliaReporterTest {
                         map("test.meter", meter),
                         this.<Timer>map());
 
-        verify(ganglia).announce("test.meter.count", "1", GMetricType.DOUBLE, "events", GMetricSlope.BOTH, 60, 0, "test");
-        verify(ganglia).announce("test.meter.mean_rate", "2.0", GMetricType.DOUBLE, "events/second", GMetricSlope.BOTH, 60, 0, "test");
-        verify(ganglia).announce("test.meter.m1_rate", "3.0", GMetricType.DOUBLE, "events/second", GMetricSlope.BOTH, 60, 0, "test");
-        verify(ganglia).announce("test.meter.m5_rate", "4.0", GMetricType.DOUBLE, "events/second", GMetricSlope.BOTH, 60, 0, "test");
-        verify(ganglia).announce("test.meter.m15_rate", "5.0", GMetricType.DOUBLE, "events/second", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.meter.count", "1", GMetricType.DOUBLE, "events", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.meter.mean_rate", "2.0", GMetricType.DOUBLE, "events/second", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.meter.m1_rate", "3.0", GMetricType.DOUBLE, "events/second", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.meter.m5_rate", "4.0", GMetricType.DOUBLE, "events/second", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.meter.m15_rate", "5.0", GMetricType.DOUBLE, "events/second", GMetricSlope.BOTH, 60, 0, "test");
         verifyNoMoreInteractions(ganglia);
     }
 
@@ -214,22 +215,22 @@ public class GangliaReporterTest {
                         this.<Meter>map(),
                         map("test.another.timer", timer));
 
-        verify(ganglia).announce("test.another.timer.max", "100.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
-        verify(ganglia).announce("test.another.timer.mean", "200.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
-        verify(ganglia).announce("test.another.timer.min", "300.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
-        verify(ganglia).announce("test.another.timer.stddev", "400.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
-        verify(ganglia).announce("test.another.timer.p50", "500.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
-        verify(ganglia).announce("test.another.timer.p75", "600.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
-        verify(ganglia).announce("test.another.timer.p95", "700.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
-        verify(ganglia).announce("test.another.timer.p98", "800.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
-        verify(ganglia).announce("test.another.timer.p99", "900.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
-        verify(ganglia).announce("test.another.timer.p999", "1000.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.max", "100.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.mean", "200.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.min", "300.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.stddev", "400.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.p50", "500.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.p75", "600.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.p95", "700.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.p98", "800.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.p99", "900.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.p999", "1000.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
 
-        verify(ganglia).announce("test.another.timer.count", "1", GMetricType.DOUBLE, "calls", GMetricSlope.BOTH, 60, 0, "test.another");
-        verify(ganglia).announce("test.another.timer.mean_rate", "2.0", GMetricType.DOUBLE, "calls/second", GMetricSlope.BOTH, 60, 0, "test.another");
-        verify(ganglia).announce("test.another.timer.m1_rate", "3.0", GMetricType.DOUBLE, "calls/second", GMetricSlope.BOTH, 60, 0, "test.another");
-        verify(ganglia).announce("test.another.timer.m5_rate", "4.0", GMetricType.DOUBLE, "calls/second", GMetricSlope.BOTH, 60, 0, "test.another");
-        verify(ganglia).announce("test.another.timer.m15_rate", "5.0", GMetricType.DOUBLE, "calls/second", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.count", "1", GMetricType.DOUBLE, "calls", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.mean_rate", "2.0", GMetricType.DOUBLE, "calls/second", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.m1_rate", "3.0", GMetricType.DOUBLE, "calls/second", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.m5_rate", "4.0", GMetricType.DOUBLE, "calls/second", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.m15_rate", "5.0", GMetricType.DOUBLE, "calls/second", GMetricSlope.BOTH, 60, 0, "test.another");
 
         verifyNoMoreInteractions(ganglia);
     }
