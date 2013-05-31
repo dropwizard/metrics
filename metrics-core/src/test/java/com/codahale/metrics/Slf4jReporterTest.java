@@ -22,6 +22,8 @@ public class Slf4jReporterTest {
                                                         .filter(MetricFilter.ALL)
                                                         .build();
 
+
+
     @Test
     public void reportsGaugeValues() throws Exception {
         reporter.report(map("gauge", gauge("value")),
@@ -73,7 +75,7 @@ public class Slf4jReporterTest {
                         this.<Timer>map());
 
         verify(logger).info(marker,
-                            "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p999={}",
+                            "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
                             "test.histogram",
                             1L,
                             4L,
@@ -146,7 +148,7 @@ public class Slf4jReporterTest {
                         map("test.another.timer", timer));
 
         verify(logger).info(marker,
-                            "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
+                            "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
                             "test.another.timer",
                             1L,
                             300.0,

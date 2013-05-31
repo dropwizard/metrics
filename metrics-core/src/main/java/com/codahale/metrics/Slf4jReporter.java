@@ -157,8 +157,8 @@ public class Slf4jReporter extends ScheduledReporter {
         final Snapshot snapshot = timer.getSnapshot();
         logger.info(marker,
                     "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, " +
-                            "p75={}, p95={}, p98={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, " +
-                            "rate_unit={}, duration_unit={}",
+                            "p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, " +
+                            "m15={}, rate_unit={}, duration_unit={}",
                     name,
                     timer.getCount(),
                     convertDuration(snapshot.getMin()),
@@ -194,7 +194,8 @@ public class Slf4jReporter extends ScheduledReporter {
     private void logHistogram(String name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
         logger.info(marker,
-                    "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p999={}",
+                    "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, " +
+                            "median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
                     name,
                     histogram.getCount(),
                     snapshot.getMin(),
