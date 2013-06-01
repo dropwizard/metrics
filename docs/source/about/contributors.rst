@@ -56,7 +56,7 @@ Many, many thanks to:
 * `Neil Prosser <https://github.com/neilprosser>`_
 * `Nick Telford <https://github.com/nicktelford>`_
 * `Niklas Konstenius <https://github.com/konnik>`_
-* `Pablo Fernandez <https://github.com/fernandezpablo85>`
+* `Pablo Fernandez <https://github.com/fernandezpablo85>`_
 * `Paul Bloch <https://github.com/pbloch>`_
 * `Paul Brown <https://github.com/prb>`_
 * `Paul Doran <https://github.com/dorzey>`_
