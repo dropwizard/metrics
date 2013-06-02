@@ -12,6 +12,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * An {@link AbstractExecutorService} that monitors the number of tasks submitted, running,
+ * completed and also keeps a {@link Timer} for the task duration.
+ *
+ * It will register the metrics using the given (or auto-generated) name as classifier, e.g:
+ * "your-executor-service.submitted", "your-executor-service.running", etc.
+ */
 public class InstrumentedExecutorService extends AbstractExecutorService
 {
   private static final AtomicLong nameCounter = new AtomicLong();
@@ -22,11 +29,24 @@ public class InstrumentedExecutorService extends AbstractExecutorService
   final Counter completed;
   final Timer duration;
 
+  /**
+   * Wraps an {@link ExecutorService} uses an auto-generated default name.
+   *
+   * @param executorService {@link ExecutorService} to wrap.
+   * @param registry {@link MetricRegistry} that will contain the metrics.
+   */
   public InstrumentedExecutorService(ExecutorService executorService, MetricRegistry registry)
   {
     this(executorService, registry, "instrumented-executorService-" + nameCounter.incrementAndGet());
   }
 
+  /**
+   * Wraps an {@link ExecutorService} with an explicit name.
+   *
+   * @param executorService {@link ExecutorService} to wrap.
+   * @param registry {@link MetricRegistry} that will contain the metrics.
+   * @param name name for this executor service.
+   */
   public InstrumentedExecutorService(ExecutorService executorService, MetricRegistry registry, String name)
   {
     this.executorService = executorService;
@@ -36,6 +56,9 @@ public class InstrumentedExecutorService extends AbstractExecutorService
     this.duration = registry.timer(name + ".duration");
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void execute(Runnable runnable)
   {
@@ -43,6 +66,9 @@ public class InstrumentedExecutorService extends AbstractExecutorService
     executorService.execute(new InstrumentedRunnable(runnable));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Future<?> submit(Runnable runnable)
   {
@@ -50,6 +76,9 @@ public class InstrumentedExecutorService extends AbstractExecutorService
     return executorService.submit(new InstrumentedRunnable(runnable));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <T> Future<T> submit(Runnable runnable, T result)
   {
@@ -57,6 +86,9 @@ public class InstrumentedExecutorService extends AbstractExecutorService
     return executorService.submit(new InstrumentedRunnable(runnable), result);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <T> Future<T> submit(Callable<T> task)
   {
@@ -64,6 +96,9 @@ public class InstrumentedExecutorService extends AbstractExecutorService
     return executorService.submit(new InstrumentedCallable<T>(task));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException
   {
@@ -72,6 +107,9 @@ public class InstrumentedExecutorService extends AbstractExecutorService
     return executorService.invokeAll(instrumented);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
           throws InterruptedException
@@ -81,6 +119,9 @@ public class InstrumentedExecutorService extends AbstractExecutorService
     return executorService.invokeAll(instrumented, timeout, unit);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws ExecutionException, InterruptedException
   {
@@ -89,6 +130,9 @@ public class InstrumentedExecutorService extends AbstractExecutorService
     return executorService.invokeAny(instrumented);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
           throws ExecutionException, InterruptedException, TimeoutException
