@@ -3,7 +3,6 @@ package com.codahale.metrics;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.Callable;
@@ -13,13 +12,13 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * An {@link AbstractExecutorService} that monitors the number of tasks submitted, running,
+ * An {@link ExecutorService} that monitors the number of tasks submitted, running,
  * completed and also keeps a {@link Timer} for the task duration.
  *
  * It will register the metrics using the given (or auto-generated) name as classifier, e.g:
  * "your-executor-service.submitted", "your-executor-service.running", etc.
  */
-public class InstrumentedExecutorService extends AbstractExecutorService
+public class InstrumentedExecutorService implements ExecutorService
 {
   private static final AtomicLong nameCounter = new AtomicLong();
 
