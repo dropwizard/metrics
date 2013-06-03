@@ -25,7 +25,7 @@ public class InstrumentedExecutorService implements ExecutorService
   private final ExecutorService delegate;
   final Counter submitted;
   final Counter running;
-  final Counter completed;
+  final Meter completed;
   final Timer duration;
 
   /**
@@ -51,7 +51,7 @@ public class InstrumentedExecutorService implements ExecutorService
     this.delegate = delegate;
     this.submitted = registry.counter(MetricRegistry.name(name, "submitted"));
     this.running = registry.counter(MetricRegistry.name(name, "running"));
-    this.completed = registry.counter(MetricRegistry.name(name, "completed"));
+    this.completed = registry.meter(MetricRegistry.name(name, "completed"));
     this.duration = registry.timer(MetricRegistry.name(name, "duration"));
   }
 
@@ -202,7 +202,7 @@ public class InstrumentedExecutorService implements ExecutorService
       {
         context.stop();
         running.dec();
-        completed.inc();
+        completed.mark();
       }
     }
   }
@@ -228,7 +228,7 @@ public class InstrumentedExecutorService implements ExecutorService
       {
         context.stop();
         running.dec();
-        completed.inc();
+        completed.mark();
       }
     }
   }
