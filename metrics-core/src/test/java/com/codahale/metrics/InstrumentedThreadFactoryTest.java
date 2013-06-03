@@ -16,9 +16,9 @@ public class InstrumentedThreadFactoryTest {
     public void reportsThreadInformation() throws Exception {
         Runnable fastOne = new FastRunnable();
         Runnable slowOne = new SlowRunnable();
-        Counter created = registry.counter("factory.created");
+        Meter created = registry.meter("factory.created");
         Counter running = registry.counter("factory.running");
-        Counter finished = registry.counter("factory.finished");
+        Meter finished = registry.meter("factory.terminated");
 
         Thread fastThread = instrumentedFactory.newThread(fastOne);
         Thread slowThread = instrumentedFactory.newThread(slowOne);
