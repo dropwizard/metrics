@@ -7,13 +7,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * A {@link ThreadFactory} that monitors the number of threads created, running and terminated.
  *
  * It will register the metrics using the given (or auto-generated) name as classifier, e.g:
- * "your-thread-factory.created", "your-thread-factory.running", etc.
+ * "your-thread-delegate.created", "your-thread-delegate.running", etc.
  */
 public class InstrumentedThreadFactory implements ThreadFactory
 {
   private static final AtomicLong nameCounter = new AtomicLong();
 
-  private final ThreadFactory factory;
+  private final ThreadFactory delegate;
   final Counter created;
   final Counter running;
   final Counter finished;
@@ -21,24 +21,24 @@ public class InstrumentedThreadFactory implements ThreadFactory
   /**
    * Wraps a {@link ThreadFactory}, uses a default auto-generated name.
    *
-   * @param factory {@link ThreadFactory} to wrap.
+   * @param delegate {@link ThreadFactory} to wrap.
    * @param registry {@link MetricRegistry} that will contain the metrics.
    */
-  public InstrumentedThreadFactory(ThreadFactory factory, MetricRegistry registry)
+  public InstrumentedThreadFactory(ThreadFactory delegate, MetricRegistry registry)
   {
-    this(factory, registry, "instrumented-thread-factory-" + nameCounter.incrementAndGet());
+    this(delegate, registry, "instrumented-thread-delegate-" + nameCounter.incrementAndGet());
   }
 
   /**
    * Wraps a {@link ThreadFactory} with an explicit name.
    *
-   * @param factory {@link ThreadFactory} to wrap.
+   * @param delegate {@link ThreadFactory} to wrap.
    * @param registry {@link MetricRegistry} that will contain the metrics.
-   * @param name name for this factory.
+   * @param name name for this delegate.
    */
-  public InstrumentedThreadFactory(ThreadFactory factory, MetricRegistry registry, String name)
+  public InstrumentedThreadFactory(ThreadFactory delegate, MetricRegistry registry, String name)
   {
-    this.factory = factory;
+    this.delegate = delegate;
     this.created = registry.counter(name + ".created");
     this.running = registry.counter(name + ".running");
     this.finished = registry.counter(name + ".finished");
@@ -51,7 +51,7 @@ public class InstrumentedThreadFactory implements ThreadFactory
   public Thread newThread(Runnable runnable)
   {
     Runnable wrappedRunnable = new InstrumentedRunnable(runnable);
-    Thread thread = factory.newThread(wrappedRunnable);
+    Thread thread = delegate.newThread(wrappedRunnable);
     created.inc();
     return thread;
   }
