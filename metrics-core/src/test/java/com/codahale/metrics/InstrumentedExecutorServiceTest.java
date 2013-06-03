@@ -17,7 +17,7 @@ public class InstrumentedExecutorServiceTest {
     public void reportsTasksInformation() throws Exception {
         Runnable fastOne = new FastRunnable();
         Runnable slowOne = new SlowRunnable();
-        Counter submitted = registry.counter("xs.submitted");
+        Meter submitted = registry.meter("xs.submitted");
         Counter running = registry.counter("xs.running");
         Meter completed = registry.meter("xs.completed");
         Timer duration = registry.timer("xs.duration");

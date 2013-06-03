@@ -22,7 +22,7 @@ public class InstrumentedExecutorService implements ExecutorService {
     private static final AtomicLong nameCounter = new AtomicLong();
 
     private final ExecutorService delegate;
-    private final Counter submitted;
+    private final Meter submitted;
     private final Counter running;
     private final Meter completed;
     private final Timer duration;
@@ -46,7 +46,7 @@ public class InstrumentedExecutorService implements ExecutorService {
      */
     public InstrumentedExecutorService(ExecutorService delegate, MetricRegistry registry, String name) {
         this.delegate = delegate;
-        this.submitted = registry.counter(MetricRegistry.name(name, "submitted"));
+        this.submitted = registry.meter(MetricRegistry.name(name, "submitted"));
         this.running = registry.counter(MetricRegistry.name(name, "running"));
         this.completed = registry.meter(MetricRegistry.name(name, "completed"));
         this.duration = registry.timer(MetricRegistry.name(name, "duration"));
@@ -57,7 +57,7 @@ public class InstrumentedExecutorService implements ExecutorService {
      */
     @Override
     public void execute(Runnable runnable) {
-        submitted.inc();
+        submitted.mark();
         delegate.execute(new InstrumentedRunnable(runnable));
     }
 
@@ -66,7 +66,7 @@ public class InstrumentedExecutorService implements ExecutorService {
      */
     @Override
     public Future<?> submit(Runnable runnable) {
-        submitted.inc();
+        submitted.mark();
         return delegate.submit(new InstrumentedRunnable(runnable));
     }
 
@@ -75,7 +75,7 @@ public class InstrumentedExecutorService implements ExecutorService {
      */
     @Override
     public <T> Future<T> submit(Runnable runnable, T result) {
-        submitted.inc();
+        submitted.mark();
         return delegate.submit(new InstrumentedRunnable(runnable), result);
     }
 
@@ -84,7 +84,7 @@ public class InstrumentedExecutorService implements ExecutorService {
      */
     @Override
     public <T> Future<T> submit(Callable<T> task) {
-        submitted.inc();
+        submitted.mark();
         return delegate.submit(new InstrumentedCallable<T>(task));
     }
 
@@ -93,7 +93,7 @@ public class InstrumentedExecutorService implements ExecutorService {
      */
     @Override
     public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
-        submitted.inc(tasks.size());
+        submitted.mark(tasks.size());
         Collection<? extends Callable<T>> instrumented = instrument(tasks);
         return delegate.invokeAll(instrumented);
     }
@@ -103,7 +103,7 @@ public class InstrumentedExecutorService implements ExecutorService {
      */
     @Override
     public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException {
-        submitted.inc(tasks.size());
+        submitted.mark(tasks.size());
         Collection<? extends Callable<T>> instrumented = instrument(tasks);
         return delegate.invokeAll(instrumented, timeout, unit);
     }
@@ -113,7 +113,7 @@ public class InstrumentedExecutorService implements ExecutorService {
      */
     @Override
     public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws ExecutionException, InterruptedException {
-        submitted.inc(tasks.size());
+        submitted.mark(tasks.size());
         Collection<? extends Callable<T>> instrumented = instrument(tasks);
         return delegate.invokeAny(instrumented);
     }
@@ -123,7 +123,7 @@ public class InstrumentedExecutorService implements ExecutorService {
      */
     @Override
     public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws ExecutionException, InterruptedException, TimeoutException {
-        submitted.inc(tasks.size());
+        submitted.mark(tasks.size());
         Collection<? extends Callable<T>> instrumented = instrument(tasks);
         return delegate.invokeAny(instrumented, timeout, unit);
     }
