@@ -49,10 +49,10 @@ public class InstrumentedExecutorService implements ExecutorService
   public InstrumentedExecutorService(ExecutorService delegate, MetricRegistry registry, String name)
   {
     this.delegate = delegate;
-    this.submitted = registry.counter(name + ".submitted");
-    this.running = registry.counter(name + ".running");
-    this.completed = registry.counter(name + ".completed");
-    this.duration = registry.timer(name + ".duration");
+    this.submitted = registry.counter(MetricRegistry.name(name, "submitted"));
+    this.running = registry.counter(MetricRegistry.name(name, "running"));
+    this.completed = registry.counter(MetricRegistry.name(name, "completed"));
+    this.duration = registry.timer(MetricRegistry.name(name, "duration"));
   }
 
   /**
