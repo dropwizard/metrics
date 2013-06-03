@@ -14,9 +14,9 @@ public class InstrumentedThreadFactory implements ThreadFactory
   private static final AtomicLong nameCounter = new AtomicLong();
 
   private final ThreadFactory delegate;
-  final Counter created;
-  final Counter running;
-  final Counter finished;
+  private final Counter created;
+  private final Counter running;
+  private final Counter finished;
 
   /**
    * Wraps a {@link ThreadFactory}, uses a default auto-generated name.
