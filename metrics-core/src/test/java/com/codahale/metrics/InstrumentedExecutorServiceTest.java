@@ -1,10 +1,12 @@
 package com.codahale.metrics;
 
+import org.junit.After;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -38,6 +40,14 @@ public class InstrumentedExecutorServiceTest {
         slowFuture.get();
         assertThat(running.getCount()).isEqualTo(0);
         assertThat(duration.getSnapshot().size()).isEqualTo(2);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        instrumentedExecutorService.shutdown();
+        if (!instrumentedExecutorService.awaitTermination(2, TimeUnit.SECONDS)) {
+            System.err.println("InstrumentedExecutorService did not terminate.");
+        }
     }
 
     private static class FastRunnable implements Runnable {
