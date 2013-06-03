@@ -10,29 +10,32 @@ import static org.fest.assertions.api.Assertions.assertThat;
 public class InstrumentedThreadFactoryTest {
   private final ThreadFactory factory = Executors.defaultThreadFactory();
   private final MetricRegistry registry = new MetricRegistry();
-  private final InstrumentedThreadFactory instrumentedFactory = new InstrumentedThreadFactory(factory, registry);
+  private final InstrumentedThreadFactory instrumentedFactory = new InstrumentedThreadFactory(factory, registry, "factory");
 
   @Test
   public void reportsThreadInformation() throws Exception {
     Runnable fastOne = new FastRunnable();
     Runnable slowOne = new SlowRunnable();
+    Counter created = registry.counter("factory.created");
+    Counter running = registry.counter("factory.running");
+    Counter finished = registry.counter("factory.finished");
 
     Thread fastThread = instrumentedFactory.newThread(fastOne);
     Thread slowThread = instrumentedFactory.newThread(slowOne);
 
-    assertThat(instrumentedFactory.created.getCount()).isEqualTo(2);
-    assertThat(instrumentedFactory.running.getCount()).isEqualTo(0);
-    assertThat(instrumentedFactory.finished.getCount()).isEqualTo(0);
+    assertThat(created.getCount()).isEqualTo(2);
+    assertThat(running.getCount()).isEqualTo(0);
+    assertThat(finished.getCount()).isEqualTo(0);
 
     fastThread.start();slowThread.start();
 
     Thread.sleep(100);
-    assertThat(instrumentedFactory.running.getCount()).isEqualTo(1);
-    assertThat(instrumentedFactory.finished.getCount()).isEqualTo(1);
+    assertThat(running.getCount()).isEqualTo(1);
+    assertThat(finished.getCount()).isEqualTo(1);
 
     Thread.sleep(1000);
-    assertThat(instrumentedFactory.running.getCount()).isEqualTo(0);
-    assertThat(instrumentedFactory.finished.getCount()).isEqualTo(2);
+    assertThat(running.getCount()).isEqualTo(0);
+    assertThat(finished.getCount()).isEqualTo(2);
   }
 
   private static class FastRunnable implements Runnable

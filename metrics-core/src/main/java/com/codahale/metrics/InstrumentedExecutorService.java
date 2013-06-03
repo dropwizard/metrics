@@ -23,10 +23,10 @@ public class InstrumentedExecutorService implements ExecutorService
   private static final AtomicLong nameCounter = new AtomicLong();
 
   private final ExecutorService delegate;
-  final Counter submitted;
-  final Counter running;
-  final Meter completed;
-  final Timer duration;
+  private final Counter submitted;
+  private final Counter running;
+  private final Meter completed;
+  private final Timer duration;
 
   /**
    * Wraps an {@link ExecutorService} uses an auto-generated default name.
