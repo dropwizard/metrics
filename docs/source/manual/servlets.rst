@@ -16,9 +16,10 @@ and returning ``501 Not Implemented`` if no health checks are registered, ``200 
 ``500 Internal Service Error`` if one or more fail. The results are returned as a human-readable
 ``text/plain`` entity.
 
-If the servlet context has an attributed named
-``com.codahale.metrics.servlets.HealthCheckServlet.registry`` which is a ``HealthCheckRegistry``,
-``HealthCheckServlet`` will use that instead of the default ``HealthCheckRegistry``.
+``HealthCheckServlet`` requires that the servlet context has a ``HealthCheckRegistry`` named
+``com.codahale.metrics.servlets.HealthCheckServlet.registry``. You can subclass
+``MetricsServletContextListener``, which will add a specific ``HealthCheckRegistry`` to the servlet
+context.
 
 .. _man-servlet-threaddump:
 
@@ -36,9 +37,10 @@ MetricsServlet
 
 ``MetricsServlet`` exposes the state of the metrics in a particular registry as a JSON object.
 
-If the servlet context has an attributed named
-``com.codahale.metrics.servlets.MetricsServlet.registry`` which is a ``MetricsRegistry``,
-``MetricsServlet`` will use that instead of the default ``MetricsRegistry``.
+``MetricsServlet`` requires that the servlet context has a ``MetricRegistry`` named
+``com.codahale.metrics.servlets.MetricsServlet.registry``. You can subclass
+``MetricsServletContextListener``, which will add a specific ``MetricRegistry`` to the servlet
+context.
 
 ``MetricsServlet`` also takes an initialization parameter, ``show-jvm-metrics``, which if ``"false"`` will
 disable the outputting of JVM-level information in the JSON object.
