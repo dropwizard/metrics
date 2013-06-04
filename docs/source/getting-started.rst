@@ -262,7 +262,7 @@ To report metrics via JMX:
     reporter.start();
 
 Once the reporter is started, all of the metrics in the registry will become visible via
-**JConsole** or **VisualVM** (if you install the JConsole plugin):
+**JConsole** or **VisualVM** (if you install the MBeans plugin):
 
 .. image:: metrics-visualvm.png
     :alt: Metrics exposed as JMX MBeans being viewed in VisualVM's MBeans browser
