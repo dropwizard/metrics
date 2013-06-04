@@ -43,7 +43,7 @@ public class ScheduledReporterTest {
         registry.register("meter", meter);
         registry.register("timer", timer);
 
-        reporter.start(100, TimeUnit.MILLISECONDS);
+        reporter.start(200, TimeUnit.MILLISECONDS);
     }
 
     @After
@@ -53,7 +53,7 @@ public class ScheduledReporterTest {
 
     @Test
     public void pollsPeriodically() throws Exception {
-        verify(reporter, timeout(250).times(2)).report(
+        verify(reporter, timeout(500).times(2)).report(
                 map("gauge", gauge),
                 map("counter", counter),
                 map("histogram", histogram),
