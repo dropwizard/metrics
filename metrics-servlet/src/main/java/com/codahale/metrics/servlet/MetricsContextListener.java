@@ -6,11 +6,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 public class MetricsContextListener implements ServletContextListener {
-    private final MetricRegistry registry;
-
-    public MetricsContextListener(MetricRegistry registry) {
-        this.registry = registry;
-    }
+    private final MetricRegistry registry = new MetricRegistry();
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
