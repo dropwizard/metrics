@@ -13,14 +13,8 @@ import javax.servlet.ServletContextListener;
  * such as in a web.xml, along with a servlet mapping for AdminServlet.
  */
 public class MetricsServletContextListener implements ServletContextListener {
-    public final MetricRegistry metricRegistry;
-    public final HealthCheckRegistry healthCheckRegistry;
-
-    public MetricsServletContextListener(MetricRegistry metricRegistry,
-                                         HealthCheckRegistry healthCheckRegistry) {
-        this.metricRegistry = metricRegistry;
-        this.healthCheckRegistry = healthCheckRegistry;
-    }
+    public final MetricRegistry metricRegistry = new MetricRegistry();
+    public final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
