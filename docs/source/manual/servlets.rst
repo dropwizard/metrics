@@ -68,16 +68,24 @@ AdminServlet
   * ``/ping``: ``PingServlet``
   * ``/threads``: ``ThreadDumpServlet``
 
-MetricsServletContextListener
-=============================
+You will need to add your ``MetricRegistry`` and ``HealthCheckRegistry`` instances to the servlet
+context as an attributes named ``com.codahale.metrics.servlets.MetricsServlet.registry`` and
+``com.codahale.metrics.servlets.HealthCheckServlet.registry``, respectively. You can do this using
+the Servlet API by extending ``AdminServletContextListener``:
 
-``MetricsServletContextListener`` is a ServletContextListener that can be used to set up registries
-that are required by the ``AdminServlet``. It receives ``MetricRegistry`` and
-``HealthCheckRegistry`` instances as constructor parameters, and adds them to the ServletContext as
-attributes.
+.. code-block:: java
 
-.. important::
+    public class MyAdminServletContextListener extends AdminServletContextListener {
+        public static final MetricRegistry METRIC_REGISTRY = new MetricRegistry();
+        public static final HealthCheckRegistry HEALTH_CHECK_REGISTRY = new HealthCheckRegistry();
 
-    You will need to create your own subclass of ``MetricsServletContextListener`` which implements
-    a zero-argument constructor if you want to use it in a ``web.xml`` file. This will involve
-    passing in **your own** registry instances.
+        @Override
+        protected MetricRegistry getMetricRegistry() {
+            return METRIC_REGISTRY;
+        }
+
+        @Override
+        protected HealthCheckRegistry getHealthCheckRegistry() {
+            return HEALTH_CHECK_REGISTRY;
+        }
+    }
