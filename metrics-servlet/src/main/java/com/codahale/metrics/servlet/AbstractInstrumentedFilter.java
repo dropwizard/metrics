@@ -20,7 +20,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  * {@link Filter} implementation which captures request information and a breakdown of the response
  * codes being returned.
  */
-public abstract class WebappMetricsFilter implements Filter {
+public abstract class AbstractInstrumentedFilter implements Filter {
     private final String otherMetricName;
     private final Map<Integer, String> meterNamesByStatusCode;
     private final String registryAttribute;
@@ -41,9 +41,9 @@ public abstract class WebappMetricsFilter implements Filter {
      *                               interested in.
      * @param otherMetricName        The name used for the catch-all meter.
      */
-    protected WebappMetricsFilter(String registryAttribute,
-                                  Map<Integer, String> meterNamesByStatusCode,
-                                  String otherMetricName) {
+    protected AbstractInstrumentedFilter(String registryAttribute,
+                                         Map<Integer, String> meterNamesByStatusCode,
+                                         String otherMetricName) {
         this.registryAttribute = registryAttribute;
         this.otherMetricName = otherMetricName;
         this.meterNamesByStatusCode = meterNamesByStatusCode;
@@ -57,13 +57,13 @@ public abstract class WebappMetricsFilter implements Filter {
                 .size());
         for (Entry<Integer, String> entry : meterNamesByStatusCode.entrySet()) {
             metersByStatusCode.put(entry.getKey(),
-                    metricsRegistry.meter(name(WebappMetricsFilter.class, entry.getValue())));
+                    metricsRegistry.meter(name(AbstractInstrumentedFilter.class, entry.getValue())));
         }
-        this.otherMeter = metricsRegistry.meter(name(WebappMetricsFilter.class,
+        this.otherMeter = metricsRegistry.meter(name(AbstractInstrumentedFilter.class,
                                                      otherMetricName));
-        this.activeRequests = metricsRegistry.counter(name(WebappMetricsFilter.class,
+        this.activeRequests = metricsRegistry.counter(name(AbstractInstrumentedFilter.class,
                                                            "activeRequests"));
-        this.requestTimer = metricsRegistry.timer(name(WebappMetricsFilter.class,
+        this.requestTimer = metricsRegistry.timer(name(AbstractInstrumentedFilter.class,
                                                        "requests"));
 
     }
