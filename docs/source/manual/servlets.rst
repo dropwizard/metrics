@@ -72,7 +72,12 @@ MetricsServletContextListener
 =============================
 
 ``MetricsServletContextListener`` is a ServletContextListener that can be used to set up registries
-that are required by the ``AdminServlet``. It receieves ``MetricRegistry`` and
-``HealthCheckRegistry`` instances as constructor parameters, and adds them to the ServletContext as attributes.
+that are required by the ``AdminServlet``. It receives ``MetricRegistry`` and
+``HealthCheckRegistry`` instances as constructor parameters, and adds them to the ServletContext as
+attributes.
 
+.. important::
 
+    You will need to create your own subclass of ``MetricsServletContextListener`` which implements
+    a zero-argument constructor if you want to use it in a ``web.xml`` file. This will involve
+    passing in **your own** registry instances.
