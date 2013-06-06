@@ -15,6 +15,7 @@ v3.0.0-SNAPSHOT
   abstract to avoid confusion.
 * Upgraded to Servlet API 3.1.
 * Upgraded to Jackson 2.2.2.
+* Upgraded to Jetty 8.1.11.
 
 .. _rel-3.0.0-RC1:
 
