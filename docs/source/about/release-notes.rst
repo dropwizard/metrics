@@ -13,6 +13,7 @@ v3.0.0-SNAPSHOT
   abstract to avoid confusion.
 * Renamed ``MetricsServletContextListener`` to ``AdminServletContextListener`` and made it fully
   abstract to avoid confusion.
+* Upgraded to Servlet API 3.1.
 
 .. _rel-3.0.0-RC1:
 
