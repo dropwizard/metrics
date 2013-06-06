@@ -4,6 +4,16 @@
 Release Notes
 #############
 
+.. _rel-3.0.0:
+v3.0.0-SNAPSHOT
+===============
+
+* Renamed ``DefaultWebappMetricsFilter`` to ``InstrumentedFilter``.
+* Renamed ``MetricsContextListener`` to ``InstrumentedFilterContextListener`` and made it fully
+  abstract to avoid confusion.
+* Renamed ``MetricsServletContextListener`` to ``AdminServletContextListener`` and made it fully
+  abstract to avoid confusion.
+
 .. _rel-3.0.0-RC1:
 
 v3.0.0-RC1: May 31 2013
