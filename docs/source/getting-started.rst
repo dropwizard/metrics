@@ -312,3 +312,4 @@ In addition to JMX and HTTP, Metrics also has reporters for the following output
 * SLF4J loggers, using :ref:`Slf4jReporter <man-core-reporters-slf4j>` from ``metrics-core``
 * Ganglia, using :ref:`GangliaReporter <manual-ganglia>` from ``metrics-ganglia``
 * Graphite, using :ref:`GraphiteReporter <manual-graphite>` from ``metrics-graphite``
+* `SPM <http://sematext.com/spm/index.html>`_, using SematextMetricsReporter from `sematext-metrics-reporter <https://github.com/sematext/sematext-metrics-reporter>`_
