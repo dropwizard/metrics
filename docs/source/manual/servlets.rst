@@ -69,7 +69,7 @@ AdminServlet
   * ``/threads``: ``ThreadDumpServlet``
 
 You will need to add your ``MetricRegistry`` and ``HealthCheckRegistry`` instances to the servlet
-context as an attributes named ``com.codahale.metrics.servlets.MetricsServlet.registry`` and
+context as attributes named ``com.codahale.metrics.servlets.MetricsServlet.registry`` and
 ``com.codahale.metrics.servlets.HealthCheckServlet.registry``, respectively. You can do this using
 the Servlet API by extending ``AdminServletContextListener``:
 
