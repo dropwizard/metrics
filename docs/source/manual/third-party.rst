@@ -11,4 +11,5 @@ the many third-party libraries which extend Metrics:
   integration with Spring's IoC and AOP functionality.
 * `sematext-metrics-reporter <https://github.com/sematext/sematext-metrics-reporter>`_ provides a
   reporter for `SPM <http://sematext.com/spm/index.html>`_.
-* `wicket-metrics <https://github.com/NitorCreations/wicket-metrics>`_ easy integration to your `Wicket <http://wicket.apache.org/>`_ application.
+* `wicket-metrics <https://github.com/NitorCreations/wicket-metrics>`_ provides easy integration for
+   your `Wicket <http://wicket.apache.org/>`_ application.
