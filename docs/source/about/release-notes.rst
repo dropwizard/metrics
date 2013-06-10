@@ -6,8 +6,8 @@ Release Notes
 
 .. _rel-3.0.0:
 
-v3.0.0-SNAPSHOT
-===============
+v3.0.0: June 10 2013
+====================
 
 * Renamed ``DefaultWebappMetricsFilter`` to ``InstrumentedFilter``.
 * Renamed ``MetricsContextListener`` to ``InstrumentedFilterContextListener`` and made it fully
