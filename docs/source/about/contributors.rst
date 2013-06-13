@@ -33,7 +33,7 @@ Many, many thanks to:
 * `Eric Daigneault <https://github.com/Newtopian>`_
 * `Evan Jones <https://github.com/evanj>`_
 * `François Beausoleil <https://github.com/francois>`_
-* `Gerolf Seitz <https://github.com/seitz>`_
+* `Gerolf Seitz <https://github.com/gseitz>`_
 * `Jackson Davis <https://github.com/jcdavis>`_
 * `James Casey <https://github.com/jamesc>`_
 * `Jason A. Beranek <https://github.com/jasonberanek>`_
