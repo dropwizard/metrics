@@ -11,7 +11,7 @@ counter for the number of active requests, and a timer for request duration. You
 .. code-block:: xml
 
     <filter>
-        <filter-name>webappMetricsFilter</filter-name>
+        <filter-name>instrumentedFilter</filter-name>
         <filter-class>com.codahale.metrics.servlet.InstrumentedFilter</filter-class>
     </filter>
     <filter-mapping>
