@@ -19,8 +19,10 @@ public class MetricRegistry implements MetricSet {
     public static String name(String name, String... names) {
         final StringBuilder builder = new StringBuilder();
         append(builder, name);
-        for (String s : names) {
-            append(builder, s);
+        if (names != null) {
+            for (String s : names) {
+                append(builder, s);
+            }
         }
         return builder.toString();
     }
