@@ -31,7 +31,7 @@ public class GangliaReporter extends ScheduledReporter {
     }
 
     /**
-     * A builder for {@link CsvReporter} instances. Defaults to using a {@code tmax} of {@code 60},
+     * A builder for {@link GangliaReporter} instances. Defaults to using a {@code tmax} of {@code 60},
      * a {@code dmax} of {@code 0}, converting rates to events/second, converting durations to
      * milliseconds, and not filtering metrics.
      */
