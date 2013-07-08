@@ -132,11 +132,14 @@ public class InstrumentedHandler extends HandlerWrapper {
 
             @Override
             public void onComplete(AsyncEvent event) throws IOException {
-                final HttpChannelState state = (HttpChannelState) event.getAsyncContext();
-                final Request request = state.getBaseRequest();
-                updateResponses(request);
-                if (!state.isDispatched()) {
-                    activeSuspended.dec();
+                HttpChannelState state = null;
+                if (HttpChannelState.class.isAssignableFrom(event.getAsyncContext().getClass())) {
+                    state = (HttpChannelState) event.getAsyncContext();
+                    final Request request = state.getBaseRequest();
+                    updateResponses(request);
+                    if (!state.isDispatched()) {
+                        activeSuspended.dec();
+                    }
                 }
             }
         };
