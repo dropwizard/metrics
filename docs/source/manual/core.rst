@@ -220,7 +220,7 @@ uniform reservoir, an exponentially decaying reservoir represents **recent data*
 know very quickly if the distribution of the data has changed. :ref:`man-core-timers` use histograms
 with exponentially decaying reservoirs by default.
 
-.. __: http://www.research.att.com/people/Cormode_Graham/library/publications/CormodeShkapenyukSrivastavaXu09.pdf
+.. __: http://dimacs.rutgers.edu/~graham/pubs/papers/fwddecay.pdf
 
 .. _man-core-histograms-sliding:
 
