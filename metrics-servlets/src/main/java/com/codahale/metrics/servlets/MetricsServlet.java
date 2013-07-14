@@ -56,6 +56,7 @@ public class MetricsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType(CONTENT_TYPE);
+        resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
         resp.setStatus(HttpServletResponse.SC_OK);
 
