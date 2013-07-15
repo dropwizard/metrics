@@ -63,12 +63,15 @@ public class Meter implements Metered {
         final long oldTick = lastTick.get();
         final long newTick = clock.getTick();
         final long age = newTick - oldTick;
-        if (age > TICK_INTERVAL && lastTick.compareAndSet(oldTick, newTick)) {
-            final long requiredTicks = age / TICK_INTERVAL;
-            for (long i = 0; i < requiredTicks; i++) {
-                m1Rate.tick();
-                m5Rate.tick();
-                m15Rate.tick();
+        if (age > TICK_INTERVAL) {
+            final long newIntervalStartTick = newTick - age % TICK_INTERVAL;
+            if (lastTick.compareAndSet(oldTick, newIntervalStartTick)) {
+                final long requiredTicks = age / TICK_INTERVAL;
+                for (long i = 0; i < requiredTicks; i++) {
+                    m1Rate.tick();
+                    m5Rate.tick();
+                    m15Rate.tick();
+                }
             }
         }
     }
