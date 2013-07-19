@@ -20,10 +20,12 @@ public class MetricsServlet extends HttpServlet {
     public static final String DURATION_UNIT = MetricsServlet.class.getCanonicalName() + ".durationUnit";
     public static final String SHOW_SAMPLES = MetricsServlet.class.getCanonicalName() + ".showSamples";
     public static final String METRICS_REGISTRY = MetricsServlet.class.getCanonicalName() + ".registry";
+    public static final String ALLOWED_ORIGINS = MetricsServlet.class.getCanonicalName() + ".corsAllowedOrigins";
 
     private static final long serialVersionUID = 1049773947734939602L;
     private static final String CONTENT_TYPE = "application/json";
 
+    private String allowedOrigins;
     private transient MetricRegistry registry;
     private transient ObjectMapper mapper;
 
@@ -47,6 +49,8 @@ public class MetricsServlet extends HttpServlet {
         final boolean showSamples = Boolean.parseBoolean(config.getServletContext()
                                                                .getInitParameter(SHOW_SAMPLES));
 
+        this.allowedOrigins = config.getInitParameter(ALLOWED_ORIGINS);
+
         this.mapper = new ObjectMapper().registerModule(new MetricsModule(rateUnit,
                                                                           durationUnit,
                                                                           showSamples));
@@ -56,7 +60,9 @@ public class MetricsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType(CONTENT_TYPE);
-        resp.setHeader("Access-Control-Allow-Origin", "*");
+        if (allowedOrigins != null) {
+            resp.setHeader("Access-Control-Allow-Origin", allowedOrigins);
+        }
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
         resp.setStatus(HttpServletResponse.SC_OK);
 
