@@ -18,7 +18,8 @@ public class MetricsServletTest extends AbstractServletTest {
     @Override
     protected void setUp(ServletTester tester) {
         tester.setAttribute("com.codahale.metrics.servlets.MetricsServlet.registry", registry);
-        tester.addServlet(MetricsServlet.class, "/metrics");
+        tester.addServlet(MetricsServlet.class, "/metrics")
+                    .setInitParameter("com.codahale.metrics.servlets.MetricsServlet.corsAllowedOrigins", "*");;
     }
 
     @Before
@@ -48,6 +49,8 @@ public class MetricsServletTest extends AbstractServletTest {
 
         assertThat(response.getStatus())
                 .isEqualTo(200);
+        assertThat(response.getHeader("Access-Control-Allow-Origin"))
+                .isEqualTo("*");
         assertThat(response.getContent())
                 .isEqualTo("{" +
                                    "\"version\":\"3.0.0\"," +
@@ -76,6 +79,8 @@ public class MetricsServletTest extends AbstractServletTest {
 
         assertThat(response.getStatus())
                 .isEqualTo(200);
+        assertThat(response.getHeader("Access-Control-Allow-Origin"))
+                .isEqualTo("*");
         assertThat(response.getContent())
                 .isEqualTo(String.format("{%n" +
                                                  "  \"version\" : \"3.0.0\",%n" +
