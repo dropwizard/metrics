@@ -7,7 +7,7 @@ package com.codahale.metrics;
  * <pre><code>
  * final Queue&lt;String&gt; queue = new ConcurrentLinkedQueue&lt;String&gt;();
  * final Gauge&lt;Integer&gt; queueDepth = new Gauge&lt;Integer&gt;() {
- *     public Integer value() {
+ *     public Integer getValue() {
  *         return queue.size();
  *     }
  * };
