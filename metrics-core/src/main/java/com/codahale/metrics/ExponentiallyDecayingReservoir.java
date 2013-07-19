@@ -14,8 +14,8 @@ import static java.lang.Math.min;
  * forward-decaying priority reservoir sampling method to produce a statistically representative
  * sampling reservoir, exponentially biased towards newer entries.
  *
- * @see <a href="http://www.research.att.com/people/Cormode_Graham/library/publications/CormodeShkapenyukSrivastavaXu09.pdf">
- *      Cormode et al. Forward Decay: A Practical Time Decay Model for Streaming Systems. ICDE '09:
+ * @see <a href="http://dimacs.rutgers.edu/~graham/pubs/papers/fwddecay.pdf">
+ * Cormode et al. Forward Decay: A Practical Time Decay Model for Streaming Systems. ICDE '09:
  *      Proceedings of the 2009 IEEE International Conference on Data Engineering (2009)</a>
  */
 public class ExponentiallyDecayingReservoir implements Reservoir {
