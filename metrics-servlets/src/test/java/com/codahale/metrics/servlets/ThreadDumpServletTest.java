@@ -1,6 +1,7 @@
 package com.codahale.metrics.servlets;
 
-import org.eclipse.jetty.testing.ServletTester;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,13 +36,13 @@ public class ThreadDumpServletTest extends AbstractServletTest {
 
     @Test
     public void returnsTextPlain() throws Exception {
-        assertThat(response.getContentType())
+        assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("text/plain");
     }
 
     @Test
     public void returnsUncacheable() throws Exception {
-        assertThat(response.getHeader("Cache-Control"))
+        assertThat(response.get(HttpHeader.CACHE_CONTROL))
                 .isEqualTo("must-revalidate,no-cache,no-store");
 
     }

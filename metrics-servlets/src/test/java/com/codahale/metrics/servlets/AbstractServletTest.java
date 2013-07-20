@@ -1,14 +1,14 @@
 package com.codahale.metrics.servlets;
 
-import org.eclipse.jetty.testing.HttpTester;
-import org.eclipse.jetty.testing.ServletTester;
+import org.eclipse.jetty.http.HttpTester;
+import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.After;
 import org.junit.Before;
 
 public abstract class AbstractServletTest {
     private final ServletTester tester = new ServletTester();
-    protected final HttpTester request = new HttpTester();
-    protected final HttpTester response = new HttpTester();
+    protected final HttpTester.Request request = HttpTester.newRequest();
+    protected HttpTester.Response response;
 
     @Before
     public void setUpTester() throws Exception {
@@ -24,6 +24,6 @@ public abstract class AbstractServletTest {
     }
 
     protected void processRequest() throws Exception {
-        response.parse(tester.getResponses(request.generate()));
+        this.response = HttpTester.parseResponse(tester.getResponses(request.generate()));
     }
 }

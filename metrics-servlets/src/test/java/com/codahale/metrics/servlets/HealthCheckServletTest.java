@@ -2,7 +2,8 @@ package com.codahale.metrics.servlets;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.health.HealthCheckRegistry;
-import org.eclipse.jetty.testing.ServletTester;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
                 .isEqualTo(501);
         assertThat(response.getContent())
                 .isEqualTo("{}");
-        assertThat(response.getContentType())
+        assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
 
@@ -62,7 +63,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
                 .isEqualTo(200);
         assertThat(response.getContent())
                 .isEqualTo("{\"fun\":{\"healthy\":true,\"message\":\"whee\"}}");
-        assertThat(response.getContentType())
+        assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
 
@@ -88,7 +89,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
                 .isEqualTo(500);
         assertThat(response.getContent())
                 .isEqualTo("{\"fun\":{\"healthy\":true,\"message\":\"whee\"},\"notFun\":{\"healthy\":false,\"message\":\"whee\"}}");
-        assertThat(response.getContentType())
+        assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
 
@@ -114,7 +115,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
                                                  "    \"message\" : \"whee\"%n" +
                                                  "  }%n" +
                                                  "}"));
-        assertThat(response.getContentType())
+        assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
 }

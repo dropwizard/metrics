@@ -50,19 +50,13 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
-            <artifactId>test-jetty-servlet</artifactId>
-            <version>${jetty8.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>${jetty8.version}</version>
+            <version>${jetty9.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.codahale.metrics</groupId>
-            <artifactId>metrics-jetty8</artifactId>
+            <artifactId>metrics-jetty9</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
