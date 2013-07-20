@@ -1,7 +1,8 @@
 package com.codahale.metrics.servlets;
 
 import com.codahale.metrics.*;
-import org.eclipse.jetty.testing.ServletTester;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,7 +50,7 @@ public class MetricsServletTest extends AbstractServletTest {
 
         assertThat(response.getStatus())
                 .isEqualTo(200);
-        assertThat(response.getHeader("Access-Control-Allow-Origin"))
+        assertThat(response.get("Access-Control-Allow-Origin"))
                 .isEqualTo("*");
         assertThat(response.getContent())
                 .isEqualTo("{" +
@@ -67,7 +68,7 @@ public class MetricsServletTest extends AbstractServletTest {
                                        "\"m\":{\"count\":1,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":3333333.3333333335,\"units\":\"events/second\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1.0,\"mean\":1.0,\"min\":1.0,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":1.0E7,\"duration_units\":\"seconds\",\"rate_units\":\"calls/second\"}" +
                                    "}" +
                                "}");
-        assertThat(response.getContentType())
+        assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
 
@@ -79,7 +80,7 @@ public class MetricsServletTest extends AbstractServletTest {
 
         assertThat(response.getStatus())
                 .isEqualTo(200);
-        assertThat(response.getHeader("Access-Control-Allow-Origin"))
+        assertThat(response.get("Access-Control-Allow-Origin"))
                 .isEqualTo("*");
         assertThat(response.getContent())
                 .isEqualTo(String.format("{%n" +
@@ -141,7 +142,7 @@ public class MetricsServletTest extends AbstractServletTest {
                                                  "    }%n" +
                                                  "  }%n" +
                                                  "}"));
-        assertThat(response.getContentType())
+        assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
 }
