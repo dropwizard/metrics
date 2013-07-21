@@ -14,6 +14,8 @@ v3.0.1-SNAPSHOT
 * Fixed cast exception for async requests in ``metrics-jetty9``.
 * Added support for ``Access-Control-Allow-Origin`` to ``MetricsServlet``.
 * Fixed numerical issue with ``Meter`` EWMA rates.
+* Deprecated ``AdminServletContextListener`` in favor of ``MetricsServlet.ContextListener`` and
+  ``HealthCheckServlet.ContextListener``.
 
 .. _rel-3.0.0:
 
