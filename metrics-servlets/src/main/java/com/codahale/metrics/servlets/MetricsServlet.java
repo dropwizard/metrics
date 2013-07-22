@@ -28,22 +28,22 @@ public class MetricsServlet extends HttpServlet {
     private transient ObjectMapper mapper;
 
     public MetricsServlet() {
-    	super();
     }
+
     public MetricsServlet(MetricRegistry registry) {
-    	this();
-    	this.registry = registry;
+        this.registry = registry;
     }
+
     @Override
     public void init(ServletConfig config) throws ServletException {
-    	if (null == registry) {
-	        final Object registryAttr = config.getServletContext().getAttribute(METRICS_REGISTRY);
-	        if (registryAttr instanceof MetricRegistry) {
-	            this.registry = (MetricRegistry) registryAttr;
-	        } else {
-	            throw new ServletException("Couldn't find a MetricRegistry instance.");
-	        }
-    	}
+        if (null == registry) {
+            final Object registryAttr = config.getServletContext().getAttribute(METRICS_REGISTRY);
+            if (registryAttr instanceof MetricRegistry) {
+                this.registry = (MetricRegistry) registryAttr;
+            } else {
+                throw new ServletException("Couldn't find a MetricRegistry instance.");
+            }
+        }
 
         final TimeUnit rateUnit = parseTimeUnit(config.getServletContext()
                                                       .getInitParameter(RATE_UNIT),
