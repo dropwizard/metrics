@@ -126,43 +126,43 @@ public class HealthCheckServletTest extends AbstractServletTest {
 
     @Test
     public void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
-    	HealthCheckRegistry healthCheckRegistry = mock(HealthCheckRegistry.class);
-    	ServletContext servletContext = mock(ServletContext.class);
-    	ServletConfig servletConfig = mock(ServletConfig.class);
-    	when(servletConfig.getServletContext()).thenReturn(servletContext);
-    	
-    	HealthCheckServlet healthCheckServlet = new HealthCheckServlet(healthCheckRegistry);
-    	healthCheckServlet.init(servletConfig);
-    	
-    	verify(servletConfig, times(1)).getServletContext();
-    	verify(servletContext, never()).getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY));
+        HealthCheckRegistry healthCheckRegistry = mock(HealthCheckRegistry.class);
+        ServletContext servletContext = mock(ServletContext.class);
+        ServletConfig servletConfig = mock(ServletConfig.class);
+        when(servletConfig.getServletContext()).thenReturn(servletContext);
+ 
+        HealthCheckServlet healthCheckServlet = new HealthCheckServlet(healthCheckRegistry);
+        healthCheckServlet.init(servletConfig);
+ 
+        verify(servletConfig, times(1)).getServletContext();
+        verify(servletContext, never()).getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY));
     }
 
     @Test
     public void constructorWithRegistryAsArgumentUsesServletConfigWhenNull() throws Exception {
-    	HealthCheckRegistry healthCheckRegistry = mock(HealthCheckRegistry.class);
-    	ServletContext servletContext = mock(ServletContext.class);
-    	ServletConfig servletConfig = mock(ServletConfig.class);
-    	when(servletConfig.getServletContext()).thenReturn(servletContext);
-    	when(servletContext.getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY)))
-    		.thenReturn(healthCheckRegistry);
-    	
-    	HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
-    	healthCheckServlet.init(servletConfig);
-    	
-    	verify(servletConfig, times(2)).getServletContext();
-    	verify(servletContext, times(1)).getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY));
+        HealthCheckRegistry healthCheckRegistry = mock(HealthCheckRegistry.class);
+        ServletContext servletContext = mock(ServletContext.class);
+        ServletConfig servletConfig = mock(ServletConfig.class);
+        when(servletConfig.getServletContext()).thenReturn(servletContext);
+        when(servletContext.getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY)))
+       	    .thenReturn(healthCheckRegistry);
+ 
+        HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
+        healthCheckServlet.init(servletConfig);
+ 
+        verify(servletConfig, times(2)).getServletContext();
+        verify(servletContext, times(1)).getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY));
     }
 
     @Test(expected = ServletException.class)
     public void constructorWithRegistryAsArgumentUsesServletConfigWhenNullButWrongTypeInContext() throws Exception {
-    	ServletContext servletContext = mock(ServletContext.class);
-    	ServletConfig servletConfig = mock(ServletConfig.class);
-    	when(servletConfig.getServletContext()).thenReturn(servletContext);
-    	when(servletContext.getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY)))
-    		.thenReturn("IRELLEVANT_STRING");
-    	
-    	HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
-    	healthCheckServlet.init(servletConfig);
+        ServletContext servletContext = mock(ServletContext.class);
+        ServletConfig servletConfig = mock(ServletConfig.class);
+        when(servletConfig.getServletContext()).thenReturn(servletContext);
+        when(servletContext.getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY)))
+        .thenReturn("IRELLEVANT_STRING");
+ 
+        HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
+        healthCheckServlet.init(servletConfig);
     }
 }
