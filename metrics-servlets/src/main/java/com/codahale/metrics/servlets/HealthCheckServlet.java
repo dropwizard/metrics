@@ -6,8 +6,7 @@ import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.codahale.metrics.json.HealthCheckModule;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
+import javax.servlet.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +17,34 @@ import java.util.SortedMap;
 import java.util.concurrent.ExecutorService;
 
 public class HealthCheckServlet extends HttpServlet {
+    public static abstract class ContextListener implements ServletContextListener {
+        /**
+         * Returns the {@link HealthCheckRegistry} to inject into the servlet context.
+         */
+        protected abstract HealthCheckRegistry getHealthCheckRegistry();
+
+        /**
+         * Returns the {@link ExecutorService} to inject into the servlet context, or {@code null}
+         * if the health checks should be run in the servlet worker thread.
+         */
+        protected ExecutorService getExecutorService() {
+            // don't use a thread pool by default
+            return null;
+        }
+
+        @Override
+        public void contextInitialized(ServletContextEvent event) {
+            final ServletContext context = event.getServletContext();
+            context.setAttribute(HEALTH_CHECK_REGISTRY, getHealthCheckRegistry());
+            context.setAttribute(HEALTH_CHECK_EXECUTOR, getExecutorService());
+        }
+
+        @Override
+        public void contextDestroyed(ServletContextEvent event) {
+            // no-op
+        }
+    }
+
     public static final String HEALTH_CHECK_REGISTRY = HealthCheckServlet.class.getCanonicalName() + ".registry";
     public static final String HEALTH_CHECK_EXECUTOR = HealthCheckServlet.class.getCanonicalName() + ".executor";
 
