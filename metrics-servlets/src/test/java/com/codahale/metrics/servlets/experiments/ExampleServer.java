@@ -1,18 +1,19 @@
 package com.codahale.metrics.servlets.experiments;
 
-import com.codahale.metrics.Clock;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
-import com.codahale.metrics.jetty8.InstrumentedHandler;
-import com.codahale.metrics.jetty8.InstrumentedQueuedThreadPool;
-import com.codahale.metrics.jetty8.InstrumentedSelectChannelConnector;
+import com.codahale.metrics.jetty9.InstrumentedConnectionFactory;
+import com.codahale.metrics.jetty9.InstrumentedHandler;
+import com.codahale.metrics.jetty9.InstrumentedQueuedThreadPool;
 import com.codahale.metrics.servlets.AdminServlet;
 import com.codahale.metrics.servlets.HealthCheckServlet;
 import com.codahale.metrics.servlets.MetricsServlet;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.thread.ThreadPool;
@@ -38,13 +39,13 @@ public class ExampleServer {
         COUNTER_1.inc();
         COUNTER_2.inc();
 
-        final Server server = new Server();
-
-        final Connector connector = new InstrumentedSelectChannelConnector(REGISTRY, 8080, Clock.defaultClock());
-        server.addConnector(connector);
-
         final ThreadPool threadPool = new InstrumentedQueuedThreadPool(REGISTRY);
-        server.setThreadPool(threadPool);
+        final Server server = new Server(threadPool);
+
+        final Connector connector = new ServerConnector(server,
+                                                        new InstrumentedConnectionFactory(new HttpConnectionFactory(),
+                                                                                          REGISTRY.timer("http.connection")));
+        server.addConnector(connector);
 
         final ServletContextHandler context = new ServletContextHandler();
         context.setContextPath("/initial");
@@ -53,8 +54,10 @@ public class ExampleServer {
 
         final ServletHolder holder = new ServletHolder(new AdminServlet());
         context.addServlet(holder, "/dingo/*");
-        
-        server.setHandler(new InstrumentedHandler(REGISTRY, context));
+
+        final InstrumentedHandler handler = new InstrumentedHandler(REGISTRY);
+        handler.setHandler(context);
+        server.setHandler(handler);
         
         server.start();
         server.join();

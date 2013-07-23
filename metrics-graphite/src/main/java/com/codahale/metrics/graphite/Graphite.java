@@ -17,6 +17,7 @@ public class Graphite implements Closeable {
 
     private final InetSocketAddress address;
     private final SocketFactory socketFactory;
+    private final Charset charset;
 
     private Socket socket;
     private Writer writer;
@@ -35,19 +36,32 @@ public class Graphite implements Closeable {
     /**
      * Creates a new client which connects to the given address and socket factory.
      *
-     * @param address the address of the Carbon server
+     * @param address       the address of the Carbon server
      * @param socketFactory the socket factory
      */
     public Graphite(InetSocketAddress address, SocketFactory socketFactory) {
+        this(address, socketFactory, UTF_8);
+    }
+
+    /**
+     * Creates a new client which connects to the given address and socket factory using the given
+     * character set.
+     *
+     * @param address       the address of the Carbon server
+     * @param socketFactory the socket factory
+     * @param charset       the character set used by the server
+     */
+    public Graphite(InetSocketAddress address, SocketFactory socketFactory, Charset charset) {
         this.address = address;
         this.socketFactory = socketFactory;
+        this.charset = charset;
     }
 
     /**
      * Connects to the server.
      *
      * @throws IllegalStateException if the client is already connected
-     * @throws IOException if there is an error connecting
+     * @throws IOException           if there is an error connecting
      */
     public void connect() throws IllegalStateException, IOException {
         if (socket != null) {
@@ -55,15 +69,15 @@ public class Graphite implements Closeable {
         }
 
         this.socket = socketFactory.createSocket(address.getAddress(), address.getPort());
-        this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), UTF_8));
+        this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), charset));
     }
 
     /**
      * Sends the given measurement to the server.
      *
-     * @param name         the name of the metric
-     * @param value        the value of the metric
-     * @param timestamp    the timestamp of the metric
+     * @param name      the name of the metric
+     * @param value     the value of the metric
+     * @param timestamp the timestamp of the metric
      * @throws IOException if there was an error sending the metric
      */
     public void send(String name, String value, long timestamp) throws IOException {

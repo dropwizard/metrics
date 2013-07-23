@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
+@SuppressWarnings("deprecation")
 public class AdminServletContextListenerTest {
     private final MetricRegistry metricRegistry = mock(MetricRegistry.class);
     private final HealthCheckRegistry healthCheckRegistry = mock(HealthCheckRegistry.class);

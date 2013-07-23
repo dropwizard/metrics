@@ -109,25 +109,4 @@ public class ExponentiallyDecayingReservoirTest {
         }
     }
 
-    class ManualClock extends Clock {
-        long ticksInNanos = 0;
-
-        public void addMillis(long millis) {
-            ticksInNanos += TimeUnit.MILLISECONDS.toNanos(millis);
-        }
-
-        public void addHours(long hours) {
-            ticksInNanos += TimeUnit.HOURS.toNanos(hours);
-        }
-
-        @Override
-        public long getTick() {
-            return ticksInNanos;
-        }
-
-        @Override
-        public long getTime() {
-            return TimeUnit.NANOSECONDS.toMillis(ticksInNanos);
-        }
-    }
 }

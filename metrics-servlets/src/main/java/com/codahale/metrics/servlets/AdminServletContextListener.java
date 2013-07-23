@@ -3,6 +3,7 @@ package com.codahale.metrics.servlets;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.util.concurrent.ExecutorService;
@@ -11,7 +12,11 @@ import java.util.concurrent.ExecutorService;
  * A listener implementation which injects a {@link MetricRegistry} instance, a
  * {@link HealthCheckRegistry} instance, and an optional {@link ExecutorService} instance  into the
  * servlet context as named attributes.
+ *
+ * @deprecated Use {@link MetricsServlet.ContextListener} and
+ *             {@link HealthCheckServlet.ContextListener} instead.
  */
+@Deprecated
 public abstract class AdminServletContextListener implements ServletContextListener {
     /**
      * Returns the {@link MetricRegistry} to inject into the servlet context.
@@ -34,12 +39,10 @@ public abstract class AdminServletContextListener implements ServletContextListe
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        servletContextEvent.getServletContext().setAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY,
-                                                             getHealthCheckRegistry());
-        servletContextEvent.getServletContext().setAttribute(HealthCheckServlet.HEALTH_CHECK_EXECUTOR,
-                                                             getExecutorService());
-        servletContextEvent.getServletContext().setAttribute(MetricsServlet.METRICS_REGISTRY,
-                                                             getMetricRegistry());
+        final ServletContext context = servletContextEvent.getServletContext();
+        context.setAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY, getHealthCheckRegistry());
+        context.setAttribute(HealthCheckServlet.HEALTH_CHECK_EXECUTOR, getExecutorService());
+        context.setAttribute(MetricsServlet.METRICS_REGISTRY, getMetricRegistry());
     }
 
     @Override
