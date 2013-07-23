@@ -39,6 +39,7 @@ Many, many thanks to:
 * `Greg Bowyer <https://github.com/GregBowyer>`_
 * `Jackson Davis <https://github.com/jcdavis>`_
 * `James Casey <https://github.com/jamesc>`_
+* `Jan-Helge Bergesen <https://github.com/jhberges>`_
 * `Jason A. Beranek <https://github.com/jasonberanek>`_
 * `Jason Slagle <https://github.com/jmslagle>`_
 * `JD Maturen <https://github.com/sku>`_

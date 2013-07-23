@@ -16,6 +16,7 @@ v3.0.1-SNAPSHOT
 * Fixed numerical issue with ``Meter`` EWMA rates.
 * Deprecated ``AdminServletContextListener`` in favor of ``MetricsServlet.ContextListener`` and
   ``HealthCheckServlet.ContextListener``.
+* Added additional constructors to ``HealthCheckServlet`` and ``MetricsServlet``.
 
 .. _rel-3.0.0:
 
