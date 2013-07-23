@@ -8,8 +8,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.mockito.Mockito.*;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -117,5 +123,47 @@ public class HealthCheckServletTest extends AbstractServletTest {
                                                  "}"));
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
+    }
+
+    @Test
+    public void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
+        final HealthCheckRegistry healthCheckRegistry = mock(HealthCheckRegistry.class);
+        final ServletContext servletContext = mock(ServletContext.class);
+        final ServletConfig servletConfig = mock(ServletConfig.class);
+        when(servletConfig.getServletContext()).thenReturn(servletContext);
+ 
+        final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(healthCheckRegistry);
+        healthCheckServlet.init(servletConfig);
+ 
+        verify(servletConfig, times(1)).getServletContext();
+        verify(servletContext, never()).getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY));
+    }
+
+    @Test
+    public void constructorWithRegistryAsArgumentUsesServletConfigWhenNull() throws Exception {
+        final HealthCheckRegistry healthCheckRegistry = mock(HealthCheckRegistry.class);
+        final ServletContext servletContext = mock(ServletContext.class);
+        final ServletConfig servletConfig = mock(ServletConfig.class);
+        when(servletConfig.getServletContext()).thenReturn(servletContext);
+        when(servletContext.getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY)))
+       	    .thenReturn(healthCheckRegistry);
+ 
+        final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
+        healthCheckServlet.init(servletConfig);
+ 
+        verify(servletConfig, times(2)).getServletContext();
+        verify(servletContext, times(1)).getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY));
+    }
+
+    @Test(expected = ServletException.class)
+    public void constructorWithRegistryAsArgumentUsesServletConfigWhenNullButWrongTypeInContext() throws Exception {
+        final ServletContext servletContext = mock(ServletContext.class);
+        final ServletConfig servletConfig = mock(ServletConfig.class);
+        when(servletConfig.getServletContext()).thenReturn(servletContext);
+        when(servletContext.getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY)))
+            .thenReturn("IRELLEVANT_STRING");
+ 
+        final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
+        healthCheckServlet.init(servletConfig);
     }
 }

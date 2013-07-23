@@ -8,8 +8,16 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class MetricsServletTest extends AbstractServletTest {
@@ -144,5 +152,47 @@ public class MetricsServletTest extends AbstractServletTest {
                                                  "}"));
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
+    }
+
+    @Test
+    public void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
+        final MetricRegistry metricRegistry = mock(MetricRegistry.class);
+        final ServletContext servletContext = mock(ServletContext.class);
+        final ServletConfig servletConfig = mock(ServletConfig.class);
+        when(servletConfig.getServletContext()).thenReturn(servletContext);
+
+        final MetricsServlet metricsServlet = new MetricsServlet(metricRegistry);
+        metricsServlet.init(servletConfig);
+ 
+        verify(servletConfig, times(1)).getServletContext();
+        verify(servletContext, never()).getAttribute(eq(MetricsServlet.METRICS_REGISTRY));
+    }
+
+    @Test
+    public void constructorWithRegistryAsArgumentUsesServletConfigWhenNull() throws Exception {
+        final MetricRegistry metricRegistry = mock(MetricRegistry.class);
+        final ServletContext servletContext = mock(ServletContext.class);
+        final ServletConfig servletConfig = mock(ServletConfig.class);
+        when(servletConfig.getServletContext()).thenReturn(servletContext);
+        when(servletContext.getAttribute(eq(MetricsServlet.METRICS_REGISTRY)))
+            .thenReturn(metricRegistry);
+
+        final MetricsServlet metricsServlet = new MetricsServlet(null);
+        metricsServlet.init(servletConfig);
+
+        verify(servletConfig, times(1)).getServletContext();
+        verify(servletContext, times(1)).getAttribute(eq(MetricsServlet.METRICS_REGISTRY));
+    }
+
+    @Test(expected = ServletException.class)
+    public void constructorWithRegistryAsArgumentUsesServletConfigWhenNullButWrongTypeInContext() throws Exception {
+        final ServletContext servletContext = mock(ServletContext.class);
+        final ServletConfig servletConfig = mock(ServletConfig.class);
+        when(servletConfig.getServletContext()).thenReturn(servletContext);
+        when(servletContext.getAttribute(eq(MetricsServlet.METRICS_REGISTRY)))
+            .thenReturn("IRELLEVANT_STRING");
+
+        final MetricsServlet metricsServlet = new MetricsServlet(null);
+        metricsServlet.init(servletConfig);
     }
 }

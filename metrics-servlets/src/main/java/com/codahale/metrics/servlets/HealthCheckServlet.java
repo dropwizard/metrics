@@ -55,13 +55,22 @@ public class HealthCheckServlet extends HttpServlet {
     private transient ExecutorService executorService;
     private transient ObjectMapper mapper;
 
+    public HealthCheckServlet() {
+    }
+
+    public HealthCheckServlet(HealthCheckRegistry registry) {
+        this.registry = registry;
+    }
+    
     @Override
     public void init(ServletConfig config) throws ServletException {
-        final Object registryAttr = config.getServletContext().getAttribute(HEALTH_CHECK_REGISTRY);
-        if (registryAttr instanceof HealthCheckRegistry) {
-            this.registry = (HealthCheckRegistry) registryAttr;
-        } else {
-            throw new ServletException("Couldn't find a HealthCheckRegistry instance.");
+        if (null == registry) {
+            final Object registryAttr = config.getServletContext().getAttribute(HEALTH_CHECK_REGISTRY);
+            if (registryAttr instanceof HealthCheckRegistry) {
+                this.registry = (HealthCheckRegistry) registryAttr;
+            } else {
+                throw new ServletException("Couldn't find a HealthCheckRegistry instance.");
+            }
         }
 
         final Object executorAttr = config.getServletContext().getAttribute(HEALTH_CHECK_EXECUTOR);
