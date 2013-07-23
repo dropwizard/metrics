@@ -6,8 +6,8 @@ Release Notes
 
 .. _rel-3.0.1:
 
-v3.0.1-SNAPSHOT
-===============
+v3.0.1: Jul 23 2013
+===================
 
 * Fixed NPE in ``MetricRegistry#name``.
 * ``ScheduledReporter`` and ``JmxReporter`` now implement ``Closeable``.
