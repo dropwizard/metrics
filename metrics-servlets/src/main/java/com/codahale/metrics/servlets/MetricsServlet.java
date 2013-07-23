@@ -83,15 +83,23 @@ public class MetricsServlet extends HttpServlet {
     private transient MetricRegistry registry;
     private transient ObjectMapper mapper;
 
+    public MetricsServlet() {
+    }
+
+    public MetricsServlet(MetricRegistry registry) {
+        this.registry = registry;
+    }
+
     @Override
     public void init(ServletConfig config) throws ServletException {
         final ServletContext context = config.getServletContext();
-
-        final Object registryAttr = context.getAttribute(METRICS_REGISTRY);
-        if (registryAttr instanceof MetricRegistry) {
-            this.registry = (MetricRegistry) registryAttr;
-        } else {
-            throw new ServletException("Couldn't find a MetricRegistry instance.");
+        if (null == registry) {
+            final Object registryAttr = context.getAttribute(METRICS_REGISTRY);
+            if (registryAttr instanceof MetricRegistry) {
+                this.registry = (MetricRegistry) registryAttr;
+            } else {
+                throw new ServletException("Couldn't find a MetricRegistry instance.");
+            }
         }
 
         final TimeUnit rateUnit = parseTimeUnit(context.getInitParameter(RATE_UNIT),
