@@ -14,7 +14,7 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(getIdleThreads(),
-                                getThreads());
+                                getMaxThreads());
             }
         });
         registry.register(name(QueuedThreadPool.class, "active-threads"), new Gauge<Integer>() {
