@@ -27,6 +27,7 @@ public abstract class AbstractInstrumentedFilter implements Filter {
 
     // initialized after call of init method
     private ConcurrentMap<Integer, Meter> metersByStatusCode;
+    private ConcurrentMap<Integer, Meter> metersByStatusCodeGroup;
     private Meter otherMeter;
     private Counter activeRequests;
     private Timer requestTimer;
@@ -59,13 +60,20 @@ public abstract class AbstractInstrumentedFilter implements Filter {
             metersByStatusCode.put(entry.getKey(),
                     metricsRegistry.meter(name(AbstractInstrumentedFilter.class, entry.getValue())));
         }
+
+
+        this.metersByStatusCodeGroup = new ConcurrentHashMap<Integer, Meter>(5);
+        for (int i = 1; i <= 5; i++) { // http status 1xx to 5xx
+            this.metersByStatusCodeGroup.put(i,
+                    metricsRegistry.meter(name(AbstractInstrumentedFilter.class, i + "xx")));
+        }
+
         this.otherMeter = metricsRegistry.meter(name(AbstractInstrumentedFilter.class,
-                                                     otherMetricName));
+                                                 otherMetricName));
         this.activeRequests = metricsRegistry.counter(name(AbstractInstrumentedFilter.class,
                                                            "activeRequests"));
         this.requestTimer = metricsRegistry.timer(name(AbstractInstrumentedFilter.class,
                                                        "requests"));
-
     }
 
     private MetricRegistry getMetricsFactory(FilterConfig filterConfig) {
@@ -98,15 +106,22 @@ public abstract class AbstractInstrumentedFilter implements Filter {
         } finally {
             context.stop();
             activeRequests.dec();
-            markMeterForStatusCode(wrappedResponse.getStatus());
+            markMetersForStatusCode(wrappedResponse.getStatus());
         }
     }
 
-    private void markMeterForStatusCode(int status) {
+    private void markMetersForStatusCode(int status) {
         final Meter metric = metersByStatusCode.get(status);
         if (metric != null) {
             metric.mark();
-        } else {
+        }
+        
+        final Meter groupMetric = metersByStatusCodeGroup.get(status / 100);
+        if (groupMetric != null) {
+            groupMetric.mark();
+        }
+        
+        if (metric == null && groupMetric == null) {
             otherMeter.mark();
         }
     }
