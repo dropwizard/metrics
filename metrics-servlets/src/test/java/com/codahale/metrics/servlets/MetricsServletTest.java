@@ -155,6 +155,19 @@ public class MetricsServletTest extends AbstractServletTest {
     }
 
     @Test
+    public void deleteRemovesAllMetrics() throws Exception {
+        request.setMethod("DELETE");
+        processRequest();
+        assertThat(response.getStatus()).isEqualTo(200);
+
+        assertThat(registry.getNames()).isEmpty();
+        assertThat(registry.getCounters()).isEmpty();
+        assertThat(registry.getGauges()).isEmpty();
+        assertThat(registry.getHistograms()).isEmpty();
+        assertThat(registry.getTimers()).isEmpty();
+    }
+
+    @Test
     public void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
         final MetricRegistry metricRegistry = mock(MetricRegistry.class);
         final ServletContext servletContext = mock(ServletContext.class);
