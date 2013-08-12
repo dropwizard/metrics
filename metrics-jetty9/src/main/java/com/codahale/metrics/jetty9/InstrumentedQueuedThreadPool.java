@@ -53,6 +53,12 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
                 return Ratio.of(getThreads() - getIdleThreads(), getThreads());
             }
         });
+        metricRegistry.register(name(QueuedThreadPool.class, getName(), "utilization-max"), new RatioGauge() {
+            @Override
+            protected Ratio getRatio() {
+                return Ratio.of(getThreads() - getIdleThreads(), getMaxThreads());
+            }
+        });
         metricRegistry.register(name(QueuedThreadPool.class, getName(), "size"), new Gauge<Integer>() {
             @Override
             public Integer getValue() {
