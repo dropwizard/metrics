@@ -15,6 +15,6 @@ the many third-party libraries which extend Metrics:
 * `sematext-metrics-reporter <https://github.com/sematext/sematext-metrics-reporter>`_ provides a
   reporter for `SPM <http://sematext.com/spm/index.html>`_.
 * `wicket-metrics <https://github.com/NitorCreations/wicket-metrics>`_ provides easy integration for
-   your `Wicket <http://wicket.apache.org/>`_ application.
+  your `Wicket <http://wicket.apache.org/>`_ application.
 * `metrics-guice <https://github.com/palominolabs/metrics-guice>`_ provides integration with `Guice <https://code.google.com/p/google-guice/>`_.
 * `metrics-scala <https://github.com/erikvanoosten/metrics-scala>`_ provides an API optimized for Scala.
