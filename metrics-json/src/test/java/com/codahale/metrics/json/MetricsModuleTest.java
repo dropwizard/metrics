@@ -107,9 +107,9 @@ public class MetricsModuleTest {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
         when(meter.getMeanRate()).thenReturn(2.0);
-        when(meter.getOneMinuteRate()).thenReturn(3.0);
+        when(meter.getOneMinuteRate()).thenReturn(5.0);
         when(meter.getFiveMinuteRate()).thenReturn(4.0);
-        when(meter.getFifteenMinuteRate()).thenReturn(5.0);
+        when(meter.getFifteenMinuteRate()).thenReturn(3.0);
 
         assertThat(mapper.writeValueAsString(meter))
                 .isEqualTo("{" +
