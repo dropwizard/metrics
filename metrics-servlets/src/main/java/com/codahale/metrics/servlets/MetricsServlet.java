@@ -2,6 +2,7 @@ package com.codahale.metrics.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.json.MetricsModule;
 
@@ -130,6 +131,14 @@ public class MetricsServlet extends HttpServlet {
         } finally {
             output.close();
         }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req,
+            HttpServletResponse resp) throws ServletException, IOException {
+        resp.setStatus(HttpServletResponse.SC_OK);
+        // Remove all metrics
+        registry.removeMatching(MetricFilter.ALL);
     }
 
     private ObjectWriter getWriter(HttpServletRequest request) {
