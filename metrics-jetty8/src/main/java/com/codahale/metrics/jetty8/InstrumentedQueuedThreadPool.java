@@ -37,5 +37,11 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
                 return getQueue().size();
             }
         });
+        registry.register(name(QueuedThreadPool.class, "utilization-max"), new RatioGauge() {
+            @Override
+            protected Ratio getRatio() {
+                return Ratio.of(getThreads() - getIdleThreads(), getMaxThreads());
+            }
+        });
     }
 }
