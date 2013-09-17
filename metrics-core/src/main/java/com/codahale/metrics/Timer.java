@@ -39,6 +39,13 @@ public class Timer implements Metered, Sampling {
         public void close() {
             stop();
         }
+
+        /**
+         * Returns the elapsed time so far, in nanoseconds.
+         */
+        public long getElapsedTime() {
+            return clock.getTick() - startTime;
+        }
     }
 
     private final Meter meter;
