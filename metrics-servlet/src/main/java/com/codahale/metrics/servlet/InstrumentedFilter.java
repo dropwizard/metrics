@@ -8,11 +8,11 @@ import java.util.Map;
  * to capture information about. <p>Use it in your servlet.xml like this:</p>
  * <pre>{@code
  * <filter>
- *     <filter-name>webappMetricsFilter</filter-name>
- *     <filter-class>com.codahale.metrics.servlet.DefaultWebappMetricsFilter</filter-class>
+ *     <filter-name>instrumentedFilter</filter-name>
+ *     <filter-class>com.codahale.metrics.servlet.InstrumentedFilter</filter-class>
  * </filter>
  * <filter-mapping>
- *     <filter-name>webappMetricsFilter</filter-name>
+ *     <filter-name>instrumentedFilter</filter-name>
  *     <url-pattern>/*</url-pattern>
  * </filter-mapping>
  * }</pre>
