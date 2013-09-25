@@ -30,6 +30,7 @@ public class CsvReporter extends ScheduledReporter {
      */
     public static class Builder {
         private final MetricRegistry registry;
+        private String name;
         private Locale locale;
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
@@ -38,6 +39,7 @@ public class CsvReporter extends ScheduledReporter {
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
+            this.name = "csv-reporter";
             this.locale = Locale.getDefault();
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
@@ -99,6 +101,17 @@ public class CsvReporter extends ScheduledReporter {
             this.filter = filter;
             return this;
         }
+        
+        /**
+         * Use the given name for this reporter.
+         * 
+         * @param name a name
+         * @return {@code this}
+         */
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
 
         /**
          * Builds a {@link CsvReporter} with the given properties, writing {@code .csv} files to the
@@ -109,6 +122,7 @@ public class CsvReporter extends ScheduledReporter {
          */
         public CsvReporter build(File directory) {
             return new CsvReporter(registry,
+                                   name,
                                    directory,
                                    locale,
                                    rateUnit,
@@ -126,13 +140,14 @@ public class CsvReporter extends ScheduledReporter {
     private final Clock clock;
 
     private CsvReporter(MetricRegistry registry,
+                        String name,
                         File directory,
                         Locale locale,
                         TimeUnit rateUnit,
                         TimeUnit durationUnit,
                         Clock clock,
                         MetricFilter filter) {
-        super(registry, "csv-reporter", filter, rateUnit, durationUnit);
+        super(registry, name, filter, rateUnit, durationUnit);
         this.directory = directory;
         this.locale = locale;
         this.clock = clock;
