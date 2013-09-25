@@ -44,6 +44,8 @@ public abstract class ScheduledReporter implements Closeable {
         }
     }
 
+    private static final AtomicInteger FACTORY_ID = new AtomicInteger();
+
     private final MetricRegistry registry;
     private final ScheduledExecutorService executor;
     private final MetricFilter filter;
@@ -67,7 +69,7 @@ public abstract class ScheduledReporter implements Closeable {
                                 TimeUnit durationUnit) {
         this.registry = registry;
         this.filter = filter;
-        this.executor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name));
+        this.executor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name + '-' + FACTORY_ID.incrementAndGet()));
         this.rateFactor = rateUnit.toSeconds(1);
         this.rateUnit = calculateRateUnit(rateUnit);
         this.durationFactor = 1.0 / durationUnit.toNanos(1);
