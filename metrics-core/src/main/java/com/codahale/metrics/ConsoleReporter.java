@@ -170,57 +170,61 @@ public class ConsoleReporter extends ScheduledReporter {
                        SortedMap<String, Histogram> histograms,
                        SortedMap<String, Meter> meters,
                        SortedMap<String, Timer> timers) {
-        final String dateTime = dateFormat.format(new Date(clock.getTime()));
-        printWithBanner(dateTime, '=');
-        output.println();
 
-        if (!gauges.isEmpty()) {
-            printWithBanner("-- Gauges", '-');
-            for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
-                output.println(entry.getKey());
-                printGauge(entry);
-            }
+        synchronized (output){
+            final String dateTime = dateFormat.format(new Date(clock.getTime()));
+            printWithBanner(dateTime, '=');
             output.println();
+
+            if (!gauges.isEmpty()) {
+                printWithBanner("-- Gauges", '-');
+                for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
+                    output.println(entry.getKey());
+                    printGauge(entry);
+                }
+                output.println();
+            }
+
+            if (!counters.isEmpty()) {
+                printWithBanner("-- Counters", '-');
+                for (Map.Entry<String, Counter> entry : counters.entrySet()) {
+                    output.println(entry.getKey());
+                    printCounter(entry);
+                }
+                output.println();
+            }
+
+            if (!histograms.isEmpty()) {
+                printWithBanner("-- Histograms", '-');
+                for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
+                    output.println(entry.getKey());
+                    printHistogram(entry.getValue());
+                }
+                output.println();
+            }
+
+            if (!meters.isEmpty()) {
+                printWithBanner("-- Meters", '-');
+                for (Map.Entry<String, Meter> entry : meters.entrySet()) {
+                    output.println(entry.getKey());
+                    printMeter(entry.getValue());
+                }
+                output.println();
+            }
+
+            if (!timers.isEmpty()) {
+                printWithBanner("-- Timers", '-');
+                for (Map.Entry<String, Timer> entry : timers.entrySet()) {
+                    output.println(entry.getKey());
+                    printTimer(entry.getValue());
+                }
+                output.println();
+            }
+
+            output.println();
+            output.flush();
         }
 
-        if (!counters.isEmpty()) {
-            printWithBanner("-- Counters", '-');
-            for (Map.Entry<String, Counter> entry : counters.entrySet()) {
-                output.println(entry.getKey());
-                printCounter(entry);
-            }
-            output.println();
-        }
-
-        if (!histograms.isEmpty()) {
-            printWithBanner("-- Histograms", '-');
-            for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
-                output.println(entry.getKey());
-                printHistogram(entry.getValue());
-            }
-            output.println();
-        }
-
-        if (!meters.isEmpty()) {
-            printWithBanner("-- Meters", '-');
-            for (Map.Entry<String, Meter> entry : meters.entrySet()) {
-                output.println(entry.getKey());
-                printMeter(entry.getValue());
-            }
-            output.println();
-        }
-
-        if (!timers.isEmpty()) {
-            printWithBanner("-- Timers", '-');
-            for (Map.Entry<String, Timer> entry : timers.entrySet()) {
-                output.println(entry.getKey());
-                printTimer(entry.getValue());
-            }
-            output.println();
-        }
-
-        output.println();
-        output.flush();
     }
 
     private void printMeter(Meter meter) {

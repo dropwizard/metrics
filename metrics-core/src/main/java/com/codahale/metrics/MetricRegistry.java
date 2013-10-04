@@ -50,13 +50,19 @@ public class MetricRegistry implements MetricSet {
 
     private final ConcurrentMap<String, Metric> metrics;
     private final List<MetricRegistryListener> listeners;
+    private final MetricPrefixStrategy prefixStrategy;
+
+    public MetricRegistry(){
+        this(null);
+    }
 
     /**
      * Creates a new {@link MetricRegistry}.
      */
-    public MetricRegistry() {
+    public MetricRegistry(MetricPrefixStrategy prefixStrategy) {
         this.metrics = buildMap();
         this.listeners = new CopyOnWriteArrayList<MetricRegistryListener>();
+        this.prefixStrategy = prefixStrategy;
     }
 
     /**
@@ -84,6 +90,7 @@ public class MetricRegistry implements MetricSet {
         if (metric instanceof MetricSet) {
             registerAll(name, (MetricSet) metric);
         } else {
+            name = getFullName(name);
             final Metric existing = metrics.putIfAbsent(name, metric);
             if (existing == null) {
                 onMetricAdded(name, metric);
@@ -151,6 +158,7 @@ public class MetricRegistry implements MetricSet {
      * @return whether or not the metric was removed
      */
     public boolean remove(String name) {
+        name = getFullName(name);
         final Metric metric = metrics.remove(name);
         if (metric != null) {
             onMetricRemoved(name, metric);
@@ -305,6 +313,7 @@ public class MetricRegistry implements MetricSet {
 
     @SuppressWarnings("unchecked")
     private <T extends Metric> T getOrAdd(String name, MetricBuilder<T> builder) {
+        name = getFullName(name);
         final Metric metric = metrics.get(name);
         if (builder.isInstance(metric)) {
             return (T) metric;
@@ -377,7 +386,7 @@ public class MetricRegistry implements MetricSet {
         }
     }
 
-    private void registerAll(String prefix, MetricSet metrics) throws IllegalArgumentException {
+    public void registerAll(String prefix, MetricSet metrics) throws IllegalArgumentException {
         for (Map.Entry<String, Metric> entry : metrics.getMetrics().entrySet()) {
             if (entry.getValue() instanceof MetricSet) {
                 registerAll(name(prefix, entry.getKey()), (MetricSet) entry.getValue());
@@ -385,6 +394,18 @@ public class MetricRegistry implements MetricSet {
                 register(name(prefix, entry.getKey()), entry.getValue());
             }
         }
+    }
+
+    private String getFullName(String name){
+
+        final String fullName;
+        if(prefixStrategy == null){
+            fullName = name;
+        } else {
+            fullName = name(prefixStrategy.getMetricPrefix(), name);
+        }
+
+        return fullName;
     }
 
     @Override
