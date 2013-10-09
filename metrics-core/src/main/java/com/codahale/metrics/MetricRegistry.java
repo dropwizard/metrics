@@ -313,21 +313,24 @@ public class MetricRegistry implements MetricSet {
 
     @SuppressWarnings("unchecked")
     private <T extends Metric> T getOrAdd(String name, MetricBuilder<T> builder) {
-        name = getFullName(name);
-        final Metric metric = metrics.get(name);
+        final String fullName = getFullName(name);
+        final Metric metric = metrics.get(fullName);
+        final Metric added;
         if (builder.isInstance(metric)) {
             return (T) metric;
         } else if (metric == null) {
             try {
                 return register(name, builder.newMetric());
             } catch (IllegalArgumentException e) {
-                final Metric added = metrics.get(name);
+                added = metrics.get(fullName);
                 if (builder.isInstance(added)) {
                     return (T) added;
                 }
             }
+        } else {
+            added = null;
         }
-        throw new IllegalArgumentException(name + " is already used for a different type of metric");
+        throw new IllegalArgumentException(name + " is already used for a different type of metric: " + metric + ", added: " + added);
     }
 
     @SuppressWarnings("unchecked")
