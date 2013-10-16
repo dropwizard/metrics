@@ -18,3 +18,5 @@ the many third-party libraries which extend Metrics:
   your `Wicket <http://wicket.apache.org/>`_ application.
 * `metrics-guice <https://github.com/palominolabs/metrics-guice>`_ provides integration with `Guice <https://code.google.com/p/google-guice/>`_.
 * `metrics-scala <https://github.com/erikvanoosten/metrics-scala>`_ provides an API optimized for Scala.
+* `MetricCatcher <https://github.com/addthis/MetricCatcher>`_ Turns JSON over UDP into Metrics so that non-jvm languages can know what's going on too.
+* `metrics-reporter-config <https://github.com/addthis/metrics-reporter-config>`_ DropWizard-eqsue YAML configuration of reporters.
