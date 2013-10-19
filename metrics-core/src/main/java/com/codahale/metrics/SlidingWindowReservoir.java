@@ -7,7 +7,8 @@ import static java.lang.Math.min;
  * measurements.
  */
 public class SlidingWindowReservoir implements Reservoir {
-    private final long[] measurements;
+	private final long[] measurements;
+    private boolean fullWindow;
     private long count;
 
     /**
@@ -22,12 +23,20 @@ public class SlidingWindowReservoir implements Reservoir {
 
     @Override
     public synchronized int size() {
-        return (int) min(count, measurements.length);
+    	if(fullWindow){
+    		return measurements.length;
+    	}else{
+    		return (int) min(count, measurements.length);
+    	}
     }
 
     @Override
     public synchronized void update(long value) {
-        measurements[((int) count++ % measurements.length)] = value;
+        measurements[(int) count++] = value;
+    	if(count >= measurements.length){
+    		count = 0;
+    		fullWindow = true;
+    	}
     }
 
     @Override
