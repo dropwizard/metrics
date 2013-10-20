@@ -7,7 +7,7 @@ import static java.lang.Math.min;
  * measurements.
  */
 public class SlidingWindowReservoir implements Reservoir {
-	private final long[] measurements;
+    private final long[] measurements;
     private boolean fullWindow;
     private long count;
 
