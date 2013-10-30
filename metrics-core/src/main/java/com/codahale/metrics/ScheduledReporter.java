@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @see CsvReporter
  * @see Slf4jReporter
  */
-public abstract class ScheduledReporter implements Closeable {
+public abstract class ScheduledReporter implements Closeable, Reporter {
     /**
      * A simple named thread factory.
      */
