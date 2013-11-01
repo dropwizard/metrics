@@ -6,6 +6,7 @@ import com.codahale.metrics.health.HealthCheckRegistry;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -16,7 +17,6 @@ import java.util.concurrent.ExecutorService;
  * @deprecated Use {@link MetricsServlet.ContextListener} and
  *             {@link HealthCheckServlet.ContextListener} instead.
  */
-@Deprecated
 public abstract class AdminServletContextListener implements ServletContextListener {
     /**
      * Returns the {@link MetricRegistry} to inject into the servlet context.
@@ -37,12 +37,15 @@ public abstract class AdminServletContextListener implements ServletContextListe
         return null;
     }
 
+    protected abstract List<? extends AppDiagnosticBaseServlet> diagnostics();
+
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         final ServletContext context = servletContextEvent.getServletContext();
         context.setAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY, getHealthCheckRegistry());
         context.setAttribute(HealthCheckServlet.HEALTH_CHECK_EXECUTOR, getExecutorService());
         context.setAttribute(MetricsServlet.METRICS_REGISTRY, getMetricRegistry());
+        context.setAttribute(AppDiagnosticBaseServlet.SERVLETS_REGISTRY, diagnostics());
     }
 
     @Override

@@ -10,7 +10,7 @@ import java.io.PrintWriter;
 /**
  * An HTTP servlets which outputs a {@code text/plain} {@code "pong"} response.
  */
-public class PingServlet extends HttpServlet {
+public class PingServlet extends AppDiagnosticBaseServlet {
     private static final long serialVersionUID = 3772654177231086757L;
     private static final String CONTENT_TYPE = "text/plain";
     private static final String CONTENT = "pong";
@@ -29,5 +29,20 @@ public class PingServlet extends HttpServlet {
         } finally {
             writer.close();
         }
+    }
+
+    @Override
+    public String uri() {
+        return "/ping";
+    }
+
+    @Override
+    public String displayName() {
+        return "Ping";
+    }
+
+    @Override
+    public boolean supportsPrettyPrint() {
+        return false;
     }
 }

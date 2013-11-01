@@ -4,7 +4,6 @@ import com.codahale.metrics.jvm.ThreadDump;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -12,10 +11,10 @@ import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
 
 /**
-* An HTTP servlets which outputs a {@code text/plain} dump of all threads in the VM. Only responds
-* to {@code GET} requests.
-*/
-public class ThreadDumpServlet extends HttpServlet {
+ * An HTTP servlets which outputs a {@code text/plain} dump of all threads in the VM. Only responds
+ * to {@code GET} requests.
+ */
+public class ThreadDumpServlet extends AppDiagnosticBaseServlet {
     private static final long serialVersionUID = -2690343532336103046L;
     private static final String CONTENT_TYPE = "text/plain";
 
@@ -38,5 +37,20 @@ public class ThreadDumpServlet extends HttpServlet {
         } finally {
             output.close();
         }
+    }
+
+    @Override
+    public String uri() {
+        return "/threads";
+    }
+
+    @Override
+    public String displayName() {
+        return "Threads";
+    }
+
+    @Override
+    public boolean supportsPrettyPrint() {
+        return false;
     }
 }

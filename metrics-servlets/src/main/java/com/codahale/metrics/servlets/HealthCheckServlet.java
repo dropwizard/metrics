@@ -7,7 +7,6 @@ import com.codahale.metrics.health.HealthCheckRegistry;
 import com.codahale.metrics.json.HealthCheckModule;
 
 import javax.servlet.*;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -16,7 +15,22 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.ExecutorService;
 
-public class HealthCheckServlet extends HttpServlet {
+public class HealthCheckServlet extends AppDiagnosticBaseServlet {
+    @Override
+    public String uri() {
+        return "/healthcheck";
+    }
+
+    @Override
+    public String displayName() {
+        return "Healthcheck";
+    }
+
+    @Override
+    public boolean supportsPrettyPrint() {
+        return true;
+    }
+
     public static abstract class ContextListener implements ServletContextListener {
         /**
          * Returns the {@link HealthCheckRegistry} to inject into the servlet context.

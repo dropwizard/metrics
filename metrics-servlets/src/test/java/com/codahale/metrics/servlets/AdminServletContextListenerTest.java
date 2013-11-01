@@ -7,8 +7,10 @@ import org.junit.Test;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
+import static java.util.Arrays.asList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,7 +21,11 @@ public class AdminServletContextListenerTest {
     private final MetricRegistry metricRegistry = mock(MetricRegistry.class);
     private final HealthCheckRegistry healthCheckRegistry = mock(HealthCheckRegistry.class);
     private final ExecutorService executorService = mock(ExecutorService.class);
+    private final AppDiagnosticBaseServlet diagnosticServlet = mock(AppDiagnosticBaseServlet.class);
+    private final List<AppDiagnosticBaseServlet> appDiagnosticBaseServlets = asList(diagnosticServlet);
+
     private final AdminServletContextListener listener = new AdminServletContextListener() {
+
         @Override
         protected MetricRegistry getMetricRegistry() {
             return metricRegistry;
@@ -33,6 +39,11 @@ public class AdminServletContextListenerTest {
         @Override
         protected ExecutorService getExecutorService() {
             return executorService;
+        }
+
+        @Override
+        protected List<? extends AppDiagnosticBaseServlet> diagnostics() {
+            return appDiagnosticBaseServlets;
         }
     };
 
@@ -63,5 +74,12 @@ public class AdminServletContextListenerTest {
         listener.contextInitialized(event);
 
         verify(context).setAttribute("com.codahale.metrics.servlets.HealthCheckServlet.executor", executorService);
+    }
+
+    @Test
+    public void injectsAppDiagnosticServlets() throws Exception {
+        listener.contextInitialized(event);
+
+        verify(context).setAttribute("com.codahale.metrics.servlets.AppDiagnosticBaseServlet.registry", appDiagnosticBaseServlets);
     }
 }

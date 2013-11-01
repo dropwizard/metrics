@@ -17,7 +17,23 @@ import java.util.concurrent.TimeUnit;
 /**
  * A servlet which returns the metrics in a given registry as an {@code application/json} response.
  */
-public class MetricsServlet extends HttpServlet {
+public class MetricsServlet extends AppDiagnosticBaseServlet {
+
+    @Override
+    public String uri() {
+        return "/metrics";
+    }
+
+    @Override
+    public String displayName() {
+        return "Metrics";
+    }
+
+    @Override
+    public boolean supportsPrettyPrint() {
+        return true;
+    }
+
     /**
      * An abstract {@link ServletContextListener} which allows you to programmatically inject the
      * {@link MetricRegistry}, rate and duration units, and allowed origin for

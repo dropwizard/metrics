@@ -7,18 +7,30 @@ import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class AdminServletTest extends AbstractServletTest {
     private final MetricRegistry registry = new MetricRegistry();
     private final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
+    protected MetricsServlet metricsServlet = new MetricsServlet();
+    protected PingServlet pingServlet = new PingServlet();
+    protected ThreadDumpServlet threadDumpServlet = new ThreadDumpServlet();
+    protected HealthCheckServlet healthCheckServlet = new HealthCheckServlet();
+    private VersionServlet versionServlet = new VersionServlet();
 
     @Override
     protected void setUp(ServletTester tester) {
         tester.setContextPath("/context");
 
+        List<? extends AppDiagnosticBaseServlet> servlets = asList(metricsServlet, pingServlet, threadDumpServlet, healthCheckServlet, versionServlet);
+
         tester.setAttribute("com.codahale.metrics.servlets.MetricsServlet.registry", registry);
         tester.setAttribute("com.codahale.metrics.servlets.HealthCheckServlet.registry", healthCheckRegistry);
+        tester.setAttribute("com.codahale.metrics.servlets.AppDiagnosticBaseServlet.registry", servlets);
         tester.addServlet(AdminServlet.class, "/admin");
     }
 
@@ -49,7 +61,8 @@ public class AdminServletTest extends AbstractServletTest {
                                 "    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n" +
                                 "    <li><a href=\"/context/admin/ping\">Ping</a></li>%n" +
                                 "    <li><a href=\"/context/admin/threads\">Threads</a></li>%n" +
-                                "    <li><a href=\"/context/admin/healthcheck\">Healthcheck</a></li>%n" +
+                                "    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n" +
+                                "    <li><a href=\"/context/admin/version\">Version</a></li>%n" +
                                 "  </ul>%n" +
                                 "</body>%n" +
                                 "</html>%n"
