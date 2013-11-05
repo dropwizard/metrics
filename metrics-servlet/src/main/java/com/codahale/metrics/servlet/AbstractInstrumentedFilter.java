@@ -52,18 +52,19 @@ public abstract class AbstractInstrumentedFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         final MetricRegistry metricsRegistry = getMetricsFactory(filterConfig);
+        final Class<?> identifyingClass = getClass();
 
         this.metersByStatusCode = new ConcurrentHashMap<Integer, Meter>(meterNamesByStatusCode
                 .size());
         for (Entry<Integer, String> entry : meterNamesByStatusCode.entrySet()) {
             metersByStatusCode.put(entry.getKey(),
-                    metricsRegistry.meter(name(AbstractInstrumentedFilter.class, entry.getValue())));
+                    metricsRegistry.meter(name(identifyingClass, entry.getValue())));
         }
-        this.otherMeter = metricsRegistry.meter(name(AbstractInstrumentedFilter.class,
+        this.otherMeter = metricsRegistry.meter(name(identifyingClass,
                                                      otherMetricName));
-        this.activeRequests = metricsRegistry.counter(name(AbstractInstrumentedFilter.class,
+        this.activeRequests = metricsRegistry.counter(name(identifyingClass,
                                                            "activeRequests"));
-        this.requestTimer = metricsRegistry.timer(name(AbstractInstrumentedFilter.class,
+        this.requestTimer = metricsRegistry.timer(name(identifyingClass,
                                                        "requests"));
 
     }
