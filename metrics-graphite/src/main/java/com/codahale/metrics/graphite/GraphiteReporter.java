@@ -274,7 +274,7 @@ public class GraphiteReporter extends ScheduledReporter {
             LOGGER.error("Unable to report metrics to Graphite", graphite, e);
         } finally {
             try {
-                publishDurationMS.set(startTime - clock.getTime());
+                publishDurationMS.set(clock.getTime() - startTime);
 
                 graphite.close();
             } catch (IOException e) {
@@ -293,21 +293,21 @@ public class GraphiteReporter extends ScheduledReporter {
         byteCount += graphite.send(prefix(name, "stddev"),
                       format(convertDuration(snapshot.getStdDev())),
                       timestamp);
-        byteCount += graphite.send(prefix(name, "p50"),
-                      format(convertDuration(snapshot.getMedian())),
-                      timestamp);
-        byteCount += graphite.send(prefix(name, "p75"),
-                      format(convertDuration(snapshot.get75thPercentile())),
-                      timestamp);
+//        byteCount += graphite.send(prefix(name, "p50"),
+//                      format(convertDuration(snapshot.getMedian())),
+//                      timestamp);
+//        byteCount += graphite.send(prefix(name, "p75"),
+//                      format(convertDuration(snapshot.get75thPercentile())),
+//                      timestamp);
         byteCount += graphite.send(prefix(name, "p95"),
                       format(convertDuration(snapshot.get95thPercentile())),
                       timestamp);
-        byteCount += graphite.send(prefix(name, "p98"),
-                      format(convertDuration(snapshot.get98thPercentile())),
-                      timestamp);
-        byteCount += graphite.send(prefix(name, "p99"),
-                      format(convertDuration(snapshot.get99thPercentile())),
-                      timestamp);
+//        byteCount += graphite.send(prefix(name, "p98"),
+//                      format(convertDuration(snapshot.get98thPercentile())),
+//                      timestamp);
+//        byteCount += graphite.send(prefix(name, "p99"),
+//                      format(convertDuration(snapshot.get99thPercentile())),
+//                      timestamp);
         byteCount += graphite.send(prefix(name, "p999"),
                       format(convertDuration(snapshot.get999thPercentile())),
                       timestamp);
@@ -344,11 +344,11 @@ public class GraphiteReporter extends ScheduledReporter {
         byteCount += graphite.send(prefix(name, "mean"), format(snapshot.getMean()), timestamp);
         byteCount += graphite.send(prefix(name, "min"), format(snapshot.getMin()), timestamp);
         byteCount += graphite.send(prefix(name, "stddev"), format(snapshot.getStdDev()), timestamp);
-        byteCount += graphite.send(prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
-        byteCount += graphite.send(prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
+//        byteCount += graphite.send(prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
+//        byteCount += graphite.send(prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
         byteCount += graphite.send(prefix(name, "p95"), format(snapshot.get95thPercentile()), timestamp);
-        byteCount += graphite.send(prefix(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
-        byteCount += graphite.send(prefix(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
+//        byteCount += graphite.send(prefix(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
+//        byteCount += graphite.send(prefix(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
         byteCount += graphite.send(prefix(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
 
         return byteCount;
