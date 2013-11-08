@@ -192,11 +192,11 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.histogram.mean", "3.00", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.min", "4", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.stddev", "5.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p50", "6.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p75", "7.00", timestamp);
+//        inOrder.verify(graphite).send("prefix.histogram.p50", "6.00", timestamp);
+//        inOrder.verify(graphite).send("prefix.histogram.p75", "7.00", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.p95", "8.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p98", "9.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p99", "10.00", timestamp);
+//        inOrder.verify(graphite).send("prefix.histogram.p98", "9.00", timestamp);
+//        inOrder.verify(graphite).send("prefix.histogram.p99", "10.00", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.p999", "11.00", timestamp);
         inOrder.verify(graphite).close();
 
@@ -266,11 +266,11 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.timer.mean", "200.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.min", "300.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.stddev", "400.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p50", "500.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p75", "600.00", timestamp);
+//        inOrder.verify(graphite).send("prefix.timer.p50", "500.00", timestamp);
+//        inOrder.verify(graphite).send("prefix.timer.p75", "600.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.p95", "700.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p98", "800.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p99", "900.00", timestamp);
+//        inOrder.verify(graphite).send("prefix.timer.p98", "800.00", timestamp);
+//        inOrder.verify(graphite).send("prefix.timer.p99", "900.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.p999", "1000.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.count", "1", timestamp);
         inOrder.verify(graphite).send("prefix.timer.m1_rate", "3.00", timestamp);
