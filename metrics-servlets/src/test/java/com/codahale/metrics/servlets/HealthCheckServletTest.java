@@ -74,7 +74,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void returnsA500IfAnyHealthChecksAreUnhealthy() throws Exception {
+    public void returnsA200IfAnyHealthChecksAreUnhealthy() throws Exception {
         registry.register("fun", new HealthCheck() {
             @Override
             protected Result check() throws Exception {
@@ -92,7 +92,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
         processRequest();
 
         assertThat(response.getStatus())
-                .isEqualTo(500);
+                .isEqualTo(200);
         assertThat(response.getContent())
                 .isEqualTo("{\"fun\":{\"healthy\":true,\"message\":\"whee\"},\"notFun\":{\"healthy\":false,\"message\":\"whee\"}}");
         assertThat(response.get(HttpHeader.CONTENT_TYPE))

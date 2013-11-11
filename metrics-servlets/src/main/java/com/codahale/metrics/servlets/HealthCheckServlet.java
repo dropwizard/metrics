@@ -89,14 +89,7 @@ public class HealthCheckServlet extends HttpServlet {
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
         if (results.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
-        } else {
-            if (isAllHealthy(results)) {
-                resp.setStatus(HttpServletResponse.SC_OK);
-            } else {
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            }
         }
-
         final OutputStream output = resp.getOutputStream();
         try {
             getWriter(req).writeValue(output, results);
