@@ -7,3 +7,5 @@ bin
 *.iml
 *.ipr
 *.iws
+pom.xml.versionsBackup
+*/pom.xml.versionsBackup

@@ -234,11 +234,12 @@ public class GraphiteReporter extends ScheduledReporter {
         final long timestamp = startTime / 1000;
 
         long bytesSent = 0;
+        long connectTime = 0;
 
         // oh it'd be lovely to use Java 7 here
         try {
             graphite.connect();
-            connectDurationMS.set(clock.getTime() - startTime);
+            connectTime = clock.getTime();
 
             if(LOGGER.isInfoEnabled()) { LOGGER.info("Gauges     : " + gauges.size()); }
             for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
@@ -264,6 +265,7 @@ public class GraphiteReporter extends ScheduledReporter {
             for (Map.Entry<String, Timer> entry : timers.entrySet()) {
                 bytesSent += reportTimer(entry.getKey(), entry.getValue(), timestamp);
             }
+
             payloadSize.set(bytesSent);
 
         } catch (IOException e) {
@@ -274,9 +276,14 @@ public class GraphiteReporter extends ScheduledReporter {
             LOGGER.error("Unable to report metrics to Graphite", graphite, e);
         } finally {
             try {
+
                 publishDurationMS.set(clock.getTime() - startTime);
+                if(connectTime > 0){
+                    connectDurationMS.set(clock.getTime() - connectTime);
+                }
 
                 graphite.close();
+
             } catch (IOException e) {
                 LOGGER.debug("Error disconnecting from Graphite", graphite, e);
             }
