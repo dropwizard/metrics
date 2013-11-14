@@ -339,7 +339,7 @@ public class MetricRegistry implements MetricSet {
         }
     }
 
-    private void notifyListenerOfAddedMetric(MetricRegistryListener listener, Metric metric, String name) {
+    protected void notifyListenerOfAddedMetric(MetricRegistryListener listener, Metric metric, String name) {
         if (metric instanceof Gauge) {
             listener.onGaugeAdded(name, (Gauge<?>) metric);
         } else if (metric instanceof Counter) {
@@ -351,7 +351,7 @@ public class MetricRegistry implements MetricSet {
         } else if (metric instanceof Timer) {
             listener.onTimerAdded(name, (Timer) metric);
         } else {
-            throw new IllegalArgumentException("Unknown metric type: " + metric.getClass());
+            listener.onMetricAdded(name, metric);
         }
     }
 
@@ -373,7 +373,7 @@ public class MetricRegistry implements MetricSet {
         } else if (metric instanceof Timer) {
             listener.onTimerRemoved(name);
         } else {
-            throw new IllegalArgumentException("Unknown metric type: " + metric.getClass());
+            listener.onMetricRemoved(name);
         }
     }
 
