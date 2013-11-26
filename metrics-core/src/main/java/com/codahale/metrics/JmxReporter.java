@@ -156,10 +156,10 @@ public class JmxReporter implements Closeable {
     // CHECKSTYLE:ON
 
 
-    private abstract static class AbstractBean implements MetricMBean {
+    public abstract static class AbstractBean implements MetricMBean {
         private final ObjectName objectName;
 
-        AbstractBean(ObjectName objectName) {
+        protected AbstractBean(ObjectName objectName) {
             this.objectName = objectName;
         }
 
@@ -485,11 +485,11 @@ public class JmxReporter implements Closeable {
     }
 
     public static class JmxListener implements MetricRegistryListener {
-        private final String name;
-        private final MBeanServer mBeanServer;
-        private final MetricFilter filter;
-        private final Set<ObjectName> registered;
-        private MetricTimeUnits timeUnits;
+        protected final String name;
+        protected final MBeanServer mBeanServer;
+	    protected final MetricFilter filter;
+	    protected final Set<ObjectName> registered;
+	    private MetricTimeUnits timeUnits;
 
 	    public JmxListener(MBeanServer mBeanServer, String name, MetricFilter filter) {
             this.mBeanServer = mBeanServer;
@@ -652,9 +652,9 @@ public class JmxReporter implements Closeable {
 		    this.timeUnits = timeUnits;
 	    }
 
-        private ObjectName createName(String type, String name) {
+	    protected ObjectName createName(String type, String name) {
             try {
-                return new ObjectName(this.name, "name", name);
+	    	    return createObjectName(name);
             } catch (MalformedObjectNameException e) {
                 try {
                     return new ObjectName(this.name, "name", ObjectName.quote(name));
@@ -664,6 +664,10 @@ public class JmxReporter implements Closeable {
                 }
             }
         }
+
+	    protected ObjectName createObjectName(String name) throws MalformedObjectNameException {
+		    return new ObjectName(this.name, "name", name);
+	    }
 
         void unregisterAll() {
             for (ObjectName name : registered) {

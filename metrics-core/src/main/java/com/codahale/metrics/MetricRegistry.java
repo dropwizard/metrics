@@ -339,7 +339,7 @@ public class MetricRegistry implements MetricSet {
         }
     }
 
-    protected void notifyListenerOfAddedMetric(MetricRegistryListener listener, Metric metric, String name) {
+    private void notifyListenerOfAddedMetric(MetricRegistryListener listener, Metric metric, String name) {
         if (metric instanceof Gauge) {
             listener.onGaugeAdded(name, (Gauge<?>) metric);
         } else if (metric instanceof Counter) {
