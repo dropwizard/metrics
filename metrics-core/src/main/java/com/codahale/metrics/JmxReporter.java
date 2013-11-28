@@ -618,7 +618,7 @@ public class JmxReporter implements Closeable {
             try {
                 final ObjectName objectName = createName("timers", name);
                 mBeanServer.unregisterMBean(objectName);
-                registered.add(objectName);
+                registered.remove(objectName);
             } catch (InstanceNotFoundException e) {
                 LOGGER.debug("Unable to unregister timer", e);
             } catch (MBeanRegistrationException e) {
