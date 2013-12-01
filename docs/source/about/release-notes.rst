@@ -12,6 +12,7 @@ v3.1.0
 * Upgraded to Guava 15.0.
 * Upgraded to Apache HttpClient 4.3.1.
 * Upgraded to Jersey 1.18.
+* Upgraded to Jackson 2.3.0.
 
 .. _rel-3.0.1:
 
