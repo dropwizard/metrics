@@ -4,6 +4,13 @@
 Release Notes
 #############
 
+.. _rel-3.1.0:
+
+v3.1.0
+======
+
+* Upgraded to Guava 15.0.
+
 .. _rel-3.0.1:
 
 v3.0.1: Jul 23 2013
