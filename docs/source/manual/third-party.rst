@@ -21,3 +21,4 @@ the many third-party libraries which extend Metrics:
 * `metrics-cassandra <https://github.com/brndnmtthws/metrics-cassandra>`_ provides a reporter for `Apache Cassandra <https://cassandra.apache.org/>`_.
 * `MetricCatcher <https://github.com/addthis/MetricCatcher>`_ Turns JSON over UDP into Metrics so that non-jvm languages can know what's going on too.
 * `metrics-reporter-config <https://github.com/addthis/metrics-reporter-config>`_ DropWizard-eqsue YAML configuration of reporters.
+* `metrics-elasticsearch-reporter <https://github.com/elasticsearch/elasticsearch-metrics-reporter-java>`_ provides a reporter for `elasticsearch <http://www.elasticsearch.org/>`_
