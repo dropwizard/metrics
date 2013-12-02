@@ -2,6 +2,7 @@ package com.codahale.metrics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.management.*;
 import java.io.Closeable;
@@ -40,6 +41,7 @@ public class JmxReporter implements Closeable {
         private String domain;
         private Map<String, TimeUnit> specificDurationUnits;
         private Map<String, TimeUnit> specificRateUnits;
+	    private JmxListener listener;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -122,14 +124,25 @@ public class JmxReporter implements Closeable {
             return this;
         }
 
-        /**
+	    /**
+	     * Use specific {@link JmxListener} for exposes metrics as namespaced MBeans
+	     *
+	     * @param listener a JmxListener
+	     * @return {@code this}
+	     */
+	    public Builder specificListener(JmxListener listener) {
+		    this.listener = listener;
+            return this;
+	    }
+
+	    /**
          * Builds a {@link JmxReporter} with the given properties.
          *
          * @return a {@link JmxReporter}
          */
         public JmxReporter build() {
             final MetricTimeUnits timeUnits = new MetricTimeUnits(rateUnit, durationUnit, specificRateUnits, specificDurationUnits);
-            return new JmxReporter(mBeanServer, domain, registry, filter, timeUnits);
+            return new JmxReporter(mBeanServer, domain, registry, filter, listener, timeUnits);
         }
     }
 
@@ -143,10 +156,10 @@ public class JmxReporter implements Closeable {
     // CHECKSTYLE:ON
 
 
-    private abstract static class AbstractBean implements MetricMBean {
+    public abstract static class AbstractBean implements MetricMBean {
         private final ObjectName objectName;
 
-        AbstractBean(ObjectName objectName) {
+        protected AbstractBean(ObjectName objectName) {
             this.objectName = objectName;
         }
 
@@ -471,18 +484,17 @@ public class JmxReporter implements Closeable {
         }
     }
 
-    private static class JmxListener implements MetricRegistryListener {
-        private final String name;
-        private final MBeanServer mBeanServer;
-        private final MetricFilter filter;
-        private final MetricTimeUnits timeUnits;
-        private final Set<ObjectName> registered;
+    public static class JmxListener implements MetricRegistryListener {
+        protected final String name;
+        protected final MBeanServer mBeanServer;
+	    protected final MetricFilter filter;
+	    protected final Set<ObjectName> registered;
+	    private MetricTimeUnits timeUnits;
 
-        private JmxListener(MBeanServer mBeanServer, String name, MetricFilter filter, MetricTimeUnits timeUnits) {
+	    public JmxListener(MBeanServer mBeanServer, String name, MetricFilter filter) {
             this.mBeanServer = mBeanServer;
             this.name = name;
             this.filter = filter;
-            this.timeUnits = timeUnits;
             this.registered = new CopyOnWriteArraySet<ObjectName>();
         }
 
@@ -626,9 +638,23 @@ public class JmxReporter implements Closeable {
             }
         }
 
-        private ObjectName createName(String type, String name) {
+	    @Override
+	    public void onMetricAdded(String name, Metric metric) {
+			throw new NotImplementedException();
+	    }
+
+	    @Override
+	    public void onMetricRemoved(String name) {
+		    throw new NotImplementedException();
+	    }
+
+	    public void setTimeUnits(MetricTimeUnits timeUnits) {
+		    this.timeUnits = timeUnits;
+	    }
+
+	    protected ObjectName createName(String type, String name) {
             try {
-                return new ObjectName(this.name, "name", name);
+	    	    return createObjectName(name);
             } catch (MalformedObjectNameException e) {
                 try {
                     return new ObjectName(this.name, "name", ObjectName.quote(name));
@@ -638,6 +664,10 @@ public class JmxReporter implements Closeable {
                 }
             }
         }
+
+	    protected ObjectName createObjectName(String name) throws MalformedObjectNameException {
+		    return new ObjectName(this.name, "name", name);
+	    }
 
         void unregisterAll() {
             for (ObjectName name : registered) {
@@ -685,9 +715,11 @@ public class JmxReporter implements Closeable {
                         String domain,
                         MetricRegistry registry,
                         MetricFilter filter,
+                        JmxListener listener,
                         MetricTimeUnits timeUnits) {
         this.registry = registry;
-        this.listener = new JmxListener(mBeanServer, domain, filter, timeUnits);
+	    this.listener = listener != null? listener: new JmxListener(mBeanServer, domain, filter);
+	    this.listener.setTimeUnits(timeUnits);
     }
 
     /**

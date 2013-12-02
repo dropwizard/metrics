@@ -49,6 +49,14 @@ public interface MetricRegistryListener extends EventListener {
         @Override
         public void onTimerRemoved(String name) {
         }
+
+	    @Override
+	    public void onMetricAdded(String name, Metric metric) {
+	    }
+
+	    @Override
+	    public void onMetricRemoved(String name) {
+	    }
     }
 
     /**
@@ -125,4 +133,21 @@ public interface MetricRegistryListener extends EventListener {
      * @param name the timer's name
      */
     void onTimerRemoved(String name);
+
+	/**
+	 * Called when a specific {@link Metric} is added to the registry.
+	 * You must override this method to use specific {@link Metric}
+	 *
+	 * @param name  the timer's name
+	 * @param metric the metric
+	 */
+	void onMetricAdded(String name, Metric metric);
+
+	/**
+	 * Called when a specific {@link Metric} is removed from the registry.
+	 * You must override this method to use specific {@link Metric}
+	 *
+	 * @param name the metric name
+	 */
+	void onMetricRemoved(String name);
 }
