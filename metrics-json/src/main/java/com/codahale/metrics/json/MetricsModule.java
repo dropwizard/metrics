@@ -158,8 +158,8 @@ public class MetricsModule extends Module {
             }
 
             json.writeNumberField("stddev", snapshot.getStdDev() * durationFactor);
-            json.writeNumberField("m15_rate", timer.getOneMinuteRate() * rateFactor);
-            json.writeNumberField("m1_rate", timer.getFifteenMinuteRate() * rateFactor);
+            json.writeNumberField("m15_rate", timer.getFifteenMinuteRate() * rateFactor);
+            json.writeNumberField("m1_rate", timer.getOneMinuteRate() * rateFactor);
             json.writeNumberField("m5_rate", timer.getFiveMinuteRate() * rateFactor);
             json.writeNumberField("mean_rate", timer.getMeanRate() * rateFactor);
             json.writeStringField("duration_units", durationUnit);
