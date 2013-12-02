@@ -18,3 +18,4 @@ the many third-party libraries which extend Metrics:
   your `Wicket <http://wicket.apache.org/>`_ application.
 * `metrics-guice <https://github.com/palominolabs/metrics-guice>`_ provides integration with `Guice <https://code.google.com/p/google-guice/>`_.
 * `metrics-scala <https://github.com/erikvanoosten/metrics-scala>`_ provides an API optimized for Scala.
+* `metrics-cassandra <https://github.com/brndnmtthws/metrics-cassandra>`_ provides a reporter for `Apache Cassandra <https://cassandra.apache.org/>`_.
