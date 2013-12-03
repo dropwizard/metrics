@@ -1,4 +1,4 @@
-Metrics ![Build Status](https://api.travis-ci.org/codahale/metrics.png)
+Metrics [![Build Status](https://secure.travis-ci.org/codahale/metrics.png)](http://travis-ci.org/codahale/metrics)
 =======
 
 *Capturing JVM- and application-level metrics. So you know what's going on.*
