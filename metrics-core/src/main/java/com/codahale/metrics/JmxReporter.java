@@ -224,6 +224,8 @@ public class JmxReporter implements Closeable {
         double get999thPercentile();
 
         long[] values();
+
+        double getSum();
     }
     // CHECKSTYLE:ON
 
@@ -299,6 +301,11 @@ public class JmxReporter implements Closeable {
         @Override
         public long[] values() {
             return metric.getSnapshot().getValues();
+        }
+
+        @Override
+        public double getSum() {
+            return metric.getSnapshot().getSum();
         }
     }
 

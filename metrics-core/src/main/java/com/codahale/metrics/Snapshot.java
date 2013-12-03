@@ -209,6 +209,23 @@ public class Snapshot {
     }
 
     /**
+     * Returns the arithmetic sum of the values in the snapshot.
+     *
+     * @return the arithmetic sum
+     */
+    public double getSum() {
+        if (values.length == 0) {
+            return 0;
+        }
+
+        double sum = 0;
+        for (long value : values) {
+            sum += value;
+        }
+        return sum;
+    }
+
+    /**
      * Writes the values of the snapshot to the given stream.
      *
      * @param output an output stream
