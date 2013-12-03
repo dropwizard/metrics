@@ -10,5 +10,6 @@ which records the rate of logged events by their logging level.
 You can add it to the root logger programmatically:
 
 .. code-block:: java
-
-    LogManager.getRootLogger().addAppender(new InstrumentedAppender(registry));
+    InstrumentedAppender appender = new InstrumentedAppender(registry);
+    appender.activateOptions();
+    LogManager.getRootLogger().addAppender(appender);
