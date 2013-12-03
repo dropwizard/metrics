@@ -92,6 +92,8 @@ public class MetricsServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+
         final ServletContext context = config.getServletContext();
         if (null == registry) {
             final Object registryAttr = context.getAttribute(METRICS_REGISTRY);
