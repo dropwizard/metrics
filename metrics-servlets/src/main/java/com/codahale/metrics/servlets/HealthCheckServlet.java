@@ -64,6 +64,8 @@ public class HealthCheckServlet extends HttpServlet {
     
     @Override
     public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+
         if (null == registry) {
             final Object registryAttr = config.getServletContext().getAttribute(HEALTH_CHECK_REGISTRY);
             if (registryAttr instanceof HealthCheckRegistry) {
