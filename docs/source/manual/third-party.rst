@@ -22,3 +22,5 @@ the many third-party libraries which extend Metrics:
 * `MetricCatcher <https://github.com/addthis/MetricCatcher>`_ Turns JSON over UDP into Metrics so that non-jvm languages can know what's going on too.
 * `metrics-reporter-config <https://github.com/addthis/metrics-reporter-config>`_ DropWizard-eqsue YAML configuration of reporters.
 * `metrics-elasticsearch-reporter <https://github.com/elasticsearch/elasticsearch-metrics-reporter-java>`_ provides a reporter for `elasticsearch <http://www.elasticsearch.org/>`_
+* `metrics-statsd <https://github.com/ReadyTalk/metrics-statsd>`_ provides a Metrics 2.x and 3.x reporter for `StatsD <https://github.com/etsy/statsd/>`_
+* `metrics-datadog <https://github.com/vistarmedia/metrics-datadog>`_ provides a reporter to send data to `Datadog <http://www.datadoghq.com/>`_
