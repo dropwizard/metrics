@@ -2,7 +2,6 @@ package com.codahale.metrics.servlets;
 
 import com.codahale.metrics.jvm.ThreadDump;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,7 @@ public class ThreadDumpServlet extends HttpServlet {
     private transient ThreadDump threadDump;
 
     @Override
-    public void init(ServletConfig config) throws ServletException {
+    public void init() throws ServletException {
         this.threadDump = new ThreadDump(ManagementFactory.getThreadMXBean());
     }
 
