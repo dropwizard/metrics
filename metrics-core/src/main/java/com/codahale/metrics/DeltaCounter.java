@@ -2,11 +2,11 @@ package com.codahale.metrics;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-public class AtomicLongCounter extends Counter {
-    protected final AtomicLong alcount;
+public class DeltaCounter implements Metric, Counting {
+    protected final AtomicLong count;
 
-    public AtomicLongCounter() {
-        this.alcount = new AtomicLong();
+    public DeltaCounter() {
+        this.count = new AtomicLong();
     }
 
     /**
@@ -22,7 +22,7 @@ public class AtomicLongCounter extends Counter {
      * @param n the amount by which the counter will be increased
      */
     public void inc(long n) {
-        alcount.addAndGet(n);
+        count.addAndGet(n);
     }
 
     /**
@@ -38,7 +38,7 @@ public class AtomicLongCounter extends Counter {
      * @param n the amount by which the counter will be decreased
      */
     public void dec(long n) {
-        alcount.addAndGet(-n);
+        count.addAndGet(-n);
     }
 
     /**
@@ -48,11 +48,16 @@ public class AtomicLongCounter extends Counter {
      */
     @Override
     public long getCount() {
-        return alcount.get();
+        return count.get();
     }
 
+    /**
+     * get the counters current value and reset it to 0.
+     *
+     * @return the counter's value before the reset
+     */
     public long getAndReset() {
-        return alcount.getAndSet(0);
+        return count.getAndSet(0);
     }
 
 }
