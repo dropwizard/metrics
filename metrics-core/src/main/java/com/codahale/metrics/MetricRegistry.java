@@ -48,7 +48,7 @@ public class MetricRegistry implements MetricSet {
         }
     }
 
-    private final ConcurrentMap<String, Metric> metrics;
+    protected final ConcurrentMap<String, Metric> metrics;
     private final List<MetricRegistryListener> listeners;
 
     /**

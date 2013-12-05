@@ -27,6 +27,10 @@ public class DeltaMetricRegistry extends MetricRegistry {
         return getOrAdd(name, counterBuilder);
     }
 
+    public void addDeltaListener(DeltaMetricListener listener) {
+        metricListeners.add(listener);
+    }
+
     public void scheduleDeltaListeners(long period, TimeUnit unit) {
         if (deltaReporter != null) {
             throw new UnsupportedOperationException("can only start delta listeners once");
@@ -38,7 +42,36 @@ public class DeltaMetricRegistry extends MetricRegistry {
     public void stopDeltaListeners() {
         if (deltaReporter != null) {
             deltaReporter.stop();
+            runDeltaReport();
             deltaReporter = null;
+        }
+    }
+
+    public void runDeltaReport() {
+        deltaReporter.report();
+    }
+
+    /**
+     * remove a delta counter, freeing up any associated memory.  After this, incrementing the DeltaCounter
+     * object will never be noticed by this registry.
+     *
+     * This is NOT thread safe.  if you try to increment the counter during this operation, the increment
+     * may or may not get recorded anywhere.
+     * @param counter
+     */
+    public void removeDeltaCounter(String counter) {
+        metrics.remove(counter);
+    }
+
+    /**
+     * clear all delta counters.  It will also run the delta reporter first, so you can capture any final
+     * increments.  But, this method is NOT thread safe.  No other threads should be incrementing counters
+     * during this process
+     */
+    public void removeAllDeltaCounters() {
+        runDeltaReport();
+        for(String name : getDeltaCounters().keySet()) {
+            metrics.remove(name);
         }
     }
 
