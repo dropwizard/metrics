@@ -15,6 +15,7 @@ public class DeltaMetricRegistry extends MetricRegistry {
 
     public DeltaMetricRegistry() {
         super();
+        deltaReporter = new DeltaReporter(this, "DeltaReporter", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     }
 
     private static final AtomicInteger FACTORY_ID = new AtomicInteger();
@@ -29,19 +30,12 @@ public class DeltaMetricRegistry extends MetricRegistry {
     }
 
     public void scheduleDeltaListeners(long period, TimeUnit unit) {
-        if (deltaReporter != null) {
-            throw new UnsupportedOperationException("can only start delta listeners once");
-        }
-        deltaReporter = new DeltaReporter(this, "DeltaReporter", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
         deltaReporter.start(period,unit);
     }
 
     public void stopDeltaListeners() {
-        if (deltaReporter != null) {
-            deltaReporter.stop();
-            runDeltaReport();
-            deltaReporter = null;
-        }
+        deltaReporter.stop();
+        runDeltaReport();
     }
 
     public void runDeltaReport() {
