@@ -1,6 +1,7 @@
 package com.codahale.metrics;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -10,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DeltaMetricRegistry extends MetricRegistry {
 
     DeltaCounterBuilder counterBuilder = new DeltaCounterBuilder();
-    private final List<DeltaMetricListener> metricListeners = new ArrayList<DeltaMetricListener>();
+    private final List<DeltaMetricListener> metricListeners = new CopyOnWriteArrayList<DeltaMetricListener>();
     DeltaReporter deltaReporter;
 
     public DeltaMetricRegistry() {
