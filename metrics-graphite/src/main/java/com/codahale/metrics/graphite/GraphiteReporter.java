@@ -39,6 +39,17 @@ public class GraphiteReporter extends ScheduledReporter {
         private TimeUnit durationUnit;
         private MetricFilter filter;
 
+        private boolean reportMeanRates;
+        private boolean reportPercentiles;
+        private boolean reportStandardDeviation;
+        private boolean reportMinMax;
+        private boolean reportMean;
+
+        /**
+         * Returns a GraphiteReporter builder for a Metrics registry
+         *
+         * @param registry the Metrics registry to be used
+         */
         private Builder(MetricRegistry registry) {
             this.registry = registry;
             this.clock = Clock.defaultClock();
@@ -46,6 +57,99 @@ public class GraphiteReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
+            this.reportMeanRates = true;
+            this.reportPercentiles = true;
+            this.reportStandardDeviation = true;
+            this.reportMinMax = true;
+            this.reportMean = true;
+        }
+
+        /**
+         * Do not report mean rates to Graphite
+         *
+         * @return {@code this}
+         */
+        public Builder withoutMeanRates() {
+            this.reportMeanRates = false;
+            return this;
+        }
+
+        /**
+         * Do not report percentiles to Graphite
+         *
+         * @return {@code this}
+         */
+        public Builder withoutPercentiles() {
+            this.reportPercentiles = false;
+            return this;
+        }
+
+        /**
+         * Do not report standard deviation to Graphite
+         *
+         * @return {@code this}
+         */
+        public Builder withoutStandardDeviation() {
+            this.reportStandardDeviation = false;
+            return this;
+        }
+
+        /**
+         * Do not report min and max to Graphite
+         *
+         * @return {@code this}
+         */
+        public Builder withoutMinMax() {
+            this.reportMinMax = false;
+            return this;
+        }
+
+        /**
+         * Do not report mean to Graphite
+         *
+         * @return {@code this}
+         */
+        public Builder withoutMean() {
+            this.reportMean = false;
+            return this;
+        }
+
+        /**
+         * Do not send all extra reports to Graphite
+         *  - mean rates
+         *  - percentiles
+         *  - standard deviation
+         *  - min and max
+         *  - mean
+         *
+         * @return {@code this}
+         */
+        public Builder withoutExtraReports() {
+            return this
+                    .withoutMeanRates()
+                    .withoutPercentiles()
+                    .withoutStandardDeviation()
+                    .withoutMinMax()
+                    .withoutMean();
+        }
+
+        /**
+         * Send all extra reports to Graphite (default)
+         *  - mean rates
+         *  - percentiles
+         *  - standard deviation
+         *  - min and max
+         *  - mean
+         *
+         * @return {@code this}
+         */
+        public Builder withAllExtraReports() {
+            this.reportMeanRates = true;
+            this.reportPercentiles = true;
+            this.reportStandardDeviation = true;
+            this.reportMinMax = true;
+            this.reportMean = true;
+            return this;
         }
 
         /**
@@ -117,8 +221,14 @@ public class GraphiteReporter extends ScheduledReporter {
                                         prefix,
                                         rateUnit,
                                         durationUnit,
-                                        filter);
+                                        filter,
+                                        reportMeanRates,
+                                        reportPercentiles,
+                                        reportStandardDeviation,
+                                        reportMinMax,
+                                        reportMean);
         }
+
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphiteReporter.class);
@@ -127,17 +237,33 @@ public class GraphiteReporter extends ScheduledReporter {
     private final Clock clock;
     private final String prefix;
 
+    private final boolean reportMeanRates;
+    private final boolean reportPercentiles;
+    private final boolean reportStandardDeviation;
+    private final boolean reportMinMax;
+    private final boolean reportMean;
+
     private GraphiteReporter(MetricRegistry registry,
                              Graphite graphite,
                              Clock clock,
                              String prefix,
                              TimeUnit rateUnit,
                              TimeUnit durationUnit,
-                             MetricFilter filter) {
+                             MetricFilter filter,
+                             boolean reportMeanRates,
+                             boolean reportPercentiles,
+                             boolean reportStandardDeviation,
+                             boolean reportMinMax,
+                             boolean reportMean) {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
+        this.reportMeanRates = reportMeanRates;
+        this.reportPercentiles = reportPercentiles;
+        this.reportStandardDeviation= reportStandardDeviation;
+        this.reportMinMax = reportMinMax;
+        this.reportMean = reportMean;
     }
 
     @Override
@@ -185,63 +311,89 @@ public class GraphiteReporter extends ScheduledReporter {
     private void reportTimer(String name, Timer timer, long timestamp) throws IOException {
         final Snapshot snapshot = timer.getSnapshot();
 
-        graphite.send(prefix(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
-        graphite.send(prefix(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
-        graphite.send(prefix(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);
-        graphite.send(prefix(name, "stddev"),
-                      format(convertDuration(snapshot.getStdDev())),
-                      timestamp);
-        graphite.send(prefix(name, "p50"),
-                      format(convertDuration(snapshot.getMedian())),
-                      timestamp);
-        graphite.send(prefix(name, "p75"),
-                      format(convertDuration(snapshot.get75thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p95"),
-                      format(convertDuration(snapshot.get95thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p98"),
-                      format(convertDuration(snapshot.get98thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p99"),
-                      format(convertDuration(snapshot.get99thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p999"),
-                      format(convertDuration(snapshot.get999thPercentile())),
-                      timestamp);
+        if (this.reportMinMax) {
+            graphite.send(prefix(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
+            graphite.send(prefix(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);
+        }
+
+        if (this.reportMean) {
+            graphite.send(prefix(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
+        }
+
+        if (reportStandardDeviation) {
+            graphite.send(prefix(name, "stddev"),
+                          format(convertDuration(snapshot.getStdDev())),
+                          timestamp);
+        }
+
+        if (this.reportPercentiles) {
+            graphite.send(prefix(name, "p50"),
+                          format(convertDuration(snapshot.getMedian())),
+                          timestamp);
+            graphite.send(prefix(name, "p75"),
+                          format(convertDuration(snapshot.get75thPercentile())),
+                          timestamp);
+            graphite.send(prefix(name, "p95"),
+                          format(convertDuration(snapshot.get95thPercentile())),
+                          timestamp);
+            graphite.send(prefix(name, "p98"),
+                          format(convertDuration(snapshot.get98thPercentile())),
+                          timestamp);
+            graphite.send(prefix(name, "p99"),
+                          format(convertDuration(snapshot.get99thPercentile())),
+                          timestamp);
+            graphite.send(prefix(name, "p999"),
+                          format(convertDuration(snapshot.get999thPercentile())),
+                          timestamp);
+        }
 
         reportMetered(name, timer, timestamp);
     }
 
     private void reportMetered(String name, Metered meter, long timestamp) throws IOException {
         graphite.send(prefix(name, "count"), format(meter.getCount()), timestamp);
-        graphite.send(prefix(name, "m1_rate"),
-                      format(convertRate(meter.getOneMinuteRate())),
-                      timestamp);
-        graphite.send(prefix(name, "m5_rate"),
-                      format(convertRate(meter.getFiveMinuteRate())),
-                      timestamp);
-        graphite.send(prefix(name, "m15_rate"),
-                      format(convertRate(meter.getFifteenMinuteRate())),
-                      timestamp);
-        graphite.send(prefix(name, "mean_rate"),
-                      format(convertRate(meter.getMeanRate())),
-                      timestamp);
+
+        if (this.reportMeanRates) {
+            graphite.send(prefix(name, "m1_rate"),
+                          format(convertRate(meter.getOneMinuteRate())),
+                          timestamp);
+            graphite.send(prefix(name, "m5_rate"),
+                          format(convertRate(meter.getFiveMinuteRate())),
+                          timestamp);
+            graphite.send(prefix(name, "m15_rate"),
+                          format(convertRate(meter.getFifteenMinuteRate())),
+                          timestamp);
+            graphite.send(prefix(name, "mean_rate"),
+                          format(convertRate(meter.getMeanRate())),
+                          timestamp);
+        }
     }
 
     private void reportHistogram(String name, Histogram histogram, long timestamp) throws IOException {
         final Snapshot snapshot = histogram.getSnapshot();
         graphite.send(prefix(name, "count"), format(histogram.getCount()), timestamp);
-        graphite.send(prefix(name, "max"), format(snapshot.getMax()), timestamp);
-        graphite.send(prefix(name, "mean"), format(snapshot.getMean()), timestamp);
-        graphite.send(prefix(name, "min"), format(snapshot.getMin()), timestamp);
-        graphite.send(prefix(name, "stddev"), format(snapshot.getStdDev()), timestamp);
-        graphite.send(prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
-        graphite.send(prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
-        graphite.send(prefix(name, "p95"), format(snapshot.get95thPercentile()), timestamp);
-        graphite.send(prefix(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
-        graphite.send(prefix(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
-        graphite.send(prefix(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
+
+        if (this.reportMinMax) {
+            graphite.send(prefix(name, "max"), format(snapshot.getMax()), timestamp);
+            graphite.send(prefix(name, "min"), format(snapshot.getMin()), timestamp);
+        }
+
+        if (this.reportMean) {
+            graphite.send(prefix(name, "mean"), format(snapshot.getMean()), timestamp);
+        }
+
+        if (reportStandardDeviation) {
+            graphite.send(prefix(name, "stddev"), format(snapshot.getStdDev()), timestamp);
+        }
+
+        if (this.reportPercentiles) {
+            graphite.send(prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
+            graphite.send(prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
+            graphite.send(prefix(name, "p95"), format(snapshot.get95thPercentile()), timestamp);
+            graphite.send(prefix(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
+            graphite.send(prefix(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
+            graphite.send(prefix(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
+        }
     }
 
     private void reportCounter(String name, Counter counter, long timestamp) throws IOException {
@@ -285,4 +437,5 @@ public class GraphiteReporter extends ScheduledReporter {
         // US-formatted digits
         return String.format(Locale.US, "%2.2f", v);
     }
+
 }

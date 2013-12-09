@@ -3,26 +3,117 @@ package com.codahale.metrics.graphite;
 import com.codahale.metrics.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mockito.InOrder;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.runners.Parameterized.Parameters;
 import static org.mockito.Mockito.*;
 
+@RunWith(Parameterized.class)
 public class GraphiteReporterTest {
+
+    @Parameters
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+            // report : meanRates Percentiles StdDEv MinMax Mean
+                     {  true,     true,       true,  true,  true  },
+                     {  false,    true,       true,  true,  true  },
+                     {  true,     false,      true,  true,  true  },
+                     {  true,     true,       false, true,  true  },
+                     {  true,     true,       true,  false, true  },
+                     {  true,     true,       true,  true,  false },
+                     {  false,    false,      false, false, false }
+        });
+    }
+
     private final long timestamp = 1000198;
     private final Clock clock = mock(Clock.class);
     private final Graphite graphite = mock(Graphite.class);
     private final MetricRegistry registry = mock(MetricRegistry.class);
-    private final GraphiteReporter reporter = GraphiteReporter.forRegistry(registry)
-                                                              .withClock(clock)
-                                                              .prefixedWith("prefix")
-                                                              .convertRatesTo(TimeUnit.SECONDS)
-                                                              .convertDurationsTo(TimeUnit.MILLISECONDS)
-                                                              .filter(MetricFilter.ALL)
-                                                              .build(graphite);
+
+    private final boolean reportMeanRates;
+    private final boolean reportPercentiles;
+    private final boolean reportStandardDeviation;
+    private final boolean reportMinMax;
+    private final boolean reportMean;
+
+    private final GraphiteReporter reporter;
+
+    public GraphiteReporterTest(final boolean reportMeanRates,
+                         final boolean reportPercentiles,
+                         final boolean reportStandardDeviation,
+                         final boolean reportMinMax,
+                         final boolean reportMean) {
+        this.reportMeanRates = reportMeanRates;
+        this.reportPercentiles = reportPercentiles;
+        this.reportStandardDeviation= reportStandardDeviation;
+        this.reportMinMax = reportMinMax;
+        this.reportMean = reportMean;
+
+        final GraphiteReporter.Builder builder = GraphiteReporter.forRegistry(registry)
+                                                                 .withClock(clock)
+                                                                 .prefixedWith("prefix")
+                                                                 .convertRatesTo(TimeUnit.SECONDS)
+                                                                 .convertDurationsTo(TimeUnit.MILLISECONDS)
+                                                                 .filter(MetricFilter.ALL);
+
+        if (this.reportMeanRates &&
+            this.reportPercentiles &&
+            this.reportStandardDeviation &&
+            this.reportMinMax &&
+            this.reportMean) {
+
+            /*
+             * The default, but here we want to test the reset
+             */
+            builder.withoutMeanRates()
+                    .withoutPercentiles()
+                    .withoutStandardDeviation()
+                    .withoutMinMax()
+                    .withoutMean();
+            builder.withAllExtraReports();
+
+        } else if ((!this.reportMeanRates) &&
+                   (!this.reportPercentiles) &&
+                   (!this.reportStandardDeviation) &&
+                   (!this.reportMinMax) &&
+                   (!this.reportMean)) {
+
+            builder.withoutExtraReports();
+
+        } else {
+
+            if ( ! this.reportMeanRates) {
+                builder.withoutMeanRates();
+            }
+
+            if ( ! this.reportPercentiles) {
+                builder.withoutPercentiles();
+            }
+
+            if ( ! this.reportStandardDeviation) {
+                builder.withoutStandardDeviation();
+            }
+
+            if ( ! this.reportMinMax) {
+                builder.withoutMinMax();
+            }
+
+            if ( ! this.reportMean) {
+                builder.withoutMean();
+            }
+
+        }
+
+        reporter = builder.build(graphite);
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -166,16 +257,28 @@ public class GraphiteReporterTest {
         when(histogram.getCount()).thenReturn(1L);
 
         final Snapshot snapshot = mock(Snapshot.class);
-        when(snapshot.getMax()).thenReturn(2L);
-        when(snapshot.getMean()).thenReturn(3.0);
-        when(snapshot.getMin()).thenReturn(4L);
-        when(snapshot.getStdDev()).thenReturn(5.0);
-        when(snapshot.getMedian()).thenReturn(6.0);
-        when(snapshot.get75thPercentile()).thenReturn(7.0);
-        when(snapshot.get95thPercentile()).thenReturn(8.0);
-        when(snapshot.get98thPercentile()).thenReturn(9.0);
-        when(snapshot.get99thPercentile()).thenReturn(10.0);
-        when(snapshot.get999thPercentile()).thenReturn(11.0);
+
+        if (this.reportMinMax) {
+            when(snapshot.getMax()).thenReturn(2L);
+            when(snapshot.getMin()).thenReturn(4L);
+        }
+
+        if (this.reportMean) {
+            when(snapshot.getMean()).thenReturn(3.0);
+        }
+
+        if (this.reportStandardDeviation) {
+            when(snapshot.getStdDev()).thenReturn(5.0);
+        }
+
+        if (this.reportPercentiles) {
+            when(snapshot.getMedian()).thenReturn(6.0);
+            when(snapshot.get75thPercentile()).thenReturn(7.0);
+            when(snapshot.get95thPercentile()).thenReturn(8.0);
+            when(snapshot.get98thPercentile()).thenReturn(9.0);
+            when(snapshot.get99thPercentile()).thenReturn(10.0);
+            when(snapshot.get999thPercentile()).thenReturn(11.0);
+        }
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
@@ -188,16 +291,29 @@ public class GraphiteReporterTest {
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.histogram.count", "1", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.max", "2", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.mean", "3.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.min", "4", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.stddev", "5.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p50", "6.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p75", "7.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p95", "8.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p98", "9.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p99", "10.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p999", "11.00", timestamp);
+
+        if (this.reportMinMax) {
+            inOrder.verify(graphite).send("prefix.histogram.max", "2", timestamp);
+            inOrder.verify(graphite).send("prefix.histogram.min", "4", timestamp);
+        }
+
+        if (this.reportMean) {
+            inOrder.verify(graphite).send("prefix.histogram.mean", "3.00", timestamp);
+        }
+
+        if (this.reportStandardDeviation) {
+            inOrder.verify(graphite).send("prefix.histogram.stddev", "5.00", timestamp);
+        }
+
+        if (this.reportPercentiles) {
+            inOrder.verify(graphite).send("prefix.histogram.p50", "6.00", timestamp);
+            inOrder.verify(graphite).send("prefix.histogram.p75", "7.00", timestamp);
+            inOrder.verify(graphite).send("prefix.histogram.p95", "8.00", timestamp);
+            inOrder.verify(graphite).send("prefix.histogram.p98", "9.00", timestamp);
+            inOrder.verify(graphite).send("prefix.histogram.p99", "10.00", timestamp);
+            inOrder.verify(graphite).send("prefix.histogram.p999", "11.00", timestamp);
+        }
+
         inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
@@ -207,10 +323,13 @@ public class GraphiteReporterTest {
     public void reportsMeters() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
-        when(meter.getOneMinuteRate()).thenReturn(2.0);
-        when(meter.getFiveMinuteRate()).thenReturn(3.0);
-        when(meter.getFifteenMinuteRate()).thenReturn(4.0);
-        when(meter.getMeanRate()).thenReturn(5.0);
+
+        if (this.reportMeanRates) {
+            when(meter.getOneMinuteRate()).thenReturn(2.0);
+            when(meter.getFiveMinuteRate()).thenReturn(3.0);
+            when(meter.getFifteenMinuteRate()).thenReturn(4.0);
+            when(meter.getMeanRate()).thenReturn(5.0);
+        }
 
         reporter.report(this.<Gauge>map(),
                         this.<Counter>map(),
@@ -221,10 +340,14 @@ public class GraphiteReporterTest {
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.meter.count", "1", timestamp);
-        inOrder.verify(graphite).send("prefix.meter.m1_rate", "2.00", timestamp);
-        inOrder.verify(graphite).send("prefix.meter.m5_rate", "3.00", timestamp);
-        inOrder.verify(graphite).send("prefix.meter.m15_rate", "4.00", timestamp);
-        inOrder.verify(graphite).send("prefix.meter.mean_rate", "5.00", timestamp);
+
+        if (this.reportMeanRates) {
+            inOrder.verify(graphite).send("prefix.meter.m1_rate", "2.00", timestamp);
+            inOrder.verify(graphite).send("prefix.meter.m5_rate", "3.00", timestamp);
+            inOrder.verify(graphite).send("prefix.meter.m15_rate", "4.00", timestamp);
+            inOrder.verify(graphite).send("prefix.meter.mean_rate", "5.00", timestamp);
+        }
+
         inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
@@ -234,23 +357,38 @@ public class GraphiteReporterTest {
     public void reportsTimers() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
-        when(timer.getMeanRate()).thenReturn(2.0);
-        when(timer.getOneMinuteRate()).thenReturn(3.0);
-        when(timer.getFiveMinuteRate()).thenReturn(4.0);
-        when(timer.getFifteenMinuteRate()).thenReturn(5.0);
+
+        if (this.reportMeanRates) {
+            when(timer.getMeanRate()).thenReturn(2.0);
+            when(timer.getOneMinuteRate()).thenReturn(3.0);
+            when(timer.getFiveMinuteRate()).thenReturn(4.0);
+            when(timer.getFifteenMinuteRate()).thenReturn(5.0);
+        }
 
         final Snapshot snapshot = mock(Snapshot.class);
-        when(snapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));
-        when(snapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));
-        when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
-        when(snapshot.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));
-        when(snapshot.getMedian()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(500));
-        when(snapshot.get75thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(600));
-        when(snapshot.get95thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(700));
-        when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
-        when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
-        when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS
-                                                                        .toNanos(1000));
+
+        if (this.reportMinMax) {
+            when(snapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));
+            when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
+        }
+
+        if (this.reportMean) {
+            when(snapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));
+        }
+
+        if (this.reportStandardDeviation) {
+            when(snapshot.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));
+        }
+
+        if (this.reportPercentiles) {
+            when(snapshot.getMedian()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(500));
+            when(snapshot.get75thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(600));
+            when(snapshot.get95thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(700));
+            when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
+            when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
+            when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS
+                                                                            .toNanos(1000));
+        }
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
@@ -262,21 +400,38 @@ public class GraphiteReporterTest {
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
-        inOrder.verify(graphite).send("prefix.timer.max", "100.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.mean", "200.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.min", "300.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.stddev", "400.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p50", "500.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p75", "600.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p95", "700.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p98", "800.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p99", "900.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p999", "1000.00", timestamp);
+
+        if (this.reportMinMax) {
+            inOrder.verify(graphite).send("prefix.timer.max", "100.00", timestamp);
+            inOrder.verify(graphite).send("prefix.timer.min", "300.00", timestamp);
+        }
+
+        if (this.reportMean) {
+            inOrder.verify(graphite).send("prefix.timer.mean", "200.00", timestamp);
+        }
+
+        if (this.reportStandardDeviation) {
+            inOrder.verify(graphite).send("prefix.timer.stddev", "400.00", timestamp);
+        }
+
+        if (this.reportPercentiles) {
+            inOrder.verify(graphite).send("prefix.timer.p50", "500.00", timestamp);
+            inOrder.verify(graphite).send("prefix.timer.p75", "600.00", timestamp);
+            inOrder.verify(graphite).send("prefix.timer.p95", "700.00", timestamp);
+            inOrder.verify(graphite).send("prefix.timer.p98", "800.00", timestamp);
+            inOrder.verify(graphite).send("prefix.timer.p99", "900.00", timestamp);
+            inOrder.verify(graphite).send("prefix.timer.p999", "1000.00", timestamp);
+        }
+
         inOrder.verify(graphite).send("prefix.timer.count", "1", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.m1_rate", "3.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.m5_rate", "4.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.m15_rate", "5.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.mean_rate", "2.00", timestamp);
+
+        if (this.reportMeanRates) {
+            inOrder.verify(graphite).send("prefix.timer.m1_rate", "3.00", timestamp);
+            inOrder.verify(graphite).send("prefix.timer.m5_rate", "4.00", timestamp);
+            inOrder.verify(graphite).send("prefix.timer.m15_rate", "5.00", timestamp);
+            inOrder.verify(graphite).send("prefix.timer.mean_rate", "2.00", timestamp);
+        }
+
         inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
@@ -297,4 +452,5 @@ public class GraphiteReporterTest {
         when(gauge.getValue()).thenReturn(value);
         return gauge;
     }
+
 }
