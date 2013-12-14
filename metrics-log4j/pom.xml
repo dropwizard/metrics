@@ -9,10 +9,10 @@
     </parent>
 
     <artifactId>metrics-log4j</artifactId>
-    <name>Metrics Integration for Log4j</name>
+    <name>Metrics Integration for Log4j 1.x</name>
     <packaging>bundle</packaging>
     <description>
-        An instrumented appender for Log4j.
+        An instrumented appender for Log4j 1.x.
     </description>
 
     <dependencies>
