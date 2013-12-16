@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Given a method like this:
  * <pre><code>
- *     \@Gauge(name = "queueSize")
+ *     {@literal @}Gauge(name = "queueSize")
  *     public int getQueueSize() {
  *         return queue.size;
  *     }

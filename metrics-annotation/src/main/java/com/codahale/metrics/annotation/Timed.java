@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Given a method like this:
  * <pre><code>
- *     \@Timed(name = "fancyName")
+ *     {@literal @}Timed(name = "fancyName")
  *     public String fancyName(String name) {
  *         return "Sir Captain " + name;
  *     }
