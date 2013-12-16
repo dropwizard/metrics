@@ -7,6 +7,7 @@ import java.io.Closeable;
 import java.util.Locale;
 import java.util.SortedMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -58,6 +59,9 @@ public abstract class ScheduledReporter implements Closeable {
     private final double rateFactor;
     private final String rateUnit;
 
+    private Future scheduledReportingJob;
+    private final Object futureLock = new Object();
+
     /**
      * Creates a new {@link ScheduledReporter} instance.
      *
@@ -87,23 +91,32 @@ public abstract class ScheduledReporter implements Closeable {
      * @param unit   the unit for {@code period}
      */
     public void start(long period, TimeUnit unit) {
-        executor.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                report();
+        synchronized (futureLock){
+            if(scheduledReportingJob != null){
+                stop();
             }
-        }, period, period, unit);
+
+            if(executor.isShutdown()){
+                throw new IllegalStateException("Metric Reporter has been shut down.");
+            }
+            scheduledReportingJob = executor.scheduleAtFixedRate(new Runnable() {
+                @Override
+                public void run() {
+                    report();
+                }
+            }, period, period, unit);
+        }
     }
 
     /**
-     * Stops the reporter and shuts down its thread of execution.
+     * Stops the reporter.
      */
     public void stop() {
-        executor.shutdown();
-        try {
-            executor.awaitTermination(1, TimeUnit.SECONDS);
-        } catch (InterruptedException ignored) {
-            // do nothing
+        synchronized (futureLock){
+            if(scheduledReportingJob != null){
+                scheduledReportingJob.cancel(false);
+                scheduledReportingJob = null;
+            }
         }
     }
 
@@ -112,7 +125,15 @@ public abstract class ScheduledReporter implements Closeable {
      */
     @Override
     public void close() {
-        stop();
+        synchronized (futureLock){
+            stop();
+            executor.shutdown();
+            try {
+                executor.awaitTermination(1, TimeUnit.SECONDS);
+            } catch (InterruptedException ignored) {
+                // do nothing
+            }
+        }
     }
 
     /**
