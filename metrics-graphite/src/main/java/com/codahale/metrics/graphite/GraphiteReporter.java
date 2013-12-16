@@ -330,15 +330,15 @@ public class GraphiteReporter extends ScheduledReporter {
         byteCount += graphite.send(prefix(name, "m1_rate"),
                       format(convertRate(meter.getOneMinuteRate())),
                       timestamp);
-        byteCount += graphite.send(prefix(name, "m5_rate"),
-                      format(convertRate(meter.getFiveMinuteRate())),
-                      timestamp);
-        byteCount += graphite.send(prefix(name, "m15_rate"),
-                      format(convertRate(meter.getFifteenMinuteRate())),
-                      timestamp);
-        byteCount += graphite.send(prefix(name, "mean_rate"),
-                      format(convertRate(meter.getMeanRate())),
-                      timestamp);
+//        byteCount += graphite.send(prefix(name, "m5_rate"),
+//                      format(convertRate(meter.getFiveMinuteRate())),
+//                      timestamp);
+//        byteCount += graphite.send(prefix(name, "m15_rate"),
+//                      format(convertRate(meter.getFifteenMinuteRate())),
+//                      timestamp);
+//        byteCount += graphite.send(prefix(name, "mean_rate"),
+//                      format(convertRate(meter.getMeanRate())),
+//                      timestamp);
 
         return byteCount;
     }
