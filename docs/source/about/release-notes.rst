@@ -4,6 +4,18 @@
 Release Notes
 #############
 
+.. _rel-3.1.0:
+
+v3.1.0
+======
+
+* Upgraded to Guava 15.0.
+* Upgraded to Apache HttpClient 4.3.1.
+* Upgraded to Jersey 1.18.
+* Upgraded to Jackson 2.3.0.
+* Upgraded to Jetty 8.1.14.
+* Upgraded to Jetty 9.0.7.
+
 .. _rel-3.0.1:
 
 v3.0.1: Jul 23 2013
