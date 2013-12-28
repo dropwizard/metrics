@@ -27,8 +27,8 @@ public class Graphite implements Closeable {
     private final SocketFactory socketFactory;
     private final Charset charset;
 
-    private Socket socket;
-    private Writer writer;
+    private volatile Socket socket;
+    Writer writer;
     private int failures;
 
     /**
@@ -79,7 +79,13 @@ public class Graphite implements Closeable {
             throw new IllegalStateException("Already connected");
         }
 
-        this.socket = socketFactory.createSocket(address.getAddress(), address.getPort());
+        final InetSocketAddress resolvedAddress;
+        if(address.isUnresolved()){
+            resolvedAddress = new InetSocketAddress(address.getHostName(), address.getPort());
+        } else {
+            resolvedAddress = address;
+        }
+        this.socket = socketFactory.createSocket(resolvedAddress.getAddress(), resolvedAddress.getPort());
         this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), charset));
     }
 
