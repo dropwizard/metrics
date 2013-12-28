@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.codahale.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>3.1.0-FORKED-6</version>
+        <version>3.1.0-FORKED-7</version>
     </parent>
 
     <artifactId>metrics-jetty9</artifactId>
