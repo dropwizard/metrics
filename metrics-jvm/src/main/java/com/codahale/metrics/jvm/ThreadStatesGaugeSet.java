@@ -18,6 +18,9 @@ import static com.codahale.metrics.MetricRegistry.name;
  * A set of gauges for the number of threads in their various states and deadlock detection.
  */
 public class ThreadStatesGaugeSet implements MetricSet {
+	// do not compute stack traces.
+	private final static int STACK_TRACE_DEPTH = 0;
+
     private final ThreadMXBean threads;
     private final ThreadDeadlockDetector deadlockDetector;
 
@@ -89,7 +92,7 @@ public class ThreadStatesGaugeSet implements MetricSet {
         return count;
     }
 
-	protected ThreadInfo[] getThreadInfo() {
-		return threads.getThreadInfo(threads.getAllThreadIds());
+	ThreadInfo[] getThreadInfo() {
+		return threads.getThreadInfo(threads.getAllThreadIds(), STACK_TRACE_DEPTH);
 	}
 }

@@ -29,8 +29,8 @@ public class CachedThreadStatesGaugeSet extends ThreadStatesGaugeSet {
         super(threadMXBean, deadlockDetector);
         threadInfo = new CachedGauge<ThreadInfo[]>(interval, unit) {
             @Override
-            protected ThreadInfo[] loadValue() {
-                return threadMXBean.getThreadInfo(threadMXBean.getAllThreadIds());
+           protected ThreadInfo[] loadValue() {
+                return CachedThreadStatesGaugeSet.super.getThreadInfo();
             }
         };
     }
@@ -43,10 +43,5 @@ public class CachedThreadStatesGaugeSet extends ThreadStatesGaugeSet {
      */
     public CachedThreadStatesGaugeSet(long interval, TimeUnit unit) {
         this(ManagementFactory.getThreadMXBean(), new ThreadDeadlockDetector(), interval, unit);
-    }
-
-    @Override
-    protected ThreadInfo[] getThreadInfo() {
-        return threadInfo.getValue();
     }
 }
