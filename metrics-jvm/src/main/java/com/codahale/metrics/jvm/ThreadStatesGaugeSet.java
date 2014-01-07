@@ -79,7 +79,7 @@ public class ThreadStatesGaugeSet implements MetricSet {
     }
 
     private int getThreadCount(Thread.State state) {
-        final ThreadInfo[] allThreads = threads.getThreadInfo(threads.getAllThreadIds());
+        final ThreadInfo[] allThreads = getThreadInfo();
         int count = 0;
         for (ThreadInfo info : allThreads) {
             if (info != null && info.getThreadState() == state) {
@@ -88,4 +88,8 @@ public class ThreadStatesGaugeSet implements MetricSet {
         }
         return count;
     }
+
+	protected ThreadInfo[] getThreadInfo() {
+		return threads.getThreadInfo(threads.getAllThreadIds());
+	}
 }
