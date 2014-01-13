@@ -19,7 +19,7 @@ public class CachedThreadStatesGaugeSet extends ThreadStatesGaugeSet {
      * Creates a new set of gauges using the given MXBean and detector.
      * Caches the information for the given interval and time unit.
      *
-     * @param threads          a thread MXBean
+     * @param threadMXBean     a thread MXBean
      * @param deadlockDetector a deadlock detector
      * @param interval         cache interval
      * @param unit             cache interval time unit
@@ -44,4 +44,10 @@ public class CachedThreadStatesGaugeSet extends ThreadStatesGaugeSet {
     public CachedThreadStatesGaugeSet(long interval, TimeUnit unit) {
         this(ManagementFactory.getThreadMXBean(), new ThreadDeadlockDetector(), interval, unit);
     }
+
+  @Override
+  ThreadInfo[] getThreadInfo()
+  {
+    return threadInfo.getValue();
+  }
 }
