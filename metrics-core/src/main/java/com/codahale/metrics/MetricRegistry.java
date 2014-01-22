@@ -333,7 +333,7 @@ public class MetricRegistry implements MetricSet {
         return Collections.unmodifiableSortedMap(timers);
     }
 
-    private void onMetricAdded(String name, Metric metric) {
+    protected void onMetricAdded(String name, Metric metric) {
         for (MetricRegistryListener listener : listeners) {
             notifyListenerOfAddedMetric(listener, metric, name);
         }
@@ -355,7 +355,7 @@ public class MetricRegistry implements MetricSet {
         }
     }
 
-    private void onMetricRemoved(String name, Metric metric) {
+    protected void onMetricRemoved(String name, Metric metric) {
         for (MetricRegistryListener listener : listeners) {
             notifyListenerOfRemovedMetric(name, metric, listener);
         }
