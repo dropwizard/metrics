@@ -52,10 +52,10 @@ public class MetricRegistryListenerTest {
 
     @Test
     public void doesNotExplodeWhenMetricsAreRemoved() throws Exception {
-        listener.onGaugeRemoved("blah");
-        listener.onCounterRemoved("blah");
-        listener.onHistogramRemoved("blah");
-        listener.onMeterRemoved("blah");
-        listener.onTimerRemoved("blah");
+        listener.onGaugeRemoved("blah", gauge);
+        listener.onCounterRemoved("blah", counter);
+        listener.onHistogramRemoved("blah", histogram);
+        listener.onMeterRemoved("blah", meter);
+        listener.onTimerRemoved("blah", timer);
     }
 }

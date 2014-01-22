@@ -502,7 +502,7 @@ public class JmxReporter implements Closeable {
         }
 
         @Override
-        public void onGaugeRemoved(String name) {
+        public void onGaugeRemoved(String name, Gauge<?> metric) {
             try {
                 final ObjectName objectName = createName("gauges", name);
                 mBeanServer.unregisterMBean(objectName);
@@ -530,7 +530,7 @@ public class JmxReporter implements Closeable {
         }
 
         @Override
-        public void onCounterRemoved(String name) {
+        public void onCounterRemoved(String name, Counter metric) {
             try {
                 final ObjectName objectName = createName("counters", name);
                 mBeanServer.unregisterMBean(objectName);
@@ -558,7 +558,7 @@ public class JmxReporter implements Closeable {
         }
 
         @Override
-        public void onHistogramRemoved(String name) {
+        public void onHistogramRemoved(String name, Histogram metric) {
             try {
                 final ObjectName objectName = createName("histograms", name);
                 mBeanServer.unregisterMBean(objectName);
@@ -586,7 +586,7 @@ public class JmxReporter implements Closeable {
         }
 
         @Override
-        public void onMeterRemoved(String name) {
+        public void onMeterRemoved(String name, Meter metric) {
             try {
                 final ObjectName objectName = createName("meters", name);
                 mBeanServer.unregisterMBean(objectName);
@@ -614,7 +614,7 @@ public class JmxReporter implements Closeable {
         }
 
         @Override
-        public void onTimerRemoved(String name) {
+        public void onTimerRemoved(String name, Timer metric) {
             try {
                 final ObjectName objectName = createName("timers", name);
                 mBeanServer.unregisterMBean(objectName);
