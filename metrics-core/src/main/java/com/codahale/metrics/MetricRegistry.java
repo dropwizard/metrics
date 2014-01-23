@@ -60,6 +60,14 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
+     * Creates a new {@link MetricRegistry}.
+     */
+    public MetricRegistry(ConcurrentMap<String, Metric> metrics) {
+        this.metrics = metrics;
+        this.listeners = new CopyOnWriteArrayList<MetricRegistryListener>();
+    }
+
+    /**
      * Creates a new {@link ConcurrentMap} implementation for use inside the registry. Override this
      * to create a {@link MetricRegistry} with space- or time-bounded metric lifecycles, for
      * example.
