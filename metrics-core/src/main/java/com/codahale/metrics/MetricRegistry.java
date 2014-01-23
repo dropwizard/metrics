@@ -60,6 +60,14 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
+     * Creates a new {@link MetricRegistry}.
+     */
+    public MetricRegistry(ConcurrentMap<String, Metric> metrics) {
+        this.metrics = metrics;
+        this.listeners = new CopyOnWriteArrayList<MetricRegistryListener>();
+    }
+
+    /**
      * Creates a new {@link ConcurrentMap} implementation for use inside the registry. Override this
      * to create a {@link MetricRegistry} with space- or time-bounded metric lifecycles, for
      * example.
@@ -333,7 +341,7 @@ public class MetricRegistry implements MetricSet {
         return Collections.unmodifiableSortedMap(timers);
     }
 
-    private void onMetricAdded(String name, Metric metric) {
+    protected void onMetricAdded(String name, Metric metric) {
         for (MetricRegistryListener listener : listeners) {
             notifyListenerOfAddedMetric(listener, metric, name);
         }
@@ -355,7 +363,7 @@ public class MetricRegistry implements MetricSet {
         }
     }
 
-    private void onMetricRemoved(String name, Metric metric) {
+    protected void onMetricRemoved(String name, Metric metric) {
         for (MetricRegistryListener listener : listeners) {
             notifyListenerOfRemovedMetric(name, metric, listener);
         }
@@ -363,15 +371,15 @@ public class MetricRegistry implements MetricSet {
 
     private void notifyListenerOfRemovedMetric(String name, Metric metric, MetricRegistryListener listener) {
         if (metric instanceof Gauge) {
-            listener.onGaugeRemoved(name);
+            listener.onGaugeRemoved(name, (Gauge<?>)metric);
         } else if (metric instanceof Counter) {
-            listener.onCounterRemoved(name);
+            listener.onCounterRemoved(name, (Counter)metric);
         } else if (metric instanceof Histogram) {
-            listener.onHistogramRemoved(name);
+            listener.onHistogramRemoved(name, (Histogram)metric);
         } else if (metric instanceof Meter) {
-            listener.onMeterRemoved(name);
+            listener.onMeterRemoved(name, (Meter)metric);
         } else if (metric instanceof Timer) {
-            listener.onTimerRemoved(name);
+            listener.onTimerRemoved(name, (Timer)metric);
         } else {
             throw new IllegalArgumentException("Unknown metric type: " + metric.getClass());
         }

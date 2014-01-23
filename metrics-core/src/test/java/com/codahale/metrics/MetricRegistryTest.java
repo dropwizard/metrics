@@ -41,7 +41,7 @@ public class MetricRegistryTest {
         assertThat(registry.remove("thing"))
                 .isTrue();
 
-        verify(listener).onGaugeRemoved("thing");
+        verify(listener).onGaugeRemoved("thing", gauge);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class MetricRegistryTest {
         assertThat(registry.remove("thing"))
                 .isTrue();
 
-        verify(listener).onCounterRemoved("thing");
+        verify(listener).onCounterRemoved("thing", counter);
     }
 
     @Test
@@ -99,7 +99,7 @@ public class MetricRegistryTest {
         assertThat(registry.remove("thing"))
                 .isTrue();
 
-        verify(listener).onHistogramRemoved("thing");
+        verify(listener).onHistogramRemoved("thing", histogram);
     }
 
     @Test
@@ -128,7 +128,7 @@ public class MetricRegistryTest {
         assertThat(registry.remove("thing"))
                 .isTrue();
 
-        verify(listener).onMeterRemoved("thing");
+        verify(listener).onMeterRemoved("thing", meter);
     }
 
     @Test
@@ -157,7 +157,7 @@ public class MetricRegistryTest {
         assertThat(registry.remove("thing"))
                 .isTrue();
 
-        verify(listener).onTimerRemoved("thing");
+        verify(listener).onTimerRemoved("thing", timer);
     }
 
     @Test
@@ -362,9 +362,9 @@ public class MetricRegistryTest {
 
     @Test
     public void removesMetricsMatchingAFilter() throws Exception {
-        registry.timer("timer-1");
+        Timer timer1 = registry.timer("timer-1");
         registry.timer("timer-2");
-        registry.histogram("histogram-1");
+        Histogram histogram1 = registry.histogram("histogram-1");
 
         assertThat(registry.getNames())
                 .contains("timer-1", "timer-2", "histogram-1");
@@ -381,7 +381,7 @@ public class MetricRegistryTest {
         assertThat(registry.getNames())
                 .contains("timer-2");
 
-        verify(listener).onTimerRemoved("timer-1");
-        verify(listener).onHistogramRemoved("histogram-1");
+        verify(listener).onTimerRemoved("timer-1", timer1);
+        verify(listener).onHistogramRemoved("histogram-1", histogram1);
     }
 }
