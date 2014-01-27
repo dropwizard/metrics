@@ -128,6 +128,17 @@ public class GangliaReporter extends ScheduledReporter {
          * @param ganglia the client to use for announcing metrics
          * @return a {@link GangliaReporter}
          */
+        public GangliaReporter build(GMetric gmetric) {
+            return new GangliaReporter(registry, Arrays.asList(gmetric), prefix, tMax, dMax, rateUnit, durationUnit, filter);
+        }
+
+        /**
+         * Builds a {@link GangliaReporter} with the given properties, announcing metrics to the
+         * given {@link GMetric} client.
+         *
+         * @param ganglia the clients to use for announcing metrics
+         * @return a {@link GangliaReporter}
+         */
         public GangliaReporter build(GMetric... gmetrics) {
             return new GangliaReporter(registry, Arrays.asList(gmetrics), prefix, tMax, dMax, rateUnit, durationUnit, filter);
         }
