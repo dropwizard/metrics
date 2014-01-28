@@ -7,6 +7,7 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
 import org.glassfish.jersey.server.ExtendedUriInfo;
+import org.glassfish.jersey.server.model.ResourceMethod;
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
 import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
@@ -73,59 +74,68 @@ public class MetricsApplicationEventListener implements ApplicationEventListener
         public void onEvent(RequestEvent event) {
             switch (event.getType()) {
                 case REQUEST_MATCHED: {
-                    final ExtendedUriInfo uriInfo = event.getUriInfo();
-                    final Method method = uriInfo.getMatchedResourceMethod().getInvocable().getHandlingMethod();
-                    final Class<?> resourceClass = method.getDeclaringClass();
+                    final ResourceMethod resourceMethod = event.getUriInfo().getMatchedResourceMethod();
 
-                    if (method.isAnnotationPresent(Timed.class)) {
-                        final Timed annotation = method.getAnnotation(Timed.class);
-                        final String name = chooseName(annotation.name(),
-                                annotation.absolute(),
-                                resourceClass.getName(),
-                                method.getName());
-                        timerContext = registry.timer(name).time();
-                    }
+                    if (null != resourceMethod) {
+                        final Method method = resourceMethod.getInvocable().getHandlingMethod();
+                        final Class<?> resourceClass = method.getDeclaringClass();
 
-                    if (method.isAnnotationPresent(Metered.class)) {
-                        final Metered annotation = method.getAnnotation(Metered.class);
-                        final String name = chooseName(annotation.name(),
-                                annotation.absolute(),
-                                resourceClass.getName(),
-                                method.getName());
-                        meter = registry.meter(name);
-                        meter.mark();
+                        if (method.isAnnotationPresent(Timed.class)) {
+                            final Timed annotation = method.getAnnotation(Timed.class);
+                            final String name = chooseName(annotation.name(),
+                                    annotation.absolute(),
+                                    resourceClass.getName(),
+                                    method.getName());
+                            timerContext = registry.timer(name).time();
+                        }
+
+                        if (method.isAnnotationPresent(Metered.class)) {
+                            final Metered annotation = method.getAnnotation(Metered.class);
+                            final String name = chooseName(annotation.name(),
+                                    annotation.absolute(),
+                                    resourceClass.getName(),
+                                    method.getName());
+                            meter = registry.meter(name);
+                            meter.mark();
+                        }
                     }
                 }
                 break;
                 case ON_EXCEPTION: {
-                    final ExtendedUriInfo uriInfo = event.getUriInfo();
-                    final Method method = uriInfo.getMatchedResourceMethod().getInvocable().getHandlingMethod();
-                    final Class<?> resourceClass = method.getDeclaringClass();
+                    final ResourceMethod resourceMethod = event.getUriInfo().getMatchedResourceMethod();
 
-                    if (method.isAnnotationPresent(ExceptionMetered.class)) {
-                        final ExceptionMetered annotation = method.getAnnotation(ExceptionMetered.class);
-                        final Class<? extends Throwable> exceptionClass = annotation.cause();
-                        final String name = chooseName(annotation.name(),
-                                annotation.absolute(),
-                                resourceClass.getName(),
-                                method.getName(),
-                                ExceptionMetered.DEFAULT_NAME_SUFFIX);
-                        exceptionMeter = registry.meter(name);
+                    if (null != resourceMethod) {
+                        final Method method = resourceMethod.getInvocable().getHandlingMethod();
+                        final Class<?> resourceClass = method.getDeclaringClass();
 
-                        final Throwable e = event.getException();
-                        if (exceptionClass.isAssignableFrom(e.getClass()) ||
-                                (e.getCause() != null && exceptionClass.isAssignableFrom(e.getCause().getClass()))) {
-                            exceptionMeter.mark();
+                        if (method.isAnnotationPresent(ExceptionMetered.class)) {
+                            final ExceptionMetered annotation = method.getAnnotation(ExceptionMetered.class);
+                            final Class<? extends Throwable> exceptionClass = annotation.cause();
+                            final String name = chooseName(annotation.name(),
+                                    annotation.absolute(),
+                                    resourceClass.getName(),
+                                    method.getName(),
+                                    ExceptionMetered.DEFAULT_NAME_SUFFIX);
+                            exceptionMeter = registry.meter(name);
+
+                            final Throwable e = event.getException();
+                            if (exceptionClass.isAssignableFrom(e.getClass()) ||
+                                    (e.getCause() != null && exceptionClass.isAssignableFrom(e.getCause().getClass()))) {
+                                exceptionMeter.mark();
+                            }
                         }
                     }
                 }
                 break;
                 case FINISHED:
-                    final ExtendedUriInfo uriInfo = event.getUriInfo();
-                    final Method method = uriInfo.getMatchedResourceMethod().getInvocable().getHandlingMethod();
+                    final ResourceMethod resourceMethod = event.getUriInfo().getMatchedResourceMethod();
 
-                    if (method.isAnnotationPresent(Timed.class)) {
-                        timerContext.stop();
+                    if (null != resourceMethod) {
+                        final Method method = resourceMethod.getInvocable().getHandlingMethod();
+
+                        if (method.isAnnotationPresent(Timed.class)) {
+                            timerContext.stop();
+                        }
                     }
                     break;
                 default:
