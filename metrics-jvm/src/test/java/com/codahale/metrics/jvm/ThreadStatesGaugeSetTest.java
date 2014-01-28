@@ -55,15 +55,15 @@ public class ThreadStatesGaugeSetTest {
     public void hasASetOfGauges() throws Exception {
         assertThat(gauges.getMetrics().keySet())
                 .containsOnly("terminated.count",
-                        "new.count",
-                        "count",
-                        "timed_waiting.count",
-                        "deadlocks",
-                        "blocked.count",
-                        "waiting.count",
-                        "daemon.count",
-                        "runnable.count",
-                        "deadlock.count");
+                              "new.count",
+                              "count",
+                              "timed_waiting.count",
+                              "deadlocks",
+                              "blocked.count",
+                              "waiting.count",
+                              "daemon.count",
+                              "runnable.count",
+                              "deadlock.count");
     }
 
     @Test
