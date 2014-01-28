@@ -12,8 +12,8 @@ import com.codahale.metrics.CachedGauge;
  * a given interval.
  */
 public class CachedThreadStatesGaugeSet extends ThreadStatesGaugeSet {
-    private final CachedGauge<ThreadInfo[]> threadInfo;
 
+    private final CachedGauge<ThreadInfo[]> threadInfo;
 
     /**
      * Creates a new set of gauges using the given MXBean and detector.
@@ -45,9 +45,9 @@ public class CachedThreadStatesGaugeSet extends ThreadStatesGaugeSet {
         this(ManagementFactory.getThreadMXBean(), new ThreadDeadlockDetector(), interval, unit);
     }
 
-  @Override
-  ThreadInfo[] getThreadInfo()
-  {
-    return threadInfo.getValue();
-  }
+    @Override
+    ThreadInfo[] getThreadInfo() {
+        return threadInfo.getValue();
+    }
+
 }
