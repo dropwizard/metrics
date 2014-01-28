@@ -40,7 +40,7 @@ public class ThreadStatesGaugeSetTest {
         when(terminatedThread.getThreadState()).thenReturn(Thread.State.TERMINATED);
 
         when(threads.getAllThreadIds()).thenReturn(ids);
-        when(threads.getThreadInfo(ids)).thenReturn(new ThreadInfo[]{
+        when(threads.getThreadInfo(ids, 0)).thenReturn(new ThreadInfo[]{
                 newThread, runnableThread, blockedThread,
                 waitingThread, timedWaitingThread, terminatedThread
         });
