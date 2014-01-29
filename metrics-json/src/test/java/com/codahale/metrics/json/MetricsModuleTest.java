@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 
 public class MetricsModuleTest {
     private final ObjectMapper mapper = new ObjectMapper().registerModule(
-            new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, false));
+            new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, false, MetricFilter.ALL));
 
     @Test
     public void serializesGauges() throws Exception {
@@ -84,7 +84,7 @@ public class MetricsModuleTest {
                                    "\"stddev\":5.0}");
 
         final ObjectMapper fullMapper = new ObjectMapper().registerModule(
-                new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, true));
+                new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, true, MetricFilter.ALL));
 
         assertThat(fullMapper.writeValueAsString(histogram))
                 .isEqualTo("{" +
@@ -171,7 +171,7 @@ public class MetricsModuleTest {
                                    "\"rate_units\":\"calls/second\"}");
 
         final ObjectMapper fullMapper = new ObjectMapper().registerModule(
-                new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, true));
+                new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, true, MetricFilter.ALL));
 
         assertThat(fullMapper.writeValueAsString(timer))
                 .isEqualTo("{" +
