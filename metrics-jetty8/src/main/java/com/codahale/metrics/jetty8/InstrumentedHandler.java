@@ -132,6 +132,11 @@ public class InstrumentedHandler extends HandlerWrapper {
         this.listener = new ContinuationListener() {
             @Override
             public void onComplete(Continuation continuation) {
+                final Request request = ((AsyncContinuation) continuation).getBaseRequest();
+                updateResponses(request);
+                if (!continuation.isResumed()) {
+                    activeSuspendedRequests.dec();
+                }
                 expires.mark();
             }
 
