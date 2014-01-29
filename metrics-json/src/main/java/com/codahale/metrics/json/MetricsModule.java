@@ -197,6 +197,10 @@ public class MetricsModule extends Module {
     private final boolean showSamples;
     private final MetricFilter filter;
     
+    public MetricsModule(TimeUnit rateUnit, TimeUnit durationUnit, boolean showSamples) {
+        this(rateUnit, durationUnit, showSamples, MetricFilter.ALL);
+    }
+
     public MetricsModule(TimeUnit rateUnit, TimeUnit durationUnit, boolean showSamples, MetricFilter filter) {
         this.rateUnit = rateUnit;
         this.durationUnit = durationUnit;
