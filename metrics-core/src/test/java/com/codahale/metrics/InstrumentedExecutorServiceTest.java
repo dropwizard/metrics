@@ -17,29 +17,32 @@ public class InstrumentedExecutorServiceTest {
 
     @Test
     public void reportsTasksInformation() throws Exception {
-        Runnable fastOne = new FastRunnable();
-        Runnable slowOne = new SlowRunnable();
-        Meter submitted = registry.meter("xs.submitted");
-        Counter running = registry.counter("xs.running");
-        Meter completed = registry.meter("xs.completed");
-        Timer duration = registry.timer("xs.duration");
+        final Meter submitted = registry.meter("xs.submitted");
+        final Counter running = registry.counter("xs.running");
+        final Meter completed = registry.meter("xs.completed");
+        final Timer duration = registry.timer("xs.duration");
 
         assertThat(submitted.getCount()).isEqualTo(0);
         assertThat(running.getCount()).isEqualTo(0);
         assertThat(completed.getCount()).isEqualTo(0);
         assertThat(duration.getCount()).isEqualTo(0);
 
-        Future<?> fastFuture = instrumentedExecutorService.submit(fastOne);
-        Future<?> slowFuture = instrumentedExecutorService.submit(slowOne);
+        Future<?> theFuture = instrumentedExecutorService.submit(new Runnable() {
+            public void run() {
+                assertThat(submitted.getCount()).isEqualTo(1);
+                assertThat(running.getCount()).isEqualTo(1);
+                assertThat(completed.getCount()).isEqualTo(0);
+                assertThat(duration.getCount()).isEqualTo(0);
+	    }
+	});
 
-        assertThat(submitted.getCount()).isEqualTo(2);
+        theFuture.get();
 
-        fastFuture.get();
-        assertThat(running.getCount()).isEqualTo(1);
-
-        slowFuture.get();
+        assertThat(submitted.getCount()).isEqualTo(1);
         assertThat(running.getCount()).isEqualTo(0);
-        assertThat(duration.getSnapshot().size()).isEqualTo(2);
+        assertThat(completed.getCount()).isEqualTo(1);
+        assertThat(duration.getCount()).isEqualTo(1);
+        assertThat(duration.getSnapshot().size()).isEqualTo(1);
     }
 
     @After
@@ -47,23 +50,6 @@ public class InstrumentedExecutorServiceTest {
         instrumentedExecutorService.shutdown();
         if (!instrumentedExecutorService.awaitTermination(2, TimeUnit.SECONDS)) {
             System.err.println("InstrumentedExecutorService did not terminate.");
-        }
-    }
-
-    private static class FastRunnable implements Runnable {
-        @Override
-        public void run() {
-            // do nothing, die young and leave a good looking corpse.
-        }
-    }
-
-    private static class SlowRunnable implements Runnable {
-        @Override
-        public void run() {
-            try {
-                // sleep a little, then die.
-                Thread.sleep(750);
-            } catch (Exception e) { }
         }
     }
 
