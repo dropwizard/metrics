@@ -399,7 +399,7 @@ public class MetricRegistry implements MetricSet {
         }
     }
 
-    private String getFullName(String name){
+    public String getFullName(String name){
 
         final String fullName;
         if(prefixStrategy == null){
