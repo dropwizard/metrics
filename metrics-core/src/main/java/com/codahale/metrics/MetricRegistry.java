@@ -411,6 +411,22 @@ public class MetricRegistry implements MetricSet {
         return fullName;
     }
 
+    /**
+     * will use configured prefix to determine full metric name, then looks up the full name.
+     */
+    public boolean containsMetricName(String name){
+        final String fullName = getFullName(name);
+
+        return containsFullMetricName(fullName);
+    }
+
+    /**
+     * looks for a metric named exactly this; ignores configured metric prefix name.
+     */
+    public boolean containsFullMetricName(String fullName){
+        return metrics.containsKey(fullName);
+    }
+
     @Override
     public Map<String, Metric> getMetrics() {
         return Collections.unmodifiableMap(metrics);
