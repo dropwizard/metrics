@@ -50,13 +50,19 @@ public class MetricRegistry implements MetricSet {
 
     private final ConcurrentMap<String, Metric> metrics;
     private final List<MetricRegistryListener> listeners;
+    private final MetricPrefixStrategy prefixStrategy;
+
+    public MetricRegistry(){
+        this(null);
+    }
 
     /**
      * Creates a new {@link MetricRegistry}.
      */
-    public MetricRegistry() {
+    public MetricRegistry(MetricPrefixStrategy prefixStrategy) {
         this.metrics = buildMap();
         this.listeners = new CopyOnWriteArrayList<MetricRegistryListener>();
+        this.prefixStrategy = prefixStrategy;
     }
 
     /**
@@ -84,6 +90,7 @@ public class MetricRegistry implements MetricSet {
         if (metric instanceof MetricSet) {
             registerAll(name, (MetricSet) metric);
         } else {
+            name = getFullName(name);
             final Metric existing = metrics.putIfAbsent(name, metric);
             if (existing == null) {
                 onMetricAdded(name, metric);
@@ -151,6 +158,7 @@ public class MetricRegistry implements MetricSet {
      * @return whether or not the metric was removed
      */
     public boolean remove(String name) {
+        name = getFullName(name);
         final Metric metric = metrics.remove(name);
         if (metric != null) {
             onMetricRemoved(name, metric);
@@ -305,20 +313,24 @@ public class MetricRegistry implements MetricSet {
 
     @SuppressWarnings("unchecked")
     private <T extends Metric> T getOrAdd(String name, MetricBuilder<T> builder) {
-        final Metric metric = metrics.get(name);
+        final String fullName = getFullName(name);
+        final Metric metric = metrics.get(fullName);
+        final Metric added;
         if (builder.isInstance(metric)) {
             return (T) metric;
         } else if (metric == null) {
             try {
                 return register(name, builder.newMetric());
             } catch (IllegalArgumentException e) {
-                final Metric added = metrics.get(name);
+                added = metrics.get(fullName);
                 if (builder.isInstance(added)) {
                     return (T) added;
                 }
             }
+        } else {
+            added = null;
         }
-        throw new IllegalArgumentException(name + " is already used for a different type of metric");
+        throw new IllegalArgumentException(name + " is already used for a different type of metric: " + metric + ", added: " + added);
     }
 
     @SuppressWarnings("unchecked")
@@ -377,7 +389,7 @@ public class MetricRegistry implements MetricSet {
         }
     }
 
-    private void registerAll(String prefix, MetricSet metrics) throws IllegalArgumentException {
+    public void registerAll(String prefix, MetricSet metrics) throws IllegalArgumentException {
         for (Map.Entry<String, Metric> entry : metrics.getMetrics().entrySet()) {
             if (entry.getValue() instanceof MetricSet) {
                 registerAll(name(prefix, entry.getKey()), (MetricSet) entry.getValue());
@@ -385,6 +397,34 @@ public class MetricRegistry implements MetricSet {
                 register(name(prefix, entry.getKey()), entry.getValue());
             }
         }
+    }
+
+    public String getFullName(String name){
+
+        final String fullName;
+        if(prefixStrategy == null){
+            fullName = name;
+        } else {
+            fullName = name(prefixStrategy.getMetricPrefix(), name);
+        }
+
+        return fullName;
+    }
+
+    /**
+     * will use configured prefix to determine full metric name, then looks up the full name.
+     */
+    public boolean containsMetricName(String name){
+        final String fullName = getFullName(name);
+
+        return containsFullMetricName(fullName);
+    }
+
+    /**
+     * looks for a metric named exactly this; ignores configured metric prefix name.
+     */
+    public boolean containsFullMetricName(String fullName){
+        return metrics.containsKey(fullName);
     }
 
     @Override

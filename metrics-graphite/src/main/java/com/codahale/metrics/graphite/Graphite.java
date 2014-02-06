@@ -1,16 +1,24 @@
 package com.codahale.metrics.graphite;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.net.SocketFactory;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 /**
- * A client to a Carbon server.
+ * A client to a Carbon server.  Absolutely not thread safe.
  */
 public class Graphite implements Closeable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Graphite.class);
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
     // this may be optimistic about Carbon/Graphite
     private static final Charset UTF_8 = Charset.forName("UTF-8");
@@ -19,8 +27,8 @@ public class Graphite implements Closeable {
     private final SocketFactory socketFactory;
     private final Charset charset;
 
-    private Socket socket;
-    private Writer writer;
+    private volatile Socket socket;
+    Writer writer;
     private int failures;
 
     /**
@@ -64,11 +72,20 @@ public class Graphite implements Closeable {
      * @throws IOException           if there is an error connecting
      */
     public void connect() throws IllegalStateException, IOException {
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("Connecting " + this);
+        }
         if (socket != null) {
             throw new IllegalStateException("Already connected");
         }
 
-        this.socket = socketFactory.createSocket(address.getAddress(), address.getPort());
+        final InetSocketAddress resolvedAddress;
+        if(address.isUnresolved()){
+            resolvedAddress = new InetSocketAddress(address.getHostName(), address.getPort());
+        } else {
+            resolvedAddress = address;
+        }
+        this.socket = socketFactory.createSocket(resolvedAddress.getAddress(), resolvedAddress.getPort());
         this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), charset));
     }
 
@@ -80,16 +97,27 @@ public class Graphite implements Closeable {
      * @param timestamp the timestamp of the metric
      * @throws IOException if there was an error sending the metric
      */
-    public void send(String name, String value, long timestamp) throws IOException {
+    public int send(String name, String value, long timestamp) throws IOException {
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("GraphiteSender: " + name + " : " + value);
+        }
+        final int byteCount;
         try {
-            writer.write(sanitize(name));
-            writer.write(' ');
-            writer.write(sanitize(value));
-            writer.write(' ');
-            writer.write(Long.toString(timestamp));
-            writer.write('\n');
+            final StringBuilder lineItem = new StringBuilder();
+            lineItem.append(sanitize(name))
+                    .append(' ')
+                    .append(sanitize(value))
+                    .append(' ')
+                    .append(Long.toString(timestamp))
+                    .append('\n');
+            final String metricString = lineItem.toString();
+            final char[] chars = metricString.toCharArray();
+            byteCount = chars.length;
+            writer.write(chars);
             writer.flush();
             this.failures = 0;
+
+            return byteCount;
         } catch (IOException e) {
             failures++;
             throw e;
@@ -107,6 +135,9 @@ public class Graphite implements Closeable {
 
     @Override
     public void close() throws IOException {
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("Closing " + this);
+        }
         if (socket != null) {
             socket.close();
         }
@@ -116,5 +147,17 @@ public class Graphite implements Closeable {
 
     protected String sanitize(String s) {
         return WHITESPACE.matcher(s).replaceAll("-");
+    }
+
+    @Override
+    public String toString() {
+        return "Graphite{" +
+                "address=" + address +
+                ", socketFactory=" + socketFactory +
+                ", charset=" + charset +
+                ", socket=" + socket +
+                ", writer=" + writer +
+                ", failures=" + failures +
+                '}';
     }
 }

@@ -7,7 +7,7 @@
 
     <groupId>com.codahale.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>3.1.0-FORKED-9</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
@@ -44,6 +44,9 @@
         <jackson.version>2.2.2</jackson.version>
         <jetty8.version>8.1.11.v20130520</jetty8.version>
         <jetty9.version>9.0.4.v20130625</jetty9.version>
+
+        <repository.url>https://scm.infusiontest.com/nexus/content/repositories/thirdparty</repository.url>
+
     </properties>
 
     <developers>
@@ -75,15 +78,10 @@
     </issueManagement>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Nexus Release Repository</name>
-            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>builds</id>
+            <name>Infusionsoft Third-party Build Repository</name>
+            <url>${repository.url}</url>
         </repository>
     </distributionManagement>
 
@@ -274,4 +272,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
