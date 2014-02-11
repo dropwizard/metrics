@@ -4,6 +4,7 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.server.AsyncContextState;
 import org.eclipse.jetty.server.Handler;
@@ -14,8 +15,10 @@ import org.eclipse.jetty.server.handler.HandlerWrapper;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -137,8 +140,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             @Override
             public void onComplete(AsyncEvent event) throws IOException {
                 final AsyncContextState state = (AsyncContextState) event.getAsyncContext();
-                final Request request = (Request) state.getRequest();
-                updateResponses(request);
+                updateResponses(state.getRequest());
                 if (!state.getHttpChannelState().isDispatched()) {
                     activeSuspended.dec();
                 }
@@ -220,14 +222,17 @@ public class InstrumentedHandler extends HandlerWrapper {
         }
     }
 
-    private void updateResponses(Request request) {
-        final int response = request.getResponse().getStatus() / 100;
-        if (response >= 1 && response <= 5) {
-            responses[response - 1].mark();
+    private void updateResponses(ServletRequest servletRequest) {
+        if (servletRequest instanceof Request) {
+            Request request = (Request) servletRequest;
+            final int response = request.getResponse().getStatus() / 100;
+            if (response >= 1 && response <= 5) {
+                responses[response - 1].mark();
+            }
+            activeRequests.dec();
+            final long elapsedTime = System.currentTimeMillis() - request.getTimeStamp();
+            requests.update(elapsedTime, TimeUnit.MILLISECONDS);
+            requestTimer(request.getMethod()).update(elapsedTime, TimeUnit.MILLISECONDS);
         }
-        activeRequests.dec();
-        final long elapsedTime = System.currentTimeMillis() - request.getTimeStamp();
-        requests.update(elapsedTime, TimeUnit.MILLISECONDS);
-        requestTimer(request.getMethod()).update(elapsedTime, TimeUnit.MILLISECONDS);
     }
 }
