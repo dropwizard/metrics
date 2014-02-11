@@ -6,6 +6,17 @@ Release Notes
 
 .. _rel-3.0.1:
 
+v3.0.2-SNAPSHOT
+===================
+
+* Fixed swapped m1 and m15 rates in MetricsModule
+* Remove duplicate update in Jetty9 InstrumentedHandler
+* Call updateResponses and decrement suspended requests in Jetty8 InstrumentedHandler
+* JmxReporter didn't properly remove timers
+* Servlets call super#init
+
+.. _rel-3.0.1:
+
 v3.0.1: Jul 23 2013
 ===================
 
