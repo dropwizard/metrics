@@ -27,7 +27,7 @@ public class SlidingWindowReservoir implements Reservoir {
 
     @Override
     public synchronized void update(long value) {
-        measurements[((int) count++ % measurements.length)] = value;
+        measurements[(int) (count++ % measurements.length)] = value;
     }
 
     @Override
