@@ -29,9 +29,13 @@ public class ClockTest {
                 .isEqualTo(System.currentTimeMillis(),
                            offset(100.0));
 
-        assertThat((double) clock.getTick())
-                .isEqualTo(System.nanoTime(),
-                           offset(100000.0));
+        long na = System.nanoTime();
+        long ca = clock.getTick();
+        long nb = System.nanoTime();
+        long cb = clock.getTick();
+
+        assertThat((double) (cb-ca))
+                .isEqualTo(nb-na, offset(100000.0));
     }
 
     @Test
