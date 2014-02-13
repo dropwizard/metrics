@@ -10,8 +10,7 @@ the many third-party libraries which extend Metrics:
 * `metrics-librato <https://github.com/librato/metrics-librato>`_ provides a reporter for
   `Librato Metrics <https://metrics.librato.com/>`_, a scalable metric collection, aggregation,
   monitoring, and alerting service.
-* `Metrics Spring Integration <https://github.com/ryantenney/metrics-spring>`_ provides full
-  integration with Spring's IoC and AOP functionality.
+* `metrics-spring <https://github.com/ryantenney/metrics-spring>`_ provides integration with Spring
 * `sematext-metrics-reporter <https://github.com/sematext/sematext-metrics-reporter>`_ provides a
   reporter for `SPM <http://sematext.com/spm/index.html>`_.
 * `wicket-metrics <https://github.com/NitorCreations/wicket-metrics>`_ provides easy integration for
