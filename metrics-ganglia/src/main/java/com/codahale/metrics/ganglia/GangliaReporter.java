@@ -292,7 +292,9 @@ public class GangliaReporter extends ScheduledReporter {
         }
     }
 
+    private static final double MIN_VAL = 1E-300;
     private void announce(String name, String group, double value, String units) throws GangliaException {
+        if (value < MIN_VAL) value = 0.0;
         for (GMetric gmetric: gmetrics) {
             gmetric.announce(name, Double.toString(value), GMetricType.DOUBLE, units, GMetricSlope.BOTH,
                 tMax, dMax, group);
