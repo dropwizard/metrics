@@ -371,15 +371,15 @@ public class MetricRegistry implements MetricSet {
 
     private void notifyListenerOfRemovedMetric(String name, Metric metric, MetricRegistryListener listener) {
         if (metric instanceof Gauge) {
-            listener.onGaugeRemoved(name, (Gauge<?>)metric);
+            listener.onGaugeRemoved(name);
         } else if (metric instanceof Counter) {
-            listener.onCounterRemoved(name, (Counter)metric);
+            listener.onCounterRemoved(name);
         } else if (metric instanceof Histogram) {
-            listener.onHistogramRemoved(name, (Histogram)metric);
+            listener.onHistogramRemoved(name);
         } else if (metric instanceof Meter) {
-            listener.onMeterRemoved(name, (Meter)metric);
+            listener.onMeterRemoved(name);
         } else if (metric instanceof Timer) {
-            listener.onTimerRemoved(name, (Timer)metric);
+            listener.onTimerRemoved(name);
         } else {
             throw new IllegalArgumentException("Unknown metric type: " + metric.getClass());
         }

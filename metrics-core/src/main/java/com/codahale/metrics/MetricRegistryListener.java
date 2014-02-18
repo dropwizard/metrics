@@ -15,7 +15,7 @@ public interface MetricRegistryListener extends EventListener {
         }
 
         @Override
-        public void onGaugeRemoved(String name, Gauge<?> metric) {
+        public void onGaugeRemoved(String name) {
         }
 
         @Override
@@ -23,7 +23,7 @@ public interface MetricRegistryListener extends EventListener {
         }
 
         @Override
-        public void onCounterRemoved(String name, Counter metric) {
+        public void onCounterRemoved(String name) {
         }
 
         @Override
@@ -31,7 +31,7 @@ public interface MetricRegistryListener extends EventListener {
         }
 
         @Override
-        public void onHistogramRemoved(String name, Histogram metric) {
+        public void onHistogramRemoved(String name) {
         }
 
         @Override
@@ -39,7 +39,7 @@ public interface MetricRegistryListener extends EventListener {
         }
 
         @Override
-        public void onMeterRemoved(String name, Meter metric) {
+        public void onMeterRemoved(String name) {
         }
 
         @Override
@@ -47,7 +47,7 @@ public interface MetricRegistryListener extends EventListener {
         }
 
         @Override
-        public void onTimerRemoved(String name, Timer metric) {
+        public void onTimerRemoved(String name) {
         }
     }
 
@@ -63,9 +63,8 @@ public interface MetricRegistryListener extends EventListener {
      * Called when a {@link Gauge} is removed from the registry.
      *
      * @param name the gauge's name
-     * @param metric
      */
-    void onGaugeRemoved(String name, Gauge<?> metric);
+    void onGaugeRemoved(String name);
 
     /**
      * Called when a {@link Counter} is added to the registry.
@@ -79,9 +78,8 @@ public interface MetricRegistryListener extends EventListener {
      * Called when a {@link Counter} is removed from the registry.
      *
      * @param name the counter's name
-     * @param metric
      */
-    void onCounterRemoved(String name, Counter metric);
+    void onCounterRemoved(String name);
 
     /**
      * Called when a {@link Histogram} is added to the registry.
@@ -95,9 +93,8 @@ public interface MetricRegistryListener extends EventListener {
      * Called when a {@link Histogram} is removed from the registry.
      *
      * @param name the histogram's name
-     * @param metric
      */
-    void onHistogramRemoved(String name, Histogram metric);
+    void onHistogramRemoved(String name);
 
     /**
      * Called when a {@link Meter} is added to the registry.
@@ -111,9 +108,8 @@ public interface MetricRegistryListener extends EventListener {
      * Called when a {@link Meter} is removed from the registry.
      *
      * @param name the meter's name
-     * @param metric
      */
-    void onMeterRemoved(String name, Meter metric);
+    void onMeterRemoved(String name);
 
     /**
      * Called when a {@link Timer} is added to the registry.
@@ -127,7 +123,6 @@ public interface MetricRegistryListener extends EventListener {
      * Called when a {@link Timer} is removed from the registry.
      *
      * @param name the timer's name
-     * @param metric
      */
-    void onTimerRemoved(String name, Timer metric);
+    void onTimerRemoved(String name);
 }
