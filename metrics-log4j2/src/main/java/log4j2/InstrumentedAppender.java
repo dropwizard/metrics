@@ -72,7 +72,7 @@ public class InstrumentedAppender extends AbstractAppender {
     @Override
     public void append(LogEvent event) {
         all.mark();
-        switch (event.getLevel()) {
+        switch (event.getLevel().getStandardLevel()) {
             case TRACE:
                 trace.mark();
                 break;
