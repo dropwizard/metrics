@@ -52,6 +52,11 @@
             <email>coda.hale@gmail.com</email>
             <timezone>-8</timezone>
         </developer>
+        <developer>
+            <name>Ryan Tenney</name>
+            <email>ryan@10e.us</email>
+            <timezone>-5</timezone>
+        </developer>
     </developers>
 
     <licenses>
@@ -63,15 +68,15 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git://github.com/codahale/metrics.git</connection>
-        <developerConnection>scm:git:git@github.com:codahale/metrics.git</developerConnection>
-        <url>http://github.com/codahale/metrics/</url>
+        <connection>scm:git:git://github.com/dropwizard/metrics.git</connection>
+        <developerConnection>scm:git:git@github.com:dropwizard/metrics.git</developerConnection>
+        <url>http://github.com/dropwizard/metrics/</url>
         <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
         <system>github</system>
-        <url>http://github.com/codahale/metrics/issues#issue/</url>
+        <url>http://github.com/dropwizard/metrics/issues#issue/</url>
     </issueManagement>
 
     <distributionManagement>
@@ -144,7 +149,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <keyname>840C3C96</keyname>
+                            <keyname>4D13335B</keyname>
                         </configuration>
                     </plugin>
                 </plugins>
