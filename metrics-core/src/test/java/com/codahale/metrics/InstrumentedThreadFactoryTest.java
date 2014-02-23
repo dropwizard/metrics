@@ -33,7 +33,7 @@ public class InstrumentedThreadFactoryTest {
 
         // terminate all threads in the executor service.
         executor.shutdown();
-        assertThat(executor.awaitTermination(1, TimeUnit.SECONDS)).isTrue();
+        assertThat(executor.awaitTermination(2, TimeUnit.SECONDS)).isTrue();
 
         // assert that all threads from the factory have been terminated.
         assertThat(terminated.getCount()).isEqualTo(10);
