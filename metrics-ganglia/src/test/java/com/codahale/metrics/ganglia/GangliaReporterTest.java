@@ -37,6 +37,18 @@ public class GangliaReporterTest {
     }
 
     @Test
+    public void escapeSlashesInMetricNames() throws Exception {
+        reporter.report(map("gauge_with\\slashes", gauge("value")),
+                        this.<Counter>map(),
+                        this.<Histogram>map(),
+                        this.<Meter>map(),
+                        this.<Timer>map());
+
+        verify(ganglia).announce("m.gauge_with_slashes", "value", GMetricType.STRING, "", GMetricSlope.BOTH, 60, 0, "");
+        verifyNoMoreInteractions(ganglia);
+    }
+
+    @Test
     public void reportsByteGaugeValues() throws Exception {
         reporter.report(map("gauge", gauge((byte) 1)),
                         this.<Counter>map(),
