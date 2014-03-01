@@ -8,12 +8,12 @@
         <version>4.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>metrics-jersey</artifactId>
-    <name>Metrics Integration for Jersey</name>
+    <artifactId>metrics-jersey1</artifactId>
+    <name>Metrics Integration for Jersey 1.x</name>
     <packaging>bundle</packaging>
     <description>
         A set of class providing Metrics integration for Jersey, the reference JAX-RS
-        implementation.
+        implementation. This module is for the old Jersey 1.x
     </description>
 
     <properties>
