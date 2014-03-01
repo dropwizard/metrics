@@ -1,4 +1,4 @@
-package com.codahale.metrics.jersey;
+package com.codahale.metrics.jersey1;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SharedMetricRegistries;
