@@ -74,7 +74,6 @@ public class Graphite implements Closeable {
             writer.write(' ');
             writer.write(Long.toString(timestamp));
             writer.write('\n');
-            writer.flush();
             this.failures = 0;
         } catch (IOException e) {
             failures++;
@@ -93,6 +92,9 @@ public class Graphite implements Closeable {
 
     @Override
     public void close() throws IOException {
+        if (writer != null) {
+            writer.flush();
+        }
         if (socket != null) {
             socket.close();
         }
