@@ -23,18 +23,47 @@ public class PickledGraphite extends Graphite {
     // graphite expects a python-pickled list of nested tuples.
     List<MetricTuple> metrics = new LinkedList<MetricTuple>();
 
+    /**
+     * Creates a new client which connects to the given address using the default
+     * {@link SocketFactory}. This defaults to a batchSize of 100
+     *
+     * @param address the address of the Carbon server
+     */
     public PickledGraphite(InetSocketAddress address) {
         this(address, DEFAULT_BATCH_SIZE);
     }
 
+    /**
+     * Creates a new client which connects to the given address using the default
+     * {@link SocketFactory}.
+     *
+     * @param address the address of the Carbon server
+     * @param batchSize     how many metrics are bundled into a single pickle request to graphite
+     */
     public PickledGraphite(InetSocketAddress address, int batchSize) {
         this(address, SocketFactory.getDefault(), batchSize);
     }
 
+    /**
+     * Creates a new client which connects to the given address and socket factory.
+     *
+     * @param address       the address of the Carbon server
+     * @param socketFactory the socket factory
+     * @param batchSize     how many metrics are bundled into a single pickle request to graphite
+     */
     public PickledGraphite(InetSocketAddress address, SocketFactory socketFactory, int batchSize) {
         this(address, socketFactory, UTF_8, batchSize);
     }
 
+    /**
+     * Creates a new client which connects to the given address and socket factory using the given
+     * character set.
+     *
+     * @param address       the address of the Carbon server
+     * @param socketFactory the socket factory
+     * @param charset       the character set used by the server
+     * @param batchSize     how many metrics are bundled into a single pickle request to graphite
+     */
     public PickledGraphite(InetSocketAddress address, SocketFactory socketFactory, Charset charset, int batchSize) {
         super(address, socketFactory, charset);
         this.batchSize = batchSize;
@@ -73,7 +102,7 @@ public class PickledGraphite extends Graphite {
      * 2. Send the message to graphite
      * 3. Clear out the list of metrics
      */
-    private void writeMetrics() {
+    private void writeMetrics() throws IOException {
         if (metrics.size() > 0) {
             try {
                 String payload = pickleMetrics(metrics);
@@ -82,19 +111,16 @@ public class PickledGraphite extends Graphite {
                 socket.getOutputStream().write(header);
                 writer.write(payload);
                 writer.flush();
-            } catch (Exception e) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Error writing to Graphite", e);
-                } else {
-                    LOGGER.warn("Error writing to Graphite: {}", e.getMessage());
-                }
+                LOGGER.debug("Wrote {} metrics", metrics.size());
+            } catch (IOException e) {
+                this.failures++;
+                throw e;
+            } finally {
+                // if there was an error, we might miss some data. for now, drop those on the floor and
+                // try to keep going.
+                metrics.clear();
             }
 
-            // if there was an error, we might miss some data. for now, drop those on the floor and
-            // try to keep going.
-            LOGGER.debug("Wrote {} metrics", metrics.size());
-
-            metrics.clear();
         }
     }
 
