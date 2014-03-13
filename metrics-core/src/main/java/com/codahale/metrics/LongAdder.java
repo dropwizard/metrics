@@ -13,23 +13,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 // CHECKSTYLE:OFF
 /**
- * One or more variables that together maintain an initially zero {@code long} sum.  When updates
- * (method {@link #add}) are contended across threads, the set of variables may grow dynamically to
- * reduce contention. Method {@link #sum} (or, equivalently, {@link #longValue}) returns the current
- * total combined across the variables maintaining the sum.
- * <p/>
- * <p>This class is usually preferable to {@link AtomicLong} when multiple threads update a common
- * sum that is used for purposes such as collecting statistics, not for fine-grained synchronization
- * control.  Under low update contention, the two classes have similar characteristics. But under
- * high contention, expected throughput of this class is significantly higher, at the expense of
- * higher space consumption.
- * <p/>
- * <p>This class extends {@link Number}, but does <em>not</em> define methods such as {@code
- * equals}, {@code hashCode} and {@code compareTo} because instances are expected to be mutated, and
- * so are not useful as collection keys.
- * <p/>
- * <p><em>jsr166e note: This class is targeted to be placed in java.util.concurrent.atomic.</em>
+ * <p><em>amire note: This class used to be implemented using a Striped64 class. We decided to replace
+ * it with a simpler LongAdder implementation, since we don't expect a lot of simultaneous updates from
+ * many threads in an android application, and since Striped64 used UNSAFE stuff whose availability
+ * is questionable in android.
  *
+ * @author Amir Eshel
  * @author Doug Lea
  * @since 1.8
  */
@@ -74,9 +63,7 @@ class LongAdder extends AtomicLong implements Serializable {
     }
 
     /**
-     * Returns the current sum.  The returned value is <em>NOT</em> an atomic snapshot; invocation
-     * in the absence of concurrent updates returns an accurate result, but concurrent updates that
-     * occur while the sum is being calculated might not be incorporated.
+     * Returns the current sum. 
      *
      * @return the sum
      */
