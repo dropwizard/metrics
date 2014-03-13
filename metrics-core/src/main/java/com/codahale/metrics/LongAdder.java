@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @since 1.8
  */
 @SuppressWarnings("all")
-class LongAdder extends Striped64 implements Serializable {
+class LongAdder extends AtomicLong implements Serializable {
     private static final long serialVersionUID = 7249069246863182397L;
 
     /**
@@ -56,19 +56,7 @@ class LongAdder extends Striped64 implements Serializable {
      * @param x the value to add
      */
     public void add(long x) {
-        Cell[] as;
-        long b, v;
-        HashCode hc;
-        Cell a;
-        int n;
-        if ((as = cells) != null || !casBase(b = base, b + x)) {
-            boolean uncontended = true;
-            int h = (hc = threadHashCode.get()).code;
-            if (as == null || (n = as.length) < 1 ||
-                    (a = as[(n - 1) & h]) == null ||
-                    !(uncontended = a.cas(v = a.value, v + x)))
-                retryUpdate(x, hc, uncontended);
-        }
+    	addAndGet(x);
     }
 
     /**
@@ -93,17 +81,7 @@ class LongAdder extends Striped64 implements Serializable {
      * @return the sum
      */
     public long sum() {
-        long sum = base;
-        Cell[] as = cells;
-        if (as != null) {
-            int n = as.length;
-            for (int i = 0; i < n; ++i) {
-                Cell a = as[i];
-                if (a != null)
-                    sum += a.value;
-            }
-        }
-        return sum;
+        return get();
     }
 
     /**
@@ -113,7 +91,7 @@ class LongAdder extends Striped64 implements Serializable {
      * concurrently updating.
      */
     public void reset() {
-        internalReset(0L);
+        set(0);
     }
 
     /**
@@ -125,20 +103,7 @@ class LongAdder extends Striped64 implements Serializable {
      * @return the sum
      */
     public long sumThenReset() {
-        long sum = base;
-        Cell[] as = cells;
-        base = 0L;
-        if (as != null) {
-            int n = as.length;
-            for (int i = 0; i < n; ++i) {
-                Cell a = as[i];
-                if (a != null) {
-                    sum += a.value;
-                    a.value = 0L;
-                }
-            }
-        }
-        return sum;
+        return getAndSet(0);
     }
 
     /**
@@ -189,9 +154,7 @@ class LongAdder extends Striped64 implements Serializable {
     private void readObject(java.io.ObjectInputStream s)
             throws java.io.IOException, ClassNotFoundException {
         s.defaultReadObject();
-        busy = 0;
-        cells = null;
-        base = s.readLong();
+        set(s.readLong());
     }
 }
 // CHECKSTYLE:ON
