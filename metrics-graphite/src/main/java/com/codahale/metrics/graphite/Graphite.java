@@ -68,7 +68,7 @@ public class Graphite implements Closeable {
             throw new IllegalStateException("Already connected");
         }
 
-        this.socket = socketFactory.createSocket(address.getAddress(), address.getPort());
+        this.socket = socketFactory.createSocket(address.getHostName(), address.getPort());
         this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), charset));
     }
 
