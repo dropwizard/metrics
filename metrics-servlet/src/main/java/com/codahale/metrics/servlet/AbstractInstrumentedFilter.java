@@ -21,6 +21,8 @@ import static com.codahale.metrics.MetricRegistry.name;
  * codes being returned.
  */
 public abstract class AbstractInstrumentedFilter implements Filter {
+    static final String METRIC_PREFIX = "name-prefix";
+
     private final String otherMetricName;
     private final Map<Integer, String> meterNamesByStatusCode;
     private final String registryAttribute;
@@ -52,19 +54,23 @@ public abstract class AbstractInstrumentedFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         final MetricRegistry metricsRegistry = getMetricsFactory(filterConfig);
-        final Class<?> identifyingClass = getClass();
+
+        String metricName = filterConfig.getInitParameter(METRIC_PREFIX);
+        if(metricName == null || metricName.isEmpty()) {
+            metricName = getClass().getName();
+        }
 
         this.metersByStatusCode = new ConcurrentHashMap<Integer, Meter>(meterNamesByStatusCode
                 .size());
         for (Entry<Integer, String> entry : meterNamesByStatusCode.entrySet()) {
             metersByStatusCode.put(entry.getKey(),
-                    metricsRegistry.meter(name(identifyingClass, entry.getValue())));
+                    metricsRegistry.meter(name(metricName, entry.getValue())));
         }
-        this.otherMeter = metricsRegistry.meter(name(identifyingClass,
+        this.otherMeter = metricsRegistry.meter(name(metricName,
                                                      otherMetricName));
-        this.activeRequests = metricsRegistry.counter(name(identifyingClass,
+        this.activeRequests = metricsRegistry.counter(name(metricName,
                                                            "activeRequests"));
-        this.requestTimer = metricsRegistry.timer(name(identifyingClass,
+        this.requestTimer = metricsRegistry.timer(name(metricName,
                                                        "requests"));
 
     }
