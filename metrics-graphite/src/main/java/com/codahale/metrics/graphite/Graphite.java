@@ -4,6 +4,7 @@ import javax.net.SocketFactory;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
@@ -67,8 +68,11 @@ public class Graphite implements Closeable {
         if (socket != null) {
             throw new IllegalStateException("Already connected");
         }
+        if (address.getAddress() == null) {
+            throw new UnknownHostException(address.getHostName());
+        }
 
-        this.socket = socketFactory.createSocket(address.getHostName(), address.getPort());
+        this.socket = socketFactory.createSocket(address.getAddress(), address.getPort());
         this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), charset));
     }
 
