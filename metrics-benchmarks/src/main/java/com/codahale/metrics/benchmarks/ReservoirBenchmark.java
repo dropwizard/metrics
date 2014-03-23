@@ -4,46 +4,63 @@ import com.codahale.metrics.ExponentiallyDecayingReservoir;
 import com.codahale.metrics.SlidingTimeWindowReservoir;
 import com.codahale.metrics.SlidingWindowReservoir;
 import com.codahale.metrics.UniformReservoir;
-import com.google.caliper.Benchmark;
-import com.google.caliper.runner.CaliperMain;
+
+import org.openjdk.jmh.annotations.GenerateMicroBenchmark;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
+
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 
-public class ReservoirBenchmark extends Benchmark {
-    public static void main(String[] args) throws Exception {
-        CaliperMain.main(ReservoirBenchmark.class, args);
-    }
+@State(Scope.Benchmark)
+public class ReservoirBenchmark {
 
     private final UniformReservoir uniform = new UniformReservoir();
     private final ExponentiallyDecayingReservoir exponential = new ExponentiallyDecayingReservoir();
     private final SlidingWindowReservoir sliding = new SlidingWindowReservoir(1000);
     private final SlidingTimeWindowReservoir slidingTime = new SlidingTimeWindowReservoir(1, TimeUnit.SECONDS);
 
-    @SuppressWarnings("UnusedDeclaration")
-    public void timeUniformReservoir(int reps) {
-        for (int i = 0; i < reps; i++) {
-            uniform.update(i);
-        }
+    // It's intentionally not declared as final to avoid constant folding
+    private long nextValue = 0xFBFBABBA;
+
+    @GenerateMicroBenchmark
+    public Object perfUniformReservoir() {
+        uniform.update(nextValue);
+        return uniform;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
-    public void timeExponentiallyDecayingReservoir(int reps) {
-        for (int i = 0; i < reps; i++) {
-            exponential.update(i);
-        }
+    @GenerateMicroBenchmark
+    public Object perfExponentiallyDecayingReservoir() {
+        exponential.update(nextValue);
+        return exponential;
+    }
+    
+    @GenerateMicroBenchmark
+    public Object perfSlidingWindowReservoir() {
+        sliding.update(nextValue);
+        return sliding;
+    }
+    
+    @GenerateMicroBenchmark
+    public Object perfSlidingTimeWindowReservoir() {
+        slidingTime.update(nextValue);
+        return slidingTime;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
-    public void timeSlidingWindowReservoir(int reps) {
-        for (int i = 0; i < reps; i++) {
-            sliding.update(i);
-        }
-    }
+    public static void main(String[] args) throws RunnerException {
+        Options opt = new OptionsBuilder()
+                .include(".*" + ReservoirBenchmark.class.getSimpleName() + ".*")
+                .warmupIterations(3)
+                .measurementIterations(5)
+                .threads(4)
+                .forks(1)
+                .build();
 
-    @SuppressWarnings("UnusedDeclaration")
-    public void timeSlidingTimeWindowReservoir(int reps) {
-        for (int i = 0; i < reps; i++) {
-            slidingTime.update(i);
-        }
+        new Runner(opt).run();
     }
+    
 }
