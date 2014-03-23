@@ -1,20 +1,40 @@
 package com.codahale.metrics.benchmarks;
 
 import com.codahale.metrics.Meter;
-import com.google.caliper.Benchmark;
-import com.google.caliper.runner.CaliperMain;
 
-public class MeterBenchmark extends Benchmark {
-    public static void main(String[] args) throws Exception {
-        CaliperMain.main(MeterBenchmark.class, args);
-    }
+import org.openjdk.jmh.annotations.GenerateMicroBenchmark;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
+
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+
+@State(Scope.Benchmark)
+public class MeterBenchmark {
 
     private final Meter meter = new Meter();
 
-    @SuppressWarnings("unused")
-    public void timeMark(int reps) {
-        for (int i = 0; i < reps; i++) {
-            meter.mark(i);
-        }
+    // It's intentionally not declared as final to avoid constant folding
+    private long nextValue = 0xFBFBABBA;
+
+    @GenerateMicroBenchmark
+    public Object perfMark() {
+        meter.mark(nextValue);
+        return meter;
     }
+
+    public static void main(String[] args) throws RunnerException {
+        Options opt = new OptionsBuilder()
+                .include(".*" + MeterBenchmark.class.getSimpleName() + ".*")
+                .warmupIterations(3)
+                .measurementIterations(5)
+                .threads(4)
+                .forks(1)
+                .build();
+
+        new Runner(opt).run();
+    }
+
 }
