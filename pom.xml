@@ -19,6 +19,7 @@
         <module>metrics-annotation</module>
         <module>metrics-benchmarks</module>
         <module>metrics-core</module>
+        <module>metrics-cloudwatch</module>
         <module>metrics-healthchecks</module>
         <module>metrics-ehcache</module>
         <module>metrics-ganglia</module>
