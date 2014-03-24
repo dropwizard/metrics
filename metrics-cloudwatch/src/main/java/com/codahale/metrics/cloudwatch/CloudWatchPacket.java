@@ -40,8 +40,18 @@ public class CloudWatchPacket {
     }
 
     public void send() {
-        if(!reqs.isEmpty()) {
-            client.putMetricData(new PutMetricDataRequest().withNamespace(nameSpace).withMetricData(reqs));
+        List<MetricDatum> subpackets = new ArrayList<MetricDatum>();
+        for (MetricDatum req : reqs) {
+            subpackets.add(req);
+            if (subpackets.size() == 20) {
+                client.putMetricData(new PutMetricDataRequest().withNamespace(nameSpace).withMetricData(subpackets));
+                subpackets = new ArrayList<MetricDatum>();
+            }
+        }
+
+
+        if (!subpackets.isEmpty()) {
+            client.putMetricData(new PutMetricDataRequest().withNamespace(nameSpace).withMetricData(subpackets));
         }
     }
 

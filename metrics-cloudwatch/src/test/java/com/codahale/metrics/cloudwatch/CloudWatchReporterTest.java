@@ -9,9 +9,11 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.internal.matchers.And;
+import org.mockito.internal.verification.Times;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +21,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class CloudWatchReporterTest {
@@ -236,6 +237,99 @@ public class CloudWatchReporterTest {
         verifyNoMoreInteractions(graphite);
     }
 
+    @Test
+    public void reportsMoreThan20MetricData() throws Exception {
+
+
+        final Timer timer1 = mock(Timer.class);
+        when(timer1.getCount()).thenReturn(1L);
+        when(timer1.getMeanRate()).thenReturn(2.0);
+        when(timer1.getOneMinuteRate()).thenReturn(3.0);
+        when(timer1.getFiveMinuteRate()).thenReturn(4.0);
+        when(timer1.getFifteenMinuteRate()).thenReturn(5.0);
+
+        final Timer timer2 = mock(Timer.class);
+        when(timer1.getCount()).thenReturn(1L);
+        when(timer1.getMeanRate()).thenReturn(2.0);
+        when(timer1.getOneMinuteRate()).thenReturn(3.0);
+        when(timer1.getFiveMinuteRate()).thenReturn(4.0);
+        when(timer1.getFifteenMinuteRate()).thenReturn(5.0);
+
+
+        final Snapshot snapshot = mock(Snapshot.class);
+        when(snapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));
+        when(snapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));
+        when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
+        when(snapshot.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));
+        when(snapshot.getMedian()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(500));
+        when(snapshot.get75thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(600));
+        when(snapshot.get95thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(700));
+        when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
+        when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
+        when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS
+                .toNanos(1000));
+
+        when(timer1.getSnapshot()).thenReturn(snapshot);
+        when(timer2.getSnapshot()).thenReturn(snapshot);
+
+        reporter.report(this.<Gauge>map(),
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                this.<Meter>map(),
+                map("timer1", timer1, "timer2", timer1));
+
+        List<Matcher> firstCall = new ArrayList<Matcher>();
+        firstCall.add(hasMetricDatum("prefix.timer1.max", 100.00));
+        firstCall.add(hasMetricDatum("prefix.timer1.mean", 200.00));
+        firstCall.add(hasMetricDatum("prefix.timer1.min", 300.00));
+        firstCall.add(hasMetricDatum("prefix.timer1.stddev", 400.00));
+        firstCall.add(hasMetricDatum("prefix.timer1.p50", 500.00));
+        firstCall.add(hasMetricDatum("prefix.timer1.p75", 600.00));
+        firstCall.add(hasMetricDatum("prefix.timer1.p95", 700.00));
+        firstCall.add(hasMetricDatum("prefix.timer1.p98", 800.00));
+        firstCall.add(hasMetricDatum("prefix.timer1.p99", 900.00));
+        firstCall.add(hasMetricDatum("prefix.timer1.p999", 1000.00));
+        firstCall.add(hasMetricDatum("prefix.timer1.count", 1));
+        firstCall.add(hasMetricDatum("prefix.timer1.m1_rate", 3.00));
+        firstCall.add(hasMetricDatum("prefix.timer1.m5_rate", 4.00));
+        firstCall.add(hasMetricDatum("prefix.timer1.m15_rate", 5.00));
+        firstCall.add(hasMetricDatum("prefix.timer1.mean_rate", 2.00));
+        firstCall.add(hasMetricDatum("prefix.timer2.max", 100.00));
+        firstCall.add(hasMetricDatum("prefix.timer2.mean", 200.00));
+        firstCall.add(hasMetricDatum("prefix.timer2.min", 300.00));
+        firstCall.add(hasMetricDatum("prefix.timer2.stddev", 400.00));
+        firstCall.add(hasMetricDatum("prefix.timer2.p50", 500.00));
+        firstCall.add(ofSize(20));
+
+        List<Matcher> secondCall = new ArrayList<Matcher>();
+        secondCall.add(hasMetricDatum("prefix.timer2.p75", 600.00));
+        secondCall.add(hasMetricDatum("prefix.timer2.p95", 700.00));
+        secondCall.add(hasMetricDatum("prefix.timer2.p98", 800.00));
+        secondCall.add(hasMetricDatum("prefix.timer2.p99", 900.00));
+        secondCall.add(hasMetricDatum("prefix.timer2.p999", 1000.00));
+        secondCall.add(hasMetricDatum("prefix.timer2.count", 1));
+        secondCall.add(hasMetricDatum("prefix.timer2.m1_rate", 3.00));
+        secondCall.add(hasMetricDatum("prefix.timer2.m5_rate", 4.00));
+        secondCall.add(hasMetricDatum("prefix.timer2.m15_rate", 5.00));
+        secondCall.add(hasMetricDatum("prefix.timer2.mean_rate", 2.00));
+        secondCall.add(ofSize(secondCall.size()));
+
+
+
+        ArgumentCaptor<PutMetricDataRequest> captor = ArgumentCaptor.forClass(PutMetricDataRequest.class);
+        verify(graphite, times(2)).putMetricData(captor.capture());
+
+        assertTrue(new And(firstCall).matches(captor.getAllValues().get(0)));
+        assertTrue(new And(secondCall).matches(captor.getAllValues().get(1)));
+
+
+
+
+        verifyNoMoreInteractions(graphite);
+    }
+
+
+
     private Matcher ofSize(final int size) {
         return new TypeSafeMatcher<PutMetricDataRequest>() {
             @Override
@@ -259,6 +353,14 @@ public class CloudWatchReporterTest {
         map.put(name, metric);
         return map;
     }
+
+    private <T> SortedMap<String, T> map(String name1, T metric1, String name2, T metric2) {
+        final TreeMap<String, T> map = new TreeMap<String, T>();
+        map.put(name1, metric1);
+        map.put(name2, metric2);
+        return map;
+    }
+
 
     private <T> Gauge gauge(T value) {
         final Gauge gauge = mock(Gauge.class);
@@ -287,6 +389,9 @@ public class CloudWatchReporterTest {
                     if(datum.getMetricName().equals(name)){
                         found.add(datum);
                     }
+                }
+                if(found.size() == 0){
+                    System.out.println("huh");
                 }
                 assertEquals(found.size(), 1);
                 return found.get(0);
