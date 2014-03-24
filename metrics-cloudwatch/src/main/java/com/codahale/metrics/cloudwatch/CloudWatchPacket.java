@@ -21,8 +21,6 @@ public class CloudWatchPacket {
     private final AmazonCloudWatchClient client;
     private final List<MetricDatum> reqs = new ArrayList<MetricDatum>();
 
-    private boolean sent = false;
-
     public CloudWatchPacket(String nameSpace, AmazonCloudWatchClient client) {
         this.nameSpace = nameSpace;
         this.client = client;
