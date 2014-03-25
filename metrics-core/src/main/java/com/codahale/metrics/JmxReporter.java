@@ -476,39 +476,37 @@ public class JmxReporter implements Reporter, Closeable {
         private final MBeanServer mBeanServer;
         private final MetricFilter filter;
         private final MetricTimeUnits timeUnits;
-        private final Map<ObjectName,ObjectName> registered;
+        private final Map<ObjectName, ObjectName> registered;
 
         private JmxListener(MBeanServer mBeanServer, String name, MetricFilter filter, MetricTimeUnits timeUnits) {
             this.mBeanServer = mBeanServer;
             this.name = name;
             this.filter = filter;
             this.timeUnits = timeUnits;
-            this.registered = new ConcurrentHashMap<ObjectName,ObjectName>();
+            this.registered = new ConcurrentHashMap<ObjectName, ObjectName>();
         }
 
         private void registerMBean(Object mBean, ObjectName objectName) throws InstanceAlreadyExistsException, JMException {
-			ObjectInstance objectInstance = mBeanServer.registerMBean(mBean, objectName);
-			if (objectInstance != null) {
-				// the websphere mbeanserver rewrites the objectname to include
-				// cell, node & server info
-				// make sure we capture the new objectName for unregistration
-				registered.put(objectName, objectInstance.getObjectName());
-			} else {
-				registered.put(objectName, objectName);
-			}
+            ObjectInstance objectInstance = mBeanServer.registerMBean(mBean, objectName);
+            if (objectInstance != null) {
+                // the websphere mbeanserver rewrites the objectname to include
+                // cell, node & server info
+                // make sure we capture the new objectName for unregistration
+                registered.put(objectName, objectInstance.getObjectName());
+            } else {
+                registered.put(objectName, objectName);
+            }
+        }
 
-		}
+        private void unregisterMBean(ObjectName originalObjectName) throws InstanceNotFoundException, MBeanRegistrationException {
+            ObjectName storedObjectName = registered.remove(originalObjectName);
+            if (storedObjectName != null) {
+                mBeanServer.unregisterMBean(storedObjectName);
+            } else {
+                mBeanServer.unregisterMBean(originalObjectName);
+            }
+        }
 
-		private void unregisterMBean(ObjectName originalObjectName) throws InstanceNotFoundException,
-				MBeanRegistrationException {
-			ObjectName storedObjectName = registered.remove(originalObjectName);
-			if (storedObjectName != null) {
-				mBeanServer.unregisterMBean(storedObjectName);
-			} else {
-				mBeanServer.unregisterMBean(originalObjectName);
-			}
-		}
-        
         @Override
         public void onGaugeAdded(String name, Gauge<?> gauge) {
             try {
@@ -553,7 +551,7 @@ public class JmxReporter implements Reporter, Closeable {
         public void onCounterRemoved(String name) {
             try {
                 final ObjectName objectName = createName("counters", name);
-                unregisterMBean(objectName);                
+                unregisterMBean(objectName);
             } catch (InstanceNotFoundException e) {
                 LOGGER.debug("Unable to unregister counter", e);
             } catch (MBeanRegistrationException e) {
