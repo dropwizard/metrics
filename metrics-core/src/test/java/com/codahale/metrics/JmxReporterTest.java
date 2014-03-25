@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
 public class JmxReporterTest {
     private final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
     private final String name = UUID.randomUUID().toString().replaceAll("[{\\-}]", "");
-    private final MetricRegistry registry = spy(new MetricRegistry());
+    private final MetricRegistry registry = new MetricRegistry();
 
     private final JmxReporter reporter = JmxReporter.forRegistry(registry)
                                                     .registerWith(mBeanServer)
@@ -210,6 +210,31 @@ public class JmxReporterTest {
         } catch (InstanceNotFoundException e) {
 
         }
+    }
+    
+    @Test
+    public void objectNameModifyingMBeanServer() throws Exception {
+    	MBeanServer mockedMBeanServer = mock(MBeanServer.class);
+    	
+    	// overwrite the objectName
+    	when(mockedMBeanServer.registerMBean(any(Object.class), any(ObjectName.class))).thenReturn(new ObjectInstance("DOMAIN:key=value","className"));
+    	
+    	MetricRegistry testRegistry = new MetricRegistry();
+    	JmxReporter testJmxReporter = JmxReporter.forRegistry(testRegistry)
+                .registerWith(mockedMBeanServer)
+                .inDomain(name)
+                .build();
+    	
+    	testJmxReporter.start();
+    
+    	// should trigger a registerMBean
+    	testRegistry.timer("test");
+    	
+    	// should trigger an unregisterMBean with the overwritten objectName = "DOMAIN:key=value"
+    	testJmxReporter.stop();
+    	
+    	verify(mockedMBeanServer).unregisterMBean(new ObjectName("DOMAIN:key=value"));
+    	
     }
 
     private AttributeList getAttributes(String name, String... attributeNames) throws JMException {
