@@ -39,6 +39,8 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
 	private static final String TAG = Log.makeLogTag(MetricSnapshotReporter.class);
 	private boolean mReportToLogcat;
 	
+	private boolean mIsRunning;
+	
 	protected final MetricRegistry mRegistry;
 	protected final MetricFilter mFilter; 
 	
@@ -49,6 +51,31 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
 	}
 	
 	private LinkedHashSet<IListener> mListeners;
+	
+    protected MetricSnapshotReporter(MetricRegistry registry,
+			String name,
+            TimeUnit rateUnit,
+            TimeUnit durationUnit,
+            MetricFilter filter, 
+            boolean enableLogcat) {
+    	mIsRunning = false;
+		mReportToLogcat = enableLogcat;
+		mRegistry = registry;
+		mFilter = filter;
+		mReporterName = name; 
+		
+		mExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name + '-' + FACTORY_ID.incrementAndGet()));
+		mRateFactor = rateUnit.toSeconds(1);
+		mRateUnit = calculateRateUnit(rateUnit);
+		mDurationFactor = 1.0 / durationUnit.toNanos(1);
+		mDurationUnit = durationUnit.toString().toLowerCase(Locale.US);
+		
+		mListeners = new LinkedHashSet<MetricSnapshotReporter.IListener>();
+	}
+	
+    public boolean isRunning() {
+    	return mIsRunning;
+    }
 	
 	public void addListener(IListener listener) {
 		mListeners.add(listener);
@@ -116,6 +143,7 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
      */
     public void start(long initialDelay, long period, TimeUnit unit) {
     	Log.d(TAG, "Starting reporter " + mReporterName + " with period=" + period + ", initialDelay=" + initialDelay + ", unit=" + unit);
+    	mIsRunning = true;
         mExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -139,6 +167,7 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
         } catch (InterruptedException ignored) {
             // do nothing
         }
+        mIsRunning = false;
     }
 
     /**
@@ -182,26 +211,6 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
         return s.substring(0, s.length() - 1);
     }
 	
-    protected MetricSnapshotReporter(MetricRegistry registry,
-    						String name,
-                            TimeUnit rateUnit,
-                            TimeUnit durationUnit,
-                            MetricFilter filter, 
-                            boolean enableLogcat) {
-        mReportToLogcat = enableLogcat;
-        mRegistry = registry;
-        mFilter = filter;
-        mReporterName = name; 
-        
-        mExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name + '-' + FACTORY_ID.incrementAndGet()));
-        mRateFactor = rateUnit.toSeconds(1);
-        mRateUnit = calculateRateUnit(rateUnit);
-        mDurationFactor = 1.0 / durationUnit.toNanos(1);
-        mDurationUnit = durationUnit.toString().toLowerCase(Locale.US);
-        
-        mListeners = new LinkedHashSet<MetricSnapshotReporter.IListener>();
-    }
-
     @SuppressWarnings("rawtypes")
 	public void report(SortedMap<String, Gauge> gauges,
                        SortedMap<String, Counter> counters,

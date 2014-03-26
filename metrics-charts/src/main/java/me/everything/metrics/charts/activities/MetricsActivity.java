@@ -2,7 +2,7 @@ package me.everything.metrics.charts.activities;
 
 import java.util.Random;
 
-import me.everything.metrics.charts.reporters.DebugReporter;
+import me.everything.metrics.charts.reporters.TimeWindowDebugReporter;
 import me.everything.metrics.filtering.GlobPatternList;
 import me.everything.metrics.logging.Log;
 import me.everything.metrics.reporters.MetricSnapshotReporter;
@@ -14,7 +14,7 @@ import android.os.Handler;
 
 public abstract class MetricsActivity extends Activity implements MetricSnapshotReporter.IListener {
 
-	private DebugReporter mReporter;
+	private TimeWindowDebugReporter mReporter;
 	private final Handler mHandler = new Handler();
 	
 	private static final String LOG = Log.makeLogTag(MetricsActivity.class);
@@ -28,7 +28,7 @@ public abstract class MetricsActivity extends Activity implements MetricSnapshot
 		return mSeriesFilter;
 	}
 	
-	protected DebugReporter reporter() {
+	protected TimeWindowDebugReporter reporter() {
 		return mReporter;
 	}
 	
@@ -78,7 +78,7 @@ public abstract class MetricsActivity extends Activity implements MetricSnapshot
 		} else {
 			setTitle("Metrics");
 		}
-		mReporter = DebugReporter.getInstance();
+		mReporter = TimeWindowDebugReporter.getInstance();
 		mReporter.addListener(this);
 	}
 	

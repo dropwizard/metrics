@@ -15,11 +15,11 @@ import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 
-public class DebugReporter extends MetricSnapshotReporter {
+public class TimeWindowDebugReporter extends MetricSnapshotReporter {
 	
 	private boolean mEnableTimeWindow = false;
 	
-    private DebugReporter(MetricRegistry registry,
+    private TimeWindowDebugReporter(MetricRegistry registry,
 				          TimeUnit rateUnit,
 				          TimeUnit durationUnit,
 				          MetricFilter filter,
@@ -135,20 +135,20 @@ public class DebugReporter extends MetricSnapshotReporter {
         	return this;
         }
         
-        public DebugReporter build() {
-        	DebugReporter ret =  new DebugReporter(registry, rateUnit, durationUnit, filter, windowSizeMs, enableLogcat);
-        	sReporterInstance = new WeakReference<DebugReporter>(ret);
+        public TimeWindowDebugReporter build() {
+        	TimeWindowDebugReporter ret =  new TimeWindowDebugReporter(registry, rateUnit, durationUnit, filter, windowSizeMs, enableLogcat);
+        	sReporterInstance = new WeakReference<TimeWindowDebugReporter>(ret);
         	return ret;
         }
 
-        public static DebugReporter getReporterInstance() {
+        public static TimeWindowDebugReporter getReporterInstance() {
         	if (sReporterInstance.get() != null) {
         		return sReporterInstance.get();
         	}
         	return null;
         }
         
-        private static WeakReference<DebugReporter> sReporterInstance = null;
+        private static WeakReference<TimeWindowDebugReporter> sReporterInstance = null;
     }
     
 	/**
@@ -161,7 +161,7 @@ public class DebugReporter extends MetricSnapshotReporter {
         return new Builder(registry);
     }
 
-    public static DebugReporter getInstance() {
+    public static TimeWindowDebugReporter getInstance() {
     	return Builder.getReporterInstance();
     }
     
