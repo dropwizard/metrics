@@ -10,10 +10,8 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.internal.matchers.And;
-import org.mockito.internal.verification.Times;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +25,7 @@ import static org.mockito.Mockito.*;
 public class CloudWatchReporterTest {
     private final long timestamp = 1000198;
     private final Clock clock = mock(Clock.class);
-    private final AmazonCloudWatchClient graphite = mock(AmazonCloudWatchClient.class);
+    private final AmazonCloudWatchClient cloudwatch = mock(AmazonCloudWatchClient.class);
     private final MetricRegistry registry = mock(MetricRegistry.class);
     private final CloudWatchReporter reporter = CloudWatchReporter.forRegistry("namespace", registry)
             .withClock(clock)
@@ -35,7 +33,7 @@ public class CloudWatchReporterTest {
             .convertRatesTo(TimeUnit.SECONDS)
             .convertDurationsTo(TimeUnit.MILLISECONDS)
             .filter(MetricFilter.ALL)
-            .build(graphite);
+            .build(cloudwatch);
 
     @Before
     public void setUp() throws Exception {
@@ -50,7 +48,7 @@ public class CloudWatchReporterTest {
                 this.<Meter>map(),
                 this.<Timer>map());
 
-        verifyNoMoreInteractions(graphite);
+        verifyNoMoreInteractions(cloudwatch);
     }
 
 
@@ -68,9 +66,9 @@ public class CloudWatchReporterTest {
         asserts.add(hasMetricDatum("prefix.gauge", 1));
         asserts.add(ofSize(asserts.size()));
 
-        verify(graphite).putMetricData(Matchers.<PutMetricDataRequest>argThat(new And(asserts)));
+        verify(cloudwatch).putMetricData(Matchers.<PutMetricDataRequest>argThat(new And(asserts)));
 
-        verifyNoMoreInteractions(graphite);
+        verifyNoMoreInteractions(cloudwatch);
     }
 
     @Test
@@ -85,10 +83,10 @@ public class CloudWatchReporterTest {
         asserts.add(hasMetricDatum("prefix.gauge", 1.1));
         asserts.add(ofSize(asserts.size()));
 
-        verify(graphite).putMetricData(Matchers.<PutMetricDataRequest>argThat(new And(asserts)));
+        verify(cloudwatch).putMetricData(Matchers.<PutMetricDataRequest>argThat(new And(asserts)));
 
 
-        verifyNoMoreInteractions(graphite);
+        verifyNoMoreInteractions(cloudwatch);
     }
 
     @Test
@@ -106,9 +104,9 @@ public class CloudWatchReporterTest {
         asserts.add(hasMetricDatum("prefix.counter.count", 100));
         asserts.add(ofSize(asserts.size()));
 
-        verify(graphite).putMetricData(Matchers.<PutMetricDataRequest>argThat(new And(asserts)));
+        verify(cloudwatch).putMetricData(Matchers.<PutMetricDataRequest>argThat(new And(asserts)));
 
-        verifyNoMoreInteractions(graphite);
+        verifyNoMoreInteractions(cloudwatch);
     }
 
     @Test
@@ -150,9 +148,9 @@ public class CloudWatchReporterTest {
         asserts.add(hasMetricDatum("prefix.histogram.p999", 11.00));
         asserts.add(ofSize(asserts.size()));
 
-        verify(graphite).putMetricData(Matchers.<PutMetricDataRequest>argThat(new And(asserts)));
+        verify(cloudwatch).putMetricData(Matchers.<PutMetricDataRequest>argThat(new And(asserts)));
 
-        verifyNoMoreInteractions(graphite);
+        verifyNoMoreInteractions(cloudwatch);
     }
 
     @Test
@@ -178,9 +176,9 @@ public class CloudWatchReporterTest {
         asserts.add(hasMetricDatum("prefix.meter.mean_rate", 5.00));
         asserts.add(ofSize(asserts.size()));
 
-        verify(graphite).putMetricData(Matchers.<PutMetricDataRequest>argThat(new And(asserts)));
+        verify(cloudwatch).putMetricData(Matchers.<PutMetricDataRequest>argThat(new And(asserts)));
 
-        verifyNoMoreInteractions(graphite);
+        verifyNoMoreInteractions(cloudwatch);
     }
 
     @Test
@@ -232,9 +230,9 @@ public class CloudWatchReporterTest {
 
         asserts.add(ofSize(asserts.size()));
 
-        verify(graphite).putMetricData(Matchers.<PutMetricDataRequest>argThat(new And(asserts)));
+        verify(cloudwatch).putMetricData(Matchers.<PutMetricDataRequest>argThat(new And(asserts)));
 
-        verifyNoMoreInteractions(graphite);
+        verifyNoMoreInteractions(cloudwatch);
     }
 
     @Test
@@ -317,7 +315,7 @@ public class CloudWatchReporterTest {
 
 
         ArgumentCaptor<PutMetricDataRequest> captor = ArgumentCaptor.forClass(PutMetricDataRequest.class);
-        verify(graphite, times(2)).putMetricData(captor.capture());
+        verify(cloudwatch, times(2)).putMetricData(captor.capture());
 
         assertTrue(new And(firstCall).matches(captor.getAllValues().get(0)));
         assertTrue(new And(secondCall).matches(captor.getAllValues().get(1)));
@@ -325,7 +323,7 @@ public class CloudWatchReporterTest {
 
 
 
-        verifyNoMoreInteractions(graphite);
+        verifyNoMoreInteractions(cloudwatch);
     }
 
 

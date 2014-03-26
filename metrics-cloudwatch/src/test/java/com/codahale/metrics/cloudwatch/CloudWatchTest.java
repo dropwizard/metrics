@@ -18,10 +18,6 @@ public class CloudWatchTest {
     private final AmazonCloudWatchClient client = mock(AmazonCloudWatchClient.class);
     private final CloudWatchPacket cloudWatchPacket = new CloudWatchPacket("example", client);
 
-    private final Socket socket = mock(Socket.class);
-    private final ByteArrayOutputStream output = new ByteArrayOutputStream();
-
-
 
     @Test
     public void writeValuesToCloudWatch() throws Exception {

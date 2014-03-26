@@ -107,14 +107,14 @@ public class CloudWatchReporter extends ScheduledReporter {
          * Builds a {@link CloudWatchReporter} with the given properties, sending metrics using the
          * given {@link com.amazonaws.services.cloudwatch.AmazonCloudWatchClient} client.
          *
-         * @param graphite a {@link com.amazonaws.services.cloudwatch.AmazonCloudWatchClient} client
+         * @param cloudwatch a {@link com.amazonaws.services.cloudwatch.AmazonCloudWatchClient} client
          * @return a {@link CloudWatchReporter}
          */
-        public CloudWatchReporter build(AmazonCloudWatchClient graphite) {
+        public CloudWatchReporter build(AmazonCloudWatchClient cloudwatch) {
             return new CloudWatchReporter(
                     nameSpace,
                     registry,
-                    graphite,
+                    cloudwatch,
                     clock,
                     prefix,
                     rateUnit,
@@ -127,14 +127,14 @@ public class CloudWatchReporter extends ScheduledReporter {
 
 
     private final String nameSpace;
-    private final AmazonCloudWatchClient graphite;
+    private final AmazonCloudWatchClient cloudwatch;
     private final Clock clock;
     private final String prefix;
 
     private CloudWatchReporter(
                              String nameSpace,
                              MetricRegistry registry,
-                             AmazonCloudWatchClient graphite,
+                             AmazonCloudWatchClient cloudwatch,
                              Clock clock,
                              String prefix,
                              TimeUnit rateUnit,
@@ -142,7 +142,7 @@ public class CloudWatchReporter extends ScheduledReporter {
                              MetricFilter filter) {
         super(registry, "cloudwatch-reporter", filter, rateUnit, durationUnit);
         this.nameSpace = nameSpace;
-        this.graphite = graphite;
+        this.cloudwatch = cloudwatch;
         this.clock = clock;
         this.prefix = prefix;
     }
@@ -154,7 +154,7 @@ public class CloudWatchReporter extends ScheduledReporter {
                        SortedMap<String, Meter> meters,
                        SortedMap<String, Timer> timers) {
 
-            CloudWatchPacket packet = new CloudWatchPacket(nameSpace, graphite);
+            CloudWatchPacket packet = new CloudWatchPacket(nameSpace, cloudwatch);
 
             for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
                 reportGauge(packet, entry.getKey(), entry.getValue());
