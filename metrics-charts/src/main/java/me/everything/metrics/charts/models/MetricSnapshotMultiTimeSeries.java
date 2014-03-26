@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import me.everything.metrics.charts.logging.Log;
+import me.everything.metrics.logging.Log;
 import me.everything.metrics.snapshots.MetricSnapshot;
 import me.everything.metrics.utils.TimeUtils;
 

@@ -2,10 +2,10 @@ package me.everything.metrics.charts.activities;
 
 import java.util.Random;
 
-import me.everything.metrics.charts.logging.Log;
 import me.everything.metrics.charts.reporters.DebugReporter;
-import me.everything.metrics.charts.reporters.MetricSnapshotReporter;
 import me.everything.metrics.filtering.GlobPatternList;
+import me.everything.metrics.logging.Log;
+import me.everything.metrics.reporters.MetricSnapshotReporter;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;

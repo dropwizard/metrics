@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import me.everything.metrics.charts.R;
-import me.everything.metrics.charts.logging.Log;
 import me.everything.metrics.filtering.GlobPatternList;
+import me.everything.metrics.logging.Log;
 import me.everything.metrics.snapshots.MetricSnapshot;
 import android.content.Context;
 import android.content.Intent;

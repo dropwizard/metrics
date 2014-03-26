@@ -1,10 +1,11 @@
-package me.everything.metrics.charts.reporters;
+package me.everything.metrics.reporters;
 
 import java.io.Closeable;
 import java.io.PrintStream;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.Executors;
@@ -13,7 +14,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import me.everything.metrics.charts.logging.Log;
+import me.everything.metrics.logging.Log;
 import me.everything.metrics.snapshots.CounterSnapshot;
 import me.everything.metrics.snapshots.GaugeSnapshot;
 import me.everything.metrics.snapshots.HistogramSnapshot;
@@ -35,7 +36,7 @@ import com.codahale.metrics.Timer;
  */
 public abstract class MetricSnapshotReporter implements Closeable, Reporter {
 
-	private static final String LOG = Log.makeLogTag("metrics");
+	private static final String TAG = Log.makeLogTag(MetricSnapshotReporter.class);
 	private boolean mReportToLogcat;
 	
 	protected final MetricRegistry mRegistry;
@@ -96,31 +97,42 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
     private final double mRateFactor;
     private final String mRateUnit;
 
+    public void startRandomInitialDelay(long period, TimeUnit unit) {
+    	Random r = new Random();
+    	long initialDelay = r.nextLong();
+    	initialDelay = initialDelay % period;
+    	start(initialDelay, period, unit);
+    }
+    
+    public void start(long period, TimeUnit unit) {
+    	start(period, period, unit);
+    }
+    
     /**
      * Starts the reporter polling at the given period.
      *
      * @param period the amount of time between polls
      * @param unit   the unit for {@code period}
      */
-    public void start(long period, TimeUnit unit) {
-    	Log.d(LOG, "Starting reporter " + mReporterName + " with period=" + period + ", unit=" + unit);
+    public void start(long initialDelay, long period, TimeUnit unit) {
+    	Log.d(TAG, "Starting reporter " + mReporterName + " with period=" + period + ", initialDelay=" + initialDelay + ", unit=" + unit);
         mExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
             	try {
             		report();
             	} catch (Exception ex) {
-            		Log.e(LOG,  "Error in reporting from " + mReporterName, ex);
+            		Log.e(TAG,  "Error in reporting from " + mReporterName, ex);
             	}
             }
-        }, period, period, unit);
+        }, initialDelay, period, unit);
     }
 
     /**
      * Stops the reporter and shuts down its thread of execution.
      */
     public void stop() {
-    	Log.d(LOG, "Stopping reporter " + mReporterName);
+    	Log.d(TAG, "Stopping reporter " + mReporterName);
         mExecutor.shutdown();
         try {
             mExecutor.awaitTermination(1, TimeUnit.SECONDS);
@@ -200,7 +212,7 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
     	int metricsCount = 0;
     	int modifications = 0;
     	
-        Log.v(LOG, mReporterName + ": " + "Begin metrics report");
+        Log.v(TAG, mReporterName + ": " + "Begin metrics report");
     	
         if (!gauges.isEmpty()) {
             for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
@@ -244,17 +256,17 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
         
         modifications += onMetricsIterationComplete();
         
-        Log.v(LOG, mReporterName + ": " + "End metrics report (" + metricsCount + " total, " + modifications  + " modifications)");
+        Log.v(TAG, mReporterName + ": " + "End metrics report (" + metricsCount + " total, " + modifications  + " modifications)");
         
         for (IListener listener : mListeners) {
         	try {
         		listener.onMetricsReport(modifications);
         	} catch (Exception ex) {
-        		Log.e(LOG, "MetricsReporter Listener error", ex);
+        		Log.e(TAG, "MetricsReporter Listener error", ex);
         	}
         }
         
-        Log.v(LOG, mReporterName + ": " + "Invoked all " + mListeners.size() + " listeners");
+        Log.v(TAG, mReporterName + ": " + "Invoked all " + mListeners.size() + " listeners");
     }
     
     protected int onMetricsIterationComplete() {
@@ -263,7 +275,7 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
 
     private int reportMetric(MetricSnapshot snapshot) {
     	if (mReportToLogcat) {
-    		Log.v(LOG, mReporterName + ": " + snapshot.toString() + ": " + snapshot.dataToString());
+    		Log.v(TAG, mReporterName + ": " + snapshot.toString() + ": " + snapshot.dataToString());
     	}
     	return performReportMetric(snapshot);
     }

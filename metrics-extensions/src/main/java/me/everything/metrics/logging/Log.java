@@ -1,11 +1,10 @@
-package me.everything.metrics.charts.logging;
+package me.everything.metrics.logging;
 
 public class Log {
-	private static final String LOG_PREFIX = "metrics.charts.";
+	private static final String LOG_PREFIX = "metrics.";
 	private static final int LOG_PREFIX_LENGTH = LOG_PREFIX.length();
 	private static final int MAX_LOG_TAG_LENGTH = 30;
-	private static boolean mEnabled = false;
-	
+	private static boolean mEnabled = false;	
 	
 	public static String makeLogTag(String str) 
 	{
