@@ -164,7 +164,8 @@ public class ConsoleReporter extends ScheduledReporter {
         dateFormat.setTimeZone(timeZone);
     }
 
-    @Override
+    @SuppressWarnings("rawtypes")
+	@Override
     public void report(SortedMap<String, Gauge> gauges,
                        SortedMap<String, Counter> counters,
                        SortedMap<String, Histogram> histograms,
@@ -235,7 +236,8 @@ public class ConsoleReporter extends ScheduledReporter {
         output.printf(locale, "             count = %d%n", entry.getValue().getCount());
     }
 
-    private void printGauge(Map.Entry<String, Gauge> entry) {
+    @SuppressWarnings("rawtypes")
+	private void printGauge(Map.Entry<String, Gauge> entry) {
         output.printf(locale, "             value = %s%n", entry.getValue().getValue());
     }
 

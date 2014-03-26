@@ -21,7 +21,6 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
     /**
      * A simple named thread factory.
      */
-    @SuppressWarnings("NullableProblems")
     private static class NamedThreadFactory implements ThreadFactory {
         private final ThreadGroup group;
         private final AtomicInteger threadNumber = new AtomicInteger(1);
@@ -131,7 +130,8 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * @param meters     all of the meters in the registry
      * @param timers     all of the timers in the registry
      */
-    public abstract void report(SortedMap<String, Gauge> gauges,
+    @SuppressWarnings("rawtypes")
+	public abstract void report(SortedMap<String, Gauge> gauges,
                                 SortedMap<String, Counter> counters,
                                 SortedMap<String, Histogram> histograms,
                                 SortedMap<String, Meter> meters,

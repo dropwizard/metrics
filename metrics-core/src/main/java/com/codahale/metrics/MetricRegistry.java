@@ -79,7 +79,6 @@ public class MetricRegistry implements MetricSet {
      * @return {@code metric}
      * @throws IllegalArgumentException if the name is already registered
      */
-    @SuppressWarnings("unchecked")
     public <T extends Metric> T register(String name, T metric) throws IllegalArgumentException {
         if (metric instanceof MetricSet) {
             registerAll(name, (MetricSet) metric);
@@ -211,7 +210,8 @@ public class MetricRegistry implements MetricSet {
      *
      * @return all the gauges in the registry
      */
-    public SortedMap<String, Gauge> getGauges() {
+    @SuppressWarnings("rawtypes")
+	public SortedMap<String, Gauge> getGauges() {
         return getGauges(MetricFilter.ALL);
     }
 
@@ -221,7 +221,8 @@ public class MetricRegistry implements MetricSet {
      * @param filter    the metric filter to match
      * @return all the gauges in the registry
      */
-    public SortedMap<String, Gauge> getGauges(MetricFilter filter) {
+    @SuppressWarnings("rawtypes")
+	public SortedMap<String, Gauge> getGauges(MetricFilter filter) {
         return getMetrics(Gauge.class, filter);
     }
 
