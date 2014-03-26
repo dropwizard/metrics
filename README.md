@@ -1,14 +1,17 @@
-Metrics [![Build Status](https://secure.travis-ci.org/dropwizard/metrics.png)](http://travis-ci.org/dropwizard/metrics)
-=======
+# Android Metrics
 
-*Capturing JVM- and application-level metrics. So you know what's going on.*
+Port of the Metrics library by Coda Hale / Yammer for Android devices.
 
-For more information, please see [the documentation](http://metrics.codahale.com).
+
+For information on the original Java library, please see [the documentation](http://metrics.codahale.com).
 
 
 License
 -------
 
-Copyright (c) 2010-2013 Coda Hale, Yammer.com
+Copyright (c) 2014 EverythingMe.
+
+This project was originally forked from Metrics, by Coda Hale / Yammer, published under the Apache Software License 2.0.
+This project includes achartengine, developed by The 4ViewSoft company, published under the Apache Software License 2.0.
 
 Published under Apache Software License 2.0, see LICENSE

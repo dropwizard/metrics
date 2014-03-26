@@ -1,6 +1,9 @@
-Metrics
-Copyright 2010-2013 Coda Hale and Yammer, Inc.
+Android Metrics
+Copyright 2014 DoAT Media, Inc. (EverythingMe).
 
+Originally forked from Metrics, Copyright 2010-2013 Coda Hale and Yammer, Inc.
+
+This product includes software developed The 4ViewSoft Company.
 This product includes software developed by Coda Hale and Yammer, Inc.
 
 This product includes code derived from the JSR-166 project (ThreadLocalRandom, Striped64,
