@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import me.everything.metrics.charts.R;
 import me.everything.metrics.charts.models.MetricSnapshotMultiTimeSeries;
-import me.everything.metrics.utils.GlobPatternList;
+import me.everything.metrics.filtering.GlobPatternList;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;

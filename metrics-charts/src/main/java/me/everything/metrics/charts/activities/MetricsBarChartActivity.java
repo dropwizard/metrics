@@ -5,8 +5,8 @@ import java.util.Map;
 
 import me.everything.metrics.charts.R;
 import me.everything.metrics.charts.logging.Log;
+import me.everything.metrics.filtering.GlobPatternList;
 import me.everything.metrics.snapshots.MetricSnapshot;
-import me.everything.metrics.utils.GlobPatternList;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;

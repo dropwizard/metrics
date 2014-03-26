@@ -1,4 +1,4 @@
-package me.everything.metrics.utils;
+package me.everything.metrics.filtering;
 
 import java.util.ArrayList;
 

@@ -1,5 +1,7 @@
 package me.everything.metrics.utils;
 
+import me.everything.metrics.filtering.GlobPatternList;
+
 public class MetricPreset {
 
 	private String id = "";
