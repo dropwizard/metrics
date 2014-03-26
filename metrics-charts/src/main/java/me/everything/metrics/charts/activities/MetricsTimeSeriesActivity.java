@@ -2,8 +2,8 @@ package me.everything.metrics.charts.activities;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import me.everything.metrics.charts.MetricSnapshotMultiTimeSeries;
 import me.everything.metrics.charts.R;
+import me.everything.metrics.charts.models.MetricSnapshotMultiTimeSeries;
 import me.everything.metrics.utils.GlobPatternList;
 
 import org.achartengine.ChartFactory;

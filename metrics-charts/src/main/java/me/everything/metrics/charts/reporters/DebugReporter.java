@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 
-import me.everything.metrics.charts.MetricSnapshotMultiTimeSeries;
+import me.everything.metrics.charts.models.MetricSnapshotMultiTimeSeries;
 import me.everything.metrics.snapshots.MetricSnapshot;
 import me.everything.metrics.utils.TimeUtils;
 

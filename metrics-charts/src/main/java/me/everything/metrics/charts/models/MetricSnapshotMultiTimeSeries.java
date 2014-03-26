@@ -1,4 +1,4 @@
-package me.everything.metrics.charts;
+package me.everything.metrics.charts.models;
 
 import java.util.Date;
 import java.util.Map;
@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import me.everything.metrics.charts.logging.Log;
 import me.everything.metrics.snapshots.MetricSnapshot;
+import me.everything.metrics.utils.TimeUtils;
 
 import org.achartengine.model.TimeSeries;
 
@@ -16,7 +17,7 @@ public class MetricSnapshotMultiTimeSeries {
 
 	private long mTimeFirst = 0;
 	private long mTimeLast = 0;
-	private long mWindowSizeMs = 60 * 1000;
+	private long mWindowSizeMs = TimeUtils.SECONDS_IN_MINUTE * TimeUtils.MSECS_IN_SECOND;
 	private ConcurrentHashMap<String, TimeSeries> mAllSeries;
 	
 	public MetricSnapshotMultiTimeSeries() {
