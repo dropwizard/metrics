@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <me.everything.android.widget.MediumTextView
+        android:id="@+id/metricName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Metric Name"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+    
+    <me.everything.android.widget.LightTextView
+        android:id="@+id/metricData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Metric Data"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+</LinearLayout>

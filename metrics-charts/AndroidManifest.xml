@@ -4,7 +4,33 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="11"
         android:targetSdkVersion="18" />
 
+    <!-- Copy these to your application's manifest -->
+    <activity
+        android:name="me.everything.metrics.charts.activities.MetricsListActivity"
+        android:launchMode="singleTop"
+        android:screenOrientation="portrait"
+        android:windowSoftInputMode="stateHidden" >
+    </activity>
+    <activity
+        android:name="me.everything.metrics.charts.activities.MetricsTimeSeriesActivity"
+        android:screenOrientation="sensor"
+        android:launchMode="singleTop"
+        android:windowSoftInputMode="stateHidden" >
+    </activity>
+    <activity
+        android:name="me.everything.metrics.charts.activities.MetricsHistogramActivity"
+        android:launchMode="singleTop"
+        android:screenOrientation="sensor"
+        android:windowSoftInputMode="stateHidden" >
+    </activity>
+    <activity
+        android:name="me.everything.metrics.charts.activities.MetricsBarChartActivity"
+        android:launchMode="singleTop"
+        android:screenOrientation="sensor"
+        android:windowSoftInputMode="stateHidden" >
+    </activity>    
+    
 </manifest>
