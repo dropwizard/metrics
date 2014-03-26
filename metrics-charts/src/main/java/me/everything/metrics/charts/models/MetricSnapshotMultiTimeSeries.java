@@ -111,9 +111,13 @@ public class MetricSnapshotMultiTimeSeries {
 		} else {			
 			int i=0;
 			x = series.getX(i);
-			while ((i < series.getItemCount()) && (x <= threshold)) {
+			while (x <= threshold) {
 				i++;
-				x = series.getX(i);
+				if (i < series.getItemCount()) {
+					x = series.getX(i);
+				} else {
+					break;
+				}
 			} 
 			return i-1;
 		}		
