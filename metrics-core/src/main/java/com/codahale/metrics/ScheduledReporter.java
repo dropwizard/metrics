@@ -81,9 +81,9 @@ public abstract class ScheduledReporter implements Closeable {
      * @param unit   the unit for {@code period}
      */
     public void start(long period, TimeUnit unit) {
-        executor.scheduleAtFixedRate(new Runnable() {
+        executor.scheduleAtFixedRate(new VerboseRunnable() {
             @Override
-            public void run() {
+            public void doRun() {
                 report();
             }
         }, period, period, unit);
