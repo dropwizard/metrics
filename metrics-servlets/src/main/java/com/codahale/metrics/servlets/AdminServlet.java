@@ -27,7 +27,7 @@ public class AdminServlet extends HttpServlet {
                     "    <li><a href=\"{0}{1}?pretty=true\">Metrics</a></li>%n" +
                     "    <li><a href=\"{2}{3}\">Ping</a></li>%n" +
                     "    <li><a href=\"{4}{5}\">Threads</a></li>%n" +
-                    "    <li><a href=\"{6}{7}\">Healthcheck</a></li>%n" +
+                    "    <li><a href=\"{6}{7}?pretty=true\">Healthcheck</a></li>%n" +
                     "  </ul>%n" +
                     "</body>%n" +
                     "</html>"
