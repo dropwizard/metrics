@@ -19,9 +19,9 @@ public class Graphite implements Closeable {
     private final SocketFactory socketFactory;
     private final Charset charset;
 
-    Socket socket;
-    Writer writer;
-    int failures;
+    protected Socket socket;
+    protected Writer writer;
+    protected int failures;
 
     /**
      * Creates a new client which connects to the given address using the default
