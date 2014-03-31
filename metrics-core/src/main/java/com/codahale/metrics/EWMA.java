@@ -19,9 +19,16 @@ public class EWMA {
     private static final int ONE_MINUTE = 1;
     private static final int FIVE_MINUTES = 5;
     private static final int FIFTEEN_MINUTES = 15;
+    
+    private static final int ONE_HOUR = 60;
+    private static final int THREE_HOURS = ONE_HOUR * 3;
+    
     private static final double M1_ALPHA = 1 - exp(-INTERVAL / SECONDS_PER_MINUTE / ONE_MINUTE);
     private static final double M5_ALPHA = 1 - exp(-INTERVAL / SECONDS_PER_MINUTE / FIVE_MINUTES);
     private static final double M15_ALPHA = 1 - exp(-INTERVAL / SECONDS_PER_MINUTE / FIFTEEN_MINUTES);
+    
+    private static final double H1_ALPHA = 1 - exp(-INTERVAL / SECONDS_PER_MINUTE / ONE_HOUR);
+    private static final double H3_ALPHA = 1 - exp(-INTERVAL / SECONDS_PER_MINUTE / THREE_HOURS);
 
     private volatile boolean initialized = false;
     private volatile double rate = 0.0;
@@ -58,7 +65,27 @@ public class EWMA {
     public static EWMA fifteenMinuteEWMA() {
         return new EWMA(M15_ALPHA, INTERVAL, TimeUnit.SECONDS);
     }
-
+    
+    /**
+     * Creates a new EWMA which is equivalent to a one hour load average and which
+     * expects to be ticked every 5 seconds.
+     *
+     * @return a one-hour EWMA
+     */    
+    public static EWMA oneHourEWMA() {
+    	return new EWMA(H1_ALPHA, INTERVAL, TimeUnit.SECONDS);
+    }
+    
+    /**
+     * Creates a new EWMA which is equivalent to a three hour load average and which
+     * expects to be ticked every 5 seconds.
+     *
+     * @return a three-hour EWMA
+     */    
+    public static EWMA threeHourEWMA() {
+    	return new EWMA(H3_ALPHA, INTERVAL, TimeUnit.SECONDS);
+    }
+    
     /**
      * Create a new EWMA with a specific smoothing constant.
      *

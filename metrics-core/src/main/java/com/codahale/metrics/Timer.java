@@ -138,6 +138,16 @@ public class Timer implements Metered, Sampling {
     }
 
     @Override
+    public double getOneHourRate() {
+        return meter.getOneHourRate();
+    }
+
+    @Override
+    public double getThreeHourRate() {
+        return meter.getThreeHourRate();
+    }    
+    
+    @Override
     public Snapshot getSnapshot() {
         return histogram.getSnapshot();
     }

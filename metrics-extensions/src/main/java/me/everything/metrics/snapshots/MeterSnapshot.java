@@ -10,7 +10,7 @@ public class MeterSnapshot extends MetricSnapshot {
 	public static final String MetricType = "Meter";
 	
 	private final long count;		
-	private final double rateMean, rate1min, rate5min, rate15min;	
+	private final double rateMean, rate1min, rate5min, rate15min, rate1hr, rate3hr;	
 	private final String rateUnit;
 
 	public MeterSnapshot(String name, Meter meter, String rateUnit, double rateFactor) {
@@ -23,7 +23,9 @@ public class MeterSnapshot extends MetricSnapshot {
 		rateMean = rateFactor * meter.getMeanRate();
 		rate1min = rateFactor * meter.getOneMinuteRate();
 		rate5min = rateFactor * meter.getFiveMinuteRate();
-		rate15min = rateFactor * meter.getFifteenMinuteRate();	
+		rate15min = rateFactor * meter.getFifteenMinuteRate();
+		rate1hr = rateFactor * meter.getOneHourRate();
+		rate3hr = rateFactor * meter.getThreeHourRate();
 	}
 
 	@Override
@@ -52,6 +54,14 @@ public class MeterSnapshot extends MetricSnapshot {
 		return rate15min;
 	}
 
+	public double rate1hr() {
+		return rate1hr;
+	}
+
+	public double rate3hr() {
+		return rate3hr;
+	}
+	
 	public String rateUnit() {
 		return rateUnit;
 	}
@@ -64,6 +74,8 @@ public class MeterSnapshot extends MetricSnapshot {
 		values.put("rate1min", rate1min());
 		values.put("rate5min", rate5min());
 		values.put("rate15min", rate15min());
+		values.put("rate1hr", rate1hr());
+		values.put("rate3hr", rate3hr());
 		return values;
 	}
 	

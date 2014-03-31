@@ -34,6 +34,11 @@ public interface Metered extends Metric, Counting {
      *         occurred since the meter was created
      */
     double getFiveMinuteRate();
+    
+    
+    double getOneHourRate();
+    
+    double getThreeHourRate();
 
     /**
      * Returns the mean rate at which events have occurred since the meter was created.

@@ -13,7 +13,7 @@ public class TimerSnapshot extends MetricSnapshot {
 	public static final String MetricType = "Timer";
 	
 	public final long count;		
-	private final double rateMean, rate1min, rate5min, rate15min;	
+	private final double rateMean, rate1min, rate5min, rate15min, rate1hr, rate3hr;	
 	private final double min, max, mean, stddev, p25, p50, p75, p90, p95, p99;
 	private final String rateUnit;
 	private final String durationUnit;
@@ -46,6 +46,8 @@ public class TimerSnapshot extends MetricSnapshot {
 		rate1min = rateFactor * timer.getOneMinuteRate();
 		rate5min = rateFactor * timer.getFiveMinuteRate();
 		rate15min = rateFactor * timer.getFifteenMinuteRate();
+		rate1hr = rateFactor * timer.getOneHourRate();
+		rate3hr = rateFactor * timer.getThreeHourRate();
 	}
 
 	@Override
@@ -114,6 +116,14 @@ public class TimerSnapshot extends MetricSnapshot {
 		return rate15min;
 	}
 
+	public double rate1hr() {
+		return rate1hr;
+	}
+
+	public double rate3hr() {
+		return rate3hr;
+	}
+	
 	public String rateUnit() {
 		return rateUnit;
 	}
@@ -137,6 +147,8 @@ public class TimerSnapshot extends MetricSnapshot {
 		values.put("rate1min", rate1min());
 		values.put("rate5min", rate5min());
 		values.put("rate15min", rate15min());
+		values.put("rate1hr", rate1hr());
+		values.put("rate3hr", rate3hr());		
 		return values;
 	}
 

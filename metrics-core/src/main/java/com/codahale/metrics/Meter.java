@@ -4,8 +4,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * A meter metric which measures mean throughput and one-, five-, and fifteen-minute
- * exponentially-weighted moving average throughputs.
+ * A meter metric which measures mean throughput and one-, five-, and fifteen-minute,
+ * as well as one- and three-hour exponentially-weighted moving average throughputs.
  *
  * @see EWMA
  */
@@ -15,6 +15,8 @@ public class Meter implements Metered {
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
     private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
     private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
+    private final EWMA h1Rate = EWMA.oneHourEWMA();
+    private final EWMA h3Rate = EWMA.threeHourEWMA();
 
     private final LongAdder count = new LongAdder();
     private final long startTime;
@@ -57,6 +59,8 @@ public class Meter implements Metered {
         m1Rate.update(n);
         m5Rate.update(n);
         m15Rate.update(n);
+        h1Rate.update(n);
+        h3Rate.update(n);
     }
 
     private void tickIfNecessary() {
@@ -71,6 +75,8 @@ public class Meter implements Metered {
                     m1Rate.tick();
                     m5Rate.tick();
                     m15Rate.tick();
+                    h1Rate.tick();
+                    h3Rate.tick();
                 }
             }
         }
@@ -93,6 +99,18 @@ public class Meter implements Metered {
         return m5Rate.getRate(TimeUnit.SECONDS);
     }
 
+    @Override
+    public double getOneHourRate() {
+        tickIfNecessary();
+        return h1Rate.getRate(TimeUnit.SECONDS);
+    }
+
+    @Override
+    public double getThreeHourRate() {
+        tickIfNecessary();
+        return h3Rate.getRate(TimeUnit.SECONDS);
+    }
+    
     @Override
     public double getMeanRate() {
         if (getCount() == 0) {
