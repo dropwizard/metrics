@@ -55,7 +55,7 @@ public class MetricsModule extends Module {
                               JsonGenerator json,
                               SerializerProvider provider) throws IOException {
             json.writeStartObject();
-            json.writeNumberField("count", counter.getCount());
+            json.writeNumberField("value", counter.getCount());
             json.writeEndObject();
         }
     }
@@ -119,13 +119,13 @@ public class MetricsModule extends Module {
                               SerializerProvider provider) throws IOException {
             json.writeStartObject();
             json.writeNumberField("count", meter.getCount());
-            json.writeNumberField("m15_rate", meter.getFifteenMinuteRate() * rateFactor);
-            json.writeNumberField("m1_rate", meter.getOneMinuteRate() * rateFactor);
-            json.writeNumberField("m5_rate", meter.getFiveMinuteRate() * rateFactor);
-            json.writeNumberField("h1_rate", meter.getOneHourRate() * rateFactor);
-            json.writeNumberField("h3_rate", meter.getThreeHourRate() * rateFactor);
-            json.writeNumberField("mean_rate", meter.getMeanRate() * rateFactor);
-            json.writeStringField("units", rateUnit);
+            json.writeNumberField("rateMean", meter.getMeanRate() * rateFactor);
+            json.writeNumberField("rate1Min", meter.getOneMinuteRate() * rateFactor);
+            json.writeNumberField("rate5Min", meter.getFiveMinuteRate() * rateFactor);
+            json.writeNumberField("rate15Min", meter.getFifteenMinuteRate() * rateFactor);
+            json.writeNumberField("rate1Hour", meter.getOneHourRate() * rateFactor);
+            json.writeNumberField("rate3Hour", meter.getThreeHourRate() * rateFactor);
+            json.writeStringField("unitsRate", rateUnit);
             json.writeEndObject();
         }
     }
@@ -177,14 +177,14 @@ public class MetricsModule extends Module {
             }
 
             json.writeNumberField("stddev", snapshot.getStdDev() * durationFactor);
-            json.writeNumberField("m15_rate", timer.getFifteenMinuteRate() * rateFactor);
-            json.writeNumberField("m1_rate", timer.getOneMinuteRate() * rateFactor);
-            json.writeNumberField("m5_rate", timer.getFiveMinuteRate() * rateFactor);
-            json.writeNumberField("h1_rate", timer.getOneHourRate() * rateFactor);
-            json.writeNumberField("h3_rate", timer.getThreeHourRate() * rateFactor);            
-            json.writeNumberField("mean_rate", timer.getMeanRate() * rateFactor);
-            json.writeStringField("duration_units", durationUnit);
-            json.writeStringField("rate_units", rateUnit);
+            json.writeNumberField("rateMean", timer.getMeanRate() * rateFactor);
+            json.writeNumberField("rate1Min", timer.getOneMinuteRate() * rateFactor);
+            json.writeNumberField("rate5Min", timer.getFiveMinuteRate() * rateFactor);
+            json.writeNumberField("rate15Min", timer.getFifteenMinuteRate() * rateFactor);
+            json.writeNumberField("rate1Hour", timer.getOneHourRate() * rateFactor);
+            json.writeNumberField("rate3Hour", timer.getThreeHourRate() * rateFactor);            
+            json.writeStringField("unitsDuration", durationUnit);
+            json.writeStringField("unitsRate", rateUnit);
             json.writeEndObject();
         }
     }
