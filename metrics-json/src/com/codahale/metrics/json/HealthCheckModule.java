@@ -1,17 +1,10 @@
 package com.codahale.metrics.json;
 
-import java.io.IOException;
-import java.util.Arrays;
-
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleSerializers;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 public class HealthCheckModule extends Module {
+	/*
     private static class HealthCheckResultSerializer extends StdSerializer<HealthCheck.Result> {
         private HealthCheckResultSerializer() {
             super(HealthCheck.Result.class);
@@ -52,6 +45,7 @@ public class HealthCheckModule extends Module {
             }
         }
     }
+	 */
 
     @Override
     public String getModuleName() {
@@ -65,8 +59,10 @@ public class HealthCheckModule extends Module {
 
     @Override
     public void setupModule(SetupContext context) {
+    	/*
         context.addSerializers(new SimpleSerializers(Arrays.<JsonSerializer<?>>asList(
                 new HealthCheckResultSerializer()
         )));
+        */
     }
 }
