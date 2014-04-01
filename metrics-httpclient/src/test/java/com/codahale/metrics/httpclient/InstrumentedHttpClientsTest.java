@@ -3,6 +3,7 @@ package com.codahale.metrics.httpclient;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricRegistryListener;
 import com.codahale.metrics.Timer;
+import org.apache.http.HttpRequest;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.junit.Before;
@@ -13,14 +14,14 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
-public class InstrumentedHttpClientTest {
+public class InstrumentedHttpClientsTest {
     private final HttpClientMetricNameStrategy metricNameStrategy =
             mock(HttpClientMetricNameStrategy.class);
     private final MetricRegistryListener registryListener =
             mock(MetricRegistryListener.class);
     private final MetricRegistry metricRegistry = new MetricRegistry();
     private final HttpClient client =
-            new InstrumentedHttpClient(metricRegistry, metricNameStrategy);
+            InstrumentedHttpClients.createDefault(metricRegistry, metricNameStrategy);
 
     @Before
     public void setUp() throws Exception {
@@ -32,7 +33,7 @@ public class InstrumentedHttpClientTest {
         final HttpGet get = new HttpGet("http://example.com?q=anything");
         final String metricName = "some.made.up.metric.name";
 
-        when(metricNameStrategy.getNameFor(anyString(), eq(get)))
+        when(metricNameStrategy.getNameFor(anyString(), any(HttpRequest.class)))
                 .thenReturn(metricName);
 
         client.execute(get);
