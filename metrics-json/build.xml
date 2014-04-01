@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="metrics-json" default="help">
+   <property environment="env" />
+   <echo>Obfuscation is ${env.OBFUSCATE}</echo>
+   <property name="proguard.enabled" value="${env.OBFUSCATE}" />
+    <!-- The local.properties file is created and updated by the 'android' tool.
+         It contains the path to the SDK. It should *NOT* be checked into
+         Version Control Systems. -->
+    <property file="local.properties" />
+
+    <!-- The ant.properties file can be created by you. It is only edited by the
+         'android' tool to add properties to it.
+         This is the place to change some Ant specific build properties.
+         Here are some properties you may want to change/update:
+
+         source.dir
+             The name of the source directory. Default is 'src'.
+         out.dir
+             The name of the output directory. Default is 'bin'.
+
+         For other overridable properties, look at the beginning of the rules
+         files in the SDK, at tools/ant/build.xml
+
+         Properties related to the SDK location or the project target should
+         be updated using the 'android' tool with the 'update' action.
+
+         This file is an integral part of the build system for your
+         application and should be checked into Version Control Systems.
+
+         -->
+    <property file="ant.properties" />
+
+    <!-- The project.properties file is created and updated by the 'android'
+         tool, as well as ADT.
+
+         This contains project specific properties such as project target, and library
+         dependencies. Lower level build properties are stored in ant.properties
+         (or in .classpath for Eclipse projects).
+
+         This file is an integral part of the build system for your
+         application and should be checked into Version Control Systems. -->
+    <loadproperties srcFile="project.properties" />
+
+    <!-- quick check on sdk.dir -->
+    <fail
+            message="sdk.dir is missing. Make sure to generate local.properties using 'android update project' or to inject it through an env var"
+            unless="sdk.dir"
+    />
+    
+    
+
+
+<!-- extension targets. Uncomment the ones where you want to do custom work
+     in between standard targets -->
+
+    <target name="-pre-build">
+        <echo message="The base directory is: ${basedir}"/>  
+        <echo message="The ant file is: ${ant.file}"/>
+        <echo message="The Ant version is: ${ant.version}"/> 
+        <echo message="The Project name is: ${ant.project.name}"/> 
+        <echo message="The Java version is: ${ant.java.version}"/> 
+        <echo message=">>>>>>>> ${sdk.dir}/tools/ant/build.xml"/>
+        <exec executable="sh" outputproperty="app.version">      <arg value="-c" />      <arg value="cat VERSION" />    </exec>
+        <echo>Changing versionName in AndroidManifest.xml to v${app.version}.${env.BUILD_NUMBER}</echo>
+        <replaceregexp file="AndroidManifest.xml" match='(android:versionName=.*\")' replace="android:versionName=&quot;${app.version}.${env.BUILD_NUMBER}&quot;"/>
+        <echo>Changing versionCode in AndroidManifest.xml to ${env.BUILD_NUMBER}</echo>
+        <replaceregexp file="AndroidManifest.xml" match='(android:versionCode=.*\")' replace="android:versionCode=&quot;${env.BUILD_NUMBER}&quot;"/>
+    </target>
+    <!-- 
+    <target name="clean" depends="android_rules.clean">
+        <exec executable="${ndk.dir}/ndk-build" failonerror="true">
+            <arg value="clean"/>
+        </exec>
+    </target>
+     -->
+<!--
+    /* This is typically used for code obfuscation.
+       Compiled code location: ${out.classes.absolute.dir}
+       If this is not done in place, override ${out.dex.input.absolute.dir} */
+    <target name="-post-compile">
+    </target>
+-->
+
+    <!-- Import the actual build file.
+
+         To customize existing targets, there are two options:
+         - Customize only one target:
+             - copy/paste the target into this file, *before* the
+               <import> task.
+             - customize it to your needs.
+         - Customize the whole content of build.xml
+             - copy/paste the content of the rules files (minus the top node)
+               into this file, replacing the <import> task.
+             - customize to your needs.
+
+         ***********************
+         ****** IMPORTANT ******
+         ***********************
+         In all cases you must update the value of version-tag below to read 'custom' instead of an integer,
+         in order to avoid having your file be overridden by tools such as "android update project"
+    -->
+    <!-- version-tag: 1 -->
+<import file="${sdk.dir}/tools/ant/build.xml" />
+    
+    <target name="MetricsJson" description="build the internal classes" depends="-setup">
+          <echo>adding classes-debug-full</echo>
+          <classpath refid="classes-debug-full"/>
+    </target>
+        
+</project>
