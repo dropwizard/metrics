@@ -80,6 +80,16 @@ public class Snapshot {
         return values.length;
     }
 
+
+    /**
+     * Returns the value at the 25th percentile in the distribution.
+     *
+     * @return the value at the 25th percentile
+     */
+    public double get25thPercentile() {
+        return getValue(0.25);
+    }
+    
     /**
      * Returns the median value in the distribution.
      *
@@ -87,6 +97,15 @@ public class Snapshot {
      */
     public double getMedian() {
         return getValue(0.5);
+    }
+    
+    /**
+     * Returns the value at the 50th percentile (median) in the distribution.
+     *
+     * @return the value at the 50th percentile (median)
+     */
+    public double get50thPercentile() {
+    	return getValue(0.5);
     }
 
     /**
@@ -98,6 +117,15 @@ public class Snapshot {
         return getValue(0.75);
     }
 
+    /**
+     * Returns the value at the 90th percentile in the distribution.
+     *
+     * @return the value at the 90th percentile
+     */
+    public double get90thPercentile() {
+        return getValue(0.90);
+    }
+    
     /**
      * Returns the value at the 95th percentile in the distribution.
      *

@@ -78,10 +78,19 @@ public class MetricsModule extends Module {
             json.writeNumberField("max", snapshot.getMax());
             json.writeNumberField("mean", snapshot.getMean());
             json.writeNumberField("min", snapshot.getMin());
+            
+    		json.writeNumberField("p10", snapshot.getValue(0.1));
+    		json.writeNumberField("p20", snapshot.getValue(0.2));
+    		json.writeNumberField("p30", snapshot.getValue(0.3));
+    		json.writeNumberField("p40", snapshot.getValue(0.4));
             json.writeNumberField("p50", snapshot.getMedian());
+            json.writeNumberField("p60", snapshot.getValue(0.6));
+            json.writeNumberField("p70", snapshot.getValue(0.7));
+            json.writeNumberField("p80", snapshot.getValue(0.8));
+            json.writeNumberField("p90", snapshot.getValue(0.9));
+            
             json.writeNumberField("p75", snapshot.get75thPercentile());
             json.writeNumberField("p95", snapshot.get95thPercentile());
-            json.writeNumberField("p98", snapshot.get98thPercentile());
             json.writeNumberField("p99", snapshot.get99thPercentile());
             json.writeNumberField("p999", snapshot.get999thPercentile());
 
@@ -150,10 +159,11 @@ public class MetricsModule extends Module {
             json.writeNumberField("mean", snapshot.getMean() * durationFactor);
             json.writeNumberField("min", snapshot.getMin() * durationFactor);
 
+            json.writeNumberField("p25", snapshot.get25thPercentile() * durationFactor);
             json.writeNumberField("p50", snapshot.getMedian() * durationFactor);
             json.writeNumberField("p75", snapshot.get75thPercentile() * durationFactor);
+            json.writeNumberField("p90", snapshot.get90thPercentile() * durationFactor);
             json.writeNumberField("p95", snapshot.get95thPercentile() * durationFactor);
-            json.writeNumberField("p98", snapshot.get98thPercentile() * durationFactor);
             json.writeNumberField("p99", snapshot.get99thPercentile() * durationFactor);
             json.writeNumberField("p999", snapshot.get999thPercentile() * durationFactor);
 
