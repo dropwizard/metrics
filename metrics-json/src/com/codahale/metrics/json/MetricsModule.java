@@ -113,6 +113,8 @@ public class MetricsModule extends Module {
             json.writeNumberField("m15_rate", meter.getFifteenMinuteRate() * rateFactor);
             json.writeNumberField("m1_rate", meter.getOneMinuteRate() * rateFactor);
             json.writeNumberField("m5_rate", meter.getFiveMinuteRate() * rateFactor);
+            json.writeNumberField("h1_rate", meter.getOneHourRate() * rateFactor);
+            json.writeNumberField("h3_rate", meter.getThreeHourRate() * rateFactor);
             json.writeNumberField("mean_rate", meter.getMeanRate() * rateFactor);
             json.writeStringField("units", rateUnit);
             json.writeEndObject();
@@ -168,6 +170,8 @@ public class MetricsModule extends Module {
             json.writeNumberField("m15_rate", timer.getFifteenMinuteRate() * rateFactor);
             json.writeNumberField("m1_rate", timer.getOneMinuteRate() * rateFactor);
             json.writeNumberField("m5_rate", timer.getFiveMinuteRate() * rateFactor);
+            json.writeNumberField("h1_rate", timer.getOneHourRate() * rateFactor);
+            json.writeNumberField("h3_rate", timer.getThreeHourRate() * rateFactor);            
             json.writeNumberField("mean_rate", timer.getMeanRate() * rateFactor);
             json.writeStringField("duration_units", durationUnit);
             json.writeStringField("rate_units", rateUnit);
