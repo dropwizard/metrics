@@ -1,5 +1,18 @@
 package com.codahale.metrics.json;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Snapshot;
+import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -7,12 +20,6 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleSerializers;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.codahale.metrics.*;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 public class MetricsModule extends Module {
     static final Version VERSION = new Version(3, 0, 0, "", "com.codahale.metrics", "metrics-json");
