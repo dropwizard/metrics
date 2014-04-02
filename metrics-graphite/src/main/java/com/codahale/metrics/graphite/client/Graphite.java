@@ -1,7 +1,10 @@
-package com.codahale.metrics.graphite;
+package com.codahale.metrics.graphite.client;
 
 import javax.net.SocketFactory;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;

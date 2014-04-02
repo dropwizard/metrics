@@ -1,6 +1,7 @@
 package com.codahale.metrics.graphite;
 
 import com.codahale.metrics.*;
+import com.codahale.metrics.graphite.client.GraphiteClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,9 +106,9 @@ public class GraphiteReporter extends ScheduledReporter {
 
         /**
          * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
-         * given {@link Graphite} client.
+         * given {@link com.codahale.metrics.graphite.client.Graphite} client.
          *
-         * @param graphite a {@link Graphite} client
+         * @param graphite a {@link com.codahale.metrics.graphite.client.Graphite} client
          * @return a {@link GraphiteReporter}
          */
         public GraphiteReporter build(GraphiteClient graphite) {

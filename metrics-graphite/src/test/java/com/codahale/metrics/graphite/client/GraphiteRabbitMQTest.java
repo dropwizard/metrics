@@ -1,4 +1,4 @@
-package com.codahale.metrics.graphite;
+package com.codahale.metrics.graphite.client;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;

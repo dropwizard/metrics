@@ -23,7 +23,6 @@
         <module>metrics-ehcache</module>
         <module>metrics-ganglia</module>
         <module>metrics-graphite</module>
-        <module>metrics-graphite-amqp</module>
         <module>metrics-httpclient</module>
         <module>metrics-jdbi</module>
         <module>metrics-jersey</module>

@@ -1,4 +1,4 @@
-package com.codahale.metrics.graphite;
+package com.codahale.metrics.graphite.client;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -28,6 +28,7 @@ public interface GraphiteClient extends Closeable {
 
     /**
      * Sanitizes a string
+     *
      * @param s the string to sanitize
      * @return
      */

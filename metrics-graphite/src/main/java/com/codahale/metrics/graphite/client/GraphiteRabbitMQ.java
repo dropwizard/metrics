@@ -1,14 +1,13 @@
-package com.codahale.metrics.graphite;
-
-import java.io.*;
-import java.net.Socket;
-import java.nio.charset.Charset;
-import java.util.regex.Pattern;
-
+package com.codahale.metrics.graphite.client;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.nio.charset.Charset;
+import java.util.regex.Pattern;
 
 /**
  * A rabbit-mq client to a Carbon server.
@@ -31,10 +30,10 @@ public class GraphiteRabbitMQ implements GraphiteClient {
     private int failures;
 
     /**
-     * Creates a new client with a given a {@link ConnectionFactory} and an amqp exchange
+     * Creates a new client with a given a {@link com.rabbitmq.client.ConnectionFactory} and an amqp exchange
      *
-     * @param connectionFactory the {@link ConnectionFactory} used to establish connection and publish to graphite server
-     * @param exchange the amqp exchange
+     * @param connectionFactory the {@link com.rabbitmq.client.ConnectionFactory} used to establish connection and publish to graphite server
+     * @param exchange          the amqp exchange
      */
     public GraphiteRabbitMQ(final ConnectionFactory connectionFactory, final String exchange) {
         this.connectionFactory = connectionFactory;
@@ -44,11 +43,11 @@ public class GraphiteRabbitMQ implements GraphiteClient {
     /**
      * Creates a new client given connection details
      *
-     * @param rabbitHost        the rabbitmq server host
-     * @param rabbitPort        the rabbitmq server port
-     * @param rabbitUsername    the rabbitmq server username
-     * @param rabbitPassword    the rabbitmq server password
-     * @param exchange          the amqp exchange
+     * @param rabbitHost     the rabbitmq server host
+     * @param rabbitPort     the rabbitmq server port
+     * @param rabbitUsername the rabbitmq server username
+     * @param rabbitPassword the rabbitmq server password
+     * @param exchange       the amqp exchange
      */
     public GraphiteRabbitMQ(
             final String rabbitHost,
@@ -70,13 +69,13 @@ public class GraphiteRabbitMQ implements GraphiteClient {
     /**
      * Creates a new client given connection details
      *
-     * @param rabbitHost the rabbitmq server host
-     * @param rabbitPort the rabbitmq server port
-     * @param rabbitUsername the rabbitmq server username
-     * @param rabbitPassword the rabbitmq server password
-     * @param exchange the amqp exchange
-     * @param rabbitConnectionTimeoutMS the connection timeout in milliseconds
-     * @param rabbitSocketTimeoutMS the socket timeout in milliseconds
+     * @param rabbitHost                        the rabbitmq server host
+     * @param rabbitPort                        the rabbitmq server port
+     * @param rabbitUsername                    the rabbitmq server username
+     * @param rabbitPassword                    the rabbitmq server password
+     * @param exchange                          the amqp exchange
+     * @param rabbitConnectionTimeoutMS         the connection timeout in milliseconds
+     * @param rabbitSocketTimeoutMS             the socket timeout in milliseconds
      * @param rabbitRequestedHeartbeatInSeconds the hearthbeat in seconds
      */
     public GraphiteRabbitMQ(
@@ -109,9 +108,9 @@ public class GraphiteRabbitMQ implements GraphiteClient {
 
     /**
      * (non-Javadoc)
-     * @see com.codahale.metrics.graphite.GraphiteClient#connect()
      *
      * @throws IllegalStateException if the client is already connected
+     * @see com.codahale.metrics.graphite.client.GraphiteClient#connect()
      */
     @Override
     public void connect() throws IllegalStateException, IOException {
@@ -125,7 +124,8 @@ public class GraphiteRabbitMQ implements GraphiteClient {
 
     /**
      * (non-Javadoc)
-     * @see com.codahale.metrics.graphite.GraphiteClient#send(String, String, long)
+     *
+     * @see com.codahale.metrics.graphite.client.GraphiteClient#send(String, String, long)
      */
     @Override
     public void send(String name, String value, long timestamp) throws IOException {
@@ -148,7 +148,8 @@ public class GraphiteRabbitMQ implements GraphiteClient {
 
     /**
      * (non-Javadoc)
-     * @see com.codahale.metrics.graphite.GraphiteClient#close()
+     *
+     * @see com.codahale.metrics.graphite.client.GraphiteClient#close()
      */
     @Override
     public void close() throws IOException {
@@ -159,7 +160,8 @@ public class GraphiteRabbitMQ implements GraphiteClient {
 
     /**
      * (non-Javadoc)
-     * @see com.codahale.metrics.graphite.GraphiteClient#sanitize(String)
+     *
+     * @see com.codahale.metrics.graphite.client.GraphiteClient#sanitize(String)
      */
     @Override
     public String sanitize(String s) {
