@@ -116,6 +116,18 @@ public class Graphite implements Closeable {
         return failures;
     }
 
+    /**
+     * Returns the prefix which is included with the metric name
+     * of the form <prefix>.<metric-name> <value> \n
+     */
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
     @Override
     public void close() throws IOException {
         if (socket != null) {
