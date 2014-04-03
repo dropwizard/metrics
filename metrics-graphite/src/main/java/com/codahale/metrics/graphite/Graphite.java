@@ -24,7 +24,7 @@ public class Graphite implements Closeable {
     protected Writer writer;
     protected int failures;
 
-    protected String metricPrefix;
+    protected String prefix;
 
     /**
      * Creates a new client which connects to the given address using the default
