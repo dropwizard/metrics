@@ -16,13 +16,15 @@ public class Graphite implements Closeable {
     // this may be optimistic about Carbon/Graphite
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
-    private final InetSocketAddress address;
-    private final SocketFactory socketFactory;
-    private final Charset charset;
+    protected final InetSocketAddress address;
+    protected final SocketFactory socketFactory;
+    protected final Charset charset;
 
-    private Socket socket;
-    private Writer writer;
-    private int failures;
+    protected Socket socket;
+    protected Writer writer;
+    protected int failures;
+
+    protected String prefix;
 
     /**
      * Creates a new client which connects to the given address using the default
@@ -86,6 +88,11 @@ public class Graphite implements Closeable {
      */
     public void send(String name, String value, long timestamp) throws IOException {
         try {
+            //you can use the prefix in some situations for the API key
+            if (prefix != null && !prefix.isEmpty()) {
+                writer.write(sanitize(prefix));
+                writer.write('.');
+            }
             writer.write(sanitize(name));
             writer.write(' ');
             writer.write(sanitize(value));
@@ -107,6 +114,18 @@ public class Graphite implements Closeable {
      */
     public int getFailures() {
         return failures;
+    }
+
+    /**
+     * Returns the prefix which is included with the metric name
+     * of the form <prefix>.<metric-name> <value> \n
+     */
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 
     @Override
