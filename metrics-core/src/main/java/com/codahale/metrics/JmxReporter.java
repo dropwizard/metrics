@@ -508,7 +508,7 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onGaugeAdded(String name, Gauge<?> gauge) {
+        public void onGaugeAdded(MetricName name, Gauge<?> gauge) {
             try {
                 if (filter.matches(name, gauge)) {
                     final ObjectName objectName = createName("gauges", name);
@@ -522,7 +522,7 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onGaugeRemoved(String name) {
+        public void onGaugeRemoved(MetricName name) {
             try {
                 final ObjectName objectName = createName("gauges", name);
                 unregisterMBean(objectName);
@@ -534,7 +534,7 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onCounterAdded(String name, Counter counter) {
+        public void onCounterAdded(MetricName name, Counter counter) {
             try {
                 if (filter.matches(name, counter)) {
                     final ObjectName objectName = createName("counters", name);
@@ -548,7 +548,7 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onCounterRemoved(String name) {
+        public void onCounterRemoved(MetricName name) {
             try {
                 final ObjectName objectName = createName("counters", name);
                 unregisterMBean(objectName);
@@ -560,7 +560,7 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onHistogramAdded(String name, Histogram histogram) {
+        public void onHistogramAdded(MetricName name, Histogram histogram) {
             try {
                 if (filter.matches(name, histogram)) {
                     final ObjectName objectName = createName("histograms", name);
@@ -574,7 +574,7 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onHistogramRemoved(String name) {
+        public void onHistogramRemoved(MetricName name) {
             try {
                 final ObjectName objectName = createName("histograms", name);
                 unregisterMBean(objectName);
@@ -586,11 +586,11 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onMeterAdded(String name, Meter meter) {
+        public void onMeterAdded(MetricName name, Meter meter) {
             try {
                 if (filter.matches(name, meter)) {
                     final ObjectName objectName = createName("meters", name);
-                    registerMBean(new JmxMeter(meter, objectName, timeUnits.rateFor(name)), objectName);
+                    registerMBean(new JmxMeter(meter, objectName, timeUnits.rateFor(name.getKey())), objectName);
                 }
             } catch (InstanceAlreadyExistsException e) {
                 LOGGER.debug("Unable to register meter", e);
@@ -600,7 +600,7 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onMeterRemoved(String name) {
+        public void onMeterRemoved(MetricName name) {
             try {
                 final ObjectName objectName = createName("meters", name);
                 unregisterMBean(objectName);
@@ -612,11 +612,11 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onTimerAdded(String name, Timer timer) {
+        public void onTimerAdded(MetricName name, Timer timer) {
             try {
                 if (filter.matches(name, timer)) {
                     final ObjectName objectName = createName("timers", name);
-                    registerMBean(new JmxTimer(timer, objectName, timeUnits.rateFor(name), timeUnits.durationFor(name)), objectName);
+                    registerMBean(new JmxTimer(timer, objectName, timeUnits.rateFor(name.getKey()), timeUnits.durationFor(name.getKey())), objectName);
                 }
             } catch (InstanceAlreadyExistsException e) {
                 LOGGER.debug("Unable to register timer", e);
@@ -626,7 +626,7 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onTimerRemoved(String name) {
+        public void onTimerRemoved(MetricName name) {
             try {
                 final ObjectName objectName = createName("timers", name);
                 unregisterMBean(objectName);
@@ -637,12 +637,12 @@ public class JmxReporter implements Reporter, Closeable {
             }
         }
 
-        private ObjectName createName(String type, String name) {
+        private ObjectName createName(String type, MetricName name) {
             try {
-                return new ObjectName(this.name, "name", name);
+                return new ObjectName(this.name, "name", name.getKey());
             } catch (MalformedObjectNameException e) {
                 try {
-                    return new ObjectName(this.name, "name", ObjectName.quote(name));
+                    return new ObjectName(this.name, "name", ObjectName.quote(name.getKey()));
                 } catch (MalformedObjectNameException e1) {
                     LOGGER.warn("Unable to register {} {}", type, name, e1);
                     throw new RuntimeException(e1);

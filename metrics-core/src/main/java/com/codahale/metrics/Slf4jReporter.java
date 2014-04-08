@@ -127,33 +127,33 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     @Override
-    public void report(SortedMap<String, Gauge> gauges,
-                       SortedMap<String, Counter> counters,
-                       SortedMap<String, Histogram> histograms,
-                       SortedMap<String, Meter> meters,
-                       SortedMap<String, Timer> timers) {
-        for (Entry<String, Gauge> entry : gauges.entrySet()) {
+    public void report(SortedMap<MetricName, Gauge> gauges,
+                       SortedMap<MetricName, Counter> counters,
+                       SortedMap<MetricName, Histogram> histograms,
+                       SortedMap<MetricName, Meter> meters,
+                       SortedMap<MetricName, Timer> timers) {
+        for (Entry<MetricName, Gauge> entry : gauges.entrySet()) {
             logGauge(entry.getKey(), entry.getValue());
         }
 
-        for (Entry<String, Counter> entry : counters.entrySet()) {
+        for (Entry<MetricName, Counter> entry : counters.entrySet()) {
             logCounter(entry.getKey(), entry.getValue());
         }
 
-        for (Entry<String, Histogram> entry : histograms.entrySet()) {
+        for (Entry<MetricName, Histogram> entry : histograms.entrySet()) {
             logHistogram(entry.getKey(), entry.getValue());
         }
 
-        for (Entry<String, Meter> entry : meters.entrySet()) {
+        for (Entry<MetricName, Meter> entry : meters.entrySet()) {
             logMeter(entry.getKey(), entry.getValue());
         }
 
-        for (Entry<String, Timer> entry : timers.entrySet()) {
+        for (Entry<MetricName, Timer> entry : timers.entrySet()) {
             logTimer(entry.getKey(), entry.getValue());
         }
     }
 
-    private void logTimer(String name, Timer timer) {
+    private void logTimer(MetricName name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
         logger.info(marker,
                     "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, " +
@@ -179,7 +179,7 @@ public class Slf4jReporter extends ScheduledReporter {
                     getDurationUnit());
     }
 
-    private void logMeter(String name, Meter meter) {
+    private void logMeter(MetricName name, Meter meter) {
         logger.info(marker,
                     "type=METER, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
                     name,
@@ -191,7 +191,7 @@ public class Slf4jReporter extends ScheduledReporter {
                     getRateUnit());
     }
 
-    private void logHistogram(String name, Histogram histogram) {
+    private void logHistogram(MetricName name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
         logger.info(marker,
                     "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, " +
@@ -210,11 +210,11 @@ public class Slf4jReporter extends ScheduledReporter {
                     snapshot.get999thPercentile());
     }
 
-    private void logCounter(String name, Counter counter) {
+    private void logCounter(MetricName name, Counter counter) {
         logger.info(marker, "type=COUNTER, name={}, count={}", name, counter.getCount());
     }
 
-    private void logGauge(String name, Gauge gauge) {
+    private void logGauge(MetricName name, Gauge gauge) {
         logger.info(marker, "type=GAUGE, name={}, value={}", name, gauge.getValue());
     }
 

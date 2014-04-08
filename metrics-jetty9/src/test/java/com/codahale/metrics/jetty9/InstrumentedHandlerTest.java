@@ -1,6 +1,8 @@
 package com.codahale.metrics.jetty9;
 
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
+
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.server.Server;
@@ -48,30 +50,32 @@ public class InstrumentedHandlerTest {
         assertThat(response.getStatus())
                 .isEqualTo(404);
 
+        final MetricName prefix = MetricName.build("org.eclipse.jetty.server.handler.DefaultHandler.handler");
+        
         assertThat(registry.getNames())
                 .containsOnly(
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.1xx-responses",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.2xx-responses",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.3xx-responses",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.4xx-responses",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.5xx-responses",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.requests",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.active-suspended",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.async-dispatches",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.async-timeouts",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.get-requests",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.put-requests",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.active-dispatches",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.trace-requests",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.other-requests",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.connect-requests",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.dispatches",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.head-requests",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.post-requests",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.options-requests",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.active-requests",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.delete-requests",
-                        "org.eclipse.jetty.server.handler.DefaultHandler.handler.move-requests"
+                        prefix.resolve("1xx-responses"),
+                        prefix.resolve("2xx-responses"),
+                        prefix.resolve("3xx-responses"),
+                        prefix.resolve("4xx-responses"),
+                        prefix.resolve("5xx-responses"),
+                        prefix.resolve("requests"),
+                        prefix.resolve("active-suspended"),
+                        prefix.resolve("async-dispatches"),
+                        prefix.resolve("async-timeouts"),
+                        prefix.resolve("get-requests"),
+                        prefix.resolve("put-requests"),
+                        prefix.resolve("active-dispatches"),
+                        prefix.resolve("trace-requests"),
+                        prefix.resolve("other-requests"),
+                        prefix.resolve("connect-requests"),
+                        prefix.resolve("dispatches"),
+                        prefix.resolve("head-requests"),
+                        prefix.resolve("post-requests"),
+                        prefix.resolve("options-requests"),
+                        prefix.resolve("active-requests"),
+                        prefix.resolve("delete-requests"),
+                        prefix.resolve("move-requests")
                 );
     }
 }

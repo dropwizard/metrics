@@ -8,7 +8,7 @@ import static org.mockito.Mockito.mock;
 public class MetricFilterTest {
     @Test
     public void theAllFilterMatchesAllMetrics() throws Exception {
-        assertThat(MetricFilter.ALL.matches("", mock(Metric.class)))
+        assertThat(MetricFilter.ALL.matches(MetricName.build(""), mock(Metric.class)))
                 .isTrue();
     }
 }
