@@ -22,4 +22,4 @@ the many third-party libraries which extend Metrics:
 * `metrics-influxdb <https://github.com/novaquark/metrics-influxdb>`_ provides a reporter which announces measurements to `InfluxDB <http://influxdb.org/>`_
 * `metrics-cdi <https://github.com/astefanutti/metrics-cdi>`_ provides integration with `CDI <http://www.cdi-spec.org/>`_ environments
 * `metrics-aspectj <https://github.com/astefanutti/metrics-aspectj>`_ provides integration with `AspectJ <http://eclipse.org/aspectj/>`_
-* `camel-metrics <https://github.com/InitiumIo/camel-metrics>` _ provides metrics based component for your `Apache Camel <https://camel.apache.org/>`_ route.
+* `camel-metrics <https://github.com/InitiumIo/camel-metrics>`_ provides component for your `Apache Camel <https://camel.apache.org/>`_ route
