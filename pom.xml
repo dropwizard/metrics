@@ -44,6 +44,7 @@
         <jackson.version>2.2.2</jackson.version>
         <jetty8.version>8.1.11.v20130520</jetty8.version>
         <jetty9.version>9.0.4.v20130625</jetty9.version>
+        <rabbitmq.version>3.2.4</rabbitmq.version>
     </properties>
 
     <developers>

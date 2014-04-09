@@ -1,5 +1,6 @@
-package com.codahale.metrics.graphite;
+package com.codahale.metrics.graphite.client;
 
+import com.codahale.metrics.graphite.client.Graphite;
 import org.junit.Before;
 import org.junit.Test;
 

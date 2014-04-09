@@ -1,6 +1,7 @@
 package com.codahale.metrics.graphite;
 
 import com.codahale.metrics.*;
+import com.codahale.metrics.graphite.client.GraphiteClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,30 +106,30 @@ public class GraphiteReporter extends ScheduledReporter {
 
         /**
          * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
-         * given {@link Graphite} client.
+         * given {@link com.codahale.metrics.graphite.client.Graphite} client.
          *
-         * @param graphite a {@link Graphite} client
+         * @param graphite a {@link com.codahale.metrics.graphite.client.Graphite} client
          * @return a {@link GraphiteReporter}
          */
-        public GraphiteReporter build(Graphite graphite) {
+        public GraphiteReporter build(GraphiteClient graphite) {
             return new GraphiteReporter(registry,
-                                        graphite,
-                                        clock,
-                                        prefix,
-                                        rateUnit,
-                                        durationUnit,
-                                        filter);
+                    graphite,
+                    clock,
+                    prefix,
+                    rateUnit,
+                    durationUnit,
+                    filter);
         }
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphiteReporter.class);
 
-    private final Graphite graphite;
+    private final GraphiteClient graphite;
     private final Clock clock;
     private final String prefix;
 
     private GraphiteReporter(MetricRegistry registry,
-                             Graphite graphite,
+                             GraphiteClient graphite,
                              Clock clock,
                              String prefix,
                              TimeUnit rateUnit,
@@ -189,26 +190,26 @@ public class GraphiteReporter extends ScheduledReporter {
         graphite.send(prefix(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
         graphite.send(prefix(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);
         graphite.send(prefix(name, "stddev"),
-                      format(convertDuration(snapshot.getStdDev())),
-                      timestamp);
+                format(convertDuration(snapshot.getStdDev())),
+                timestamp);
         graphite.send(prefix(name, "p50"),
-                      format(convertDuration(snapshot.getMedian())),
-                      timestamp);
+                format(convertDuration(snapshot.getMedian())),
+                timestamp);
         graphite.send(prefix(name, "p75"),
-                      format(convertDuration(snapshot.get75thPercentile())),
-                      timestamp);
+                format(convertDuration(snapshot.get75thPercentile())),
+                timestamp);
         graphite.send(prefix(name, "p95"),
-                      format(convertDuration(snapshot.get95thPercentile())),
-                      timestamp);
+                format(convertDuration(snapshot.get95thPercentile())),
+                timestamp);
         graphite.send(prefix(name, "p98"),
-                      format(convertDuration(snapshot.get98thPercentile())),
-                      timestamp);
+                format(convertDuration(snapshot.get98thPercentile())),
+                timestamp);
         graphite.send(prefix(name, "p99"),
-                      format(convertDuration(snapshot.get99thPercentile())),
-                      timestamp);
+                format(convertDuration(snapshot.get99thPercentile())),
+                timestamp);
         graphite.send(prefix(name, "p999"),
-                      format(convertDuration(snapshot.get999thPercentile())),
-                      timestamp);
+                format(convertDuration(snapshot.get999thPercentile())),
+                timestamp);
 
         reportMetered(name, timer, timestamp);
     }
@@ -216,17 +217,17 @@ public class GraphiteReporter extends ScheduledReporter {
     private void reportMetered(String name, Metered meter, long timestamp) throws IOException {
         graphite.send(prefix(name, "count"), format(meter.getCount()), timestamp);
         graphite.send(prefix(name, "m1_rate"),
-                      format(convertRate(meter.getOneMinuteRate())),
-                      timestamp);
+                format(convertRate(meter.getOneMinuteRate())),
+                timestamp);
         graphite.send(prefix(name, "m5_rate"),
-                      format(convertRate(meter.getFiveMinuteRate())),
-                      timestamp);
+                format(convertRate(meter.getFiveMinuteRate())),
+                timestamp);
         graphite.send(prefix(name, "m15_rate"),
-                      format(convertRate(meter.getFifteenMinuteRate())),
-                      timestamp);
+                format(convertRate(meter.getFifteenMinuteRate())),
+                timestamp);
         graphite.send(prefix(name, "mean_rate"),
-                      format(convertRate(meter.getMeanRate())),
-                      timestamp);
+                format(convertRate(meter.getMeanRate())),
+                timestamp);
     }
 
     private void reportHistogram(String name, Histogram histogram, long timestamp) throws IOException {

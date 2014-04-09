@@ -1,7 +1,10 @@
-package com.codahale.metrics.graphite;
+package com.codahale.metrics.graphite.client;
 
 import javax.net.SocketFactory;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -11,7 +14,7 @@ import java.util.regex.Pattern;
 /**
  * A client to a Carbon server.
  */
-public class Graphite implements Closeable {
+public class Graphite implements GraphiteClient {
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
     // this may be optimistic about Carbon/Graphite
     private static final Charset UTF_8 = Charset.forName("UTF-8");
@@ -64,6 +67,7 @@ public class Graphite implements Closeable {
      * @throws IllegalStateException if the client is already connected
      * @throws IOException           if there is an error connecting
      */
+    @Override
     public void connect() throws IllegalStateException, IOException {
         if (socket != null) {
             throw new IllegalStateException("Already connected");
@@ -84,6 +88,7 @@ public class Graphite implements Closeable {
      * @param timestamp the timestamp of the metric
      * @throws IOException if there was an error sending the metric
      */
+    @Override
     public void send(String name, String value, long timestamp) throws IOException {
         try {
             writer.write(sanitize(name));
@@ -118,7 +123,8 @@ public class Graphite implements Closeable {
         this.writer = null;
     }
 
-    protected String sanitize(String s) {
+    @Override
+    public String sanitize(String s) {
         return WHITESPACE.matcher(s).replaceAll("-");
     }
 }

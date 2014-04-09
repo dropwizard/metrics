@@ -1,6 +1,7 @@
 package com.codahale.metrics.graphite;
 
 import com.codahale.metrics.*;
+import com.codahale.metrics.graphite.client.Graphite;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
