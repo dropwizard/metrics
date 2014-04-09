@@ -114,7 +114,7 @@ public class GraphiteRabbitMQ implements GraphiteClient {
      */
     @Override
     public void connect() throws IllegalStateException, IOException {
-        if (connection != null) {
+        if (connection != null && connection.isOpen()) {
             throw new IllegalStateException("Already connected");
         }
 
