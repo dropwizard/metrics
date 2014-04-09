@@ -35,6 +35,7 @@ public class GraphiteRabbitMQTest
     public void setUp() throws Exception {
         when(connectionFactory.newConnection()).thenReturn(connection);
         when(connection.createChannel()).thenReturn(channel);
+        when(connection.isOpen()).thenReturn(true);
 
         when(bogusConnectionFactory.newConnection()).thenReturn(bogusConnection);
         when(bogusConnection.createChannel()).thenReturn(bogusChannel);
