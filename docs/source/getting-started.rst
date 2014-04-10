@@ -15,7 +15,7 @@ Getting Started
 Setting Up Maven
 ================
 
-Just add the ``metrics-core`` library as a dependency:
+You need the ``metrics-core`` library as a dependency:
 
 .. code-block:: xml
 
@@ -33,6 +33,107 @@ Just add the ``metrics-core`` library as a dependency:
     which is |release|.
 
 Now it's time to add some metrics to your application!
+
+.. _gs-meters:
+
+Meters
+======
+
+A meter measures the rate of events over time (e.g., "requests per second"). In addition to the mean
+rate, meters also track 1-, 5-, and 15-minute moving averages.
+
+.. code-block:: java
+
+    private final Meter requests = metrics.meter("requests");
+
+    public void handleRequest(Request request, Response response) {
+        requests.mark();
+        // etc
+    }
+
+This meter will measure the rate of requests in requests per second.
+
+.. _gs-reporter:
+
+Console Reporter
+================
+
+A Console Reporter is exactly what it sounds like - report to the console.
+This reporter will print every second.
+
+.. code-block:: java
+  
+     ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics)
+            .convertRatesTo(TimeUnit.SECONDS)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .build();
+        reporter.start(1, TimeUnit.SECONDS);
+    
+.. _gs-complete:
+
+Complete getting started
+========================
+
+So the complete Getting Started is
+
+.. code-block:: java
+    
+    package sample;
+    import com.codahale.metrics.*;
+    import java.util.concurrent.TimeUnit;
+
+    public class GetStarted {
+      static final MetricRegistry metrics = new MetricRegistry();
+      public static void main(String args[]) {
+        startReport();
+        Meter requests = metrics.meter("requests");
+        requests.mark();
+        wait5Seconds();
+      }
+
+    static void startReport() {
+        ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics)
+            .convertRatesTo(TimeUnit.SECONDS)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .build();
+        reporter.start(1, TimeUnit.SECONDS);
+    }
+
+    static void wait5Seconds() {
+        try {
+            Thread.sleep(5*1000);
+        }
+        catch(InterruptedException e) {}
+    }
+  }
+
+
+.. code-block:: xml
+
+  <?xml version="1.0" encoding="UTF-8"?>
+  <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>sample</artifactId>
+    <groupId>somegroup</groupId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Sapmels for Metrics</name>
+
+    <dependencies>
+      <dependency>
+        <groupId>com.codahale.metrics</groupId>
+        <artifactId>metrics-core</artifactId>
+        <version>3.0.1</version>
+      </dependency>
+    </dependencies>
+  </project>
+
+To run
+
+.. code-block:: sh
+
+  mvn package exec:java -Dexec.mainClass=sample.First
+
 
 .. _gs-registry:
 
@@ -122,24 +223,6 @@ same name.
 Also, we've statically imported ``MetricRegistry``'s ``name`` method in this scope to reduce
 clutter.
 
-.. _gs-meters:
-
-Meters
-======
-
-A meter measures the rate of events over time (e.g., "requests per second"). In addition to the mean
-rate, meters also track 1-, 5-, and 15-minute moving averages.
-
-.. code-block:: java
-
-    private final Meter requests = metrics.meter(name(RequestHandler.class, "requests"));
-
-    public void handleRequest(Request request, Response response) {
-        requests.mark();
-        // etc
-    }
-
-This meter will measure the rate of requests in requests per second.
 
 .. _gs-histograms:
 
