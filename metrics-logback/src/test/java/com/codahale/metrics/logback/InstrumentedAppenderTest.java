@@ -8,6 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -111,4 +112,30 @@ public class InstrumentedAppenderTest {
         assertThat(registry.meter(METRIC_NAME_PREFIX + ".info").getCount())
                 .isEqualTo(1);
     }
+
+    @Test
+    public void usesDefaultRegistry() throws Exception {
+      SharedMetricRegistries.add(InstrumentedAppender.DEFAULT_REGISTRY, registry);
+      final InstrumentedAppender shared = new InstrumentedAppender();
+      shared.start();
+      shared.doAppend(event);
+
+      assertThat(SharedMetricRegistries.names().contains(InstrumentedAppender.DEFAULT_REGISTRY));
+      assertThat(registry.meter(METRIC_NAME_PREFIX + ".info").getCount())
+              .isEqualTo(1);
+    }
+
+    @Test
+    public void usesRegistryFromProperty() throws Exception {
+      SharedMetricRegistries.add("something_else", registry);
+      System.setProperty(InstrumentedAppender.REGISTRY_PROPERTY_NAME, "something_else");
+      final InstrumentedAppender shared = new InstrumentedAppender();
+      shared.start();
+      shared.doAppend(event);
+
+      assertThat(SharedMetricRegistries.names().contains("something_else"));
+      assertThat(registry.meter(METRIC_NAME_PREFIX + ".info").getCount())
+              .isEqualTo(1);
+    }
+
 }
