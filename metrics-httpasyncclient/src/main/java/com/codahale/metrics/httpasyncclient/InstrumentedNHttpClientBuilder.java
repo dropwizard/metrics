@@ -6,8 +6,6 @@ import com.codahale.metrics.httpclient.HttpClientMetricNameStrategies;
 import com.codahale.metrics.httpclient.HttpClientMetricNameStrategy;
 import java.io.IOException;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.concurrent.FutureCallback;
