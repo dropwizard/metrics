@@ -121,7 +121,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
     public Snapshot getSnapshot() {
         lockForRegularUsage();
         try {
-            return new Snapshot(values.values());
+            return new UniformSnapshot(values.values());
         } finally {
             unlockForRegularUsage();
         }
