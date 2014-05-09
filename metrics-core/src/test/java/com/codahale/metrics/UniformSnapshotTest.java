@@ -145,41 +145,41 @@ public class UniformSnapshotTest {
 
     @Test
     public void calculatesAMinOfZeroForAnEmptySnapshot() throws Exception {
-        final Snapshot snapshot = new UniformSnapshot(new long[]{ });
+        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{ });
 
-        assertThat(snapshot.getMin())
+        assertThat(emptySnapshot.getMin())
                 .isZero();
     }
 
     @Test
     public void calculatesAMaxOfZeroForAnEmptySnapshot() throws Exception {
-        final Snapshot snapshot = new UniformSnapshot(new long[]{ });
+        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{ });
 
-        assertThat(snapshot.getMax())
+        assertThat(emptySnapshot.getMax())
                 .isZero();
     }
 
     @Test
     public void calculatesAMeanOfZeroForAnEmptySnapshot() throws Exception {
-        final Snapshot snapshot = new UniformSnapshot(new long[]{ });
+        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{ });
 
-        assertThat(snapshot.getMean())
+        assertThat(emptySnapshot.getMean())
                 .isZero();
     }
 
     @Test
     public void calculatesAStdDevOfZeroForAnEmptySnapshot() throws Exception {
-        final Snapshot snapshot = new UniformSnapshot(new long[]{ });
+        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{ });
 
-        assertThat(snapshot.getStdDev())
+        assertThat(emptySnapshot.getStdDev())
                 .isZero();
     }
 
     @Test
     public void calculatesAStdDevOfZeroForASingletonSnapshot() throws Exception {
-        final Snapshot snapshot = new UniformSnapshot(new long[]{ 1 });
+        final Snapshot singleItemSnapshot = new UniformSnapshot(new long[]{ 1 });
 
-        assertThat(snapshot.getStdDev())
+        assertThat(singleItemSnapshot.getStdDev())
                 .isZero();
     }
 }
