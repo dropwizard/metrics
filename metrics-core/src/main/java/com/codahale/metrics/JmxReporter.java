@@ -33,7 +33,7 @@ public class JmxReporter implements Reporter, Closeable {
      */
     public static class Builder {
         private final MetricRegistry registry;
-        private MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        private MBeanServer mBeanServer;
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter = MetricFilter.ALL;
@@ -129,6 +129,9 @@ public class JmxReporter implements Reporter, Closeable {
          */
         public JmxReporter build() {
             final MetricTimeUnits timeUnits = new MetricTimeUnits(rateUnit, durationUnit, specificRateUnits, specificDurationUnits);
+            if (mBeanServer==null) {
+            	mBeanServer = ManagementFactory.getPlatformMBeanServer();
+            }
             return new JmxReporter(mBeanServer, domain, registry, filter, timeUnits);
         }
     }
