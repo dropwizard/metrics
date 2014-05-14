@@ -118,6 +118,7 @@ public class InstrumentedAppenderTest {
       SharedMetricRegistries.add(InstrumentedAppender.DEFAULT_REGISTRY, registry);
       final InstrumentedAppender shared = new InstrumentedAppender();
       shared.start();
+      when(event.getLevel()).thenReturn(Level.INFO);
       shared.doAppend(event);
 
       assertThat(SharedMetricRegistries.names().contains(InstrumentedAppender.DEFAULT_REGISTRY));
@@ -131,6 +132,7 @@ public class InstrumentedAppenderTest {
       System.setProperty(InstrumentedAppender.REGISTRY_PROPERTY_NAME, "something_else");
       final InstrumentedAppender shared = new InstrumentedAppender();
       shared.start();
+      when(event.getLevel()).thenReturn(Level.INFO);
       shared.doAppend(event);
 
       assertThat(SharedMetricRegistries.names().contains("something_else"));
