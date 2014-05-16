@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 
+import java.net.UnknownHostException;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -277,6 +278,22 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.timer.m5_rate", "4.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.m15_rate", "5.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.mean_rate", "2.00", timestamp);
+        inOrder.verify(graphite).close();
+
+        verifyNoMoreInteractions(graphite);
+    }
+
+    @Test
+    public void closesConnectionIfGraphiteIsUnavailable() throws Exception {
+        doThrow(new UnknownHostException("UNKNOWN-HOST")).when(graphite).connect();
+        reporter.report(map("gauge", gauge(1)),
+            this.<Counter>map(),
+            this.<Histogram>map(),
+            this.<Meter>map(),
+            this.<Timer>map());
+
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).connect();
         inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);

@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
  * {@code #fancyName(String)} method is invoked, the meter will be marked.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ ElementType.TYPE, ElementType.METHOD })
 public @interface Metered {
     /**
      * The name of the meter.
