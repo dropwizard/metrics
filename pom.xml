@@ -7,7 +7,7 @@
 
     <groupId>com.codahale.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>3.1.0-FORKED-9</version>
+    <version>3.1.0-FORKED-10-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
