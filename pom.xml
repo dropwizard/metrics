@@ -7,7 +7,7 @@
 
     <groupId>com.codahale.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>3.1.0-FORKED-10-SNAPSHOT</version>
+    <version>3.1.0-FORKED-10</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
@@ -69,7 +69,7 @@
         <connection>scm:git:ssh://github.com/infusionsoft/yammer-metrics.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/infusionsoft/yammer-metrics.git</developerConnection>
         <url>https://github.com/infusionsoft/yammer-metrics.git</url>
-        <tag>HEAD</tag>
+        <tag>v3.1.0-FORKED-10</tag>
     </scm>
 
     <issueManagement>
