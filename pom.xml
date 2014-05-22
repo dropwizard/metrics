@@ -66,9 +66,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git://github.com/codahale/metrics.git</connection>
-        <developerConnection>scm:git:git@github.com:codahale/metrics.git</developerConnection>
-        <url>http://github.com/codahale/metrics/</url>
+        <connection>scm:git:ssh://github.com/infusionsoft/yammer-metrics.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/infusionsoft/yammer-metrics.git</developerConnection>
+        <url>https://github.com/infusionsoft/yammer-metrics.git</url>
         <tag>HEAD</tag>
     </scm>
 
