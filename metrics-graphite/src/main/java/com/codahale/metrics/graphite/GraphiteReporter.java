@@ -1,16 +1,6 @@
 package com.codahale.metrics.graphite;
 
-import com.codahale.metrics.Clock;
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.Histogram;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.Metered;
-import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.ScheduledReporter;
-import com.codahale.metrics.Snapshot;
-import com.codahale.metrics.Timer;
+import com.codahale.metrics.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +8,11 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * A reporter which publishes metric values to a Graphite server.
@@ -27,6 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @see <a href="http://graphite.wikidot.com/">Graphite - Scalable Realtime Graphing</a>
  */
 public class GraphiteReporter extends ScheduledReporter {
+
     /**
      * Returns a new {@link Builder} for {@link GraphiteReporter}.
      *
@@ -43,14 +37,16 @@ public class GraphiteReporter extends ScheduledReporter {
      * not filtering metrics.
      */
     public static class Builder {
+
         private final MetricRegistry registry;
+
+        private ScheduledExecutorService executorService;
         private MetricRegistry reportingRegistry;
         private Clock clock;
         private String prefix;
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
-        private String threadName;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -60,7 +56,11 @@ public class GraphiteReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
-            this.threadName = "";
+        }
+
+        public Builder executorService(ScheduledExecutorService executorService) {
+            this.executorService = executorService;
+            return this;
         }
 
         /**
@@ -118,12 +118,7 @@ public class GraphiteReporter extends ScheduledReporter {
             return this;
         }
 
-        public Builder namedThread(String threadName){
-            this.threadName = threadName;
-            return this;
-        }
-
-        public Builder reportingRegistry(MetricRegistry registry){
+        public Builder reportingRegistry(MetricRegistry registry) {
             this.reportingRegistry = registry;
             return this;
         }
@@ -136,15 +131,16 @@ public class GraphiteReporter extends ScheduledReporter {
          * @return a {@link GraphiteReporter}
          */
         public GraphiteReporter build(Graphite graphite) {
-            return new GraphiteReporter(registry,
-                                        reportingRegistry,
-                                        graphite,
-                                        clock,
-                                        prefix,
-                                        rateUnit,
-                                        durationUnit,
-                                        filter,
-                                        threadName);
+            return new GraphiteReporter(
+                    executorService,
+                    registry,
+                    reportingRegistry,
+                    graphite,
+                    clock,
+                    prefix,
+                    rateUnit,
+                    durationUnit,
+                    filter);
         }
     }
 
@@ -153,26 +149,24 @@ public class GraphiteReporter extends ScheduledReporter {
     private final Graphite graphite;
     private final Clock clock;
     private final String prefix;
-    private final MetricRegistry reportingRegistry;
 
     private final AtomicLong connectDurationMS = new AtomicLong(0);
     private final AtomicLong publishDurationMS = new AtomicLong(0);
     private final AtomicLong payloadSize = new AtomicLong(0);
 
-    private GraphiteReporter(MetricRegistry registry,
-                             MetricRegistry reportingRegistry,
-                             Graphite graphite,
-                             Clock clock,
-                             String prefix,
-                             TimeUnit rateUnit,
-                             TimeUnit durationUnit,
-                             MetricFilter filter,
-                             String threadName) {
-        super(registry, threadName(threadName), filter, rateUnit, durationUnit);
+    private GraphiteReporter(ScheduledExecutorService executor,
+                                    MetricRegistry registry,
+                                    MetricRegistry reportingRegistry,
+                                    Graphite graphite,
+                                    Clock clock,
+                                    String prefix,
+                                    TimeUnit rateUnit,
+                                    TimeUnit durationUnit,
+                                    MetricFilter filter) {
+        super(registry, executor, filter, rateUnit, durationUnit);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
-        this.reportingRegistry = reportingRegistry;
 
         configurePublishingMetrics(reportingRegistry);
     }
@@ -180,11 +174,11 @@ public class GraphiteReporter extends ScheduledReporter {
     /**
      * The publisher tracks connection time, publish time, and payload size.  These metrics lag real
      * time by one publishing period.
-     *
+     * <p/>
      * Meaning, at time T, this records how long it took to connect and publish the data that report's
      * size.  At T+1, the values from T are sent with T+1's report.
      */
-    private void configurePublishingMetrics(MetricRegistry registry){
+    private void configurePublishingMetrics(MetricRegistry registry) {
         final Gauge<Long> connectionGauge = new Gauge<Long>() {
             @Override
             public Long getValue() {
@@ -215,15 +209,6 @@ public class GraphiteReporter extends ScheduledReporter {
         registry.register("GraphiteReporter.networkPayloadBytes", payloadGauge);
     }
 
-    private static String threadName(String name){
-        String threadName = "graphite-reporter";
-        if(name != null && !name.isEmpty()){
-            threadName = threadName + "-" + name;
-        }
-
-        return threadName;
-    }
-
     @Override
     public void report(SortedMap<String, Gauge> gauges,
                        SortedMap<String, Counter> counters,
@@ -241,27 +226,27 @@ public class GraphiteReporter extends ScheduledReporter {
             graphite.connect();
             connectTime = clock.getTime();
 
-            if(LOGGER.isInfoEnabled()) { LOGGER.info("Gauges     : " + gauges.size()); }
+            if (LOGGER.isInfoEnabled()) { LOGGER.info("Gauges     : " + gauges.size()); }
             for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
                 bytesSent += reportGauge(entry.getKey(), entry.getValue(), timestamp);
             }
 
-            if(LOGGER.isInfoEnabled()) { LOGGER.info("Counters   : " + counters.size()); }
+            if (LOGGER.isInfoEnabled()) { LOGGER.info("Counters   : " + counters.size()); }
             for (Map.Entry<String, Counter> entry : counters.entrySet()) {
                 bytesSent += reportCounter(entry.getKey(), entry.getValue(), timestamp);
             }
 
-            if(LOGGER.isInfoEnabled()) { LOGGER.info("Histograms : " + histograms.size()); }
+            if (LOGGER.isInfoEnabled()) { LOGGER.info("Histograms : " + histograms.size()); }
             for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
                 bytesSent += reportHistogram(entry.getKey(), entry.getValue(), timestamp);
             }
 
-            if(LOGGER.isInfoEnabled()) { LOGGER.info("Meters     : " + meters.size()); }
+            if (LOGGER.isInfoEnabled()) { LOGGER.info("Meters     : " + meters.size()); }
             for (Map.Entry<String, Meter> entry : meters.entrySet()) {
                 bytesSent += reportMetered(entry.getKey(), entry.getValue(), timestamp);
             }
 
-            if(LOGGER.isInfoEnabled()) { LOGGER.info("Timers     : " + timers.size()); }
+            if (LOGGER.isInfoEnabled()) { LOGGER.info("Timers     : " + timers.size()); }
             for (Map.Entry<String, Timer> entry : timers.entrySet()) {
                 bytesSent += reportTimer(entry.getKey(), entry.getValue(), timestamp);
             }
@@ -269,23 +254,18 @@ public class GraphiteReporter extends ScheduledReporter {
             payloadSize.set(bytesSent);
 
         } catch (IOException e) {
-            reportingRegistry.meter("GraphiteReporter.Errors." + e.getClass().getSimpleName());
             LOGGER.warn("Unable to report to Graphite", graphite, e);
-        } catch (Exception e) {
-            reportingRegistry.meter("GraphiteReporter.Errors." + e.getClass().getSimpleName());
-            LOGGER.error("Unable to report metrics to Graphite", graphite, e);
+
         } finally {
             try {
-
                 publishDurationMS.set(clock.getTime() - startTime);
-                if(connectTime > 0){
+                if (connectTime > 0) {
                     connectDurationMS.set(clock.getTime() - connectTime);
                 }
 
                 graphite.close();
-
             } catch (IOException e) {
-                LOGGER.debug("Error disconnecting from Graphite", graphite, e);
+                LOGGER.warn("Error disconnecting from Graphite", graphite, e);
             }
         }
     }
@@ -391,7 +371,7 @@ public class GraphiteReporter extends ScheduledReporter {
     }
 
     private String prefix(String... components) {
-        return MetricRegistry.name(prefix, components);
+        return name(prefix, components);
     }
 
     private String format(long n) {
