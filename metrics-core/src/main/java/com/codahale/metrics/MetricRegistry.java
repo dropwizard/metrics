@@ -114,6 +114,46 @@ public class MetricRegistry implements MetricSet {
     /**
      * Creates a new {@link Counter} and registers it under the given name.
      *
+     * @param name the name of the metric
+     * @return a new {@link Counter}
+     */
+    public Counter counter(String name) {
+        return getOrAdd(name, MetricBuilder.COUNTERS);
+    }
+
+    /**
+     * Creates a new {@link Histogram} and registers it under the given name.
+     *
+     * @param name the name of the metric
+     * @return a new {@link Histogram}
+     */
+    public Histogram histogram(String name) {
+        return getOrAdd(name, MetricBuilder.HISTOGRAMS);
+    }
+
+    /**
+     * Creates a new {@link Meter} and registers it under the given name.
+     *
+     * @param name the name of the metric
+     * @return a new {@link Meter}
+     */
+    public Meter meter(String name) {
+        return getOrAdd(name, MetricBuilder.METERS);
+    }
+
+    /**
+     * Creates a new {@link Timer} and registers it under the given name.
+     *
+     * @param name the name of the metric
+     * @return a new {@link Timer}
+     */
+    public Timer timer(String name) {
+        return getOrAdd(name, MetricBuilder.TIMERS);
+    }
+
+    /**
+     * Creates a new {@link Counter} and registers it under the given name.
+     *
      * @param name     the first element of the name
      * @param names    the remaining elements of the name
      * @return a new {@link Counter}
