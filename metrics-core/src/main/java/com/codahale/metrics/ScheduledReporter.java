@@ -1,5 +1,6 @@
 package com.codahale.metrics;
 
+import org.slf4j.LoggerFactory;
 import java.io.Closeable;
 import java.util.Locale;
 import java.util.SortedMap;
@@ -86,7 +87,12 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
         executor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                report();
+                try {
+                    report();
+                } catch (RuntimeException e) {
+                    LoggerFactory.getLogger(getClass()).error("An unexpected error occurred attempting to report metrics.", e);
+                    throw e;
+                }
             }
         }, period, period, unit);
     }
