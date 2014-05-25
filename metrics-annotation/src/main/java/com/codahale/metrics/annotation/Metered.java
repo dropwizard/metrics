@@ -23,12 +23,12 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE, ElementType.METHOD })
 public @interface Metered {
     /**
-     * The name of the meter.
+     * @return The name of the meter.
      */
     String name() default "";
 
     /**
-     * If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
+     * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
      * relative to the annotated class.
      */
     boolean absolute() default false;

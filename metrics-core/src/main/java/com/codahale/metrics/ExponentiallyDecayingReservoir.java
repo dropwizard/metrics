@@ -58,6 +58,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
      * @param size  the number of samples to keep in the sampling reservoir
      * @param alpha the exponential decay factor; the higher this is, the more biased the reservoir
      *              will be towards newer values
+     * @param clock the clock used to timestamp samples and track rescaling
      */
     public ExponentiallyDecayingReservoir(int size, double alpha, Clock clock) {
         this.values = new ConcurrentSkipListMap<Double, Long>();

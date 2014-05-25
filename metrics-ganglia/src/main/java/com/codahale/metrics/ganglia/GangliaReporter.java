@@ -125,7 +125,7 @@ public class GangliaReporter extends ScheduledReporter {
          * Builds a {@link GangliaReporter} with the given properties, announcing metrics to the
          * given {@link GMetric} client.
          *
-         * @param ganglia the client to use for announcing metrics
+         * @param gmetric the client to use for announcing metrics
          * @return a {@link GangliaReporter}
          */
         public GangliaReporter build(GMetric gmetric) {
@@ -136,7 +136,7 @@ public class GangliaReporter extends ScheduledReporter {
          * Builds a {@link GangliaReporter} with the given properties, announcing metrics to the
          * given {@link GMetric} client.
          *
-         * @param ganglia the clients to use for announcing metrics
+         * @param gmetrics the clients to use for announcing metrics
          * @return a {@link GangliaReporter}
          */
         public GangliaReporter build(GMetric... gmetrics) {

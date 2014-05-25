@@ -67,6 +67,8 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      *                 reporter will report
      * @param name     the reporter's name
      * @param filter   the filter for which metrics to report
+     * @param rateUnit a unit of time 
+     * @param durationUnit a unit of time
      */
     protected ScheduledReporter(MetricRegistry registry,
                                 String name,
