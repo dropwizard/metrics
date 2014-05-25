@@ -151,6 +151,14 @@
                             <additionalparam>-Xdoclint:all -Xdoclint:-html</additionalparam>
                         </configuration>
                     </plugin>
+                    <!-- disable findbugs for Java 8 as it is not yet supported (May 2014) -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>findbugs-maven-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
