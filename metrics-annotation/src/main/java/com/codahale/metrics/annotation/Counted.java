@@ -27,17 +27,18 @@ import java.lang.annotation.Target;
 public @interface Counted {
 
     /**
-     * The name of the counter.
+     * @return The name of the counter.
      */
     String name() default "";
 
     /**
-     * If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
+     * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
      * relative to the annotated class.
      */
     boolean absolute() default false;
 
     /**
+     * @return 
      * If {@code false} (default), the counter is decremented when the annotated
      * method returns, counting current invocations of the annotated method.
      * If {@code true}, the counter increases monotonically, counting total

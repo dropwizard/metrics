@@ -82,7 +82,7 @@ public class HealthCheckRegistry {
 
     /**
      * Runs the registered health checks in parallel and returns a map of the results.
-     *
+     * @param   executor object to launch and track health checks progress
      * @return a map of the health check results
      */
     public SortedMap<String, HealthCheck.Result> runHealthChecks(ExecutorService executor) {

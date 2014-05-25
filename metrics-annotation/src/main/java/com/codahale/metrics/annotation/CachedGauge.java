@@ -30,23 +30,23 @@ import java.util.concurrent.TimeUnit;
 public @interface CachedGauge {
 
     /**
-     * The name of the counter.
+     * @return The name of the counter.
      */
     String name() default "";
 
     /**
-     * If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
+     * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
      * relative to the annotated class.
      */
     boolean absolute() default false;
 
     /**
-     * The amount of time to cache the result
+     * @return The amount of time to cache the result
      */
     long timeout();
 
     /**
-     * The unit of timeout
+     * @return The unit of timeout
      */
     TimeUnit timeoutUnit() default TimeUnit.MILLISECONDS;
 

@@ -43,19 +43,19 @@ public @interface ExceptionMetered {
     String DEFAULT_NAME_SUFFIX = "exceptions";
 
     /**
-     * The name of the meter. If not specified, the meter will be given a name based on the method
+     * @return The name of the meter. If not specified, the meter will be given a name based on the method
      * it decorates and the suffix "Exceptions".
      */
     String name() default "";
 
     /**
-     * If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
+     * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
      * relative to the annotated class.
      */
     boolean absolute() default false;
 
     /**
-     * The type of exceptions that the meter will catch and count.
+     * @return The type of exceptions that the meter will catch and count.
      */
     Class<? extends Throwable> cause() default Exception.class;
 }
