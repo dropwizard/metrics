@@ -22,6 +22,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
      * and a set of gauges for Ehcache's built-in statistics:
      * <p/>
      * <table>
+     * <caption>Ehcache timered metrics</caption>
      * <tr>
      * <td>{@code hits}</td>
      * <td>The number of times a requested item was found in the

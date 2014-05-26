@@ -27,12 +27,12 @@ public class MetricsServlet extends HttpServlet {
      */
     public static abstract class ContextListener implements ServletContextListener {
         /**
-         * Returns the {@link MetricRegistry} to inject into the servlet context.
+         * @return the {@link MetricRegistry} to inject into the servlet context.
          */
         protected abstract MetricRegistry getMetricRegistry();
 
         /**
-         * Returns the {@link TimeUnit} to which rates should be converted, or {@code null} if the
+         * @return the {@link TimeUnit} to which rates should be converted, or {@code null} if the
          * default should be used.
          */
         protected TimeUnit getRateUnit() {
@@ -41,7 +41,7 @@ public class MetricsServlet extends HttpServlet {
         }
 
         /**
-         * Returns the {@link TimeUnit} to which durations should be converted, or {@code null} if
+         * @return the {@link TimeUnit} to which durations should be converted, or {@code null} if
          * the default should be used.
          */
         protected TimeUnit getDurationUnit() {
@@ -50,7 +50,7 @@ public class MetricsServlet extends HttpServlet {
         }
 
         /**
-         * Returns the {@code Access-Control-Allow-Origin} header value, if any.
+         * @return the {@code Access-Control-Allow-Origin} header value, if any.
          */
         protected String getAllowedOrigin() {
             // use the default
@@ -58,7 +58,7 @@ public class MetricsServlet extends HttpServlet {
         }
 
         /**
-         * Returns the {@link MetricFilter} that shall be used to filter metrics, or {@link MetricFilter#ALL} if
+         * @return the {@link MetricFilter} that shall be used to filter metrics, or {@link MetricFilter#ALL} if
          * the default should be used.
          */
         protected MetricFilter getMetricFilter() {

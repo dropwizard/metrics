@@ -19,17 +19,17 @@ import java.util.concurrent.ExecutorService;
 @Deprecated
 public abstract class AdminServletContextListener implements ServletContextListener {
     /**
-     * Returns the {@link MetricRegistry} to inject into the servlet context.
+     * @return the {@link MetricRegistry} to inject into the servlet context.
      */
     protected abstract MetricRegistry getMetricRegistry();
 
     /**
-     * Returns the {@link HealthCheckRegistry} to inject into the servlet context.
+     * @return the {@link HealthCheckRegistry} to inject into the servlet context.
      */
     protected abstract HealthCheckRegistry getHealthCheckRegistry();
 
     /**
-     * Returns the {@link ExecutorService} to inject into the servlet context, or {@code null} if
+     * @return the {@link ExecutorService} to inject into the servlet context, or {@code null} if
      * the health checks should be run in the servlet worker thread.
      */
     protected ExecutorService getExecutorService() {

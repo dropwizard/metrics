@@ -12,7 +12,7 @@ import javax.servlet.ServletContextListener;
  */
 public abstract class InstrumentedFilterContextListener implements ServletContextListener {
     /**
-     * Returns the {@link MetricRegistry} to inject into the servlet context.
+     * @return the {@link MetricRegistry} to inject into the servlet context.
      */
     protected abstract MetricRegistry getMetricRegistry();
 
