@@ -135,6 +135,34 @@
 
     <profiles>
         <profile>
+            <id>doclint-java8-disable</id>
+            <activation>
+                <jdk>[1.8,</jdk>
+            </activation>
+
+            <build>
+                <plugins>
+                    <!-- java 8 doclint html verification is excluded to suppress strict HTML 4.0 compliance errors 
+                         like "error: self-closing element not allowed <p/>"   -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <additionalparam>-Xdoclint:all -Xdoclint:-html</additionalparam>
+                        </configuration>
+                    </plugin>
+                    <!-- disable findbugs for Java 8 as it is not yet supported (May 2014) -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>findbugs-maven-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>release-sign-artifacts</id>
             <activation>
                 <property>
