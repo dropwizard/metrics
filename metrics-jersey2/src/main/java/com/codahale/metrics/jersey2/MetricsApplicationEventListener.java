@@ -6,7 +6,6 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
-import org.glassfish.jersey.server.ExtendedUriInfo;
 import org.glassfish.jersey.server.model.ResourceMethod;
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
 import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
@@ -78,21 +77,21 @@ public class MetricsApplicationEventListener implements ApplicationEventListener
 
                     if (null != resourceMethod) {
                         final Method method = resourceMethod.getInvocable().getHandlingMethod();
+                        final Timed timedAnnotation = method.getAnnotation(Timed.class);
+                        final Metered meteredAnnotation = method.getAnnotation(Metered.class);
                         final Class<?> resourceClass = method.getDeclaringClass();
 
-                        if (method.isAnnotationPresent(Timed.class)) {
-                            final Timed annotation = method.getAnnotation(Timed.class);
-                            final String name = chooseName(annotation.name(),
-                                    annotation.absolute(),
+                        if (timedAnnotation != null) {
+                            final String name = chooseName(timedAnnotation.name(),
+                                    timedAnnotation.absolute(),
                                     resourceClass.getName(),
                                     method.getName());
                             timerContext = registry.timer(name).time();
                         }
 
-                        if (method.isAnnotationPresent(Metered.class)) {
-                            final Metered annotation = method.getAnnotation(Metered.class);
-                            final String name = chooseName(annotation.name(),
-                                    annotation.absolute(),
+                        if (meteredAnnotation != null) {
+                            final String name = chooseName(meteredAnnotation.name(),
+                                    meteredAnnotation.absolute(),
                                     resourceClass.getName(),
                                     method.getName());
                             meter = registry.meter(name);
@@ -106,10 +105,10 @@ public class MetricsApplicationEventListener implements ApplicationEventListener
 
                     if (null != resourceMethod) {
                         final Method method = resourceMethod.getInvocable().getHandlingMethod();
+                        final ExceptionMetered annotation = method.getAnnotation(ExceptionMetered.class);
                         final Class<?> resourceClass = method.getDeclaringClass();
 
-                        if (method.isAnnotationPresent(ExceptionMetered.class)) {
-                            final ExceptionMetered annotation = method.getAnnotation(ExceptionMetered.class);
+                        if (annotation != null) {
                             final Class<? extends Throwable> exceptionClass = annotation.cause();
                             final String name = chooseName(annotation.name(),
                                     annotation.absolute(),
