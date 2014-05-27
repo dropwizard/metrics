@@ -1,6 +1,5 @@
 package com.codahale.metrics.jersey2;
 
-import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.ExceptionMetered;
@@ -62,8 +61,6 @@ public class MetricsApplicationEventListener implements ApplicationEventListener
         private final MetricRegistry registry;
 
         private volatile Timer.Context timerContext;
-        private volatile Meter meter;
-        private volatile Meter exceptionMeter;
 
         private MetricsRequestEventListener(final MetricRegistry registry) {
             this.registry = registry;
@@ -94,8 +91,7 @@ public class MetricsApplicationEventListener implements ApplicationEventListener
                                     meteredAnnotation.absolute(),
                                     resourceClass.getName(),
                                     method.getName());
-                            meter = registry.meter(name);
-                            meter.mark();
+                            registry.meter(name).mark();
                         }
                     }
                 }
@@ -115,12 +111,11 @@ public class MetricsApplicationEventListener implements ApplicationEventListener
                                     resourceClass.getName(),
                                     method.getName(),
                                     ExceptionMetered.DEFAULT_NAME_SUFFIX);
-                            exceptionMeter = registry.meter(name);
 
                             final Throwable e = event.getException();
                             if (exceptionClass.isAssignableFrom(e.getClass()) ||
                                     (e.getCause() != null && exceptionClass.isAssignableFrom(e.getCause().getClass()))) {
-                                exceptionMeter.mark();
+                                registry.meter(name).mark();
                             }
                         }
                     }
