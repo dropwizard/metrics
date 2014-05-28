@@ -36,7 +36,7 @@ import com.codahale.metrics.annotation.Timed;
 public class InstrumentedResourceMethodApplicationListener implements
         ApplicationEventListener {
     
-    private MetricRegistry metrics;
+    private final MetricRegistry metrics;
 
     /**
      * Construct an application event listener using the given metrics registry.
@@ -47,7 +47,7 @@ public class InstrumentedResourceMethodApplicationListener implements
      *
      * @param metrics a {@link MetricRegistry}
      */
-    public InstrumentedResourceMethodApplicationListener (MetricRegistry metrics) {
+    public InstrumentedResourceMethodApplicationListener (final MetricRegistry metrics) {
         this.metrics = metrics;
     }
 
@@ -61,9 +61,9 @@ public class InstrumentedResourceMethodApplicationListener implements
         public final Meter meter;
         public final Class<? extends Throwable> cause;
         
-        public ExceptionMeterMetric (MetricRegistry registry,
-                                     ResourceMethod method,
-                                     ExceptionMetered exceptionMetered) {
+        public ExceptionMeterMetric (final MetricRegistry registry,
+                                     final ResourceMethod method,
+                                     final ExceptionMetered exceptionMetered) {
             final String name = chooseName(exceptionMetered.name(), 
                     exceptionMetered.absolute(), method, 
                     ExceptionMetered.DEFAULT_NAME_SUFFIX);
@@ -78,8 +78,8 @@ public class InstrumentedResourceMethodApplicationListener implements
         private final RequestEventListener other;
         private Timer.Context context = null;
         
-        public TimerRequestEventListener (Map<Method,Timer> timerMap,
-                                          RequestEventListener other)
+        public TimerRequestEventListener (final Map<Method,Timer> timerMap,
+                                          final RequestEventListener other)
         {
             this.timerMap = timerMap;
             this.other = other;
@@ -91,7 +91,7 @@ public class InstrumentedResourceMethodApplicationListener implements
                 this.other.onEvent(event);
             if (event.getType() == RequestEvent.Type.RESOURCE_METHOD_START)
             {
-                Timer timer = this.timerMap.get(event.getUriInfo()
+                final Timer timer = this.timerMap.get(event.getUriInfo()
                         .getMatchedResourceMethod().getInvocable().getDefinitionMethod());
                 if (timer != null)
                     this.context = timer.time();
@@ -109,8 +109,8 @@ public class InstrumentedResourceMethodApplicationListener implements
         private final Map<Method,Meter> meterMap;
         private final RequestEventListener other;
         
-        public MeterRequestEventListener (Map<Method,Meter> meterMap,
-                                          RequestEventListener other)
+        public MeterRequestEventListener (final Map<Method,Meter> meterMap,
+                                          final RequestEventListener other)
         {
             this.meterMap = meterMap;
             this.other = other;
@@ -122,7 +122,7 @@ public class InstrumentedResourceMethodApplicationListener implements
                 this.other.onEvent(event);
             if (event.getType() == RequestEvent.Type.RESOURCE_METHOD_START)
             {
-                Meter meter = this.meterMap.get(event.getUriInfo()
+                final Meter meter = this.meterMap.get(event.getUriInfo()
                         .getMatchedResourceMethod().getInvocable().getDefinitionMethod());
                 if (meter != null)
                     meter.mark();
@@ -135,8 +135,8 @@ public class InstrumentedResourceMethodApplicationListener implements
         private final Map<Method,ExceptionMeterMetric> exceptionMeterMap;
         private final RequestEventListener other;
         
-        public ExceptionMeterRequestEventListener (Map<Method,ExceptionMeterMetric> exceptionMeterMap,
-                                                   RequestEventListener other)
+        public ExceptionMeterRequestEventListener (final Map<Method,ExceptionMeterMetric> exceptionMeterMap,
+                                                   final RequestEventListener other)
         {
             this.exceptionMeterMap = exceptionMeterMap;
             this.other = other;
@@ -149,9 +149,9 @@ public class InstrumentedResourceMethodApplicationListener implements
             
             if (event.getType() == RequestEvent.Type.ON_EXCEPTION)
             {
-                ResourceMethod method = event.getUriInfo().getMatchedResourceMethod();
+                final ResourceMethod method = event.getUriInfo().getMatchedResourceMethod();
                 
-                ExceptionMeterMetric metric = (method != null ?
+                final ExceptionMeterMetric metric = (method != null ?
                             this.exceptionMeterMap.get(method.getInvocable().getDefinitionMethod()) :
                             null);
                 if (metric != null)
@@ -168,25 +168,25 @@ public class InstrumentedResourceMethodApplicationListener implements
     }
 
 
-    private Map<Method,Timer> timerMap = new HashMap<Method,Timer>();
-    private Map<Method,Meter> meterMap = new HashMap<Method,Meter>();
-    private Map<Method,ExceptionMeterMetric> exceptionMeterMap = 
+    private final Map<Method,Timer> timerMap = new HashMap<Method,Timer>();
+    private final Map<Method,Meter> meterMap = new HashMap<Method,Meter>();
+    private final Map<Method,ExceptionMeterMetric> exceptionMeterMap = 
             new HashMap<Method,ExceptionMeterMetric>();
 
     @Override
     public void onEvent(ApplicationEvent event) {
         if (event.getType() == ApplicationEvent.Type.INITIALIZATION_APP_FINISHED)
         {
-            for (Resource resource : event.getResourceModel().getResources())
+            for (final Resource resource : event.getResourceModel().getResources())
             {
-                for (ResourceMethod method : resource.getAllMethods())
+                for (final ResourceMethod method : resource.getAllMethods())
                 {
                     registerMetricsAnnotations (method);
                 }
                 
-                for (Resource childResource : resource.getChildResources())
+                for (final Resource childResource : resource.getChildResources())
                 {
-                    for (ResourceMethod method : childResource.getAllMethods())
+                    for (final ResourceMethod method : childResource.getAllMethods())
                     {
                         registerMetricsAnnotations (method);
                     }
@@ -204,11 +204,11 @@ public class InstrumentedResourceMethodApplicationListener implements
         return listener;
     }
     
-    private void registerMetricsAnnotations (ResourceMethod method)
+    private void registerMetricsAnnotations (final ResourceMethod method)
     {
-        Metered meteredAnnotation = method.getInvocable().getDefinitionMethod().getAnnotation(Metered.class);
-        Timed timedAnnotation = method.getInvocable().getDefinitionMethod().getAnnotation(Timed.class);
-        ExceptionMetered exceptionMeteredAnnotation = method.getInvocable().getDefinitionMethod().getAnnotation(ExceptionMetered.class);
+        final Metered meteredAnnotation = method.getInvocable().getDefinitionMethod().getAnnotation(Metered.class);
+        final Timed timedAnnotation = method.getInvocable().getDefinitionMethod().getAnnotation(Timed.class);
+        final ExceptionMetered exceptionMeteredAnnotation = method.getInvocable().getDefinitionMethod().getAnnotation(ExceptionMetered.class);
         
         if (meteredAnnotation != null)
         {
@@ -229,22 +229,22 @@ public class InstrumentedResourceMethodApplicationListener implements
         }
     }
     
-    private static Timer timerMetric (MetricRegistry registry,
-                                      ResourceMethod method,
-                                      Timed timed) {
+    private static Timer timerMetric (final MetricRegistry registry,
+                                      final ResourceMethod method,
+                                      final Timed timed) {
         final String name = chooseName(timed.name(), timed.absolute(), method);
         return registry.timer(name);
     }
     
-    private static Meter meterMetric (MetricRegistry registry,
-                                      ResourceMethod method,
-                                      Metered metered)
+    private static Meter meterMetric (final MetricRegistry registry,
+                                      final ResourceMethod method,
+                                      final Metered metered)
     {
         final String name = chooseName(metered.name(), metered.absolute(), method);
         return registry.meter(name);
     }
     
-    protected static String chooseName(String explicitName, boolean absolute, ResourceMethod method, String... suffixes) {
+    protected static String chooseName(final String explicitName, final boolean absolute, final ResourceMethod method, final String... suffixes) {
         if (explicitName != null && !explicitName.isEmpty()) {
             if (absolute) {
                 return explicitName;
