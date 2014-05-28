@@ -21,11 +21,7 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.jersey2.resources.InstrumentedResource;
 
 /**
- * Tests importing {@link InstrumentedResourceMethodDispatchAdapter} as a singleton
- * in a Jersey {@link com.sun.jersey.api.core.ResourceConfig}
- */
-/**
- * Tests importing {@link InstrumentedResourceMethodApplicationListener} as a singleton
+ * Tests registering {@link InstrumentedResourceMethodApplicationListener} as a singleton
  * in a Jersey {@link org.glassfish.jersey.server.ResourceConfig}
  */
 
