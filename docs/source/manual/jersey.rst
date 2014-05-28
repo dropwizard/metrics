@@ -14,6 +14,16 @@ application's ``ResourceConfig`` as a singleton provider for this to work.
 
 .. code-block:: java
 
+   public class ExampleApplication {
+        private final DefaultResourceConfig config = new DefaultResourceConfig();
+
+        public void init() {
+            config.getSingletons().add(new InstrumentedResourceMethodDispatchAdapter(registry));
+            config.getClasses().add(ExampleResource.class);
+        }
+    }
+
+
     @Path("/example")
     @Produces(MediaType.TEXT_PLAIN)
     public class ExampleResource {
@@ -46,6 +56,17 @@ An instance of ``InstrumentedResourceMethodApplicationListener`` must be registe
 application's ``ResourceConfig`` as a singleton provider for this to work.
 
 .. code-block:: java
+
+    public class ExampleApplication extends ResourceConfig {
+        .
+        .
+        .
+        register(new InstrumentedResourceMethodApplicationListener (new MetricRegistry())); 
+        config = config.register(ExampleResource.class); 
+        .
+        .
+        .
+    }
 
     @Path("/example")
     @Produces(MediaType.TEXT_PLAIN)
