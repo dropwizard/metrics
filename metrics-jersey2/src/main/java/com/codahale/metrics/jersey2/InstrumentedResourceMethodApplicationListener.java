@@ -3,10 +3,10 @@ package com.codahale.metrics.jersey2;
 import static com.codahale.metrics.MetricRegistry.name;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.ws.rs.ext.Provider;
+
+import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceMethod;
@@ -74,11 +74,11 @@ public class InstrumentedResourceMethodApplicationListener implements
     
     private static class TimerRequestEventListener implements RequestEventListener
     {
-        private final Map<Method,Timer> timerMap;
+        private final ImmutableMap<Method,Timer> timerMap;
         private final RequestEventListener other;
         private Timer.Context context = null;
         
-        public TimerRequestEventListener (final Map<Method,Timer> timerMap,
+        public TimerRequestEventListener (final ImmutableMap<Method,Timer> timerMap,
                                           final RequestEventListener other)
         {
             this.timerMap = timerMap;
@@ -106,10 +106,10 @@ public class InstrumentedResourceMethodApplicationListener implements
     
     private static class MeterRequestEventListener implements RequestEventListener
     {
-        private final Map<Method,Meter> meterMap;
+        private final ImmutableMap<Method,Meter> meterMap;
         private final RequestEventListener other;
         
-        public MeterRequestEventListener (final Map<Method,Meter> meterMap,
+        public MeterRequestEventListener (final ImmutableMap<Method,Meter> meterMap,
                                           final RequestEventListener other)
         {
             this.meterMap = meterMap;
@@ -132,10 +132,10 @@ public class InstrumentedResourceMethodApplicationListener implements
     
     private static class ExceptionMeterRequestEventListener implements RequestEventListener
     {
-        private final Map<Method,ExceptionMeterMetric> exceptionMeterMap;
+        private final ImmutableMap<Method,ExceptionMeterMetric> exceptionMeterMap;
         private final RequestEventListener other;
         
-        public ExceptionMeterRequestEventListener (final Map<Method,ExceptionMeterMetric> exceptionMeterMap,
+        public ExceptionMeterRequestEventListener (final ImmutableMap<Method,ExceptionMeterMetric> exceptionMeterMap,
                                                    final RequestEventListener other)
         {
             this.exceptionMeterMap = exceptionMeterMap;
@@ -164,34 +164,44 @@ public class InstrumentedResourceMethodApplicationListener implements
                 }
             }
         }
-        
     }
 
 
-    private final Map<Method,Timer> timerMap = new HashMap<Method,Timer>();
-    private final Map<Method,Meter> meterMap = new HashMap<Method,Meter>();
-    private final Map<Method,ExceptionMeterMetric> exceptionMeterMap = 
-            new HashMap<Method,ExceptionMeterMetric>();
+    private ImmutableMap<Method,Timer> timerMap = null;
+    private ImmutableMap<Method,Meter> meterMap = null;
+    private ImmutableMap<Method,ExceptionMeterMetric> exceptionMeterMap = null;
 
     @Override
     public void onEvent(ApplicationEvent event) {
         if (event.getType() == ApplicationEvent.Type.INITIALIZATION_APP_FINISHED)
         {
+            ImmutableMap.Builder<Method,Timer> timerBuilder = ImmutableMap.<Method,Timer>builder(); 
+            ImmutableMap.Builder<Method,Meter> meterBuilder = ImmutableMap.<Method,Meter> builder();
+            ImmutableMap.Builder<Method,ExceptionMeterMetric> exceptionMeterBuilder = ImmutableMap.<Method,ExceptionMeterMetric>builder();
+
             for (final Resource resource : event.getResourceModel().getResources())
             {
                 for (final ResourceMethod method : resource.getAllMethods())
                 {
-                    registerMetricsAnnotations (method);
+                    timerBuilder = registerTimedAnnotations(timerBuilder, method);
+                    meterBuilder = registerMeteredAnnotations(meterBuilder, method);
+                    exceptionMeterBuilder = registerExceptionMeteredAnnotations(exceptionMeterBuilder, method);
                 }
                 
                 for (final Resource childResource : resource.getChildResources())
                 {
                     for (final ResourceMethod method : childResource.getAllMethods())
                     {
-                        registerMetricsAnnotations (method);
+                        timerBuilder = registerTimedAnnotations(timerBuilder, method);
+                        meterBuilder = registerMeteredAnnotations(meterBuilder, method);
+                        exceptionMeterBuilder = registerExceptionMeteredAnnotations(exceptionMeterBuilder, method);
                     }
                 }
             }
+
+            timerMap = timerBuilder.build();
+            meterMap = meterBuilder.build();
+            exceptionMeterMap = exceptionMeterBuilder.build();
         }
     }
 
@@ -203,30 +213,38 @@ public class InstrumentedResourceMethodApplicationListener implements
 
         return listener;
     }
-    
-    private void registerMetricsAnnotations (final ResourceMethod method)
-    {
-        final Metered meteredAnnotation = method.getInvocable().getDefinitionMethod().getAnnotation(Metered.class);
+
+    private ImmutableMap.Builder<Method,Timer> registerTimedAnnotations (final ImmutableMap.Builder<Method,Timer> builder,
+                                                                         final ResourceMethod method) {
         final Timed timedAnnotation = method.getInvocable().getDefinitionMethod().getAnnotation(Timed.class);
+
+        if (timedAnnotation == null)
+            return builder;
+
+        return builder.put(method.getInvocable().getDefinitionMethod(),
+                           timerMetric(this.metrics, method, timedAnnotation));
+    }
+
+    private ImmutableMap.Builder<Method,Meter> registerMeteredAnnotations (final ImmutableMap.Builder<Method,Meter> builder,
+                                                                           final ResourceMethod method) {
+        final Metered meteredAnnotation = method.getInvocable().getDefinitionMethod().getAnnotation(Metered.class);
+
+        if (meteredAnnotation == null)
+            return builder;
+
+        return builder.put (method.getInvocable().getDefinitionMethod(), 
+                            meterMetric(this.metrics, method, meteredAnnotation));
+    }
+
+    private ImmutableMap.Builder<Method,ExceptionMeterMetric>
+        registerExceptionMeteredAnnotations (final ImmutableMap.Builder<Method,ExceptionMeterMetric> builder,
+                                             final ResourceMethod method) {
         final ExceptionMetered exceptionMeteredAnnotation = method.getInvocable().getDefinitionMethod().getAnnotation(ExceptionMetered.class);
-        
-        if (meteredAnnotation != null)
-        {
-            meterMap.put(method.getInvocable().getDefinitionMethod(), 
-                    meterMetric(this.metrics, method, meteredAnnotation));
-        }
-        
-        if (timedAnnotation != null)
-        {
-            timerMap.put(method.getInvocable().getDefinitionMethod(),
-                    timerMetric(this.metrics, method, timedAnnotation));
-        }
-        
-        if (exceptionMeteredAnnotation != null)
-        {
-            exceptionMeterMap.put(method.getInvocable().getDefinitionMethod(), 
-                    new ExceptionMeterMetric(this.metrics, method, exceptionMeteredAnnotation));
-        }
+        if (exceptionMeteredAnnotation == null)
+            return builder;
+
+        return builder.put(method.getInvocable().getDefinitionMethod(), 
+                           new ExceptionMeterMetric(this.metrics, method, exceptionMeteredAnnotation));
     }
     
     private static Timer timerMetric (final MetricRegistry registry,
