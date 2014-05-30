@@ -1,4 +1,4 @@
-package com.codahale.metrics.jersey;
+package com.codahale.metrics.jersey1;
 
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -8,7 +8,7 @@ import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.codahale.metrics.jersey.resources.InstrumentedResource;
+import com.codahale.metrics.jersey1.resources.InstrumentedResource;
 import org.junit.Test;
 
 import java.io.IOException;
