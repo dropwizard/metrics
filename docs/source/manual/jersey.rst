@@ -44,7 +44,7 @@ Instrumenting Jersey 2.x
 ########################
 
 Jersey 2.x changed the API for how resource method monitoring works, so a new
-module ``metrics-jersey2`` provides ``InstrumentedResourceMethodApplicationListener``, 
+module ``metrics-jersey2`` provides ``InstrumentedResourceMethodApplicationListener``,
 which allows you to instrument methods on your `Jersey 2.x`_ resource classes:
 
 The ``metrics-jersey2`` module provides ``InstrumentedResourceMethodApplicationListener``, which allows
@@ -61,8 +61,8 @@ application's ``ResourceConfig`` as a singleton provider for this to work.
         .
         .
         .
-        register(new InstrumentedResourceMethodApplicationListener (new MetricRegistry())); 
-        config = config.register(ExampleResource.class); 
+        register(new InstrumentedResourceMethodApplicationListener (new MetricRegistry()));
+        config = config.register(ExampleResource.class);
         .
         .
         .
