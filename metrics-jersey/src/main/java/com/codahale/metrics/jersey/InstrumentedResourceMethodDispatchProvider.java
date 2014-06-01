@@ -1,4 +1,4 @@
-package com.codahale.metrics.jersey1;
+package com.codahale.metrics.jersey;
 
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
