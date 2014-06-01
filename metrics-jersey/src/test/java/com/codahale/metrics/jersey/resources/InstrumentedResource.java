@@ -1,4 +1,4 @@
-package com.codahale.metrics.jersey1.resources;
+package com.codahale.metrics.jersey.resources;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
