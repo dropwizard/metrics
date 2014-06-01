@@ -8,11 +8,11 @@
         <version>4.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>metrics-jetty9</artifactId>
-    <name>Metrics Integration for Jetty 9</name>
+    <artifactId>metrics-jetty9-legacy</artifactId>
+    <name>Metrics Integration for Jetty 9.0</name>
     <packaging>bundle</packaging>
     <description>
-        A set of extensions for Jetty 9 which provide instrumentation of thread pools, connector
+        A set of extensions for Jetty 9.0 which provide instrumentation of thread pools, connector
         metrics, and application latency and utilization.
     </description>
 
@@ -25,12 +25,12 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>${jetty9.version}</version>
+            <version>${jetty9.legacy.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-client</artifactId>
-            <version>${jetty9.version}</version>
+            <version>${jetty9.legacy.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
