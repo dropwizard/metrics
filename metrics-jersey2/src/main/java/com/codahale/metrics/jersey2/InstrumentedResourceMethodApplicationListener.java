@@ -33,9 +33,9 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class InstrumentedResourceMethodApplicationListener implements ApplicationEventListener {
 
     private final MetricRegistry metrics;
-    private ImmutableMap<Method, Timer> timerMap = null;
-    private ImmutableMap<Method, Meter> meterMap = null;
-    private ImmutableMap<Method, ExceptionMeterMetric> exceptionMeterMap = null;
+    private ImmutableMap<Method, Timer> timers = ImmutableMap.of();
+    private ImmutableMap<Method, Meter> meters = ImmutableMap.of();
+    private ImmutableMap<Method, ExceptionMeterMetric> exceptionMeters = ImmutableMap.of();
 
     /**
      * Construct an application event listener using the given metrics registry.
@@ -144,10 +144,9 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
 
             if (event.getType() == RequestEvent.Type.ON_EXCEPTION) {
                 final ResourceMethod method = event.getUriInfo().getMatchedResourceMethod();
+                final ExceptionMeterMetric metric = (method != null) ?
+                        this.exceptionMeterMap.get(method.getInvocable().getDefinitionMethod()) : null;
 
-                final ExceptionMeterMetric metric = (method != null ?
-                        this.exceptionMeterMap.get(method.getInvocable().getDefinitionMethod()) :
-                        null);
                 if (metric != null) {
                     if (metric.cause.isAssignableFrom(event.getException().getClass()) ||
                             (event.getException().getCause() != null &&
@@ -162,75 +161,66 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     @Override
     public void onEvent(ApplicationEvent event) {
         if (event.getType() == ApplicationEvent.Type.INITIALIZATION_APP_FINISHED) {
-            ImmutableMap.Builder<Method, Timer> timerBuilder = ImmutableMap.<Method, Timer>builder();
-            ImmutableMap.Builder<Method, Meter> meterBuilder = ImmutableMap.<Method, Meter>builder();
-            ImmutableMap.Builder<Method, ExceptionMeterMetric> exceptionMeterBuilder = ImmutableMap.<Method, ExceptionMeterMetric>builder();
+            final ImmutableMap.Builder<Method, Timer> timerBuilder = ImmutableMap.<Method, Timer>builder();
+            final ImmutableMap.Builder<Method, Meter> meterBuilder = ImmutableMap.<Method, Meter>builder();
+            final ImmutableMap.Builder<Method, ExceptionMeterMetric> exceptionMeterBuilder = ImmutableMap.<Method, ExceptionMeterMetric>builder();
 
             for (final Resource resource : event.getResourceModel().getResources()) {
                 for (final ResourceMethod method : resource.getAllMethods()) {
-                    timerBuilder = registerTimedAnnotations(timerBuilder, method);
-                    meterBuilder = registerMeteredAnnotations(meterBuilder, method);
-                    exceptionMeterBuilder = registerExceptionMeteredAnnotations(exceptionMeterBuilder, method);
+                    registerTimedAnnotations(timerBuilder, method);
+                    registerMeteredAnnotations(meterBuilder, method);
+                    registerExceptionMeteredAnnotations(exceptionMeterBuilder, method);
                 }
 
                 for (final Resource childResource : resource.getChildResources()) {
                     for (final ResourceMethod method : childResource.getAllMethods()) {
-                        timerBuilder = registerTimedAnnotations(timerBuilder, method);
-                        meterBuilder = registerMeteredAnnotations(meterBuilder, method);
-                        exceptionMeterBuilder = registerExceptionMeteredAnnotations(exceptionMeterBuilder, method);
+                        registerTimedAnnotations(timerBuilder, method);
+                        registerMeteredAnnotations(meterBuilder, method);
+                        registerExceptionMeteredAnnotations(exceptionMeterBuilder, method);
                     }
                 }
             }
 
-            timerMap = timerBuilder.build();
-            meterMap = meterBuilder.build();
-            exceptionMeterMap = exceptionMeterBuilder.build();
+            timers = timerBuilder.build();
+            meters = meterBuilder.build();
+            exceptionMeters = exceptionMeterBuilder.build();
         }
     }
 
     @Override
     public RequestEventListener onRequest(RequestEvent event) {
-        RequestEventListener listener = new TimerRequestEventListener(timerMap, null);
-        listener = new MeterRequestEventListener(meterMap, listener);
-        listener = new ExceptionMeterRequestEventListener(exceptionMeterMap, listener);
+        RequestEventListener listener = new TimerRequestEventListener(timers, null);
+        listener = new MeterRequestEventListener(meters, listener);
+        listener = new ExceptionMeterRequestEventListener(exceptionMeters, listener);
 
         return listener;
     }
 
-    private ImmutableMap.Builder<Method, Timer> registerTimedAnnotations(final ImmutableMap.Builder<Method, Timer> builder,
-                                                                         final ResourceMethod method) {
-        final Timed timedAnnotation = method.getInvocable().getDefinitionMethod().getAnnotation(Timed.class);
+    private void registerTimedAnnotations(final ImmutableMap.Builder<Method, Timer> builder,
+                                          final ResourceMethod method) {
+        final Timed annotation = method.getInvocable().getDefinitionMethod().getAnnotation(Timed.class);
 
-        if (timedAnnotation == null) {
-            return builder;
+        if (annotation != null) {
+            builder.put(method.getInvocable().getDefinitionMethod(), timerMetric(this.metrics, method, annotation));
         }
-
-        return builder.put(method.getInvocable().getDefinitionMethod(),
-                timerMetric(this.metrics, method, timedAnnotation));
     }
 
-    private ImmutableMap.Builder<Method, Meter> registerMeteredAnnotations(final ImmutableMap.Builder<Method, Meter> builder,
-                                                                           final ResourceMethod method) {
-        final Metered meteredAnnotation = method.getInvocable().getDefinitionMethod().getAnnotation(Metered.class);
+    private void registerMeteredAnnotations(final ImmutableMap.Builder<Method, Meter> builder,
+                                            final ResourceMethod method) {
+        final Metered annotation = method.getInvocable().getDefinitionMethod().getAnnotation(Metered.class);
 
-        if (meteredAnnotation == null) {
-            return builder;
+        if (annotation != null) {
+            builder.put(method.getInvocable().getDefinitionMethod(), meterMetric(metrics, method, annotation));
         }
-
-        return builder.put(method.getInvocable().getDefinitionMethod(),
-                meterMetric(this.metrics, method, meteredAnnotation));
     }
 
-    private ImmutableMap.Builder<Method, ExceptionMeterMetric>
-    registerExceptionMeteredAnnotations(final ImmutableMap.Builder<Method, ExceptionMeterMetric> builder,
-                                        final ResourceMethod method) {
-        final ExceptionMetered exceptionMeteredAnnotation = method.getInvocable().getDefinitionMethod().getAnnotation(ExceptionMetered.class);
-        if (exceptionMeteredAnnotation == null) {
-            return builder;
-        }
+    private void registerExceptionMeteredAnnotations(final ImmutableMap.Builder<Method, ExceptionMeterMetric> builder,
+                                                     final ResourceMethod method) {
+        final ExceptionMetered annotation = method.getInvocable().getDefinitionMethod().getAnnotation(ExceptionMetered.class);
 
-        return builder.put(method.getInvocable().getDefinitionMethod(),
-                new ExceptionMeterMetric(this.metrics, method, exceptionMeteredAnnotation));
+        if (annotation != null) {
+            builder.put(method.getInvocable().getDefinitionMethod(), new ExceptionMeterMetric(metrics, method, annotation));
+        }
     }
 
     private static Timer timerMetric(final MetricRegistry registry,
