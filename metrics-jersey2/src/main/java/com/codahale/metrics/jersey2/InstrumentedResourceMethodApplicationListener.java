@@ -70,24 +70,17 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private static class TimerRequestEventListener implements RequestEventListener {
-        private final ImmutableMap<Method, Timer> timerMap;
-        private final RequestEventListener other;
+        private final ImmutableMap<Method, Timer> timers;
         private Timer.Context context = null;
 
-        public TimerRequestEventListener(final ImmutableMap<Method, Timer> timerMap,
-                                         final RequestEventListener other) {
-            this.timerMap = timerMap;
-            this.other = other;
+        public TimerRequestEventListener(final ImmutableMap<Method, Timer> timers) {
+            this.timers = timers;
         }
 
         @Override
         public void onEvent(RequestEvent event) {
-            if (this.other != null) {
-                this.other.onEvent(event);
-            }
-
             if (event.getType() == RequestEvent.Type.RESOURCE_METHOD_START) {
-                final Timer timer = this.timerMap.get(event.getUriInfo()
+                final Timer timer = this.timers.get(event.getUriInfo()
                         .getMatchedResourceMethod().getInvocable().getDefinitionMethod());
                 if (timer != null) {
                     this.context = timer.time();
@@ -101,23 +94,16 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private static class MeterRequestEventListener implements RequestEventListener {
-        private final ImmutableMap<Method, Meter> meterMap;
-        private final RequestEventListener other;
+        private final ImmutableMap<Method, Meter> meters;
 
-        public MeterRequestEventListener(final ImmutableMap<Method, Meter> meterMap,
-                                         final RequestEventListener other) {
-            this.meterMap = meterMap;
-            this.other = other;
+        public MeterRequestEventListener(final ImmutableMap<Method, Meter> meters) {
+            this.meters = meters;
         }
 
         @Override
         public void onEvent(RequestEvent event) {
-            if (this.other != null) {
-                this.other.onEvent(event);
-            }
-
             if (event.getType() == RequestEvent.Type.RESOURCE_METHOD_START) {
-                final Meter meter = this.meterMap.get(event.getUriInfo()
+                final Meter meter = this.meters.get(event.getUriInfo()
                         .getMatchedResourceMethod().getInvocable().getDefinitionMethod());
                 if (meter != null) {
                     meter.mark();
@@ -127,25 +113,18 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private static class ExceptionMeterRequestEventListener implements RequestEventListener {
-        private final ImmutableMap<Method, ExceptionMeterMetric> exceptionMeterMap;
-        private final RequestEventListener other;
+        private final ImmutableMap<Method, ExceptionMeterMetric> exceptionMeters;
 
-        public ExceptionMeterRequestEventListener(final ImmutableMap<Method, ExceptionMeterMetric> exceptionMeterMap,
-                                                  final RequestEventListener other) {
-            this.exceptionMeterMap = exceptionMeterMap;
-            this.other = other;
+        public ExceptionMeterRequestEventListener(final ImmutableMap<Method, ExceptionMeterMetric> exceptionMeters) {
+            this.exceptionMeters = exceptionMeters;
         }
 
         @Override
         public void onEvent(RequestEvent event) {
-            if (this.other != null) {
-                this.other.onEvent(event);
-            }
-
             if (event.getType() == RequestEvent.Type.ON_EXCEPTION) {
                 final ResourceMethod method = event.getUriInfo().getMatchedResourceMethod();
                 final ExceptionMeterMetric metric = (method != null) ?
-                        this.exceptionMeterMap.get(method.getInvocable().getDefinitionMethod()) : null;
+                        this.exceptionMeters.get(method.getInvocable().getDefinitionMethod()) : null;
 
                 if (metric != null) {
                     if (metric.cause.isAssignableFrom(event.getException().getClass()) ||
@@ -154,6 +133,21 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                         metric.meter.mark();
                     }
                 }
+            }
+        }
+    }
+
+    private static class ChainedRequestEventListener implements RequestEventListener {
+        private final RequestEventListener[] listeners;
+
+        private ChainedRequestEventListener(final RequestEventListener... listeners) {
+            this.listeners = listeners;
+        }
+
+        @Override
+        public void onEvent(final RequestEvent event) {
+            for (RequestEventListener listener : listeners) {
+                listener.onEvent(event);
             }
         }
     }
@@ -188,38 +182,42 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     @Override
-    public RequestEventListener onRequest(RequestEvent event) {
-        RequestEventListener listener = new TimerRequestEventListener(timers, null);
-        listener = new MeterRequestEventListener(meters, listener);
-        listener = new ExceptionMeterRequestEventListener(exceptionMeters, listener);
+    public RequestEventListener onRequest(final RequestEvent event) {
+        final RequestEventListener listener = new ChainedRequestEventListener(
+                new TimerRequestEventListener(timers),
+                new MeterRequestEventListener(meters),
+                new ExceptionMeterRequestEventListener(exceptionMeters));
 
         return listener;
     }
 
     private void registerTimedAnnotations(final ImmutableMap.Builder<Method, Timer> builder,
                                           final ResourceMethod method) {
-        final Timed annotation = method.getInvocable().getDefinitionMethod().getAnnotation(Timed.class);
+        final Method definitionMethod = method.getInvocable().getDefinitionMethod();
+        final Timed annotation = definitionMethod.getAnnotation(Timed.class);
 
         if (annotation != null) {
-            builder.put(method.getInvocable().getDefinitionMethod(), timerMetric(this.metrics, method, annotation));
+            builder.put(definitionMethod, timerMetric(this.metrics, method, annotation));
         }
     }
 
     private void registerMeteredAnnotations(final ImmutableMap.Builder<Method, Meter> builder,
                                             final ResourceMethod method) {
-        final Metered annotation = method.getInvocable().getDefinitionMethod().getAnnotation(Metered.class);
+        final Method definitionMethod = method.getInvocable().getDefinitionMethod();
+        final Metered annotation = definitionMethod.getAnnotation(Metered.class);
 
         if (annotation != null) {
-            builder.put(method.getInvocable().getDefinitionMethod(), meterMetric(metrics, method, annotation));
+            builder.put(definitionMethod, meterMetric(metrics, method, annotation));
         }
     }
 
     private void registerExceptionMeteredAnnotations(final ImmutableMap.Builder<Method, ExceptionMeterMetric> builder,
                                                      final ResourceMethod method) {
-        final ExceptionMetered annotation = method.getInvocable().getDefinitionMethod().getAnnotation(ExceptionMetered.class);
+        final Method definitionMethod = method.getInvocable().getDefinitionMethod();
+        final ExceptionMetered annotation = definitionMethod.getAnnotation(ExceptionMetered.class);
 
         if (annotation != null) {
-            builder.put(method.getInvocable().getDefinitionMethod(), new ExceptionMeterMetric(metrics, method, annotation));
+            builder.put(definitionMethod, new ExceptionMeterMetric(metrics, method, annotation));
         }
     }
 
