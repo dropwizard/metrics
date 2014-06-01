@@ -4,12 +4,15 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.jersey2.resources.InstrumentedResource;
+import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -89,5 +92,18 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
         }
 
         assertThat(meter.getCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void testResourceNotFound() {
+        final Response response = target().path("not-found").request().get();
+        assertThat(response.getStatus()).isEqualTo(404);
+
+        try {
+            target().path("not-found").request().get(ClientResponse.class);
+            failBecauseExceptionWasNotThrown(NotFoundException.class);
+        } catch (NotFoundException e) {
+            assertThat(e.getMessage()).isEqualTo("HTTP 404 Not Found");
+        }
     }
 }
