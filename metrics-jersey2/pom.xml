@@ -3,48 +3,62 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.dropwizard.metrics</groupId>
-        <artifactId>metrics-parent</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+	<groupId>io.dropwizard.metrics</groupId>
+	<artifactId>metrics-parent</artifactId>
+	<version>4.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-jersey2</artifactId>
     <name>Metrics Integration for Jersey 2.x</name>
     <packaging>bundle</packaging>
     <description>
-        A set of class providing Metrics integration for Jersey, the reference JAX-RS
-        implementation.
+	A set of class providing Metrics integration for Jersey, the reference JAX-RS
+	implementation.
     </description>
 
     <properties>
-        <jersey.version>2.6</jersey.version>
+	<jersey.version>2.9</jersey.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-annotation</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-        	<groupId>org.glassfish.jersey.core</groupId>
-        	<artifactId>jersey-server</artifactId>
-        	<version>${jersey.version}</version>
-        </dependency>
-        <dependency>
-        	<groupId>
-        		org.glassfish.jersey.test-framework.providers
-        	</groupId>
-        	<artifactId>
-        		jersey-test-framework-provider-inmemory
-        	</artifactId>
-        	<version>${jersey.version}</version>
-        	<scope>test</scope>
-        </dependency>
+	<dependency>
+	    <groupId>io.dropwizard.metrics</groupId>
+	    <artifactId>metrics-core</artifactId>
+	    <version>${project.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>io.dropwizard.metrics</groupId>
+	    <artifactId>metrics-annotation</artifactId>
+	    <version>${project.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>org.glassfish.jersey.core</groupId>
+		<artifactId>jersey-server</artifactId>
+		<version>${jersey.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>
+			org.glassfish.jersey.test-framework.providers
+		</groupId>
+		<artifactId>
+			jersey-test-framework-provider-inmemory
+		</artifactId>
+		<version>${jersey.version}</version>
+		<scope>test</scope>
+	</dependency>
     </dependencies>
+
+    <build>
+	<plugins>
+	    <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-compiler-plugin</artifactId>
+		<version>3.1</version>
+		<configuration>
+		    <source>1.7</source>
+		    <target>1.7</target>
+		</configuration>
+	    </plugin>
+	</plugins>
+    </build>
 </project>
