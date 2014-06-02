@@ -9,9 +9,9 @@ import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 /**
- * A client to a Carbon server.
+ * A client to a Carbon server via TCP.
  */
-public class Graphite implements Closeable {
+public class Graphite implements GraphiteSender {
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
     // this may be optimistic about Carbon/Graphite
     private static final Charset UTF_8 = Charset.forName("UTF-8");
@@ -58,12 +58,7 @@ public class Graphite implements Closeable {
         this.charset = charset;
     }
 
-    /**
-     * Connects to the server.
-     *
-     * @throws IllegalStateException if the client is already connected
-     * @throws IOException           if there is an error connecting
-     */
+    @Override
     public void connect() throws IllegalStateException, IOException {
         if (socket != null) {
             throw new IllegalStateException("Already connected");
@@ -76,14 +71,7 @@ public class Graphite implements Closeable {
         this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), charset));
     }
 
-    /**
-     * Sends the given measurement to the server.
-     *
-     * @param name      the name of the metric
-     * @param value     the value of the metric
-     * @param timestamp the timestamp of the metric
-     * @throws IOException if there was an error sending the metric
-     */
+    @Override
     public void send(String name, String value, long timestamp) throws IOException {
         try {
             writer.write(sanitize(name));
@@ -100,11 +88,7 @@ public class Graphite implements Closeable {
         }
     }
 
-    /**
-     * Returns the number of failed writes to the server.
-     *
-     * @return the number of failed writes to the server
-     */
+    @Override
     public int getFailures() {
         return failures;
     }
