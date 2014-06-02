@@ -29,7 +29,7 @@ public @interface Timed {
 
     /**
      * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
-     * relative to the annotated class.
+     * relative to the annotated class. When annotating a class, this must be {@code false}.
      */
     boolean absolute() default false;
 }
