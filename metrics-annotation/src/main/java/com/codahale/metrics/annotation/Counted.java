@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD })
+@Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD })
 public @interface Counted {
 
     /**
