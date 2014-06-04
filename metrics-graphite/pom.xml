@@ -21,5 +21,11 @@
             <artifactId>metrics-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>${rabbitmq.version}</version>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 </project>
