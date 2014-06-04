@@ -105,12 +105,12 @@ public class GraphiteReporter extends ScheduledReporter {
 
         /**
          * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
-         * given {@link Graphite} client.
+         * given {@link GraphiteSender}.
          *
-         * @param graphite a {@link Graphite} client
+         * @param graphite a {@link GraphiteSender}
          * @return a {@link GraphiteReporter}
          */
-        public GraphiteReporter build(Graphite graphite) {
+        public GraphiteReporter build(GraphiteSender graphite) {
             return new GraphiteReporter(registry,
                                         graphite,
                                         clock,
@@ -123,12 +123,12 @@ public class GraphiteReporter extends ScheduledReporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphiteReporter.class);
 
-    private final Graphite graphite;
+    private final GraphiteSender graphite;
     private final Clock clock;
     private final String prefix;
 
     private GraphiteReporter(MetricRegistry registry,
-                             Graphite graphite,
+                             GraphiteSender graphite,
                              Clock clock,
                              String prefix,
                              TimeUnit rateUnit,
