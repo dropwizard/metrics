@@ -14,15 +14,15 @@ import java.util.regex.Pattern;
 public class Graphite implements GraphiteSender {
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
     // this may be optimistic about Carbon/Graphite
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
+    static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private final InetSocketAddress address;
     private final SocketFactory socketFactory;
     private final Charset charset;
 
-    private Socket socket;
-    private Writer writer;
-    private int failures;
+    protected Socket socket;
+    protected Writer writer;
+    protected int failures;
 
     /**
      * Creates a new client which connects to the given address using the default
