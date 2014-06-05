@@ -9,7 +9,7 @@
     <artifactId>metrics-parent</artifactId>
     <version>3.1.0-FORKED-10</version>
     <packaging>pom</packaging>
-    <name>Metrics Parent</name>
+    <name>Yammer Metrics Fork</name>
     <description>
         The Metrics library.
     </description>
