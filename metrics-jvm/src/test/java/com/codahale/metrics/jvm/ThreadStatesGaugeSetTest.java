@@ -62,7 +62,8 @@ public class ThreadStatesGaugeSetTest {
                               "blocked.count",
                               "waiting.count",
                               "daemon.count",
-                              "runnable.count");
+                              "runnable.count",
+                              "deadlocked.count");
     }
 
     @Test
@@ -83,6 +84,9 @@ public class ThreadStatesGaugeSetTest {
                 .isEqualTo(1);
 
         assertThat(((Gauge) gauges.getMetrics().get("terminated.count")).getValue())
+                .isEqualTo(1);
+
+        assertThat(((Gauge) gauges.getMetrics().get("deadlocked.count")).getValue())
                 .isEqualTo(1);
     }
 

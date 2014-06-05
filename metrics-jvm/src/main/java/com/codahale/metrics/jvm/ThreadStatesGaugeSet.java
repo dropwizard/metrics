@@ -75,7 +75,7 @@ public class ThreadStatesGaugeSet implements MetricSet {
             }
         });
 
-        gauges.put("deadlockCount", new Gauge<Integer>() {
+        gauges.put("deadlocked.count", new Gauge<Integer>() {
             @Override
             public Integer getValue() {
                 return deadlockDetector.getDeadlockedThreads().size();
