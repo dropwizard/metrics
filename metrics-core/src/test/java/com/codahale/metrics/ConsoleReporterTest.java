@@ -52,7 +52,7 @@ public class ConsoleReporterTest {
                         "3/17/13 6:04:36 PM =============================================================",
                         "",
                         "-- Gauges ----------------------------------------------------------------------",
-                        "gauge",
+                        "gauge{}",
                         "             value = 1",
                         "",
                         ""
@@ -75,7 +75,7 @@ public class ConsoleReporterTest {
                         "3/17/13 6:04:36 PM =============================================================",
                         "",
                         "-- Counters --------------------------------------------------------------------",
-                        "test.counter",
+                        "test.counter{}",
                         "             count = 100",
                         "",
                         ""
@@ -112,7 +112,7 @@ public class ConsoleReporterTest {
                         "3/17/13 6:04:36 PM =============================================================",
                         "",
                         "-- Histograms ------------------------------------------------------------------",
-                        "test.histogram",
+                        "test.histogram{}",
                         "             count = 1",
                         "               min = 4",
                         "               max = 2",
@@ -149,7 +149,7 @@ public class ConsoleReporterTest {
                         "3/17/13 6:04:36 PM =============================================================",
                         "",
                         "-- Meters ----------------------------------------------------------------------",
-                        "test.meter",
+                        "test.meter{}",
                         "             count = 1",
                         "         mean rate = 2.00 events/second",
                         "     1-minute rate = 3.00 events/second",
@@ -195,7 +195,7 @@ public class ConsoleReporterTest {
                         "3/17/13 6:04:36 PM =============================================================",
                         "",
                         "-- Timers ----------------------------------------------------------------------",
-                        "test.another.timer",
+                        "test.another.timer{}",
                         "             count = 1",
                         "         mean rate = 2.00 calls/second",
                         "     1-minute rate = 3.00 calls/second",
@@ -228,13 +228,13 @@ public class ConsoleReporterTest {
         return bytes.toString("UTF-8");
     }
 
-    private <T> SortedMap<String, T> map() {
-        return new TreeMap<String, T>();
+    private <T> SortedMap<MetricName, T> map() {
+        return new TreeMap<MetricName, T>();
     }
 
-    private <T> SortedMap<String, T> map(String name, T metric) {
-        final TreeMap<String, T> map = new TreeMap<String, T>();
-        map.put(name, metric);
+    private <T> SortedMap<MetricName, T> map(String name, T metric) {
+        final TreeMap<MetricName, T> map = new TreeMap<MetricName, T>();
+        map.put(MetricName.build(name), metric);
         return map;
     }
 }

@@ -147,7 +147,7 @@ public class GangliaReporter extends ScheduledReporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(GangliaReporter.class);
 
     private final List<GMetric> gmetrics;
-    private final String prefix;
+    private final MetricName prefix;
     private final int tMax;
     private final int dMax;
 
@@ -161,39 +161,39 @@ public class GangliaReporter extends ScheduledReporter {
                             MetricFilter filter) {
         super(registry, "ganglia-reporter", filter, rateUnit, durationUnit);
         this.gmetrics = gmetrics;
-        this.prefix = prefix;
+        this.prefix = MetricName.build(prefix);
         this.tMax = tMax;
         this.dMax = dMax;
     }
 
     @Override
-    public void report(SortedMap<String, Gauge> gauges,
-                       SortedMap<String, Counter> counters,
-                       SortedMap<String, Histogram> histograms,
-                       SortedMap<String, Meter> meters,
-                       SortedMap<String, Timer> timers) {
-        for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
+    public void report(SortedMap<MetricName, Gauge> gauges,
+                       SortedMap<MetricName, Counter> counters,
+                       SortedMap<MetricName, Histogram> histograms,
+                       SortedMap<MetricName, Meter> meters,
+                       SortedMap<MetricName, Timer> timers) {
+        for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
             reportGauge(entry.getKey(), entry.getValue());
         }
 
-        for (Map.Entry<String, Counter> entry : counters.entrySet()) {
+        for (Map.Entry<MetricName, Counter> entry : counters.entrySet()) {
             reportCounter(entry.getKey(), entry.getValue());
         }
 
-        for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
+        for (Map.Entry<MetricName, Histogram> entry : histograms.entrySet()) {
             reportHistogram(entry.getKey(), entry.getValue());
         }
 
-        for (Map.Entry<String, Meter> entry : meters.entrySet()) {
+        for (Map.Entry<MetricName, Meter> entry : meters.entrySet()) {
             reportMeter(entry.getKey(), entry.getValue());
         }
 
-        for (Map.Entry<String, Timer> entry : timers.entrySet()) {
+        for (Map.Entry<MetricName, Timer> entry : timers.entrySet()) {
             reportTimer(entry.getKey(), entry.getValue());
         }
     }
 
-    private void reportTimer(String name, Timer timer) {
+    private void reportTimer(MetricName name, Timer timer) {
         final String group = group(name);
         try {
             final Snapshot snapshot = timer.getSnapshot();
@@ -231,7 +231,7 @@ public class GangliaReporter extends ScheduledReporter {
         }
     }
 
-    private void reportMeter(String name, Meter meter) {
+    private void reportMeter(MetricName name, Meter meter) {
         final String group = group(name);
         try {
             reportMetered(name, meter, group, "events");
@@ -240,7 +240,7 @@ public class GangliaReporter extends ScheduledReporter {
         }
     }
 
-    private void reportMetered(String name, Metered meter, String group, String eventName) throws GangliaException {
+    private void reportMetered(MetricName name, Metered meter, String group, String eventName) throws GangliaException {
         final String unit = eventName + '/' + getRateUnit();
         announce(prefix(name, "count"), group, meter.getCount(), eventName);
         announce(prefix(name, "m1_rate"), group, convertRate(meter.getOneMinuteRate()), unit);
@@ -249,7 +249,7 @@ public class GangliaReporter extends ScheduledReporter {
         announce(prefix(name, "mean_rate"), group, convertRate(meter.getMeanRate()), unit);
     }
 
-    private void reportHistogram(String name, Histogram histogram) {
+    private void reportHistogram(MetricName name, Histogram histogram) {
         final String group = group(name);
         try {
             final Snapshot snapshot = histogram.getSnapshot();
@@ -270,7 +270,7 @@ public class GangliaReporter extends ScheduledReporter {
         }
     }
 
-    private void reportCounter(String name, Counter counter) {
+    private void reportCounter(MetricName name, Counter counter) {
         final String group = group(name);
         try {
             announce(prefix(name, "count"), group, counter.getCount(), "");
@@ -279,12 +279,13 @@ public class GangliaReporter extends ScheduledReporter {
         }
     }
 
-    private void reportGauge(String name, Gauge gauge) {
-        final String group = group(name);
+    private void reportGauge(MetricName name, Gauge gauge) {
+        final String group = group(name.getKey());
         final Object obj = gauge.getValue();
         try {
             for(GMetric gmetric: gmetrics) {
-                gmetric.announce(name(prefix, escapeSlashes(name)), String.valueOf(obj), detectType(obj), "",
+                final MetricName announced = prefix.resolve(escapeSlashes(name.getKey()));
+                gmetric.announce(announced.getKey(), String.valueOf(obj), detectType(obj), "",
                     GMetricSlope.BOTH, tMax, dMax, group);
             }
         } catch (GangliaException e) {
@@ -326,6 +327,10 @@ public class GangliaReporter extends ScheduledReporter {
         return GMetricType.STRING;
     }
 
+    private String group(MetricName name) {
+        return group(name.getKey());
+    }
+
     private String group(String name) {
         final int i = name.lastIndexOf('.');
         if (i < 0) {
@@ -334,8 +339,8 @@ public class GangliaReporter extends ScheduledReporter {
         return name.substring(0, i);
     }
 
-    private String prefix(String name, String n) {
-        return name(prefix, escapeSlashes(name), n);
+    private String prefix(MetricName name, String n) {
+        return MetricName.join(prefix, name).resolve(n).getKey();
     }
 
     // ganglia metric names can't contain slashes.

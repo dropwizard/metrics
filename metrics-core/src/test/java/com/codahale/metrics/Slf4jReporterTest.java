@@ -32,7 +32,7 @@ public class Slf4jReporterTest {
                         this.<Meter>map(),
                         this.<Timer>map());
 
-        verify(logger).info(marker, "type=GAUGE, name={}, value={}", "gauge", "value");
+        verify(logger).info(marker, "type=GAUGE, name={}, value={}", MetricName.build("gauge"), "value");
     }
 
     @Test
@@ -46,7 +46,7 @@ public class Slf4jReporterTest {
                         this.<Meter>map(),
                         this.<Timer>map());
 
-        verify(logger).info(marker, "type=COUNTER, name={}, count={}", "test.counter", 100L);
+        verify(logger).info(marker, "type=COUNTER, name={}, count={}", MetricName.build("test.counter"), 100L);
     }
 
     @Test
@@ -76,7 +76,7 @@ public class Slf4jReporterTest {
 
         verify(logger).info(marker,
                             "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
-                            "test.histogram",
+                            MetricName.build("test.histogram"),
                             1L,
                             4L,
                             2L,
@@ -107,7 +107,7 @@ public class Slf4jReporterTest {
 
         verify(logger).info(marker,
                             "type=METER, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
-                            "test.meter",
+                            MetricName.build("test.meter"),
                             1L,
                             2.0,
                             3.0,
@@ -149,7 +149,7 @@ public class Slf4jReporterTest {
 
         verify(logger).info(marker,
                             "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
-                            "test.another.timer",
+                            MetricName.build("test.another.timer"),
                             1L,
                             300.0,
                             100.0,
@@ -169,13 +169,13 @@ public class Slf4jReporterTest {
                             "milliseconds");
     }
 
-    private <T> SortedMap<String, T> map() {
-        return new TreeMap<String, T>();
+    private <T> SortedMap<MetricName, T> map() {
+        return new TreeMap<MetricName, T>();
     }
 
-    private <T> SortedMap<String, T> map(String name, T metric) {
-        final TreeMap<String, T> map = new TreeMap<String, T>();
-        map.put(name, metric);
+    private <T> SortedMap<MetricName, T> map(String name, T metric) {
+        final TreeMap<MetricName, T> map = new TreeMap<MetricName, T>();
+        map.put(MetricName.build(name), metric);
         return map;
     }
 

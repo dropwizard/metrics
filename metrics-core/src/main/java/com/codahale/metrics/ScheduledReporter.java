@@ -155,11 +155,11 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * @param meters     all of the meters in the registry
      * @param timers     all of the timers in the registry
      */
-    public abstract void report(SortedMap<String, Gauge> gauges,
-                                SortedMap<String, Counter> counters,
-                                SortedMap<String, Histogram> histograms,
-                                SortedMap<String, Meter> meters,
-                                SortedMap<String, Timer> timers);
+    public abstract void report(SortedMap<MetricName, Gauge> gauges,
+                                SortedMap<MetricName, Counter> counters,
+                                SortedMap<MetricName, Histogram> histograms,
+                                SortedMap<MetricName, Meter> meters,
+                                SortedMap<MetricName, Timer> timers);
 
     protected String getRateUnit() {
         return rateUnit;

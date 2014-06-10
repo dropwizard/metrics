@@ -2,8 +2,10 @@ package com.codahale.metrics.jetty9;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.server.AsyncContextState;
 import org.eclipse.jetty.server.Handler;
@@ -16,6 +18,7 @@ import javax.servlet.AsyncListener;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -101,36 +104,36 @@ public class InstrumentedHandler extends HandlerWrapper {
     protected void doStart() throws Exception {
         super.doStart();
 
-        final String prefix = this.prefix == null ? name(getHandler().getClass(), name) : name(this.prefix, name);
+        final MetricName prefix = this.prefix == null ? name(getHandler().getClass(), name) : name(this.prefix, name);
 
-        this.requests = metricRegistry.timer(name(prefix, "requests"));
-        this.dispatches = metricRegistry.timer(name(prefix, "dispatches"));
+        this.requests = metricRegistry.timer(prefix.resolve("requests"));
+        this.dispatches = metricRegistry.timer(prefix.resolve("dispatches"));
 
-        this.activeRequests = metricRegistry.counter(name(prefix, "active-requests"));
-        this.activeDispatches = metricRegistry.counter(name(prefix, "active-dispatches"));
-        this.activeSuspended = metricRegistry.counter(name(prefix, "active-suspended"));
+        this.activeRequests = metricRegistry.counter(prefix.resolve("active-requests"));
+        this.activeDispatches = metricRegistry.counter(prefix.resolve("active-dispatches"));
+        this.activeSuspended = metricRegistry.counter(prefix.resolve("active-suspended"));
 
-        this.asyncDispatches = metricRegistry.meter(name(prefix, "async-dispatches"));
-        this.asyncTimeouts = metricRegistry.meter(name(prefix, "async-timeouts"));
+        this.asyncDispatches = metricRegistry.meter(prefix.resolve("async-dispatches"));
+        this.asyncTimeouts = metricRegistry.meter(prefix.resolve("async-timeouts"));
 
         this.responses = new Meter[]{
-                metricRegistry.meter(name(prefix, "1xx-responses")), // 1xx
-                metricRegistry.meter(name(prefix, "2xx-responses")), // 2xx
-                metricRegistry.meter(name(prefix, "3xx-responses")), // 3xx
-                metricRegistry.meter(name(prefix, "4xx-responses")), // 4xx
-                metricRegistry.meter(name(prefix, "5xx-responses"))  // 5xx
+                metricRegistry.meter(prefix.resolve("1xx-responses")), // 1xx
+                metricRegistry.meter(prefix.resolve("2xx-responses")), // 2xx
+                metricRegistry.meter(prefix.resolve("3xx-responses")), // 3xx
+                metricRegistry.meter(prefix.resolve("4xx-responses")), // 4xx
+                metricRegistry.meter(prefix.resolve("5xx-responses"))  // 5xx
         };
 
-        this.getRequests = metricRegistry.timer(name(prefix, "get-requests"));
-        this.postRequests = metricRegistry.timer(name(prefix, "post-requests"));
-        this.headRequests = metricRegistry.timer(name(prefix, "head-requests"));
-        this.putRequests = metricRegistry.timer(name(prefix, "put-requests"));
-        this.deleteRequests = metricRegistry.timer(name(prefix, "delete-requests"));
-        this.optionsRequests = metricRegistry.timer(name(prefix, "options-requests"));
-        this.traceRequests = metricRegistry.timer(name(prefix, "trace-requests"));
-        this.connectRequests = metricRegistry.timer(name(prefix, "connect-requests"));
-        this.moveRequests = metricRegistry.timer(name(prefix, "move-requests"));
-        this.otherRequests = metricRegistry.timer(name(prefix, "other-requests"));
+        this.getRequests = metricRegistry.timer(prefix.resolve("get-requests"));
+        this.postRequests = metricRegistry.timer(prefix.resolve("post-requests"));
+        this.headRequests = metricRegistry.timer(prefix.resolve("head-requests"));
+        this.putRequests = metricRegistry.timer(prefix.resolve("put-requests"));
+        this.deleteRequests = metricRegistry.timer(prefix.resolve("delete-requests"));
+        this.optionsRequests = metricRegistry.timer(prefix.resolve("options-requests"));
+        this.traceRequests = metricRegistry.timer(prefix.resolve("trace-requests"));
+        this.connectRequests = metricRegistry.timer(prefix.resolve("connect-requests"));
+        this.moveRequests = metricRegistry.timer(prefix.resolve("move-requests"));
+        this.otherRequests = metricRegistry.timer(prefix.resolve("other-requests"));
 
         this.listener = new AsyncListener() {
             @Override

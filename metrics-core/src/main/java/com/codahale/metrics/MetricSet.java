@@ -13,5 +13,5 @@ public interface MetricSet extends Metric {
      *
      * @return the metrics
      */
-    Map<String, Metric> getMetrics();
+    Map<MetricName, Metric> getMetrics();
 }

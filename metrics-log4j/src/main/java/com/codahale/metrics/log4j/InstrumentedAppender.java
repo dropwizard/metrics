@@ -42,7 +42,7 @@ public class InstrumentedAppender extends AppenderSkeleton {
      */
     public InstrumentedAppender(MetricRegistry registry) {
         this.registry = registry;
-        setName(name(Appender.class));
+        setName(name(Appender.class).getKey());
     }
 
     @Override

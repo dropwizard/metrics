@@ -2,6 +2,7 @@ package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricSet;
 import com.codahale.metrics.RatioGauge;
 
@@ -36,10 +37,10 @@ public class MemoryUsageGaugeSet implements MetricSet {
     }
 
     @Override
-    public Map<String, Metric> getMetrics() {
-        final Map<String, Metric> gauges = new HashMap<String, Metric>();
+    public Map<MetricName, Metric> getMetrics() {
+        final Map<MetricName, Metric> gauges = new HashMap<MetricName, Metric>();
 
-        gauges.put("total.init", new Gauge<Long>() {
+        gauges.put(MetricName.build("total.init"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return mxBean.getHeapMemoryUsage().getInit() +
@@ -47,7 +48,7 @@ public class MemoryUsageGaugeSet implements MetricSet {
             }
         });
 
-        gauges.put("total.used", new Gauge<Long>() {
+        gauges.put(MetricName.build("total.used"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return mxBean.getHeapMemoryUsage().getUsed() +
@@ -55,7 +56,7 @@ public class MemoryUsageGaugeSet implements MetricSet {
             }
         });
 
-        gauges.put("total.max", new Gauge<Long>() {
+        gauges.put(MetricName.build("total.max"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return mxBean.getHeapMemoryUsage().getMax() +
@@ -63,7 +64,7 @@ public class MemoryUsageGaugeSet implements MetricSet {
             }
         });
 
-        gauges.put("total.committed", new Gauge<Long>() {
+        gauges.put(MetricName.build("total.committed"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return mxBean.getHeapMemoryUsage().getCommitted() +
@@ -72,35 +73,35 @@ public class MemoryUsageGaugeSet implements MetricSet {
         });
 
 
-        gauges.put("heap.init", new Gauge<Long>() {
+        gauges.put(MetricName.build("heap.init"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return mxBean.getHeapMemoryUsage().getInit();
             }
         });
 
-        gauges.put("heap.used", new Gauge<Long>() {
+        gauges.put(MetricName.build("heap.used"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return mxBean.getHeapMemoryUsage().getUsed();
             }
         });
 
-        gauges.put("heap.max", new Gauge<Long>() {
+        gauges.put(MetricName.build("heap.max"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return mxBean.getHeapMemoryUsage().getMax();
             }
         });
 
-        gauges.put("heap.committed", new Gauge<Long>() {
+        gauges.put(MetricName.build("heap.committed"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return mxBean.getHeapMemoryUsage().getCommitted();
             }
         });
 
-        gauges.put("heap.usage", new RatioGauge() {
+        gauges.put(MetricName.build("heap.usage"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 final MemoryUsage usage = mxBean.getHeapMemoryUsage();
@@ -108,35 +109,35 @@ public class MemoryUsageGaugeSet implements MetricSet {
             }
         });
 
-        gauges.put("non-heap.init", new Gauge<Long>() {
+        gauges.put(MetricName.build("non-heap.init"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return mxBean.getNonHeapMemoryUsage().getInit();
             }
         });
 
-        gauges.put("non-heap.used", new Gauge<Long>() {
+        gauges.put(MetricName.build("non-heap.used"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return mxBean.getNonHeapMemoryUsage().getUsed();
             }
         });
 
-        gauges.put("non-heap.max", new Gauge<Long>() {
+        gauges.put(MetricName.build("non-heap.max"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return mxBean.getNonHeapMemoryUsage().getMax();
             }
         });
 
-        gauges.put("non-heap.committed", new Gauge<Long>() {
+        gauges.put(MetricName.build("non-heap.committed"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return mxBean.getNonHeapMemoryUsage().getCommitted();
             }
         });
 
-        gauges.put("non-heap.usage", new RatioGauge() {
+        gauges.put(MetricName.build("non-heap.usage"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 final MemoryUsage usage = mxBean.getNonHeapMemoryUsage();

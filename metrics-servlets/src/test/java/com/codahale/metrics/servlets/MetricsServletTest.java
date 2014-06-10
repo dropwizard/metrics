@@ -64,16 +64,18 @@ public class MetricsServletTest extends AbstractServletTest {
                 .isEqualTo("{" +
                                    "\"version\":\"3.0.0\"," +
                                    "\"gauges\":{" +
-                                       "\"g1\":{\"value\":100}" +
+                                       "\"g1{}\":{\"value\":100}" +
                                    "}," +
                                    "\"counters\":{" +
-                                       "\"c\":{\"count\":1}" +
+                                       "\"c{}\":{\"count\":1}" +
                                    "}," +
                                    "\"histograms\":{" +
-                                       "\"h\":{\"count\":1,\"max\":1,\"mean\":1.0,\"min\":1,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0}" +
+                                       "\"h{}\":{\"count\":1,\"max\":1,\"mean\":1.0,\"min\":1,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0}" +
                                    "}," +
                                    "\"meters\":{" +
-                                       "\"m\":{\"count\":1,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":3333333.3333333335,\"units\":\"events/second\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1.0,\"mean\":1.0,\"min\":1.0,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":1.0E7,\"duration_units\":\"seconds\",\"rate_units\":\"calls/second\"}" +
+                                       "\"m{}\":{\"count\":1,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":3333333.3333333335,\"units\":\"events/second\"}},"+
+                                   "\"timers\":{"+
+                                       "\"t{}\":{\"count\":1,\"max\":1.0,\"mean\":1.0,\"min\":1.0,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":1.0E7,\"duration_units\":\"seconds\",\"rate_units\":\"calls/second\"}" +
                                    "}" +
                                "}");
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
@@ -94,17 +96,17 @@ public class MetricsServletTest extends AbstractServletTest {
                 .isEqualTo(String.format("{%n" +
                                                  "  \"version\" : \"3.0.0\",%n" +
                                                  "  \"gauges\" : {%n" +
-                                                 "    \"g1\" : {%n" +
+                                                 "    \"g1{}\" : {%n" +
                                                  "      \"value\" : 100%n" +
                                                  "    }%n" +
                                                  "  },%n" +
                                                  "  \"counters\" : {%n" +
-                                                 "    \"c\" : {%n" +
+                                                 "    \"c{}\" : {%n" +
                                                  "      \"count\" : 1%n" +
                                                  "    }%n" +
                                                  "  },%n" +
                                                  "  \"histograms\" : {%n" +
-                                                 "    \"h\" : {%n" +
+                                                 "    \"h{}\" : {%n" +
                                                  "      \"count\" : 1,%n" +
                                                  "      \"max\" : 1,%n" +
                                                  "      \"mean\" : 1.0,%n" +
@@ -119,7 +121,7 @@ public class MetricsServletTest extends AbstractServletTest {
                                                  "    }%n" +
                                                  "  },%n" +
                                                  "  \"meters\" : {%n" +
-                                                 "    \"m\" : {%n" +
+                                                 "    \"m{}\" : {%n" +
                                                  "      \"count\" : 1,%n" +
                                                  "      \"m15_rate\" : 0.0,%n" +
                                                  "      \"m1_rate\" : 0.0,%n" +
@@ -129,7 +131,7 @@ public class MetricsServletTest extends AbstractServletTest {
                                                  "    }%n" +
                                                  "  },%n" +
                                                  "  \"timers\" : {%n" +
-                                                 "    \"t\" : {%n" +
+                                                 "    \"t{}\" : {%n" +
                                                  "      \"count\" : 1,%n" +
                                                  "      \"max\" : 1.0,%n" +
                                                  "      \"mean\" : 1.0,%n" +

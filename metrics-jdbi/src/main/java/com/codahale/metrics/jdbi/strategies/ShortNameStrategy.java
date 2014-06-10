@@ -2,6 +2,8 @@ package com.codahale.metrics.jdbi.strategies;
 
 import org.skife.jdbi.v2.StatementContext;
 
+import com.codahale.metrics.MetricName;
+
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -31,7 +33,7 @@ public final class ShortNameStrategy extends DelegatingStatementNameStrategy {
 
     private final class ShortContextClassStrategy implements StatementNameStrategy {
         @Override
-        public String getStatementName(StatementContext statementContext) {
+        public MetricName getStatementName(StatementContext statementContext) {
             final Object classObj = statementContext.getAttribute(NameStrategies.STATEMENT_CLASS);
             final Object nameObj = statementContext.getAttribute(NameStrategies.STATEMENT_NAME);
 
@@ -60,7 +62,7 @@ public final class ShortNameStrategy extends DelegatingStatementNameStrategy {
 
     private final class ShortSqlObjectStrategy implements StatementNameStrategy {
         @Override
-        public String getStatementName(StatementContext statementContext) {
+        public MetricName getStatementName(StatementContext statementContext) {
             final Class<?> clazz = statementContext.getSqlObjectType();
             final Method method = statementContext.getSqlObjectMethod();
             if (clazz != null && method != null) {

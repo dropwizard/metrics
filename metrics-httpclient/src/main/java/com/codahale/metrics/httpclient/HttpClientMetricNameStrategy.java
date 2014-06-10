@@ -2,6 +2,8 @@ package com.codahale.metrics.httpclient;
 
 import org.apache.http.HttpRequest;
 
+import com.codahale.metrics.MetricName;
+
 public interface HttpClientMetricNameStrategy {
-    String getNameFor(String name, HttpRequest request);
+    MetricName getNameFor(String name, HttpRequest request);
 }
