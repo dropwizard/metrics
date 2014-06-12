@@ -641,11 +641,15 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         private ObjectName createName(String type, String name) {
+            Hashtable<String, String> properties = new Hashtable<String, String>();
+            properties.put("name", name);
+            properties.put("type", type);
             try {
-                return new ObjectName(this.name, "name", name);
+                return new ObjectName(this.name, properties);
             } catch (MalformedObjectNameException e) {
                 try {
-                    return new ObjectName(this.name, "name", ObjectName.quote(name));
+                    properties.put("name", ObjectName.quote(name));
+                    return new ObjectName(this.name, properties);
                 } catch (MalformedObjectNameException e1) {
                     LOGGER.warn("Unable to register {} {}", type, name, e1);
                     throw new RuntimeException(e1);
