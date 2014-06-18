@@ -27,8 +27,8 @@ public class MetricsServletTest extends AbstractServletTest {
     @Override
     protected void setUp(ServletTester tester) {
         tester.setAttribute("com.codahale.metrics.servlets.MetricsServlet.registry", registry);
-        tester.addServlet(MetricsServlet.class, "/metrics")
-                    .setInitParameter("com.codahale.metrics.servlets.MetricsServlet.allowedOrigin", "*");
+        tester.addServlet(MetricsServlet.class, "/metrics");
+        tester.getContext().setInitParameter("com.codahale.metrics.servlets.MetricsServlet.allowedOrigin", "*");
     }
 
     @Before
