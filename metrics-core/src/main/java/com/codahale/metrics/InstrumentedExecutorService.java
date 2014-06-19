@@ -131,7 +131,7 @@ public class InstrumentedExecutorService implements ExecutorService {
     private <T> Collection<? extends Callable<T>> instrument(Collection<? extends Callable<T>> tasks) {
         final List<InstrumentedCallable<T>> instrumented = new ArrayList<InstrumentedCallable<T>>(tasks.size());
         for (Callable<T> task : tasks) {
-            instrumented.add(new InstrumentedCallable(task));
+            instrumented.add(new InstrumentedCallable<T>(task));
         }
         return instrumented;
     }
