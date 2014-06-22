@@ -131,7 +131,7 @@ public class Slf4jReporter extends ScheduledReporter {
                     break;
             }
             loggerHelper = new DebugLoggerHelper(logger);
-        	return new Slf4jReporter(registry, loggerHelper, marker, rateUnit, durationUnit, filter);
+            return new Slf4jReporter(registry, loggerHelper, marker, rateUnit, durationUnit, filter);
         }
     }
 
