@@ -133,6 +133,12 @@ public class Slf4jReporter extends ScheduledReporter {
             loggerHelper = new DebugLoggerHelper(logger);
             return new Slf4jReporter(registry, loggerHelper, marker, rateUnit, durationUnit, filter);
         }
+
+        public Builder useLoggingLevel(LoggingLevel loggingLevel) {
+            this.loggingLevel = loggingLevel;
+            return this;
+        }
+
     }
 
     private final LoggerHelper loggerHelper;
