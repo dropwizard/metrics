@@ -25,6 +25,8 @@ public class Slf4jReporter extends ScheduledReporter {
         return new Builder(registry);
     }
 
+    public enum LoggingLevel {TRACE, DEBUG, INFO, WARN, ERROR}
+
     /**
      * A builder for {@link CsvReporter} instances. Defaults to logging to {@code metrics}, not
      * using a marker, converting rates to events/second, converting durations to milliseconds, and
@@ -33,6 +35,7 @@ public class Slf4jReporter extends ScheduledReporter {
     public static class Builder {
         private final MetricRegistry registry;
         private Logger logger;
+        private LoggingLevel loggingLevel;
         private Marker marker;
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
@@ -41,6 +44,7 @@ public class Slf4jReporter extends ScheduledReporter {
         private Builder(MetricRegistry registry) {
             this.registry = registry;
             this.logger = LoggerFactory.getLogger("metrics");
+            this.loggingLevel = LoggingLevel.INFO;
             this.marker = null;
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
@@ -108,21 +112,40 @@ public class Slf4jReporter extends ScheduledReporter {
          * @return a {@link Slf4jReporter}
          */
         public Slf4jReporter build() {
-            return new Slf4jReporter(registry, logger, marker, rateUnit, durationUnit, filter);
+            LoggerHelper loggerHelper;
+            switch (loggingLevel) {
+                case TRACE:
+                    loggerHelper = new TraceLoggerHelper(logger);
+                    break;
+                case DEBUG:
+                    loggerHelper = new DebugLoggerHelper(logger);
+                    break;
+                case INFO:
+                    loggerHelper = new InfoLoggerHelper(logger);
+                    break;
+                case WARN:
+                    loggerHelper = new WarnLoggerHelper(logger);
+                    break;
+                case ERROR:
+                    loggerHelper = new ErrorLoggerHelper(logger);
+                    break;
+            }
+            loggerHelper = new DebugLoggerHelper(logger);
+        	return new Slf4jReporter(registry, loggerHelper, marker, rateUnit, durationUnit, filter);
         }
     }
 
-    private final Logger logger;
+    private final LoggerHelper loggerHelper;
     private final Marker marker;
 
     private Slf4jReporter(MetricRegistry registry,
-                          Logger logger,
+                          LoggerHelper loggerHelper,
                           Marker marker,
                           TimeUnit rateUnit,
                           TimeUnit durationUnit,
                           MetricFilter filter) {
         super(registry, "logger-reporter", filter, rateUnit, durationUnit);
-        this.logger = logger;
+        this.loggerHelper = loggerHelper;
         this.marker = marker;
     }
 
@@ -155,7 +178,7 @@ public class Slf4jReporter extends ScheduledReporter {
 
     private void logTimer(String name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
-        logger.info(marker,
+        loggerHelper.log(marker,
                     "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, " +
                             "p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, " +
                             "m15={}, rate_unit={}, duration_unit={}",
@@ -180,7 +203,7 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     private void logMeter(String name, Meter meter) {
-        logger.info(marker,
+    	loggerHelper.log(marker,
                     "type=METER, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
                     name,
                     meter.getCount(),
@@ -193,7 +216,7 @@ public class Slf4jReporter extends ScheduledReporter {
 
     private void logHistogram(String name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
-        logger.info(marker,
+        loggerHelper.log(marker,
                     "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, " +
                             "median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
                     name,
@@ -211,15 +234,74 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     private void logCounter(String name, Counter counter) {
-        logger.info(marker, "type=COUNTER, name={}, count={}", name, counter.getCount());
+    	loggerHelper.log(marker, "type=COUNTER, name={}, count={}", name, counter.getCount());
     }
 
     private void logGauge(String name, Gauge gauge) {
-        logger.info(marker, "type=GAUGE, name={}, value={}", name, gauge.getValue());
+    	loggerHelper.log(marker, "type=GAUGE, name={}, value={}", name, gauge.getValue());
     }
 
     @Override
     protected String getRateUnit() {
         return "events/" + super.getRateUnit();
     }
+
+    private static abstract class LoggerHelper {
+        protected final Logger logger;
+        public LoggerHelper(Logger logger) {
+            this.logger = logger;
+        }
+        abstract void log(Marker marker, String format, Object... arguments);
+    }
+
+    private static class TraceLoggerHelper extends LoggerHelper {
+        public TraceLoggerHelper(Logger logger) {
+            super(logger);
+        }
+        @Override
+        public void log(Marker marker, String format, Object... arguments) {
+            logger.trace(marker, format, arguments);
+        }
+    }
+
+    private static class DebugLoggerHelper extends LoggerHelper {
+        public DebugLoggerHelper(Logger logger) {
+            super(logger);
+        }
+        @Override
+        public void log(Marker marker, String format, Object... arguments) {
+            logger.debug(marker, format, arguments);
+        }
+    }
+
+    private static class InfoLoggerHelper extends LoggerHelper {
+        public InfoLoggerHelper(Logger logger) {
+            super(logger);
+        }
+        @Override
+        public void log(Marker marker, String format, Object... arguments) {
+            logger.info(marker, format, arguments);
+        }
+    }
+
+    private static class WarnLoggerHelper extends LoggerHelper {
+        public WarnLoggerHelper(Logger logger) {
+            super(logger);
+        }
+        @Override
+        public void log(Marker marker, String format, Object... arguments) {
+            logger.warn(marker, format, arguments);
+        }
+    }
+
+    private static class ErrorLoggerHelper extends LoggerHelper {
+        public ErrorLoggerHelper(Logger logger) {
+            super(logger);
+        }
+        @Override
+        public void log(Marker marker, String format, Object... arguments) {
+            logger.error(marker, format, arguments);
+        }
+    }
+
 }
