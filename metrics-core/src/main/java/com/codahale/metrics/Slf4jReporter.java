@@ -114,23 +114,22 @@ public class Slf4jReporter extends ScheduledReporter {
         public Slf4jReporter build() {
             LoggerHelper loggerHelper;
             switch (loggingLevel) {
-                case TRACE:
-                    loggerHelper = new TraceLoggerHelper(logger);
-                    break;
-                case DEBUG:
-                    loggerHelper = new DebugLoggerHelper(logger);
-                    break;
-                case INFO:
-                    loggerHelper = new InfoLoggerHelper(logger);
+                case ERROR:
+                    loggerHelper = new ErrorLoggerHelper(logger);
                     break;
                 case WARN:
                     loggerHelper = new WarnLoggerHelper(logger);
                     break;
-                case ERROR:
-                    loggerHelper = new ErrorLoggerHelper(logger);
+                case INFO:
+                    loggerHelper = new InfoLoggerHelper(logger);
                     break;
+                case TRACE:
+                    loggerHelper = new TraceLoggerHelper(logger);
+                    break;
+                default:
+                    loggerHelper = new DebugLoggerHelper(logger);
+                	break;                	
             }
-            loggerHelper = new DebugLoggerHelper(logger);
             return new Slf4jReporter(registry, loggerHelper, marker, rateUnit, durationUnit, filter);
         }
 
