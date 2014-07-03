@@ -48,6 +48,10 @@ public class GraphiteReporter extends ScheduledReporter {
         private TimeUnit durationUnit;
         private MetricFilter filter;
 
+        private GraphiteMeterProfile meterProfile;
+        private GraphiteHistogramProfile histogramProfile;
+        private GraphiteTimerProfile timerProfile;
+
         private Builder(MetricRegistry registry) {
             this.registry = registry;
             this.reportingRegistry = registry;
@@ -56,6 +60,9 @@ public class GraphiteReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
+            this.meterProfile = new GraphiteMeterProfile.Builder().build();
+            this.histogramProfile = new GraphiteHistogramProfile.Builder().build();
+            this.timerProfile = new GraphiteTimerProfile.Builder().build();
         }
 
         public Builder executorService(ScheduledExecutorService executorService) {
@@ -123,6 +130,21 @@ public class GraphiteReporter extends ScheduledReporter {
             return this;
         }
 
+        public Builder meterProfile(GraphiteMeterProfile profile) {
+            this.meterProfile = profile;
+            return this;
+        }
+
+        public Builder histogramProfile(GraphiteHistogramProfile profile) {
+            this.histogramProfile = profile;
+            return this;
+        }
+
+        public Builder timerProfile(GraphiteTimerProfile profile) {
+            this.timerProfile = profile;
+            return this;
+        }
+
         /**
          * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
          * given {@link Graphite} client.
@@ -140,7 +162,11 @@ public class GraphiteReporter extends ScheduledReporter {
                     prefix,
                     rateUnit,
                     durationUnit,
-                    filter);
+                    filter,
+                    meterProfile,
+                    histogramProfile,
+                    timerProfile
+            );
         }
     }
 
@@ -154,6 +180,10 @@ public class GraphiteReporter extends ScheduledReporter {
     private final AtomicLong publishDurationMS = new AtomicLong(0);
     private final AtomicLong payloadSize = new AtomicLong(0);
 
+    private final GraphiteMeterProfile meterProfile;
+    private final GraphiteHistogramProfile histogramProfile;
+    private final GraphiteTimerProfile timerProfile;
+
     private GraphiteReporter(ScheduledExecutorService executor,
                                     MetricRegistry registry,
                                     MetricRegistry reportingRegistry,
@@ -162,11 +192,17 @@ public class GraphiteReporter extends ScheduledReporter {
                                     String prefix,
                                     TimeUnit rateUnit,
                                     TimeUnit durationUnit,
-                                    MetricFilter filter) {
+                                    MetricFilter filter,
+                                    GraphiteMeterProfile meterProfile,
+                                    GraphiteHistogramProfile histogramProfile,
+                                    GraphiteTimerProfile timerProfile) {
         super(registry, executor, filter, rateUnit, durationUnit);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
+        this.meterProfile = meterProfile;
+        this.histogramProfile = histogramProfile;
+        this.timerProfile = timerProfile;
 
         configurePublishingMetrics(reportingRegistry);
     }
@@ -228,27 +264,62 @@ public class GraphiteReporter extends ScheduledReporter {
 
             if (LOGGER.isInfoEnabled()) { LOGGER.info("Gauges     : " + gauges.size()); }
             for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
-                bytesSent += reportGauge(entry.getKey(), entry.getValue(), timestamp);
+                final String name = entry.getKey();
+                try {
+                    bytesSent += reportGauge(name, entry.getValue(), timestamp);
+                } catch (IOException e) {
+                    throw e;
+                } catch (Exception e) {
+                    LOGGER.warn("Unable to report " + name, e);
+                }
             }
 
             if (LOGGER.isInfoEnabled()) { LOGGER.info("Counters   : " + counters.size()); }
             for (Map.Entry<String, Counter> entry : counters.entrySet()) {
-                bytesSent += reportCounter(entry.getKey(), entry.getValue(), timestamp);
-            }
-
-            if (LOGGER.isInfoEnabled()) { LOGGER.info("Histograms : " + histograms.size()); }
-            for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
-                bytesSent += reportHistogram(entry.getKey(), entry.getValue(), timestamp);
+                final String name = entry.getKey();
+                try {
+                    bytesSent += reportCounter(name, entry.getValue(), timestamp);
+                } catch (IOException e) {
+                    throw e;
+                } catch (Exception e) {
+                    LOGGER.warn("Unable to report " + name, e);
+                }
             }
 
             if (LOGGER.isInfoEnabled()) { LOGGER.info("Meters     : " + meters.size()); }
             for (Map.Entry<String, Meter> entry : meters.entrySet()) {
-                bytesSent += reportMetered(entry.getKey(), entry.getValue(), timestamp);
+                final String name = entry.getKey();
+                try {
+                    bytesSent += reportMeter(name, entry.getValue(), timestamp);
+                } catch (IOException e) {
+                    throw e;
+                } catch (Exception e) {
+                    LOGGER.warn("Unable to report " + name, e);
+                }
+            }
+
+            if (LOGGER.isInfoEnabled()) { LOGGER.info("Histograms : " + histograms.size()); }
+            for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
+                final String name = entry.getKey();
+                try {
+                    bytesSent += reportHistogram(name, entry.getValue(), timestamp);
+                } catch (IOException e) {
+                    throw e;
+                } catch (Exception e) {
+                    LOGGER.warn("Unable to report " + name, e);
+                }
             }
 
             if (LOGGER.isInfoEnabled()) { LOGGER.info("Timers     : " + timers.size()); }
             for (Map.Entry<String, Timer> entry : timers.entrySet()) {
-                bytesSent += reportTimer(entry.getKey(), entry.getValue(), timestamp);
+                final String name = entry.getKey();
+                try {
+                    bytesSent += reportTimer(name, entry.getValue(), timestamp);
+                } catch (IOException e) {
+                    throw e;
+                } catch (Exception e) {
+                    LOGGER.warn("Unable to report " + name, e);
+                }
             }
 
             payloadSize.set(bytesSent);
@@ -270,55 +341,40 @@ public class GraphiteReporter extends ScheduledReporter {
         }
     }
 
-    private int reportTimer(String name, Timer timer, long timestamp) throws IOException {
-        final Snapshot snapshot = timer.getSnapshot();
-        int byteCount = 0;
-
-        byteCount += graphite.send(prefix(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
-        byteCount += graphite.send(prefix(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
-        byteCount += graphite.send(prefix(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);
-        byteCount += graphite.send(prefix(name, "stddev"),
-                      format(convertDuration(snapshot.getStdDev())),
-                      timestamp);
-//        byteCount += graphite.send(prefix(name, "p50"),
-//                      format(convertDuration(snapshot.getMedian())),
-//                      timestamp);
-//        byteCount += graphite.send(prefix(name, "p75"),
-//                      format(convertDuration(snapshot.get75thPercentile())),
-//                      timestamp);
-        byteCount += graphite.send(prefix(name, "p95"),
-                      format(convertDuration(snapshot.get95thPercentile())),
-                      timestamp);
-//        byteCount += graphite.send(prefix(name, "p98"),
-//                      format(convertDuration(snapshot.get98thPercentile())),
-//                      timestamp);
-//        byteCount += graphite.send(prefix(name, "p99"),
-//                      format(convertDuration(snapshot.get99thPercentile())),
-//                      timestamp);
-        byteCount += graphite.send(prefix(name, "p999"),
-                      format(convertDuration(snapshot.get999thPercentile())),
-                      timestamp);
-
-        byteCount += reportMetered(name, timer, timestamp);
-
-        return byteCount;
+    private int reportGauge(String name, Gauge gauge, long timestamp) throws IOException {
+        final String value = format(gauge.getValue());
+        if (value != null) {
+            return graphite.send(prefix(name), value, timestamp);
+        }
+        return 0;
     }
 
-    private int reportMetered(String name, Metered meter, long timestamp) throws IOException {
+    private int reportCounter(String name, Counter counter, long timestamp) throws IOException {
+        return graphite.send(prefix(name, "count"), format(counter.getCount()), timestamp);
+    }
+
+    private int reportMeter(String name, Metered meter, long timestamp) throws IOException {
         int byteCount = 0;
-        byteCount += graphite.send(prefix(name, "count"), format(meter.getCount()), timestamp);
-        byteCount += graphite.send(prefix(name, "m1_rate"),
-                      format(convertRate(meter.getOneMinuteRate())),
-                      timestamp);
-//        byteCount += graphite.send(prefix(name, "m5_rate"),
-//                      format(convertRate(meter.getFiveMinuteRate())),
-//                      timestamp);
-//        byteCount += graphite.send(prefix(name, "m15_rate"),
-//                      format(convertRate(meter.getFifteenMinuteRate())),
-//                      timestamp);
-//        byteCount += graphite.send(prefix(name, "mean_rate"),
-//                      format(convertRate(meter.getMeanRate())),
-//                      timestamp);
+
+        if (meterProfile.isCount()) {
+            byteCount += graphite.send(prefix(name, "count"), format(meter.getCount()), timestamp);
+        }
+
+        if (meterProfile.isOneMinuteRate()) {
+            byteCount += graphite.send(prefix(name, "m1_rate"), format(convertRate(meter.getOneMinuteRate())), timestamp);
+        }
+
+        if (meterProfile.isFiveMinuteRate()) {
+            byteCount += graphite.send(prefix(name, "m5_rate"), format(convertRate(meter.getFiveMinuteRate())), timestamp);
+        }
+
+        if (meterProfile.isFifteenMinuteRate()) {
+            byteCount += graphite.send(prefix(name, "m15_rate"), format(convertRate(meter.getFifteenMinuteRate())), timestamp);
+        }
+
+        if (meterProfile.isMeanRate()) {
+            byteCount += graphite.send(prefix(name, "mean_rate"), format(convertRate(meter.getMeanRate())), timestamp);
+        }
 
         return byteCount;
     }
@@ -326,31 +382,119 @@ public class GraphiteReporter extends ScheduledReporter {
     private int reportHistogram(String name, Histogram histogram, long timestamp) throws IOException {
         final Snapshot snapshot = histogram.getSnapshot();
         int byteCount = 0;
-        byteCount += graphite.send(prefix(name, "count"), format(histogram.getCount()), timestamp);
-        byteCount += graphite.send(prefix(name, "max"), format(snapshot.getMax()), timestamp);
-        byteCount += graphite.send(prefix(name, "mean"), format(snapshot.getMean()), timestamp);
-        byteCount += graphite.send(prefix(name, "min"), format(snapshot.getMin()), timestamp);
-        byteCount += graphite.send(prefix(name, "stddev"), format(snapshot.getStdDev()), timestamp);
-//        byteCount += graphite.send(prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
-//        byteCount += graphite.send(prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
-        byteCount += graphite.send(prefix(name, "p95"), format(snapshot.get95thPercentile()), timestamp);
-//        byteCount += graphite.send(prefix(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
-//        byteCount += graphite.send(prefix(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
-        byteCount += graphite.send(prefix(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
+
+        if (histogramProfile.isCount()) {
+            byteCount += graphite.send(prefix(name, "count"), format(histogram.getCount()), timestamp);
+        }
+
+        if (histogramProfile.isMax()) {
+            byteCount += graphite.send(prefix(name, "max"), format(snapshot.getMax()), timestamp);
+        }
+
+        if (histogramProfile.isMean()) {
+            byteCount += graphite.send(prefix(name, "mean"), format(snapshot.getMean()), timestamp);
+        }
+
+        if (histogramProfile.isMin()) {
+            byteCount += graphite.send(prefix(name, "min"), format(snapshot.getMin()), timestamp);
+        }
+
+        if (histogramProfile.isStdDev()) {
+            byteCount += graphite.send(prefix(name, "stddev"), format(snapshot.getStdDev()), timestamp);
+        }
+
+        if (histogramProfile.is50thPercentile()) {
+            byteCount += graphite.send(prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
+        }
+
+        if (histogramProfile.is75thPercentile()) {
+            byteCount += graphite.send(prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
+        }
+
+        if (histogramProfile.is95thPercentile()) {
+            byteCount += graphite.send(prefix(name, "p95"), format(snapshot.get95thPercentile()), timestamp);
+        }
+
+        if (histogramProfile.is98thPercentile()) {
+            byteCount += graphite.send(prefix(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
+        }
+
+        if (histogramProfile.is99thPercentile()) {
+            byteCount += graphite.send(prefix(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
+        }
+
+        if (histogramProfile.is999thPercentile()) {
+            byteCount += graphite.send(prefix(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
+        }
 
         return byteCount;
     }
 
-    private int reportCounter(String name, Counter counter, long timestamp) throws IOException {
-        return graphite.send(prefix(name, "count"), format(counter.getCount()), timestamp);
-    }
+    private int reportTimer(String name, Timer timer, long timestamp) throws IOException {
+        final Snapshot snapshot = timer.getSnapshot();
+        int byteCount = 0;
 
-    private int reportGauge(String name, Gauge gauge, long timestamp) throws IOException {
-        final String value = format(gauge.getValue());
-        if (value != null) {
-            return graphite.send(prefix(name), value, timestamp);
+        if (timerProfile.isCount()) {
+            byteCount += graphite.send(prefix(name, "count"), format(timer.getCount()), timestamp);
         }
-        return 0;
+
+        if (timerProfile.isOneMinuteRate()) {
+            byteCount += graphite.send(prefix(name, "m1_rate"), format(convertRate(timer.getOneMinuteRate())), timestamp);
+        }
+
+        if (timerProfile.isFiveMinuteRate()) {
+            byteCount += graphite.send(prefix(name, "m5_rate"), format(convertRate(timer.getFiveMinuteRate())), timestamp);
+        }
+
+        if (timerProfile.isFifteenMinuteRate()) {
+            byteCount += graphite.send(prefix(name, "m15_rate"), format(convertRate(timer.getFifteenMinuteRate())), timestamp);
+        }
+
+        if (timerProfile.isMeanRate()) {
+            byteCount += graphite.send(prefix(name, "mean_rate"), format(convertRate(timer.getMeanRate())), timestamp);
+        }
+
+        if (timerProfile.isMax()) {
+            byteCount += graphite.send(prefix(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
+        }
+
+        if (timerProfile.isMean()) {
+            byteCount += graphite.send(prefix(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
+        }
+
+        if (timerProfile.isMin()) {
+            byteCount += graphite.send(prefix(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);
+        }
+
+        if (timerProfile.isStdDev()) {
+            byteCount += graphite.send(prefix(name, "stddev"), format(convertDuration(snapshot.getStdDev())), timestamp);
+        }
+
+        if (timerProfile.is50thPercentile()) {
+            byteCount += graphite.send(prefix(name, "p50"), format(convertDuration(snapshot.getMedian())), timestamp);
+        }
+
+        if (timerProfile.is75thPercentile()) {
+            byteCount += graphite.send(prefix(name, "p75"), format(convertDuration(snapshot.get75thPercentile())), timestamp);
+        }
+
+        if (timerProfile.is95thPercentile()) {
+            byteCount += graphite.send(prefix(name, "p95"), format(convertDuration(snapshot.get95thPercentile())), timestamp);
+        }
+
+        if (timerProfile.is98thPercentile()) {
+            byteCount += graphite.send(prefix(name, "p98"), format(convertDuration(snapshot.get98thPercentile())), timestamp);
+        }
+
+        if (timerProfile.is99thPercentile()) {
+            byteCount += graphite.send(prefix(name, "p99"), format(convertDuration(snapshot.get99thPercentile())), timestamp);
+        }
+
+        if (timerProfile.is999thPercentile()) {
+            byteCount += graphite.send(prefix(name, "p999"), format(convertDuration(snapshot.get999thPercentile())), timestamp);
+        }
+
+        return byteCount;
     }
 
     private String format(Object o) {
@@ -383,4 +527,5 @@ public class GraphiteReporter extends ScheduledReporter {
         // US-formatted digits
         return String.format(Locale.US, "%2.2f", v);
     }
+
 }
