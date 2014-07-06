@@ -29,10 +29,10 @@ public class SharedMetricRegistries {
         return REGISTRIES.putIfAbsent(name, registry);
     }
 
-    public static MetricRegistry getOrCreate(String name) {
+    public static MetricRegistry getOrCreate(String name, boolean enabled) {
         final MetricRegistry existing = REGISTRIES.get(name);
         if (existing == null) {
-            final MetricRegistry created = new MetricRegistry();
+            final MetricRegistry created = MetricsFactory.getMetricRegistry(enabled);
             final MetricRegistry raced = add(name, created);
             if (raced == null) {
                 return created;

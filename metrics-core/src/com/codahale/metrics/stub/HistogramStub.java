@@ -1,5 +1,7 @@
-package com.codahale.metrics;
+package com.codahale.metrics.stub;
 
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Snapshot;
 
 /**
  * A metric which calculates the distribution of a value.
@@ -7,21 +9,23 @@ package com.codahale.metrics;
  * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately computing running
  *      variance</a>
  */
-public abstract class Histogram implements Metric, Sampling, Counting {
+public class HistogramStub extends Histogram {
 
     /**
      * Adds a recorded value.
      *
      * @param value the length of the value
      */
-    public abstract void update(int value);
+    public void update(int value) {
+    }
 
     /**
      * Adds a recorded value.
      *
      * @param value the length of the value
      */
-    public abstract void update(long value);
+    public void update(long value) {
+    }
 
     /**
      * Returns the number of values recorded.
@@ -29,8 +33,12 @@ public abstract class Histogram implements Metric, Sampling, Counting {
      * @return the number of values recorded
      */
     @Override
-    public abstract long getCount();
+    public long getCount() {
+        return 0;
+    }
 
     @Override
-    public abstract Snapshot getSnapshot();
+    public Snapshot getSnapshot() {
+        return null;
+    }
 }

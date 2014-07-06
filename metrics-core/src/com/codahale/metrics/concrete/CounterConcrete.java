@@ -1,33 +1,49 @@
-package com.codahale.metrics;
+package com.codahale.metrics.concrete;
+
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.LongAdder;
 
 /**
  * An incrementing and decrementing counter metric.
  */
-public abstract class Counter implements Metric, Counting {
+public class CounterConcrete extends Counter {
+    private final LongAdder count;
 
-	/**
+    public CounterConcrete() {
+        this.count = new LongAdder();
+    }
+
+    /**
      * Increment the counter by one.
      */
-    public abstract void inc();
+    public void inc() {
+        inc(1);
+    }
 
     /**
      * Increment the counter by {@code n}.
      *
      * @param n the amount by which the counter will be increased
      */
-    public abstract void inc(long n);
+    public void inc(long n) {
+        count.add(n);
+    }
 
     /**
      * Decrement the counter by one.
      */
-    public abstract void dec();
+    public void dec() {
+        dec(1);
+    }
 
     /**
      * Decrement the counter by {@code n}.
      *
      * @param n the amount by which the counter will be decreased
      */
-    public abstract void dec(long n);
+    public void dec(long n) {
+        count.add(-n);
+    }
 
     /**
      * Returns the counter's current value.
@@ -35,5 +51,7 @@ public abstract class Counter implements Metric, Counting {
      * @return the counter's current value
      */
     @Override
-    public abstract long getCount();
+    public long getCount() {
+        return count.sum();
+    }
 }

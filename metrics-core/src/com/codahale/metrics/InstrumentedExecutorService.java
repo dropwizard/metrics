@@ -3,11 +3,11 @@ package com.codahale.metrics;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -46,10 +46,10 @@ public class InstrumentedExecutorService implements ExecutorService {
      */
     public InstrumentedExecutorService(ExecutorService delegate, MetricRegistry registry, String name) {
         this.delegate = delegate;
-        this.submitted = registry.meter(MetricRegistry.name(name, "submitted"));
-        this.running = registry.counter(MetricRegistry.name(name, "running"));
-        this.completed = registry.meter(MetricRegistry.name(name, "completed"));
-        this.duration = registry.timer(MetricRegistry.name(name, "duration"));
+        this.submitted = registry.meter(registry.name(name, "submitted"));
+        this.running = registry.counter(registry.name(name, "running"));
+        this.completed = registry.meter(registry.name(name, "completed"));
+        this.duration = registry.timer(registry.name(name, "duration"));
     }
 
     /**
@@ -171,7 +171,7 @@ public class InstrumentedExecutorService implements ExecutorService {
         @Override
         public void run() {
             running.inc();
-            final Timer.Context context = duration.time();
+            final TimerContext context = duration.time();
             try {
                 task.run();
             } finally {
@@ -192,7 +192,7 @@ public class InstrumentedExecutorService implements ExecutorService {
         @Override
         public T call() throws Exception {
             running.inc();
-            final Timer.Context context = duration.time();
+            final TimerContext context = duration.time();
             try {
                 return callable.call();
             } finally {

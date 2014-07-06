@@ -36,9 +36,9 @@ public class InstrumentedThreadFactory implements ThreadFactory {
      */
     public InstrumentedThreadFactory(ThreadFactory delegate, MetricRegistry registry, String name) {
         this.delegate = delegate;
-        this.created = registry.meter(MetricRegistry.name(name, "created"));
-        this.running = registry.counter(MetricRegistry.name(name, "running"));
-        this.terminated = registry.meter(MetricRegistry.name(name, "terminated"));
+        this.created = registry.meter(registry.name(name, "created"));
+        this.running = registry.counter(registry.name(name, "running"));
+        this.terminated = registry.meter(registry.name(name, "terminated"));
     }
 
     /**

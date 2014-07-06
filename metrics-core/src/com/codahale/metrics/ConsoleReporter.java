@@ -2,7 +2,11 @@ package com.codahale.metrics;
 
 import java.io.PrintStream;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -175,7 +179,7 @@ public class ConsoleReporter extends ScheduledReporter {
         printWithBanner(dateTime, '=');
         output.println();
 
-        if (!gauges.isEmpty()) {
+        if (gauges != null && !gauges.isEmpty()) {
             printWithBanner("-- Gauges", '-');
             for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
                 output.println(entry.getKey());
@@ -184,7 +188,7 @@ public class ConsoleReporter extends ScheduledReporter {
             output.println();
         }
 
-        if (!counters.isEmpty()) {
+        if (counters != null && !counters.isEmpty()) {
             printWithBanner("-- Counters", '-');
             for (Map.Entry<String, Counter> entry : counters.entrySet()) {
                 output.println(entry.getKey());
@@ -193,7 +197,7 @@ public class ConsoleReporter extends ScheduledReporter {
             output.println();
         }
 
-        if (!histograms.isEmpty()) {
+        if (histograms != null && !histograms.isEmpty()) {
             printWithBanner("-- Histograms", '-');
             for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
                 output.println(entry.getKey());
@@ -202,7 +206,7 @@ public class ConsoleReporter extends ScheduledReporter {
             output.println();
         }
 
-        if (!meters.isEmpty()) {
+        if (meters != null && !meters.isEmpty()) {
             printWithBanner("-- Meters", '-');
             for (Map.Entry<String, Meter> entry : meters.entrySet()) {
                 output.println(entry.getKey());
@@ -211,7 +215,7 @@ public class ConsoleReporter extends ScheduledReporter {
             output.println();
         }
 
-        if (!timers.isEmpty()) {
+        if (timers != null && !timers.isEmpty()) {
             printWithBanner("-- Timers", '-');
             for (Map.Entry<String, Timer> entry : timers.entrySet()) {
                 output.println(entry.getKey());

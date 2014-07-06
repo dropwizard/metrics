@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @since 1.8
  */
 @SuppressWarnings("all")
-class LongAdder extends AtomicLong implements Serializable {
+public class LongAdder extends AtomicLong implements Serializable {
     private static final long serialVersionUID = 7249069246863182397L;
 
     /**
@@ -36,7 +36,7 @@ class LongAdder extends AtomicLong implements Serializable {
     /**
      * Creates a new adder with initial sum of zero.
      */
-    LongAdder() {
+    public LongAdder() {
     }
 
     /**
