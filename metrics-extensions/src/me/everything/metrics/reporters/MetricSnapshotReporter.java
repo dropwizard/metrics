@@ -223,7 +223,7 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
     	
         Log.v(TAG, mReporterName + ": " + "Begin metrics report");
     	
-        if (!gauges.isEmpty()) {
+        if (gauges != null && !gauges.isEmpty()) {
             for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
             	GaugeSnapshot snap = new GaugeSnapshot(entry.getKey(), entry.getValue());
             	modifications += reportMetric(snap);
@@ -231,7 +231,7 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
             }
         }
         
-        if (!counters.isEmpty()) {
+        if (counters != null && !counters.isEmpty()) {
             for (Map.Entry<String, Counter> entry : counters.entrySet()) {
             	CounterSnapshot snap = new CounterSnapshot(entry.getKey(), entry.getValue());
             	modifications += reportMetric(snap);
@@ -239,7 +239,7 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
             }
         }
         
-        if (!histograms.isEmpty()) {
+        if (histograms != null && !histograms.isEmpty()) {
             for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
                 HistogramSnapshot snap = new HistogramSnapshot(entry.getKey(), entry.getValue());
                 modifications += reportMetric(snap);
@@ -247,7 +247,7 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
             }
         }
         
-        if (!meters.isEmpty()) {
+        if (meters != null && !meters.isEmpty()) {
             for (Map.Entry<String, Meter> entry : meters.entrySet()) {
                 MeterSnapshot snap = new MeterSnapshot(entry.getKey(), entry.getValue(), mRateUnit, mRateFactor);
                 modifications += reportMetric(snap);
@@ -255,7 +255,7 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
             }
         }
 
-        if (!timers.isEmpty()) {
+        if (timers != null && !timers.isEmpty()) {
             for (Map.Entry<String, Timer> entry : timers.entrySet()) {
                 TimerSnapshot snap = new TimerSnapshot(entry.getKey(), entry.getValue(), mRateUnit, mDurationUnit, mRateFactor, mDurationFactor);
                 modifications += reportMetric(snap);
@@ -306,35 +306,35 @@ public abstract class MetricSnapshotReporter implements Closeable, Reporter {
         double rateFactor = convertRate(1);
         double durationFactor = convertDuration(1);
     	
-        if (!gauges.isEmpty()) {
+        if (gauges != null && !gauges.isEmpty()) {
             for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
             	GaugeSnapshot snap = new GaugeSnapshot(entry.getKey(), entry.getValue());
         		metrics.put(entry.getKey(), snap);
             }
         }
 
-        if (!counters.isEmpty()) {
+        if (counters != null && !counters.isEmpty()) {
             for (Map.Entry<String, Counter> entry : counters.entrySet()) {
             	CounterSnapshot snap = new CounterSnapshot(entry.getKey(), entry.getValue());
             	metrics.put(entry.getKey(), snap);
             }
         }
 
-        if (!histograms.isEmpty()) {
+        if (histograms != null && !histograms.isEmpty()) {
             for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
                 HistogramSnapshot snap = new HistogramSnapshot(entry.getKey(), entry.getValue());
                 metrics.put(entry.getKey(), snap);
             }
         }
 
-        if (!meters.isEmpty()) {
+        if (meters != null && !meters.isEmpty()) {
             for (Map.Entry<String, Meter> entry : meters.entrySet()) {
                 MeterSnapshot snap = new MeterSnapshot(entry.getKey(), entry.getValue(), rateUnit, rateFactor);
                 metrics.put(entry.getKey(), snap);
             }
         }
 
-        if (!timers.isEmpty()) {
+        if (timers != null && !timers.isEmpty()) {
             for (Map.Entry<String, Timer> entry : timers.entrySet()) {
                 TimerSnapshot snap = new TimerSnapshot(entry.getKey(), entry.getValue(), rateUnit, durationUnit, rateFactor, durationFactor);
                 metrics.put(entry.getKey(), snap);
