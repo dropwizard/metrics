@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 
 public class MetricsModuleTest {
     private final ObjectMapper mapper = new ObjectMapper().registerModule(
-            new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, false));
+            new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, false, MetricFilter.ALL));
 
     @Test
     public void serializesGauges() throws Exception {
@@ -84,7 +84,7 @@ public class MetricsModuleTest {
                                    "\"stddev\":5.0}");
 
         final ObjectMapper fullMapper = new ObjectMapper().registerModule(
-                new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, true));
+                new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, true, MetricFilter.ALL));
 
         assertThat(fullMapper.writeValueAsString(histogram))
                 .isEqualTo("{" +
@@ -107,9 +107,9 @@ public class MetricsModuleTest {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
         when(meter.getMeanRate()).thenReturn(2.0);
-        when(meter.getOneMinuteRate()).thenReturn(3.0);
+        when(meter.getOneMinuteRate()).thenReturn(5.0);
         when(meter.getFiveMinuteRate()).thenReturn(4.0);
-        when(meter.getFifteenMinuteRate()).thenReturn(5.0);
+        when(meter.getFifteenMinuteRate()).thenReturn(3.0);
 
         assertThat(mapper.writeValueAsString(meter))
                 .isEqualTo("{" +
@@ -163,15 +163,15 @@ public class MetricsModuleTest {
                                    "\"p99\":900.0," +
                                    "\"p999\":1000.0," +
                                    "\"stddev\":400.0," +
-                                   "\"m15_rate\":3.0," +
-                                   "\"m1_rate\":5.0," +
+                                   "\"m15_rate\":5.0," +
+                                   "\"m1_rate\":3.0," +
                                    "\"m5_rate\":4.0," +
                                    "\"mean_rate\":2.0," +
                                    "\"duration_units\":\"milliseconds\"," +
                                    "\"rate_units\":\"calls/second\"}");
 
         final ObjectMapper fullMapper = new ObjectMapper().registerModule(
-                new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, true));
+                new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, true, MetricFilter.ALL));
 
         assertThat(fullMapper.writeValueAsString(timer))
                 .isEqualTo("{" +
@@ -187,8 +187,8 @@ public class MetricsModuleTest {
                                    "\"p999\":1000.0," +
                                    "\"values\":[1.0,2.0,3.0]," +
                                    "\"stddev\":400.0," +
-                                   "\"m15_rate\":3.0," +
-                                   "\"m1_rate\":5.0," +
+                                   "\"m15_rate\":5.0," +
+                                   "\"m1_rate\":3.0," +
                                    "\"m5_rate\":4.0," +
                                    "\"mean_rate\":2.0," +
                                    "\"duration_units\":\"milliseconds\"," +

@@ -9,6 +9,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The abstract base class for all scheduled reporters (i.e., reporters which process a registry's
  * metrics periodically).
@@ -17,7 +20,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @see CsvReporter
  * @see Slf4jReporter
  */
-public abstract class ScheduledReporter implements Closeable {
+public abstract class ScheduledReporter implements Closeable, Reporter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ScheduledReporter.class);
+
     /**
      * A simple named thread factory.
      */
@@ -44,6 +50,8 @@ public abstract class ScheduledReporter implements Closeable {
         }
     }
 
+    private static final AtomicInteger FACTORY_ID = new AtomicInteger();
+
     private final MetricRegistry registry;
     private final ScheduledExecutorService executor;
     private final MetricFilter filter;
@@ -59,6 +67,8 @@ public abstract class ScheduledReporter implements Closeable {
      *                 reporter will report
      * @param name     the reporter's name
      * @param filter   the filter for which metrics to report
+     * @param rateUnit a unit of time 
+     * @param durationUnit a unit of time
      */
     protected ScheduledReporter(MetricRegistry registry,
                                 String name,
@@ -67,7 +77,7 @@ public abstract class ScheduledReporter implements Closeable {
                                 TimeUnit durationUnit) {
         this.registry = registry;
         this.filter = filter;
-        this.executor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name));
+        this.executor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name + '-' + FACTORY_ID.incrementAndGet()));
         this.rateFactor = rateUnit.toSeconds(1);
         this.rateUnit = calculateRateUnit(rateUnit);
         this.durationFactor = 1.0 / durationUnit.toNanos(1);
@@ -81,23 +91,39 @@ public abstract class ScheduledReporter implements Closeable {
      * @param unit   the unit for {@code period}
      */
     public void start(long period, TimeUnit unit) {
-        executor.scheduleAtFixedRate(new VerboseRunnable() {
+        executor.scheduleAtFixedRate(new Runnable() {
             @Override
-            public void doRun() {
-                report();
+            public void run() {
+                try {
+                    report();
+                } catch (RuntimeException ex) {
+                    LOG.error("RuntimeException thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
+                }
             }
         }, period, period, unit);
     }
 
     /**
      * Stops the reporter and shuts down its thread of execution.
+     *
+     * Uses the shutdown pattern from http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ExecutorService.html
      */
     public void stop() {
-        executor.shutdown();
+        executor.shutdown(); // Disable new tasks from being submitted
         try {
-            executor.awaitTermination(1, TimeUnit.SECONDS);
-        } catch (InterruptedException ignored) {
-            // do nothing
+            // Wait a while for existing tasks to terminate
+            if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+                executor.shutdownNow(); // Cancel currently executing tasks
+                // Wait a while for tasks to respond to being cancelled
+                if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+                    System.err.println(getClass().getSimpleName() + ": ScheduledExecutorService did not terminate");
+                }
+            }
+        } catch (InterruptedException ie) {
+            // (Re-)Cancel if current thread also interrupted
+            executor.shutdownNow();
+            // Preserve interrupt status
+            Thread.currentThread().interrupt();
         }
     }
 

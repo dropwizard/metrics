@@ -103,8 +103,8 @@ public class MetricsModule extends Module {
                               SerializerProvider provider) throws IOException {
             json.writeStartObject();
             json.writeNumberField("count", meter.getCount());
-            json.writeNumberField("m15_rate", meter.getOneMinuteRate() * rateFactor);
-            json.writeNumberField("m1_rate", meter.getFifteenMinuteRate() * rateFactor);
+            json.writeNumberField("m15_rate", meter.getFifteenMinuteRate() * rateFactor);
+            json.writeNumberField("m1_rate", meter.getOneMinuteRate() * rateFactor);
             json.writeNumberField("m5_rate", meter.getFiveMinuteRate() * rateFactor);
             json.writeNumberField("mean_rate", meter.getMeanRate() * rateFactor);
             json.writeStringField("units", rateUnit);
@@ -158,8 +158,8 @@ public class MetricsModule extends Module {
             }
 
             json.writeNumberField("stddev", snapshot.getStdDev() * durationFactor);
-            json.writeNumberField("m15_rate", timer.getOneMinuteRate() * rateFactor);
-            json.writeNumberField("m1_rate", timer.getFifteenMinuteRate() * rateFactor);
+            json.writeNumberField("m15_rate", timer.getFifteenMinuteRate() * rateFactor);
+            json.writeNumberField("m1_rate", timer.getOneMinuteRate() * rateFactor);
             json.writeNumberField("m5_rate", timer.getFiveMinuteRate() * rateFactor);
             json.writeNumberField("mean_rate", timer.getMeanRate() * rateFactor);
             json.writeStringField("duration_units", durationUnit);
@@ -169,8 +169,12 @@ public class MetricsModule extends Module {
     }
 
     private static class MetricRegistrySerializer extends StdSerializer<MetricRegistry> {
-        private MetricRegistrySerializer() {
+      
+        private final MetricFilter filter;
+        
+        private MetricRegistrySerializer(MetricFilter filter) {
             super(MetricRegistry.class);
+            this.filter = filter;
         }
 
         @Override
@@ -179,11 +183,11 @@ public class MetricsModule extends Module {
                               SerializerProvider provider) throws IOException {
             json.writeStartObject();
             json.writeStringField("version", VERSION.toString());
-            json.writeObjectField("gauges", registry.getGauges());
-            json.writeObjectField("counters", registry.getCounters());
-            json.writeObjectField("histograms", registry.getHistograms());
-            json.writeObjectField("meters", registry.getMeters());
-            json.writeObjectField("timers", registry.getTimers());
+            json.writeObjectField("gauges", registry.getGauges(filter));
+            json.writeObjectField("counters", registry.getCounters(filter));
+            json.writeObjectField("histograms", registry.getHistograms(filter));
+            json.writeObjectField("meters", registry.getMeters(filter));
+            json.writeObjectField("timers", registry.getTimers(filter));
             json.writeEndObject();
         }
     }
@@ -191,11 +195,17 @@ public class MetricsModule extends Module {
     private final TimeUnit rateUnit;
     private final TimeUnit durationUnit;
     private final boolean showSamples;
-
+    private final MetricFilter filter;
+    
     public MetricsModule(TimeUnit rateUnit, TimeUnit durationUnit, boolean showSamples) {
+        this(rateUnit, durationUnit, showSamples, MetricFilter.ALL);
+    }
+
+    public MetricsModule(TimeUnit rateUnit, TimeUnit durationUnit, boolean showSamples, MetricFilter filter) {
         this.rateUnit = rateUnit;
         this.durationUnit = durationUnit;
         this.showSamples = showSamples;
+        this.filter = filter;
     }
 
     @Override
@@ -216,7 +226,7 @@ public class MetricsModule extends Module {
                 new HistogramSerializer(showSamples),
                 new MeterSerializer(rateUnit),
                 new TimerSerializer(rateUnit, durationUnit, showSamples),
-                new MetricRegistrySerializer()
+                new MetricRegistrySerializer(filter)
         )));
     }
 

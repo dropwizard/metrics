@@ -2,6 +2,7 @@ package com.codahale.metrics.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.json.MetricsModule;
 
@@ -9,6 +10,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Locale;
@@ -25,12 +27,12 @@ public class MetricsServlet extends HttpServlet {
      */
     public static abstract class ContextListener implements ServletContextListener {
         /**
-         * Returns the {@link MetricRegistry} to inject into the servlet context.
+         * @return the {@link MetricRegistry} to inject into the servlet context.
          */
         protected abstract MetricRegistry getMetricRegistry();
 
         /**
-         * Returns the {@link TimeUnit} to which rates should be converted, or {@code null} if the
+         * @return the {@link TimeUnit} to which rates should be converted, or {@code null} if the
          * default should be used.
          */
         protected TimeUnit getRateUnit() {
@@ -39,7 +41,7 @@ public class MetricsServlet extends HttpServlet {
         }
 
         /**
-         * Returns the {@link TimeUnit} to which durations should be converted, or {@code null} if
+         * @return the {@link TimeUnit} to which durations should be converted, or {@code null} if
          * the default should be used.
          */
         protected TimeUnit getDurationUnit() {
@@ -48,11 +50,20 @@ public class MetricsServlet extends HttpServlet {
         }
 
         /**
-         * Returns the {@code Access-Control-Allow-Origin} header value, if any.
+         * @return the {@code Access-Control-Allow-Origin} header value, if any.
          */
         protected String getAllowedOrigin() {
             // use the default
             return null;
+        }
+
+        /**
+         * @return the {@link MetricFilter} that shall be used to filter metrics, or {@link MetricFilter#ALL} if
+         * the default should be used.
+         */
+        protected MetricFilter getMetricFilter() {
+            // use the default
+            return MetricFilter.ALL;
         }
 
         @Override
@@ -62,6 +73,7 @@ public class MetricsServlet extends HttpServlet {
             context.setAttribute(RATE_UNIT, getRateUnit());
             context.setAttribute(DURATION_UNIT, getDurationUnit());
             context.setAttribute(ALLOWED_ORIGIN, getAllowedOrigin());
+            context.setAttribute(METRIC_FILTER, getMetricFilter());
         }
 
         @Override
@@ -75,6 +87,7 @@ public class MetricsServlet extends HttpServlet {
     public static final String SHOW_SAMPLES = MetricsServlet.class.getCanonicalName() + ".showSamples";
     public static final String METRICS_REGISTRY = MetricsServlet.class.getCanonicalName() + ".registry";
     public static final String ALLOWED_ORIGIN = MetricsServlet.class.getCanonicalName() + ".allowedOrigin";
+    public static final String METRIC_FILTER = MetricsServlet.class.getCanonicalName() + ".metricFilter";
 
     private static final long serialVersionUID = 1049773947734939602L;
     private static final String CONTENT_TYPE = "application/json";
@@ -92,6 +105,8 @@ public class MetricsServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+
         final ServletContext context = config.getServletContext();
         if (null == registry) {
             final Object registryAttr = context.getAttribute(METRICS_REGISTRY);
@@ -107,9 +122,14 @@ public class MetricsServlet extends HttpServlet {
         final TimeUnit durationUnit = parseTimeUnit(context.getInitParameter(DURATION_UNIT),
                                                     TimeUnit.SECONDS);
         final boolean showSamples = Boolean.parseBoolean(context.getInitParameter(SHOW_SAMPLES));
+        MetricFilter filter = (MetricFilter) context.getAttribute(METRIC_FILTER);
+        if (filter == null) {
+          filter = MetricFilter.ALL;
+        }
         this.mapper = new ObjectMapper().registerModule(new MetricsModule(rateUnit,
                                                                           durationUnit,
-                                                                          showSamples));
+                                                                          showSamples,
+                                                                          filter));
 
         this.allowedOrigin = config.getInitParameter(ALLOWED_ORIGIN);
     }

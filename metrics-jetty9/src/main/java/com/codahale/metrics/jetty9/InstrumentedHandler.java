@@ -29,6 +29,7 @@ public class InstrumentedHandler extends HandlerWrapper {
     private final MetricRegistry metricRegistry;
 
     private String name;
+    private final String prefix;
 
     // the requests handled by this handler, excluding active
     private Timer requests;
@@ -73,8 +74,20 @@ public class InstrumentedHandler extends HandlerWrapper {
      *
      */
     public InstrumentedHandler(MetricRegistry registry) {
-        this.metricRegistry = registry;
+        this(registry, null);
     }
+
+	/**
+	 * Create a new instrumented handler using a given metrics registry.
+	 *
+	 * @param registry   the registry for the metrics
+	 * @param prefix     the prefix to use for the metrics names
+	 *
+	 */
+	public InstrumentedHandler(MetricRegistry registry, String prefix) {
+		this.metricRegistry = registry;
+		this.prefix = prefix;
+	}
 
     public String getName() {
         return name;
@@ -88,7 +101,7 @@ public class InstrumentedHandler extends HandlerWrapper {
     protected void doStart() throws Exception {
         super.doStart();
 
-        final String prefix = name(getHandler().getClass(), name);
+        final String prefix = this.prefix == null ? name(getHandler().getClass(), name) : name(this.prefix, name);
 
         this.requests = metricRegistry.timer(name(prefix, "requests"));
         this.dispatches = metricRegistry.timer(name(prefix, "dispatches"));
@@ -139,7 +152,7 @@ public class InstrumentedHandler extends HandlerWrapper {
                 final AsyncContextState state = (AsyncContextState) event.getAsyncContext();
                 final Request request = (Request) state.getRequest();
                 updateResponses(request);
-                if (!state.getHttpChannelState().isDispatched()) {
+                if (state.getHttpChannelState().getState() != HttpChannelState.State.DISPATCHED) {
                     activeSuspended.dec();
                 }
             }
@@ -164,7 +177,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             // resumed request
             start = System.currentTimeMillis();
             activeSuspended.dec();
-            if (state.isDispatched()) {
+            if (state.getState() == HttpChannelState.State.DISPATCHED) {
                 asyncDispatches.mark();
             }
         }
@@ -184,7 +197,6 @@ public class InstrumentedHandler extends HandlerWrapper {
                 }
                 activeSuspended.inc();
             } else if (state.isInitial()) {
-                requests.update(dispatched, TimeUnit.MILLISECONDS);
                 updateResponses(request);
             }
             // else onCompletion will handle it.

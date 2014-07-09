@@ -4,19 +4,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.management.*;
+
 import java.io.Closeable;
 import java.lang.management.ManagementFactory;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
  * A reporter which listens for new metrics and exposes them as namespaced MBeans.
  */
-public class JmxReporter implements Closeable {
+public class JmxReporter implements Reporter, Closeable {
     /**
      * Returns a new {@link Builder} for {@link JmxReporter}.
      *
@@ -33,7 +33,7 @@ public class JmxReporter implements Closeable {
      */
     public static class Builder {
         private final MetricRegistry registry;
-        private MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        private MBeanServer mBeanServer;
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter = MetricFilter.ALL;
@@ -129,6 +129,9 @@ public class JmxReporter implements Closeable {
          */
         public JmxReporter build() {
             final MetricTimeUnits timeUnits = new MetricTimeUnits(rateUnit, durationUnit, specificRateUnits, specificDurationUnits);
+            if (mBeanServer==null) {
+            	mBeanServer = ManagementFactory.getPlatformMBeanServer();
+            }
             return new JmxReporter(mBeanServer, domain, registry, filter, timeUnits);
         }
     }
@@ -476,14 +479,35 @@ public class JmxReporter implements Closeable {
         private final MBeanServer mBeanServer;
         private final MetricFilter filter;
         private final MetricTimeUnits timeUnits;
-        private final Set<ObjectName> registered;
+        private final Map<ObjectName, ObjectName> registered;
 
         private JmxListener(MBeanServer mBeanServer, String name, MetricFilter filter, MetricTimeUnits timeUnits) {
             this.mBeanServer = mBeanServer;
             this.name = name;
             this.filter = filter;
             this.timeUnits = timeUnits;
-            this.registered = new CopyOnWriteArraySet<ObjectName>();
+            this.registered = new ConcurrentHashMap<ObjectName, ObjectName>();
+        }
+
+        private void registerMBean(Object mBean, ObjectName objectName) throws InstanceAlreadyExistsException, JMException {
+            ObjectInstance objectInstance = mBeanServer.registerMBean(mBean, objectName);
+            if (objectInstance != null) {
+                // the websphere mbeanserver rewrites the objectname to include
+                // cell, node & server info
+                // make sure we capture the new objectName for unregistration
+                registered.put(objectName, objectInstance.getObjectName());
+            } else {
+                registered.put(objectName, objectName);
+            }
+        }
+
+        private void unregisterMBean(ObjectName originalObjectName) throws InstanceNotFoundException, MBeanRegistrationException {
+            ObjectName storedObjectName = registered.remove(originalObjectName);
+            if (storedObjectName != null) {
+                mBeanServer.unregisterMBean(storedObjectName);
+            } else {
+                mBeanServer.unregisterMBean(originalObjectName);
+            }
         }
 
         @Override
@@ -491,8 +515,7 @@ public class JmxReporter implements Closeable {
             try {
                 if (filter.matches(name, gauge)) {
                     final ObjectName objectName = createName("gauges", name);
-                    mBeanServer.registerMBean(new JmxGauge(gauge, objectName), objectName);
-                    registered.add(objectName);
+                    registerMBean(new JmxGauge(gauge, objectName), objectName);
                 }
             } catch (InstanceAlreadyExistsException e) {
                 LOGGER.debug("Unable to register gauge", e);
@@ -505,8 +528,7 @@ public class JmxReporter implements Closeable {
         public void onGaugeRemoved(String name) {
             try {
                 final ObjectName objectName = createName("gauges", name);
-                mBeanServer.unregisterMBean(objectName);
-                registered.remove(objectName);
+                unregisterMBean(objectName);
             } catch (InstanceNotFoundException e) {
                 LOGGER.debug("Unable to unregister gauge", e);
             } catch (MBeanRegistrationException e) {
@@ -519,8 +541,7 @@ public class JmxReporter implements Closeable {
             try {
                 if (filter.matches(name, counter)) {
                     final ObjectName objectName = createName("counters", name);
-                    mBeanServer.registerMBean(new JmxCounter(counter, objectName), objectName);
-                    registered.add(objectName);
+                    registerMBean(new JmxCounter(counter, objectName), objectName);
                 }
             } catch (InstanceAlreadyExistsException e) {
                 LOGGER.debug("Unable to register counter", e);
@@ -533,8 +554,7 @@ public class JmxReporter implements Closeable {
         public void onCounterRemoved(String name) {
             try {
                 final ObjectName objectName = createName("counters", name);
-                mBeanServer.unregisterMBean(objectName);
-                registered.remove(objectName);
+                unregisterMBean(objectName);
             } catch (InstanceNotFoundException e) {
                 LOGGER.debug("Unable to unregister counter", e);
             } catch (MBeanRegistrationException e) {
@@ -547,8 +567,7 @@ public class JmxReporter implements Closeable {
             try {
                 if (filter.matches(name, histogram)) {
                     final ObjectName objectName = createName("histograms", name);
-                    mBeanServer.registerMBean(new JmxHistogram(histogram, objectName), objectName);
-                    registered.add(objectName);
+                    registerMBean(new JmxHistogram(histogram, objectName), objectName);
                 }
             } catch (InstanceAlreadyExistsException e) {
                 LOGGER.debug("Unable to register histogram", e);
@@ -561,8 +580,7 @@ public class JmxReporter implements Closeable {
         public void onHistogramRemoved(String name) {
             try {
                 final ObjectName objectName = createName("histograms", name);
-                mBeanServer.unregisterMBean(objectName);
-                registered.remove(objectName);
+                unregisterMBean(objectName);
             } catch (InstanceNotFoundException e) {
                 LOGGER.debug("Unable to unregister histogram", e);
             } catch (MBeanRegistrationException e) {
@@ -575,8 +593,7 @@ public class JmxReporter implements Closeable {
             try {
                 if (filter.matches(name, meter)) {
                     final ObjectName objectName = createName("meters", name);
-                    mBeanServer.registerMBean(new JmxMeter(meter, objectName, timeUnits.rateFor(name)), objectName);
-                    registered.add(objectName);
+                    registerMBean(new JmxMeter(meter, objectName, timeUnits.rateFor(name)), objectName);
                 }
             } catch (InstanceAlreadyExistsException e) {
                 LOGGER.debug("Unable to register meter", e);
@@ -589,8 +606,7 @@ public class JmxReporter implements Closeable {
         public void onMeterRemoved(String name) {
             try {
                 final ObjectName objectName = createName("meters", name);
-                mBeanServer.unregisterMBean(objectName);
-                registered.remove(objectName);
+                unregisterMBean(objectName);
             } catch (InstanceNotFoundException e) {
                 LOGGER.debug("Unable to unregister meter", e);
             } catch (MBeanRegistrationException e) {
@@ -603,8 +619,7 @@ public class JmxReporter implements Closeable {
             try {
                 if (filter.matches(name, timer)) {
                     final ObjectName objectName = createName("timers", name);
-                    mBeanServer.registerMBean(new JmxTimer(timer, objectName, timeUnits.rateFor(name), timeUnits.durationFor(name)), objectName);
-                    registered.add(objectName);
+                    registerMBean(new JmxTimer(timer, objectName, timeUnits.rateFor(name), timeUnits.durationFor(name)), objectName);
                 }
             } catch (InstanceAlreadyExistsException e) {
                 LOGGER.debug("Unable to register timer", e);
@@ -617,8 +632,7 @@ public class JmxReporter implements Closeable {
         public void onTimerRemoved(String name) {
             try {
                 final ObjectName objectName = createName("timers", name);
-                mBeanServer.unregisterMBean(objectName);
-                registered.add(objectName);
+                unregisterMBean(objectName);
             } catch (InstanceNotFoundException e) {
                 LOGGER.debug("Unable to unregister timer", e);
             } catch (MBeanRegistrationException e) {
@@ -640,9 +654,9 @@ public class JmxReporter implements Closeable {
         }
 
         void unregisterAll() {
-            for (ObjectName name : registered) {
+            for (ObjectName name : registered.keySet()) {
                 try {
-                    mBeanServer.unregisterMBean(name);
+                    unregisterMBean(name);
                 } catch (InstanceNotFoundException e) {
                     LOGGER.debug("Unable to unregister metric", e);
                 } catch (MBeanRegistrationException e) {
