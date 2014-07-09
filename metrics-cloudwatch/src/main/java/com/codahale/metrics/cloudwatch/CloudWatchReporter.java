@@ -176,7 +176,16 @@ public class CloudWatchReporter extends ScheduledReporter {
                 reportTimer(packet, entry.getKey(), entry.getValue());
             }
 
-        packet.send();
+        try {
+            packet.send();
+        }catch (Error e){
+            // Fail on error, like it should
+            throw e;
+        }catch (Throwable e){
+            // Either a RuntimeException or an atypical Throwable is causing the thread to die.
+            // Log and continue
+            LOGGER.warn("Exception encountered while sending metrics, continuing...", e);
+        }
     }
 
     private void reportTimer(CloudWatchPacket packet, String name, Timer timer) {
