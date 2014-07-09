@@ -1,7 +1,5 @@
 package com.codahale.metrics.concrete;
 
-import android.util.Log;
-
 import com.codahale.metrics.GlobalTimer;
 import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
@@ -33,14 +31,12 @@ public class GlobalTimerConcrete extends GlobalTimer {
 		
 		// New measurement
 		mContext = mTimer.time();
-		Log.e("TEST", "Start: " + System.currentTimeMillis()/1000);
 	}
 	
 	public synchronized void stop() {
 		if (mContext != null) {
 			mContext.stop();
 			mContext = null;
-			Log.e("TEST", "Stop: " + System.currentTimeMillis()/1000);
 		}
 	}
 
