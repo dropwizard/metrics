@@ -22,9 +22,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.aws-java-sdk</artifactId>
-            <version>1.7.12_1</version>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>1.8.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-codec</groupId>
