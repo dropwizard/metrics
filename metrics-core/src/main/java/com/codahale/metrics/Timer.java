@@ -26,8 +26,8 @@ public class Timer implements Metered, Sampling {
         }
 
         /**
-         * Stops recording the elapsed time, updates the timer and returns the elapsed time in
-         * nanoseconds.
+         * Stops recording the elapsed time and updates the timer.
+         * @return the elapsed time in nanoseconds
          */
         public long stop() {
             final long elapsed = clock.getTick() - startTime;

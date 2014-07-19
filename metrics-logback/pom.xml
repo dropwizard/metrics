@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.codahale.metrics</groupId>
+        <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
         <version>3.1.0-SNAPSHOT</version>
     </parent>
@@ -16,12 +16,12 @@
     </description>
 
     <properties>
-        <logback.version>1.0.13</logback.version>
+        <logback.version>1.1.1</logback.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>com.codahale.metrics</groupId>
+            <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
             <version>${project.version}</version>
         </dependency>

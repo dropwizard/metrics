@@ -19,12 +19,12 @@ import java.util.concurrent.ExecutorService;
 public class HealthCheckServlet extends HttpServlet {
     public static abstract class ContextListener implements ServletContextListener {
         /**
-         * Returns the {@link HealthCheckRegistry} to inject into the servlet context.
+         * @return the {@link HealthCheckRegistry} to inject into the servlet context.
          */
         protected abstract HealthCheckRegistry getHealthCheckRegistry();
 
         /**
-         * Returns the {@link ExecutorService} to inject into the servlet context, or {@code null}
+         * @return the {@link ExecutorService} to inject into the servlet context, or {@code null}
          * if the health checks should be run in the servlet worker thread.
          */
         protected ExecutorService getExecutorService() {

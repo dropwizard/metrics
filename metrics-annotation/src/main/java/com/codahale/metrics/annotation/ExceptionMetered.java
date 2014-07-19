@@ -1,6 +1,8 @@
 package com.codahale.metrics.annotation;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -10,7 +12,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Given a method like this:
  * <pre><code>
- *     \@ExceptionMetered(name = "fancyName", cause=IllegalArgumentException.class)
+ *     {@literal @}ExceptionMetered(name = "fancyName", cause=IllegalArgumentException.class)
  *     public String fancyName(String name) {
  *         return "Sir Captain " + name;
  *     }
@@ -25,7 +27,7 @@ import java.lang.annotation.Target;
  * <p/>
  * For instance, given a declaration of
  * <pre><code>
- *     \@ExceptionMetered
+ *     {@literal @}ExceptionMetered
  *     public String fancyName(String name) {
  *         return "Sir Captain " + name;
  *     }
@@ -34,8 +36,10 @@ import java.lang.annotation.Target;
  * A meter named {@code fancyName.exceptions} will be created and marked every time an exception is
  * thrown.
  */
+@Inherited
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD })
 public @interface ExceptionMetered {
     /**
      * The default suffix for meter names.
@@ -43,19 +47,19 @@ public @interface ExceptionMetered {
     String DEFAULT_NAME_SUFFIX = "exceptions";
 
     /**
-     * The name of the meter. If not specified, the meter will be given a name based on the method
+     * @return The name of the meter. If not specified, the meter will be given a name based on the method
      * it decorates and the suffix "Exceptions".
      */
     String name() default "";
 
     /**
-     * If {@code true}, use the given name an as absolute name. If {@code false}, use the given name
-     * relative to the annotated class.
+     * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
+     * relative to the annotated class. When annotating a class, this must be {@code false}.
      */
     boolean absolute() default false;
 
     /**
-     * The type of exceptions that the meter will catch and count.
+     * @return The type of exceptions that the meter will catch and count.
      */
     Class<? extends Throwable> cause() default Exception.class;
 }

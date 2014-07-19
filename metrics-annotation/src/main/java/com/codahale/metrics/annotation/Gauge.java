@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Given a method like this:
  * <pre><code>
- *     \@Gauge(name = "queueSize")
+ *     {@literal @}Gauge(name = "queueSize")
  *     public int getQueueSize() {
  *         return queue.size;
  *     }
@@ -23,12 +23,12 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD, ElementType.FIELD })
 public @interface Gauge {
     /**
-     * The gauge's name.
+     * @return The gauge's name.
      */
     String name() default "";
 
     /**
-     * If {@code true}, use the given name an as absolute name. If {@code false}, use the given name
+     * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
      * relative to the annotated class.
      */
     boolean absolute() default false;

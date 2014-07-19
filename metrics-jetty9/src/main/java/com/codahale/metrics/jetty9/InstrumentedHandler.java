@@ -152,7 +152,7 @@ public class InstrumentedHandler extends HandlerWrapper {
                 final AsyncContextState state = (AsyncContextState) event.getAsyncContext();
                 final Request request = (Request) state.getRequest();
                 updateResponses(request);
-                if (!state.getHttpChannelState().isDispatched()) {
+                if (state.getHttpChannelState().getState() != HttpChannelState.State.DISPATCHED) {
                     activeSuspended.dec();
                 }
             }
@@ -177,7 +177,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             // resumed request
             start = System.currentTimeMillis();
             activeSuspended.dec();
-            if (state.isDispatched()) {
+            if (state.getState() == HttpChannelState.State.DISPATCHED) {
                 asyncDispatches.mark();
             }
         }
