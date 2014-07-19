@@ -152,7 +152,7 @@ percentiles.
 
 .. code-block:: java
 
-    private final Histogram responseSizes = metrics.histogram(name(RequestHandler.class, "response-sizes");
+    private final Histogram responseSizes = metrics.histogram(name(RequestHandler.class, "response-sizes"));
 
     public void handleRequest(Request request, Response response) {
         // etc

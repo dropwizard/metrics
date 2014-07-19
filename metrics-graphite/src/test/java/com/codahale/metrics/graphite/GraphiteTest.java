@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Fail.failBecauseExceptionWasNotThrown;
@@ -26,10 +27,7 @@ public class GraphiteTest {
     @Before
     public void setUp() throws Exception {
         when(socket.getOutputStream()).thenReturn(output);
-
-        when(socketFactory.createSocket(any(InetAddress.class),
-                                        anyInt())).thenReturn(socket);
-
+        when(socketFactory.createSocket(any(InetAddress.class), anyInt())).thenReturn(socket);
     }
 
     @Test
@@ -69,6 +67,7 @@ public class GraphiteTest {
     public void writesValuesToGraphite() throws Exception {
         graphite.connect();
         graphite.send("name", "value", 100);
+        graphite.close();
 
         assertThat(output.toString())
                 .isEqualTo("name value 100\n");
@@ -78,6 +77,7 @@ public class GraphiteTest {
     public void sanitizesNames() throws Exception {
         graphite.connect();
         graphite.send("name woo", "value", 100);
+        graphite.close();
 
         assertThat(output.toString())
                 .isEqualTo("name-woo value 100\n");
@@ -87,8 +87,24 @@ public class GraphiteTest {
     public void sanitizesValues() throws Exception {
         graphite.connect();
         graphite.send("name", "value woo", 100);
+        graphite.close();
 
         assertThat(output.toString())
                 .isEqualTo("name value-woo 100\n");
+    }
+
+    @Test
+    public void notifiesIfGraphiteIsUnavailable() throws Exception {
+        final String unavailableHost = "unknown-host-10el6m7yg56ge7dm.com";
+        InetSocketAddress unavailableAddress = new InetSocketAddress(unavailableHost, 1234);
+        Graphite unavailableGraphite = new Graphite(unavailableAddress, socketFactory);
+
+        try {
+            unavailableGraphite.connect();
+            failBecauseExceptionWasNotThrown(UnknownHostException.class);
+        } catch (Exception e) {
+            assertThat(e.getMessage())
+                .isEqualTo(unavailableHost);
+        }
     }
 }

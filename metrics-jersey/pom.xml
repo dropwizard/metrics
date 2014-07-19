@@ -3,31 +3,31 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.codahale.metrics</groupId>
+        <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
         <version>3.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-jersey</artifactId>
-    <name>Metrics Integration for Jersey</name>
+    <name>Metrics Integration for Jersey 1.x</name>
     <packaging>bundle</packaging>
     <description>
         A set of class providing Metrics integration for Jersey, the reference JAX-RS
-        implementation.
+        implementation. This module is for the old Jersey 1.x
     </description>
 
     <properties>
-        <jersey.version>1.17.1</jersey.version>
+        <jersey.version>1.18.1</jersey.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>com.codahale.metrics</groupId>
+            <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.codahale.metrics</groupId>
+            <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-annotation</artifactId>
             <version>${project.version}</version>
         </dependency>

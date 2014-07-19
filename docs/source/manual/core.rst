@@ -99,9 +99,9 @@ A ratio gauge is a simple way to create a gauge which is the ratio between two n
         }
 
         @Override
-        public Ratio getValue() {
-            return Ratio.of(hits.oneMinuteRate(),
-                            calls.oneMinuteRate());
+        public Ratio getRatio() {
+            return Ratio.of(hits.getOneMinuteRate(),
+                            calls.getOneMinuteRate());
         }
     }
 
