@@ -41,14 +41,19 @@ public class CloudWatchPacket {
         reqs.add(datum);
     }
 
-    private static final double MINIMUM_VALUE = Math.pow(2, -360);
-    private static final double MAXIMUM_VALUE = Math.pow(2, 360);
+    public static final double MINIMUM_VALUE = Math.pow(2, -360);
+    public static final double MAXIMUM_VALUE = Math.pow(2, 360);
 
 
     private double validate(double value) {
         if(Double.isInfinite(value) || Double.isNaN(value)){
             throw new IllegalArgumentException("Invalid value :" + value);
         }else{
+            // 0 is a valid value
+            if (value == 0){
+                return value;
+            }
+
             // Amazon CloudWatch rejects values that are either too small or too large.
             // Values must be in the range of 2e-360 to 2e360 (Base 2).
             value = MINIMUM_VALUE > value ? MINIMUM_VALUE : value;

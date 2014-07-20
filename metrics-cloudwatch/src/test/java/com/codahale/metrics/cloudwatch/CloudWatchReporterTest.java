@@ -388,9 +388,6 @@ public class CloudWatchReporterTest {
                         found.add(datum);
                     }
                 }
-                if(found.size() == 0){
-                    System.out.println("huh");
-                }
                 assertEquals(found.size(), 1);
                 return found.get(0);
             }
