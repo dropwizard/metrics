@@ -59,33 +59,14 @@ public class CloudWatchPacket {
 
     public void send() {
         List<MetricDatum> subpackets = new ArrayList<MetricDatum>();
-        try {
-            doSend(subpackets);
-        }catch (RuntimeException e){
-            String dump = dump(subpackets);
-            throw new RuntimeException("Tried to send " + dump, e);
-        }
-    }
-
-    private String dump(List<MetricDatum> subpackets) {
-        StringBuilder sb = new StringBuilder();
-        for (MetricDatum datum : subpackets) {
-            sb.append("(" + datum.getMetricName()+", " + datum.getValue() + ")");
-            sb.append("|");
-        }
-
-        return sb.toString();
-    }
-
-    private void doSend(List<MetricDatum> subpackets) {
         for (MetricDatum req : reqs) {
             subpackets.add(req);
+            // Only 20 data can be sent to AWS at a time
             if (subpackets.size() == 20) {
                 client.putMetricData(new PutMetricDataRequest().withNamespace(nameSpace).withMetricData(subpackets));
                 subpackets = new ArrayList<MetricDatum>();
             }
         }
-
 
         if (!subpackets.isEmpty()) {
             client.putMetricData(new PutMetricDataRequest().withNamespace(nameSpace).withMetricData(subpackets));
