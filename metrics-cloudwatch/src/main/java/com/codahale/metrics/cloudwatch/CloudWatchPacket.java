@@ -41,8 +41,8 @@ public class CloudWatchPacket {
         reqs.add(datum);
     }
 
-    private static final double MINIMUM_VALUE = Math.pow(2, -361);
-    private static final double MAXIMUM_VALUE = Math.pow(2, 361);
+    private static final double MINIMUM_VALUE = Math.pow(2, -360);
+    private static final double MAXIMUM_VALUE = Math.pow(2, 360);
 
 
     private double validate(double value) {
