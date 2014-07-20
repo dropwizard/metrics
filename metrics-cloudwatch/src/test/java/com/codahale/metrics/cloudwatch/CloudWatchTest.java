@@ -7,27 +7,24 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.net.Socket;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 
 public class CloudWatchTest {
     private final AmazonCloudWatchClient client = mock(AmazonCloudWatchClient.class);
-    private final CloudWatchPacket cloudWatchPacket = new CloudWatchPacket("example", client);
+    private final CloudWatchSendTask cloudWatchSendTask = new CloudWatchSendTask("example", client);
 
 
     @Test
     public void writeValuesToCloudWatch() throws Exception {
 
-        cloudWatchPacket.add("example.metric1", 1.0);
-        cloudWatchPacket.add("example.metric2", 2.0);
-        cloudWatchPacket.add("example.metric3", Double.MIN_VALUE);
-        cloudWatchPacket.add("example.metric4", Double.MAX_VALUE);
-        cloudWatchPacket.add("example.metric5", 0.0);
-        cloudWatchPacket.send();
+        cloudWatchSendTask.add("example.metric1", 1.0);
+        cloudWatchSendTask.add("example.metric2", 2.0);
+        cloudWatchSendTask.add("example.metric3", Double.MIN_VALUE);
+        cloudWatchSendTask.add("example.metric4", Double.MAX_VALUE);
+        cloudWatchSendTask.add("example.metric5", 0.0);
+        cloudWatchSendTask.send();
 
         Matcher<PutMetricDataRequest> matcher = new TypeSafeMatcher<PutMetricDataRequest>() {
             @Override
@@ -38,8 +35,8 @@ public class CloudWatchTest {
                 assertEquals(item.getMetricData().get(0).getDimensions().size(), 1);
                 assertEquals(item.getMetricData().get(0).getDimensions().get(0).getName(), "hostname");
                 assertNotNull(item.getMetricData().get(0).getDimensions().get(0).getName());
-                assertEquals(item.getMetricData().get(2).getValue(), CloudWatchPacket.MINIMUM_VALUE, Double.MIN_VALUE);
-                assertEquals(item.getMetricData().get(3).getValue(), CloudWatchPacket.MAXIMUM_VALUE, Double.MIN_VALUE);
+                assertEquals(item.getMetricData().get(2).getValue(), CloudWatchSendTask.MINIMUM_VALUE, Double.MIN_VALUE);
+                assertEquals(item.getMetricData().get(3).getValue(), CloudWatchSendTask.MAXIMUM_VALUE, Double.MIN_VALUE);
                 assertEquals(item.getMetricData().get(4).getValue(), 0, Double.MIN_VALUE);
                 return true;
             }

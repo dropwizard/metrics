@@ -12,20 +12,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A client to AWS CloudWatch
+ * Accumulates metrics data and sends it to CloudWatch
  */
-public class CloudWatchPacket {
+public class CloudWatchSendTask {
     private static final String HOST_NAME = getHostName();
 
     private final String nameSpace;
     private final AmazonCloudWatchClient client;
     private final List<MetricDatum> reqs = new ArrayList<MetricDatum>();
 
-    public CloudWatchPacket(String nameSpace, AmazonCloudWatchClient client) {
+    public CloudWatchSendTask(String nameSpace, AmazonCloudWatchClient client) {
         this.nameSpace = nameSpace;
         this.client = client;
     }
 
+    /**
+     * Add metrics to be sent
+     * @param metricName
+     * @param value
+     */
     public void add(String metricName, double value) {
         value = validate(value);
 
@@ -41,6 +46,8 @@ public class CloudWatchPacket {
         reqs.add(datum);
     }
 
+    // Amazon CloudWatch rejects values that are either too small or too large.
+    // Values must be in the range of 2e-360 to 2e360 (Base 2).
     public static final double MINIMUM_VALUE = Math.pow(2, -360);
     public static final double MAXIMUM_VALUE = Math.pow(2, 360);
 
@@ -49,13 +56,12 @@ public class CloudWatchPacket {
         if(Double.isInfinite(value) || Double.isNaN(value)){
             throw new IllegalArgumentException("Invalid value :" + value);
         }else{
-            // 0 is a valid value
+            // 0 is allowed
             if (value == 0){
                 return value;
             }
 
-            // Amazon CloudWatch rejects values that are either too small or too large.
-            // Values must be in the range of 2e-360 to 2e360 (Base 2).
+            // Comply with CloudWatch's restriction on very large/small values
             value = MINIMUM_VALUE > value ? MINIMUM_VALUE : value;
             value = MAXIMUM_VALUE < value ? MAXIMUM_VALUE : value;
             return value;

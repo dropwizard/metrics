@@ -154,7 +154,7 @@ public class CloudWatchReporter extends ScheduledReporter {
                        SortedMap<String, Meter> meters,
                        SortedMap<String, Timer> timers) {
 
-            CloudWatchPacket packet = new CloudWatchPacket(nameSpace, cloudwatch);
+            CloudWatchSendTask packet = new CloudWatchSendTask(nameSpace, cloudwatch);
 
             for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
                 reportGauge(packet, entry.getKey(), entry.getValue());
@@ -184,7 +184,7 @@ public class CloudWatchReporter extends ScheduledReporter {
         }
     }
 
-    private void reportTimer(CloudWatchPacket packet, String name, Timer timer) {
+    private void reportTimer(CloudWatchSendTask packet, String name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
 
         packet.add(prefix(name, "max"), format(convertDuration(snapshot.getMax())));
@@ -208,7 +208,7 @@ public class CloudWatchReporter extends ScheduledReporter {
         reportMetered(packet, name, timer);
     }
 
-    private void reportMetered(CloudWatchPacket packet, String name, Metered meter) {
+    private void reportMetered(CloudWatchSendTask packet, String name, Metered meter) {
         packet.add(prefix(name, "count"), format(meter.getCount()));
         packet.add(prefix(name, "m1_rate"),
                 format(convertRate(meter.getOneMinuteRate())));
@@ -220,7 +220,7 @@ public class CloudWatchReporter extends ScheduledReporter {
                 format(convertRate(meter.getMeanRate())));
     }
 
-    private void reportHistogram(CloudWatchPacket packet, String name, Histogram histogram) {
+    private void reportHistogram(CloudWatchSendTask packet, String name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
         packet.add(prefix(name, "count"), format(histogram.getCount()));
         packet.add(prefix(name, "max"), format(snapshot.getMax()));
@@ -235,11 +235,11 @@ public class CloudWatchReporter extends ScheduledReporter {
         packet.add(prefix(name, "p999"), format(snapshot.get999thPercentile()));
     }
 
-    private void reportCounter(CloudWatchPacket packet, String name, Counter counter) {
+    private void reportCounter(CloudWatchSendTask packet, String name, Counter counter) {
         packet.add(prefix(name, "count"), format(counter.getCount()));
     }
 
-    private void reportGauge(CloudWatchPacket packet, String name, Gauge gauge) {
+    private void reportGauge(CloudWatchSendTask packet, String name, Gauge gauge) {
         final Double value = format(gauge.getValue());
         if (value != null) {
             packet.add(prefix(name), value);
