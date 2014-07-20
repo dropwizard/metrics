@@ -27,6 +27,8 @@ public class CloudWatchPacket {
     }
 
     public void add(String metricName, double value) {
+        value = validate(value);
+
         MetricDatum datum =
                 new MetricDatum()
                         .withMetricName(metricName)
@@ -37,6 +39,22 @@ public class CloudWatchPacket {
                                         .withName("hostname")
                                         .withValue(HOST_NAME));
         reqs.add(datum);
+    }
+
+    private static final double MINIMUM_VALUE = Math.pow(2, -361);
+    private static final double MAXIMUM_VALUE = Math.pow(2, 361);
+
+
+    private double validate(double value) {
+        if(Double.isInfinite(value) || Double.isNaN(value)){
+            throw new IllegalArgumentException("Invalid value :" + value);
+        }else{
+            // Amazon CloudWatch rejects values that are either too small or too large.
+            // Values must be in the range of 2e-360 to 2e360 (Base 2).
+            value = MINIMUM_VALUE > value ? MINIMUM_VALUE : value;
+            value = MAXIMUM_VALUE < value ? MAXIMUM_VALUE : value;
+            return value;
+        }
     }
 
     public void send() {
