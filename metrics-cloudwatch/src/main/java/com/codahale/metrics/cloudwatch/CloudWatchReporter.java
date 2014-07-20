@@ -178,13 +178,9 @@ public class CloudWatchReporter extends ScheduledReporter {
 
         try {
             packet.send();
-        }catch (Error e){
-            // Fail on error, like it should
-            throw e;
-        }catch (Throwable e){
-            // Either a RuntimeException or an atypical Throwable is causing the thread to die.
-            // Log and continue
-            LOGGER.warn("Exception encountered while sending metrics, continuing...", e);
+        }catch (RuntimeException e){
+            // Do not kill the reporting thread due to a RuntimeException
+            LOGGER.warn("RuntimeException while reporting metrics", e);
         }
     }
 
