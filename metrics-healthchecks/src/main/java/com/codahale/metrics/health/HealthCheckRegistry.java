@@ -15,12 +15,14 @@ public class HealthCheckRegistry {
     private static final Logger LOGGER = LoggerFactory.getLogger(HealthCheckRegistry.class);
 
     private final ConcurrentMap<String, HealthCheck> healthChecks;
+    private final ConcurrentMap<Listener, Boolean> checkListeners;
 
     /**
      * Creates a new {@link HealthCheckRegistry}.
      */
     public HealthCheckRegistry() {
         this.healthChecks = new ConcurrentHashMap<String, HealthCheck>();
+        this.checkListeners = new ConcurrentHashMap<HealthCheckRegistry.Listener, Boolean>();
     }
 
     /**
@@ -40,6 +42,22 @@ public class HealthCheckRegistry {
      */
     public void unregister(String name) {
         healthChecks.remove(name);
+    }
+
+    /**
+     * Adds a listener which is called on the completion of every health check.
+     * @param listener the listener to call
+     */
+    public void addListener(Listener listener) {
+        checkListeners.put(listener, Boolean.TRUE);
+    }
+
+    /**
+     * Remove a previosuly registered listener.
+     * @param listener the listener to remove
+     */
+    public void removeListener(Listener listener) {
+        checkListeners.remove(listener);
     }
 
     /**
@@ -63,7 +81,7 @@ public class HealthCheckRegistry {
         if (healthCheck == null) {
             throw new NoSuchElementException("No health check named " + name + " exists");
         }
-        return healthCheck.execute();
+        return callListeners(name, healthCheck.execute());
     }
 
     /**
@@ -75,7 +93,9 @@ public class HealthCheckRegistry {
         final SortedMap<String, HealthCheck.Result> results = new TreeMap<String, HealthCheck.Result>();
         for (Map.Entry<String, HealthCheck> entry : healthChecks.entrySet()) {
             final Result result = entry.getValue().execute();
-            results.put(entry.getKey(), result);
+            final String name = entry.getKey();
+            callListeners(name, result);
+            results.put(name, result);
         }
         return Collections.unmodifiableSortedMap(results);
     }
@@ -98,12 +118,36 @@ public class HealthCheckRegistry {
 
         final SortedMap<String, HealthCheck.Result> results = new TreeMap<String, HealthCheck.Result>();
         for (Map.Entry<String, Future<Result>> entry : futures.entrySet()) {
+            final String name = entry.getKey();
             try {
-                results.put(entry.getKey(), entry.getValue().get());
+                final Result result = entry.getValue().get();
+                callListeners(name, result);
+                results.put(name, result);
             } catch (Exception e) {
-                LOGGER.warn("Error executing health check {}", entry.getKey(), e);
+                LOGGER.warn("Error executing health check {}", name, e);
             }
         }
         return Collections.unmodifiableSortedMap(results);
+    }
+
+    private Result callListeners(String name, Result result)
+    {
+        for (Listener l : checkListeners.keySet()) {
+            try {
+                l.checkCompleted(name, result);
+            } catch (Exception e) {
+                LOGGER.warn(String.format(
+                        "Exception while invoking listener %s on check %s with result %s", l, name, result),
+                        e);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Simple Listener which can be called on the result of every health check.
+     */
+    public interface Listener {
+        void checkCompleted(String name, Result result);
     }
 }
