@@ -37,6 +37,7 @@ public class GraphiteReporter extends ScheduledReporter {
         private String prefix;
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
+        private String fractionalFormat = "%2.2f";
         private MetricFilter filter;
 
         private Builder(MetricRegistry registry) {
@@ -56,6 +57,17 @@ public class GraphiteReporter extends ScheduledReporter {
          */
         public Builder withClock(Clock clock) {
             this.clock = clock;
+            return this;
+        }
+
+        /**
+         * Use the string template to format Double and Float {@link java.lang.String#format(java.util.Locale, String, Object...)}
+         *
+         * @param fractionalFormat a template to format Double and Float
+         * @return {@code this}
+         */
+        public Builder withFractionalFormat(String fractionalFormat) {
+            this.fractionalFormat = fractionalFormat;
             return this;
         }
 
@@ -117,6 +129,7 @@ public class GraphiteReporter extends ScheduledReporter {
                                         prefix,
                                         rateUnit,
                                         durationUnit,
+                                        fractionalFormat,
                                         filter);
         }
     }
@@ -126,6 +139,7 @@ public class GraphiteReporter extends ScheduledReporter {
     private final GraphiteSender graphite;
     private final Clock clock;
     private final String prefix;
+    private final String fractionalFormat;
 
     private GraphiteReporter(MetricRegistry registry,
                              GraphiteSender graphite,
@@ -133,11 +147,13 @@ public class GraphiteReporter extends ScheduledReporter {
                              String prefix,
                              TimeUnit rateUnit,
                              TimeUnit durationUnit,
+                             String fractionalFormat,
                              MetricFilter filter) {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
+        this.fractionalFormat = fractionalFormat;
     }
 
     @Override
@@ -283,6 +299,6 @@ public class GraphiteReporter extends ScheduledReporter {
     private String format(double v) {
         // the Carbon plaintext format is pretty underspecified, but it seems like it just wants
         // US-formatted digits
-        return String.format(Locale.US, "%2.2f", v);
+        return String.format(Locale.US, fractionalFormat, v);
     }
 }
