@@ -26,7 +26,8 @@ public class Timer implements Metered, Sampling {
         }
 
         /**
-         * Stops recording the elapsed time and updates the timer.
+         * Updates the timer with the difference between current and start time. Call to this method will
+         * not reset the start time. Multiple calls result in multiple updates.
          * @return the elapsed time in nanoseconds
          */
         public long stop() {
@@ -35,6 +36,7 @@ public class Timer implements Metered, Sampling {
             return elapsed;
         }
 
+        /** Equivalent to calling {@link #stop()}. */
         @Override
         public void close() {
             stop();
