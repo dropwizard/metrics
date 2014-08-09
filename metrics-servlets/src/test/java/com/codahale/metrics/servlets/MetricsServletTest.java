@@ -1,7 +1,9 @@
 package com.codahale.metrics.servlets;
 
 import com.codahale.metrics.*;
+
 import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,12 +25,12 @@ import static org.mockito.Mockito.when;
 public class MetricsServletTest extends AbstractServletTest {
     private final Clock clock = mock(Clock.class);
     private final MetricRegistry registry = new MetricRegistry();
-
+    private ServletHolder metricsServlet;
     @Override
     protected void setUp(ServletTester tester) {
         tester.setAttribute("com.codahale.metrics.servlets.MetricsServlet.registry", registry);
-        tester.addServlet(MetricsServlet.class, "/metrics");
-        tester.getContext().setInitParameter("com.codahale.metrics.servlets.MetricsServlet.allowedOrigin", "*");
+        metricsServlet = tester.addServlet(MetricsServlet.class, "/metrics");
+        metricsServlet.setInitParameter("com.codahale.metrics.servlets.MetricsServlet.allowedOrigin", "*");
     }
 
     @Before
@@ -76,6 +78,69 @@ public class MetricsServletTest extends AbstractServletTest {
                                        "\"m\":{\"count\":1,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":3333333.3333333335,\"units\":\"events/second\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1.0,\"mean\":1.0,\"min\":1.0,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":1.0E7,\"duration_units\":\"seconds\",\"rate_units\":\"calls/second\"}" +
                                    "}" +
                                "}");
+        assertThat(response.get(HttpHeader.CONTENT_TYPE))
+                .isEqualTo("application/json");
+    }
+
+    @Test
+    public void returnsJsonWhenJsonpInitParamNotSet() throws Exception {
+    	String callbackParamName = "callbackParam";
+    	String callbackParamVal = "callbackParamVal";
+        request.setURI("/metrics?" + callbackParamName + "=" + callbackParamVal);
+        processRequest();
+
+        assertThat(response.getStatus())
+                .isEqualTo(200);
+        assertThat(response.get("Access-Control-Allow-Origin"))
+                .isEqualTo("*");
+        assertThat(response.getContent())
+                .isEqualTo("{" +
+                                   "\"version\":\"3.0.0\"," +
+                                   "\"gauges\":{" +
+                                       "\"g1\":{\"value\":100}" +
+                                   "}," +
+                                   "\"counters\":{" +
+                                       "\"c\":{\"count\":1}" +
+                                   "}," +
+                                   "\"histograms\":{" +
+                                       "\"h\":{\"count\":1,\"max\":1,\"mean\":1.0,\"min\":1,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0}" +
+                                   "}," +
+                                   "\"meters\":{" +
+                                       "\"m\":{\"count\":1,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":3333333.3333333335,\"units\":\"events/second\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1.0,\"mean\":1.0,\"min\":1.0,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":1.0E7,\"duration_units\":\"seconds\",\"rate_units\":\"calls/second\"}" +
+                                   "}" +
+                               "}");
+        assertThat(response.get(HttpHeader.CONTENT_TYPE))
+                .isEqualTo("application/json");
+    }
+
+    @Test
+    public void returnsJsonpWhenInitParamSet() throws Exception {
+    	String callbackParamName = "callbackParam";
+    	String callbackParamVal = "callbackParamVal";
+        request.setURI("/metrics?" + callbackParamName + "=" + callbackParamVal);
+        metricsServlet
+        .setInitParameter("com.codahale.metrics.servlets.MetricsServlet.jsonpCallback", callbackParamName);
+        processRequest();
+
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(response.get("Access-Control-Allow-Origin"))
+                .isEqualTo("*");
+        assertThat(response.getContent())
+                .isEqualTo(callbackParamVal + "({" +
+                                   "\"version\":\"3.0.0\"," +
+                                   "\"gauges\":{" +
+                                       "\"g1\":{\"value\":100}" +
+                                   "}," +
+                                   "\"counters\":{" +
+                                       "\"c\":{\"count\":1}" +
+                                   "}," +
+                                   "\"histograms\":{" +
+                                       "\"h\":{\"count\":1,\"max\":1,\"mean\":1.0,\"min\":1,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0}" +
+                                   "}," +
+                                   "\"meters\":{" +
+                                       "\"m\":{\"count\":1,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":3333333.3333333335,\"units\":\"events/second\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1.0,\"mean\":1.0,\"min\":1.0,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":1.0E7,\"duration_units\":\"seconds\",\"rate_units\":\"calls/second\"}" +
+                                   "}" +
+                               "})");
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
