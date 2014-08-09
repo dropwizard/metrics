@@ -3,7 +3,6 @@ package com.codahale.metrics.servlets;
 import com.codahale.metrics.*;
 
 import org.eclipse.jetty.http.HttpHeader;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,12 +24,14 @@ import static org.mockito.Mockito.when;
 public class MetricsServletTest extends AbstractServletTest {
     private final Clock clock = mock(Clock.class);
     private final MetricRegistry registry = new MetricRegistry();
-    private ServletHolder metricsServlet;
+    private ServletTester tester;
+
     @Override
     protected void setUp(ServletTester tester) {
+        this.tester = tester;
         tester.setAttribute("com.codahale.metrics.servlets.MetricsServlet.registry", registry);
-        metricsServlet = tester.addServlet(MetricsServlet.class, "/metrics");
-        metricsServlet.setInitParameter("com.codahale.metrics.servlets.MetricsServlet.allowedOrigin", "*");
+        tester.addServlet(MetricsServlet.class, "/metrics");
+        tester.getContext().setInitParameter("com.codahale.metrics.servlets.MetricsServlet.allowedOrigin", "*");
     }
 
     @Before
@@ -118,8 +119,7 @@ public class MetricsServletTest extends AbstractServletTest {
     	String callbackParamName = "callbackParam";
     	String callbackParamVal = "callbackParamVal";
         request.setURI("/metrics?" + callbackParamName + "=" + callbackParamVal);
-        metricsServlet
-        .setInitParameter("com.codahale.metrics.servlets.MetricsServlet.jsonpCallback", callbackParamName);
+        tester.getContext().setInitParameter("com.codahale.metrics.servlets.MetricsServlet.jsonpCallback", callbackParamName);
         processRequest();
 
         assertThat(response.getStatus()).isEqualTo(200);
@@ -228,7 +228,7 @@ public class MetricsServletTest extends AbstractServletTest {
 
         final MetricsServlet metricsServlet = new MetricsServlet(metricRegistry);
         metricsServlet.init(servletConfig);
- 
+
         verify(servletConfig, times(1)).getServletContext();
         verify(servletContext, never()).getAttribute(eq(MetricsServlet.METRICS_REGISTRY));
     }
