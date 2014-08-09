@@ -1,45 +1,11 @@
 package com.codahale.metrics;
 
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collection;
-
-import static java.lang.Math.floor;
 
 /**
  * A statistical snapshot of a {@link Snapshot}.
  */
-public class Snapshot {
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
-
-    private final long[] values;
-
-    /**
-     * Create a new {@link Snapshot} with the given values.
-     *
-     * @param values    an unordered set of values in the reservoir
-     */
-    public Snapshot(Collection<Long> values) {
-        final Object[] copy = values.toArray();
-        this.values = new long[copy.length];
-        for (int i = 0; i < copy.length; i++) {
-            this.values[i] = (Long) copy[i];
-        }
-        Arrays.sort(this.values);
-    }
-
-    /**
-     * Create a new {@link Snapshot} with the given values.
-     *
-     * @param values    an unordered set of values in the reservoir
-     */
-    public Snapshot(long[] values) {
-        this.values = Arrays.copyOf(values, values.length);
-        Arrays.sort(this.values);
-    }
+public abstract class Snapshot {
 
     /**
      * Returns the value at the given quantile.
@@ -47,39 +13,22 @@ public class Snapshot {
      * @param quantile    a given quantile, in {@code [0..1]}
      * @return the value in the distribution at {@code quantile}
      */
-    public double getValue(double quantile) {
-        if (quantile < 0.0 || quantile > 1.0) {
-            throw new IllegalArgumentException(quantile + " is not in [0..1]");
-        }
+    public abstract double getValue(double quantile);
 
-        if (values.length == 0) {
-            return 0.0;
-        }
-
-        final double pos = quantile * (values.length + 1);
-
-        if (pos < 1) {
-            return values[0];
-        }
-
-        if (pos >= values.length) {
-            return values[values.length - 1];
-        }
-
-        final double lower = values[(int) pos - 1];
-        final double upper = values[(int) pos];
-        return lower + (pos - floor(pos)) * (upper - lower);
-    }
+    /**
+     * Returns the entire set of values in the snapshot.
+     *
+     * @return the entire set of values
+     */
+    public abstract long[] getValues();
 
     /**
      * Returns the number of values in the snapshot.
      *
      * @return the number of values
      */
-    public int size() {
-        return values.length;
-    }
-
+    public abstract int size();
+    
     /**
      * Returns the median value in the distribution.
      *
@@ -135,92 +84,38 @@ public class Snapshot {
     }
 
     /**
-     * Returns the entire set of values in the snapshot.
-     *
-     * @return the entire set of values
-     */
-    public long[] getValues() {
-        return Arrays.copyOf(values, values.length);
-    }
-
-    /**
      * Returns the highest value in the snapshot.
      *
      * @return the highest value
      */
-    public long getMax() {
-        if (values.length == 0) {
-            return 0;
-        }
-        return values[values.length - 1];
-    }
-
-    /**
-     * Returns the lowest value in the snapshot.
-     *
-     * @return the lowest value
-     */
-    public long getMin() {
-        if (values.length == 0) {
-            return 0;
-        }
-        return values[0];
-    }
+    public abstract long getMax();
 
     /**
      * Returns the arithmetic mean of the values in the snapshot.
      *
      * @return the arithmetic mean
      */
-    public double getMean() {
-        if (values.length == 0) {
-            return 0;
-        }
+    public abstract double getMean();
 
-        double sum = 0;
-        for (long value : values) {
-            sum += value;
-        }
-        return sum / values.length;
-    }
+    /**
+     * Returns the lowest value in the snapshot.
+     *
+     * @return the lowest value
+     */
+    public abstract long getMin();
 
     /**
      * Returns the standard deviation of the values in the snapshot.
      *
      * @return the standard value
      */
-    public double getStdDev() {
-        // two-pass algorithm for variance, avoids numeric overflow
-
-        if (values.length <= 1) {
-            return 0;
-        }
-
-        final double mean = getMean();
-        double sum = 0;
-
-        for (long value : values) {
-            final double diff = value - mean;
-            sum += diff * diff;
-        }
-
-        final double variance = sum / (values.length - 1);
-        return Math.sqrt(variance);
-    }
+    public abstract double getStdDev();
 
     /**
      * Writes the values of the snapshot to the given stream.
      *
      * @param output an output stream
      */
-    public void dump(OutputStream output) {
-        final PrintWriter out = new PrintWriter(new OutputStreamWriter(output, UTF_8));
-        try {
-            for (long value : values) {
-                out.printf("%d%n", value);
-            }
-        } finally {
-            out.close();
-        }
-    }
+    public abstract void dump(OutputStream output);
+   
 }
