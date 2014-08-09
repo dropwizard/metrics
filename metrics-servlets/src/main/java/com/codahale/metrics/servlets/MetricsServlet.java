@@ -70,10 +70,16 @@ public class MetricsServlet extends HttpServlet {
         public void contextInitialized(ServletContextEvent event) {
             final ServletContext context = event.getServletContext();
             context.setAttribute(METRICS_REGISTRY, getMetricRegistry());
-            context.setAttribute(RATE_UNIT, getRateUnit());
-            context.setAttribute(DURATION_UNIT, getDurationUnit());
-            context.setAttribute(ALLOWED_ORIGIN, getAllowedOrigin());
             context.setAttribute(METRIC_FILTER, getMetricFilter());
+            if (getDurationUnit() != null) {
+                context.setInitParameter(MetricsServlet.DURATION_UNIT, getDurationUnit().toString());
+            }
+            if (getRateUnit() != null) {
+                context.setInitParameter(MetricsServlet.RATE_UNIT, getRateUnit().toString());
+            }
+            if (getAllowedOrigin() != null) {
+                context.setInitParameter(MetricsServlet.ALLOWED_ORIGIN, getAllowedOrigin());
+            }
         }
 
         @Override
@@ -131,7 +137,7 @@ public class MetricsServlet extends HttpServlet {
                                                                           showSamples,
                                                                           filter));
 
-        this.allowedOrigin = config.getInitParameter(ALLOWED_ORIGIN);
+        this.allowedOrigin = context.getInitParameter(ALLOWED_ORIGIN);
     }
 
     @Override
