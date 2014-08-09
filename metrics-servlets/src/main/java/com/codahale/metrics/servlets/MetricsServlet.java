@@ -1,20 +1,25 @@
 package com.codahale.metrics.servlets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.json.MetricsModule;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.json.MetricsModule;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 
 /**
  * A servlet which returns the metrics in a given registry as an {@code application/json} response.
@@ -58,7 +63,14 @@ public class MetricsServlet extends HttpServlet {
         }
 
         /**
-         * @return the {@link MetricFilter} that shall be used to filter metrics, or {@link MetricFilter#ALL} if
+         * Returns the name of the parameter used to specify the jsonp callback, if any.
+         */
+        protected String getJsonpCallbackParameter() {
+            return null;
+        }
+
+        /**
+         * Returns the {@link MetricFilter} that shall be used to filter metrics, or {@link MetricFilter#ALL} if
          * the default should be used.
          */
         protected MetricFilter getMetricFilter() {
@@ -80,6 +92,9 @@ public class MetricsServlet extends HttpServlet {
             if (getAllowedOrigin() != null) {
                 context.setInitParameter(MetricsServlet.ALLOWED_ORIGIN, getAllowedOrigin());
             }
+            if (getJsonpCallbackParameter() != null) {
+                context.setAttribute(CALLBACK_PARAM, getJsonpCallbackParameter());
+            }
         }
 
         @Override
@@ -94,11 +109,13 @@ public class MetricsServlet extends HttpServlet {
     public static final String METRICS_REGISTRY = MetricsServlet.class.getCanonicalName() + ".registry";
     public static final String ALLOWED_ORIGIN = MetricsServlet.class.getCanonicalName() + ".allowedOrigin";
     public static final String METRIC_FILTER = MetricsServlet.class.getCanonicalName() + ".metricFilter";
+    public static final String CALLBACK_PARAM = MetricsServlet.class.getCanonicalName() + ".jsonpCallback";
 
     private static final long serialVersionUID = 1049773947734939602L;
     private static final String CONTENT_TYPE = "application/json";
 
     private String allowedOrigin;
+    private String jsonpParamName;
     private transient MetricRegistry registry;
     private transient ObjectMapper mapper;
 
@@ -138,6 +155,7 @@ public class MetricsServlet extends HttpServlet {
                                                                           filter));
 
         this.allowedOrigin = context.getInitParameter(ALLOWED_ORIGIN);
+        this.jsonpParamName = context.getInitParameter(CALLBACK_PARAM);
     }
 
     @Override
@@ -149,10 +167,14 @@ public class MetricsServlet extends HttpServlet {
         }
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
         resp.setStatus(HttpServletResponse.SC_OK);
-
+        
         final OutputStream output = resp.getOutputStream();
         try {
-            getWriter(req).writeValue(output, registry);
+            if (jsonpParamName != null && req.getParameter(jsonpParamName) != null) {
+                getWriter(req).writeValue(output, new JSONPObject(req.getParameter(jsonpParamName), registry));
+            } else {
+                getWriter(req).writeValue(output, registry);
+            }
         } finally {
             output.close();
         }
