@@ -32,6 +32,8 @@ public class JmxReporterTest {
     private final Histogram histogram = mock(Histogram.class);
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
+    private final ObjectNameFactory mockObjectNameFactory = mock(ObjectNameFactory.class);
+    private final ObjectNameFactory concreteObjectNameFactory = reporter.getObjectNameFactory();
 
     @Before
     public void setUp() throws Exception {
@@ -95,6 +97,32 @@ public class JmxReporterTest {
         reporter.stop();
     }
 
+    @Test
+    public void registersMBeansForMetricObjectsUsingProvidedObjectNameFactory() throws Exception {
+    	ObjectName n = new ObjectName(name + ":name=dummy");
+    	try {
+    		String widgetName = "something";
+    		when(mockObjectNameFactory.createName(any(String.class), any(String.class), any(String.class))).thenReturn(n);
+    		Gauge aGauge = mock(Gauge.class);
+            when(aGauge.getValue()).thenReturn(1);
+
+    		JmxReporter reporter = JmxReporter.forRegistry(registry)
+	                .registerWith(mBeanServer)
+	                .inDomain(name)
+	                .createsObjectNamesWith(mockObjectNameFactory)
+	                .build();
+	        registry.register(widgetName, aGauge);
+	        reporter.start();
+	        verify(mockObjectNameFactory).createName(eq("gauges"), any(String.class), eq("something"));
+	        //verifyNoMoreInteractions(mockObjectNameFactory);
+    	} finally {
+    		reporter.stop();
+    		if(mBeanServer.isRegistered(n)) {
+    			mBeanServer.unregisterMBean(n);
+    		}
+    	}
+    }
+    
     @Test
     public void registersMBeansForGauges() throws Exception {
         final AttributeList attributes = getAttributes("gauge", "Value");
@@ -238,7 +266,7 @@ public class JmxReporterTest {
     }
 
     private AttributeList getAttributes(String name, String... attributeNames) throws JMException {
-        final ObjectName n = new ObjectName(this.name, "name", name);
+    	ObjectName n = concreteObjectNameFactory.createName("only-for-logging-error", this.name, name);
         return mBeanServer.getAttributes(n, attributeNames);
     }
 

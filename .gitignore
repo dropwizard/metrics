@@ -7,3 +7,4 @@ bin
 *.iml
 *.ipr
 *.iws
+.metadata
