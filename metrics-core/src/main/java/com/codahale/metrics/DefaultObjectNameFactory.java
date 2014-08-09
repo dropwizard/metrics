@@ -13,7 +13,11 @@ public class DefaultObjectNameFactory implements ObjectNameFactory {
 	@Override
 	public ObjectName createName(String type, String domain, String name) {
 		try {
-			return new ObjectName(domain, "name", name);
+			ObjectName objectName = new ObjectName(domain, "name", name);
+			if (objectName.isPattern()) {
+				objectName = new ObjectName(domain, "name", ObjectName.quote(name));
+			}
+			return objectName;
 		} catch (MalformedObjectNameException e) {
 			try {
 				return new ObjectName(domain, "name", ObjectName.quote(name));

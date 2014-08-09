@@ -265,6 +265,13 @@ public class JmxReporterTest {
     	
     }
 
+    @Test
+    public void testJmxMetricNameWithAsterisk() {
+        MetricRegistry metricRegistry = new MetricRegistry();
+        JmxReporter.forRegistry(metricRegistry).build().start();
+        metricRegistry.counter("test*");
+    }
+
     private AttributeList getAttributes(String name, String... attributeNames) throws JMException {
     	ObjectName n = concreteObjectNameFactory.createName("only-for-logging-error", this.name, name);
         return mBeanServer.getAttributes(n, attributeNames);
