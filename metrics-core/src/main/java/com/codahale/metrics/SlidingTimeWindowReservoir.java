@@ -62,7 +62,7 @@ public class SlidingTimeWindowReservoir implements Reservoir {
     @Override
     public Snapshot getSnapshot() {
         trim();
-        return new Snapshot(measurements.values());
+        return new UniformSnapshot(measurements.values());
     }
 
     private long getTick() {
