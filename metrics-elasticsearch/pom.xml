@@ -12,9 +12,7 @@
 	<artifactId>metrics-elasticsearch</artifactId>
 	<name>Elasticsearch Common for Metrics</name>
 	<packaging>bundle</packaging>
-	<description>
-        Common classes for reporters which announce measurements to an Elasticsearch cluster.
-    </description>
+	<description>Common classes for reporters which announce measurements to an Elasticsearch cluster.</description>
 
 	<dependencies>
 		<dependency>

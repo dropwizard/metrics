@@ -12,9 +12,7 @@
 	<artifactId>metrics-elasticsearch-transport</artifactId>
 	<name>Elasticsearch for Metrics over Transport protocol</name>
 	<packaging>bundle</packaging>
-	<description>
-        A reporter for Metrics which announces measurements to an Elasticsearch cluster using the Elasticsearch transport protocol.
-    </description>
+	<description>A reporter for Metrics which announces measurements to an Elasticsearch cluster using the Elasticsearch transport protocol.</description>
 
 	<dependencies>
 		<dependency>

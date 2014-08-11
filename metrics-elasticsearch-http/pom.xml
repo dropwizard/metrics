@@ -12,9 +12,7 @@
 	<artifactId>metrics-elasticsearch-http</artifactId>
 	<name>Elasticsearch for Metrics over HTTP</name>
 	<packaging>bundle</packaging>
-	<description>
-        A reporter for Metrics which announces measurements to an Elasticsearch cluster using the HTTP API.
-    </description>
+	<description>A reporter for Metrics which announces measurements to an Elasticsearch cluster using the HTTP API.</description>
 
 	<dependencies>
 		<dependency>
