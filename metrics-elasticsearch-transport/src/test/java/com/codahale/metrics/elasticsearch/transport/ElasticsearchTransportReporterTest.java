@@ -1,29 +1,26 @@
 package com.codahale.metrics.elasticsearch.transport;
 
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
-
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequestBuilder;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.InternalTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Order;
+import org.elasticsearch.test.ElasticsearchIntegrationTest;
+import org.elasticsearch.test.ElasticsearchIntegrationTest.ClusterScope;
+import org.elasticsearch.test.ElasticsearchIntegrationTest.Scope;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.codahale.metrics.Clock;
@@ -37,46 +34,39 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.elasticsearch.ElasticsearchReporter;
 import com.codahale.metrics.elasticsearch.MetricElasticsearchTypes;
 
-public class ElasticsearchTransportReporterTest {
+@ClusterScope(scope = Scope.SUITE)
+public class ElasticsearchTransportReporterTest extends
+        ElasticsearchIntegrationTest {
     private final String prefix = "prefix";
     private final MetricRegistry registry = new MetricRegistry();
 
-    private static Node node;
-    private static Client client;
     private ElasticsearchReporter reporter;
 
-    @BeforeClass
-    public static void beforeClass() {
-        NodeBuilder nodeBuilder = nodeBuilder();
-        nodeBuilder.settings()
-                .put("path.data", System.getProperty("java.io.tmpdir")).build();
-        node = nodeBuilder.clusterName("ElasticsearchTransportReporterTest")
-                .node();
-        client = node.client();
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        client.close();
-        node.close();
-    }
-
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
+        super.setUp();
         reporter = ElasticsearchTransportReporter
                 .forRegistryAndIndexPrefix(registry, "test")
                 .withClock(Clock.defaultClock()).prefixedWith(prefix)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .withBulkRequestLimit(10).filter(MetricFilter.ALL)
-                .build(client);
+                .build(ElasticsearchIntegrationTest.client());
         reporter.start(1, TimeUnit.SECONDS);
     }
 
     @After
-    public void teardown() {
-        reporter.stop();
+    public void teardown() throws Exception {
         deleteIndices();
+        reporter.stop();
+        super.tearDown();
+    }
+
+    @Override
+    protected Settings nodeSettings(int nodeOrdinal) {
+        return ImmutableSettings.settingsBuilder()
+                .put("path.data", System.getProperty("java.io.tmpdir"))
+                .put(super.nodeSettings(nodeOrdinal)).build();
     }
 
     @Test
@@ -89,24 +79,27 @@ public class ElasticsearchTransportReporterTest {
             counter.inc();
         }
         waitForReporter();
-        refreshIndices();
+        flushAndRefresh();
 
-        SearchResponse searchResponse = new SearchRequestBuilder(client)
-                .setIndices("_all")
-                .setTypes(MetricElasticsearchTypes.COUNTER)
-                .setQuery(QueryBuilders.matchAllQuery())
-                .setSize(0)
-                .addAggregation(
-                        AggregationBuilders
-                                .terms("timestamps")
-                                .size(50)
-                                .field("@timestamp")
-                                .order(Order.term(true))
-                                .subAggregation(
-                                        AggregationBuilders.terms("names")
-                                                .size(50).field("@name")
-                                                .order(Order.term(true))))
-                .execute().actionGet();
+        SearchResponse searchResponse = searchWithTimeout(
+                new SearchRequestBuilder(ElasticsearchIntegrationTest.client())
+                        .setIndices("_all")
+                        .setTypes(MetricElasticsearchTypes.COUNTER)
+                        .setQuery(QueryBuilders.matchAllQuery())
+                        .setSize(0)
+                        .addAggregation(
+                                AggregationBuilders
+                                        .terms("timestamps")
+                                        .size(50)
+                                        .field("@timestamp")
+                                        .order(Order.term(true))
+                                        .subAggregation(
+                                                AggregationBuilders
+                                                        .terms("names")
+                                                        .size(50)
+                                                        .field("@name")
+                                                        .order(Order.term(true)))),
+                15);
 
         InternalTerms timestamps = searchResponse.getAggregations().get(
                 "timestamps");
@@ -134,7 +127,7 @@ public class ElasticsearchTransportReporterTest {
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .withBulkRequestLimit(10).filter(MetricFilter.ALL)
-                .build(client);
+                .build(ElasticsearchIntegrationTest.client());
         reporter.start(1, TimeUnit.SECONDS);
 
         String metricName = "com.codahale.metrics.elasticsearch.test.counter";
@@ -143,11 +136,13 @@ public class ElasticsearchTransportReporterTest {
         counter.inc();
 
         waitForReporter();
-        refreshIndices();
+        flushAndRefresh();
 
-        SearchResponse searchResponse = new SearchRequestBuilder(client)
-                .setIndices("_all").setTypes(MetricElasticsearchTypes.COUNTER)
-                .setQuery(QueryBuilders.matchAllQuery()).execute().actionGet();
+        SearchResponse searchResponse = searchWithTimeout(
+                new SearchRequestBuilder(ElasticsearchIntegrationTest.client())
+                        .setIndices("_all")
+                        .setTypes(MetricElasticsearchTypes.COUNTER)
+                        .setQuery(QueryBuilders.matchAllQuery()), 1);
         Assert.assertEquals(true, searchResponse.getHits().getHits().length > 0);
         Map<String, Object> searchHitSource = searchResponse.getHits()
                 .getHits()[0].getSource();
@@ -165,11 +160,13 @@ public class ElasticsearchTransportReporterTest {
         counter.inc();
 
         waitForReporter();
-        refreshIndices();
+        flushAndRefresh();
 
-        SearchResponse searchResponse = new SearchRequestBuilder(client)
-                .setIndices("_all").setTypes(MetricElasticsearchTypes.COUNTER)
-                .setQuery(QueryBuilders.matchAllQuery()).execute().actionGet();
+        SearchResponse searchResponse = searchWithTimeout(
+                new SearchRequestBuilder(ElasticsearchIntegrationTest.client())
+                        .setIndices("_all")
+                        .setTypes(MetricElasticsearchTypes.COUNTER)
+                        .setQuery(QueryBuilders.matchAllQuery()), 1);
         Assert.assertEquals(true, searchResponse.getHits().getHits().length > 0);
         Map<String, Object> searchHitSource = searchResponse.getHits()
                 .getHits()[0].getSource();
@@ -186,11 +183,13 @@ public class ElasticsearchTransportReporterTest {
         timer.update(1000, TimeUnit.MILLISECONDS);
 
         waitForReporter();
-        refreshIndices();
+        flushAndRefresh();
 
-        SearchResponse searchResponse = new SearchRequestBuilder(client)
-                .setIndices("_all").setTypes(MetricElasticsearchTypes.TIMER)
-                .setQuery(QueryBuilders.matchAllQuery()).execute().actionGet();
+        SearchResponse searchResponse = searchWithTimeout(
+                new SearchRequestBuilder(ElasticsearchIntegrationTest.client())
+                        .setIndices("_all")
+                        .setTypes(MetricElasticsearchTypes.TIMER)
+                        .setQuery(QueryBuilders.matchAllQuery()), 1);
         Assert.assertEquals(true, searchResponse.getHits().getHits().length > 0);
         Map<String, Object> searchHitSource = searchResponse.getHits()
                 .getHits()[0].getSource();
@@ -207,11 +206,13 @@ public class ElasticsearchTransportReporterTest {
         meter.mark();
 
         waitForReporter();
-        refreshIndices();
+        flushAndRefresh();
 
-        SearchResponse searchResponse = new SearchRequestBuilder(client)
-                .setIndices("_all").setTypes(MetricElasticsearchTypes.METER)
-                .setQuery(QueryBuilders.matchAllQuery()).execute().actionGet();
+        SearchResponse searchResponse = searchWithTimeout(
+                new SearchRequestBuilder(ElasticsearchIntegrationTest.client())
+                        .setIndices("_all")
+                        .setTypes(MetricElasticsearchTypes.METER)
+                        .setQuery(QueryBuilders.matchAllQuery()), 1);
         Assert.assertEquals(true, searchResponse.getHits().getHits().length > 0);
         Map<String, Object> searchHitSource = searchResponse.getHits()
                 .getHits()[0].getSource();
@@ -228,12 +229,13 @@ public class ElasticsearchTransportReporterTest {
         histogram.update(1);
 
         waitForReporter();
-        refreshIndices();
+        flushAndRefresh();
 
-        SearchResponse searchResponse = new SearchRequestBuilder(client)
-                .setIndices("_all")
-                .setTypes(MetricElasticsearchTypes.HISTOGRAM)
-                .setQuery(QueryBuilders.matchAllQuery()).execute().actionGet();
+        SearchResponse searchResponse = searchWithTimeout(
+                new SearchRequestBuilder(ElasticsearchIntegrationTest.client())
+                        .setIndices("_all")
+                        .setTypes(MetricElasticsearchTypes.HISTOGRAM)
+                        .setQuery(QueryBuilders.matchAllQuery()), 1);
         Assert.assertEquals(true, searchResponse.getHits().getHits().length > 0);
         Map<String, Object> searchHitSource = searchResponse.getHits()
                 .getHits()[0].getSource();
@@ -265,14 +267,15 @@ public class ElasticsearchTransportReporterTest {
         });
 
         waitForReporter();
-        refreshIndices();
+        flushAndRefresh();
 
-        SearchResponse searchResponse = new SearchRequestBuilder(client)
-                .setIndices("_all")
-                .setTypes(MetricElasticsearchTypes.GAUGE)
-                .setQuery(
-                        QueryBuilders.matchPhraseQuery("@name", prefix + "."
-                                + metricName)).execute().actionGet();
+        SearchResponse searchResponse = searchWithTimeout(
+                new SearchRequestBuilder(ElasticsearchIntegrationTest.client())
+                        .setIndices("_all")
+                        .setTypes(MetricElasticsearchTypes.GAUGE)
+                        .setQuery(
+                                QueryBuilders.matchPhraseQuery("@name", prefix
+                                        + "." + metricName)), 1);
         Assert.assertEquals(true, searchResponse.getHits().getHits().length > 0);
         Map<String, Object> searchHitSource = searchResponse.getHits()
                 .getHits()[0].getSource();
@@ -307,17 +310,36 @@ public class ElasticsearchTransportReporterTest {
 
     private void waitForReporter() {
         try {
-            Thread.sleep(2000);
+            Thread.sleep(1500);
         } catch (Exception e) {
         }
     }
 
-    private void refreshIndices() {
-        new RefreshRequestBuilder(client.admin().indices()).get();
+    private SearchResponse searchWithTimeout(
+            SearchRequestBuilder searchRequestBuilder, int expectedResultSize) {
+        int timeout = 10;
+        while (timeout > 0) {
+            try {
+                SearchResponse response = searchRequestBuilder.execute()
+                        .actionGet();
+                if (response.getFailedShards() == 0
+                        && response.getHits().getTotalHits() >= expectedResultSize) {
+                    return response;
+                }
+            } catch (Exception e) {
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (Exception ex) {
+            }
+            timeout--;
+        }
+        return null;
     }
 
     private void deleteIndices() {
-        new DeleteIndexRequestBuilder(client.admin().indices(), "test-*")
-                .execute().actionGet();
+        new DeleteIndexRequestBuilder(admin().indices(), "test-*").execute()
+                .actionGet();
+        flushAndRefresh();
     }
 }

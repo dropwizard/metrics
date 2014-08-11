@@ -228,13 +228,21 @@ public class ElasticsearchHttpReporter extends ElasticsearchReporter {
     @Override
     protected void sendBulkRequest() throws IOException {
         HttpURLConnection connection = openConnection("/_bulk", "POST");
+        if(connection == null) {
+            resetBulkRequest();
+            return;
+        }
+        
         OutputStreamWriter printWriter = new OutputStreamWriter(
                 connection.getOutputStream(), "UTF-8");
         printWriter.write(bulkRequest.toString());
         printWriter.flush();
         printWriter.close();
         closeConnection(connection);
-
+        resetBulkRequest();
+    }
+    
+    private void resetBulkRequest() {
         bulkRequest = new StringWriter();
         requestCount.set(0);
     }
@@ -244,27 +252,29 @@ public class ElasticsearchHttpReporter extends ElasticsearchReporter {
      * in a round robin fashion to load balance reporting
      */
     private HttpURLConnection openConnection(String uri, String method) {
-        int hostIndex = nextHost.get();
-        nextHost.set(nextHost.get() == elasticsearchHosts.length - 1 ? 0
-                : nextHost.get() + 1);
-        try {
-            URL templateUrl = new URL("http://" + elasticsearchHosts[hostIndex]
-                    + uri);
-            HttpURLConnection connection = (HttpURLConnection) templateUrl
-                    .openConnection();
-            connection.setRequestMethod(method);
-            connection.setConnectTimeout(timeout);
-            connection.setUseCaches(false);
-            if (method.equalsIgnoreCase("POST")
-                    || method.equalsIgnoreCase("PUT")) {
-                connection.setDoOutput(true);
-            }
-            connection.connect();
+        for(int i = 0; i < elasticsearchHosts.length; i++) {
+            int hostIndex = nextHost.get();
+            nextHost.set(nextHost.get() == elasticsearchHosts.length - 1 ? 0
+                    : nextHost.get() + 1);
+            try {
+                URL templateUrl = new URL("http://" + elasticsearchHosts[hostIndex]
+                        + uri);
+                HttpURLConnection connection = (HttpURLConnection) templateUrl
+                        .openConnection();
+                connection.setRequestMethod(method);
+                connection.setConnectTimeout(timeout);
+                connection.setUseCaches(false);
+                if (method.equalsIgnoreCase("POST")
+                        || method.equalsIgnoreCase("PUT")) {
+                    connection.setDoOutput(true);
+                }
+                connection.connect();
 
-            return connection;
-        } catch (IOException e) {
-            LOGGER.error("Error connecting to {}: {}",
-                    elasticsearchHosts[hostIndex], e);
+                return connection;
+            } catch (IOException e) {
+                LOGGER.error("Error connecting to {}: {}",
+                        elasticsearchHosts[hostIndex], e);
+            }
         }
         return null;
     }
