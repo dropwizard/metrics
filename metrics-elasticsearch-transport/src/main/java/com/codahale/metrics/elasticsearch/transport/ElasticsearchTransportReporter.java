@@ -29,7 +29,7 @@ import com.codahale.metrics.elasticsearch.ElasticsearchReporter;
 public class ElasticsearchTransportReporter extends ElasticsearchReporter {
     /**
      * Returns a new {@link Builder} for
-     * {@link ElasticsearchTransportReporterTest}.
+     * {@link ElasticsearchTransportReporter}.
      *
      * @param registry
      *            the registry to report
@@ -37,7 +37,7 @@ public class ElasticsearchTransportReporter extends ElasticsearchReporter {
      *            the indices created will be prefixed with this value, e.g.
      *            "test" will result with indices like "test-2014.08.10"
      * @return a {@link Builder} instance for a
-     *         {@link ElasticsearchTransportReporterTest}
+     *         {@link ElasticsearchTransportReporter}
      */
     public static Builder forRegistryAndIndexPrefix(MetricRegistry registry,
             String elasticsearchIndexPrefix) {
@@ -45,7 +45,7 @@ public class ElasticsearchTransportReporter extends ElasticsearchReporter {
     }
 
     /**
-     * A builder for {@link ElasticsearchTransportReporterTest} instances.
+     * A builder for {@link ElasticsearchTransportReporter} instances.
      * Defaults to not using a prefix, using the default clock, converting rates
      * to events/second, converting durations to milliseconds, and not filtering
      * metrics.
