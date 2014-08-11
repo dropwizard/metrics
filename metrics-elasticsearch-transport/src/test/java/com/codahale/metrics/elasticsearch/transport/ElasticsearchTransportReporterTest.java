@@ -11,6 +11,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.InternalTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
@@ -81,7 +82,7 @@ public class ElasticsearchTransportReporterTest extends
         waitForReporter();
         flushAndRefresh();
 
-        SearchResponse searchResponse = searchWithTimeout(
+        SearchResponse searchResponse = nestedAggregationWithTimeout(
                 new SearchRequestBuilder(ElasticsearchIntegrationTest.client())
                         .setIndices("_all")
                         .setTypes(MetricElasticsearchTypes.COUNTER)
@@ -107,14 +108,16 @@ public class ElasticsearchTransportReporterTest extends
         Assert.assertEquals(true, timestampBuckets.size() > 0);
         for (Bucket bucket : timestampBuckets) {
             InternalTerms names = bucket.getAggregations().get("names");
-            Assert.assertEquals(15, names.getBuckets().size());
-            for (int i = 0; i < names.getBuckets().size(); i++) {
-                Assert.assertEquals(
-                        prefix + "." + metricNamePrefix + formatter.format(i),
-                        ((Bucket) names.getBuckets().toArray()[i]).getKey());
+            if(names.getBuckets().size() >= 15) {
+                for (int i = 0; i < names.getBuckets().size(); i++) {
+                    Assert.assertEquals(
+                            prefix + "." + metricNamePrefix + formatter.format(i),
+                            ((Bucket) names.getBuckets().toArray()[i]).getKey());
+                }
+                return;
             }
-            break;
         }
+        Assert.fail("Insufficient metrics reported");
     }
 
     @Test
@@ -324,6 +327,39 @@ public class ElasticsearchTransportReporterTest extends
                         .actionGet();
                 if (response.getFailedShards() == 0
                         && response.getHits().getTotalHits() >= expectedResultSize) {
+                    return response;
+                }
+            } catch (Exception e) {
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (Exception ex) {
+            }
+            timeout--;
+        }
+        return null;
+    }
+
+    private SearchResponse nestedAggregationWithTimeout(
+            SearchRequestBuilder searchRequestBuilder, int expectedResultSize) {
+        int timeout = 10;
+        while (timeout > 0) {
+            try {
+                SearchResponse response = searchRequestBuilder.execute()
+                        .actionGet();
+                if (response.getFailedShards() == 0) {
+                    for (Aggregation aggregation : response.getAggregations()) {
+                        for (Bucket bucket : ((InternalTerms) aggregation)
+                                .getBuckets()) {
+                            for (Aggregation nestedAggregation : bucket
+                                    .getAggregations()) {
+                                if (((InternalTerms) nestedAggregation)
+                                        .getBuckets().size() >= expectedResultSize) {
+                                    return response;
+                                }
+                            }
+                        }
+                    }
                     return response;
                 }
             } catch (Exception e) {

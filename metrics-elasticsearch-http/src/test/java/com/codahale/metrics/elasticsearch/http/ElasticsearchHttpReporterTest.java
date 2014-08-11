@@ -11,6 +11,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.InternalTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
@@ -34,8 +35,12 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.elasticsearch.ElasticsearchReporter;
 import com.codahale.metrics.elasticsearch.MetricElasticsearchTypes;
 
+import static org.mockito.Mockito.*;
+
 @ClusterScope(scope = Scope.SUITE, numDataNodes = 1, numClientNodes = 1)
 public class ElasticsearchHttpReporterTest extends ElasticsearchIntegrationTest {
+    private final long timestamp = System.currentTimeMillis();
+    private final Clock clock = mock(Clock.class);
     private final String prefix = "prefix";
     private final MetricRegistry registry = new MetricRegistry();
 
@@ -45,12 +50,13 @@ public class ElasticsearchHttpReporterTest extends ElasticsearchIntegrationTest 
     public void setUp() throws Exception {
         reporter = ElasticsearchHttpReporter
                 .forRegistryAndIndexPrefix(registry, "test-")
-                .withClock(Clock.defaultClock()).prefixedWith(prefix)
+                .withClock(clock).prefixedWith(prefix)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .withBulkRequestLimit(10).filter(MetricFilter.ALL)
                 .build("localhost:9201");
         reporter.start(1, TimeUnit.SECONDS);
+        when(clock.getTime()).thenReturn(timestamp);
         super.setUp();
     }
 
@@ -80,7 +86,7 @@ public class ElasticsearchHttpReporterTest extends ElasticsearchIntegrationTest 
         waitForReporter();
         flushAndRefresh();
 
-        SearchResponse searchResponse = searchWithTimeout(
+        SearchResponse searchResponse = nestedAggregationWithTimeout(
                 new SearchRequestBuilder(ElasticsearchIntegrationTest.client())
                         .setIndices("_all")
                         .setTypes(MetricElasticsearchTypes.COUNTER)
@@ -106,14 +112,16 @@ public class ElasticsearchHttpReporterTest extends ElasticsearchIntegrationTest 
         Assert.assertEquals(true, timestampBuckets.size() > 0);
         for (Bucket bucket : timestampBuckets) {
             InternalTerms names = bucket.getAggregations().get("names");
-            Assert.assertEquals(15, names.getBuckets().size());
-            for (int i = 0; i < names.getBuckets().size(); i++) {
-                Assert.assertEquals(
-                        prefix + "." + metricNamePrefix + formatter.format(i),
-                        ((Bucket) names.getBuckets().toArray()[i]).getKey());
+            if(names.getBuckets().size() >= 15) {
+                for (int i = 0; i < names.getBuckets().size(); i++) {
+                    Assert.assertEquals(
+                            prefix + "." + metricNamePrefix + formatter.format(i),
+                            ((Bucket) names.getBuckets().toArray()[i]).getKey());
+                }
+                return;
             }
-            break;
         }
+        Assert.fail("Insufficient metrics reported");
     }
 
     @Test
@@ -323,6 +331,39 @@ public class ElasticsearchHttpReporterTest extends ElasticsearchIntegrationTest 
                         .actionGet();
                 if (response.getFailedShards() == 0
                         && response.getHits().getTotalHits() >= expectedResultSize) {
+                    return response;
+                }
+            } catch (Exception e) {
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (Exception ex) {
+            }
+            timeout--;
+        }
+        return null;
+    }
+    
+    private SearchResponse nestedAggregationWithTimeout(
+            SearchRequestBuilder searchRequestBuilder, int expectedResultSize) {
+        int timeout = 10;
+        while (timeout > 0) {
+            try {
+                SearchResponse response = searchRequestBuilder.execute()
+                        .actionGet();
+                if (response.getFailedShards() == 0) {
+                    for (Aggregation aggregation : response.getAggregations()) {
+                        for (Bucket bucket : ((InternalTerms) aggregation)
+                                .getBuckets()) {
+                            for (Aggregation nestedAggregation : bucket
+                                    .getAggregations()) {
+                                if (((InternalTerms) nestedAggregation)
+                                        .getBuckets().size() >= expectedResultSize) {
+                                    return response;
+                                }
+                            }
+                        }
+                    }
                     return response;
                 }
             } catch (Exception e) {
