@@ -322,7 +322,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Metric> SortedMap<String, T> getMetrics(Class<T> klass, MetricFilter filter) {
+    protected final <T extends Metric> SortedMap<String, T> getMetrics(Class<T> klass, MetricFilter filter) {
         final TreeMap<String, T> timers = new TreeMap<String, T>();
         for (Map.Entry<String, Metric> entry : metrics.entrySet()) {
             if (klass.isInstance(entry.getValue()) && filter.matches(entry.getKey(),
