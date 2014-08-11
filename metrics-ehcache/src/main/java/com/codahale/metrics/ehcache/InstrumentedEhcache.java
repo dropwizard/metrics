@@ -6,8 +6,8 @@ import com.codahale.metrics.Timer;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
-import net.sf.ehcache.Statistics;
 import net.sf.ehcache.constructs.EhcacheDecoratorAdapter;
+import net.sf.ehcache.statistics.StatisticsGateway;
 
 import java.io.Serializable;
 
@@ -113,18 +113,16 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
      * @param cache       an {@link Ehcache} instance
      * @param registry    a {@link MetricRegistry}
      * @return an instrumented decorator for {@code cache}
-     * @see Statistics
+     * @see StatisticsGateway
      */
     public static Ehcache instrument(MetricRegistry registry, final Ehcache cache) {
-        cache.setSampledStatisticsEnabled(true);
-        cache.setStatisticsAccuracy(Statistics.STATISTICS_ACCURACY_NONE);
 
         final String prefix = name(cache.getClass(), cache.getName());
         registry.register(name(prefix, "hits"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
-                                  return cache.getStatistics().getCacheHits();
+                                  return cache.getStatistics().cacheHitCount();
                               }
                           });
 
@@ -132,7 +130,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
-                                  return cache.getStatistics().getInMemoryHits();
+                                  return cache.getStatistics().localHeapHitCount();
                               }
                           });
 
@@ -140,7 +138,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
-                                  return cache.getStatistics().getOffHeapHits();
+                                  return cache.getStatistics().localOffHeapHitCount();
                               }
                           });
 
@@ -148,7 +146,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
-                                  return cache.getStatistics().getOnDiskHits();
+                                  return cache.getStatistics().localDiskHitCount();
                               }
                           });
 
@@ -156,7 +154,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
-                                  return cache.getStatistics().getCacheMisses();
+                                  return cache.getStatistics().cacheMissCount();
                               }
                           });
 
@@ -164,7 +162,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
-                                  return cache.getStatistics().getInMemoryMisses();
+                                  return cache.getStatistics().localHeapMissCount();
                               }
                           });
 
@@ -172,7 +170,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
-                                  return cache.getStatistics().getOffHeapMisses();
+                                  return cache.getStatistics().localOffHeapMissCount();
                               }
                           });
 
@@ -180,7 +178,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
-                                  return cache.getStatistics().getOnDiskMisses();
+                                  return cache.getStatistics().localDiskMissCount();
                               }
                           });
 
@@ -188,7 +186,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
-                                  return cache.getStatistics().getObjectCount();
+                                  return cache.getStatistics().getSize();
                               }
                           });
 
@@ -196,7 +194,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
-                                  return cache.getStatistics().getMemoryStoreObjectCount();
+                                  return cache.getStatistics().getLocalHeapSize();
                               }
                           });
 
@@ -204,7 +202,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
-                                  return cache.getStatistics().getOffHeapStoreObjectCount();
+                                  return cache.getStatistics().getLocalOffHeapSize();
                               }
                           });
 
@@ -212,23 +210,23 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
-                                  return cache.getStatistics().getDiskStoreObjectCount();
+                                  return cache.getStatistics().getLocalDiskSize();
                               }
                           });
 
         registry.register(name(prefix, "mean-get-time"),
-                          new Gauge<Float>() {
+                          new Gauge<Double>() {
                               @Override
-                              public Float getValue() {
-                                  return cache.getStatistics().getAverageGetTime();
+                              public Double getValue() {
+                                  return cache.getStatistics().cacheGetOperation().latency().average().value();
                               }
                           });
 
         registry.register(name(prefix, "mean-search-time"),
-                          new Gauge<Long>() {
+                          new Gauge<Double>() {
                               @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().getAverageSearchTime();
+                              public Double getValue() {
+                                  return cache.getStatistics().cacheSearchOperation().latency().average().value();
                               }
                           });
 
@@ -236,15 +234,15 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
-                                  return cache.getStatistics().getEvictionCount();
+                                  return cache.getStatistics().cacheEvictionOperation().count().value();
                               }
                           });
 
         registry.register(name(prefix, "searches-per-second"),
-                          new Gauge<Long>() {
+                          new Gauge<Double>() {
                               @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().getSearchesPerSecond();
+                              public Double getValue() {
+                                  return cache.getStatistics().cacheSearchOperation().rate().value();
                               }
                           });
 
@@ -252,16 +250,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
-                                  return cache.getStatistics().getWriterQueueSize();
-                              }
-                          });
-
-        registry.register(name(prefix, "accuracy"),
-                          new Gauge<String>() {
-                              @Override
-                              public String getValue() {
-                                  return cache.getStatistics()
-                                              .getStatisticsAccuracyDescription();
+                                  return cache.getStatistics().getWriterQueueLength();
                               }
                           });
 
