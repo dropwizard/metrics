@@ -43,7 +43,7 @@ import java.lang.annotation.Target;
  * </code></pre>
  * </p>
  *
- * @since 4.0.0
+ * @since 3.1
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER })
