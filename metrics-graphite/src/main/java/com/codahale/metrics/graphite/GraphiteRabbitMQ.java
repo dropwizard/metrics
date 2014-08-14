@@ -3,6 +3,7 @@ package com.codahale.metrics.graphite;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.DefaultSocketConfigurator;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -90,13 +91,15 @@ public class GraphiteRabbitMQ implements GraphiteSender {
 
         this.exchange = exchange;
 
-        this.connectionFactory = new ConnectionFactory() {
+        this.connectionFactory = new ConnectionFactory();
+
+	connectionFactory.setSocketConfigurator(new DefaultSocketConfigurator() {
             @Override
-            protected void configureSocket(Socket socket) throws IOException {
-                super.configureSocket(socket);
+            public void configure(Socket socket) throws IOException {
+                super.configure(socket);
                 socket.setSoTimeout(rabbitSocketTimeoutMS);
             }
-        };
+        });
 
         connectionFactory.setConnectionTimeout(rabbitConnectionTimeoutMS);
         connectionFactory.setRequestedHeartbeat(rabbitRequestedHeartbeatInSeconds);
