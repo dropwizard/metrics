@@ -20,6 +20,16 @@ public class GraphiteUDP implements GraphiteSender {
 
     private DatagramChannel datagramChannel = null;
     private int failures;
+    
+    /**
+     * Creates a new client which sends data to given address using UDP
+     *
+     * @param hostname The hostname of the Carbon server
+     * @param port The port of the Carbon server
+     */
+    public GraphiteUDP(String hostname, int port) {
+        this(new InetSocketAddress(hostname, port));
+    }
 
     /**
      * Creates a new client which sends data to given address using UDP
