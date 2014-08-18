@@ -75,9 +75,28 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 MetricFilter filter,
                                 TimeUnit rateUnit,
                                 TimeUnit durationUnit) {
+		this(registry, name, filter, rateUnit, durationUnit,
+                Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name + '-' + FACTORY_ID.incrementAndGet())));
+    }
+	
+    /**
+     * Creates a new {@link ScheduledReporter} instance.
+     *
+     * @param registry the {@link com.codahale.metrics.MetricRegistry} containing the metrics this
+     *                 reporter will report
+     * @param name     the reporter's name
+     * @param filter   the filter for which metrics to report
+     * @param executor the executor to use while scheduling reporting of metrics.
+     */
+    protected ScheduledReporter(MetricRegistry registry,
+                                String name,
+                                MetricFilter filter,
+                                TimeUnit rateUnit,
+                                TimeUnit durationUnit,
+                                ScheduledExecutorService executor) {
         this.registry = registry;
         this.filter = filter;
-        this.executor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name + '-' + FACTORY_ID.incrementAndGet()));
+        this.executor = executor;
         this.rateFactor = rateUnit.toSeconds(1);
         this.rateUnit = calculateRateUnit(rateUnit);
         this.durationFactor = 1.0 / durationUnit.toNanos(1);
@@ -139,11 +158,13 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * Report the current values of all metrics in the registry.
      */
     public void report() {
-        report(registry.getGauges(filter),
-               registry.getCounters(filter),
-               registry.getHistograms(filter),
-               registry.getMeters(filter),
-               registry.getTimers(filter));
+        synchronized (this) {
+            report(registry.getGauges(filter),
+                    registry.getCounters(filter),
+                    registry.getHistograms(filter),
+                    registry.getMeters(filter),
+                    registry.getTimers(filter));
+        }
     }
 
     /**
