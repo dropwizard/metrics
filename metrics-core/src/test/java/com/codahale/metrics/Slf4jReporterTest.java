@@ -8,6 +8,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import static com.codahale.metrics.Slf4jReporter.LoggingLevel;
 import static org.mockito.Mockito.*;
 
 public class Slf4jReporterTest {
@@ -15,22 +16,21 @@ public class Slf4jReporterTest {
     private final Marker marker = mock(Marker.class);
     private final MetricRegistry registry = mock(MetricRegistry.class);
     private final Slf4jReporter reporter = Slf4jReporter.forRegistry(registry)
-                                                        .outputTo(logger)
-                                                        .markWith(marker)
-                                                        .convertRatesTo(TimeUnit.SECONDS)
-                                                        .convertDurationsTo(TimeUnit.MILLISECONDS)
-                                                        .filter(MetricFilter.ALL)
-                                                        .build();
-
-
+            .outputTo(logger)
+            .markWith(marker)
+            .convertRatesTo(TimeUnit.SECONDS)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .filter(MetricFilter.ALL)
+            .withLoggingLevel(LoggingLevel.INFO)
+            .build();
 
     @Test
     public void reportsGaugeValues() throws Exception {
         reporter.report(map("gauge", gauge("value")),
-                        this.<Counter>map(),
-                        this.<Histogram>map(),
-                        this.<Meter>map(),
-                        this.<Timer>map());
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                this.<Meter>map(),
+                this.<Timer>map());
 
         verify(logger).info(marker, "type=GAUGE, name={}, value={}", "gauge", "value");
     }
@@ -41,12 +41,12 @@ public class Slf4jReporterTest {
         when(counter.getCount()).thenReturn(100L);
 
         reporter.report(this.<Gauge>map(),
-                        map("test.counter", counter),
-                        this.<Histogram>map(),
-                        this.<Meter>map(),
-                        this.<Timer>map());
+                map("test.counter", counter),
+                this.<Histogram>map(),
+                this.<Meter>map(),
+                this.<Timer>map());
 
-        verify(logger).info(marker, "type=COUNTER, name={}, count={}", "test.counter", 100L);
+        verify(logger, times(1)).info(marker, "type=COUNTER, name={}, count={}", "test.counter", 100L);
     }
 
     @Test
@@ -69,25 +69,25 @@ public class Slf4jReporterTest {
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
         reporter.report(this.<Gauge>map(),
-                        this.<Counter>map(),
-                        map("test.histogram", histogram),
-                        this.<Meter>map(),
-                        this.<Timer>map());
+                this.<Counter>map(),
+                map("test.histogram", histogram),
+                this.<Meter>map(),
+                this.<Timer>map());
 
         verify(logger).info(marker,
-                            "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
-                            "test.histogram",
-                            1L,
-                            4L,
-                            2L,
-                            3.0,
-                            5.0,
-                            6.0,
-                            7.0,
-                            8.0,
-                            9.0,
-                            10.0,
-                            11.0);
+                "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
+                "test.histogram",
+                1L,
+                4L,
+                2L,
+                3.0,
+                5.0,
+                6.0,
+                7.0,
+                8.0,
+                9.0,
+                10.0,
+                11.0);
     }
 
     @Test
@@ -100,20 +100,20 @@ public class Slf4jReporterTest {
         when(meter.getFifteenMinuteRate()).thenReturn(5.0);
 
         reporter.report(this.<Gauge>map(),
-                        this.<Counter>map(),
-                        this.<Histogram>map(),
-                        map("test.meter", meter),
-                        this.<Timer>map());
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                map("test.meter", meter),
+                this.<Timer>map());
 
         verify(logger).info(marker,
-                            "type=METER, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
-                            "test.meter",
-                            1L,
-                            2.0,
-                            3.0,
-                            4.0,
-                            5.0,
-                            "events/second");
+                "type=METER, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
+                "test.meter",
+                1L,
+                2.0,
+                3.0,
+                4.0,
+                5.0,
+                "events/second");
     }
 
     @Test
@@ -137,36 +137,36 @@ public class Slf4jReporterTest {
         when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
         when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
         when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS
-                                                                        .toNanos(1000));
+                .toNanos(1000));
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
         reporter.report(this.<Gauge>map(),
-                        this.<Counter>map(),
-                        this.<Histogram>map(),
-                        this.<Meter>map(),
-                        map("test.another.timer", timer));
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                this.<Meter>map(),
+                map("test.another.timer", timer));
 
         verify(logger).info(marker,
-                            "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
-                            "test.another.timer",
-                            1L,
-                            300.0,
-                            100.0,
-                            200.0,
-                            400.0,
-                            500.0,
-                            600.0,
-                            700.0,
-                            800.0,
-                            900.0,
-                            1000.0,
-                            2.0,
-                            3.0,
-                            4.0,
-                            5.0,
-                            "events/second",
-                            "milliseconds");
+                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
+                "test.another.timer",
+                1L,
+                300.0,
+                100.0,
+                200.0,
+                400.0,
+                500.0,
+                600.0,
+                700.0,
+                800.0,
+                900.0,
+                1000.0,
+                2.0,
+                3.0,
+                4.0,
+                5.0,
+                "events/second",
+                "milliseconds");
     }
 
     private <T> SortedMap<String, T> map() {
