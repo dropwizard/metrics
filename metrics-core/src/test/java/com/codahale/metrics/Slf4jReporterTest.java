@@ -176,6 +176,7 @@ public class Slf4jReporterTest {
                 "events/second",
                 "milliseconds");
     }
+
     @Test
     public void reportsGaugeValues() throws Exception {
         infoReporter.report(map("gauge", gauge("value")),
@@ -336,4 +337,5 @@ public class Slf4jReporterTest {
         when(gauge.getValue()).thenReturn(value);
         return gauge;
     }
+
 }
