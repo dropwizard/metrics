@@ -25,6 +25,8 @@ public class Slf4jReporter extends ScheduledReporter {
         return new Builder(registry);
     }
 
+    public enum LoggingLevel {TRACE, DEBUG, INFO, WARN, ERROR}
+
     /**
      * A builder for {@link CsvReporter} instances. Defaults to logging to {@code metrics}, not
      * using a marker, converting rates to events/second, converting durations to milliseconds, and
@@ -33,6 +35,7 @@ public class Slf4jReporter extends ScheduledReporter {
     public static class Builder {
         private final MetricRegistry registry;
         private Logger logger;
+        private LoggingLevel loggingLevel;
         private Marker marker;
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
@@ -45,6 +48,7 @@ public class Slf4jReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
+            this.loggingLevel = LoggingLevel.INFO;
         }
 
         /**
@@ -103,26 +107,56 @@ public class Slf4jReporter extends ScheduledReporter {
         }
 
         /**
+         * Use Logging Level when reporting.
+         *
+         * @param loggingLevel a (@link Slf4jReporter.LoggingLevel}
+         * @return {@code this}
+         */
+        public Builder withLoggingLevel(LoggingLevel loggingLevel) {
+            this.loggingLevel = loggingLevel;
+            return this;
+        }
+
+        /**
          * Builds a {@link Slf4jReporter} with the given properties.
          *
          * @return a {@link Slf4jReporter}
          */
         public Slf4jReporter build() {
-            return new Slf4jReporter(registry, logger, marker, rateUnit, durationUnit, filter);
+            LoggerProxy loggerProxy;
+            switch (loggingLevel) {
+                case TRACE:
+                    loggerProxy = new TraceLoggerProxy(logger);
+                    break;
+                case INFO:
+                    loggerProxy = new InfoLoggerProxy(logger);
+                    break;
+                case WARN:
+                    loggerProxy = new WarnLoggerProxy(logger);
+                    break;
+                case ERROR:
+                    loggerProxy = new ErrorLoggerProxy(logger);
+                    break;
+                default:
+                case DEBUG:
+                    loggerProxy = new DebugLoggerProxy(logger);
+                    break;
+            }
+            return new Slf4jReporter(registry, loggerProxy, marker, rateUnit, durationUnit, filter);
         }
     }
 
-    private final Logger logger;
+    private final LoggerProxy loggerProxy;
     private final Marker marker;
 
     private Slf4jReporter(MetricRegistry registry,
-                          Logger logger,
+                          LoggerProxy loggerProxy,
                           Marker marker,
                           TimeUnit rateUnit,
                           TimeUnit durationUnit,
                           MetricFilter filter) {
         super(registry, "logger-reporter", filter, rateUnit, durationUnit);
-        this.logger = logger;
+        this.loggerProxy = loggerProxy;
         this.marker = marker;
     }
 
@@ -155,71 +189,144 @@ public class Slf4jReporter extends ScheduledReporter {
 
     private void logTimer(String name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
-        logger.info(marker,
-                    "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, " +
-                            "p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, " +
-                            "m15={}, rate_unit={}, duration_unit={}",
-                    name,
-                    timer.getCount(),
-                    convertDuration(snapshot.getMin()),
-                    convertDuration(snapshot.getMax()),
-                    convertDuration(snapshot.getMean()),
-                    convertDuration(snapshot.getStdDev()),
-                    convertDuration(snapshot.getMedian()),
-                    convertDuration(snapshot.get75thPercentile()),
-                    convertDuration(snapshot.get95thPercentile()),
-                    convertDuration(snapshot.get98thPercentile()),
-                    convertDuration(snapshot.get99thPercentile()),
-                    convertDuration(snapshot.get999thPercentile()),
-                    convertRate(timer.getMeanRate()),
-                    convertRate(timer.getOneMinuteRate()),
-                    convertRate(timer.getFiveMinuteRate()),
-                    convertRate(timer.getFifteenMinuteRate()),
-                    getRateUnit(),
-                    getDurationUnit());
+        loggerProxy.log(marker,
+                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, " +
+                        "p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, " +
+                        "m15={}, rate_unit={}, duration_unit={}",
+                name,
+                timer.getCount(),
+                convertDuration(snapshot.getMin()),
+                convertDuration(snapshot.getMax()),
+                convertDuration(snapshot.getMean()),
+                convertDuration(snapshot.getStdDev()),
+                convertDuration(snapshot.getMedian()),
+                convertDuration(snapshot.get75thPercentile()),
+                convertDuration(snapshot.get95thPercentile()),
+                convertDuration(snapshot.get98thPercentile()),
+                convertDuration(snapshot.get99thPercentile()),
+                convertDuration(snapshot.get999thPercentile()),
+                convertRate(timer.getMeanRate()),
+                convertRate(timer.getOneMinuteRate()),
+                convertRate(timer.getFiveMinuteRate()),
+                convertRate(timer.getFifteenMinuteRate()),
+                getRateUnit(),
+                getDurationUnit());
     }
 
     private void logMeter(String name, Meter meter) {
-        logger.info(marker,
-                    "type=METER, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
-                    name,
-                    meter.getCount(),
-                    convertRate(meter.getMeanRate()),
-                    convertRate(meter.getOneMinuteRate()),
-                    convertRate(meter.getFiveMinuteRate()),
-                    convertRate(meter.getFifteenMinuteRate()),
-                    getRateUnit());
+        loggerProxy.log(marker,
+                "type=METER, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
+                name,
+                meter.getCount(),
+                convertRate(meter.getMeanRate()),
+                convertRate(meter.getOneMinuteRate()),
+                convertRate(meter.getFiveMinuteRate()),
+                convertRate(meter.getFifteenMinuteRate()),
+                getRateUnit());
     }
 
     private void logHistogram(String name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
-        logger.info(marker,
-                    "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, " +
-                            "median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
-                    name,
-                    histogram.getCount(),
-                    snapshot.getMin(),
-                    snapshot.getMax(),
-                    snapshot.getMean(),
-                    snapshot.getStdDev(),
-                    snapshot.getMedian(),
-                    snapshot.get75thPercentile(),
-                    snapshot.get95thPercentile(),
-                    snapshot.get98thPercentile(),
-                    snapshot.get99thPercentile(),
-                    snapshot.get999thPercentile());
+        loggerProxy.log(marker,
+                "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, " +
+                        "median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
+                name,
+                histogram.getCount(),
+                snapshot.getMin(),
+                snapshot.getMax(),
+                snapshot.getMean(),
+                snapshot.getStdDev(),
+                snapshot.getMedian(),
+                snapshot.get75thPercentile(),
+                snapshot.get95thPercentile(),
+                snapshot.get98thPercentile(),
+                snapshot.get99thPercentile(),
+                snapshot.get999thPercentile());
     }
 
     private void logCounter(String name, Counter counter) {
-        logger.info(marker, "type=COUNTER, name={}, count={}", name, counter.getCount());
+        loggerProxy.log(marker, "type=COUNTER, name={}, count={}", name, counter.getCount());
     }
 
     private void logGauge(String name, Gauge gauge) {
-        logger.info(marker, "type=GAUGE, name={}, value={}", name, gauge.getValue());
+        loggerProxy.log(marker, "type=GAUGE, name={}, value={}", name, gauge.getValue());
     }
 
     @Override
     protected String getRateUnit() {
         return "events/" + super.getRateUnit();
     }
+
+    /* private class to allow logger configuration */
+    static abstract class LoggerProxy {
+        protected final Logger logger;
+
+        public LoggerProxy(Logger logger) {
+            this.logger = logger;
+        }
+
+        abstract void log(Marker marker, String format, Object... arguments);
+    }
+
+    /* private class to allow logger configuration */
+    private static class DebugLoggerProxy extends LoggerProxy {
+        public DebugLoggerProxy(Logger logger) {
+            super(logger);
+        }
+
+        @Override
+        public void log(Marker marker, String format, Object... arguments) {
+            logger.debug(marker, format, arguments);
+        }
+    }
+
+    /* private class to allow logger configuration */
+    private static class TraceLoggerProxy extends LoggerProxy {
+        public TraceLoggerProxy(Logger logger) {
+            super(logger);
+        }
+
+        @Override
+        public void log(Marker marker, String format, Object... arguments) {
+            logger.trace(marker, format, arguments);
+        }
+
+    }
+
+    /* private class to allow logger configuration */
+    private static class InfoLoggerProxy extends LoggerProxy {
+        public InfoLoggerProxy(Logger logger) {
+            super(logger);
+        }
+
+        @Override
+        public void log(Marker marker, String format, Object... arguments) {
+            logger.info(marker, format, arguments);
+        }
+    }
+
+    /* private class to allow logger configuration */
+    private static class WarnLoggerProxy extends LoggerProxy {
+        public WarnLoggerProxy(Logger logger) {
+            super(logger);
+        }
+
+        @Override
+        public void log(Marker marker, String format, Object... arguments) {
+            logger.warn(marker, format, arguments);
+        }
+    }
+
+    /* private class to allow logger configuration */
+    private static class ErrorLoggerProxy extends LoggerProxy {
+        public ErrorLoggerProxy(Logger logger) {
+            super(logger);
+        }
+
+        @Override
+        public void log(Marker marker, String format, Object... arguments) {
+            logger.error(marker, format, arguments);
+        }
+    }
+
 }
