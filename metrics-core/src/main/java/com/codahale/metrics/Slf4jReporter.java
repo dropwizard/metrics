@@ -123,40 +123,40 @@ public class Slf4jReporter extends ScheduledReporter {
          * @return a {@link Slf4jReporter}
          */
         public Slf4jReporter build() {
-            LoggerHelper loggerHelper;
+            LoggerProxy loggerProxy;
             switch (loggingLevel) {
                 case TRACE:
-                    loggerHelper = new TraceLoggerHelper(logger);
+                    loggerProxy = new TraceLoggerProxy(logger);
                     break;
                 case INFO:
-                    loggerHelper = new InfoLoggerHelper(logger);
+                    loggerProxy = new InfoLoggerProxy(logger);
                     break;
                 case WARN:
-                    loggerHelper = new WarnLoggerHelper(logger);
+                    loggerProxy = new WarnLoggerProxy(logger);
                     break;
                 case ERROR:
-                    loggerHelper = new ErrorLoggerHelper(logger);
+                    loggerProxy = new ErrorLoggerProxy(logger);
                     break;
                 default:
                 case DEBUG:
-                    loggerHelper = new DebugLoggerHelper(logger);
+                    loggerProxy = new DebugLoggerProxy(logger);
                     break;
             }
-            return new Slf4jReporter(registry, loggerHelper, marker, rateUnit, durationUnit, filter);
+            return new Slf4jReporter(registry, loggerProxy, marker, rateUnit, durationUnit, filter);
         }
     }
 
-    private final LoggerHelper loggerHelper;
+    private final LoggerProxy loggerProxy;
     private final Marker marker;
 
     private Slf4jReporter(MetricRegistry registry,
-                          LoggerHelper loggerHelper,
+                          LoggerProxy loggerProxy,
                           Marker marker,
                           TimeUnit rateUnit,
                           TimeUnit durationUnit,
                           MetricFilter filter) {
         super(registry, "logger-reporter", filter, rateUnit, durationUnit);
-        this.loggerHelper = loggerHelper;
+        this.loggerProxy = loggerProxy;
         this.marker = marker;
     }
 
@@ -189,7 +189,7 @@ public class Slf4jReporter extends ScheduledReporter {
 
     private void logTimer(String name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
-        loggerHelper.log(marker,
+        loggerProxy.log(marker,
                 "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, " +
                         "p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, " +
                         "m15={}, rate_unit={}, duration_unit={}",
@@ -214,7 +214,7 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     private void logMeter(String name, Meter meter) {
-        loggerHelper.log(marker,
+        loggerProxy.log(marker,
                 "type=METER, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
                 name,
                 meter.getCount(),
@@ -227,7 +227,7 @@ public class Slf4jReporter extends ScheduledReporter {
 
     private void logHistogram(String name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
-        loggerHelper.log(marker,
+        loggerProxy.log(marker,
                 "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, " +
                         "median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
                 name,
@@ -245,11 +245,11 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     private void logCounter(String name, Counter counter) {
-        loggerHelper.log(marker, "type=COUNTER, name={}, count={}", name, counter.getCount());
+        loggerProxy.log(marker, "type=COUNTER, name={}, count={}", name, counter.getCount());
     }
 
     private void logGauge(String name, Gauge gauge) {
-        loggerHelper.log(marker, "type=GAUGE, name={}, value={}", name, gauge.getValue());
+        loggerProxy.log(marker, "type=GAUGE, name={}, value={}", name, gauge.getValue());
     }
 
     @Override
@@ -258,10 +258,10 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     /* private class to allow logger configuration */
-    static abstract class LoggerHelper {
+    static abstract class LoggerProxy {
         protected final Logger logger;
 
-        public LoggerHelper(Logger logger) {
+        public LoggerProxy(Logger logger) {
             this.logger = logger;
         }
 
@@ -269,8 +269,8 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     /* private class to allow logger configuration */
-    private static class DebugLoggerHelper extends LoggerHelper {
-        public DebugLoggerHelper(Logger logger) {
+    private static class DebugLoggerProxy extends LoggerProxy {
+        public DebugLoggerProxy(Logger logger) {
             super(logger);
         }
 
@@ -281,8 +281,8 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     /* private class to allow logger configuration */
-    private static class TraceLoggerHelper extends LoggerHelper {
-        public TraceLoggerHelper(Logger logger) {
+    private static class TraceLoggerProxy extends LoggerProxy {
+        public TraceLoggerProxy(Logger logger) {
             super(logger);
         }
 
@@ -294,20 +294,20 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     /* private class to allow logger configuration */
-    private static class InfoLoggerHelper extends LoggerHelper {
-        public InfoLoggerHelper(Logger logger) {
+    private static class InfoLoggerProxy extends LoggerProxy {
+        public InfoLoggerProxy(Logger logger) {
             super(logger);
         }
 
         @Override
         public void log(Marker marker, String format, Object... arguments) {
-         logger.info(marker, format, arguments);
+            logger.info(marker, format, arguments);
         }
     }
 
     /* private class to allow logger configuration */
-    private static class WarnLoggerHelper extends LoggerHelper {
-        public WarnLoggerHelper(Logger logger) {
+    private static class WarnLoggerProxy extends LoggerProxy {
+        public WarnLoggerProxy(Logger logger) {
             super(logger);
         }
 
@@ -318,8 +318,8 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     /* private class to allow logger configuration */
-    private static class ErrorLoggerHelper extends LoggerHelper {
-        public ErrorLoggerHelper(Logger logger) {
+    private static class ErrorLoggerProxy extends LoggerProxy {
+        public ErrorLoggerProxy(Logger logger) {
             super(logger);
         }
 
