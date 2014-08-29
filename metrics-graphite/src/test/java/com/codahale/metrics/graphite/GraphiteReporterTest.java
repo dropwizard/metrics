@@ -1,6 +1,7 @@
 package com.codahale.metrics.graphite;
 
 import com.codahale.metrics.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -159,6 +160,31 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
+    }
+
+    @Test
+    public void errorInOneMetricMustNotBreakReporting() throws Exception {
+        final Counter counter = mock(Counter.class);
+        when(counter.getCount()).thenThrow(new RuntimeException());
+        final Gauge gauge = mock(Gauge.class);
+        when(gauge.getValue()).thenThrow(new RuntimeException());
+        final Histogram histogram = mock(Histogram.class);
+        when(histogram.getCount()).thenThrow(new RuntimeException());
+        final Meter meter = mock(Meter.class);
+        when(meter.getCount()).thenThrow(new RuntimeException());
+        final Timer timer = mock(Timer.class);
+        when(timer.getSnapshot()).thenThrow(new RuntimeException());
+
+        reporter.report(this.<Gauge>map(),
+                        this.<Counter>map("counter", counter),
+                        this.<Histogram>map("histogram", histogram),
+                        this.<Meter>map("meter", meter),
+                        this.<Timer>map("timer", timer));
+
+        verify(counter).getCount();
+        verify(histogram).getCount();
+        verify(meter).getCount();
+        verify(timer).getSnapshot();
     }
 
     @Test
