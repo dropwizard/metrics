@@ -1,32 +1,66 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<title>Home | Metrics</title>
-<link rel="stylesheet" href="style.css" type="text/css"/>
-<link rel="top" title="Metrics" href="#"/>
-<link rel="next" title="Getting Started" href="getting-started/"/>
-<style lang="text/css">#top-bar,#top-bar small,#top-bar a{text-shadow:0px -1px 0px #cf2c0f;color:#fff}#top-bar{background-color:#ed4a2d;background-image:-moz-linear-gradient(top,#ff684b,#cf2c0f);background-image:-ms-linear-gradient(top,#ff684b,#cf2c0f);background-image:-webkit-gradient(linear,0 0,0 100%,from(#ff684b),to(#cf2c0f));background-image:-webkit-linear-gradient(top,#ff684b,#cf2c0f);background-image:-o-linear-gradient(top,#ff684b,#cf2c0f);background-image:linear-gradient(top,#ff684b,#cf2c0f);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ff684b', endColorstr = '#cf2c0f', GradientType = 0);-webkit-border-radius:0;-moz-border-radius:0;border-radius:0}.hero-unit{background-image:url(http://metrics.codahale.com/_static/xmetrics-hat.png.pagespeed.ic.ndBrkKNw8j.png)!important;background-repeat:no-repeat!important;background-position:30px 50px}.hero-unit div.section{padding-left:200px!important}</style>
+    <meta charset="utf-8">
+    <title>Home | Metrics</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="_static/metrics.css" type="text/css"/>
+    <link rel="top" title="Metrics" href="#"/>
+    <link rel="next" title="Getting Started" href="getting-started/"/>
+    <style lang="text/css">
+        #top-bar, #top-bar small, #top-bar a {
+            text-shadow: 0px -1px 0px #cf2c0f;
+            color: #fff;
+        }
+        
+        #top-bar {
+            background-color: #ED4A2D;
+            background-image: -moz-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -ms-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ff684b), to(#cf2c0f));
+            background-image: -webkit-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -o-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: linear-gradient(top, #ff684b, #cf2c0f);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ff684b', endColorstr = '#cf2c0f', GradientType = 0);
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0;
+        }
+
+
+        .hero-unit {
+            background-image: url("_static/metrics-hat.png") !important;
+            background-repeat: no-repeat !important;
+            background-position: 30px 50px;
+        }
+
+        .hero-unit div.section {
+            padding-left: 200px !important;
+        }
+    </style>
 </head>
 <body>
-<a href="https://github.com/dropwizard/metrics">
-<img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
-<div class="navbar">
-<div class="navbar-inner container-fluid" id="top-bar">
-<header class="row-fluid">
-<h1 class="span12" id="title"><img class="logo" src="data:image/png;base64,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" alt="Logo"/>
-<a href="#">Metrics</a>
-<small>Mind the gap.</small>
-</h1>
-</header>
-</div>
-</div>
-<div class="container-fluid">
-<div class="row-fluid">
-<div class="span12" id="body">
-<div class="hero-unit"><div class="section" id="metrics-is-a-java-library-which-gives-you-unparalleled-insight-into-what-your-code-does-in-production">
+    <a href="https://github.com/dropwizard/metrics">
+        <img style="position: absolute; top: 0; right: 0; border: 0;"
+             src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"
+             alt="Fork me on GitHub"></a>
+    <div class="navbar">
+        <div class="navbar-inner container-fluid" id="top-bar">
+            <header class="row-fluid">
+                <h1 class="span12" id="title"><img class="logo" src="_static/metrics-logo.png" alt="Logo"/>
+                    <a href="#">Metrics</a>
+                    <small>Mind the gap.</small>
+                </h1>
+            </header>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span12" id="body">
+                
+  <div class="hero-unit"><div class="section" id="metrics-is-a-java-library-which-gives-you-unparalleled-insight-into-what-your-code-does-in-production">
 <h1>Metrics is a Java library which gives you unparalleled insight into what your code does in production.</h1>
 <p><strong>Metrics</strong> provides a powerful toolkit of ways to measure the behavior of critical components
 <strong>in your production environment.</strong></p>
@@ -41,21 +75,24 @@ provides you with full-stack visibility.</p>
 </ul>
 </div>
 </div></div>
-</div><div>
-YourKit is kindly supporting the Metrics project with its full-featured Java Profiler.
-YourKit, LLC
-is the creator of innovative and intelligent tools for profiling Java and .NET
-applications. Take a look at YourKit's leading software products:
-<a href="http://www.yourkit.com/java/profiler/index.jsp">YourKit Java Profiler</a> and
-<a href="http://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET Profiler</a>.
-</div></div>
-<hr/>
-<footer>
-&copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
-Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
-1.1.3.
-</footer>
-</div>
+
+
+            </div><div>
+        YourKit is kindly supporting the Metrics project with its full-featured Java Profiler.
+        YourKit, LLC
+        is the creator of innovative and intelligent tools for profiling Java and .NET
+        applications. Take a look at YourKit's leading software products:
+        <a href="http://www.yourkit.com/java/profiler/index.jsp">YourKit Java Profiler</a> and
+        <a href="http://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET Profiler</a>.
+        </div></div>
+        <hr/>
+        <footer>
+            &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
+            Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
+            1.2.2.
+        </footer>
+    </div>
 </body>
 </html>
+
 

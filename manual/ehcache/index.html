@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Instrumenting Ehcache | Metrics</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="../../_static/metrics.css" type="text/css"/>
+    <link rel="top" title="Metrics" href="../../"/>
+    <link rel="up" title="User Manual" href="../"/>
+    <link rel="next" title="Reporting to Ganglia" href="../ganglia/"/>
+    <link rel="prev" title="Health Checks" href="../healthchecks/"/>
+    <style lang="text/css">
+        #top-bar, #top-bar small, #top-bar a {
+            text-shadow: 0px -1px 0px #cf2c0f;
+            color: #fff;
+        }
+        
+        #top-bar {
+            background-color: #ED4A2D;
+            background-image: -moz-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -ms-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ff684b), to(#cf2c0f));
+            background-image: -webkit-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -o-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: linear-gradient(top, #ff684b, #cf2c0f);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ff684b', endColorstr = '#cf2c0f', GradientType = 0);
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0;
+        }
+
+
+        .hero-unit {
+            background-image: url("../../_static/metrics-hat.png") !important;
+            background-repeat: no-repeat !important;
+            background-position: 30px 50px;
+        }
+
+        .hero-unit div.section {
+            padding-left: 200px !important;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://github.com/dropwizard/metrics">
+        <img style="position: absolute; top: 0; right: 0; border: 0;"
+             src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"
+             alt="Fork me on GitHub"></a>
+    <div class="navbar">
+        <div class="navbar-inner container-fluid" id="top-bar">
+            <header class="row-fluid">
+                <h1 class="span12" id="title"><img class="logo" src="../../_static/metrics-logo.png" alt="Logo"/>
+                    <a href="../../">Metrics</a>
+                    <small>Mind the gap.</small>
+                </h1>
+            </header>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span3" id="sidebar">
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../">User Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../core/">Metrics Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../healthchecks/">Health Checks</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Instrumenting Ehcache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ganglia/">Reporting to Ganglia</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../graphite/">Reporting to Graphite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../httpclient/">Instrumenting Apache HttpClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jdbi/">Instrumenting JDBI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jersey/">Instrumenting Jersey</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jetty/">Instrumenting Jetty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../log4j/">Instrumenting Log4j</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../logback/">Instrumenting Logback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jvm/">JVM Instrumentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../json/">JSON Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../servlets/">Metrics Servlets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../servlet/">Instrumenting Web Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../third-party/">Third Party Libraries</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About Metrics</a></li>
+</ul>
+
+                <hr/>
+                <ul>
+                    <li><a href="https://groups.google.com/forum/#!forum/metrics-user">Mailing List</a></li>
+                </ul>
+            </div>
+            <div class="span9" id="body">
+                
+  <div class="section" id="instrumenting-ehcache">
+<span id="manual-ehcache"></span><h1>Instrumenting Ehcache</h1>
+<p class="rubric">The <tt class="docutils literal"><span class="pre">metrics-ehcache</span></tt> module provides <tt class="docutils literal"><span class="pre">InstrumentedEhcache</span></tt>, a decorator for
+<a class="reference external" href="http://ehcache.org/documentation">Ehcache</a> caches:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">Cache</span> <span class="n">c</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Cache</span><span class="o">(</span><span class="k">new</span> <span class="n">CacheConfiguration</span><span class="o">(</span><span class="s">&quot;test&quot;</span><span class="o">,</span> <span class="mi">100</span><span class="o">));</span>
+<span class="n">MANAGER</span><span class="o">.</span><span class="na">addCache</span><span class="o">(</span><span class="n">c</span><span class="o">);</span>
+<span class="k">this</span><span class="o">.</span><span class="na">cache</span> <span class="o">=</span> <span class="n">InstrumentedEhcache</span><span class="o">.</span><span class="na">instrument</span><span class="o">(</span><span class="n">registry</span><span class="o">,</span> <span class="n">c</span><span class="o">);</span>
+</pre></div>
+</div>
+<p>Instrumenting an <tt class="docutils literal"><span class="pre">Ehcache</span></tt> instance creates gauges for all of the Ehcache-provided statistics:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="28%" />
+<col width="72%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">hits</span></tt></td>
+<td>The number of times a requested item was found in the cache.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">in-memory-hits</span></tt></td>
+<td>Number of times a requested item was found in the memory store.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">off-heap-hits</span></tt></td>
+<td>Number of times a requested item was found in the off-heap store.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">on-disk-hits</span></tt></td>
+<td>Number of times a requested item was found in the disk store.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">misses</span></tt></td>
+<td>Number of times a requested item was not found in the cache.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">in-memory-misses</span></tt></td>
+<td>Number of times a requested item was not found in the memory store.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">off-heap-misses</span></tt></td>
+<td>Number of times a requested item was not found in the off-heap store.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">on-disk-misses</span></tt></td>
+<td>Number of times a requested item was not found in the disk store.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">objects</span></tt></td>
+<td>Number of elements stored in the cache.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">in-memory-objects</span></tt></td>
+<td>Number of objects in the memory store.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">off-heap-objects</span></tt></td>
+<td>Number of objects in the off-heap store.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">on-disk-objects</span></tt></td>
+<td>Number of objects in the disk store.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">mean-get-time</span></tt></td>
+<td>The average get time. Because ehcache supports JDK1.4.2, each get
+time uses <tt class="docutils literal"><span class="pre">System.currentTimeMillis()</span></tt>, rather than nanoseconds.
+The accuracy is thus limited.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">mean-search-time</span></tt></td>
+<td>The average execution time (in milliseconds) within the last sample
+period.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">eviction-count</span></tt></td>
+<td>The number of cache evictions, since the cache was created, or
+statistics were cleared.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">searches-per-second</span></tt></td>
+<td>The number of search executions that have completed in the last
+second.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">accuracy</span></tt></td>
+<td>A human readable description of the accuracy setting. One of &#8220;None&#8221;,
+&#8220;Best Effort&#8221; or &#8220;Guaranteed&#8221;.</td>
+</tr>
+</tbody>
+</table>
+<p>It also adds full timers for the cache&#8217;s <tt class="docutils literal"><span class="pre">get</span></tt> and <tt class="docutils literal"><span class="pre">put</span></tt> methods.</p>
+<p>The metrics are all scoped to the cache&#8217;s class and name, so a <tt class="docutils literal"><span class="pre">Cache</span></tt> instance named <tt class="docutils literal"><span class="pre">users</span></tt>
+would have metric names like <tt class="docutils literal"><span class="pre">net.sf.ehcache.Cache.users.get</span></tt>, etc.</p>
+</div>
+
+
+            </div></div>
+        <hr/>
+        <footer>
+            &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
+            Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
+            1.2.2.
+        </footer>
+    </div>
+</body>
+</html>
+
+

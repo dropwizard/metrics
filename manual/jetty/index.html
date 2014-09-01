@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Instrumenting Jetty | Metrics</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="../../_static/metrics.css" type="text/css"/>
+    <link rel="top" title="Metrics" href="../../"/>
+    <link rel="up" title="User Manual" href="../"/>
+    <link rel="next" title="Instrumenting Log4j" href="../log4j/"/>
+    <link rel="prev" title="Instrumenting Jersey" href="../jersey/"/>
+    <style lang="text/css">
+        #top-bar, #top-bar small, #top-bar a {
+            text-shadow: 0px -1px 0px #cf2c0f;
+            color: #fff;
+        }
+        
+        #top-bar {
+            background-color: #ED4A2D;
+            background-image: -moz-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -ms-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ff684b), to(#cf2c0f));
+            background-image: -webkit-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -o-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: linear-gradient(top, #ff684b, #cf2c0f);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ff684b', endColorstr = '#cf2c0f', GradientType = 0);
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0;
+        }
+
+
+        .hero-unit {
+            background-image: url("../../_static/metrics-hat.png") !important;
+            background-repeat: no-repeat !important;
+            background-position: 30px 50px;
+        }
+
+        .hero-unit div.section {
+            padding-left: 200px !important;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://github.com/dropwizard/metrics">
+        <img style="position: absolute; top: 0; right: 0; border: 0;"
+             src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"
+             alt="Fork me on GitHub"></a>
+    <div class="navbar">
+        <div class="navbar-inner container-fluid" id="top-bar">
+            <header class="row-fluid">
+                <h1 class="span12" id="title"><img class="logo" src="../../_static/metrics-logo.png" alt="Logo"/>
+                    <a href="../../">Metrics</a>
+                    <small>Mind the gap.</small>
+                </h1>
+            </header>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span3" id="sidebar">
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../">User Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../core/">Metrics Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../healthchecks/">Health Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ehcache/">Instrumenting Ehcache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ganglia/">Reporting to Ganglia</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../graphite/">Reporting to Graphite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../httpclient/">Instrumenting Apache HttpClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jdbi/">Instrumenting JDBI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jersey/">Instrumenting Jersey</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Instrumenting Jetty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../log4j/">Instrumenting Log4j</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../logback/">Instrumenting Logback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jvm/">JVM Instrumentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../json/">JSON Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../servlets/">Metrics Servlets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../servlet/">Instrumenting Web Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../third-party/">Third Party Libraries</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About Metrics</a></li>
+</ul>
+
+                <hr/>
+                <ul>
+                    <li><a href="https://groups.google.com/forum/#!forum/metrics-user">Mailing List</a></li>
+                </ul>
+            </div>
+            <div class="span9" id="body">
+                
+  <div class="section" id="instrumenting-jetty">
+<span id="manual-jetty"></span><h1>Instrumenting Jetty</h1>
+<p>The <tt class="docutils literal"><span class="pre">metrics-jetty</span></tt> modules provides a set of instrumented equivalents of <a class="reference external" href="http://www.eclipse.org/jetty/">Jetty</a> classes:
+<tt class="docutils literal"><span class="pre">InstrumentedBlockingChannelConnector</span></tt>, <tt class="docutils literal"><span class="pre">InstrumentedHandler</span></tt>, <tt class="docutils literal"><span class="pre">InstrumentedQueuedThreadPool</span></tt>,
+<tt class="docutils literal"><span class="pre">InstrumentedSelectChannelConnector</span></tt>, and <tt class="docutils literal"><span class="pre">InstrumentedSocketConnector</span></tt>.</p>
+<p>The <tt class="docutils literal"><span class="pre">Connector</span></tt> implementations are simple, instrumented subclasses of the Jetty connector types
+which measure connection duration, the rate of accepted connections, connections, disconnections,
+and the total number of active connections.</p>
+<p><tt class="docutils literal"><span class="pre">InstrumentedQueuedThreadPool</span></tt> is a <tt class="docutils literal"><span class="pre">QueuedThreadPool</span></tt> subclass which measures the ratio of idle
+threads to working threads as well as the absolute number of threads (idle and otherwise).</p>
+<p><tt class="docutils literal"><span class="pre">InstrumentedHandler</span></tt> is a <tt class="docutils literal"><span class="pre">Handler</span></tt> decorator which measures a wide range of HTTP behavior:
+dispatch times, requests, resumes, suspends, expires, the number of active, suspected, and
+dispatched requests, as well as meters of responses with <tt class="docutils literal"><span class="pre">1xx</span></tt>, <tt class="docutils literal"><span class="pre">2xx</span></tt>, <tt class="docutils literal"><span class="pre">3xx</span></tt>, <tt class="docutils literal"><span class="pre">4xx</span></tt>, and
+<tt class="docutils literal"><span class="pre">5xx</span></tt> status codes. It even has gauges for the ratios of <tt class="docutils literal"><span class="pre">4xx</span></tt> and <tt class="docutils literal"><span class="pre">5xx</span></tt> response rates to
+overall response rates. Finally, it includes meters for requests by the HTTP method: <tt class="docutils literal"><span class="pre">GET</span></tt>,
+<tt class="docutils literal"><span class="pre">POST</span></tt>, etc.</p>
+</div>
+
+
+            </div></div>
+        <hr/>
+        <footer>
+            &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
+            Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
+            1.2.2.
+        </footer>
+    </div>
+</body>
+</html>
+
+

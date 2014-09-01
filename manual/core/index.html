@@ -1,0 +1,445 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Metrics Core | Metrics</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="../../_static/metrics.css" type="text/css"/>
+    <link rel="top" title="Metrics" href="../../"/>
+    <link rel="up" title="User Manual" href="../"/>
+    <link rel="next" title="Health Checks" href="../healthchecks/"/>
+    <link rel="prev" title="User Manual" href="../"/>
+    <style lang="text/css">
+        #top-bar, #top-bar small, #top-bar a {
+            text-shadow: 0px -1px 0px #cf2c0f;
+            color: #fff;
+        }
+        
+        #top-bar {
+            background-color: #ED4A2D;
+            background-image: -moz-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -ms-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ff684b), to(#cf2c0f));
+            background-image: -webkit-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -o-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: linear-gradient(top, #ff684b, #cf2c0f);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ff684b', endColorstr = '#cf2c0f', GradientType = 0);
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0;
+        }
+
+
+        .hero-unit {
+            background-image: url("../../_static/metrics-hat.png") !important;
+            background-repeat: no-repeat !important;
+            background-position: 30px 50px;
+        }
+
+        .hero-unit div.section {
+            padding-left: 200px !important;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://github.com/dropwizard/metrics">
+        <img style="position: absolute; top: 0; right: 0; border: 0;"
+             src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"
+             alt="Fork me on GitHub"></a>
+    <div class="navbar">
+        <div class="navbar-inner container-fluid" id="top-bar">
+            <header class="row-fluid">
+                <h1 class="span12" id="title"><img class="logo" src="../../_static/metrics-logo.png" alt="Logo"/>
+                    <a href="../../">Metrics</a>
+                    <small>Mind the gap.</small>
+                </h1>
+            </header>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span3" id="sidebar">
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../">User Manual</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">Metrics Core</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#metric-registries">Metric Registries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metric-names">Metric Names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gauges">Gauges</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#jmx-gauges">JMX Gauges</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ratio-gauges">Ratio Gauges</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cached-gauges">Cached Gauges</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#derivative-gauges">Derivative Gauges</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#counters">Counters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#histograms">Histograms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#uniform-reservoirs">Uniform Reservoirs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#exponentially-decaying-reservoirs">Exponentially Decaying Reservoirs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sliding-window-reservoirs">Sliding Window Reservoirs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sliding-time-window-reservoirs">Sliding Time Window Reservoirs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#meters">Meters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#timers">Timers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metric-sets">Metric Sets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reporters">Reporters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#jmx">JMX</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#console">Console</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#csv">CSV</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#slf4j">SLF4J</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#other-reporters">Other Reporters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../healthchecks/">Health Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ehcache/">Instrumenting Ehcache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ganglia/">Reporting to Ganglia</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../graphite/">Reporting to Graphite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../httpclient/">Instrumenting Apache HttpClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jdbi/">Instrumenting JDBI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jersey/">Instrumenting Jersey</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jetty/">Instrumenting Jetty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../log4j/">Instrumenting Log4j</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../logback/">Instrumenting Logback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jvm/">JVM Instrumentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../json/">JSON Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../servlets/">Metrics Servlets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../servlet/">Instrumenting Web Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../third-party/">Third Party Libraries</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About Metrics</a></li>
+</ul>
+
+                <hr/>
+                <ul>
+                    <li><a href="https://groups.google.com/forum/#!forum/metrics-user">Mailing List</a></li>
+                </ul>
+            </div>
+            <div class="span9" id="body">
+                
+  <div class="section" id="metrics-core">
+<span id="manual-core"></span><h1>Metrics Core</h1>
+<p>The central library for Metrics is <tt class="docutils literal"><span class="pre">metrics-core</span></tt>, which provides some basic functionality:</p>
+<ul class="simple">
+<li>Metric <a class="reference internal" href="#man-core-registries"><em>registries</em></a>.</li>
+<li>The five metric types: <a class="reference internal" href="#man-core-gauges"><em>Gauges</em></a>, <a class="reference internal" href="#man-core-counters"><em>Counters</em></a>,
+<a class="reference internal" href="#man-core-histograms"><em>Histograms</em></a>, <a class="reference internal" href="#man-core-meters"><em>Meters</em></a>, and <a class="reference internal" href="#man-core-timers"><em>Timers</em></a>.</li>
+<li>Reporting metrics values via <a class="reference internal" href="#man-core-reporters-jmx"><em>JMX</em></a>, the
+<a class="reference internal" href="#man-core-reporters-console"><em>console</em></a>, <a class="reference internal" href="#man-core-reporters-csv"><em>CSV</em></a> files, and
+<a class="reference internal" href="#man-core-reporters-slf4j"><em>SLF4J loggers</em></a>.</li>
+</ul>
+<div class="section" id="metric-registries">
+<span id="man-core-registries"></span><h2>Metric Registries</h2>
+<p>The starting point for Metrics is the <tt class="docutils literal"><span class="pre">MetricRegistry</span></tt> class, which is a collection of all the
+metrics for your application (or a subset of your application). If your application is running
+alongside other applications in a single JVM instance (e.g., multiple WARs deployed to an
+application server), you should use per-application <tt class="docutils literal"><span class="pre">MetricRegistry</span></tt> instances with different
+names.</p>
+</div>
+<div class="section" id="metric-names">
+<span id="man-core-names"></span><h2>Metric Names</h2>
+<p>Each metric has a unique <em>name</em>, which is a simple dotted name, like <tt class="docutils literal"><span class="pre">com.example.Queue.size</span></tt>.
+This flexibility allows you to encode a wide variety of context directly into a metric&#8217;s name. If
+you have two instances of <tt class="docutils literal"><span class="pre">com.example.Queue</span></tt>, you can give them more specific:
+<tt class="docutils literal"><span class="pre">com.example.Queue.requests.size</span></tt> vs. <tt class="docutils literal"><span class="pre">com.example.Queue.responses.size</span></tt>, for example.</p>
+<p><tt class="docutils literal"><span class="pre">MetricRegistry</span></tt> has a set of static helper methods for easily creating names:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">MetricRegistry</span><span class="o">.</span><span class="na">name</span><span class="o">(</span><span class="n">Queue</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;requests&quot;</span><span class="o">,</span> <span class="s">&quot;size&quot;</span><span class="o">)</span>
+<span class="n">MetricRegistry</span><span class="o">.</span><span class="na">name</span><span class="o">(</span><span class="n">Queue</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;responses&quot;</span><span class="o">,</span> <span class="s">&quot;size&quot;</span><span class="o">)</span>
+</pre></div>
+</div>
+<p>These methods will also elide any <tt class="docutils literal"><span class="pre">null</span></tt> values, allowing for easy optional scopes.</p>
+</div>
+<div class="section" id="gauges">
+<span id="man-core-gauges"></span><h2>Gauges</h2>
+<p>A gauge is the simplest metric type. It just returns a <em>value</em>. If, for example, your application
+has a value which is maintained by a third-party library, you can easily expose it by registering a
+<tt class="docutils literal"><span class="pre">Gauge</span></tt> instance which returns that value:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">registry</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="n">name</span><span class="o">(</span><span class="n">SessionStore</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;cache-evictions&quot;</span><span class="o">),</span> <span class="k">new</span> <span class="n">Gauge</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">Integer</span> <span class="nf">getValue</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">cache</span><span class="o">.</span><span class="na">getEvictionsCount</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">});</span>
+</pre></div>
+</div>
+<p>This will create a new gauge named <tt class="docutils literal"><span class="pre">com.example.proj.auth.SessionStore.cache-evictions</span></tt> which will
+return the number of evictions from the cache.</p>
+<div class="section" id="jmx-gauges">
+<span id="man-core-gauges-jmx"></span><h3>JMX Gauges</h3>
+<p>Given that many third-party library often expose metrics only via JMX, Metrics provides the
+<tt class="docutils literal"><span class="pre">JmxAttributeGauge</span></tt> class, which takes the object name of a JMX MBean and the name of an attribute
+and produces a gauge implementation which returns the value of that attribute:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">registry</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="n">name</span><span class="o">(</span><span class="n">SessionStore</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;cache-evictions&quot;</span><span class="o">),</span>
+                 <span class="k">new</span> <span class="nf">JmxAttributeGauge</span><span class="o">(</span><span class="s">&quot;net.sf.ehcache:type=Cache,scope=sessions,name=eviction-count&quot;</span><span class="o">,</span> <span class="s">&quot;Value&quot;</span><span class="o">));</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ratio-gauges">
+<span id="man-core-gauges-ratio"></span><h3>Ratio Gauges</h3>
+<p>A ratio gauge is a simple way to create a gauge which is the ratio between two numbers:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CacheHitRatio</span> <span class="kd">extends</span> <span class="n">RatioGauge</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Meter</span> <span class="n">hits</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Timer</span> <span class="n">calls</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">CacheHitRatio</span><span class="o">(</span><span class="n">Meter</span> <span class="n">hits</span><span class="o">,</span> <span class="n">Timer</span> <span class="n">calls</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">hits</span> <span class="o">=</span> <span class="n">hits</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">calls</span> <span class="o">=</span> <span class="n">calls</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">Ratio</span> <span class="nf">getValue</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">Ratio</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">hits</span><span class="o">.</span><span class="na">oneMinuteRate</span><span class="o">(),</span>
+                        <span class="n">calls</span><span class="o">.</span><span class="na">oneMinuteRate</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>This gauge returns the ratio of cache hits to misses using a meter and a timer.</p>
+</div>
+<div class="section" id="cached-gauges">
+<span id="man-core-gauges-cached"></span><h3>Cached Gauges</h3>
+<p>A cached gauge allows for a more efficient reporting of values which are expensive to calculate:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">registry</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="n">name</span><span class="o">(</span><span class="n">Cache</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">cache</span><span class="o">.</span><span class="na">getName</span><span class="o">(),</span> <span class="s">&quot;size&quot;</span><span class="o">),</span>
+                  <span class="k">new</span> <span class="n">CachedGauge</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;(</span><span class="mi">10</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">MINUTES</span><span class="o">)</span> <span class="o">{</span>
+                      <span class="nd">@Override</span>
+                      <span class="kd">protected</span> <span class="n">Long</span> <span class="nf">loadValue</span><span class="o">()</span> <span class="o">{</span>
+                          <span class="c1">// assume this does something which takes a long time</span>
+                          <span class="k">return</span> <span class="n">cache</span><span class="o">.</span><span class="na">getSize</span><span class="o">();</span>
+                      <span class="o">}</span>
+                  <span class="o">});</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="derivative-gauges">
+<span id="man-core-gauges-derivative"></span><h3>Derivative Gauges</h3>
+<p>A derivative gauge allows you to derive values from other gauges&#8217; values:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CacheSizeGauge</span> <span class="kd">extends</span> <span class="n">DerivativeGauge</span><span class="o">&lt;</span><span class="n">CacheStats</span><span class="o">,</span> <span class="n">Long</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nf">CacheSizeGauge</span><span class="o">(</span><span class="n">Gauge</span><span class="o">&lt;</span><span class="n">CacheStats</span><span class="o">&gt;</span> <span class="n">statsGauge</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">statsGauge</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="n">Long</span> <span class="nf">transform</span><span class="o">(</span><span class="n">CacheStats</span> <span class="n">stats</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="na">getSize</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="counters">
+<span id="man-core-counters"></span><h2>Counters</h2>
+<p>A counter is a simple incrementing and decrementing 64-bit integer:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">Counter</span> <span class="n">evictions</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="na">counter</span><span class="o">(</span><span class="n">name</span><span class="o">(</span><span class="n">SessionStore</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;cache-evictions&quot;</span><span class="o">));</span>
+<span class="n">evictions</span><span class="o">.</span><span class="na">inc</span><span class="o">();</span>
+<span class="n">evictions</span><span class="o">.</span><span class="na">inc</span><span class="o">(</span><span class="mi">3</span><span class="o">);</span>
+<span class="n">evictions</span><span class="o">.</span><span class="na">dec</span><span class="o">();</span>
+<span class="n">evictions</span><span class="o">.</span><span class="na">dec</span><span class="o">(</span><span class="mi">2</span><span class="o">);</span>
+</pre></div>
+</div>
+<p>All <tt class="docutils literal"><span class="pre">Counter</span></tt> metrics start out at 0.</p>
+</div>
+<div class="section" id="histograms">
+<span id="man-core-histograms"></span><h2>Histograms</h2>
+<p>A <tt class="docutils literal"><span class="pre">Histogram</span></tt> measures the distribution of values in a stream of data: e.g., the number of results
+returned by a search:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">Histogram</span> <span class="n">resultCounts</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="na">histogram</span><span class="o">(</span><span class="n">name</span><span class="o">(</span><span class="n">ProductDAO</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;result-counts&quot;</span><span class="o">);</span>
+<span class="n">resultCounts</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">results</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">Histogram</span></tt> metrics allow you to measure not just easy things like the min, mean, max, and
+standard deviation of values, but also <a class="reference external" href="http://en.wikipedia.org/wiki/Quantile">quantiles</a> like the median or 95th percentile.</p>
+<p>Traditionally, the way the median (or any other quantile) is calculated is to take the entire data
+set, sort it, and take the value in the middle (or 1% from the end, for the 99th percentile). This
+works for small data sets, or batch processing systems, but not for high-throughput, low-latency
+services.</p>
+<p>The solution for this is to sample the data as it goes through. By maintaining a small, manageable
+reservoir which is statistically representative of the data stream as a whole, we can quickly and
+easily calculate quantiles which are valid approximations of the actual quantiles. This technique is
+called <strong>reservoir sampling</strong>.</p>
+<p>Metrics provides a number of different <tt class="docutils literal"><span class="pre">Reservoir</span></tt> implementations, each of which is useful.</p>
+<div class="section" id="uniform-reservoirs">
+<span id="man-core-histograms-uniform"></span><h3>Uniform Reservoirs</h3>
+<p>A histogram with a uniform reservoir produces quantiles which are valid for the entirely of the
+histogram&#8217;s lifetime. It will return a median value, for example, which is the median of all the
+values the histogram has ever been updated with. It does this by using an algorithm called
+<a class="reference external" href="http://www.cs.umd.edu/~samir/498/vitter.pdf">Vitter&#8217;s R</a>), which randomly selects values for the reservoir with linearly-decreasing
+probability.</p>
+<p>Use a uniform histogram when you&#8217;re interested in long-term measurements. Don&#8217;t use one where you&#8217;d
+want to know if the distribution of the underlying data stream has changed recently.</p>
+</div>
+<div class="section" id="exponentially-decaying-reservoirs">
+<span id="man-core-histograms-exponential"></span><h3>Exponentially Decaying Reservoirs</h3>
+<p>A histogram with an exponentially decaying reservoir produces quantiles which are representative of
+(roughly) the last five minutes of data. It does so by using a
+<a class="reference external" href="http://dimacs.rutgers.edu/~graham/pubs/papers/fwddecay.pdf">forward-decaying priority reservoir</a> with an exponential weighting towards newer data. Unlike the
+uniform reservoir, an exponentially decaying reservoir represents <strong>recent data</strong>, allowing you to
+know very quickly if the distribution of the data has changed. <a class="reference internal" href="#man-core-timers"><em>Timers</em></a> use histograms
+with exponentially decaying reservoirs by default.</p>
+</div>
+<div class="section" id="sliding-window-reservoirs">
+<span id="man-core-histograms-sliding"></span><h3>Sliding Window Reservoirs</h3>
+<p>A histogram with a sliding window reservoir produces quantiles which are representative of the past
+<tt class="docutils literal"><span class="pre">N</span></tt> measurements.</p>
+</div>
+<div class="section" id="sliding-time-window-reservoirs">
+<span id="man-core-histograms-sliding-time"></span><h3>Sliding Time Window Reservoirs</h3>
+<p>A histogram with a sliding time window reservoir produces quantiles which are strictly
+representative of the past <tt class="docutils literal"><span class="pre">N</span></tt> seconds (or other time period).</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">While <tt class="docutils literal"><span class="pre">SlidingTimeWindowReservoir</span></tt> is easier to understand than
+<tt class="docutils literal"><span class="pre">ExponentiallyDecayingReservoir</span></tt>, it is not bounded in size, so using it to sample a
+high-frequency process can require a significant amount of memory. Because it records every
+measurement, it&#8217;s also the slowest reservoir type.</p>
+</div>
+</div>
+</div>
+<div class="section" id="meters">
+<span id="man-core-meters"></span><h2>Meters</h2>
+<p>A meter measures the <em>rate</em> at which a set of events occur:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">Meter</span> <span class="n">getRequests</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="na">meter</span><span class="o">(</span><span class="n">name</span><span class="o">(</span><span class="n">WebProxy</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;get-requests&quot;</span><span class="o">,</span> <span class="s">&quot;requests&quot;</span><span class="o">));</span>
+<span class="n">getRequests</span><span class="o">.</span><span class="na">mark</span><span class="o">();</span>
+<span class="n">getRequests</span><span class="o">.</span><span class="na">mark</span><span class="o">(</span><span class="n">requests</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
+</pre></div>
+</div>
+<p>Meters measure the rate of the events in a few different ways. The <em>mean</em> rate is the average rate
+of events. It&#8217;s generally useful for trivia, but as it represents the total rate for your
+application&#8217;s entire lifetime (e.g., the total number of requests handled, divided by the number of
+seconds the process has been running), it doesn&#8217;t offer a sense of recency. Luckily, meters also
+record three different <em>exponentially-weighted moving average</em> rates: the 1-, 5-, and 15-minute
+moving averages.</p>
+<div class="admonition hint">
+<p class="first admonition-title">Hint</p>
+<p class="last">Just like the Unix load averages visible in <tt class="docutils literal"><span class="pre">uptime</span></tt> or <tt class="docutils literal"><span class="pre">top</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="timers">
+<span id="man-core-timers"></span><h2>Timers</h2>
+<p>A timer is basically a <a class="reference internal" href="#man-core-histograms"><em>histogram</em></a> of the duration of a type of event and
+a <a class="reference internal" href="#man-core-meters"><em>meter</em></a> of the rate of its occurrence.</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">Timer</span> <span class="n">timer</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="na">timer</span><span class="o">(</span><span class="n">name</span><span class="o">(</span><span class="n">WebProxy</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;get-requests&quot;</span><span class="o">));</span>
+
+<span class="kd">final</span> <span class="n">Timer</span><span class="o">.</span><span class="na">Context</span> <span class="n">context</span> <span class="o">=</span> <span class="n">timer</span><span class="o">.</span><span class="na">time</span><span class="o">();</span>
+<span class="k">try</span> <span class="o">{</span>
+    <span class="c1">// handle request</span>
+<span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+    <span class="n">context</span><span class="o">.</span><span class="na">stop</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Elapsed times for it events are measured internally in nanoseconds, using Java&#8217;s high-precision
+<tt class="docutils literal"><span class="pre">System.nanoTime()</span></tt> method. Its precision and accuracy vary depending on operating system and
+hardware.</p>
+</div>
+</div>
+<div class="section" id="metric-sets">
+<span id="man-core-sets"></span><h2>Metric Sets</h2>
+<p>Metrics can also be grouped together into reusable metric sets using the <tt class="docutils literal"><span class="pre">MetricSet</span></tt> interface.
+This allows library authors to provide a single entry point for the instrumentation of a wide
+variety of functionality.</p>
+</div>
+<div class="section" id="reporters">
+<span id="man-core-reporters"></span><h2>Reporters</h2>
+<p>Reporters are the way that your application exports all the measurements being made by its metrics.
+<tt class="docutils literal"><span class="pre">metrics-core</span></tt> comes with four ways of exporting your metrics:
+<a class="reference internal" href="#man-core-reporters-jmx"><em>JMX</em></a>, <a class="reference internal" href="#man-core-reporters-console"><em>console</em></a>,
+<a class="reference internal" href="#man-core-reporters-slf4j"><em>SLF4J</em></a>, and <a class="reference internal" href="#man-core-reporters-csv"><em>CSV</em></a>.</p>
+<div class="section" id="jmx">
+<span id="man-core-reporters-jmx"></span><h3>JMX</h3>
+<p>With <tt class="docutils literal"><span class="pre">JmxReporter</span></tt>, you can expose your metrics as JMX MBeans. To explore this you can use
+<a class="reference external" href="http://visualvm.java.net/">VisualVM</a> (which ships with most JDKs as <tt class="docutils literal"><span class="pre">jvisualvm</span></tt>) with the VisualVM-MBeans plugins installed
+or JConsole (which ships with most JDKs as <tt class="docutils literal"><span class="pre">jconsole</span></tt>):</p>
+<img alt="Metrics exposed as JMX MBeans being viewed in VisualVM's MBeans browser" src="../../_images/metrics-visualvm1.png" />
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">If you double-click any of the metric properties, VisualVM will start graphing the data for that
+property. Sweet, eh?</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">We don&#8217;t recommend that you try to gather metrics from your production environment. JMX&#8217;s RPC
+API is fragile and bonkers. For development purposes and browsing, though, it can be very
+useful.</p>
+</div>
+<p>To report metrics via JMX:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">JmxReporter</span> <span class="n">reporter</span> <span class="o">=</span> <span class="n">JmxReporter</span><span class="o">.</span><span class="na">forRegistry</span><span class="o">(</span><span class="n">registry</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+<span class="n">reporter</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="console">
+<span id="man-core-reporters-console"></span><h3>Console</h3>
+<p>For simple benchmarks, Metrics comes with <tt class="docutils literal"><span class="pre">ConsoleReporter</span></tt>, which periodically reports all
+registered metrics to the console:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">ConsoleReporter</span> <span class="n">reporter</span> <span class="o">=</span> <span class="n">ConsoleReporter</span><span class="o">.</span><span class="na">forRegistry</span><span class="o">(</span><span class="n">registry</span><span class="o">)</span>
+                                                <span class="o">.</span><span class="na">convertRatesTo</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
+                                                <span class="o">.</span><span class="na">convertDurationsTo</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">MILLISECONDS</span><span class="o">)</span>
+                                                <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+<span class="n">reporter</span><span class="o">.</span><span class="na">start</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">MINUTES</span><span class="o">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="csv">
+<span id="man-core-reporters-csv"></span><h3>CSV</h3>
+<p>For more complex benchmarks, Metrics comes with <tt class="docutils literal"><span class="pre">CsvReporter</span></tt>, which periodically appends to a set
+of <tt class="docutils literal"><span class="pre">.csv</span></tt> files in a given directory:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">CsvReporter</span> <span class="n">reporter</span> <span class="o">=</span> <span class="n">CsvReporter</span><span class="o">.</span><span class="na">forRegistry</span><span class="o">(</span><span class="n">registry</span><span class="o">)</span>
+                                        <span class="o">.</span><span class="na">formatFor</span><span class="o">(</span><span class="n">Locale</span><span class="o">.</span><span class="na">US</span><span class="o">)</span>
+                                        <span class="o">.</span><span class="na">convertRatesTo</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
+                                        <span class="o">.</span><span class="na">convertDurationsTo</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">MILLISECONDS</span><span class="o">)</span>
+                                        <span class="o">.</span><span class="na">build</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">&quot;~/projects/data/&quot;</span><span class="o">));</span>
+<span class="n">reporter</span><span class="o">.</span><span class="na">start</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>
+</pre></div>
+</div>
+<p>For each metric registered, a <tt class="docutils literal"><span class="pre">.csv</span></tt> file will be created, and every second its state will be
+written to it as a new row.</p>
+</div>
+<div class="section" id="slf4j">
+<span id="man-core-reporters-slf4j"></span><h3>SLF4J</h3>
+<p>It&#8217;s also possible to log metrics to an SLF4J logger:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">Slf4jReporter</span> <span class="n">reporter</span> <span class="o">=</span> <span class="n">Slf4jReporter</span><span class="o">.</span><span class="na">forRegistry</span><span class="o">(</span><span class="n">registry</span><span class="o">)</span>
+                                            <span class="o">.</span><span class="na">outputTo</span><span class="o">(</span><span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="s">&quot;com.example.metrics&quot;</span><span class="o">))</span>
+                                            <span class="o">.</span><span class="na">convertRatesTo</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
+                                            <span class="o">.</span><span class="na">convertDurationsTo</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">MILLISECONDS</span><span class="o">)</span>
+                                            <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+<span class="n">reporter</span><span class="o">.</span><span class="na">start</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">MINUTES</span><span class="o">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="other-reporters">
+<span id="man-core-reporters-other"></span><h3>Other Reporters</h3>
+<p>Metrics has other reporter implementations, too:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../servlets/#manual-servlets"><em>MetricsServlet</em></a> is a servlet which not only exposes your metrics as a JSON
+object, but it also runs your health checks, performs thread dumps, and exposes valuable JVM-level
+and OS-level information.</li>
+<li><a class="reference internal" href="../ganglia/#manual-ganglia"><em>GangliaReporter</em></a> allows you to constantly stream metrics data to your
+Ganglia servers.</li>
+<li><a class="reference internal" href="../graphite/#manual-graphite"><em>GraphiteReporter</em></a> allows you to constantly stream metrics data to your
+Graphite servers.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+            </div></div>
+        <hr/>
+        <footer>
+            &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
+            Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
+            1.2.2.
+        </footer>
+    </div>
+</body>
+</html>
+
+
