@@ -41,7 +41,7 @@ public class SlidingTimeWindowReservoir implements Reservoir {
         this.clock = clock;
         this.measurements = new ConcurrentSkipListMap<Long, Long>();
         this.window = windowUnit.toNanos(window) * COLLISION_BUFFER;
-        this.lastTick = new AtomicLong();
+        this.lastTick = new AtomicLong(clock.getTick() * COLLISION_BUFFER);
         this.count = new AtomicLong();
     }
 
@@ -62,7 +62,7 @@ public class SlidingTimeWindowReservoir implements Reservoir {
     @Override
     public Snapshot getSnapshot() {
         trim();
-        return new Snapshot(measurements.values());
+        return new UniformSnapshot(measurements.values());
     }
 
     private long getTick() {
@@ -70,7 +70,7 @@ public class SlidingTimeWindowReservoir implements Reservoir {
             final long oldTick = lastTick.get();
             final long tick = clock.getTick() * COLLISION_BUFFER;
             // ensure the tick is strictly incrementing even if there are duplicate ticks
-            final long newTick = tick > oldTick ? tick : oldTick + 1;
+            final long newTick = tick - oldTick > 0 ? tick : oldTick + 1;
             if (lastTick.compareAndSet(oldTick, newTick)) {
                 return newTick;
             }

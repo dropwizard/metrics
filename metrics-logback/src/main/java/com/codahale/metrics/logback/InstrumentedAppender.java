@@ -3,7 +3,7 @@ package com.codahale.metrics.logback;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
-import ch.qos.logback.core.AppenderBase;
+import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SharedMetricRegistries;
@@ -15,8 +15,10 @@ import static com.codahale.metrics.MetricRegistry.name;
  * number of statements being logged. The meter names are the logging level names appended to the
  * name of the appender.
  */
-public class InstrumentedAppender extends AppenderBase<ILoggingEvent> {
+public class InstrumentedAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
     private final MetricRegistry registry;
+    public static final String DEFAULT_REGISTRY = "logback-metrics";
+    public static final String REGISTRY_PROPERTY_NAME = "metrics.logback.registry";
 
     private Meter all;
     private Meter trace;
@@ -25,6 +27,14 @@ public class InstrumentedAppender extends AppenderBase<ILoggingEvent> {
     private Meter warn;
     private Meter error;
 
+
+    /**
+     * Create a new instrumented appender using the given registry name.
+     *
+     */
+    public InstrumentedAppender() {
+      this(System.getProperty(REGISTRY_PROPERTY_NAME, DEFAULT_REGISTRY));
+    }
     /**
      * Create a new instrumented appender using the given registry name.
      *

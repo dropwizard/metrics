@@ -34,7 +34,7 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
             public Integer getValue() {
                 // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
                 // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.
-                return getQueue().size();
+                return getQueue() != null ? getQueue().size() : 0;
             }
         });
         registry.register(name(QueuedThreadPool.class, "utilization-max"), new RatioGauge() {

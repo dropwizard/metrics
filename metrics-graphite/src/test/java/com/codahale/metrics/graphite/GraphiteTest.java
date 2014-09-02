@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Fail.failBecauseExceptionWasNotThrown;
@@ -16,37 +17,48 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.*;
 
 public class GraphiteTest {
+    private final String host = "example.com";
+    private final int port = 1234;
     private final SocketFactory socketFactory = mock(SocketFactory.class);
-    private final InetSocketAddress address = new InetSocketAddress("example.com", 1234);
-    private final Graphite graphite = new Graphite(address, socketFactory);
+    private final InetSocketAddress address = new InetSocketAddress(host, port);
 
     private final Socket socket = mock(Socket.class);
     private final ByteArrayOutputStream output = new ByteArrayOutputStream();
+    
+    private Graphite graphite;
 
     @Before
     public void setUp() throws Exception {
         when(socket.getOutputStream()).thenReturn(output);
-
-        when(socketFactory.createSocket(any(InetAddress.class),
-                                        anyInt())).thenReturn(socket);
-
+        when(socketFactory.createSocket(any(InetAddress.class), anyInt())).thenReturn(socket);
     }
 
     @Test
-    public void connectsToGraphite() throws Exception {
+    public void connectsToGraphiteWithInetSocketAddress() throws Exception {
+        graphite = new Graphite(address, socketFactory);
         graphite.connect();
 
         verify(socketFactory).createSocket(address.getAddress(), address.getPort());
     }
+    
+    @Test
+    public void connectsToGraphiteWithHostAndPort() throws Exception {
+        graphite = new Graphite(host, port, socketFactory);
+        graphite.connect();
+        
+        verify(socketFactory).createSocket(address.getAddress(), port);
+    }
 
     @Test
     public void measuresFailures() throws Exception {
+        graphite = new Graphite(address, socketFactory);
         assertThat(graphite.getFailures())
                 .isZero();
     }
 
     @Test
     public void disconnectsFromGraphite() throws Exception {
+        graphite = new Graphite(address, socketFactory);
         graphite.connect();
         graphite.close();
 
@@ -55,6 +67,7 @@ public class GraphiteTest {
 
     @Test
     public void doesNotAllowDoubleConnections() throws Exception {
+        graphite = new Graphite(address, socketFactory);
         graphite.connect();
         try {
             graphite.connect();
@@ -67,8 +80,10 @@ public class GraphiteTest {
 
     @Test
     public void writesValuesToGraphite() throws Exception {
+        graphite = new Graphite(address, socketFactory);
         graphite.connect();
         graphite.send("name", "value", 100);
+        graphite.close();
 
         assertThat(output.toString())
                 .isEqualTo("name value 100\n");
@@ -76,8 +91,10 @@ public class GraphiteTest {
 
     @Test
     public void sanitizesNames() throws Exception {
+        graphite = new Graphite(address, socketFactory);
         graphite.connect();
         graphite.send("name woo", "value", 100);
+        graphite.close();
 
         assertThat(output.toString())
                 .isEqualTo("name-woo value 100\n");
@@ -85,10 +102,27 @@ public class GraphiteTest {
 
     @Test
     public void sanitizesValues() throws Exception {
+        graphite = new Graphite(address, socketFactory);
         graphite.connect();
         graphite.send("name", "value woo", 100);
+        graphite.close();
 
         assertThat(output.toString())
                 .isEqualTo("name value-woo 100\n");
+    }
+
+    @Test
+    public void notifiesIfGraphiteIsUnavailable() throws Exception {
+        final String unavailableHost = "unknown-host-10el6m7yg56ge7dm.com";
+        InetSocketAddress unavailableAddress = new InetSocketAddress(unavailableHost, 1234);
+        Graphite unavailableGraphite = new Graphite(unavailableAddress, socketFactory);
+
+        try {
+            unavailableGraphite.connect();
+            failBecauseExceptionWasNotThrown(UnknownHostException.class);
+        } catch (Exception e) {
+            assertThat(e.getMessage())
+                .isEqualTo(unavailableHost);
+        }
     }
 }
