@@ -12,8 +12,8 @@ import static org.fest.assertions.api.Assertions.offset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-public class SnapshotTest {
-    private final Snapshot snapshot = new Snapshot(new long[]{5, 1, 2, 3, 4});
+public class UniformSnapshotTest {
+    private final Snapshot snapshot = new UniformSnapshot(new long[]{5, 1, 2, 3, 4});
 
     @Test
     public void smallQuantilesAreTheFirstValue() throws Exception {
@@ -71,7 +71,7 @@ public class SnapshotTest {
 
     @Test
     public void canAlsoBeCreatedFromACollectionOfLongs() throws Exception {
-        final Snapshot other = new Snapshot(asList(5L, 1L, 2L, 3L, 4L));
+        final Snapshot other = new UniformSnapshot(asList(5L, 1L, 2L, 3L, 4L));
 
         assertThat(other.getValues())
                 .containsOnly(1, 2, 3, 4, 5);
@@ -87,7 +87,7 @@ public class SnapshotTest {
         longs.add(4L);
         when(longs.size()).thenReturn(4, 5);
 
-        final Snapshot other = new Snapshot(longs);
+        final Snapshot other = new UniformSnapshot(longs);
 
         assertThat(other.getValues())
                 .containsOnly(1, 2, 3, 4, 5);
@@ -103,7 +103,7 @@ public class SnapshotTest {
         longs.add(4L);
         when(longs.size()).thenReturn(6, 5);
 
-        final Snapshot other = new Snapshot(longs);
+        final Snapshot other = new UniformSnapshot(longs);
 
         assertThat(other.getValues())
                 .containsOnly(1, 2, 3, 4, 5);
@@ -145,41 +145,41 @@ public class SnapshotTest {
 
     @Test
     public void calculatesAMinOfZeroForAnEmptySnapshot() throws Exception {
-        final Snapshot snapshot = new Snapshot(new long[]{ });
+        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{ });
 
-        assertThat(snapshot.getMin())
+        assertThat(emptySnapshot.getMin())
                 .isZero();
     }
 
     @Test
     public void calculatesAMaxOfZeroForAnEmptySnapshot() throws Exception {
-        final Snapshot snapshot = new Snapshot(new long[]{ });
+        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{ });
 
-        assertThat(snapshot.getMax())
+        assertThat(emptySnapshot.getMax())
                 .isZero();
     }
 
     @Test
     public void calculatesAMeanOfZeroForAnEmptySnapshot() throws Exception {
-        final Snapshot snapshot = new Snapshot(new long[]{ });
+        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{ });
 
-        assertThat(snapshot.getMean())
+        assertThat(emptySnapshot.getMean())
                 .isZero();
     }
 
     @Test
     public void calculatesAStdDevOfZeroForAnEmptySnapshot() throws Exception {
-        final Snapshot snapshot = new Snapshot(new long[]{ });
+        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{ });
 
-        assertThat(snapshot.getStdDev())
+        assertThat(emptySnapshot.getStdDev())
                 .isZero();
     }
 
     @Test
     public void calculatesAStdDevOfZeroForASingletonSnapshot() throws Exception {
-        final Snapshot snapshot = new Snapshot(new long[]{ 1 });
+        final Snapshot singleItemSnapshot = new UniformSnapshot(new long[]{ 1 });
 
-        assertThat(snapshot.getStdDev())
+        assertThat(singleItemSnapshot.getStdDev())
                 .isZero();
     }
 }

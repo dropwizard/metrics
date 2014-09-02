@@ -4,17 +4,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.SocketFactory;
+
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * A client to a Carbon server that sends all metrics after they have been pickled in configurable sized batches
  */
-public class PickledGraphite extends Graphite {
+public class PickledGraphite implements GraphiteSender {
+
+    private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
+    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PickledGraphite.class);
     final static int DEFAULT_BATCH_SIZE = 100;
@@ -22,6 +32,14 @@ public class PickledGraphite extends Graphite {
     int batchSize;
     // graphite expects a python-pickled list of nested tuples.
     List<MetricTuple> metrics = new LinkedList<MetricTuple>();
+
+		private final InetSocketAddress address;
+		private final SocketFactory socketFactory;
+		private final Charset charset;
+
+		private Socket socket;
+		private Writer writer;
+		private int failures;
 
     /**
      * Creates a new client which connects to the given address using the default
@@ -65,8 +83,23 @@ public class PickledGraphite extends Graphite {
      * @param batchSize     how many metrics are bundled into a single pickle request to graphite
      */
     public PickledGraphite(InetSocketAddress address, SocketFactory socketFactory, Charset charset, int batchSize) {
-        super(address, socketFactory, charset);
+        this.address = address;
+        this.socketFactory = socketFactory;
+        this.charset = charset;
         this.batchSize = batchSize;
+    }
+
+    @Override
+    public void connect() throws IllegalStateException, IOException {
+        if (socket != null) {
+            throw new IllegalStateException("Already connected");
+        }
+        if (address.getAddress() == null) {
+            throw new UnknownHostException(address.getHostName());
+        }
+
+        this.socket = socketFactory.createSocket(address.getAddress(), address.getPort());
+        this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), charset));
     }
 
     /**
@@ -93,8 +126,20 @@ public class PickledGraphite extends Graphite {
 
     @Override
     public void close() throws IOException {
-        writeMetrics();
-        super.close();
+      writeMetrics();
+      if (writer != null) {
+          writer.flush();
+      }
+      if (socket != null) {
+          socket.close();
+      }
+      this.socket = null;
+      this.writer = null;
+    }
+
+    @Override
+    public int getFailures() {
+    	return failures;
     }
 
     /**
@@ -111,7 +156,9 @@ public class PickledGraphite extends Graphite {
                 socket.getOutputStream().write(header);
                 writer.write(payload);
                 writer.flush();
-                LOGGER.debug("Wrote {} metrics", metrics.size());
+                if (LOGGER.isDebugEnabled()) {
+                	LOGGER.debug("Wrote {} metrics", metrics.size());
+                }
             } catch (IOException e) {
                 this.failures++;
                 throw e;
@@ -196,4 +243,9 @@ public class PickledGraphite extends Graphite {
             this.value = value;
         }
     }
+
+    protected String sanitize(String s) {
+        return WHITESPACE.matcher(s).replaceAll("-");
+    }
+
 }

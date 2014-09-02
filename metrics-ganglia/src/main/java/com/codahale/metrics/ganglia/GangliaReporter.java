@@ -125,7 +125,7 @@ public class GangliaReporter extends ScheduledReporter {
          * Builds a {@link GangliaReporter} with the given properties, announcing metrics to the
          * given {@link GMetric} client.
          *
-         * @param ganglia the client to use for announcing metrics
+         * @param gmetric the client to use for announcing metrics
          * @return a {@link GangliaReporter}
          */
         public GangliaReporter build(GMetric gmetric) {
@@ -136,7 +136,7 @@ public class GangliaReporter extends ScheduledReporter {
          * Builds a {@link GangliaReporter} with the given properties, announcing metrics to the
          * given {@link GMetric} client.
          *
-         * @param ganglia the clients to use for announcing metrics
+         * @param gmetrics the clients to use for announcing metrics
          * @return a {@link GangliaReporter}
          */
         public GangliaReporter build(GMetric... gmetrics) {
@@ -292,7 +292,9 @@ public class GangliaReporter extends ScheduledReporter {
         }
     }
 
+    private static final double MIN_VAL = 1E-300;
     private void announce(String name, String group, double value, String units) throws GangliaException {
+        if (Math.abs(value) < MIN_VAL) value = 0.0;
         for (GMetric gmetric: gmetrics) {
             gmetric.announce(name, Double.toString(value), GMetricType.DOUBLE, units, GMetricSlope.BOTH,
                 tMax, dMax, group);

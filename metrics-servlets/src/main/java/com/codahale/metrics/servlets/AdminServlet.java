@@ -14,6 +14,13 @@ public class AdminServlet extends HttpServlet {
     public static final String DEFAULT_METRICS_URI = "/metrics";
     public static final String DEFAULT_PING_URI = "/ping";
     public static final String DEFAULT_THREADS_URI = "/threads";
+
+    public static final String METRICS_URI_PARAM_KEY = "metrics-uri";
+    public static final String PING_URI_PARAM_KEY = "ping-uri";
+    public static final String THREADS_URI_PARAM_KEY = "threads-uri";
+    public static final String HEALTHCHECK_URI_PARAM_KEY = "healthcheck-uri";
+    public static final String SERVICE_NAME_PARAM_KEY= "service-name";
+
     private static final String TEMPLATE = String.format(
             "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n" +
                     "        \"http://www.w3.org/TR/html4/loose.dtd\">%n" +
@@ -27,7 +34,7 @@ public class AdminServlet extends HttpServlet {
                     "    <li><a href=\"{0}{1}?pretty=true\">Metrics</a></li>%n" +
                     "    <li><a href=\"{2}{3}\">Ping</a></li>%n" +
                     "    <li><a href=\"{4}{5}\">Threads</a></li>%n" +
-                    "    <li><a href=\"{6}{7}\">Healthcheck</a></li>%n" +
+                    "    <li><a href=\"{6}{7}?pretty=true\">Healthcheck</a></li>%n" +
                     "  </ul>%n" +
                     "</body>%n" +
                     "</html>"
@@ -61,11 +68,11 @@ public class AdminServlet extends HttpServlet {
         this.threadDumpServlet = new ThreadDumpServlet();
         threadDumpServlet.init(config);
 
-        this.metricsUri = getParam(config.getInitParameter("metrics-uri"), DEFAULT_METRICS_URI);
-        this.pingUri = getParam(config.getInitParameter("ping-uri"), DEFAULT_PING_URI);
-        this.threadsUri = getParam(config.getInitParameter("threads-uri"), DEFAULT_THREADS_URI);
-        this.healthcheckUri = getParam(config.getInitParameter("healthcheck-uri"), DEFAULT_HEALTHCHECK_URI);
-        this.serviceName = getParam(config.getInitParameter("service-name"), null);
+        this.metricsUri = getParam(config.getInitParameter(METRICS_URI_PARAM_KEY), DEFAULT_METRICS_URI);
+        this.pingUri = getParam(config.getInitParameter(PING_URI_PARAM_KEY), DEFAULT_PING_URI);
+        this.threadsUri = getParam(config.getInitParameter(THREADS_URI_PARAM_KEY), DEFAULT_THREADS_URI);
+        this.healthcheckUri = getParam(config.getInitParameter(HEALTHCHECK_URI_PARAM_KEY), DEFAULT_HEALTHCHECK_URI);
+        this.serviceName = getParam(config.getInitParameter(SERVICE_NAME_PARAM_KEY), null);
     }
 
     @Override

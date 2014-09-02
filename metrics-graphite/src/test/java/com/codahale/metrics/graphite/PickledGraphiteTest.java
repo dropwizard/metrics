@@ -17,15 +17,17 @@ import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.SimpleBindings;
+
 import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.charset.Charset;
 
 public class PickledGraphiteTest {
     private final SocketFactory socketFactory = mock(SocketFactory.class);
     private final InetSocketAddress address = new InetSocketAddress("example.com", 1234);
-    private final PickledGraphite graphite = new PickledGraphite(address, socketFactory, Graphite.UTF_8, 2);
+    private final PickledGraphite graphite = new PickledGraphite(address, socketFactory, Charset.forName("UTF-8"), 2);
 
     private final Socket socket = mock(Socket.class);
     private final ByteArrayOutputStream output = new ByteArrayOutputStream();

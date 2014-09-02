@@ -4,24 +4,47 @@ import javax.net.SocketFactory;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 /**
- * A client to a Carbon server.
+ * A client to a Carbon server via TCP.
  */
-public class Graphite implements Closeable {
+public class Graphite implements GraphiteSender {
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
     // this may be optimistic about Carbon/Graphite
-    static final Charset UTF_8 = Charset.forName("UTF-8");
+    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private final InetSocketAddress address;
     private final SocketFactory socketFactory;
     private final Charset charset;
 
-    protected Socket socket;
-    protected Writer writer;
-    protected int failures;
+    private Socket socket;
+    private Writer writer;
+    private int failures;
+    
+    /**
+     * Creates a new client which connects to the given address using the default
+     * {@link SocketFactory}.
+     *
+     * @param hostname The hostname of the Carbon server
+     * @param port The port of the Carbon server
+     */
+    public Graphite(String hostname, int port) {
+        this(new InetSocketAddress(hostname, port));
+    }
+    
+    /**
+     * Creates a new client which connects to the given address and socket factory.
+     *
+     * @param hostname The hostname of the Carbon server
+     * @param port The port of the Carbon server
+     * @param socketFactory the socket factory
+     */
+    public Graphite(String hostname, int port, SocketFactory socketFactory) {
+        this(new InetSocketAddress(hostname, port), socketFactory);
+    }
 
     /**
      * Creates a new client which connects to the given address using the default
@@ -57,29 +80,20 @@ public class Graphite implements Closeable {
         this.charset = charset;
     }
 
-    /**
-     * Connects to the server.
-     *
-     * @throws IllegalStateException if the client is already connected
-     * @throws IOException           if there is an error connecting
-     */
+    @Override
     public void connect() throws IllegalStateException, IOException {
         if (socket != null) {
             throw new IllegalStateException("Already connected");
+        }
+        if (address.getAddress() == null) {
+            throw new UnknownHostException(address.getHostName());
         }
 
         this.socket = socketFactory.createSocket(address.getAddress(), address.getPort());
         this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), charset));
     }
 
-    /**
-     * Sends the given measurement to the server.
-     *
-     * @param name      the name of the metric
-     * @param value     the value of the metric
-     * @param timestamp the timestamp of the metric
-     * @throws IOException if there was an error sending the metric
-     */
+    @Override
     public void send(String name, String value, long timestamp) throws IOException {
         try {
             writer.write(sanitize(name));
@@ -88,7 +102,6 @@ public class Graphite implements Closeable {
             writer.write(' ');
             writer.write(Long.toString(timestamp));
             writer.write('\n');
-            writer.flush();
             this.failures = 0;
         } catch (IOException e) {
             failures++;
@@ -96,17 +109,16 @@ public class Graphite implements Closeable {
         }
     }
 
-    /**
-     * Returns the number of failed writes to the server.
-     *
-     * @return the number of failed writes to the server
-     */
+    @Override
     public int getFailures() {
         return failures;
     }
 
     @Override
     public void close() throws IOException {
+        if (writer != null) {
+            writer.flush();
+        }
         if (socket != null) {
             socket.close();
         }

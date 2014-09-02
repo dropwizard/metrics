@@ -8,6 +8,10 @@ public class ManualClock extends Clock {
     public synchronized void addNanos(long nanos) {
         ticksInNanos += nanos;
     }
+
+    public synchronized void addSeconds(long seconds) {
+        ticksInNanos += TimeUnit.SECONDS.toNanos(seconds);
+    }
     
     public synchronized void addMillis(long millis) {
         ticksInNanos += TimeUnit.MILLISECONDS.toNanos(millis);

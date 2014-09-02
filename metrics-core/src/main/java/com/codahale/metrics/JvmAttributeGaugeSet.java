@@ -22,6 +22,7 @@ public class JvmAttributeGaugeSet implements MetricSet {
 
     /**
      * Creates a new set of gauges with the given {@link RuntimeMXBean}.
+     * @param runtime JVM management interface with access to system properties
      */
     public JvmAttributeGaugeSet(RuntimeMXBean runtime) {
         this.runtime = runtime;
