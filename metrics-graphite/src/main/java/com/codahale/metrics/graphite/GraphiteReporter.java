@@ -173,6 +173,8 @@ public class GraphiteReporter extends ScheduledReporter {
             for (Map.Entry<String, Timer> entry : timers.entrySet()) {
                 reportTimer(entry.getKey(), entry.getValue(), timestamp);
             }
+
+            graphite.flush();
         } catch (IOException e) {
             LOGGER.warn("Unable to report to Graphite", graphite, e);
             try {
