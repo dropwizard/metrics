@@ -35,6 +35,8 @@ public class PickledGraphite implements GraphiteSender {
     // graphite expects a python-pickled list of nested tuples.
     private List<MetricTuple> metrics = new LinkedList<MetricTuple>();
 
+		private final String hostname;
+		private final int port;
 		private final InetSocketAddress address;
 		private final SocketFactory socketFactory;
 		private final Charset charset;
@@ -86,6 +88,62 @@ public class PickledGraphite implements GraphiteSender {
      */
     public PickledGraphite(InetSocketAddress address, SocketFactory socketFactory, Charset charset, int batchSize) {
         this.address = address;
+        this.hostname = null;
+        this.port = -1;
+        this.socketFactory = socketFactory;
+        this.charset = charset;
+        this.batchSize = batchSize;
+    }
+
+    /**
+     * Creates a new client which connects to the given address using the default
+     * {@link SocketFactory}. This defaults to a batchSize of 100
+     *
+     * @param hostname      the hostname of the Carbon server
+     * @param port          the port of the Carbon server
+     */
+    public PickledGraphite(String hostname, int port) {
+        this(hostname, port, DEFAULT_BATCH_SIZE);
+    }
+
+    /**
+     * Creates a new client which connects to the given address using the default
+     * {@link SocketFactory}.
+     *
+     * @param hostname      the hostname of the Carbon server
+     * @param port          the port of the Carbon server
+     * @param batchSize     how many metrics are bundled into a single pickle request to graphite
+     */
+    public PickledGraphite(String hostname, int port, int batchSize) {
+        this(hostname, port, SocketFactory.getDefault(), batchSize);
+    }
+
+    /**
+     * Creates a new client which connects to the given address and socket factory.
+     *
+     * @param hostname      the hostname of the Carbon server
+     * @param port          the port of the Carbon server
+     * @param socketFactory the socket factory
+     * @param batchSize     how many metrics are bundled into a single pickle request to graphite
+     */
+    public PickledGraphite(String hostname, int port, SocketFactory socketFactory, int batchSize) {
+        this(hostname, port, socketFactory, UTF_8, batchSize);
+    }
+
+    /**
+     * Creates a new client which connects to the given address and socket factory using the given
+     * character set.
+     *
+     * @param hostname      the hostname of the Carbon server
+     * @param port          the port of the Carbon server
+     * @param socketFactory the socket factory
+     * @param charset       the character set used by the server
+     * @param batchSize     how many metrics are bundled into a single pickle request to graphite
+     */
+    public PickledGraphite(String hostname, int port, SocketFactory socketFactory, Charset charset, int batchSize) {
+        this.address = null;
+        this.hostname = hostname;
+        this.port = port;
         this.socketFactory = socketFactory;
         this.charset = charset;
         this.batchSize = batchSize;
@@ -95,6 +153,10 @@ public class PickledGraphite implements GraphiteSender {
     public void connect() throws IllegalStateException, IOException {
         if (isConnected()) {
             throw new IllegalStateException("Already connected");
+        }
+        InetSocketAddress address = this.address;
+        if (address == null) {
+            address = new InetSocketAddress(hostname, port);
         }
         if (address.getAddress() == null) {
             throw new UnknownHostException(address.getHostName());
