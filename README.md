@@ -3,7 +3,7 @@ Metrics [![Build Status](https://secure.travis-ci.org/dropwizard/metrics.png)](h
 
 *Capturing JVM- and application-level metrics. So you know what's going on.*
 
-For more information, please see [the documentation](http://metrics.codahale.com).
+For more information, please see [the documentation](http://dropwizard.github.io/metrics/).
 
 
 License
