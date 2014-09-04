@@ -150,7 +150,9 @@ public class GraphiteReporter extends ScheduledReporter {
 
         // oh it'd be lovely to use Java 7 here
         try {
-            graphite.connect();
+            if (!graphite.isConnected()) {
+    	          graphite.connect();
+            }
 
             for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
                 reportGauge(entry.getKey(), entry.getValue(), timestamp);
@@ -173,6 +175,18 @@ public class GraphiteReporter extends ScheduledReporter {
             }
         } catch (IOException e) {
             LOGGER.warn("Unable to report to Graphite", graphite, e);
+            try {
+                graphite.close();
+            } catch (IOException e1) {
+                LOGGER.warn("Error closing Graphite", graphite, e);
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        try {
+            super.stop();
         } finally {
             try {
                 graphite.close();
