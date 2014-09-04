@@ -25,6 +25,18 @@ public interface GraphiteSender extends Closeable{
 			throws IOException;
 
 	/**
+	 * Flushes buffer, if applicable
+	 *
+	 * @throws IOException
+	 */
+	void flush() throws IOException;
+
+	/**
+	 * Returns true if ready to send data
+	 */
+	boolean isConnected();
+
+	/**
 	 * Returns the number of failed writes to the server.
 	 *
 	 * @return the number of failed writes to the server
