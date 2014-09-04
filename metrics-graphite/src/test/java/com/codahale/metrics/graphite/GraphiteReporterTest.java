@@ -42,6 +42,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite, never()).send("prefix.gauge", "value", timestamp);
+        inOrder.verify(graphite).flush();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -58,6 +59,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1", timestamp);
+        inOrder.verify(graphite).flush();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -74,6 +76,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1", timestamp);
+        inOrder.verify(graphite).flush();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -90,6 +93,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1", timestamp);
+        inOrder.verify(graphite).flush();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -106,6 +110,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1", timestamp);
+        inOrder.verify(graphite).flush();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -122,6 +127,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1.10", timestamp);
+        inOrder.verify(graphite).flush();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -138,6 +144,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1.10", timestamp);
+        inOrder.verify(graphite).flush();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -157,6 +164,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.counter.count", "100", timestamp);
+        inOrder.verify(graphite).flush();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -200,6 +208,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.histogram.p98", "9.00", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.p99", "10.00", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.p999", "11.00", timestamp);
+        inOrder.verify(graphite).flush();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -227,6 +236,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.meter.m5_rate", "3.00", timestamp);
         inOrder.verify(graphite).send("prefix.meter.m15_rate", "4.00", timestamp);
         inOrder.verify(graphite).send("prefix.meter.mean_rate", "5.00", timestamp);
+        inOrder.verify(graphite).flush();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -279,6 +289,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.timer.m5_rate", "4.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.m15_rate", "5.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.mean_rate", "2.00", timestamp);
+        inOrder.verify(graphite).flush();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -296,6 +307,15 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).close();
+
+        verifyNoMoreInteractions(graphite);
+    }
+
+    @Test
+    public void closesConnectionOnReporterStop() throws Exception {
+        reporter.stop();
+
+        verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
     }
