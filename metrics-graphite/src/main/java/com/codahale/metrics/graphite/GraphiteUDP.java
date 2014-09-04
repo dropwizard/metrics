@@ -16,11 +16,13 @@ public class GraphiteUDP implements GraphiteSender {
 
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
-    private final InetSocketAddress address;
+    private final String hostname;
+    private final int port;
+    private InetSocketAddress address;
 
     private DatagramChannel datagramChannel = null;
     private int failures;
-    
+
     /**
      * Creates a new client which sends data to given address using UDP
      *
@@ -28,7 +30,9 @@ public class GraphiteUDP implements GraphiteSender {
      * @param port The port of the Carbon server
      */
     public GraphiteUDP(String hostname, int port) {
-        this(new InetSocketAddress(hostname, port));
+        this.hostname = hostname;
+        this.port = port;
+        this.address = null;
     }
 
     /**
@@ -37,23 +41,40 @@ public class GraphiteUDP implements GraphiteSender {
      * @param address the address of the Carbon server
      */
     public GraphiteUDP(InetSocketAddress address) {
+        this.hostname = null;
+        this.port = -1;
         this.address = address;
     }
 
     @Override
     public void connect() throws IllegalStateException, IOException {
         // Only open the channel the first time...
-        if (datagramChannel == null) {
-            datagramChannel = DatagramChannel.open();
+        if (isConnected()) {
+            throw new IllegalStateException("Already connected");
         }
+
+        if (datagramChannel != null) {
+            datagramChannel.close();
+        }
+
+        // Resolve hostname
+        if (hostname != null) {
+            address = new InetSocketAddress(hostname, port);
+        }
+
+        datagramChannel = DatagramChannel.open();
+    }
+
+    @Override
+    public boolean isConnected() {
+    		return datagramChannel != null && !datagramChannel.socket().isClosed();
     }
 
     @Override
     public void send(String name, String value, long timestamp) throws IOException {
         // Underlying socket can be closed by ICMP
-        if (datagramChannel.socket().isClosed()) {
-            datagramChannel.close();
-            datagramChannel = DatagramChannel.open();
+        if (!isConnected()) {
+            connect();
         }
 
         try {
@@ -77,6 +98,11 @@ public class GraphiteUDP implements GraphiteSender {
     @Override
     public int getFailures() {
         return failures;
+    }
+
+    @Override
+    public void flush() throws IOException {
+    	  // Nothing to do
     }
 
     @Override
