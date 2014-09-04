@@ -43,13 +43,13 @@ public class GraphiteUDP implements GraphiteSender {
     @Override
     public void connect() throws IllegalStateException, IOException {
         // Only open the channel the first time...
-    		if (isConnected()) {
+        if (isConnected()) {
             throw new IllegalStateException("Already connected");
-    		}
+        }
 
-    		if (datagramChannel != null) {
-    				datagramChannel.close();
-    		}
+        if (datagramChannel != null) {
+            datagramChannel.close();
+        }
 
         datagramChannel = DatagramChannel.open();
     }
