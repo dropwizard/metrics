@@ -27,5 +27,11 @@
             <version>${rabbitmq.version}</version>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.python</groupId>
+            <artifactId>jython-standalone</artifactId>
+            <version>2.5.3</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
