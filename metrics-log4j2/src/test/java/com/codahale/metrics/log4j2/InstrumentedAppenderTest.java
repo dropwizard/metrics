@@ -17,7 +17,7 @@ public class InstrumentedAppenderTest {
     public static final String METRIC_NAME_PREFIX = "org.apache.logging.log4j.core.Appender";
 
     private final MetricRegistry registry = new MetricRegistry();
-    private final InstrumentedAppender appender = new InstrumentedAppender(registry, null, null, true);
+    private final InstrumentedAppender appender = new InstrumentedAppender(registry);
     private final LogEvent event = mock(LogEvent.class);
 
     @Before
@@ -115,7 +115,7 @@ public class InstrumentedAppenderTest {
 
         SharedMetricRegistries.add(registryName, registry);
 
-        final InstrumentedAppender shared = new InstrumentedAppender(registryName, null, null, false);
+        final InstrumentedAppender shared = new InstrumentedAppender(registryName);
         shared.start();
 
         when(event.getLevel()).thenReturn(Level.INFO);
