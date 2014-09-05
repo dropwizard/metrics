@@ -21,6 +21,13 @@ For log4j 1.x:
 For log4j 2.x:
 
 .. code-block:: java
-     InstrumentedAppender appender = new InstrumentedAppender(registry, filter, layout, true);
+     Filter filter = null; // That's fine if we don't use filters; https://logging.apache.org/log4j/2.x/manual/filters.html
+     PatternLayout layout = PatternLayout.newBuilder().withPattern("").build(); // The layout isn't used inside the InstrumentedAppender
+
+     InstrumentedAppender appender = new InstrumentedAppender(metrics, filter, layout, false);
      appender.start();
-     LogManager.getRootLogger().addAppender(appender);
+
+     LoggerContext context = (LoggerContext) LogManager.getContext(false);
+     Configuration config = context.getConfiguration();
+     config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).addAppender(appender, level, filter);
+     context.updateLoggers(config);
