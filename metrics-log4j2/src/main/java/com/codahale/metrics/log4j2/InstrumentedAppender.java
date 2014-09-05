@@ -44,6 +44,24 @@ public class InstrumentedAppender extends AbstractAppender {
     }
 
     /**
+     * Create a new instrumented appender using the given registry name.
+     *
+     * @param registryName the name of the registry in {@link SharedMetricRegistries}
+     */
+    public InstrumentedAppender(String registryName) {
+        this(SharedMetricRegistries.getOrCreate(registryName));
+    }
+
+    /**
+     * Create a new instrumented appender using the given registry.
+     *
+     * @param registry the metric registry
+     */
+    public InstrumentedAppender(MetricRegistry registry) {
+        this(registry, null, null, true);
+    }
+
+    /**
      * Create a new instrumented appender using the given registry.
      *
      * @param registry the metric registry
