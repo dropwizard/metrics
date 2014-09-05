@@ -107,6 +107,19 @@ public class GraphiteReporter extends ScheduledReporter {
          * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
          * given {@link GraphiteSender}.
          *
+         * Present for binary compatibility
+         *
+         * @param graphite a {@link Graphite}
+         * @return a {@link GraphiteReporter}
+         */
+        public GraphiteReporter build(Graphite graphite) {
+            return build((GraphiteSender) graphite);
+        }
+
+        /**
+         * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
+         * given {@link GraphiteSender}.
+         *
          * @param graphite a {@link GraphiteSender}
          * @return a {@link GraphiteReporter}
          */
