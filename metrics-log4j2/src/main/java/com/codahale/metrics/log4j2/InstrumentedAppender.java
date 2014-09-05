@@ -1,4 +1,4 @@
-package log4j2;
+package com.codahale.metrics.log4j2;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
