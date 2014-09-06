@@ -28,7 +28,7 @@ public class JmxReporter implements Reporter, Closeable {
     }
 
     /**
-     * A builder for {@link CsvReporter} instances. Defaults to using the default MBean server and
+     * A builder for {@link JmxReporter} instances. Defaults to using the default MBean server and
      * not filtering metrics.
      */
     public static class Builder {
