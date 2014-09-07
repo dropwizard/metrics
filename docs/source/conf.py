@@ -106,7 +106,8 @@ html_theme_options = {
     'landing_logo': u'metrics-hat.png',
     'landing_logo_width': u'200px',
     'github_page': u'https://github.com/dropwizard/metrics',
-    'mailing_list': u'https://groups.google.com/forum/#!forum/metrics-user'
+    'mailing_list': u'https://groups.google.com/forum/#!forum/metrics-user',
+    'apidocs': u'https://dropwizard.github.io/metrics/' + release + '/apidocs/'
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
