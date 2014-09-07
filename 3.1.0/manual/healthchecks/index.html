@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Health Checks | Metrics</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="../../_static/metrics.css" type="text/css"/>
+    <link rel="top" title="Metrics" href="../../"/>
+    <link rel="up" title="User Manual" href="../"/>
+    <link rel="next" title="Instrumenting Ehcache" href="../ehcache/"/>
+    <link rel="prev" title="Metrics Core" href="../core/"/>
+    <style lang="text/css">
+        #top-bar, #top-bar small, #top-bar a {
+            text-shadow: 0px -1px 0px #cf2c0f;
+            color: #fff;
+        }
+        
+        #top-bar {
+            background-color: #ED4A2D;
+            background-image: -moz-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -ms-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ff684b), to(#cf2c0f));
+            background-image: -webkit-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -o-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: linear-gradient(top, #ff684b, #cf2c0f);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ff684b', endColorstr = '#cf2c0f', GradientType = 0);
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0;
+        }
+
+
+        .hero-unit {
+            background-image: url("../../_static/metrics-hat.png") !important;
+            background-repeat: no-repeat !important;
+            background-position: 30px 50px;
+        }
+
+        .hero-unit div.section {
+            padding-left: 200px !important;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://github.com/dropwizard/metrics">
+        <img style="position: absolute; top: 0; right: 0; border: 0;"
+             src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"
+             alt="Fork me on GitHub"></a>
+    <div class="navbar">
+        <div class="navbar-inner container-fluid" id="top-bar">
+            <header class="row-fluid">
+                <h1 class="span12" id="title"><img class="logo" src="../../_static/metrics-logo.png" alt="Logo"/>
+                    <a href="../../">Metrics</a>
+                    <small>Mind the gap.</small>
+                </h1>
+            </header>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span3" id="sidebar">
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../">User Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../core/">Metrics Core</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Health Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ehcache/">Instrumenting Ehcache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ganglia/">Reporting to Ganglia</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../graphite/">Reporting to Graphite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../httpclient/">Instrumenting Apache HttpClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jdbi/">Instrumenting JDBI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jersey/">Instrumenting Jersey 1.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jersey/#instrumenting-jersey-2-x">Instrumenting Jersey 2.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jetty/">Instrumenting Jetty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../log4j/">Instrumenting Log4j</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../logback/">Instrumenting Logback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jvm/">JVM Instrumentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../json/">JSON Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../servlets/">Metrics Servlets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../servlet/">Instrumenting Web Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../third-party/">Third Party Libraries</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About Metrics</a></li>
+</ul>
+
+                <hr/>
+                <ul>
+                    <li><a href="https://groups.google.com/forum/#!forum/metrics-user">Mailing List</a></li>
+                </ul>
+            </div>
+            <div class="span9" id="body">
+                
+  <div class="section" id="health-checks">
+<span id="man-healthchecks"></span><h1>Health Checks</h1>
+<p>Metrics also provides you with a consistent, unified way of performing application health checks. A
+health check is basically a small self-test which your application performs to verify that a
+specific component or responsibility is performing correctly.</p>
+<p>To create a health check, extend the <tt class="docutils literal"><span class="pre">HealthCheck</span></tt> class:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">DatabaseHealthCheck</span> <span class="kd">extends</span> <span class="n">HealthCheck</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Database</span> <span class="n">database</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">DatabaseHealthCheck</span><span class="o">(</span><span class="n">Database</span> <span class="n">database</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">database</span> <span class="o">=</span> <span class="n">database</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="n">Result</span> <span class="nf">check</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">database</span><span class="o">.</span><span class="na">ping</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">Result</span><span class="o">.</span><span class="na">healthy</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">Result</span><span class="o">.</span><span class="na">unhealthy</span><span class="o">(</span><span class="s">&quot;Can&#39;t ping database&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>In this example, we&#8217;ve created a health check for a <tt class="docutils literal"><span class="pre">Database</span></tt> class on which our application
+depends. Our fictitious <tt class="docutils literal"><span class="pre">Database</span></tt> class has a <tt class="docutils literal"><span class="pre">#ping()</span></tt> method, which executes a safe test
+query (e.g., <tt class="docutils literal"><span class="pre">SELECT</span> <span class="pre">1</span></tt>). <tt class="docutils literal"><span class="pre">#ping()</span></tt> returns <tt class="docutils literal"><span class="pre">true</span></tt> if the query returns the expected result,
+returns <tt class="docutils literal"><span class="pre">false</span></tt> if it returns something else, and throws an exception if things have gone
+seriously wrong.</p>
+<p>Our <tt class="docutils literal"><span class="pre">DatabaseHealthCheck</span></tt>, then, takes a <tt class="docutils literal"><span class="pre">Database</span></tt> instance and in its <tt class="docutils literal"><span class="pre">#check()</span></tt> method,
+attempts to ping the database. If it can, it returns a <strong>healthy</strong> result. If it can&#8217;t, it returns
+an <strong>unhealthy</strong> result.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Exceptions thrown inside a health check&#8217;s <tt class="docutils literal"><span class="pre">#check()</span></tt> method are automatically caught and
+turned into unhealthy results with the full stack trace.</p>
+</div>
+<p>To register a health check, either use a <tt class="docutils literal"><span class="pre">HealthCheckRegistry</span></tt> instance:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">registry</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="s">&quot;database&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">DatabaseHealthCheck</span><span class="o">(</span><span class="n">database</span><span class="o">));</span>
+</pre></div>
+</div>
+<p>You can also run the set of registered health checks:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="k">for</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Result</span><span class="o">&gt;</span> <span class="n">entry</span> <span class="o">:</span> <span class="n">registry</span><span class="o">.</span><span class="na">runHealthChecks</span><span class="o">().</span><span class="na">entrySet</span><span class="o">())</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">isHealthy</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">entry</span><span class="o">.</span><span class="na">getKey</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;: OK&quot;</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">entry</span><span class="o">.</span><span class="na">getKey</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;: FAIL&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+
+
+            </div></div>
+        <hr/>
+        <footer>
+            &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
+            Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
+            1.2.2.
+        </footer>
+    </div>
+</body>
+</html>
+
+

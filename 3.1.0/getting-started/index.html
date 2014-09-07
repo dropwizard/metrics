@@ -1,0 +1,341 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Getting Started | Metrics</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="../_static/metrics.css" type="text/css"/>
+    <link rel="top" title="Metrics" href="../"/>
+    <link rel="next" title="User Manual" href="../manual/"/>
+    <link rel="prev" title="Metrics is a Java library which gives you unparalleled insight into what your code does in production." href="../"/>
+    <style lang="text/css">
+        #top-bar, #top-bar small, #top-bar a {
+            text-shadow: 0px -1px 0px #cf2c0f;
+            color: #fff;
+        }
+        
+        #top-bar {
+            background-color: #ED4A2D;
+            background-image: -moz-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -ms-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ff684b), to(#cf2c0f));
+            background-image: -webkit-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -o-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: linear-gradient(top, #ff684b, #cf2c0f);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ff684b', endColorstr = '#cf2c0f', GradientType = 0);
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0;
+        }
+
+
+        .hero-unit {
+            background-image: url("../_static/metrics-hat.png") !important;
+            background-repeat: no-repeat !important;
+            background-position: 30px 50px;
+        }
+
+        .hero-unit div.section {
+            padding-left: 200px !important;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://github.com/dropwizard/metrics">
+        <img style="position: absolute; top: 0; right: 0; border: 0;"
+             src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"
+             alt="Fork me on GitHub"></a>
+    <div class="navbar">
+        <div class="navbar-inner container-fluid" id="top-bar">
+            <header class="row-fluid">
+                <h1 class="span12" id="title"><img class="logo" src="../_static/metrics-logo.png" alt="Logo"/>
+                    <a href="../">Metrics</a>
+                    <small>Mind the gap.</small>
+                </h1>
+            </header>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span3" id="sidebar">
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-maven">Setting Up Maven</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-registry">The Registry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gauges">Gauges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#counters">Counters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#meters">Meters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#histograms">Histograms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#timers">Timers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#health-checks">Health Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reporting-via-jmx">Reporting Via JMX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reporting-via-http">Reporting Via HTTP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#other-reporting">Other Reporting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual/">User Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/">About Metrics</a></li>
+</ul>
+
+                <hr/>
+                <ul>
+                    <li><a href="https://groups.google.com/forum/#!forum/metrics-user">Mailing List</a></li>
+                </ul>
+            </div>
+            <div class="span9" id="body">
+                
+  <div class="section" id="getting-started">
+<span id="id1"></span><h1>Getting Started</h1>
+<p class="rubric"><em>Getting Started</em> will guide you through the process of adding Metrics to an existing
+application. We&#8217;ll go through the various measuring instruments that Metrics provides,
+how to use them, and when they&#8217;ll come in handy.</p>
+<div class="section" id="setting-up-maven">
+<span id="gs-maven"></span><h2>Setting Up Maven</h2>
+<p>Just add the <tt class="docutils literal"><span class="pre">metrics-core</span></tt> library as a dependency:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;dependencies&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>com.codahale.metrics<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>metrics-core<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;version&gt;</span>${metrics.version}<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;/dependencies&gt;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Make sure you have a <tt class="docutils literal"><span class="pre">metrics.version</span></tt> property declared in your POM with the current version,
+which is 3.1.0.</p>
+</div>
+<p>Now it&#8217;s time to add some metrics to your application!</p>
+</div>
+<div class="section" id="the-registry">
+<span id="gs-registry"></span><h2>The Registry</h2>
+<p>The centerpiece of Metrics is the <tt class="docutils literal"><span class="pre">MetricRegistry</span></tt> class, which is the container for all your
+application&#8217;s metrics. Go ahead and create a new one:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">MetricRegistry</span> <span class="n">metrics</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MetricRegistry</span><span class="o">();</span>
+</pre></div>
+</div>
+<p>You&#8217;ll probably want to integrate this into your application&#8217;s lifecycle (maybe using your
+dependency injection framework), but <tt class="docutils literal"><span class="pre">static</span></tt> field is fine.</p>
+</div>
+<div class="section" id="gauges">
+<span id="gs-gauges"></span><h2>Gauges</h2>
+<p>A gauge is an instantaneous measurement of a value. For example, we may want to measure the number
+of pending jobs in a queue:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">QueueManager</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Queue</span> <span class="n">queue</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">QueueManager</span><span class="o">(</span><span class="n">MetricRegistry</span> <span class="n">metrics</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">queue</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Queue</span><span class="o">();</span>
+        <span class="n">metrics</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="n">MetricRegistry</span><span class="o">.</span><span class="na">name</span><span class="o">(</span><span class="n">QueueManager</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="s">&quot;size&quot;</span><span class="o">),</span>
+                         <span class="k">new</span> <span class="n">Gauge</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+                             <span class="nd">@Override</span>
+                             <span class="kd">public</span> <span class="n">Integer</span> <span class="nf">getValue</span><span class="o">()</span> <span class="o">{</span>
+                                 <span class="k">return</span> <span class="n">queue</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+                             <span class="o">}</span>
+                         <span class="o">});</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>When this gauge is measured, it will return the number of jobs in the queue.</p>
+<p>Every metric in a registry has a unique name, which is just a dotted-name string like
+<tt class="docutils literal"><span class="pre">&quot;things.count&quot;</span></tt> or <tt class="docutils literal"><span class="pre">&quot;com.example.Thing.latency&quot;</span></tt>. <tt class="docutils literal"><span class="pre">MetricRegistry</span></tt> has a static helper method
+for constructing these names:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">MetricRegistry</span><span class="o">.</span><span class="na">name</span><span class="o">(</span><span class="n">QueueManager</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;jobs&quot;</span><span class="o">,</span> <span class="s">&quot;size&quot;</span><span class="o">)</span>
+</pre></div>
+</div>
+<p>This will return a string with something like <tt class="docutils literal"><span class="pre">&quot;com.example.QueueManager.jobs.size&quot;</span></tt>.</p>
+<p>For most queue and queue-like structures, you won&#8217;t want to simply return <tt class="docutils literal"><span class="pre">queue.size()</span></tt>. Most of
+<tt class="docutils literal"><span class="pre">java.util</span></tt> and <tt class="docutils literal"><span class="pre">java.util.concurrent</span></tt> have implementations of <tt class="docutils literal"><span class="pre">#size()</span></tt> which are <strong>O(n)</strong>,
+which means your gauge will be slow (potentially while holding a lock).</p>
+</div>
+<div class="section" id="counters">
+<span id="gs-counters"></span><h2>Counters</h2>
+<p>A counter is just a gauge for an <tt class="docutils literal"><span class="pre">AtomicLong</span></tt> instance. You can increment or decrement its value.
+For example, we may want a more efficient way of measuring the pending job in a queue:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">private</span> <span class="kd">final</span> <span class="n">Counter</span> <span class="n">pendingJobs</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="na">counter</span><span class="o">(</span><span class="n">name</span><span class="o">(</span><span class="n">QueueManager</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;pending-jobs&quot;</span><span class="o">));</span>
+
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">addJob</span><span class="o">(</span><span class="n">Job</span> <span class="n">job</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">pendingJobs</span><span class="o">.</span><span class="na">inc</span><span class="o">();</span>
+    <span class="n">queue</span><span class="o">.</span><span class="na">offer</span><span class="o">(</span><span class="n">job</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="n">Job</span> <span class="nf">takeJob</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">pendingJobs</span><span class="o">.</span><span class="na">dec</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">queue</span><span class="o">.</span><span class="na">take</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Every time this counter is measured, it will return the number of jobs in the queue.</p>
+<p>As you can see, the API for counters is slightly different: <tt class="docutils literal"><span class="pre">#counter(String)</span></tt> instead of
+<tt class="docutils literal"><span class="pre">#register(String,</span> <span class="pre">Metric)</span></tt>. While you can use <tt class="docutils literal"><span class="pre">register</span></tt> and create your own <tt class="docutils literal"><span class="pre">Counter</span></tt>
+instance, <tt class="docutils literal"><span class="pre">#counter(String)</span></tt> does all the work for you, and allows you to reuse metrics with the
+same name.</p>
+<p>Also, we&#8217;ve statically imported <tt class="docutils literal"><span class="pre">MetricRegistry</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">name</span></tt> method in this scope to reduce
+clutter.</p>
+</div>
+<div class="section" id="meters">
+<span id="gs-meters"></span><h2>Meters</h2>
+<p>A meter measures the rate of events over time (e.g., &#8220;requests per second&#8221;). In addition to the mean
+rate, meters also track 1-, 5-, and 15-minute moving averages.</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">private</span> <span class="kd">final</span> <span class="n">Meter</span> <span class="n">requests</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="na">meter</span><span class="o">(</span><span class="n">name</span><span class="o">(</span><span class="n">RequestHandler</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;requests&quot;</span><span class="o">));</span>
+
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">handleRequest</span><span class="o">(</span><span class="n">Request</span> <span class="n">request</span><span class="o">,</span> <span class="n">Response</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">requests</span><span class="o">.</span><span class="na">mark</span><span class="o">();</span>
+    <span class="c1">// etc</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>This meter will measure the rate of requests in requests per second.</p>
+</div>
+<div class="section" id="histograms">
+<span id="gs-histograms"></span><h2>Histograms</h2>
+<p>A histogram measures the statistical distribution of values in a stream of data. In addition to
+minimum, maximum, mean, etc., it also measures median, 75th, 90th, 95th, 98th, 99th, and 99.9th
+percentiles.</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">private</span> <span class="kd">final</span> <span class="n">Histogram</span> <span class="n">responseSizes</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="na">histogram</span><span class="o">(</span><span class="n">name</span><span class="o">(</span><span class="n">RequestHandler</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;response-sizes&quot;</span><span class="o">));</span>
+
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">handleRequest</span><span class="o">(</span><span class="n">Request</span> <span class="n">request</span><span class="o">,</span> <span class="n">Response</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// etc</span>
+    <span class="n">responseSizes</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">getContent</span><span class="o">().</span><span class="na">length</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>This histogram will measure the size of responses in bytes.</p>
+</div>
+<div class="section" id="timers">
+<span id="gs-timers"></span><h2>Timers</h2>
+<p>A timer measures both the rate that a particular piece of code is called and the distribution of its
+duration.</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">private</span> <span class="kd">final</span> <span class="n">Timer</span> <span class="n">responses</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="na">timer</span><span class="o">(</span><span class="n">name</span><span class="o">(</span><span class="n">RequestHandler</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;responses&quot;</span><span class="o">));</span>
+
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">handleRequest</span><span class="o">(</span><span class="n">Request</span> <span class="n">request</span><span class="o">,</span> <span class="n">Response</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="n">Timer</span><span class="o">.</span><span class="na">Context</span> <span class="n">context</span> <span class="o">=</span> <span class="n">responses</span><span class="o">.</span><span class="na">time</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="c1">// etc;</span>
+        <span class="k">return</span> <span class="s">&quot;OK&quot;</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">context</span><span class="o">.</span><span class="na">stop</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>This timer will measure the amount of time it takes to process each request in nanoseconds and
+provide a rate of requests in requests per second.</p>
+</div>
+<div class="section" id="health-checks">
+<span id="gs-healthchecks"></span><h2>Health Checks</h2>
+<p>Metrics also has the ability to centralize your service&#8217;s health checks with the
+<tt class="docutils literal"><span class="pre">metrics-healthchecks</span></tt> module.</p>
+<p>First, create a new <tt class="docutils literal"><span class="pre">HealthCheckRegistry</span></tt> instance:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">HealthCheckRegistry</span> <span class="n">healthChecks</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HealthCheckRegistry</span><span class="o">();</span>
+</pre></div>
+</div>
+<p>Second, implement a <tt class="docutils literal"><span class="pre">HealthCheck</span></tt> subclass:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">DatabaseHealthCheck</span> <span class="kd">extends</span> <span class="n">HealthCheck</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Database</span> <span class="n">database</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">DatabaseHealthCheck</span><span class="o">(</span><span class="n">Database</span> <span class="n">database</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">database</span> <span class="o">=</span> <span class="n">database</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">HealthCheck</span><span class="o">.</span><span class="na">Result</span> <span class="nf">check</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">database</span><span class="o">.</span><span class="na">isConnected</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">HealthCheck</span><span class="o">.</span><span class="na">Result</span><span class="o">.</span><span class="na">healthy</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">HealthCheck</span><span class="o">.</span><span class="na">Result</span><span class="o">.</span><span class="na">unhealthy</span><span class="o">(</span><span class="s">&quot;Cannot connect to &quot;</span> <span class="o">+</span> <span class="n">database</span><span class="o">.</span><span class="na">getUrl</span><span class="o">());</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Then register an instance of it with Metrics:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">healthChecks</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="s">&quot;postgres&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">DatabaseHealthCheck</span><span class="o">(</span><span class="n">database</span><span class="o">));</span>
+</pre></div>
+</div>
+<p>To run all of the registered health checks:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">HealthCheck</span><span class="o">.</span><span class="na">Result</span><span class="o">&gt;</span> <span class="n">results</span> <span class="o">=</span> <span class="n">healthChecks</span><span class="o">.</span><span class="na">runHealthChecks</span><span class="o">();</span>
+<span class="k">for</span> <span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">HealthCheck</span><span class="o">.</span><span class="na">Result</span><span class="o">&gt;</span> <span class="n">entry</span> <span class="o">:</span> <span class="n">results</span><span class="o">.</span><span class="na">entrySet</span><span class="o">())</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">isHealthy</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">entry</span><span class="o">.</span><span class="na">getKey</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot; is healthy&quot;</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">err</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">entry</span><span class="o">.</span><span class="na">getKey</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot; is UNHEALTHY: &quot;</span> <span class="o">+</span> <span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">getMessage</span><span class="o">());</span>
+        <span class="kd">final</span> <span class="n">Throwable</span> <span class="n">e</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">getError</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">e</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Metrics comes with a pre-built health check: <tt class="docutils literal"><span class="pre">ThreadDeadlockHealthCheck</span></tt>, which uses Java&#8217;s
+built-in thread deadlock detection to determine if any threads are deadlocked.</p>
+</div>
+<div class="section" id="reporting-via-jmx">
+<span id="gs-jmx"></span><h2>Reporting Via JMX</h2>
+<p>To report metrics via JMX:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">JmxReporter</span> <span class="n">reporter</span> <span class="o">=</span> <span class="n">JmxReporter</span><span class="o">.</span><span class="na">forRegistry</span><span class="o">(</span><span class="n">registry</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+<span class="n">reporter</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+</pre></div>
+</div>
+<p>Once the reporter is started, all of the metrics in the registry will become visible via
+<strong>JConsole</strong> or <strong>VisualVM</strong> (if you install the MBeans plugin):</p>
+<img alt="Metrics exposed as JMX MBeans being viewed in VisualVM's MBeans browser" src="../_images/metrics-visualvm.png" />
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">If you double-click any of the metric properties, VisualVM will start graphing the data for that
+property. Sweet, eh?</p>
+</div>
+</div>
+<div class="section" id="reporting-via-http">
+<span id="gs-http"></span><h2>Reporting Via HTTP</h2>
+<p>Metrics also ships with a servlet (<tt class="docutils literal"><span class="pre">AdminServlet</span></tt>) which will serve a JSON representation of all
+registered metrics. It will also run health checks, print out a thread dump, and provide a simple
+&#8220;ping&#8221; response for load-balancers. (It also has single servlets&#8211;<tt class="docutils literal"><span class="pre">MetricsServlet</span></tt>,
+<tt class="docutils literal"><span class="pre">HealthCheckServlet</span></tt>, <tt class="docutils literal"><span class="pre">ThreadDumpServlet</span></tt>, and <tt class="docutils literal"><span class="pre">PingServlet</span></tt>&#8211;which do these individual
+tasks.)</p>
+<p>To use this servlet, include the <tt class="docutils literal"><span class="pre">metrics-servlets</span></tt> module as a dependency:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>com.codahale.metrics<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>metrics-servlets<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>${metrics.version}<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Make sure you have a <tt class="docutils literal"><span class="pre">metrics.version</span></tt> property declared in your POM with the current version,
+which is 3.1.0.</p>
+</div>
+<p>From there on, you can map the servlet to whatever path you see fit.</p>
+</div>
+<div class="section" id="other-reporting">
+<span id="gs-other"></span><h2>Other Reporting</h2>
+<p>In addition to JMX and HTTP, Metrics also has reporters for the following outputs:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">STDOUT</span></tt>, using <a class="reference internal" href="../manual/core/#man-core-reporters-console"><em>ConsoleReporter</em></a> from <tt class="docutils literal"><span class="pre">metrics-core</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">CSV</span></tt> files, using <a class="reference internal" href="../manual/core/#man-core-reporters-csv"><em>CsvReporter</em></a> from <tt class="docutils literal"><span class="pre">metrics-core</span></tt></li>
+<li>SLF4J loggers, using <a class="reference internal" href="../manual/core/#man-core-reporters-slf4j"><em>Slf4jReporter</em></a> from <tt class="docutils literal"><span class="pre">metrics-core</span></tt></li>
+<li>Ganglia, using <a class="reference internal" href="../manual/ganglia/#manual-ganglia"><em>GangliaReporter</em></a> from <tt class="docutils literal"><span class="pre">metrics-ganglia</span></tt></li>
+<li>Graphite, using <a class="reference internal" href="../manual/graphite/#manual-graphite"><em>GraphiteReporter</em></a> from <tt class="docutils literal"><span class="pre">metrics-graphite</span></tt></li>
+</ul>
+</div>
+</div>
+
+
+            </div></div>
+        <hr/>
+        <footer>
+            &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
+            Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
+            1.2.2.
+        </footer>
+    </div>
+</body>
+</html>
+
+
