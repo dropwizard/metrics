@@ -63,10 +63,12 @@
                 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#setting-up-maven">Setting Up Maven</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#meters">Meters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#console-reporter">Console Reporter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#complete-getting-started">Complete getting started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#the-registry">The Registry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gauges">Gauges</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#counters">Counters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#meters">Meters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#histograms">Histograms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#timers">Timers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#health-checks">Health Checks</a></li>
@@ -94,10 +96,10 @@ application. We&#8217;ll go through the various measuring instruments that Metri
 how to use them, and when they&#8217;ll come in handy.</p>
 <div class="section" id="setting-up-maven">
 <span id="gs-maven"></span><h2>Setting Up Maven</h2>
-<p>Just add the <tt class="docutils literal"><span class="pre">metrics-core</span></tt> library as a dependency:</p>
+<p>You need the <tt class="docutils literal"><span class="pre">metrics-core</span></tt> library as a dependency:</p>
 <div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;dependencies&gt;</span>
     <span class="nt">&lt;dependency&gt;</span>
-        <span class="nt">&lt;groupId&gt;</span>com.codahale.metrics<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>io.dropwizard.metrics<span class="nt">&lt;/groupId&gt;</span>
         <span class="nt">&lt;artifactId&gt;</span>metrics-core<span class="nt">&lt;/artifactId&gt;</span>
         <span class="nt">&lt;version&gt;</span>${metrics.version}<span class="nt">&lt;/version&gt;</span>
     <span class="nt">&lt;/dependency&gt;</span>
@@ -110,6 +112,94 @@ how to use them, and when they&#8217;ll come in handy.</p>
 which is 3.1.0.</p>
 </div>
 <p>Now it&#8217;s time to add some metrics to your application!</p>
+</div>
+<div class="section" id="meters">
+<span id="gs-meters"></span><h2>Meters</h2>
+<p>A meter measures the rate of events over time (e.g., &#8220;requests per second&#8221;). In addition to the mean
+rate, meters also track 1-, 5-, and 15-minute moving averages.</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">private</span> <span class="kd">final</span> <span class="n">Meter</span> <span class="n">requests</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="na">meter</span><span class="o">(</span><span class="s">&quot;requests&quot;</span><span class="o">);</span>
+
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">handleRequest</span><span class="o">(</span><span class="n">Request</span> <span class="n">request</span><span class="o">,</span> <span class="n">Response</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">requests</span><span class="o">.</span><span class="na">mark</span><span class="o">();</span>
+    <span class="c1">// etc</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>This meter will measure the rate of requests in requests per second.</p>
+</div>
+<div class="section" id="console-reporter">
+<span id="gs-reporter"></span><h2>Console Reporter</h2>
+<p>A Console Reporter is exactly what it sounds like - report to the console.
+This reporter will print every second.</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">ConsoleReporter</span> <span class="n">reporter</span> <span class="o">=</span> <span class="n">ConsoleReporter</span><span class="o">.</span><span class="na">forRegistry</span><span class="o">(</span><span class="n">metrics</span><span class="o">)</span>
+       <span class="o">.</span><span class="na">convertRatesTo</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
+       <span class="o">.</span><span class="na">convertDurationsTo</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">MILLISECONDS</span><span class="o">)</span>
+       <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+   <span class="n">reporter</span><span class="o">.</span><span class="na">start</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="complete-getting-started">
+<span id="gs-complete"></span><h2>Complete getting started</h2>
+<p>So the complete Getting Started is</p>
+<div class="highlight-java"><div class="highlight"><pre>  <span class="kn">package</span> <span class="n">sample</span><span class="o">;</span>
+  <span class="kn">import</span> <span class="nn">com.codahale.metrics.*</span><span class="o">;</span>
+  <span class="kn">import</span> <span class="nn">java.util.concurrent.TimeUnit</span><span class="o">;</span>
+
+  <span class="kd">public</span> <span class="kd">class</span> <span class="nc">GetStarted</span> <span class="o">{</span>
+    <span class="kd">static</span> <span class="kd">final</span> <span class="n">MetricRegistry</span> <span class="n">metrics</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MetricRegistry</span><span class="o">();</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
+      <span class="n">startReport</span><span class="o">();</span>
+      <span class="n">Meter</span> <span class="n">requests</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="na">meter</span><span class="o">(</span><span class="s">&quot;requests&quot;</span><span class="o">);</span>
+      <span class="n">requests</span><span class="o">.</span><span class="na">mark</span><span class="o">();</span>
+      <span class="n">wait5Seconds</span><span class="o">();</span>
+    <span class="o">}</span>
+
+  <span class="kd">static</span> <span class="kt">void</span> <span class="nf">startReport</span><span class="o">()</span> <span class="o">{</span>
+      <span class="n">ConsoleReporter</span> <span class="n">reporter</span> <span class="o">=</span> <span class="n">ConsoleReporter</span><span class="o">.</span><span class="na">forRegistry</span><span class="o">(</span><span class="n">metrics</span><span class="o">)</span>
+          <span class="o">.</span><span class="na">convertRatesTo</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
+          <span class="o">.</span><span class="na">convertDurationsTo</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">MILLISECONDS</span><span class="o">)</span>
+          <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+      <span class="n">reporter</span><span class="o">.</span><span class="na">start</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>
+  <span class="o">}</span>
+
+  <span class="kd">static</span> <span class="kt">void</span> <span class="nf">wait5Seconds</span><span class="o">()</span> <span class="o">{</span>
+      <span class="k">try</span> <span class="o">{</span>
+          <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">5</span><span class="o">*</span><span class="mi">1000</span><span class="o">);</span>
+      <span class="o">}</span>
+      <span class="k">catch</span><span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<div class="highlight-xml"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">&quot;http://maven.apache.org/POM/4.0.0&quot;</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span> <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+
+  <span class="nt">&lt;groupId&gt;</span>somegroup<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>sample<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>0.0.1-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;name&gt;</span>Example project for Metrics<span class="nt">&lt;/name&gt;</span>
+
+  <span class="nt">&lt;dependencies&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>io.dropwizard.metrics<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>metrics-core<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>${metrics.version}<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+  <span class="nt">&lt;/dependencies&gt;</span>
+<span class="nt">&lt;/project&gt;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Make sure you have a <tt class="docutils literal"><span class="pre">metrics.version</span></tt> property declared in your POM with the current version,
+which is 3.1.0.</p>
+</div>
+<p>To run</p>
+<div class="highlight-sh"><div class="highlight"><pre>mvn package <span class="nb">exec</span>:java -Dexec.mainClass<span class="o">=</span>sample.First
+</pre></div>
+</div>
 </div>
 <div class="section" id="the-registry">
 <span id="gs-registry"></span><h2>The Registry</h2>
@@ -177,20 +267,6 @@ instance, <tt class="docutils literal"><span class="pre">#counter(String)</span>
 same name.</p>
 <p>Also, we&#8217;ve statically imported <tt class="docutils literal"><span class="pre">MetricRegistry</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">name</span></tt> method in this scope to reduce
 clutter.</p>
-</div>
-<div class="section" id="meters">
-<span id="gs-meters"></span><h2>Meters</h2>
-<p>A meter measures the rate of events over time (e.g., &#8220;requests per second&#8221;). In addition to the mean
-rate, meters also track 1-, 5-, and 15-minute moving averages.</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="kd">private</span> <span class="kd">final</span> <span class="n">Meter</span> <span class="n">requests</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="na">meter</span><span class="o">(</span><span class="n">name</span><span class="o">(</span><span class="n">RequestHandler</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;requests&quot;</span><span class="o">));</span>
-
-<span class="kd">public</span> <span class="kt">void</span> <span class="nf">handleRequest</span><span class="o">(</span><span class="n">Request</span> <span class="n">request</span><span class="o">,</span> <span class="n">Response</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">requests</span><span class="o">.</span><span class="na">mark</span><span class="o">();</span>
-    <span class="c1">// etc</span>
-<span class="o">}</span>
-</pre></div>
-</div>
-<p>This meter will measure the rate of requests in requests per second.</p>
 </div>
 <div class="section" id="histograms">
 <span id="gs-histograms"></span><h2>Histograms</h2>
@@ -301,7 +377,7 @@ registered metrics. It will also run health checks, print out a thread dump, and
 tasks.)</p>
 <p>To use this servlet, include the <tt class="docutils literal"><span class="pre">metrics-servlets</span></tt> module as a dependency:</p>
 <div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;dependency&gt;</span>
-    <span class="nt">&lt;groupId&gt;</span>com.codahale.metrics<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.dropwizard.metrics<span class="nt">&lt;/groupId&gt;</span>
     <span class="nt">&lt;artifactId&gt;</span>metrics-servlets<span class="nt">&lt;/artifactId&gt;</span>
     <span class="nt">&lt;version&gt;</span>${metrics.version}<span class="nt">&lt;/version&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
