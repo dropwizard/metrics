@@ -5,7 +5,7 @@ import com.codahale.metrics.SlidingTimeWindowReservoir;
 import com.codahale.metrics.SlidingWindowReservoir;
 import com.codahale.metrics.UniformReservoir;
 
-import org.openjdk.jmh.annotations.GenerateMicroBenchmark;
+import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 
@@ -27,25 +27,25 @@ public class ReservoirBenchmark {
     // It's intentionally not declared as final to avoid constant folding
     private long nextValue = 0xFBFBABBA;
 
-    @GenerateMicroBenchmark
+    @Benchmark
     public Object perfUniformReservoir() {
         uniform.update(nextValue);
         return uniform;
     }
 
-    @GenerateMicroBenchmark
+    @Benchmark
     public Object perfExponentiallyDecayingReservoir() {
         exponential.update(nextValue);
         return exponential;
     }
     
-    @GenerateMicroBenchmark
+    @Benchmark
     public Object perfSlidingWindowReservoir() {
         sliding.update(nextValue);
         return sliding;
     }
     
-    @GenerateMicroBenchmark
+    @Benchmark
     public Object perfSlidingTimeWindowReservoir() {
         slidingTime.update(nextValue);
         return slidingTime;

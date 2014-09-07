@@ -1,11 +1,9 @@
 package com.codahale.metrics.benchmarks;
 
 import com.codahale.metrics.Counter;
-
-import org.openjdk.jmh.annotations.GenerateMicroBenchmark;
+import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
-
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -19,7 +17,7 @@ public class CounterBenchmark {
     // It's intentionally not declared as final to avoid constant folding
     private long nextValue = 0xFBFBABBA;
 
-    @GenerateMicroBenchmark
+    @Benchmark
     public Object perfIncrement() {
         counter.inc(nextValue); 
         return counter;
