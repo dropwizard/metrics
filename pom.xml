@@ -13,7 +13,7 @@
     <description>
         The Metrics library.
     </description>
-    <url>http://metrics.codahale.com/</url>
+    <url>http://metrics.dropwizard.io/</url>
 
     <modules>
         <module>metrics-annotation</module>
