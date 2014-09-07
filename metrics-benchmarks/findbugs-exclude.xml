@@ -2,4 +2,7 @@
     <Match>
         <Package name="com.codahale.metrics.benchmarks.generated" />
     </Match>
+    <Match>
+        <Package name="org.openjdk.jmh.infra.generated" />
+    </Match>
 </FindBugsFilter>
