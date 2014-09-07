@@ -114,19 +114,24 @@ So the complete Getting Started is
   <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>sample</artifactId>
     <groupId>somegroup</groupId>
+    <artifactId>sample</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Sapmels for Metrics</name>
+    <name>Example project for Metrics</name>
 
     <dependencies>
       <dependency>
         <groupId>com.codahale.metrics</groupId>
         <artifactId>metrics-core</artifactId>
-        <version>3.0.1</version>
+        <version>${metrics.version}</version>
       </dependency>
     </dependencies>
   </project>
+
+.. note::
+
+    Make sure you have a ``metrics.version`` property declared in your POM with the current version,
+    which is |release|.
 
 To run
 
