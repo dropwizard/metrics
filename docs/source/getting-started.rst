@@ -21,7 +21,7 @@ You need the ``metrics-core`` library as a dependency:
 
     <dependencies>
         <dependency>
-            <groupId>com.codahale.metrics</groupId>
+            <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
             <version>${metrics.version}</version>
         </dependency>
@@ -62,13 +62,13 @@ A Console Reporter is exactly what it sounds like - report to the console.
 This reporter will print every second.
 
 .. code-block:: java
-  
+
      ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics)
             .convertRatesTo(TimeUnit.SECONDS)
             .convertDurationsTo(TimeUnit.MILLISECONDS)
             .build();
         reporter.start(1, TimeUnit.SECONDS);
-    
+
 .. _gs-complete:
 
 Complete getting started
@@ -121,7 +121,7 @@ So the complete Getting Started is
 
     <dependencies>
       <dependency>
-        <groupId>com.codahale.metrics</groupId>
+        <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-core</artifactId>
         <version>${metrics.version}</version>
       </dependency>
@@ -376,7 +376,7 @@ To use this servlet, include the ``metrics-servlets`` module as a dependency:
 .. code-block:: xml
 
     <dependency>
-        <groupId>com.codahale.metrics</groupId>
+        <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-servlets</artifactId>
         <version>${metrics.version}</version>
     </dependency>
