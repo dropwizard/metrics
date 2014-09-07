@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rss version="0.91">
+  <channel>
+    <title>Metrics Logback Support - Checkstyle report</title>
+    <link>http://metrics.codahale.com/metrics-logback/</link>
+    <description>Metrics Logback Support - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2014</copyright>
+    <item>
+      <title>File: 1,
+             Errors: 3,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>http://metrics.codahale.com/metrics-logback//checkstyle.html</link>
+      <description>
+        <p>Click <a href="http://metrics.codahale.com/metrics-logback//checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-logback//checkstyle.html#com.yammer.metrics.logback.InstrumentedAppender.java">com/yammer/metrics/logback/InstrumentedAppender.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  3
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

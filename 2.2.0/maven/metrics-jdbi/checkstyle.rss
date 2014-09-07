@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rss version="0.91">
+  <channel>
+    <title>Metrics JDBI Support - Checkstyle report</title>
+    <link>http://metrics.codahale.com/metrics-jdbi/</link>
+    <description>Metrics JDBI Support - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2014</copyright>
+    <item>
+      <title>File: 10,
+             Errors: 24,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>http://metrics.codahale.com/metrics-jdbi//checkstyle.html</link>
+      <description>
+        <p>Click <a href="http://metrics.codahale.com/metrics-jdbi//checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-jdbi//checkstyle.html#com.yammer.metrics.jdbi.strategies.SmartNameStrategy.java">com/yammer/metrics/jdbi/strategies/SmartNameStrategy.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-jdbi//checkstyle.html#com.yammer.metrics.jdbi.strategies.NaiveNameStrategy.java">com/yammer/metrics/jdbi/strategies/NaiveNameStrategy.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-jdbi//checkstyle.html#com.yammer.metrics.jdbi.strategies.StatementName.java">com/yammer/metrics/jdbi/strategies/StatementName.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  3
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-jdbi//checkstyle.html#com.yammer.metrics.jdbi.strategies.ShortNameStrategy.java">com/yammer/metrics/jdbi/strategies/ShortNameStrategy.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-jdbi//checkstyle.html#com.yammer.metrics.jdbi.strategies.DelegatingStatementNameStrategy.java">com/yammer/metrics/jdbi/strategies/DelegatingStatementNameStrategy.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  3
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-jdbi//checkstyle.html#com.yammer.metrics.jdbi.strategies.ContextNameStrategy.java">com/yammer/metrics/jdbi/strategies/ContextNameStrategy.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-jdbi//checkstyle.html#com.yammer.metrics.jdbi.strategies.NameStrategies.java">com/yammer/metrics/jdbi/strategies/NameStrategies.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  7
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-jdbi//checkstyle.html#com.yammer.metrics.jdbi.InstrumentedTimingCollector.java">com/yammer/metrics/jdbi/InstrumentedTimingCollector.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  4
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-jdbi//checkstyle.html#com.yammer.metrics.jdbi.strategies.BasicSqlNameStrategy.java">com/yammer/metrics/jdbi/strategies/BasicSqlNameStrategy.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-jdbi//checkstyle.html#com.yammer.metrics.jdbi.strategies.StatementNameStrategy.java">com/yammer/metrics/jdbi/strategies/StatementNameStrategy.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

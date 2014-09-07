@@ -1,0 +1,7 @@
+com.yammer.metrics.core
+com.yammer.metrics.core.tests
+com.yammer.metrics.examples
+com.yammer.metrics.reporting.tests
+com.yammer.metrics.stats.tests
+com.yammer.metrics.tests
+com.yammer.metrics.util.tests

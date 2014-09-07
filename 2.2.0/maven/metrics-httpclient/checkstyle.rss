@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rss version="0.91">
+  <channel>
+    <title>Metrics HttpClient Support - Checkstyle report</title>
+    <link>http://metrics.codahale.com/metrics-httpclient/</link>
+    <description>Metrics HttpClient Support - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2014</copyright>
+    <item>
+      <title>File: 3,
+             Errors: 13,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>http://metrics.codahale.com/metrics-httpclient//checkstyle.html</link>
+      <description>
+        <p>Click <a href="http://metrics.codahale.com/metrics-httpclient//checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-httpclient//checkstyle.html#com.yammer.metrics.httpclient.InstrumentedClientConnManager.java">com/yammer/metrics/httpclient/InstrumentedClientConnManager.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  5
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-httpclient//checkstyle.html#com.yammer.metrics.httpclient.InstrumentedHttpClient.java">com/yammer/metrics/httpclient/InstrumentedHttpClient.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  6
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-httpclient//checkstyle.html#com.yammer.metrics.httpclient.InstrumentedRequestDirector.java">com/yammer/metrics/httpclient/InstrumentedRequestDirector.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

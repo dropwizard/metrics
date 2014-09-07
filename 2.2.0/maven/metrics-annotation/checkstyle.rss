@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rss version="0.91">
+  <channel>
+    <title>Metrics Annotations - Checkstyle report</title>
+    <link>http://metrics.codahale.com/metrics-annotation/</link>
+    <description>Metrics Annotations - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2014</copyright>
+    <item>
+      <title>File: 4,
+             Errors: 1,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>http://metrics.codahale.com/metrics-annotation//checkstyle.html</link>
+      <description>
+        <p>Click <a href="http://metrics.codahale.com/metrics-annotation//checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-annotation//checkstyle.html#com.yammer.metrics.annotation.Metered.java">com/yammer/metrics/annotation/Metered.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-annotation//checkstyle.html#com.yammer.metrics.annotation.Gauge.java">com/yammer/metrics/annotation/Gauge.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-annotation//checkstyle.html#com.yammer.metrics.annotation.Timed.java">com/yammer/metrics/annotation/Timed.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-annotation//checkstyle.html#com.yammer.metrics.annotation.ExceptionMetered.java">com/yammer/metrics/annotation/ExceptionMetered.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

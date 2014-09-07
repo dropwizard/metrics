@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rss version="0.91">
+  <channel>
+    <title>Metrics Spring Support - Checkstyle report</title>
+    <link>http://metrics.codahale.com/metrics-spring/</link>
+    <description>Metrics Spring Support - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2014</copyright>
+    <item>
+      <title>File: 18,
+             Errors: 68,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>http://metrics.codahale.com/metrics-spring//checkstyle.html</link>
+      <description>
+        <p>Click <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.GaugeMethod.java">com/yammer/metrics/spring/GaugeMethod.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.GaugeAnnotationBeanPostProcessor.java">com/yammer/metrics/spring/GaugeAnnotationBeanPostProcessor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  8
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.TimedAnnotationBeanPostProcessor.java">com/yammer/metrics/spring/TimedAnnotationBeanPostProcessor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.MeteredAnnotationBeanPostProcessor.java">com/yammer/metrics/spring/MeteredAnnotationBeanPostProcessor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.AbstractProxyingBeanPostProcessor.java">com/yammer/metrics/spring/AbstractProxyingBeanPostProcessor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  5
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.config.AnnotationDrivenBeanDefinitionParser.java">com/yammer/metrics/spring/config/AnnotationDrivenBeanDefinitionParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  4
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.TimedMethodInterceptor.java">com/yammer/metrics/spring/TimedMethodInterceptor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  5
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.config.JmxReporterBeanDefinitionParser.java">com/yammer/metrics/spring/config/JmxReporterBeanDefinitionParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.JmxReporterFactory.java">com/yammer/metrics/spring/JmxReporterFactory.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  3
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.ExceptionMeteredAnnotationBeanPostProcessor.java">com/yammer/metrics/spring/ExceptionMeteredAnnotationBeanPostProcessor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.ExceptionMeteredMethodInterceptor.java">com/yammer/metrics/spring/ExceptionMeteredMethodInterceptor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  6
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.config.MetricsNamespaceHandler.java">com/yammer/metrics/spring/config/MetricsNamespaceHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.HealthCheckBeanPostProcessor.java">com/yammer/metrics/spring/HealthCheckBeanPostProcessor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  5
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.GaugeField.java">com/yammer/metrics/spring/GaugeField.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.config.HealthCheckRegistryBeanDefinitionParser.java">com/yammer/metrics/spring/config/HealthCheckRegistryBeanDefinitionParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.config.MetricsRegistryBeanDefinitionParser.java">com/yammer/metrics/spring/config/MetricsRegistryBeanDefinitionParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.MeteredMethodInterceptor.java">com/yammer/metrics/spring/MeteredMethodInterceptor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  14
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-spring//checkstyle.html#com.yammer.metrics.spring.AnnotationFilter.java">com/yammer/metrics/spring/AnnotationFilter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  3
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rss version="0.91">
+  <channel>
+    <title>Metrics Guice Support - Checkstyle report</title>
+    <link>http://metrics.codahale.com/metrics-guice/</link>
+    <description>Metrics Guice Support - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2014</copyright>
+    <item>
+      <title>File: 12,
+             Errors: 31,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>http://metrics.codahale.com/metrics-guice//checkstyle.html</link>
+      <description>
+        <p>Click <a href="http://metrics.codahale.com/metrics-guice//checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-guice//checkstyle.html#com.yammer.metrics.guice.servlet.AdminServletProvider.java">com/yammer/metrics/guice/servlet/AdminServletProvider.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  3
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-guice//checkstyle.html#com.yammer.metrics.guice.MeteredListener.java">com/yammer/metrics/guice/MeteredListener.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-guice//checkstyle.html#com.yammer.metrics.guice.InstrumentationModule.java">com/yammer/metrics/guice/InstrumentationModule.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  6
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-guice//checkstyle.html#com.yammer.metrics.guice.JmxReporterProvider.java">com/yammer/metrics/guice/JmxReporterProvider.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-guice//checkstyle.html#com.yammer.metrics.guice.TimedInterceptor.java">com/yammer/metrics/guice/TimedInterceptor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-guice//checkstyle.html#com.yammer.metrics.guice.GaugeInjectionListener.java">com/yammer/metrics/guice/GaugeInjectionListener.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-guice//checkstyle.html#com.yammer.metrics.guice.servlet.AdminServletModule.java">com/yammer/metrics/guice/servlet/AdminServletModule.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  16
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-guice//checkstyle.html#com.yammer.metrics.guice.GaugeListener.java">com/yammer/metrics/guice/GaugeListener.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-guice//checkstyle.html#com.yammer.metrics.guice.ExceptionMeteredInterceptor.java">com/yammer/metrics/guice/ExceptionMeteredInterceptor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-guice//checkstyle.html#com.yammer.metrics.guice.TimedListener.java">com/yammer/metrics/guice/TimedListener.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-guice//checkstyle.html#com.yammer.metrics.guice.MeteredInterceptor.java">com/yammer/metrics/guice/MeteredInterceptor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://metrics.codahale.com/metrics-guice//checkstyle.html#com.yammer.metrics.guice.ExceptionMeteredListener.java">com/yammer/metrics/guice/ExceptionMeteredListener.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

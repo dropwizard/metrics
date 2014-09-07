@@ -1,0 +1,628 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Release Notes | Metrics</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="../../_static/yammerdoc.css" type="text/css"/>
+    <link rel="top" title="Metrics" href="../../"/>
+    <link rel="up" title="About Metrics" href="../"/>
+    <link rel="next" title="Documentation TODOs" href="../todos/"/>
+    <link rel="prev" title="Contributors" href="../contributors/"/>
+    <style lang="text/css">
+        #top-bar, #top-bar small, #top-bar a {
+            text-shadow: 0px -1px 0px #cf2c0f;
+            color: #fff;
+        }
+        
+        #top-bar {
+            background-color: #ED4A2D;
+            background-image: -moz-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -ms-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ff684b), to(#cf2c0f));
+            background-image: -webkit-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -o-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: linear-gradient(top, #ff684b, #cf2c0f);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ff684b', endColorstr = '#cf2c0f', GradientType = 0);
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0;
+        }
+
+
+        .hero-unit {
+            background-image: url("../../_static/metrics-hat.png") !important;
+            background-repeat: no-repeat !important;
+            background-position: 30px 50px;
+        }
+
+        .hero-unit div.section {
+            padding-left: 200px !important;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://github.com/dropwizard/metrics">
+        <img style="position: absolute; top: 0; right: 0; border: 0;"
+             src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"
+             alt="Fork me on GitHub"></a>
+    <div class="navbar">
+        <div class="navbar-inner container-fluid" id="top-bar">
+            <header class="row-fluid">
+                <h1 class="span12" id="title"><img class="logo" src="../../_static/metrics-logo.png" alt="Logo"/>
+                    <a href="../../">Metrics</a>
+                    <small>Mind the gap.</small>
+                </h1>
+            </header>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span3" id="sidebar">
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual/">User Manual</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../">About Metrics</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../contributors/">Contributors</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Release Notes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#v2-2-0-snapshot">v2.2.0-SNAPSHOT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-1-5-nov-19-2012">v2.1.5: Nov 19 2012</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-1-4-nov-15-2012">v2.1.4: Nov 15 2012</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-1-3-aug-06-2012">v2.1.3: Aug 06 2012</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-1-2-apr-11-2012">v2.1.2: Apr 11 2012</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-1-1-mar-13-2012">v2.1.1: Mar 13 2012</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-1-0-mar-12-2012">v2.1.0: Mar 12 2012</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-3-feb-24-2012">v2.0.3: Feb 24 2012</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-2-feb-09-2012">v2.0.2: Feb 09 2012</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-1-feb-08-2012">v2.0.1: Feb 08 2012</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-feb-07-2012">v2.0.0: Feb 07 2012</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-rc0-jan-19-2012">v2.0.0-RC0: Jan 19 2012</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta19-jan-07-2012">v2.0.0-BETA19: Jan 07 2012</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta18-dec-16-2011">v2.0.0-BETA18: Dec 16 2011</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta17-oct-07-2011">v2.0.0-BETA17: Oct 07 2011</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta16-aug-23-2011">v2.0.0-BETA16: Aug 23 2011</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta15-aug-15-2011">v2.0.0-BETA15: Aug 15 2011</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta14-jul-05-2011">v2.0.0-BETA14: Jul 05 2011</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta13-may-13-2011">v2.0.0-BETA13: May 13 2011</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta12-may-09-2011">v2.0.0-BETA12: May 09 2011</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta11-apr-27-2011">v2.0.0-BETA11: Apr 27 2011</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta10-mar-25-2011">v2.0.0-BETA10: Mar 25 2011</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta9-mar-14-2011">v2.0.0-BETA9: Mar 14 2011</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta8-mar-01-2011">v2.0.0-BETA8: Mar 01 2011</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta7-jan-12-2011">v2.0.0-BETA7: Jan 12 2011</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta6-jan-12-2011">v2.0.0-BETA6: Jan 12 2011</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta5-jan-11-2011">v2.0.0-BETA5: Jan 11 2011</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta3-dec-23-2010">v2.0.0-BETA3: Dec 23 2010</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta2-dec-22-2010">v2.0.0-BETA2: Dec 22 2010</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v2-0-0-beta1-dec-22-2010">v2.0.0-BETA1: Dec 22 2010</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v1-0-7-sep-21-2010">v1.0.7: Sep 21 2010</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v1-0-6-jul-15-2010">v1.0.6: Jul 15 2010</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v1-0-5-jun-01-2010">v1.0.5: Jun 01 2010</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v1-0-4-apr-27-2010">v1.0.4: Apr 27 2010</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v1-0-3-apr-16-2010">v1.0.3: Apr 16 2010</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v1-0-2-mar-08-2010">v1.0.2: Mar 08 2010</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v1-0-1-mar-05-2010">v1.0.1: Mar 05 2010</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v1-0-0-feb-27-2010">v1.0.0: Feb 27 2010</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../todos/">Documentation TODOs</a></li>
+</ul>
+</li>
+</ul>
+
+                <hr/>
+                <ul>
+                    <li><a href="https://groups.google.com/forum/#!forum/metrics-user">Mailing List</a></li>
+                    <li><a href="https://dropwizard.github.io/metrics/2.2.0/maven/">Maven Site</a></li>
+                </ul>
+            </div>
+            <div class="span9" id="body">
+                
+  <div class="section" id="release-notes">
+<span id="id1"></span><h1>Release Notes</h1>
+<div class="section" id="v2-2-0-snapshot">
+<span id="rel-2-2-0"></span><h2>v2.2.0-SNAPSHOT</h2>
+<ul class="simple">
+<li>Removed all OSGi bundling. This will be back in 3.0.</li>
+<li>Added <tt class="docutils literal"><span class="pre">InstrumentedSslSelectChannelConnector</span></tt> and <tt class="docutils literal"><span class="pre">InstrumentedSslSocketConnector</span></tt>.</li>
+<li>Made all metric names JMX-safe.</li>
+<li>Upgraded to Ehcache 2.6.2.</li>
+<li>Upgraded to Apache HttpClient 4.2.2.</li>
+<li>Upgraded to Jersey 1.15.</li>
+<li>Upgraded to Log4j 1.2.17.</li>
+<li>Upgraded to Logback 1.0.7.</li>
+<li>Upgraded to Spring 3.1.3.</li>
+<li>Upgraded to Jetty 8.1.8.</li>
+<li>Upgraded to SLF4J 1.7.2.</li>
+<li>Replaced usage of <tt class="docutils literal"><span class="pre">Unsafe</span></tt> in <tt class="docutils literal"><span class="pre">InstrumentedResourceMethodDispatchProvider</span></tt> with type erasure
+trickery.</li>
+</ul>
+</div>
+<div class="section" id="v2-1-5-nov-19-2012">
+<span id="rel-2-1-5"></span><h2>v2.1.5: Nov 19 2012</h2>
+<ul class="simple">
+<li>Upgraded to Jackson 2.1.1.</li>
+</ul>
+</div>
+<div class="section" id="v2-1-4-nov-15-2012">
+<span id="rel-2-1-4"></span><h2>v2.1.4: Nov 15 2012</h2>
+<ul class="simple">
+<li>Added OSGi bundling manifests.</li>
+</ul>
+</div>
+<div class="section" id="v2-1-3-aug-06-2012">
+<span id="rel-2-1-3"></span><h2>v2.1.3: Aug 06 2012</h2>
+<ul class="simple">
+<li>Upgraded to Apache HttpClient 4.2.1.</li>
+<li>Changed <tt class="docutils literal"><span class="pre">InstrumentedClientConnManager</span></tt> to extend <tt class="docutils literal"><span class="pre">PoolingClientConnectionManager</span></tt> instead of
+the deprecated <tt class="docutils literal"><span class="pre">ThreadSafeClientConnManager</span></tt>.</li>
+<li>Fixed a bug in <tt class="docutils literal"><span class="pre">ExponentiallyDecayingSample</span></tt> with long periods of inactivity.</li>
+<li>Fixed problems with re-registering metrics in JMX.</li>
+<li>Added support for <tt class="docutils literal"><span class="pre">DnsResolver</span></tt> instances to <tt class="docutils literal"><span class="pre">InstrumentedClientConnManager</span></tt>.</li>
+<li>Added support for formatted health check error messages.</li>
+</ul>
+</div>
+<div class="section" id="v2-1-2-apr-11-2012">
+<span id="rel-2-1-2"></span><h2>v2.1.2: Apr 11 2012</h2>
+<ul class="simple">
+<li>Fixed double-registration in <tt class="docutils literal"><span class="pre">metrics-guice</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="v2-1-1-mar-13-2012">
+<span id="rel-2-1-1"></span><h2>v2.1.1: Mar 13 2012</h2>
+<ul class="simple">
+<li>Fixed instrumentation of all usages of <tt class="docutils literal"><span class="pre">InstrumentedHttpClient</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="v2-1-0-mar-12-2012">
+<span id="rel-2-1-0"></span><h2>v2.1.0: Mar 12 2012</h2>
+<ul class="simple">
+<li>Added support for Java 7&#8217;s direct and mapped buffer pool stats in <tt class="docutils literal"><span class="pre">VirtualMachineMetrics</span></tt> and
+<tt class="docutils literal"><span class="pre">metrics-servlet</span></tt>.</li>
+<li>Added support for XML configuration in <tt class="docutils literal"><span class="pre">metrics-ehcache</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">metrics-spring</span></tt> now support <tt class="docutils literal"><span class="pre">&#64;Gauge</span></tt>-annotated fields.</li>
+<li>Opened <tt class="docutils literal"><span class="pre">GraphiteReporter</span></tt> up for extension.</li>
+<li>Added <tt class="docutils literal"><span class="pre">group</span></tt> and <tt class="docutils literal"><span class="pre">type</span></tt> to <tt class="docutils literal"><span class="pre">metrics-annotations</span></tt>, <tt class="docutils literal"><span class="pre">metrics-guice</span></tt>, <tt class="docutils literal"><span class="pre">metrics-jersey</span></tt>,
+and <tt class="docutils literal"><span class="pre">metrics-spring</span></tt>.</li>
+<li>Fixed handling of non-int gauges in <tt class="docutils literal"><span class="pre">GangliaReporter</span></tt>.</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">NullPointerException</span></tt> errors in <tt class="docutils literal"><span class="pre">metrics-spring</span></tt>.</li>
+<li>General improvements to <tt class="docutils literal"><span class="pre">metrics-spring</span></tt>, including allowing custom <tt class="docutils literal"><span class="pre">Clock</span></tt> instances.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-3-feb-24-2012">
+<span id="rel-2-0-3"></span><h2>v2.0.3: Feb 24 2012</h2>
+<ul class="simple">
+<li>Change logging of <tt class="docutils literal"><span class="pre">InstanceNotFoundException</span></tt> exceptions thrown while unregistering a metric
+in <tt class="docutils literal"><span class="pre">JmxReporter</span></tt> to <tt class="docutils literal"><span class="pre">TRACE</span></tt>. It being <tt class="docutils literal"><span class="pre">WARN</span></tt> resulted in huge log dumps preventing process
+shutdowns when applications had ~1K+ metrics.</li>
+<li>Upgraded to Spring 3.1.1 for <tt class="docutils literal"><span class="pre">metrics-spring</span></tt>.</li>
+<li>Upgraded to JDBI 2.31.2.</li>
+<li>Upgraded to Jersey 1.12.</li>
+<li>Upgraded to Jetty 7.6.1.</li>
+<li>Fixed rate units for meters in <tt class="docutils literal"><span class="pre">GangliaReporter</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-2-feb-09-2012">
+<span id="rel-2-0-2"></span><h2>v2.0.2: Feb 09 2012</h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">InstrumentationModule</span></tt> in <tt class="docutils literal"><span class="pre">metrics-guice</span></tt> now uses the default <tt class="docutils literal"><span class="pre">MetricsRegistry</span></tt> and
+<tt class="docutils literal"><span class="pre">HealthCheckRegistry</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-1-feb-08-2012">
+<span id="rel-2-0-1"></span><h2>v2.0.1: Feb 08 2012</h2>
+<ul class="simple">
+<li>Fixed a concurrency bug in <tt class="docutils literal"><span class="pre">JmxReporter</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-feb-07-2012">
+<span id="rel-2-0-0"></span><h2>v2.0.0: Feb 07 2012</h2>
+<ul class="simple">
+<li>Upgraded to Jackson 1.9.4.</li>
+<li>Upgraded to Jetty 7.6.0.</li>
+<li>Added escaping for garbage collector and memory pool names in <tt class="docutils literal"><span class="pre">GraphiteReporter</span></tt>.</li>
+<li>Fixed the inability to start and stop multiple reporter instances.</li>
+<li>Switched to using a backported version of <tt class="docutils literal"><span class="pre">ThreadLocalRandom</span></tt> for <tt class="docutils literal"><span class="pre">UniformSample</span></tt> and
+<tt class="docutils literal"><span class="pre">ExponentiallyDecayingSample</span></tt> to reduce lock contention on random number generation.</li>
+<li>Removed <tt class="docutils literal"><span class="pre">Ordered</span></tt> from <tt class="docutils literal"><span class="pre">TimedAnnotationBeanPostProcessor</span></tt> in <tt class="docutils literal"><span class="pre">metrics-spring</span></tt>.</li>
+<li>Upgraded to JDBI 2.31.1.</li>
+<li>Upgraded to Ehcache 2.5.1.</li>
+<li>Added <tt class="docutils literal"><span class="pre">#timerContext()</span></tt> to Scala <tt class="docutils literal"><span class="pre">Timer</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-rc0-jan-19-2012">
+<span id="rel-2-0-0-rc0"></span><h2>v2.0.0-RC0: Jan 19 2012</h2>
+<ul class="simple">
+<li>Added FindBugs checks to the build process.</li>
+<li>Fixed the catching of <tt class="docutils literal"><span class="pre">Error</span></tt> instances thrown during health checks.</li>
+<li>Added <tt class="docutils literal"><span class="pre">enable</span></tt> static methods to <tt class="docutils literal"><span class="pre">CsvReporter</span></tt> and changed
+<tt class="docutils literal"><span class="pre">CsvReporter(File,</span> <span class="pre">MetricsRegistry)</span></tt> to <tt class="docutils literal"><span class="pre">CsvReporter(MetricsRegistry,</span> <span class="pre">File)</span></tt>.</li>
+<li>Slimmed down <tt class="docutils literal"><span class="pre">InstrumentedEhcache</span></tt>.</li>
+<li>Hid the internals of <tt class="docutils literal"><span class="pre">GangliaReporter</span></tt>.</li>
+<li>Hid the internals of <tt class="docutils literal"><span class="pre">metrics-guice</span></tt>.</li>
+<li>Changed <tt class="docutils literal"><span class="pre">metrics-httpclient</span></tt> to consistently associate metrics with the <tt class="docutils literal"><span class="pre">org.apache</span></tt> class
+being extended.</li>
+<li>Hid the internals of <tt class="docutils literal"><span class="pre">metrics-httpclient</span></tt>.</li>
+<li>Rewrote <tt class="docutils literal"><span class="pre">InstrumentedAppender</span></tt> in <tt class="docutils literal"><span class="pre">metrics-log4j</span></tt>. It no longer forwards events to an
+appender. Instead, you can just attach it to your root logger to instrument logging.</li>
+<li>Rewrote <tt class="docutils literal"><span class="pre">InstrumentedAppender</span></tt> in <tt class="docutils literal"><span class="pre">metrics-logback</span></tt>. No major API changes.</li>
+<li>Fixed bugs with <tt class="docutils literal"><span class="pre">&#64;ExceptionMetered</span></tt>-annotated resource methods in <tt class="docutils literal"><span class="pre">metrics-jersey</span></tt>.</li>
+<li>Fixed bugs generating <tt class="docutils literal"><span class="pre">Snapshot</span></tt> instances from concurrently modified collections.</li>
+<li>Fixed edge case in <tt class="docutils literal"><span class="pre">MetricsServlet</span></tt>&#8216;s thread dumps where one thread could be missed.</li>
+<li>Added <tt class="docutils literal"><span class="pre">RatioGauge</span></tt> and <tt class="docutils literal"><span class="pre">PercentGauge</span></tt>.</li>
+<li>Changed <tt class="docutils literal"><span class="pre">InstrumentedQueuedThreadPool</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">percent-idle</span></tt> gauge to be a ratio.</li>
+<li>Decomposed <tt class="docutils literal"><span class="pre">MetricsServlet</span></tt> into a set of focused servlets: <tt class="docutils literal"><span class="pre">HealthCheckServlet</span></tt>,
+<tt class="docutils literal"><span class="pre">MetricsServlet</span></tt>, <tt class="docutils literal"><span class="pre">PingServlet</span></tt>, and <tt class="docutils literal"><span class="pre">ThreadDumpServlet</span></tt>. The top-level servlet which
+provides the HTML menu page is now <tt class="docutils literal"><span class="pre">AdminServlet</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">metrics-spring</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta19-jan-07-2012">
+<span id="rel-2-0-0-beta19"></span><h2>v2.0.0-BETA19: Jan 07 2012</h2>
+<ul class="simple">
+<li>Added absolute memory usage to <tt class="docutils literal"><span class="pre">MetricsServlet</span></tt>.</li>
+<li>Extracted <tt class="docutils literal"><span class="pre">&#64;Timed</span></tt> etc. to <tt class="docutils literal"><span class="pre">metrics-annotations</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">metrics-jersey</span></tt>, which provides a class allowing you to automatically instrument all
+<tt class="docutils literal"><span class="pre">&#64;Timed</span></tt>, <tt class="docutils literal"><span class="pre">&#64;Metered</span></tt>, and <tt class="docutils literal"><span class="pre">&#64;ExceptionMetered</span></tt>-annotated resource methods.</li>
+<li>Moved all classes in <tt class="docutils literal"><span class="pre">metrics-scala</span></tt> from <tt class="docutils literal"><span class="pre">com.yammer.metrics</span></tt> to
+<tt class="docutils literal"><span class="pre">com.yammer.metrics.scala</span></tt>.</li>
+<li>Renamed <tt class="docutils literal"><span class="pre">CounterMetric</span></tt> to <tt class="docutils literal"><span class="pre">Counter</span></tt>.</li>
+<li>Renamed <tt class="docutils literal"><span class="pre">GaugeMetric</span></tt> to <tt class="docutils literal"><span class="pre">Gauge</span></tt>.</li>
+<li>Renamed <tt class="docutils literal"><span class="pre">HistogramMetric</span></tt> to <tt class="docutils literal"><span class="pre">Histogram</span></tt>.</li>
+<li>Renamed <tt class="docutils literal"><span class="pre">MeterMetric</span></tt> to <tt class="docutils literal"><span class="pre">Meter</span></tt>.</li>
+<li>Renamed <tt class="docutils literal"><span class="pre">TimerMetric</span></tt> to <tt class="docutils literal"><span class="pre">Timer</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">ToggleGauge</span></tt>, which returns <tt class="docutils literal"><span class="pre">1</span></tt> the first time it&#8217;s called and <tt class="docutils literal"><span class="pre">0</span></tt> every time after
+that.</li>
+<li>Now licensed under Apache License 2.0.</li>
+<li>Converted <tt class="docutils literal"><span class="pre">VirtualMachineMetrics</span></tt> to a non-singleton class.</li>
+<li>Removed <tt class="docutils literal"><span class="pre">Utils</span></tt>.</li>
+<li>Removed deprecated constructors from <tt class="docutils literal"><span class="pre">Meter</span></tt> and <tt class="docutils literal"><span class="pre">Timer</span></tt>.</li>
+<li>Removed <tt class="docutils literal"><span class="pre">LoggerMemoryLeakFix</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">DeathRattleExceptionHandler</span></tt> now logs to SLF4J, not syserr.</li>
+<li>Added <tt class="docutils literal"><span class="pre">MetricsRegistry#groupedMetrics()</span></tt>.</li>
+<li>Removed <tt class="docutils literal"><span class="pre">Metrics#allMetrics()</span></tt>.</li>
+<li>Removed <tt class="docutils literal"><span class="pre">Metrics#remove(MetricName)</span></tt>.</li>
+<li>Removed <tt class="docutils literal"><span class="pre">MetricsRegistry#threadPools()</span></tt> and <tt class="docutils literal"><span class="pre">#newMeterTickThreadPool()</span></tt> and added
+<tt class="docutils literal"><span class="pre">#newScheduledThreadPool</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">MetricsRegistry#shutdown()</span></tt>.</li>
+<li>Renamed <tt class="docutils literal"><span class="pre">ThreadPools#shutdownThreadPools()</span></tt> to <tt class="docutils literal"><span class="pre">#shutdown()</span></tt>.</li>
+<li>Replaced <tt class="docutils literal"><span class="pre">HealthCheck</span></tt>&#8216;s abstract <tt class="docutils literal"><span class="pre">name</span></tt> method with a required constructor parameter.</li>
+<li><tt class="docutils literal"><span class="pre">HealthCheck#check()</span></tt> is now <tt class="docutils literal"><span class="pre">protected</span></tt>.</li>
+<li>Moved <tt class="docutils literal"><span class="pre">DeadlockHealthCheck</span></tt> from <tt class="docutils literal"><span class="pre">com.yammer.metrics.core</span></tt> to <tt class="docutils literal"><span class="pre">com.yammer.metrics.utils</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">HealthCheckRegistry#unregister(HealthCheck)</span></tt>.</li>
+<li>Fixed typo in <tt class="docutils literal"><span class="pre">VirtualMachineMetrics</span></tt> and <tt class="docutils literal"><span class="pre">MetricsServlet</span></tt>: <tt class="docutils literal"><span class="pre">commited</span></tt> to <tt class="docutils literal"><span class="pre">committed</span></tt>.</li>
+<li>Changed <tt class="docutils literal"><span class="pre">MetricsRegistry#createName</span></tt> to <tt class="docutils literal"><span class="pre">protected</span></tt>.</li>
+<li>All metric types are created exclusively through <tt class="docutils literal"><span class="pre">MetricsRegistry</span></tt> now.</li>
+<li><tt class="docutils literal"><span class="pre">Metrics.newJmxGauge</span></tt> and <tt class="docutils literal"><span class="pre">MetricsRegistry.newJmxGauge</span></tt> are deprecated.</li>
+<li>Fixed heap metrics in <tt class="docutils literal"><span class="pre">VirtualMachineMetrics</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">Snapshot</span></tt>, which calculates quantiles.</li>
+<li>Renamed <tt class="docutils literal"><span class="pre">Percentiled</span></tt> to <tt class="docutils literal"><span class="pre">Sampling</span></tt> and dropped <tt class="docutils literal"><span class="pre">percentile</span></tt> and <tt class="docutils literal"><span class="pre">percentiles</span></tt> in favor of
+producing <tt class="docutils literal"><span class="pre">Snapshot</span></tt> instances. This affects both <tt class="docutils literal"><span class="pre">Histogram</span></tt> and <tt class="docutils literal"><span class="pre">Timer</span></tt>.</li>
+<li>Renamed <tt class="docutils literal"><span class="pre">Summarized</span></tt> to <tt class="docutils literal"><span class="pre">Summarizable</span></tt>.</li>
+<li>Changed order of <tt class="docutils literal"><span class="pre">CsvReporter</span></tt>&#8216;s construction parameters.</li>
+<li>Renamed <tt class="docutils literal"><span class="pre">VirtualMachineMetrics.GarbageCollector</span></tt> to
+<tt class="docutils literal"><span class="pre">VirtualMachineMetrics.GarbageCollectorStats</span></tt>.</li>
+<li>Moved Guice/Servlet support from <tt class="docutils literal"><span class="pre">metrics-servlet</span></tt> to <tt class="docutils literal"><span class="pre">metrics-guice</span></tt>.</li>
+<li>Removed <tt class="docutils literal"><span class="pre">metrics-aop</span></tt>.</li>
+<li>Removed <tt class="docutils literal"><span class="pre">newJmxGauge</span></tt> from both <tt class="docutils literal"><span class="pre">Metrics</span></tt> and <tt class="docutils literal"><span class="pre">MetricsRegistry</span></tt>. Just use <tt class="docutils literal"><span class="pre">JmxGauge</span></tt>.</li>
+<li>Moved <tt class="docutils literal"><span class="pre">JmxGauge</span></tt> to <tt class="docutils literal"><span class="pre">com.yammer.metrics.util</span></tt>.</li>
+<li>Moved <tt class="docutils literal"><span class="pre">MetricPredicate</span></tt> to <tt class="docutils literal"><span class="pre">com.yammer.metrics.core</span></tt>.</li>
+<li>Moved <tt class="docutils literal"><span class="pre">NameThreadFactory</span></tt> into <tt class="docutils literal"><span class="pre">ThreadPools</span></tt> and made <tt class="docutils literal"><span class="pre">ThreadPools</span></tt> package-visible.</li>
+<li>Removed <tt class="docutils literal"><span class="pre">Timer#values()</span></tt>, <tt class="docutils literal"><span class="pre">Histogram#values()</span></tt>, and <tt class="docutils literal"><span class="pre">Sample#values()</span></tt>. Use <tt class="docutils literal"><span class="pre">getSnapshot()</span></tt>
+instead.</li>
+<li>Removed <tt class="docutils literal"><span class="pre">Timer#dump(File)</span></tt> and <tt class="docutils literal"><span class="pre">Histogram#dump(File)</span></tt>, and <tt class="docutils literal"><span class="pre">Sample#dump(File)</span></tt>. Use
+<tt class="docutils literal"><span class="pre">Snapshot#dump(File)</span></tt> instead.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta18-dec-16-2011">
+<span id="rel-2-0-0-beta18"></span><h2>v2.0.0-BETA18: Dec 16 2011</h2>
+<ul class="simple">
+<li>Added <tt class="docutils literal"><span class="pre">DeathRattleExceptionHandler</span></tt>.</li>
+<li>Fixed NPE in <tt class="docutils literal"><span class="pre">VirtualMachineMetrics</span></tt>.</li>
+<li>Added decorators for connectors and thread pools in <tt class="docutils literal"><span class="pre">metrics-jetty</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">TimerMetric#time()</span></tt> and <tt class="docutils literal"><span class="pre">TimerContext</span></tt>.</li>
+<li>Added a shorter factory method for millisecond/second timers.</li>
+<li>Switched tests to JUnit.</li>
+<li>Improved logging in <tt class="docutils literal"><span class="pre">GangliaReporter</span></tt>.</li>
+<li>Improved random number generation for <tt class="docutils literal"><span class="pre">UniformSample</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">metrics-httpclient</span></tt> for instrumenting Apache HttpClient 4.1.</li>
+<li>Massively overhauled the reporting code.</li>
+<li>Added support for instrumented, non-<tt class="docutils literal"><span class="pre">public</span></tt> methods in <tt class="docutils literal"><span class="pre">metrics-guice</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">&#64;ExceptionMetered</span></tt> to <tt class="docutils literal"><span class="pre">metrics-guice</span></tt>.</li>
+<li>Added group prefixes to <tt class="docutils literal"><span class="pre">GangliaReporter</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">CvsReporter</span></tt>, which outputs metric values to <tt class="docutils literal"><span class="pre">.csv</span></tt> files.</li>
+<li>Improved metric name sanitization in <tt class="docutils literal"><span class="pre">GangliaReporter</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">Metrics.shutdown()</span></tt> and improved metrics lifecycle behavior.</li>
+<li>Added <tt class="docutils literal"><span class="pre">metrics-web</span></tt>.</li>
+<li>Upgraded to ehcache 2.5.0.</li>
+<li>Many, many refactorings.</li>
+<li><tt class="docutils literal"><span class="pre">metrics-servlet</span></tt> now responds with <tt class="docutils literal"><span class="pre">501</span> <span class="pre">Not</span> <span class="pre">Implememented</span></tt> when no health checks have been
+registered.</li>
+<li>Many internal refactorings for testability.</li>
+<li>Added histogram counts to <tt class="docutils literal"><span class="pre">metrics-servlet</span></tt>.</li>
+<li>Fixed a race condition in <tt class="docutils literal"><span class="pre">ExponentiallyDecayingSample</span></tt>.</li>
+<li>Added timezone and locale support to <tt class="docutils literal"><span class="pre">ConsoleReporter</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">metrics-aop</span></tt> for Guiceless support of method annotations.</li>
+<li>Added <tt class="docutils literal"><span class="pre">metrics-jdbi</span></tt> which adds instrumentation to <a class="reference external" href="http://www.jdbi.org">JDBI</a>.</li>
+<li>Fixed NPE for metrics which belong to classes in the default package.</li>
+<li>Now deploying artifacts to Maven Central.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta17-oct-07-2011">
+<span id="rel-2-0-0-beta17"></span><h2>v2.0.0-BETA17: Oct 07 2011</h2>
+<ul class="simple">
+<li>Added an option message to successful health check results.</li>
+<li>Fixed locale issues in <tt class="docutils literal"><span class="pre">GraphiteReporter</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">GangliaReporter</span></tt>.</li>
+<li>Added per-HTTP method timers to <tt class="docutils literal"><span class="pre">InstrumentedHandler</span></tt> in <tt class="docutils literal"><span class="pre">metrics-jetty</span></tt>.</li>
+<li>Fixed a thread pool leak for meters.</li>
+<li>Added <tt class="docutils literal"><span class="pre">#dump(File)</span></tt> to <tt class="docutils literal"><span class="pre">HistogramMetric</span></tt> and <tt class="docutils literal"><span class="pre">TimerMetric</span></tt>.</li>
+<li>Upgraded to Jackson 1.9.x.</li>
+<li>Upgraded to slf4j 1.6.2.</li>
+<li>Upgraded to logback 0.9.30.</li>
+<li>Upgraded to ehcache 2.4.5.</li>
+<li>Surfaced <tt class="docutils literal"><span class="pre">Metrics.removeMetric()</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta16-aug-23-2011">
+<span id="rel-2-0-0-beta16"></span><h2>v2.0.0-BETA16: Aug 23 2011</h2>
+<ul class="simple">
+<li>Fixed a bug in GC monitoring.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta15-aug-15-2011">
+<span id="rel-2-0-0-beta15"></span><h2>v2.0.0-BETA15: Aug 15 2011</h2>
+<ul class="simple">
+<li>Fixed dependency scopes for <tt class="docutils literal"><span class="pre">metrics-jetty</span></tt>.</li>
+<li>Added time and VM version to <tt class="docutils literal"><span class="pre">vm</span></tt> output of <tt class="docutils literal"><span class="pre">MetricsServlet</span></tt>.</li>
+<li>Dropped <tt class="docutils literal"><span class="pre">com.sun.mangement</span></tt>-based GC instrumentation in favor of a
+<tt class="docutils literal"><span class="pre">java.lang.management</span></tt>-based one. <tt class="docutils literal"><span class="pre">getLastGcInfo</span></tt> has a nasty native memory leak in it, plus
+it often returned incorrect data.</li>
+<li>Upgraded to Jackson 1.8.5.</li>
+<li>Upgraded to Jetty 7.4.5.</li>
+<li>Added sanitization for metric names in <tt class="docutils literal"><span class="pre">GraphiteReporter</span></tt>.</li>
+<li>Extracted out a <tt class="docutils literal"><span class="pre">Clock</span></tt> interface for timers for non-wall-clock timing.</li>
+<li>Extracted out most of the remaining statics into <tt class="docutils literal"><span class="pre">MetricsRegistry</span></tt> and <tt class="docutils literal"><span class="pre">HealthCheckRegistry</span></tt>.</li>
+<li>Added an init parameter to <tt class="docutils literal"><span class="pre">MetricsServlet</span></tt> for disabling the <tt class="docutils literal"><span class="pre">jvm</span></tt> section.</li>
+<li>Added a Guice module for <tt class="docutils literal"><span class="pre">MetricsServlet</span></tt>.</li>
+<li>Added dynamic metric names.</li>
+<li>Upgraded to ehcache 2.4.5.</li>
+<li>Upgraded to logback 0.9.29.</li>
+<li>Allowed for the removal of metrics.</li>
+<li>Added the ability to filter metrics exposed by a reporter to those which match a given predicate.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta14-jul-05-2011">
+<span id="rel-2-0-0-beta14"></span><h2>v2.0.0-BETA14: Jul 05 2011</h2>
+<ul class="simple">
+<li>Moved to Maven for a build system and extracted the Scala façade to a <tt class="docutils literal"><span class="pre">metrics-scala</span></tt> module
+which is now the only cross-built module. All other modules dropped the Scala version suffix in
+their <tt class="docutils literal"><span class="pre">artifactId</span></tt>.</li>
+<li>Fixed non-heap metric name in <tt class="docutils literal"><span class="pre">GraphiteReporter</span></tt>.</li>
+<li>Fixed stability error in <tt class="docutils literal"><span class="pre">GraphiteReporter</span></tt> when dealing with unavailable servers.</li>
+<li>Fixed error with anonymous, instrumented classes.</li>
+<li>Fixed error in <tt class="docutils literal"><span class="pre">MetricsServlet</span></tt> when a gauge throws an exception.</li>
+<li>Fixed error with bogus GC run times.</li>
+<li>Link to the pretty JSON output from the <tt class="docutils literal"><span class="pre">MetricsServlet</span></tt> menu page.</li>
+<li>Fixed potential race condition in histograms&#8217; variance calculations.</li>
+<li>Fixed memory pool reporting for the G1 collector.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta13-may-13-2011">
+<span id="rel-2-0-0-beta13"></span><h2>v2.0.0-BETA13: May 13 2011</h2>
+<ul class="simple">
+<li>Fixed a bug in the initial startup phase of the <tt class="docutils literal"><span class="pre">JmxReporter</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">metrics-ehcache</span></tt>, for the instrumentation of <tt class="docutils literal"><span class="pre">Ehcache</span></tt> instances.</li>
+<li>Fixed a typo in <tt class="docutils literal"><span class="pre">metrics-jetty</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">InstrumentedHandler</span></tt>.</li>
+<li>Added name prefixes to <tt class="docutils literal"><span class="pre">GraphiteReporter</span></tt>.</li>
+<li>Added JVM metrics reporting to <tt class="docutils literal"><span class="pre">GraphiteReporter</span></tt>.</li>
+<li>Actually fixed <tt class="docutils literal"><span class="pre">MetricsServlet</span></tt>&#8216;s links when the servlet has a non-root context path.</li>
+<li>Now cross-building for Scala 2.9.0.</li>
+<li>Added <tt class="docutils literal"><span class="pre">pretty</span></tt> query parameter for <tt class="docutils literal"><span class="pre">MetricsServlet</span></tt> to format the JSON object for human
+consumption.</li>
+<li>Added <tt class="docutils literal"><span class="pre">no-cache</span></tt> headers to the <tt class="docutils literal"><span class="pre">MetricsServlet</span></tt> responses.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta12-may-09-2011">
+<span id="rel-2-0-0-beta12"></span><h2>v2.0.0-BETA12: May 09 2011</h2>
+<ul class="simple">
+<li>Upgraded to Jackson 1.7.6.</li>
+<li>Added a new instrumented Log4J appender.</li>
+<li>Added a new instrumented Logback appender. Thanks to Bruce Mitchener
+(&#64;waywardmonkeys) for the patch.</li>
+<li>Added a new reporter for the <a class="reference external" href="http://graphite.wikidot.com">Graphite</a> aggregation system. Thanks to Mahesh Tiyyagura (&#64;tmahesh)
+for the patch.</li>
+<li>Added scoped metric names.</li>
+<li>Added Scala 2.9.0.RC{2,3,4} as build targets.</li>
+<li>Added meters to Jetty handler for the percent of responses which have <tt class="docutils literal"><span class="pre">4xx</span></tt> or <tt class="docutils literal"><span class="pre">5xx</span></tt> status
+codes.</li>
+<li>Changed the Servlet API to be a <tt class="docutils literal"><span class="pre">provided</span></tt> dependency. Thanks to Mårten Gustafson (&#64;chids) for
+the patch.</li>
+<li>Separated project into modules:<ul>
+<li><tt class="docutils literal"><span class="pre">metrics-core</span></tt>: A dependency-less project with all the core metrics.</li>
+<li><tt class="docutils literal"><span class="pre">metrics-graphite</span></tt>: A reporter for the [Graphite](<a class="reference external" href="http://graphite.wikidot.com">http://graphite.wikidot.com</a>)
+aggregation system.</li>
+<li><tt class="docutils literal"><span class="pre">metrics-guice</span></tt>: Guice AOP support.</li>
+<li><tt class="docutils literal"><span class="pre">metrics-jetty</span></tt>: An instrumented Jetty handler.</li>
+<li><tt class="docutils literal"><span class="pre">metrics-log4j</span></tt>: An instrumented Log4J appender.</li>
+<li><tt class="docutils literal"><span class="pre">metrics-logback</span></tt>: An instrumented Logback appender.</li>
+<li><tt class="docutils literal"><span class="pre">metrics-servlet</span></tt>: The Metrics servlet with context listener.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta11-apr-27-2011">
+<span id="rel-2-0-0-beta11"></span><h2>v2.0.0-BETA11: Apr 27 2011</h2>
+<ul class="simple">
+<li>Added thread state and deadlock detection metrics.</li>
+<li>Fix <tt class="docutils literal"><span class="pre">VirtualMachineMetrics</span></tt>&#8216; initialization.</li>
+<li>Context path fixes for the servlet.</li>
+<li>Added the <tt class="docutils literal"><span class="pre">&#64;Gauge</span></tt> annotation.</li>
+<li>Big reworking of the exponentially-weighted moving average code for meters. Thanks to JD Maturen
+(&#64;sku) and John Ewart (&#64;johnewart) for pointing this out.</li>
+<li>Upgraded to Guice 3.0.</li>
+<li>Upgraded to Jackson 1.7.5.</li>
+<li>Upgraded to Jetty 7.4.0.</li>
+<li>Big rewrite of the servlet&#8217;s thread dump code.</li>
+<li>Fixed race condition in <tt class="docutils literal"><span class="pre">ExponentiallyDecayingSample</span></tt>. Thanks to Martin Traverso (&#64;martint) for
+the patch.</li>
+<li>Lots of spelling fixes in Javadocs. Thanks to Bruce Mitchener (&#64;waywardmonkeys) for the patch.</li>
+<li>Added Scala 2.9.0.RC1 as a build target. Thanks to Bruce Mitchener (&#64;waywardmonkeys) for the
+patch.</li>
+<li>Patched a hilarious memory leak in <tt class="docutils literal"><span class="pre">java.util.logging</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta10-mar-25-2011">
+<span id="rel-2-0-0-beta10"></span><h2>v2.0.0-BETA10: Mar 25 2011</h2>
+<ul class="simple">
+<li>Added Guice AOP annotations: <tt class="docutils literal"><span class="pre">&#64;Timed</span></tt> and <tt class="docutils literal"><span class="pre">&#64;Metered</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">HealthCheck#name()</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">Metrics.newJmxGauge()</span></tt>.</li>
+<li>Moved health checks into <tt class="docutils literal"><span class="pre">HealthChecks</span></tt>.</li>
+<li>Upgraded to Jackson 1.7.3 and Jetty 7.3.1.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta9-mar-14-2011">
+<span id="rel-2-0-0-beta9"></span><h2>v2.0.0-BETA9: Mar 14 2011</h2>
+<ul class="simple">
+<li>Fixed <tt class="docutils literal"><span class="pre">JmxReporter</span></tt> lag.</li>
+<li>Added default arguments to timers and meters.</li>
+<li>Added default landing page to the servlet.</li>
+<li>Improved the performance of <tt class="docutils literal"><span class="pre">ExponentiallyDecayingSample</span></tt>.</li>
+<li>Fixed an integer overflow bug in <tt class="docutils literal"><span class="pre">UniformSample</span></tt>.</li>
+<li>Added linear scaling to <tt class="docutils literal"><span class="pre">ExponentiallyDecayingSample</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta8-mar-01-2011">
+<span id="rel-2-0-0-beta8"></span><h2>v2.0.0-BETA8: Mar 01 2011</h2>
+<ul class="simple">
+<li>Added histograms.</li>
+<li>Added biased sampling for timers.</li>
+<li>Added dumping of timer/histogram samples via the servlet.</li>
+<li>Added dependency on <tt class="docutils literal"><span class="pre">jackon-mapper</span></tt>.</li>
+<li>Added classname filtering for the servlet.</li>
+<li>Added URI configuration for the servlet.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta7-jan-12-2011">
+<span id="rel-2-0-0-beta7"></span><h2>v2.0.0-BETA7: Jan 12 2011</h2>
+<ul class="simple">
+<li>Added <tt class="docutils literal"><span class="pre">JettyHandler</span></tt>.</li>
+<li>Made the <tt class="docutils literal"><span class="pre">Servlet</span></tt> dependency optional.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta6-jan-12-2011">
+<span id="rel-2-0-0-beta6"></span><h2>v2.0.0-BETA6: Jan 12 2011</h2>
+<ul class="simple">
+<li>Fix <tt class="docutils literal"><span class="pre">JmxReporter</span></tt> initialization.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta5-jan-11-2011">
+<span id="rel-2-0-0-beta5"></span><h2>v2.0.0-BETA5: Jan 11 2011</h2>
+<ul class="simple">
+<li>Dropped <tt class="docutils literal"><span class="pre">Counter#++</span></tt> and <tt class="docutils literal"><span class="pre">Counter#--</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">Timer#update</span></tt>.</li>
+<li>Upgraded to Jackson 1.7.0.</li>
+<li>Made JMX reporting implicit.</li>
+<li>Added health checks.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta3-dec-23-2010">
+<span id="rel-2-0-0-beta3"></span><h2>v2.0.0-BETA3: Dec 23 2010</h2>
+<ul class="simple">
+<li>Fixed thread names and some docs.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta2-dec-22-2010">
+<span id="rel-2-0-0-beta2"></span><h2>v2.0.0-BETA2: Dec 22 2010</h2>
+<ul class="simple">
+<li>Fixed a memory leak in <tt class="docutils literal"><span class="pre">MeterMetric</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="v2-0-0-beta1-dec-22-2010">
+<span id="rel-2-0-0-beta1"></span><h2>v2.0.0-BETA1: Dec 22 2010</h2>
+<ul class="simple">
+<li>Total rewrite in Java.</li>
+</ul>
+</div>
+<div class="section" id="v1-0-7-sep-21-2010">
+<span id="rel-1-0-7"></span><h2>v1.0.7: Sep 21 2010</h2>
+<ul class="simple">
+<li>Added <tt class="docutils literal"><span class="pre">median</span></tt> to <tt class="docutils literal"><span class="pre">Timer</span></tt>.</li>
+<li>Added <tt class="docutils literal"><span class="pre">p95</span></tt> to <tt class="docutils literal"><span class="pre">Timer</span></tt> (95th percentile).</li>
+<li>Added <tt class="docutils literal"><span class="pre">p98</span></tt> to <tt class="docutils literal"><span class="pre">Timer</span></tt> (98th percentile).</li>
+<li>Added <tt class="docutils literal"><span class="pre">p99</span></tt> to <tt class="docutils literal"><span class="pre">Timer</span></tt> (99th percentile).</li>
+</ul>
+</div>
+<div class="section" id="v1-0-6-jul-15-2010">
+<span id="rel-1-0-6"></span><h2>v1.0.6: Jul 15 2010</h2>
+<ul class="simple">
+<li>Now compiled exclusively for 2.8.0 final.</li>
+</ul>
+</div>
+<div class="section" id="v1-0-5-jun-01-2010">
+<span id="rel-1-0-5"></span><h2>v1.0.5: Jun 01 2010</h2>
+<ul class="simple">
+<li>Documentation fix.</li>
+<li>Added <tt class="docutils literal"><span class="pre">TimedToggle</span></tt>, which may or may not be useful at all.</li>
+<li>Now cross-building for RC2 and RC3.</li>
+</ul>
+</div>
+<div class="section" id="v1-0-4-apr-27-2010">
+<span id="rel-1-0-4"></span><h2>v1.0.4: Apr 27 2010</h2>
+<ul class="simple">
+<li>Blank <tt class="docutils literal"><span class="pre">Timer</span></tt> instances (i.e., those which have recorded no timings yet) no longer explode when
+asked for metrics for that which does not yet exist.</li>
+<li>Nested classes, companion objects, and singletons don&#8217;t have trailing <tt class="docutils literal"><span class="pre">$</span></tt> characters messing up
+JMX&#8217;s good looks.</li>
+</ul>
+</div>
+<div class="section" id="v1-0-3-apr-16-2010">
+<span id="rel-1-0-3"></span><h2>v1.0.3: Apr 16 2010</h2>
+<ul class="simple">
+<li>Fixed some issues with the <a class="reference external" href="http://implicit.ly">implicit.ly</a> plumbing.</li>
+<li>Tweaked the sample size for <tt class="docutils literal"><span class="pre">Timer</span></tt>, giving it 99.9% confidence level with a %5 margin of error
+(for a normally distributed variable, which it almost certainly isn&#8217;t.)</li>
+<li><tt class="docutils literal"><span class="pre">Sample#iterator</span></tt> returns only the recorded data, not a bunch of zeros.</li>
+<li>Moved units of <tt class="docutils literal"><span class="pre">Timer</span></tt>, <tt class="docutils literal"><span class="pre">Meter</span></tt>, and <tt class="docutils literal"><span class="pre">LoadMeter</span></tt> to their own attributes, which allows for
+easy export of Metrics data via JMX to things like <a class="reference external" href="http://ganglia.sourceforge.net/">Ganglia</a> or whatever.</li>
+</ul>
+</div>
+<div class="section" id="v1-0-2-mar-08-2010">
+<span id="rel-1-0-2"></span><h2>v1.0.2: Mar 08 2010</h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Timer</span></tt> now uses Welford&#8217;s algorithm for calculating running variance, which means no more
+hilariously wrong standard deviations (e.g., <tt class="docutils literal"><span class="pre">NaN</span></tt>).</li>
+<li><tt class="docutils literal"><span class="pre">Timer</span></tt> now supports <tt class="docutils literal"><span class="pre">+=(Long)</span></tt> for pre-recorded, nanosecond-precision timings.</li>
+</ul>
+</div>
+<div class="section" id="v1-0-1-mar-05-2010">
+<span id="rel-1-0-1"></span><h2>v1.0.1: Mar 05 2010</h2>
+<ul class="simple">
+<li>changed <tt class="docutils literal"><span class="pre">Sample</span></tt> to use an <tt class="docutils literal"><span class="pre">AtomicReferenceArray</span></tt></li>
+</ul>
+</div>
+<div class="section" id="v1-0-0-feb-27-2010">
+<span id="rel-1-0-0"></span><h2>v1.0.0: Feb 27 2010</h2>
+<ul class="simple">
+<li>Initial release</li>
+</ul>
+</div>
+</div>
+
+
+            </div>
+        </div>
+        <hr/>
+        <footer>
+            &copy; Copyright 2010-2012, Coda Hale, Yammer Inc..
+            Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
+            1.2.2.
+        </footer>
+    </div>
+</body>
+</html>
+
+
