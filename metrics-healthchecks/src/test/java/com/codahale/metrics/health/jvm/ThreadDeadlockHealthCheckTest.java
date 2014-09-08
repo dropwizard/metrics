@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

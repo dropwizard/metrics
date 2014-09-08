@@ -2,7 +2,7 @@ package com.codahale.metrics;
 
 import org.junit.Test;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DerivativeGaugeTest {
     private final Gauge<String> gauge1 = new Gauge<String>() {
