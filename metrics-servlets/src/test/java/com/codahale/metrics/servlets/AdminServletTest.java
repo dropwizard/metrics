@@ -7,7 +7,7 @@ import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AdminServletTest extends AbstractServletTest {
     private final MetricRegistry registry = new MetricRegistry();

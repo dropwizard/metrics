@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static org.fest.assertions.api.Assertions.assertThat;
-import static org.fest.assertions.data.MapEntry.entry;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Mockito.*;
 
 public class MetricRegistryTest {

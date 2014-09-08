@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class InstrumentedEhcacheTest {
     private static final CacheManager MANAGER = CacheManager.create();

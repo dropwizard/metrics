@@ -4,8 +4,8 @@ import org.junit.Test;
 
 import java.lang.management.ManagementFactory;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-import static org.fest.assertions.data.Offset.offset;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.offset;
 
 public class ClockTest {
     @Test
