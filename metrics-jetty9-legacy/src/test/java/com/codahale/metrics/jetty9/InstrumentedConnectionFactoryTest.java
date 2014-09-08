@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class InstrumentedConnectionFactoryTest {
     private final MetricRegistry registry = new MetricRegistry();
