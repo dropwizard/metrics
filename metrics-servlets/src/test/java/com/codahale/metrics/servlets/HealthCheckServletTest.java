@@ -17,7 +17,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class HealthCheckServletTest extends AbstractServletTest {
     private final HealthCheckRegistry registry = new HealthCheckRegistry();

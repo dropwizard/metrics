@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import java.util.concurrent.*;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class InstrumentedScheduledExecutorServiceTest {
     private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();

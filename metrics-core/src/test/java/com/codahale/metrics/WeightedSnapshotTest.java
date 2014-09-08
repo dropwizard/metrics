@@ -8,8 +8,8 @@ import java.util.List;
 
 import com.codahale.metrics.WeightedSnapshot.WeightedSample;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-import static org.fest.assertions.api.Assertions.offset;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.offset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
