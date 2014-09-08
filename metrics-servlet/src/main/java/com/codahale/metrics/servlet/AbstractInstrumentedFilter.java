@@ -144,6 +144,12 @@ public abstract class AbstractInstrumentedFilter implements Filter {
             super.setStatus(sc);
         }
 
+        @Override
+        public void setStatus(int sc, String sm) {
+            httpStatus = sc;
+            super.setStatus(sc, sm);
+        }
+
         public int getStatus() {
             return httpStatus;
         }
