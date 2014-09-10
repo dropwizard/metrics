@@ -39,7 +39,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD })
+@Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
 public @interface ExceptionMetered {
     /**
      * The default suffix for meter names.
