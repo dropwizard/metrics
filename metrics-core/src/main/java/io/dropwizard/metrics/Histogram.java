@@ -1,5 +1,10 @@
 package io.dropwizard.metrics;
 
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 /**
  * A metric which calculates the distribution of a value.
  *
@@ -7,6 +12,7 @@ package io.dropwizard.metrics;
  *      variance</a>
  */
 public class Histogram implements Metric, Sampling, Counting {
+
     private final Reservoir reservoir;
     private final LongAdder count;
 
@@ -52,5 +58,16 @@ public class Histogram implements Metric, Sampling, Counting {
     @Override
     public Snapshot getSnapshot() {
         return reservoir.getSnapshot();
+    }
+
+    @Override
+    public String toString() {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        this.getSnapshot().dump(out);
+        try {
+            return out.toString(StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            return super.toString();
+        }
     }
 }

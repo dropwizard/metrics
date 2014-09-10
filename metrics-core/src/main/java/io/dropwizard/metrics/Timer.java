@@ -40,6 +40,12 @@ public class Timer implements Metered, Sampling {
         public void close() {
             stop();
         }
+
+        @Override
+        public String toString() {
+            return "Timer.Context[start_time=" + this.startTime +
+                   ", " + this.timer + ", " +  this.clock + "]";
+        }
     }
 
     private final Meter meter;
@@ -163,5 +169,14 @@ public class Timer implements Metered, Sampling {
             histogram.update(duration);
             meter.mark();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Timer[count=" + this.getCount() +
+               ", mean=" + this.getMeanRate() +
+               ", 1m=" + this.getOneMinuteRate() +
+               ", 5m=" + this.getFiveMinuteRate() +
+               ", 15m=" + this.getFifteenMinuteRate() + " ]";
     }
 }

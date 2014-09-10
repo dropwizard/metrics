@@ -108,4 +108,12 @@ public class Meter implements Metered {
         tickIfNecessary();
         return m1Rate.getRate(TimeUnit.SECONDS);
     }
+
+    @Override
+    public String toString() {
+        return "Meter[mean=" + this.getMeanRate() +
+               ", 1m=" + this.m1Rate.getRate(TimeUnit.SECONDS) +
+               ", 5m=" + this.m5Rate.getRate(TimeUnit.SECONDS) +
+               ", 15m=" + this.m15Rate.getRate(TimeUnit.SECONDS) + "]";
+    }
 }
