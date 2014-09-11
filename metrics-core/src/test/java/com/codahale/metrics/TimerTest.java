@@ -1,13 +1,13 @@
 package com.codahale.metrics;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.offset;
+import static org.mockito.Mockito.*;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.offset;
-import static org.mockito.Mockito.*;
+import org.junit.Test;
 
 public class TimerTest {
     private final Reservoir reservoir = mock(Reservoir.class);
@@ -96,5 +96,18 @@ public class TimerTest {
                 .isZero();
 
         verifyZeroInteractions(reservoir);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void pauseCalledTwice() throws Exception {
+        Timer.Context time = timer.time();
+        time.pause();
+        time.pause();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void resumeWithoutPause() throws Exception {
+        Timer.Context time = timer.time();
+        time.resume();
     }
 }
