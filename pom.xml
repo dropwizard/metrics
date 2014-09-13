@@ -56,12 +56,18 @@
         <developer>
             <name>Coda Hale</name>
             <email>coda.hale@gmail.com</email>
-            <timezone>-8</timezone>
+            <timezone>America/Los_Angeles</timezone>
+            <roles>
+                <role>architect</role>
+            </roles>
         </developer>
         <developer>
             <name>Ryan Tenney</name>
             <email>ryan@10e.us</email>
-            <timezone>-5</timezone>
+            <timezone>America/New_York</timezone>
+            <roles>
+                <role>committer</role>
+            </roles>
         </developer>
     </developers>
 
