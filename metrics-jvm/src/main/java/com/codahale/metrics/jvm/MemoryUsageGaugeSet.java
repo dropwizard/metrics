@@ -145,18 +145,48 @@ public class MemoryUsageGaugeSet implements MetricSet {
         });
 
         for (final MemoryPoolMXBean pool : memoryPools) {
-            gauges.put(name("pools",
-                            WHITESPACE.matcher(pool.getName()).replaceAll("-"),
-                            "usage"),
-                       new RatioGauge() {
+            final MemoryUsage usage = pool.getUsage();
+            final long init = usage.getInit();
+            final long max = usage.getMax();
+            final long used = usage.getUsed();
+            final long committed = usage.getCommitted();
+
+            final String poolName = name("pools", WHITESPACE.matcher(pool.getName()).replaceAll("-"));
+            gauges.put(name(poolName, "usage"),
+                    new RatioGauge() {
                            @Override
                            protected Ratio getRatio() {
-                               final long max = pool.getUsage().getMax() == -1 ?
-                                       pool.getUsage().getCommitted() :
-                                       pool.getUsage().getMax();
-                               return Ratio.of(pool.getUsage().getUsed(), max);
+                               return Ratio.of(used, max == -1 ? committed : max);
                            }
-                       });
+                    });
+
+            gauges.put(name(poolName, "max"),new Gauge<Long>() {
+                @Override
+                public Long getValue() {
+                    return max;
+                }
+            });
+
+            gauges.put(name(poolName, "used"),new Gauge<Long>() {
+                @Override
+                public Long getValue() {
+                    return used;
+                }
+            });
+
+            gauges.put(name(poolName, "committed"),new Gauge<Long>() {
+                @Override
+                public Long getValue() {
+                    return committed;
+                }
+            });
+
+            gauges.put(name(poolName, "init"),new Gauge<Long>() {
+                @Override
+                public Long getValue() {
+                    return init;
+                }
+            });
         }
 
         return Collections.unmodifiableMap(gauges);
