@@ -145,18 +145,45 @@ public class MemoryUsageGaugeSet implements MetricSet {
         });
 
         for (final MemoryPoolMXBean pool : memoryPools) {
-            gauges.put(name("pools",
-                            WHITESPACE.matcher(pool.getName()).replaceAll("-"),
-                            "usage"),
-                       new RatioGauge() {
+            final String poolName = name("pools", WHITESPACE.matcher(pool.getName()).replaceAll("-"));
+
+            gauges.put(name(poolName, "usage"),
+                    new RatioGauge() {
                            @Override
                            protected Ratio getRatio() {
-                               final long max = pool.getUsage().getMax() == -1 ?
-                                       pool.getUsage().getCommitted() :
-                                       pool.getUsage().getMax();
-                               return Ratio.of(pool.getUsage().getUsed(), max);
+                               MemoryUsage usage = pool.getUsage();
+                               return Ratio.of(usage.getUsed(),
+                                       usage.getMax() == -1 ? usage.getCommitted() : usage.getMax());
                            }
-                       });
+                    });
+
+            gauges.put(name(poolName, "max"),new Gauge<Long>() {
+                @Override
+                public Long getValue() {
+                    return pool.getUsage().getMax();
+                }
+            });
+
+            gauges.put(name(poolName, "used"),new Gauge<Long>() {
+                @Override
+                public Long getValue() {
+                    return pool.getUsage().getUsed();
+                }
+            });
+
+            gauges.put(name(poolName, "committed"),new Gauge<Long>() {
+                @Override
+                public Long getValue() {
+                    return pool.getUsage().getCommitted();
+                }
+            });
+
+            gauges.put(name(poolName, "init"),new Gauge<Long>() {
+                @Override
+                public Long getValue() {
+                    return pool.getUsage().getInit();
+                }
+            });
         }
 
         return Collections.unmodifiableMap(gauges);
