@@ -61,22 +61,31 @@ public class MemoryUsageGaugeSetTest {
     @Test
     public void hasASetOfGauges() throws Exception {
         assertThat(gauges.getMetrics().keySet())
-                .containsOnly("heap.init",
-                              "non-heap.usage",
-                              "total.max",
-                              "total.init",
-                              "heap.committed",
-                              "non-heap.max",
-                              "heap.usage",
-                              "pools.Big-Pool.usage",
-                              "pools.Weird-Pool.usage",
-                              "heap.used",
-                              "non-heap.used",
-                              "non-heap.init",
-                              "total.used",
-                              "total.committed",
-                              "non-heap.committed",
-                              "heap.max");
+                .containsOnly(
+                        "heap.init",
+                        "heap.committed",
+                        "heap.used",
+                        "heap.usage",
+                        "heap.max",
+                        "non-heap.init",
+                        "non-heap.committed",
+                        "non-heap.used",
+                        "non-heap.usage",
+                        "non-heap.max",
+                        "total.init",
+                        "total.committed",
+                        "total.used",
+                        "total.max",
+                        "pools.Big-Pool.init",
+                        "pools.Big-Pool.committed",
+                        "pools.Big-Pool.used",
+                        "pools.Big-Pool.usage",
+                        "pools.Big-Pool.max",
+                        "pools.Weird-Pool.init",
+                        "pools.Weird-Pool.committed",
+                        "pools.Weird-Pool.used",
+                        "pools.Weird-Pool.usage",
+                        "pools.Weird-Pool.max");
     }
 
     @Test
@@ -200,11 +209,43 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
+    public void hasAGaugeForWeirdMemoryPoolInit() throws Exception {
+        final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.init");
+
+        assertThat(gauge.getValue())
+                .isEqualTo(200L);
+    }
+
+    @Test
+    public void hasAGaugeForWeirdMemoryPoolCommitted() throws Exception {
+        final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.committed");
+
+        assertThat(gauge.getValue())
+                .isEqualTo(100L);
+    }
+
+    @Test
+    public void hasAGaugeForWeirdMemoryPoolUsed() throws Exception {
+        final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.used");
+
+        assertThat(gauge.getValue())
+                .isEqualTo(300L);
+    }
+
+    @Test
     public void hasAGaugeForWeirdMemoryPoolUsage() throws Exception {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.usage");
 
         assertThat(gauge.getValue())
                 .isEqualTo(3.0);
+    }
+
+    @Test
+    public void hasAGaugeForWeirdMemoryPoolMax() throws Exception {
+        final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.max");
+
+        assertThat(gauge.getValue())
+                .isEqualTo(-1L);
     }
 
     @Test
