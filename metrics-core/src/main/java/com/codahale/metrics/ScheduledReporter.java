@@ -75,7 +75,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 MetricFilter filter,
                                 TimeUnit rateUnit,
                                 TimeUnit durationUnit) {
-		this(registry, name, filter, rateUnit, durationUnit,
+		this(registry, filter, rateUnit, durationUnit,
                 Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name + '-' + FACTORY_ID.incrementAndGet())));
     }
 	
@@ -84,12 +84,10 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      *
      * @param registry the {@link com.codahale.metrics.MetricRegistry} containing the metrics this
      *                 reporter will report
-     * @param name     the reporter's name
      * @param filter   the filter for which metrics to report
      * @param executor the executor to use while scheduling reporting of metrics.
      */
     protected ScheduledReporter(MetricRegistry registry,
-                                String name,
                                 MetricFilter filter,
                                 TimeUnit rateUnit,
                                 TimeUnit durationUnit,
