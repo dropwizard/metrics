@@ -43,6 +43,11 @@ public class WeightedSnapshotTest {
                 .isEqualTo(5.0, offset(0.1));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void disallowsNotANumber() {
+        snapshot.getValue( Double.NaN );
+    }
+
     @Test
     public void hasAMedian() throws Exception {
         assertThat(snapshot.getMedian()).isEqualTo(3.0, offset(0.1));
