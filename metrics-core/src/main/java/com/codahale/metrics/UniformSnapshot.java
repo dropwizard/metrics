@@ -58,17 +58,18 @@ public class UniformSnapshot extends Snapshot {
         }
 
         final double pos = quantile * (values.length + 1);
+        final int index = (int) pos;
 
-        if (pos < 1) {
+        if (index < 1) {
             return values[0];
         }
 
-        if (pos >= values.length) {
+        if (index >= values.length) {
             return values[values.length - 1];
         }
 
-        final double lower = values[(int) pos - 1];
-        final double upper = values[(int) pos];
+        final double lower = values[index - 1];
+        final double upper = values[index];
         return lower + (pos - floor(pos)) * (upper - lower);
     }
 
