@@ -44,8 +44,18 @@ public class WeightedSnapshotTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void disallowsNotANumber() {
+    public void disallowsNotANumberQuantile() {
         snapshot.getValue( Double.NaN );
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void disallowsNegativeQuantile() {
+        snapshot.getValue( -0.5 );
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void disallowsQuantileOverOne() {
+        snapshot.getValue( 1.5 );
     }
 
     @Test
