@@ -105,40 +105,44 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * Creates a new {@link Counter} and registers it under the given name.
+     * Return the {@link Counter} registered under this name; or create and register 
+     * a new {@link Counter} if none is registered.
      *
      * @param name the name of the metric
-     * @return a new {@link Counter}
+     * @return a new or pre-existing {@link Counter}
      */
     public Counter counter(String name) {
         return getOrAdd(name, MetricBuilder.COUNTERS);
     }
 
     /**
-     * Creates a new {@link Histogram} and registers it under the given name.
+     * Return the {@link Histogram} registered under this name; or create and register 
+     * a new {@link Histogram} if none is registered.
      *
      * @param name the name of the metric
-     * @return a new {@link Histogram}
+     * @return a new or pre-existing {@link Histogram}
      */
     public Histogram histogram(String name) {
         return getOrAdd(name, MetricBuilder.HISTOGRAMS);
     }
 
     /**
-     * Creates a new {@link Meter} and registers it under the given name.
+     * Return the {@link Meter} registered under this name; or create and register 
+     * a new {@link Meter} if none is registered.
      *
      * @param name the name of the metric
-     * @return a new {@link Meter}
+     * @return a new or pre-existing {@link Meter}
      */
     public Meter meter(String name) {
         return getOrAdd(name, MetricBuilder.METERS);
     }
 
     /**
-     * Creates a new {@link Timer} and registers it under the given name.
+     * Return the {@link Timer} registered under this name; or create and register 
+     * a new {@link Timer} if none is registered.
      *
      * @param name the name of the metric
-     * @return a new {@link Timer}
+     * @return a new or pre-existing {@link Timer}
      */
     public Timer timer(String name) {
         return getOrAdd(name, MetricBuilder.TIMERS);
