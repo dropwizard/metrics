@@ -154,12 +154,19 @@ public class Graphite implements GraphiteSender {
 
     @Override
     public void close() throws IOException {
-    	  flush();
-        if (socket != null) {
-            socket.close();
+        try {
+            flush();
+            if (writer != null) {
+                writer.close();
+            }
+        } catch (IOException ex) {
+            if (socket != null) {
+                socket.close();
+            }
+        } finally {
+            this.socket = null;
+            this.writer = null;
         }
-        this.socket = null;
-        this.writer = null;
     }
 
     protected String sanitize(String s) {
