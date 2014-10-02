@@ -1,5 +1,7 @@
 language: java
 
+before_install: sudo pip install codecov
+
 install: echo "I trust Maven."
 
 # don't just run the tests, also run Findbugs and friends
@@ -9,8 +11,9 @@ jdk:
   - oraclejdk7
   - oraclejdk8
 
+after_success: codecov
+
 notifications:
   email:
     recipients:
       - ryan@10e.us
-
