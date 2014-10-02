@@ -1,5 +1,6 @@
 package com.codahale.metrics.jersey;
 
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.test.framework.AppDescriptor;
@@ -11,6 +12,7 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.jersey.resources.InstrumentedResource;
 import org.junit.Test;
 
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -84,5 +86,11 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
 
         assertThat(meter.getCount())
                 .isEqualTo(1);
+
+            ClientResponse response = resource().path("failure-response-metered")
+                    .queryParam("splode", "true").get(ClientResponse.class);
+            assertThat(response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL);
+
+        assertThat(meter.getCount()).isEqualTo(2);
     }
 }
