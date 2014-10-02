@@ -11,6 +11,8 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
 
+import javax.ws.rs.core.Response;
+
 import static com.codahale.metrics.MetricRegistry.name;
 
 class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispatchProvider {
