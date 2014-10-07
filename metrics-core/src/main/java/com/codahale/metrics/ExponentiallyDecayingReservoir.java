@@ -21,8 +21,8 @@ import com.codahale.metrics.WeightedSnapshot.WeightedSample;
  *      Proceedings of the 2009 IEEE International Conference on Data Engineering (2009)</a>
  */
 public class ExponentiallyDecayingReservoir implements Reservoir {
-    private static final int DEFAULT_SIZE = 1028;
-    private static final double DEFAULT_ALPHA = 0.015;
+    static final int DEFAULT_SIZE = 1028;
+    static final double DEFAULT_ALPHA = 0.015;
     private static final long RESCALE_THRESHOLD = TimeUnit.HOURS.toNanos(1);
 
     private final ConcurrentSkipListMap<Double, WeightedSample> values;

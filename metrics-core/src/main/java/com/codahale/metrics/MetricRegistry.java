@@ -50,13 +50,20 @@ public class MetricRegistry implements MetricSet {
 
     private final ConcurrentMap<String, Metric> metrics;
     private final List<MetricRegistryListener> listeners;
+    private final ReservoirBuilder reservoirBuilder;
 
     /**
      * Creates a new {@link MetricRegistry}.
      */
-    public MetricRegistry() {
+    public MetricRegistry(ReservoirBuilder reservoirBuilder) {
+        this.reservoirBuilder = reservoirBuilder;
         this.metrics = buildMap();
         this.listeners = new CopyOnWriteArrayList<MetricRegistryListener>();
+    }
+
+    public MetricRegistry() {
+        this(new ReservoirBuilder.ExponentiallyDecayingReservoirBuilder(ExponentiallyDecayingReservoir.DEFAULT_SIZE,
+            ExponentiallyDecayingReservoir.DEFAULT_ALPHA));
     }
 
     /**
@@ -111,7 +118,7 @@ public class MetricRegistry implements MetricSet {
      * @return a new {@link Counter}
      */
     public Counter counter(String name) {
-        return getOrAdd(name, MetricBuilder.COUNTERS);
+        return getOrAdd(name, countersBuilder);
     }
 
     /**
@@ -121,7 +128,7 @@ public class MetricRegistry implements MetricSet {
      * @return a new {@link Histogram}
      */
     public Histogram histogram(String name) {
-        return getOrAdd(name, MetricBuilder.HISTOGRAMS);
+        return getOrAdd(name, histogramsBuilder);
     }
 
     /**
@@ -131,7 +138,7 @@ public class MetricRegistry implements MetricSet {
      * @return a new {@link Meter}
      */
     public Meter meter(String name) {
-        return getOrAdd(name, MetricBuilder.METERS);
+        return getOrAdd(name, metersBuilder);
     }
 
     /**
@@ -141,7 +148,7 @@ public class MetricRegistry implements MetricSet {
      * @return a new {@link Timer}
      */
     public Timer timer(String name) {
-        return getOrAdd(name, MetricBuilder.TIMERS);
+        return getOrAdd(name, timersBuilder);
     }
 
     /**
@@ -396,56 +403,56 @@ public class MetricRegistry implements MetricSet {
      * A quick and easy way of capturing the notion of default metrics.
      */
     private interface MetricBuilder<T extends Metric> {
-        MetricBuilder<Counter> COUNTERS = new MetricBuilder<Counter>() {
-            @Override
-            public Counter newMetric() {
-                return new Counter();
-            }
-
-            @Override
-            public boolean isInstance(Metric metric) {
-                return Counter.class.isInstance(metric);
-            }
-        };
-
-        MetricBuilder<Histogram> HISTOGRAMS = new MetricBuilder<Histogram>() {
-            @Override
-            public Histogram newMetric() {
-                return new Histogram(new ExponentiallyDecayingReservoir());
-            }
-
-            @Override
-            public boolean isInstance(Metric metric) {
-                return Histogram.class.isInstance(metric);
-            }
-        };
-
-        MetricBuilder<Meter> METERS = new MetricBuilder<Meter>() {
-            @Override
-            public Meter newMetric() {
-                return new Meter();
-            }
-
-            @Override
-            public boolean isInstance(Metric metric) {
-                return Meter.class.isInstance(metric);
-            }
-        };
-
-        MetricBuilder<Timer> TIMERS = new MetricBuilder<Timer>() {
-            @Override
-            public Timer newMetric() {
-                return new Timer();
-            }
-
-            @Override
-            public boolean isInstance(Metric metric) {
-                return Timer.class.isInstance(metric);
-            }
-        };
-
         T newMetric();
 
         boolean isInstance(Metric metric);
     }
+
+    final MetricBuilder<Counter> countersBuilder = new MetricBuilder<Counter>() {
+        @Override
+        public Counter newMetric() {
+            return new Counter();
+        }
+
+        @Override
+        public boolean isInstance(Metric metric) {
+            return Counter.class.isInstance(metric);
+        }
+    };
+
+    final MetricBuilder<Histogram> histogramsBuilder = new MetricBuilder<Histogram>() {
+        @Override
+        public Histogram newMetric() {
+            return new Histogram(reservoirBuilder.newReservoir());
+        }
+
+        @Override
+        public boolean isInstance(Metric metric) {
+            return Histogram.class.isInstance(metric);
+        }
+    };
+
+    final MetricBuilder<Meter> metersBuilder = new MetricBuilder<Meter>() {
+        @Override
+        public Meter newMetric() {
+            return new Meter();
+        }
+
+        @Override
+        public boolean isInstance(Metric metric) {
+            return Meter.class.isInstance(metric);
+        }
+    };
+
+    final MetricBuilder<Timer> timersBuilder = new MetricBuilder<Timer>() {
+        @Override
+        public Timer newMetric() {
+            return new Timer(reservoirBuilder.newReservoir());
+        }
+
+        @Override
+        public boolean isInstance(Metric metric) {
+            return Timer.class.isInstance(metric);
+        }
+    };
 }
