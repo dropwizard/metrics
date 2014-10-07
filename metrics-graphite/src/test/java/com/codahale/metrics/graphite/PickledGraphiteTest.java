@@ -7,6 +7,8 @@ import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.python.core.PyList;
 import org.python.core.PyTuple;
 
@@ -30,7 +32,7 @@ public class PickledGraphiteTest {
     private final PickledGraphite graphite = new PickledGraphite(address, socketFactory, Charset.forName("UTF-8"), 2);
 
     private final Socket socket = mock(Socket.class);
-    private final ByteArrayOutputStream output = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream output = spy(new ByteArrayOutputStream());
 
     // Pulls apart the pickled payload. This skips ahead 4 characters to safely ignore
     // the header (length)
@@ -48,6 +50,16 @@ public class PickledGraphiteTest {
     @Before
     public void setUp() throws Exception {
         when(socket.getOutputStream()).thenReturn(output);
+
+        // Mock behavior of socket.getOutputStream().close() calling socket.close();
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                invocation.callRealMethod();
+                socket.close();
+                return null;
+            }
+        }).when(output).close();
 
         when(socketFactory.createSocket(any(InetAddress.class),
             anyInt())).thenReturn(socket);
