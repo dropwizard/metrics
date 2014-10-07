@@ -2,8 +2,11 @@ package com.codahale.metrics.graphite;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import javax.net.SocketFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -23,13 +26,24 @@ public class GraphiteTest {
     private final InetSocketAddress address = new InetSocketAddress(host, port);
 
     private final Socket socket = mock(Socket.class);
-    private final ByteArrayOutputStream output = new ByteArrayOutputStream();
-    
+    private final ByteArrayOutputStream output = spy(new ByteArrayOutputStream());
+
     private Graphite graphite;
 
     @Before
     public void setUp() throws Exception {
         when(socket.getOutputStream()).thenReturn(output);
+
+        // Mock behavior of socket.getOutputStream().close() calling socket.close();
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                invocation.callRealMethod();
+                socket.close();
+                return null;
+            }
+        }).when(output).close();
+
         when(socketFactory.createSocket(any(InetAddress.class), anyInt())).thenReturn(socket);
     }
 
@@ -40,12 +54,12 @@ public class GraphiteTest {
 
         verify(socketFactory).createSocket(address.getAddress(), address.getPort());
     }
-    
+
     @Test
     public void connectsToGraphiteWithHostAndPort() throws Exception {
         graphite = new Graphite(host, port, socketFactory);
         graphite.connect();
-        
+
         verify(socketFactory).createSocket(address.getAddress(), port);
     }
 
