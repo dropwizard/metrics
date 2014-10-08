@@ -27,6 +27,21 @@ public class UniformSnapshotTest {
                 .isEqualTo(5, offset(0.1));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void disallowsNotANumberQuantile() {
+        snapshot.getValue( Double.NaN );
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void disallowsNegativeQuantile() {
+        snapshot.getValue( -0.5 );
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void disallowsQuantileOverOne() {
+       snapshot.getValue( 1.5 );
+    }
+
     @Test
     public void hasAMedian() throws Exception {
         assertThat(snapshot.getMedian()).isEqualTo(3, offset(0.1));
