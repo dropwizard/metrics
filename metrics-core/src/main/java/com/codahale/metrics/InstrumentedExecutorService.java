@@ -3,12 +3,7 @@ package com.codahale.metrics;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -26,6 +21,7 @@ public class InstrumentedExecutorService implements ExecutorService {
     private final Counter running;
     private final Meter completed;
     private final Timer duration;
+    private final Meter rejected;
 
     /**
      * Wraps an {@link ExecutorService} uses an auto-generated default name.
@@ -50,6 +46,7 @@ public class InstrumentedExecutorService implements ExecutorService {
         this.running = registry.counter(MetricRegistry.name(name, "running"));
         this.completed = registry.meter(MetricRegistry.name(name, "completed"));
         this.duration = registry.timer(MetricRegistry.name(name, "duration"));
+        this.rejected = registry.meter(MetricRegistry.name(name, "rejected"));
     }
 
     /**
@@ -58,7 +55,12 @@ public class InstrumentedExecutorService implements ExecutorService {
     @Override
     public void execute(Runnable runnable) {
         submitted.mark();
-        delegate.execute(new InstrumentedRunnable(runnable));
+        try {
+            delegate.execute(new InstrumentedRunnable(runnable));
+        } catch (RejectedExecutionException e) {
+            rejected.mark();
+            throw e;
+        }
     }
 
     /**
@@ -67,7 +69,12 @@ public class InstrumentedExecutorService implements ExecutorService {
     @Override
     public Future<?> submit(Runnable runnable) {
         submitted.mark();
-        return delegate.submit(new InstrumentedRunnable(runnable));
+        try {
+            return delegate.submit(new InstrumentedRunnable(runnable));
+        } catch (RejectedExecutionException e) {
+            rejected.mark();
+            throw e;
+        }
     }
 
     /**
@@ -76,7 +83,12 @@ public class InstrumentedExecutorService implements ExecutorService {
     @Override
     public <T> Future<T> submit(Runnable runnable, T result) {
         submitted.mark();
-        return delegate.submit(new InstrumentedRunnable(runnable), result);
+        try {
+            return delegate.submit(new InstrumentedRunnable(runnable), result);
+        } catch (RejectedExecutionException e) {
+            rejected.mark();
+            throw e;
+        }
     }
 
     /**
@@ -85,7 +97,12 @@ public class InstrumentedExecutorService implements ExecutorService {
     @Override
     public <T> Future<T> submit(Callable<T> task) {
         submitted.mark();
-        return delegate.submit(new InstrumentedCallable<T>(task));
+        try {
+            return delegate.submit(new InstrumentedCallable<T>(task));
+        } catch (RejectedExecutionException e) {
+            rejected.mark();
+            throw e;
+        }
     }
 
     /**
@@ -95,7 +112,12 @@ public class InstrumentedExecutorService implements ExecutorService {
     public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
         submitted.mark(tasks.size());
         Collection<? extends Callable<T>> instrumented = instrument(tasks);
-        return delegate.invokeAll(instrumented);
+        try {
+            return delegate.invokeAll(instrumented);
+        } catch (RejectedExecutionException e) {
+            rejected.mark();
+            throw e;
+        }
     }
 
     /**
@@ -105,7 +127,12 @@ public class InstrumentedExecutorService implements ExecutorService {
     public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException {
         submitted.mark(tasks.size());
         Collection<? extends Callable<T>> instrumented = instrument(tasks);
-        return delegate.invokeAll(instrumented, timeout, unit);
+        try {
+            return delegate.invokeAll(instrumented, timeout, unit);
+        } catch (RejectedExecutionException e) {
+            rejected.mark();
+            throw e;
+        }
     }
 
     /**
@@ -115,7 +142,12 @@ public class InstrumentedExecutorService implements ExecutorService {
     public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws ExecutionException, InterruptedException {
         submitted.mark(tasks.size());
         Collection<? extends Callable<T>> instrumented = instrument(tasks);
-        return delegate.invokeAny(instrumented);
+        try {
+            return delegate.invokeAny(instrumented);
+        } catch (RejectedExecutionException e) {
+            rejected.mark();
+            throw e;
+        }
     }
 
     /**
@@ -125,7 +157,12 @@ public class InstrumentedExecutorService implements ExecutorService {
     public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws ExecutionException, InterruptedException, TimeoutException {
         submitted.mark(tasks.size());
         Collection<? extends Callable<T>> instrumented = instrument(tasks);
-        return delegate.invokeAny(instrumented, timeout, unit);
+        try {
+            return delegate.invokeAny(instrumented, timeout, unit);
+        } catch (RejectedExecutionException e) {
+            rejected.mark();
+            throw e;
+        }
     }
 
     private <T> Collection<? extends Callable<T>> instrument(Collection<? extends Callable<T>> tasks) {
