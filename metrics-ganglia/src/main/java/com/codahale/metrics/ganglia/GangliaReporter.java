@@ -1,18 +1,19 @@
 package com.codahale.metrics.ganglia;
 
 import com.codahale.metrics.*;
+
 import info.ganglia.gmetric4j.gmetric.GMetric;
 import info.ganglia.gmetric4j.gmetric.GMetricSlope;
 import info.ganglia.gmetric4j.gmetric.GMetricType;
 import info.ganglia.gmetric4j.gmetric.GangliaException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -22,6 +23,9 @@ import static com.codahale.metrics.MetricRegistry.name;
  * @see <a href="http://ganglia.sourceforge.net/">Ganglia Monitoring System</a>
  */
 public class GangliaReporter extends ScheduledReporter {
+
+    private static final Pattern SLASHES = Pattern.compile("\\\\");
+
     /**
      * Returns a new {@link Builder} for {@link GangliaReporter}.
      *
@@ -129,7 +133,7 @@ public class GangliaReporter extends ScheduledReporter {
          * @return a {@link GangliaReporter}
          */
         public GangliaReporter build(GMetric gmetric) {
-            return new GangliaReporter(registry, Arrays.asList(gmetric), prefix, tMax, dMax, rateUnit, durationUnit, filter);
+            return new GangliaReporter(registry, gmetric, null, prefix, tMax, dMax, rateUnit, durationUnit, filter);
         }
 
         /**
@@ -140,19 +144,21 @@ public class GangliaReporter extends ScheduledReporter {
          * @return a {@link GangliaReporter}
          */
         public GangliaReporter build(GMetric... gmetrics) {
-            return new GangliaReporter(registry, Arrays.asList(gmetrics), prefix, tMax, dMax, rateUnit, durationUnit, filter);
+            return new GangliaReporter(registry, null, gmetrics, prefix, tMax, dMax, rateUnit, durationUnit, filter);
         }
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GangliaReporter.class);
 
-    private final List<GMetric> gmetrics;
+    private final GMetric gmetric;
+    private final GMetric[] gmetrics;
     private final String prefix;
     private final int tMax;
     private final int dMax;
 
     private GangliaReporter(MetricRegistry registry,
-                            List<GMetric> gmetrics,
+                            GMetric gmetric,
+                            GMetric[] gmetrics,
                             String prefix,
                             int tMax,
                             int dMax,
@@ -160,6 +166,7 @@ public class GangliaReporter extends ScheduledReporter {
                             TimeUnit durationUnit,
                             MetricFilter filter) {
         super(registry, "ganglia-reporter", filter, rateUnit, durationUnit);
+        this.gmetric = gmetric;
         this.gmetrics = gmetrics;
         this.prefix = prefix;
         this.tMax = tMax;
@@ -194,47 +201,49 @@ public class GangliaReporter extends ScheduledReporter {
     }
 
     private void reportTimer(String name, Timer timer) {
+        final String sanitizedName = escapeSlashes(name);
         final String group = group(name);
         try {
             final Snapshot snapshot = timer.getSnapshot();
 
-            announce(prefix(name, "max"), group, convertDuration(snapshot.getMax()), getDurationUnit());
-            announce(prefix(name, "mean"), group, convertDuration(snapshot.getMean()), getDurationUnit());
-            announce(prefix(name, "min"), group, convertDuration(snapshot.getMin()), getDurationUnit());
-            announce(prefix(name, "stddev"), group, convertDuration(snapshot.getStdDev()), getDurationUnit());
+            announce(prefix(sanitizedName, "max"), group, convertDuration(snapshot.getMax()), getDurationUnit());
+            announce(prefix(sanitizedName, "mean"), group, convertDuration(snapshot.getMean()), getDurationUnit());
+            announce(prefix(sanitizedName, "min"), group, convertDuration(snapshot.getMin()), getDurationUnit());
+            announce(prefix(sanitizedName, "stddev"), group, convertDuration(snapshot.getStdDev()), getDurationUnit());
 
-            announce(prefix(name, "p50"), group, convertDuration(snapshot.getMedian()), getDurationUnit());
-            announce(prefix(name, "p75"),
+            announce(prefix(sanitizedName, "p50"), group, convertDuration(snapshot.getMedian()), getDurationUnit());
+            announce(prefix(sanitizedName, "p75"),
                      group,
                      convertDuration(snapshot.get75thPercentile()),
                      getDurationUnit());
-            announce(prefix(name, "p95"),
+            announce(prefix(sanitizedName, "p95"),
                      group,
                      convertDuration(snapshot.get95thPercentile()),
                      getDurationUnit());
-            announce(prefix(name, "p98"),
+            announce(prefix(sanitizedName, "p98"),
                      group,
                      convertDuration(snapshot.get98thPercentile()),
                      getDurationUnit());
-            announce(prefix(name, "p99"),
+            announce(prefix(sanitizedName, "p99"),
                      group,
                      convertDuration(snapshot.get99thPercentile()),
                      getDurationUnit());
-            announce(prefix(name, "p999"),
+            announce(prefix(sanitizedName, "p999"),
                      group,
                      convertDuration(snapshot.get999thPercentile()),
                      getDurationUnit());
 
-            reportMetered(name, timer, group, "calls");
+            reportMetered(sanitizedName, timer, group, "calls");
         } catch (GangliaException e) {
-            LOGGER.warn("Unable to report timer {}", name, e);
+            LOGGER.warn("Unable to report timer {}", sanitizedName, e);
         }
     }
 
     private void reportMeter(String name, Meter meter) {
+        final String sanitizedName = escapeSlashes(name);
         final String group = group(name);
         try {
-            reportMetered(name, meter, group, "events");
+            reportMetered(sanitizedName, meter, group, "events");
         } catch (GangliaException e) {
             LOGGER.warn("Unable to report meter {}", name, e);
         }
@@ -250,43 +259,45 @@ public class GangliaReporter extends ScheduledReporter {
     }
 
     private void reportHistogram(String name, Histogram histogram) {
+        final String sanitizedName = escapeSlashes(name);
         final String group = group(name);
         try {
             final Snapshot snapshot = histogram.getSnapshot();
 
-            announce(prefix(name, "count"), group, histogram.getCount(), "");
-            announce(prefix(name, "max"), group, snapshot.getMax(), "");
-            announce(prefix(name, "mean"), group, snapshot.getMean(), "");
-            announce(prefix(name, "min"), group, snapshot.getMin(), "");
-            announce(prefix(name, "stddev"), group, snapshot.getStdDev(), "");
-            announce(prefix(name, "p50"), group, snapshot.getMedian(), "");
-            announce(prefix(name, "p75"), group, snapshot.get75thPercentile(), "");
-            announce(prefix(name, "p95"), group, snapshot.get95thPercentile(), "");
-            announce(prefix(name, "p98"), group, snapshot.get98thPercentile(), "");
-            announce(prefix(name, "p99"), group, snapshot.get99thPercentile(), "");
-            announce(prefix(name, "p999"), group, snapshot.get999thPercentile(), "");
+            announce(prefix(sanitizedName, "count"), group, histogram.getCount(), "");
+            announce(prefix(sanitizedName, "max"), group, snapshot.getMax(), "");
+            announce(prefix(sanitizedName, "mean"), group, snapshot.getMean(), "");
+            announce(prefix(sanitizedName, "min"), group, snapshot.getMin(), "");
+            announce(prefix(sanitizedName, "stddev"), group, snapshot.getStdDev(), "");
+            announce(prefix(sanitizedName, "p50"), group, snapshot.getMedian(), "");
+            announce(prefix(sanitizedName, "p75"), group, snapshot.get75thPercentile(), "");
+            announce(prefix(sanitizedName, "p95"), group, snapshot.get95thPercentile(), "");
+            announce(prefix(sanitizedName, "p98"), group, snapshot.get98thPercentile(), "");
+            announce(prefix(sanitizedName, "p99"), group, snapshot.get99thPercentile(), "");
+            announce(prefix(sanitizedName, "p999"), group, snapshot.get999thPercentile(), "");
         } catch (GangliaException e) {
-            LOGGER.warn("Unable to report histogram {}", name, e);
+            LOGGER.warn("Unable to report histogram {}", sanitizedName, e);
         }
     }
 
     private void reportCounter(String name, Counter counter) {
+        final String sanitizedName = escapeSlashes(name);
         final String group = group(name);
         try {
-            announce(prefix(name, "count"), group, counter.getCount(), "");
+            announce(prefix(sanitizedName, "count"), group, counter.getCount(), "");
         } catch (GangliaException e) {
             LOGGER.warn("Unable to report counter {}", name, e);
         }
     }
 
     private void reportGauge(String name, Gauge gauge) {
+        final String sanitizedName = escapeSlashes(name);
         final String group = group(name);
         final Object obj = gauge.getValue();
+        final String value = String.valueOf(obj);
+        final GMetricType type = detectType(obj);
         try {
-            for(GMetric gmetric: gmetrics) {
-                gmetric.announce(name(prefix, escapeSlashes(name)), String.valueOf(obj), detectType(obj), "",
-                    GMetricSlope.BOTH, tMax, dMax, group);
-            }
+            announce(name(prefix, sanitizedName), group, value, type, "");
         } catch (GangliaException e) {
             LOGGER.warn("Unable to report gauge {}", name, e);
         }
@@ -294,18 +305,21 @@ public class GangliaReporter extends ScheduledReporter {
 
     private static final double MIN_VAL = 1E-300;
     private void announce(String name, String group, double value, String units) throws GangliaException {
-        if (Math.abs(value) < MIN_VAL) value = 0.0;
-        for (GMetric gmetric: gmetrics) {
-            gmetric.announce(name, Double.toString(value), GMetricType.DOUBLE, units, GMetricSlope.BOTH,
-                tMax, dMax, group);
-        }
+        final String string = Math.abs(value) < MIN_VAL ? "0" : Double.toString(value);
+        announce(name, group, string, GMetricType.DOUBLE, units);
     }
 
     private void announce(String name, String group, long value, String units) throws GangliaException {
-        final String v = Long.toString(value);
-        for(GMetric gmetric: gmetrics) {
-            gmetric.announce(name, v, GMetricType.DOUBLE, units, GMetricSlope.BOTH,
-                tMax, dMax, group);
+        announce(name, group, Long.toString(value), GMetricType.DOUBLE, units);
+    }
+
+    private void announce(String name, String group, String value, GMetricType type, String units) throws GangliaException {
+        if (gmetric != null) {
+            gmetric.announce(name, value, type, units, GMetricSlope.BOTH, tMax, dMax, group);
+        } else {
+            for (GMetric gmetric : gmetrics) {
+                gmetric.announce(name, value, type, units, GMetricSlope.BOTH, tMax, dMax, group);
+            }
         }
     }
 
@@ -335,11 +349,11 @@ public class GangliaReporter extends ScheduledReporter {
     }
 
     private String prefix(String name, String n) {
-        return name(prefix, escapeSlashes(name), n);
+        return name(prefix, name, n);
     }
 
     // ganglia metric names can't contain slashes.
     private String escapeSlashes(String name) {
-        return name.replace("\\", "_");
+        return SLASHES.matcher(name).replaceAll("_");
     }
 }
