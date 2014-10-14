@@ -21,12 +21,16 @@ import static com.codahale.metrics.MetricRegistry.name;
  */
 public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientConnectionManager {
 
+
     protected static Registry<ConnectionSocketFactory> getDefaultRegistry() {
         return RegistryBuilder.<ConnectionSocketFactory>create()
                 .register("http", PlainConnectionSocketFactory.getSocketFactory())
                 .register("https", SSLConnectionSocketFactory.getSocketFactory())
                 .build();
     }
+
+    private final MetricRegistry metricsRegistry;
+    private final String name;
 
     public InstrumentedHttpClientConnectionManager(MetricRegistry metricRegistry) {
         this(metricRegistry, getDefaultRegistry());
@@ -54,6 +58,8 @@ public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientCo
                                                    TimeUnit connTTLTimeUnit,
                                                    String name) {
         super(socketFactoryRegistry, connFactory, schemePortResolver, dnsResolver, connTTL, connTTLTimeUnit);
+        this.metricsRegistry = metricsRegistry;
+        this.name = name;
         metricsRegistry.register(name(HttpClientConnectionManager.class, name, "available-connections"),
                                  new Gauge<Integer>() {
                                      @Override
@@ -86,5 +92,14 @@ public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientCo
                                          return getTotalStats().getPending();
                                      }
                                  });
+    }
+
+    @Override
+    public void shutdown() {
+        super.shutdown();
+        metricsRegistry.remove(name(HttpClientConnectionManager.class, name, "available-connections"));
+        metricsRegistry.remove(name(HttpClientConnectionManager.class, name, "leased-connections"));
+        metricsRegistry.remove(name(HttpClientConnectionManager.class, name, "max-connections"));
+        metricsRegistry.remove(name(HttpClientConnectionManager.class, name, "pending-connections"));
     }
 }
