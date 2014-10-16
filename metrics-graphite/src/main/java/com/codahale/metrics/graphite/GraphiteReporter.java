@@ -180,7 +180,7 @@ public class GraphiteReporter extends ScheduledReporter {
             try {
                 graphite.close();
             } catch (IOException e1) {
-                LOGGER.warn("Error closing Graphite", graphite, e);
+                LOGGER.warn("Error closing Graphite", graphite, e1);
             }
         }
     }
