@@ -9,6 +9,6 @@ For more information, please see [the documentation](http://dropwizard.github.io
 License
 -------
 
-Copyright (c) 2010-2013 Coda Hale, Yammer.com
+Copyright (c) 2010-2014 Coda Hale, Yammer.com
 
 Published under Apache Software License 2.0, see LICENSE
