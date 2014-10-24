@@ -160,6 +160,12 @@ public class GraphiteRabbitMQ implements GraphiteSender {
         return failures;
     }
 
+    @Override
+    public String toString() {
+        return "GraphiteRabbitMQ hostname: " + this.connectionFactory.getHost() +
+                " port: " + this.connectionFactory.getPort();
+    }
+
     public String sanitize(String s) {
         return WHITESPACE.matcher(s).replaceAll("-");
     }

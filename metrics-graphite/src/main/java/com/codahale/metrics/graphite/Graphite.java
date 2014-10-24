@@ -168,6 +168,11 @@ public class Graphite implements GraphiteSender {
         }
     }
 
+    @Override
+    public String toString() {
+        return "GraphiteTCP hostname: " + hostname + " port: " + port;
+    }
+
     protected String sanitize(String s) {
         return WHITESPACE.matcher(s).replaceAll("-");
     }

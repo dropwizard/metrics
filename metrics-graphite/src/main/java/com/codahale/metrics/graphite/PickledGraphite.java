@@ -246,6 +246,12 @@ public class PickledGraphite implements GraphiteSender {
         return failures;
     }
 
+
+    @Override
+    public String toString() {
+        return "PickledGraphite hostname: " + hostname + " port: " + port;
+    }
+
     /**
      * 1. Run the pickler script to package all the pending metrics into a single message
      * 2. Send the message to graphite

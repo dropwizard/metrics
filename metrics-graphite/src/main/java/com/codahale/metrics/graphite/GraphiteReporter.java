@@ -176,11 +176,11 @@ public class GraphiteReporter extends ScheduledReporter {
 
             graphite.flush();
         } catch (IOException e) {
-            LOGGER.warn("Unable to report to Graphite", graphite, e);
+            LOGGER.warn("Unable to report to Graphite: {}", graphite, e);
             try {
                 graphite.close();
             } catch (IOException e1) {
-                LOGGER.warn("Error closing Graphite", graphite, e1);
+                LOGGER.warn("Error closing Graphite: {}", graphite, e1);
             }
         }
     }
@@ -193,7 +193,7 @@ public class GraphiteReporter extends ScheduledReporter {
             try {
                 graphite.close();
             } catch (IOException e) {
-                LOGGER.debug("Error disconnecting from Graphite", graphite, e);
+                LOGGER.debug("Error disconnecting from Graphite: {}", graphite, e);
             }
         }
     }

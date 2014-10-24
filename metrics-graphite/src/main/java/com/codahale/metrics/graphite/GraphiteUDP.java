@@ -110,6 +110,11 @@ public class GraphiteUDP implements GraphiteSender {
         // Leave channel & socket open for next metrics
     }
 
+    @Override
+    public String toString() {
+        return "GraphiteUDP hostname: " + hostname + " port: " + port;
+    }
+
     protected String sanitize(String s) {
         return WHITESPACE.matcher(s).replaceAll("-");
     }
