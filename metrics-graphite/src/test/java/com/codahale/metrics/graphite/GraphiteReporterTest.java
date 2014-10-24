@@ -23,6 +23,7 @@ public class GraphiteReporterTest {
                                                               .convertRatesTo(TimeUnit.SECONDS)
                                                               .convertDurationsTo(TimeUnit.MILLISECONDS)
                                                               .filter(MetricFilter.ALL)
+                                                              .reportError(true)
                                                               .build(graphite);
 
     @Before
