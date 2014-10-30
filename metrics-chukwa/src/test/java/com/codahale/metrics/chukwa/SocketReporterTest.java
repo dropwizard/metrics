@@ -1,4 +1,4 @@
-package com.codahale.metrics;
+package com.codahale.metrics.chukwa;
 
 
 import static org.junit.Assert.assertEquals;
@@ -11,13 +11,26 @@ import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.SortedMap;
-import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.spi.LoggingEvent;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.codahale.metrics.Clock;
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Snapshot;
+import com.codahale.metrics.Timer;
 
 public class SocketReporterTest {
 	private volatile boolean running = true;
@@ -25,13 +38,13 @@ public class SocketReporterTest {
 	private Thread receiverThread = new Thread(receiver);
 	private final MetricRegistry registry = mock(MetricRegistry.class);
 	private final Clock clock = mock(Clock.class);
-	private String message = null;
+	private LoggingEvent event = null;
+	private PatternLayout layout = new PatternLayout("%m%n");
 	
 	private final SocketReporter reporter = SocketReporter.forRegistry(registry)
-															.formattedFor(TimeZone.getTimeZone("PST"))
 															.convertRatesTo(TimeUnit.SECONDS)
 															.convertDurationsTo(TimeUnit.MILLISECONDS).filter(MetricFilter.ALL)
-															.withHost("localhost").withPort("9095").build();
+															.withHost("localhost").withPort(9095).build();
 
 	@Before
 	public void setUp() throws Exception {
@@ -47,31 +60,38 @@ public class SocketReporterTest {
 	@Test
 	public void reportsGaugeValues() throws Exception {
 		final Gauge gauge = mock(Gauge.class);
-		final String testString = "[type=GAUGE, name=gauge, value=1]";
-		when(gauge.getValue()).thenReturn(1);
+		
+		when(gauge.getValue()).thenReturn(1L);
 
 		reporter.report(map("gauge", gauge), this.<Counter> map(),
 				this.<Histogram> map(), this.<Meter> map(), this.<Timer> map());
-
-		assertEquals(testString, getMessage());
+		
+		JSONObject json = (JSONObject)JSONValue.parse(getMetric());
+		
+		assertEquals(1L, json.get("value"));
+		
+		setEvent(null);
 	}
 
 	@Test
 	public void reportsCounterValues() throws Exception {
 		final Counter counter = mock(Counter.class);
-		final String testString = "[type=COUNTER, name=test.counter, count=100]";
+
 		when(counter.getCount()).thenReturn(100L);
 
 		reporter.report(this.<Gauge> map(), map("test.counter", counter),
 				this.<Histogram> map(), this.<Meter> map(), this.<Timer> map());
-		assertEquals(testString, getMessage());
-
+		
+		JSONObject json = (JSONObject)JSONValue.parse(getMetric());
+		
+		assertEquals(100L, json.get("value"));
+		
+		setEvent(null);
 	}
 	
 	@Test
     public void reportsHistogramValues() throws Exception {
         final Histogram histogram = mock(Histogram.class);
-		final String testString = "[type=HISTOGRAM, name=test.histogram, count=1, min=4, max=2, mean=3.0, stddev=5.0, median=6.0, p75=7.0, p95=8.0, p98=9.0, p99=10.0, p999=11.0]";
         
         when(histogram.getCount()).thenReturn(1L);
 
@@ -94,14 +114,21 @@ public class SocketReporterTest {
                         map("test.histogram", histogram),
                         this.<Meter>map(),
                         this.<Timer>map());
-        assertEquals(testString, getMessage());
 
+        JSONObject json = (JSONObject)JSONValue.parse(getMetric());
+        
+        assertEquals(3.0, json.get("mean"));
+        assertEquals(9.0, json.get("p98"));
+        assertEquals(11.0, json.get("p999"));
+        assertEquals(5.0, json.get("stddev"));
+        
+        setEvent(null);
     }
 
     @Test
     public void reportsMeterValues() throws Exception {
         final Meter meter = mock(Meter.class);
-        final String testString = "[type=METER, name=test.meter, count=1, mean_rate=2.0, m1=3.0, m5=4.0, m15=5.0, rate_unit=second]";
+        
         when(meter.getCount()).thenReturn(1L);
         when(meter.getMeanRate()).thenReturn(2.0);
         when(meter.getOneMinuteRate()).thenReturn(3.0);
@@ -114,13 +141,20 @@ public class SocketReporterTest {
                         map("test.meter", meter),
                         this.<Timer>map());
 
-        assertEquals(testString, getMessage());
+        JSONObject json = (JSONObject)JSONValue.parse(getMetric());
+        
+        assertEquals(1L, json.get("count"));
+        assertEquals(2.0, json.get("mean_rate"));
+        assertEquals(3.0, json.get("m1"));
+        assertEquals(5.0, json.get("m15"));
+        
+       setEvent(null);
     }
 
     @Test
     public void reportsTimerValues() throws Exception {
         final Timer timer = mock(Timer.class);
-		final String testString = "[type=TIMER, name=test.another.timer, count=1.0E-6, min=300.0, max=100.0, mean=200.0, stddev=400.0, median=500.0, p75=600.0, p95=700.0, p98=800.0, p99=900.0, p999=1000.0, mean_rate=2.0, m1=3.0, m5=4.0, m15=5.0, rate_unit=second, duration_unit=milliseconds]";
+        
         when(timer.getCount()).thenReturn(1L);
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
@@ -147,8 +181,16 @@ public class SocketReporterTest {
                         this.<Histogram>map(),
                         this.<Meter>map(),
                         map("test.another.timer", timer));
+        
+        JSONObject json = (JSONObject)JSONValue.parse(getMetric());
 
-        assertEquals(testString, getMessage());
+        
+        assertEquals(3.0, json.get("m1"));
+        assertEquals(2.0, json.get("mean_rate"));
+        assertEquals(5.0, json.get("m15"));
+        assertEquals(900.0, json.get("p99"));
+        
+        setEvent(null);
     }
 
 	private <T> SortedMap<String, T> map(String name, T metric) {
@@ -199,6 +241,7 @@ public class SocketReporterTest {
 	private class Worker implements Runnable {
 		private Socket connection = null;
 		private ObjectInputStream inputStream = null;
+		
 
 		public Worker(Socket connection) {
 			this.connection = connection;
@@ -211,9 +254,8 @@ public class SocketReporterTest {
 						connection.getInputStream()));
 				if (inputStream != null) {
 					while (running) {
-						String msg = (String) inputStream.readObject();
-						setMessage(msg);
-						break;
+						LoggingEvent event = (LoggingEvent) inputStream.readObject();
+						setEvent(event);
 					}
 				}
 			} catch (IOException e) {
@@ -240,16 +282,19 @@ public class SocketReporterTest {
 		}
 
 	}
-	public String getMessage() {
+	public String getMetric() {
 		try {
-			while(message == null) {
-				Thread.currentThread().sleep(2000L);
+			while(event == null) {
+				TimeUnit.SECONDS.sleep(2L);
 			}
 		}catch(InterruptedException e) {}
-		return message;
+		
+		byte[] bytes = layout.format(event).getBytes();
+		String data = new String(bytes); 
+		return data;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public void setEvent(LoggingEvent event) {
+		this.event = event;
 	}
 }
