@@ -172,12 +172,12 @@ public class GraphiteReporter extends ScheduledReporter {
                 reportTimer(entry.getKey(), entry.getValue(), timestamp);
             }
         } catch (IOException e) {
-            LOGGER.warn("Unable to report to Graphite", graphite, e);
+            LOGGER.warn("Unable to report to Graphite", e);
         } finally {
             try {
                 graphite.close();
             } catch (IOException e) {
-                LOGGER.debug("Error disconnecting from Graphite", graphite, e);
+                LOGGER.debug("Error disconnecting from Graphite", e);
             }
         }
     }
