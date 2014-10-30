@@ -1,6 +1,5 @@
 package com.codahale.metrics.chukwa;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -40,11 +39,11 @@ public class SocketReporterTest {
 	private final Clock clock = mock(Clock.class);
 	private LoggingEvent event = null;
 	private PatternLayout layout = new PatternLayout("%m%n");
-	
-	private final SocketReporter reporter = SocketReporter.forRegistry(registry)
-															.convertRatesTo(TimeUnit.SECONDS)
-															.convertDurationsTo(TimeUnit.MILLISECONDS).filter(MetricFilter.ALL)
-															.withHost("localhost").withPort(9095).build();
+
+	private final SocketReporter reporter = SocketReporter
+			.forRegistry(registry).convertRatesTo(TimeUnit.SECONDS)
+			.convertDurationsTo(TimeUnit.MILLISECONDS).filter(MetricFilter.ALL)
+			.withHost("localhost").withPort(9095).build();
 
 	@Before
 	public void setUp() throws Exception {
@@ -60,16 +59,16 @@ public class SocketReporterTest {
 	@Test
 	public void reportsGaugeValues() throws Exception {
 		final Gauge gauge = mock(Gauge.class);
-		
+
 		when(gauge.getValue()).thenReturn(1L);
 
 		reporter.report(map("gauge", gauge), this.<Counter> map(),
 				this.<Histogram> map(), this.<Meter> map(), this.<Timer> map());
-		
-		JSONObject json = (JSONObject)JSONValue.parse(getMetric());
-		
+
+		JSONObject json = (JSONObject) JSONValue.parse(getMetric());
+
 		assertEquals(1L, json.get("value"));
-		
+
 		setEvent(null);
 	}
 
@@ -81,117 +80,117 @@ public class SocketReporterTest {
 
 		reporter.report(this.<Gauge> map(), map("test.counter", counter),
 				this.<Histogram> map(), this.<Meter> map(), this.<Timer> map());
-		
-		JSONObject json = (JSONObject)JSONValue.parse(getMetric());
-		
+
+		JSONObject json = (JSONObject) JSONValue.parse(getMetric());
+
 		assertEquals(100L, json.get("value"));
-		
+
 		setEvent(null);
 	}
-	
+
 	@Test
-    public void reportsHistogramValues() throws Exception {
-        final Histogram histogram = mock(Histogram.class);
-        
-        when(histogram.getCount()).thenReturn(1L);
+	public void reportsHistogramValues() throws Exception {
+		final Histogram histogram = mock(Histogram.class);
 
-        final Snapshot snapshot = mock(Snapshot.class);
-        when(snapshot.getMax()).thenReturn(2L);
-        when(snapshot.getMean()).thenReturn(3.0);
-        when(snapshot.getMin()).thenReturn(4L);
-        when(snapshot.getStdDev()).thenReturn(5.0);
-        when(snapshot.getMedian()).thenReturn(6.0);
-        when(snapshot.get75thPercentile()).thenReturn(7.0);
-        when(snapshot.get95thPercentile()).thenReturn(8.0);
-        when(snapshot.get98thPercentile()).thenReturn(9.0);
-        when(snapshot.get99thPercentile()).thenReturn(10.0);
-        when(snapshot.get999thPercentile()).thenReturn(11.0);
+		when(histogram.getCount()).thenReturn(1L);
 
-        when(histogram.getSnapshot()).thenReturn(snapshot);
+		final Snapshot snapshot = mock(Snapshot.class);
+		when(snapshot.getMax()).thenReturn(2L);
+		when(snapshot.getMean()).thenReturn(3.0);
+		when(snapshot.getMin()).thenReturn(4L);
+		when(snapshot.getStdDev()).thenReturn(5.0);
+		when(snapshot.getMedian()).thenReturn(6.0);
+		when(snapshot.get75thPercentile()).thenReturn(7.0);
+		when(snapshot.get95thPercentile()).thenReturn(8.0);
+		when(snapshot.get98thPercentile()).thenReturn(9.0);
+		when(snapshot.get99thPercentile()).thenReturn(10.0);
+		when(snapshot.get999thPercentile()).thenReturn(11.0);
 
-        reporter.report(this.<Gauge>map(),
-                        this.<Counter>map(),
-                        map("test.histogram", histogram),
-                        this.<Meter>map(),
-                        this.<Timer>map());
+		when(histogram.getSnapshot()).thenReturn(snapshot);
 
-        JSONObject json = (JSONObject)JSONValue.parse(getMetric());
-        
-        assertEquals(3.0, json.get("mean"));
-        assertEquals(9.0, json.get("p98"));
-        assertEquals(11.0, json.get("p999"));
-        assertEquals(5.0, json.get("stddev"));
-        
-        setEvent(null);
-    }
+		reporter.report(this.<Gauge> map(), this.<Counter> map(),
+				map("test.histogram", histogram), this.<Meter> map(),
+				this.<Timer> map());
 
-    @Test
-    public void reportsMeterValues() throws Exception {
-        final Meter meter = mock(Meter.class);
-        
-        when(meter.getCount()).thenReturn(1L);
-        when(meter.getMeanRate()).thenReturn(2.0);
-        when(meter.getOneMinuteRate()).thenReturn(3.0);
-        when(meter.getFiveMinuteRate()).thenReturn(4.0);
-        when(meter.getFifteenMinuteRate()).thenReturn(5.0);
+		JSONObject json = (JSONObject) JSONValue.parse(getMetric());
 
-        reporter.report(this.<Gauge>map(),
-                        this.<Counter>map(),
-                        this.<Histogram>map(),
-                        map("test.meter", meter),
-                        this.<Timer>map());
+		assertEquals(3.0, json.get("mean"));
+		assertEquals(9.0, json.get("p98"));
+		assertEquals(11.0, json.get("p999"));
+		assertEquals(5.0, json.get("stddev"));
 
-        JSONObject json = (JSONObject)JSONValue.parse(getMetric());
-        
-        assertEquals(1L, json.get("count"));
-        assertEquals(2.0, json.get("mean_rate"));
-        assertEquals(3.0, json.get("m1"));
-        assertEquals(5.0, json.get("m15"));
-        
-       setEvent(null);
-    }
+		setEvent(null);
+	}
 
-    @Test
-    public void reportsTimerValues() throws Exception {
-        final Timer timer = mock(Timer.class);
-        
-        when(timer.getCount()).thenReturn(1L);
-        when(timer.getMeanRate()).thenReturn(2.0);
-        when(timer.getOneMinuteRate()).thenReturn(3.0);
-        when(timer.getFiveMinuteRate()).thenReturn(4.0);
-        when(timer.getFifteenMinuteRate()).thenReturn(5.0);
+	@Test
+	public void reportsMeterValues() throws Exception {
+		final Meter meter = mock(Meter.class);
 
-        final Snapshot snapshot = mock(Snapshot.class);
-        when(snapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));
-        when(snapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));
-        when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
-        when(snapshot.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));
-        when(snapshot.getMedian()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(500));
-        when(snapshot.get75thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(600));
-        when(snapshot.get95thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(700));
-        when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
-        when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
-        when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS
-                                                                        .toNanos(1000));
+		when(meter.getCount()).thenReturn(1L);
+		when(meter.getMeanRate()).thenReturn(2.0);
+		when(meter.getOneMinuteRate()).thenReturn(3.0);
+		when(meter.getFiveMinuteRate()).thenReturn(4.0);
+		when(meter.getFifteenMinuteRate()).thenReturn(5.0);
 
-        when(timer.getSnapshot()).thenReturn(snapshot);
+		reporter.report(this.<Gauge> map(), this.<Counter> map(),
+				this.<Histogram> map(), map("test.meter", meter),
+				this.<Timer> map());
 
-        reporter.report(this.<Gauge>map(),
-                        this.<Counter>map(),
-                        this.<Histogram>map(),
-                        this.<Meter>map(),
-                        map("test.another.timer", timer));
-        
-        JSONObject json = (JSONObject)JSONValue.parse(getMetric());
+		JSONObject json = (JSONObject) JSONValue.parse(getMetric());
 
-        
-        assertEquals(3.0, json.get("m1"));
-        assertEquals(2.0, json.get("mean_rate"));
-        assertEquals(5.0, json.get("m15"));
-        assertEquals(900.0, json.get("p99"));
-        
-        setEvent(null);
-    }
+		assertEquals(1L, json.get("count"));
+		assertEquals(2.0, json.get("mean_rate"));
+		assertEquals(3.0, json.get("m1"));
+		assertEquals(5.0, json.get("m15"));
+
+		setEvent(null);
+	}
+
+	@Test
+	public void reportsTimerValues() throws Exception {
+		final Timer timer = mock(Timer.class);
+
+		when(timer.getCount()).thenReturn(1L);
+		when(timer.getMeanRate()).thenReturn(2.0);
+		when(timer.getOneMinuteRate()).thenReturn(3.0);
+		when(timer.getFiveMinuteRate()).thenReturn(4.0);
+		when(timer.getFifteenMinuteRate()).thenReturn(5.0);
+
+		final Snapshot snapshot = mock(Snapshot.class);
+		when(snapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));
+		when(snapshot.getMean()).thenReturn(
+				(double) TimeUnit.MILLISECONDS.toNanos(200));
+		when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
+		when(snapshot.getStdDev()).thenReturn(
+				(double) TimeUnit.MILLISECONDS.toNanos(400));
+		when(snapshot.getMedian()).thenReturn(
+				(double) TimeUnit.MILLISECONDS.toNanos(500));
+		when(snapshot.get75thPercentile()).thenReturn(
+				(double) TimeUnit.MILLISECONDS.toNanos(600));
+		when(snapshot.get95thPercentile()).thenReturn(
+				(double) TimeUnit.MILLISECONDS.toNanos(700));
+		when(snapshot.get98thPercentile()).thenReturn(
+				(double) TimeUnit.MILLISECONDS.toNanos(800));
+		when(snapshot.get99thPercentile()).thenReturn(
+				(double) TimeUnit.MILLISECONDS.toNanos(900));
+		when(snapshot.get999thPercentile()).thenReturn(
+				(double) TimeUnit.MILLISECONDS.toNanos(1000));
+
+		when(timer.getSnapshot()).thenReturn(snapshot);
+
+		reporter.report(this.<Gauge> map(), this.<Counter> map(),
+				this.<Histogram> map(), this.<Meter> map(),
+				map("test.another.timer", timer));
+
+		JSONObject json = (JSONObject) JSONValue.parse(getMetric());
+
+		assertEquals(3.0, json.get("m1"));
+		assertEquals(2.0, json.get("mean_rate"));
+		assertEquals(5.0, json.get("m15"));
+		assertEquals(900.0, json.get("p99"));
+
+		setEvent(null);
+	}
 
 	private <T> SortedMap<String, T> map(String name, T metric) {
 		final TreeMap<String, T> map = new TreeMap<String, T>();
@@ -241,7 +240,6 @@ public class SocketReporterTest {
 	private class Worker implements Runnable {
 		private Socket connection = null;
 		private ObjectInputStream inputStream = null;
-		
 
 		public Worker(Socket connection) {
 			this.connection = connection;
@@ -254,7 +252,8 @@ public class SocketReporterTest {
 						connection.getInputStream()));
 				if (inputStream != null) {
 					while (running) {
-						LoggingEvent event = (LoggingEvent) inputStream.readObject();
+						LoggingEvent event = (LoggingEvent) inputStream
+								.readObject();
 						setEvent(event);
 					}
 				}
@@ -282,15 +281,18 @@ public class SocketReporterTest {
 		}
 
 	}
+
 	public String getMetric() {
 		try {
-			while(event == null) {
+			while (event == null) {
 				TimeUnit.SECONDS.sleep(2L);
 			}
-		}catch(InterruptedException e) {}
-		
+		} catch (InterruptedException e) {
+			//ignore
+		}
+
 		byte[] bytes = layout.format(event).getBytes();
-		String data = new String(bytes); 
+		String data = new String(bytes);
 		return data;
 	}
 

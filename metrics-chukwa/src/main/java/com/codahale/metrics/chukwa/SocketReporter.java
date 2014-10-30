@@ -56,7 +56,7 @@ public class SocketReporter extends ScheduledReporter {
 		}
 
 		/**
-		 * Use the host for sending the metrics 
+		 * Use the host for sending the metrics
 		 * 
 		 * @param host
 		 * @return {@code this}
@@ -135,11 +135,11 @@ public class SocketReporter extends ScheduledReporter {
 		super(registry, "socket-reporter", filter, rateUnit, durationUnit);
 		this.host = host;
 		this.port = port;
-		
+
 		appender = new SocketAppender();
 		log = Logger.getLogger("Metrics");
 		layout = new PatternLayout("%m%n");
-		
+
 		appender.setLayout(layout);
 		log.addAppender(appender);
 	}
@@ -153,7 +153,7 @@ public class SocketReporter extends ScheduledReporter {
 		appender.setRemoteHost(host);
 		appender.setPort(port);
 		appender.activateOptions();
-		
+
 		if (gauges != null) {
 			for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
 				writeGauge(entry.getKey(), entry.getValue());
@@ -189,7 +189,7 @@ public class SocketReporter extends ScheduledReporter {
 	@SuppressWarnings("unchecked")
 	private void writeGauge(String key, Gauge gauge) {
 		final JSONObject json = new JSONObject();
-		
+
 		json.put("type", "gauge");
 		json.put("key", key);
 		json.put("value", gauge.getValue());
@@ -200,7 +200,7 @@ public class SocketReporter extends ScheduledReporter {
 	@SuppressWarnings("unchecked")
 	private void writeCounter(String key, Counter counter) {
 		final JSONObject json = new JSONObject();
-		
+
 		json.put("type", "counter");
 		json.put("key", key);
 		json.put("value", counter.getCount());
@@ -212,7 +212,7 @@ public class SocketReporter extends ScheduledReporter {
 	private void writeHistogram(String key, Histogram histogram) {
 		final Snapshot snapshot = histogram.getSnapshot();
 		final JSONObject json = new JSONObject();
-		
+
 		json.put("type", "histogram");
 		json.put("key", key);
 		json.put("count", histogram.getCount());
@@ -226,14 +226,14 @@ public class SocketReporter extends ScheduledReporter {
 		json.put("p98", snapshot.get98thPercentile());
 		json.put("p99", snapshot.get99thPercentile());
 		json.put("p999", snapshot.get999thPercentile());
-		
+
 		log.info(json.toString());
 	}
 
 	@SuppressWarnings("unchecked")
 	private void writeMeter(String key, Meter meter) {
 		final JSONObject json = new JSONObject();
-		
+
 		json.put("type", "meter");
 		json.put("key", key);
 		json.put("count", meter.getCount());
@@ -242,7 +242,7 @@ public class SocketReporter extends ScheduledReporter {
 		json.put("m5", meter.getFiveMinuteRate());
 		json.put("m15", meter.getFifteenMinuteRate());
 		json.put("rate_unit", getRateUnit());
-		
+
 		log.info(json.toString());
 	}
 
@@ -270,7 +270,7 @@ public class SocketReporter extends ScheduledReporter {
 		json.put("m15", timer.getFifteenMinuteRate());
 		json.put("rate_unit", getRateUnit());
 		json.put("duration_unit", getDurationUnit());
-		
+
 		log.info(json.toString());
 	}
 }
