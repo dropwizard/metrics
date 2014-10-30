@@ -1,5 +1,8 @@
 package com.codahale.metrics;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Closeable;
 import java.util.Locale;
 import java.util.SortedMap;
@@ -18,6 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @see Slf4jReporter
  */
 public abstract class ScheduledReporter implements Closeable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledReporter.class);
+
     /**
      * A simple named thread factory.
      */
@@ -113,11 +118,17 @@ public abstract class ScheduledReporter implements Closeable {
      * Report the current values of all metrics in the registry.
      */
     public void report() {
-        report(registry.getGauges(filter),
-               registry.getCounters(filter),
-               registry.getHistograms(filter),
-               registry.getMeters(filter),
-               registry.getTimers(filter));
+        try {
+            report(registry.getGauges(filter),
+                    registry.getCounters(filter),
+                    registry.getHistograms(filter),
+                    registry.getMeters(filter),
+                    registry.getTimers(filter));
+        }catch (RuntimeException e){
+            LOGGER.warn("A metric threw an exception",e);
+            //if we rethrow this, the scheduledReporter thread dies.
+            //throw e;
+        }
     }
 
     /**
