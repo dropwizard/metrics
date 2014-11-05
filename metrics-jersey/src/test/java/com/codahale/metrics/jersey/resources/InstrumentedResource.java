@@ -6,7 +6,11 @@ import com.codahale.metrics.annotation.Timed;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.Collections;
+
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Path("/")
 @Produces(MediaType.TEXT_PLAIN)
@@ -34,4 +38,16 @@ public class InstrumentedResource {
         }
         return "fuh";
     }
+
+    @GET
+    @ExceptionMetered
+    @Path("/failure-response-metered")
+    public Response failureResponseMetered(@QueryParam("splode") @DefaultValue("false") boolean splode) throws IOException {
+        if (splode) {
+		return Response.status(BAD_REQUEST).entity("failed").build();
+            
+        }
+        return Response.ok().build();
+    }
+
 }

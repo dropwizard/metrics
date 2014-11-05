@@ -11,6 +11,8 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
 
+import javax.ws.rs.core.Response;
+
 import static com.codahale.metrics.MetricRegistry.name;
 
 class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispatchProvider {
@@ -67,6 +69,9 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
         public void dispatch(Object resource, HttpContext httpContext) {
             try {
                 underlying.dispatch(resource, httpContext);
+	 	if(httpContext.getResponse().getStatusType().getFamily() != Response.Status.Family.SUCCESSFUL) {
+			meter.mark();
+                }
             } catch (Exception e) {
                 if (exceptionClass.isAssignableFrom(e.getClass()) ||
                         (e.getCause() != null && exceptionClass.isAssignableFrom(e.getCause().getClass()))) {
