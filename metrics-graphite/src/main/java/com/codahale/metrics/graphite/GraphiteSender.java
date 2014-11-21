@@ -32,7 +32,7 @@ public interface GraphiteSender extends Closeable{
 	void flush() throws IOException;
 
 	/**
-	 * Returns true if ready to send data
+	 * Returns true if ready to add data
 	 */
 	boolean isConnected();
 

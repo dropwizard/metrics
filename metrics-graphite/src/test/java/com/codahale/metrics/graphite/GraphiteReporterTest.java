@@ -39,12 +39,8 @@ public class GraphiteReporterTest {
                         this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).isConnected();
-        inOrder.verify(graphite).connect();
         inOrder.verify(graphite, never()).send("prefix.gauge", "value", timestamp);
         inOrder.verify(graphite).flush();
-
-        verifyNoMoreInteractions(graphite);
     }
 
     @Test
@@ -209,8 +205,6 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.histogram.p99", "10.00", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.p999", "11.00", timestamp);
         inOrder.verify(graphite).flush();
-
-        verifyNoMoreInteractions(graphite);
     }
 
     @Test
@@ -237,8 +231,6 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.meter.m15_rate", "4.00", timestamp);
         inOrder.verify(graphite).send("prefix.meter.mean_rate", "5.00", timestamp);
         inOrder.verify(graphite).flush();
-
-        verifyNoMoreInteractions(graphite);
     }
 
     @Test
@@ -290,25 +282,21 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.timer.m15_rate", "5.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.mean_rate", "2.00", timestamp);
         inOrder.verify(graphite).flush();
-
-        verifyNoMoreInteractions(graphite);
     }
 
     @Test
     public void closesConnectionIfGraphiteIsUnavailable() throws Exception {
         doThrow(new UnknownHostException("UNKNOWN-HOST")).when(graphite).connect();
         reporter.report(map("gauge", gauge(1)),
-            this.<Counter>map(),
-            this.<Histogram>map(),
-            this.<Meter>map(),
-            this.<Timer>map());
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                this.<Meter>map(),
+                this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).close();
-
-        verifyNoMoreInteractions(graphite);
     }
 
     @Test
