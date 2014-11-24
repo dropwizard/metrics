@@ -6,29 +6,29 @@ import java.util.Queue;
 public class EvictingDeadQueue implements DeadQueue {
 
     private final int maxSize;
-    private final Queue<Entry> list;
+    private final Queue<Entry> queue;
 
     public EvictingDeadQueue(int maxSize) {
         this.maxSize = maxSize;
-        list = new LinkedList<Entry>();
+        queue = new LinkedList<Entry>();
     }
 
     @Override
     public void add(Entry entry) {
-        if (list.size() >= maxSize) {
-            list.poll();
+        if (queue.size() >= maxSize) {
+            queue.poll();
         }
 
-        list.add(entry);
+        queue.add(entry);
     }
 
     @Override
     public boolean isEmpty() {
-        return list.isEmpty();
+        return queue.isEmpty();
     }
 
     @Override
     public Entry poll() {
-        return list.poll();
+        return queue.poll();
     }
 }
