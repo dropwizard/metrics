@@ -365,7 +365,7 @@ public class GraphiteReporter extends ScheduledReporter {
                         graphite.send(entry.getName(), entry.getValue(), entry.getTimestamp());
 
                     } catch (IOException ex) {
-                        LOGGER.warn("Error closing Graphite", graphite, ex);
+                        LOGGER.warn("Unable to report to Graphite", graphite, ex);
                     }
                 }
             }

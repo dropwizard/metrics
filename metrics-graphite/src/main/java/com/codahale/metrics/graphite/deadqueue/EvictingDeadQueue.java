@@ -15,7 +15,7 @@ public class EvictingDeadQueue implements DeadQueue {
 
     @Override
     public void add(Entry entry) {
-        if (queue.size() >= maxSize) {
+        while (queue.size() >= maxSize) {
             queue.poll();
         }
 
