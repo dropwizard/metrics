@@ -8,10 +8,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.nio.charset.Charset;
 
-/**
- * Created by p.willoughby on 27/11/14.
- */
-public class GraphitePickler {
+public final class GraphitePickler {
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
     /**
      * Minimally necessary pickle opcodes.
