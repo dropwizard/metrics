@@ -46,6 +46,7 @@ public class Timer implements Metered, Sampling {
     private final Meter meter;
     private final Histogram histogram;
     private final Clock clock;
+    private final Counter totalDuration;
 
     /**
      * Creates a new {@link Timer} using an {@link ExponentiallyDecayingReservoir} and the default
@@ -74,6 +75,7 @@ public class Timer implements Metered, Sampling {
         this.meter = new Meter(clock);
         this.clock = clock;
         this.histogram = new Histogram(reservoir);
+        this.totalDuration = new Counter();
     }
 
     /**
@@ -119,6 +121,15 @@ public class Timer implements Metered, Sampling {
         return histogram.getCount();
     }
 
+    /**
+     * Returns the total elapsed duration.
+     *
+     * @return the total elapsed duration
+     */
+    public long getTotalDuration() {
+        return totalDuration.getCount();
+    }
+
     @Override
     public double getFifteenMinuteRate() {
         return meter.getFifteenMinuteRate();
@@ -148,6 +159,7 @@ public class Timer implements Metered, Sampling {
         if (duration >= 0) {
             histogram.update(duration);
             meter.mark();
+            totalDuration.inc(duration);
         }
     }
 }

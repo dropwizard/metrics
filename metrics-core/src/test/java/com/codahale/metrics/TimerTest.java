@@ -97,4 +97,25 @@ public class TimerTest {
 
         verifyZeroInteractions(reservoir);
     }
+
+    @Test
+    public void updatesTotalDuration() throws Exception {
+        final long totalTime = timer.getTotalDuration();
+
+        timer.update(100, TimeUnit.NANOSECONDS);
+
+        assertThat(timer.getTotalDuration())
+                .isEqualTo(totalTime + 100);
+
+        timer.update(100, TimeUnit.NANOSECONDS);
+
+        assertThat(timer.getTotalDuration())
+                .isEqualTo(totalTime + 200);
+
+        timer.update(-200, TimeUnit.NANOSECONDS);
+
+        // negative values should be ignored
+        assertThat(timer.getTotalDuration())
+                .isEqualTo(totalTime + 200);
+    }
 }
