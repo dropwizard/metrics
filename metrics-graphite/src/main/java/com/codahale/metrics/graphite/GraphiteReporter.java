@@ -114,7 +114,7 @@ public class GraphiteReporter extends ScheduledReporter {
          * @param value Value of the percentil (i.e. 0.99999)
          * @return {@code this}
          */
-        public Builder withAdditionalPercentil(String name, double value) {
+        public Builder withCustomPercentil(String name, double value) {
             this.quantiles.add(new Quantile(name, value));
             return this;
         }

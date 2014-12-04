@@ -2,6 +2,8 @@ package com.codahale.metrics;
 
 import java.io.PrintStream;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +35,7 @@ public class ConsoleReporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
+        private List<Quantile> quantiles;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -43,6 +46,7 @@ public class ConsoleReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
+            this.quantiles = Quantiles.defaultQuantiles();
         }
 
         /**
@@ -123,6 +127,18 @@ public class ConsoleReporter extends ScheduledReporter {
         }
 
         /**
+         * Add custom quantile to the set of reported quantiles.
+         *
+         * @param name Name of the quantile (i.e. p99999)
+         * @param value Value of the quantile (i.e. 0.99999)
+         * @return {@code this}
+         */
+        public Builder withCustomQuantile(String name, double value) {
+            this.quantiles.add(new Quantile(name, value));
+            return this;
+        }
+
+        /**
          * Builds a {@link ConsoleReporter} with the given properties.
          *
          * @return a {@link ConsoleReporter}
@@ -135,7 +151,8 @@ public class ConsoleReporter extends ScheduledReporter {
                                        timeZone,
                                        rateUnit,
                                        durationUnit,
-                                       filter);
+                                       filter,
+                                       quantiles);
         }
     }
 
@@ -145,6 +162,8 @@ public class ConsoleReporter extends ScheduledReporter {
     private final Locale locale;
     private final Clock clock;
     private final DateFormat dateFormat;
+    private final DecimalFormat decimalFormat;
+    private final List<Quantile> quantiles;
 
     private ConsoleReporter(MetricRegistry registry,
                             PrintStream output,
@@ -153,15 +172,18 @@ public class ConsoleReporter extends ScheduledReporter {
                             TimeZone timeZone,
                             TimeUnit rateUnit,
                             TimeUnit durationUnit,
-                            MetricFilter filter) {
+                            MetricFilter filter,
+                            List<Quantile> quantiles) {
         super(registry, "console-reporter", filter, rateUnit, durationUnit);
         this.output = output;
         this.locale = locale;
         this.clock = clock;
+        this.quantiles = quantiles;
         this.dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT,
                                                          DateFormat.MEDIUM,
                                                          locale);
         dateFormat.setTimeZone(timeZone);
+        decimalFormat = new DecimalFormat("#.#####", new DecimalFormatSymbols(locale));
     }
 
     @Override
@@ -246,12 +268,14 @@ public class ConsoleReporter extends ScheduledReporter {
         output.printf(locale, "               max = %d%n", snapshot.getMax());
         output.printf(locale, "              mean = %2.2f%n", snapshot.getMean());
         output.printf(locale, "            stddev = %2.2f%n", snapshot.getStdDev());
-        output.printf(locale, "            median = %2.2f%n", snapshot.getMedian());
-        output.printf(locale, "              75%% <= %2.2f%n", snapshot.get75thPercentile());
-        output.printf(locale, "              95%% <= %2.2f%n", snapshot.get95thPercentile());
-        output.printf(locale, "              98%% <= %2.2f%n", snapshot.get98thPercentile());
-        output.printf(locale, "              99%% <= %2.2f%n", snapshot.get99thPercentile());
-        output.printf(locale, "            99.9%% <= %2.2f%n", snapshot.get999thPercentile());
+
+        for (Quantile quantile : quantiles) {
+            if (quantile.getValue() == 0.50) {
+                output.printf(locale, "            median = %2.2f%n", snapshot.getValue(quantile.getValue()));
+            } else {
+                output.printf(locale, "           %6s <= %2.2f%n", convertPercentilValueToString(quantile.getValue()), snapshot.getValue(quantile.getValue()));
+            }
+        }
     }
 
     private void printTimer(Timer timer) {
@@ -266,12 +290,14 @@ public class ConsoleReporter extends ScheduledReporter {
         output.printf(locale, "               max = %2.2f %s%n", convertDuration(snapshot.getMax()), getDurationUnit());
         output.printf(locale, "              mean = %2.2f %s%n", convertDuration(snapshot.getMean()), getDurationUnit());
         output.printf(locale, "            stddev = %2.2f %s%n", convertDuration(snapshot.getStdDev()), getDurationUnit());
-        output.printf(locale, "            median = %2.2f %s%n", convertDuration(snapshot.getMedian()), getDurationUnit());
-        output.printf(locale, "              75%% <= %2.2f %s%n", convertDuration(snapshot.get75thPercentile()), getDurationUnit());
-        output.printf(locale, "              95%% <= %2.2f %s%n", convertDuration(snapshot.get95thPercentile()), getDurationUnit());
-        output.printf(locale, "              98%% <= %2.2f %s%n", convertDuration(snapshot.get98thPercentile()), getDurationUnit());
-        output.printf(locale, "              99%% <= %2.2f %s%n", convertDuration(snapshot.get99thPercentile()), getDurationUnit());
-        output.printf(locale, "            99.9%% <= %2.2f %s%n", convertDuration(snapshot.get999thPercentile()), getDurationUnit());
+
+        for (Quantile quantile : quantiles) {
+            if (quantile.getValue() == 0.50) {
+                output.printf(locale, "            median = %2.2f %s%n", convertDuration(snapshot.getValue(quantile.getValue())), getDurationUnit());
+            } else {
+                output.printf(locale, "           %6s <= %2.2f %s%n", convertPercentilValueToString(quantile.getValue()), convertDuration(snapshot.getValue(quantile.getValue())), getDurationUnit());
+            }
+        }
     }
 
     private void printWithBanner(String s, char c) {
@@ -281,5 +307,9 @@ public class ConsoleReporter extends ScheduledReporter {
             output.print(c);
         }
         output.println();
+    }
+
+    private String convertPercentilValueToString(double value) {
+        return decimalFormat.format(value * 100) +"%";
     }
 }

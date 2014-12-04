@@ -10,6 +10,7 @@ import info.ganglia.gmetric4j.gmetric.GangliaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +50,7 @@ public class GangliaReporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
+        private List<Quantile> quantiles;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -57,6 +59,7 @@ public class GangliaReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
+            this.quantiles = Quantiles.defaultQuantiles();
         }
 
         /**
@@ -126,6 +129,18 @@ public class GangliaReporter extends ScheduledReporter {
         }
 
         /**
+         * Add custom quantile to the set of reported quantiles.
+         *
+         * @param name Name of the quantile (i.e. p99999)
+         * @param value Value of the quantile (i.e. 0.99999)
+         * @return {@code this}
+         */
+        public Builder withCustomQuantile(String name, double value) {
+            this.quantiles.add(new Quantile(name, value));
+            return this;
+        }
+
+        /**
          * Builds a {@link GangliaReporter} with the given properties, announcing metrics to the
          * given {@link GMetric} client.
          *
@@ -133,7 +148,7 @@ public class GangliaReporter extends ScheduledReporter {
          * @return a {@link GangliaReporter}
          */
         public GangliaReporter build(GMetric gmetric) {
-            return new GangliaReporter(registry, gmetric, null, prefix, tMax, dMax, rateUnit, durationUnit, filter);
+            return new GangliaReporter(registry, gmetric, null, prefix, tMax, dMax, rateUnit, durationUnit, filter, quantiles);
         }
 
         /**
@@ -144,7 +159,7 @@ public class GangliaReporter extends ScheduledReporter {
          * @return a {@link GangliaReporter}
          */
         public GangliaReporter build(GMetric... gmetrics) {
-            return new GangliaReporter(registry, null, gmetrics, prefix, tMax, dMax, rateUnit, durationUnit, filter);
+            return new GangliaReporter(registry, null, gmetrics, prefix, tMax, dMax, rateUnit, durationUnit, filter, quantiles);
         }
     }
 
@@ -155,6 +170,7 @@ public class GangliaReporter extends ScheduledReporter {
     private final String prefix;
     private final int tMax;
     private final int dMax;
+    private final List<Quantile> quantiles;
 
     private GangliaReporter(MetricRegistry registry,
                             GMetric gmetric,
@@ -164,13 +180,15 @@ public class GangliaReporter extends ScheduledReporter {
                             int dMax,
                             TimeUnit rateUnit,
                             TimeUnit durationUnit,
-                            MetricFilter filter) {
+                            MetricFilter filter,
+                            List<Quantile> quantiles) {
         super(registry, "ganglia-reporter", filter, rateUnit, durationUnit);
         this.gmetric = gmetric;
         this.gmetrics = gmetrics;
         this.prefix = prefix;
         this.tMax = tMax;
         this.dMax = dMax;
+        this.quantiles = quantiles;
     }
 
     @Override
@@ -211,27 +229,9 @@ public class GangliaReporter extends ScheduledReporter {
             announce(prefix(sanitizedName, "min"), group, convertDuration(snapshot.getMin()), getDurationUnit());
             announce(prefix(sanitizedName, "stddev"), group, convertDuration(snapshot.getStdDev()), getDurationUnit());
 
-            announce(prefix(sanitizedName, "p50"), group, convertDuration(snapshot.getMedian()), getDurationUnit());
-            announce(prefix(sanitizedName, "p75"),
-                     group,
-                     convertDuration(snapshot.get75thPercentile()),
-                     getDurationUnit());
-            announce(prefix(sanitizedName, "p95"),
-                     group,
-                     convertDuration(snapshot.get95thPercentile()),
-                     getDurationUnit());
-            announce(prefix(sanitizedName, "p98"),
-                     group,
-                     convertDuration(snapshot.get98thPercentile()),
-                     getDurationUnit());
-            announce(prefix(sanitizedName, "p99"),
-                     group,
-                     convertDuration(snapshot.get99thPercentile()),
-                     getDurationUnit());
-            announce(prefix(sanitizedName, "p999"),
-                     group,
-                     convertDuration(snapshot.get999thPercentile()),
-                     getDurationUnit());
+            for (Quantile quantile : quantiles) {
+                announce(prefix(sanitizedName, quantile.getName()), group, convertDuration(snapshot.getValue(quantile.getValue())), getDurationUnit());
+            }
 
             reportMetered(sanitizedName, timer, group, "calls");
         } catch (GangliaException e) {
@@ -269,12 +269,9 @@ public class GangliaReporter extends ScheduledReporter {
             announce(prefix(sanitizedName, "mean"), group, snapshot.getMean(), "");
             announce(prefix(sanitizedName, "min"), group, snapshot.getMin(), "");
             announce(prefix(sanitizedName, "stddev"), group, snapshot.getStdDev(), "");
-            announce(prefix(sanitizedName, "p50"), group, snapshot.getMedian(), "");
-            announce(prefix(sanitizedName, "p75"), group, snapshot.get75thPercentile(), "");
-            announce(prefix(sanitizedName, "p95"), group, snapshot.get95thPercentile(), "");
-            announce(prefix(sanitizedName, "p98"), group, snapshot.get98thPercentile(), "");
-            announce(prefix(sanitizedName, "p99"), group, snapshot.get99thPercentile(), "");
-            announce(prefix(sanitizedName, "p999"), group, snapshot.get999thPercentile(), "");
+            for (Quantile quantile : quantiles) {
+                announce(prefix(sanitizedName, quantile.getName()), group, snapshot.getValue(quantile.getValue()), "");
+            }
         } catch (GangliaException e) {
             LOGGER.warn("Unable to report histogram {}", sanitizedName, e);
         }
