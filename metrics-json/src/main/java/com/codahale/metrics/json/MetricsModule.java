@@ -11,6 +11,7 @@ import com.codahale.metrics.*;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -55,11 +56,14 @@ public class MetricsModule extends Module {
 
     private static class HistogramSerializer extends StdSerializer<Histogram> {
         private final boolean showSamples;
+        private final List<Quantile> quantiles;
 
-        private HistogramSerializer(boolean showSamples) {
+        public HistogramSerializer(boolean showSamples, List<Quantile> quantiles) {
             super(Histogram.class);
             this.showSamples = showSamples;
+            this.quantiles = quantiles;
         }
+
 
         @Override
         public void serialize(Histogram histogram,
@@ -71,12 +75,9 @@ public class MetricsModule extends Module {
             json.writeNumberField("max", snapshot.getMax());
             json.writeNumberField("mean", snapshot.getMean());
             json.writeNumberField("min", snapshot.getMin());
-            json.writeNumberField("p50", snapshot.getMedian());
-            json.writeNumberField("p75", snapshot.get75thPercentile());
-            json.writeNumberField("p95", snapshot.get95thPercentile());
-            json.writeNumberField("p98", snapshot.get98thPercentile());
-            json.writeNumberField("p99", snapshot.get99thPercentile());
-            json.writeNumberField("p999", snapshot.get999thPercentile());
+            for (Quantile quantile : quantiles) {
+                json.writeNumberField(quantile.getName(), snapshot.getValue(quantile.getValue()));
+            }
 
             if (showSamples) {
                 json.writeObjectField("values", snapshot.getValues());
@@ -118,11 +119,14 @@ public class MetricsModule extends Module {
         private final String durationUnit;
         private final double durationFactor;
         private final boolean showSamples;
+        private final List<Quantile> quantiles;
 
         private TimerSerializer(TimeUnit rateUnit,
                                 TimeUnit durationUnit,
-                                boolean showSamples) {
+                                boolean showSamples,
+                                List<Quantile> quantiles) {
             super(Timer.class);
+            this.quantiles = quantiles;
             this.rateUnit = calculateRateUnit(rateUnit, "calls");
             this.rateFactor = rateUnit.toSeconds(1);
             this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
@@ -141,12 +145,9 @@ public class MetricsModule extends Module {
             json.writeNumberField("mean", snapshot.getMean() * durationFactor);
             json.writeNumberField("min", snapshot.getMin() * durationFactor);
 
-            json.writeNumberField("p50", snapshot.getMedian() * durationFactor);
-            json.writeNumberField("p75", snapshot.get75thPercentile() * durationFactor);
-            json.writeNumberField("p95", snapshot.get95thPercentile() * durationFactor);
-            json.writeNumberField("p98", snapshot.get98thPercentile() * durationFactor);
-            json.writeNumberField("p99", snapshot.get99thPercentile() * durationFactor);
-            json.writeNumberField("p999", snapshot.get999thPercentile() * durationFactor);
+            for (Quantile quantile : quantiles) {
+                json.writeNumberField(quantile.getName(), snapshot.getValue(quantile.getValue()) * durationFactor);
+            }
 
             if (showSamples) {
                 final long[] values = snapshot.getValues();
@@ -196,16 +197,23 @@ public class MetricsModule extends Module {
     private final TimeUnit durationUnit;
     private final boolean showSamples;
     private final MetricFilter filter;
-    
+    private List<Quantile> quantiles;
+
     public MetricsModule(TimeUnit rateUnit, TimeUnit durationUnit, boolean showSamples) {
         this(rateUnit, durationUnit, showSamples, MetricFilter.ALL);
     }
 
     public MetricsModule(TimeUnit rateUnit, TimeUnit durationUnit, boolean showSamples, MetricFilter filter) {
+        this(rateUnit, durationUnit, showSamples, filter, Quantiles.defaultQuantiles());
+    }
+
+    public MetricsModule(TimeUnit rateUnit, TimeUnit durationUnit, boolean showSamples, MetricFilter filter,
+                         List<Quantile> quantiles) {
         this.rateUnit = rateUnit;
         this.durationUnit = durationUnit;
         this.showSamples = showSamples;
         this.filter = filter;
+        this.quantiles = quantiles;
     }
 
     @Override
@@ -223,9 +231,9 @@ public class MetricsModule extends Module {
         context.addSerializers(new SimpleSerializers(Arrays.<JsonSerializer<?>>asList(
                 new GaugeSerializer(),
                 new CounterSerializer(),
-                new HistogramSerializer(showSamples),
+                new HistogramSerializer(showSamples, quantiles),
                 new MeterSerializer(rateUnit),
-                new TimerSerializer(rateUnit, durationUnit, showSamples),
+                new TimerSerializer(rateUnit, durationUnit, showSamples, quantiles),
                 new MetricRegistrySerializer(filter)
         )));
     }

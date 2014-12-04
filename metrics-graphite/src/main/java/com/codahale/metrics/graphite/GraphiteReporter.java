@@ -108,13 +108,13 @@ public class GraphiteReporter extends ScheduledReporter {
         }
 
         /**
-         * Add custom percentil to the set of reported percentils.
+         * Add custom quantile to the set of reported quantiles.
          *
-         * @param name Name of the percentil (i.e. p99999)
-         * @param value Value of the percentil (i.e. 0.99999)
+         * @param name Name of the quantile (i.e. p99999)
+         * @param value Value of the quantile (i.e. 0.99999)
          * @return {@code this}
          */
-        public Builder withCustomPercentil(String name, double value) {
+        public Builder withCustomQuantile(String name, double value) {
             this.quantiles.add(new Quantile(name, value));
             return this;
         }

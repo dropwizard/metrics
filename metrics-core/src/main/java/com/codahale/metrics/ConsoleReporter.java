@@ -270,11 +270,7 @@ public class ConsoleReporter extends ScheduledReporter {
         output.printf(locale, "            stddev = %2.2f%n", snapshot.getStdDev());
 
         for (Quantile quantile : quantiles) {
-            if (quantile.getValue() == 0.50) {
-                output.printf(locale, "            median = %2.2f%n", snapshot.getValue(quantile.getValue()));
-            } else {
-                output.printf(locale, "           %6s <= %2.2f%n", convertPercentilValueToString(quantile.getValue()), snapshot.getValue(quantile.getValue()));
-            }
+            output.printf(locale, "           %6s <= %2.2f%n", convertPercentilValueToString(quantile.getValue()), snapshot.getValue(quantile.getValue()));
         }
     }
 
@@ -292,11 +288,7 @@ public class ConsoleReporter extends ScheduledReporter {
         output.printf(locale, "            stddev = %2.2f %s%n", convertDuration(snapshot.getStdDev()), getDurationUnit());
 
         for (Quantile quantile : quantiles) {
-            if (quantile.getValue() == 0.50) {
-                output.printf(locale, "            median = %2.2f %s%n", convertDuration(snapshot.getValue(quantile.getValue())), getDurationUnit());
-            } else {
-                output.printf(locale, "           %6s <= %2.2f %s%n", convertPercentilValueToString(quantile.getValue()), convertDuration(snapshot.getValue(quantile.getValue())), getDurationUnit());
-            }
+            output.printf(locale, "           %6s <= %2.2f %s%n", convertPercentilValueToString(quantile.getValue()), convertDuration(snapshot.getValue(quantile.getValue())), getDurationUnit());
         }
     }
 

@@ -59,12 +59,12 @@ public class MetricsModuleTest {
         when(snapshot.getMean()).thenReturn(3.0);
         when(snapshot.getMin()).thenReturn(4L);
         when(snapshot.getStdDev()).thenReturn(5.0);
-        when(snapshot.getMedian()).thenReturn(6.0);
-        when(snapshot.get75thPercentile()).thenReturn(7.0);
-        when(snapshot.get95thPercentile()).thenReturn(8.0);
-        when(snapshot.get98thPercentile()).thenReturn(9.0);
-        when(snapshot.get99thPercentile()).thenReturn(10.0);
-        when(snapshot.get999thPercentile()).thenReturn(11.0);
+        when(snapshot.getValue(0.50)).thenReturn(6.0);
+        when(snapshot.getValue(0.75)).thenReturn(7.0);
+        when(snapshot.getValue(0.95)).thenReturn(8.0);
+        when(snapshot.getValue(0.98)).thenReturn(9.0);
+        when(snapshot.getValue(0.99)).thenReturn(10.0);
+        when(snapshot.getValue(0.999)).thenReturn(11.0);
         when(snapshot.getValues()).thenReturn(new long[]{ 1, 2, 3 });
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
@@ -135,12 +135,12 @@ public class MetricsModuleTest {
         when(snapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));
         when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
         when(snapshot.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));
-        when(snapshot.getMedian()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(500));
-        when(snapshot.get75thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(600));
-        when(snapshot.get95thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(700));
-        when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
-        when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
-        when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(1000));
+        when(snapshot.getValue(0.50)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(500));
+        when(snapshot.getValue(0.75)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(600));
+        when(snapshot.getValue(0.95)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(700));
+        when(snapshot.getValue(0.98)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
+        when(snapshot.getValue(0.99)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
+        when(snapshot.getValue(0.999)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(1000));
 
         when(snapshot.getValues()).thenReturn(new long[]{
                 TimeUnit.MILLISECONDS.toNanos(1),

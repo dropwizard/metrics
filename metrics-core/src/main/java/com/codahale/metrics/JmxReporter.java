@@ -236,6 +236,8 @@ public class JmxReporter implements Reporter, Closeable {
 
         double get999thPercentile();
 
+        double getQuantile(double quantileValue);
+
         long[] values();
     }
     // CHECKSTYLE:ON
@@ -307,6 +309,11 @@ public class JmxReporter implements Reporter, Closeable {
         @Override
         public double get999thPercentile() {
             return metric.getSnapshot().get999thPercentile();
+        }
+
+        @Override
+        public double getQuantile(double value) {
+            return metric.getSnapshot().getValue(value);
         }
 
         @Override

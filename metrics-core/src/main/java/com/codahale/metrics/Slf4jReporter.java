@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
@@ -40,6 +42,7 @@ public class Slf4jReporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
+        private List<Quantile> quantiles;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -49,6 +52,7 @@ public class Slf4jReporter extends ScheduledReporter {
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
             this.loggingLevel = LoggingLevel.INFO;
+            this.quantiles = Quantiles.defaultQuantiles();
         }
 
         /**
@@ -142,22 +146,56 @@ public class Slf4jReporter extends ScheduledReporter {
                     loggerProxy = new DebugLoggerProxy(logger);
                     break;
             }
-            return new Slf4jReporter(registry, loggerProxy, marker, rateUnit, durationUnit, filter);
+            return new Slf4jReporter(registry, loggerProxy, marker, rateUnit, durationUnit, filter, quantiles);
+        }
+    }
+
+    static class Slf4LogBuilder {
+
+        private final List<String> labels;
+        private final List<Object> values;
+        private final String type;
+
+        public Slf4LogBuilder(String type) {
+            labels = new ArrayList<String>();
+            values = new ArrayList<Object>();
+            this.type = type;
+        }
+
+        public void append(String label, Object value) {
+            labels.add(label);
+            values.add(value);
+        }
+
+        public String getLabels() {
+
+            StringBuilder builder = new StringBuilder("type="+type);
+            for (String label : labels) {
+                builder.append(", " + label + "={}");
+            }
+            return builder.toString();
+        }
+
+        public Object[] getValues() {
+            return values.toArray();
         }
     }
 
     private final LoggerProxy loggerProxy;
     private final Marker marker;
+    private final List<Quantile> quantiles;
 
     private Slf4jReporter(MetricRegistry registry,
                           LoggerProxy loggerProxy,
                           Marker marker,
                           TimeUnit rateUnit,
                           TimeUnit durationUnit,
-                          MetricFilter filter) {
+                          MetricFilter filter,
+                          List<Quantile> quantiles) {
         super(registry, "logger-reporter", filter, rateUnit, durationUnit);
         this.loggerProxy = loggerProxy;
         this.marker = marker;
+        this.quantiles = quantiles;
     }
 
     @Override
@@ -189,28 +227,25 @@ public class Slf4jReporter extends ScheduledReporter {
 
     private void logTimer(String name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
-        loggerProxy.log(marker,
-                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, " +
-                        "p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, " +
-                        "m15={}, rate_unit={}, duration_unit={}",
-                name,
-                timer.getCount(),
-                convertDuration(snapshot.getMin()),
-                convertDuration(snapshot.getMax()),
-                convertDuration(snapshot.getMean()),
-                convertDuration(snapshot.getStdDev()),
-                convertDuration(snapshot.getMedian()),
-                convertDuration(snapshot.get75thPercentile()),
-                convertDuration(snapshot.get95thPercentile()),
-                convertDuration(snapshot.get98thPercentile()),
-                convertDuration(snapshot.get99thPercentile()),
-                convertDuration(snapshot.get999thPercentile()),
-                convertRate(timer.getMeanRate()),
-                convertRate(timer.getOneMinuteRate()),
-                convertRate(timer.getFiveMinuteRate()),
-                convertRate(timer.getFifteenMinuteRate()),
-                getRateUnit(),
-                getDurationUnit());
+
+        Slf4LogBuilder logBuilder = new Slf4LogBuilder("TIMER");
+        logBuilder.append("name", name);
+        logBuilder.append("count", timer.getCount());
+        logBuilder.append("min", convertDuration(snapshot.getMin()));
+        logBuilder.append("max", convertDuration(snapshot.getMax()));
+        logBuilder.append("mean", convertDuration(snapshot.getMean()));
+        logBuilder.append("stddev", convertDuration(snapshot.getStdDev()));
+        for (Quantile quantile : quantiles) {
+            logBuilder.append(quantile.getName(), convertDuration(snapshot.getValue(quantile.getValue())));
+        }
+        logBuilder.append("mean_rate", convertRate(timer.getMeanRate()));
+        logBuilder.append("m1", convertRate(timer.getOneMinuteRate()));
+        logBuilder.append("m5", convertRate(timer.getFiveMinuteRate()));
+        logBuilder.append("m15", convertRate(timer.getFifteenMinuteRate()));
+        logBuilder.append("rate_unit", getRateUnit());
+        logBuilder.append("duration_unit", getDurationUnit());
+
+        loggerProxy.log(marker,logBuilder.getLabels(),logBuilder.getValues());
     }
 
     private void logMeter(String name, Meter meter) {
@@ -227,21 +262,19 @@ public class Slf4jReporter extends ScheduledReporter {
 
     private void logHistogram(String name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
-        loggerProxy.log(marker,
-                "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, " +
-                        "median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
-                name,
-                histogram.getCount(),
-                snapshot.getMin(),
-                snapshot.getMax(),
-                snapshot.getMean(),
-                snapshot.getStdDev(),
-                snapshot.getMedian(),
-                snapshot.get75thPercentile(),
-                snapshot.get95thPercentile(),
-                snapshot.get98thPercentile(),
-                snapshot.get99thPercentile(),
-                snapshot.get999thPercentile());
+
+        Slf4LogBuilder logBuilder = new Slf4LogBuilder("HISTOGRAM");
+        logBuilder.append("name", name);
+        logBuilder.append("count", histogram.getCount());
+        logBuilder.append("min", snapshot.getMin());
+        logBuilder.append("max", snapshot.getMax());
+        logBuilder.append("mean", snapshot.getMean());
+        logBuilder.append("stddev", snapshot.getStdDev());
+        for (Quantile quantile : quantiles) {
+            logBuilder.append(quantile.getName(), snapshot.getValue(quantile.getValue()));
+        }
+
+        loggerProxy.log(marker, logBuilder.getLabels(), logBuilder.getValues());
     }
 
     private void logCounter(String name, Counter counter) {

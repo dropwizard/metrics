@@ -106,6 +106,18 @@ public class CsvReporter extends ScheduledReporter {
         }
 
         /**
+         * Add custom quantile to the set of reported quantiles.
+         *
+         * @param name Name of the quantile (i.e. p99999)
+         * @param value Value of the quantile (i.e. 0.99999)
+         * @return {@code this}
+         */
+        public Builder withCustomQuantile(String name, double value) {
+            this.quantiles.add(new Quantile(name, value));
+            return this;
+        }
+
+        /**
          * Builds a {@link CsvReporter} with the given properties, writing {@code .csv} files to the
          * given directory.
          *
