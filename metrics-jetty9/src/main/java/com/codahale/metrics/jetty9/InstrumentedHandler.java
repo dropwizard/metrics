@@ -227,6 +227,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             // new request
             activeRequests.inc();
             start = request.getTimeStamp();
+            state.addListener(listener);
         } else {
             // resumed request
             start = System.currentTimeMillis();
@@ -246,9 +247,6 @@ public class InstrumentedHandler extends HandlerWrapper {
             dispatches.update(dispatched, TimeUnit.MILLISECONDS);
 
             if (state.isSuspended()) {
-                if (state.isInitial()) {
-                    state.addListener(listener);
-                }
                 activeSuspended.inc();
             } else if (state.isInitial()) {
                 updateResponses(httpRequest, httpResponse, start);
