@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
@@ -35,6 +38,7 @@ public class CsvReporter extends ScheduledReporter {
         private TimeUnit durationUnit;
         private Clock clock;
         private MetricFilter filter;
+        private List<Quantile> quantiles;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -43,6 +47,7 @@ public class CsvReporter extends ScheduledReporter {
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.clock = Clock.defaultClock();
             this.filter = MetricFilter.ALL;
+            this.quantiles = Quantiles.defaultQuantiles();
         }
 
         /**
@@ -114,7 +119,46 @@ public class CsvReporter extends ScheduledReporter {
                                    rateUnit,
                                    durationUnit,
                                    clock,
-                                   filter);
+                                   filter,
+                                   quantiles);
+        }
+    }
+
+    static class CsvLineBuilder {
+
+        private final List<String> labels;
+        private final List<String> formats;
+        private final List<Object> values;
+
+        public CsvLineBuilder() {
+            labels = new ArrayList<String>();
+            formats = new ArrayList<String>();
+            values = new ArrayList<Object>();
+        }
+
+        public void append(String label, String format, Object value) {
+            labels.add(label);
+            formats.add(format);
+            values.add(value);
+        }
+
+        public String getLabels() {
+            return join(labels, ",");
+        }
+
+        public String getFormattedValues(Locale locale) {
+            return String.format(locale, join(formats, ","), values.toArray());
+        }
+
+        private static String join(List<String> s, String delimiter) {
+            if (s == null || s.isEmpty()) return "";
+            Iterator<String> iter = s.iterator();
+            StringBuilder builder = new StringBuilder(iter.next());
+            while( iter.hasNext() )
+            {
+                builder.append(delimiter).append(iter.next());
+            }
+            return builder.toString();
         }
     }
 
@@ -124,6 +168,7 @@ public class CsvReporter extends ScheduledReporter {
     private final File directory;
     private final Locale locale;
     private final Clock clock;
+    private final List<Quantile> quantiles;
 
     private CsvReporter(MetricRegistry registry,
                         File directory,
@@ -131,11 +176,13 @@ public class CsvReporter extends ScheduledReporter {
                         TimeUnit rateUnit,
                         TimeUnit durationUnit,
                         Clock clock,
-                        MetricFilter filter) {
+                        MetricFilter filter,
+                        List<Quantile> quantiles) {
         super(registry, "csv-reporter", filter, rateUnit, durationUnit);
         this.directory = directory;
         this.locale = locale;
         this.clock = clock;
+        this.quantiles = quantiles;
     }
 
     @Override
@@ -170,60 +217,61 @@ public class CsvReporter extends ScheduledReporter {
     private void reportTimer(long timestamp, String name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
 
-        report(timestamp,
-               name,
-               "count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
-               "%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,calls/%s,%s",
-               timer.getCount(),
-               convertDuration(snapshot.getMax()),
-               convertDuration(snapshot.getMean()),
-               convertDuration(snapshot.getMin()),
-               convertDuration(snapshot.getStdDev()),
-               convertDuration(snapshot.getMedian()),
-               convertDuration(snapshot.get75thPercentile()),
-               convertDuration(snapshot.get95thPercentile()),
-               convertDuration(snapshot.get98thPercentile()),
-               convertDuration(snapshot.get99thPercentile()),
-               convertDuration(snapshot.get999thPercentile()),
-               convertRate(timer.getMeanRate()),
-               convertRate(timer.getOneMinuteRate()),
-               convertRate(timer.getFiveMinuteRate()),
-               convertRate(timer.getFifteenMinuteRate()),
-               getRateUnit(),
-               getDurationUnit());
+        CsvLineBuilder lineBuilder = new CsvLineBuilder();
+        lineBuilder.append("count", "%d", timer.getCount());
+        lineBuilder.append("max", "%f", convertDuration(snapshot.getMax()));
+        lineBuilder.append("mean", "%f", convertDuration(snapshot.getMean()));
+        lineBuilder.append("min", "%f", convertDuration(snapshot.getMin()));
+        lineBuilder.append("stddev", "%f", convertDuration(snapshot.getStdDev()));
+
+        for (Quantile quantile : quantiles) {
+            lineBuilder.append(quantile.getName(), "%f", convertDuration(snapshot.getValue(quantile.getValue())));
+        }
+
+        lineBuilder.append("mean_rate", "%f", convertRate(timer.getMeanRate()));
+        lineBuilder.append("m1_rate", "%f", convertRate(timer.getOneMinuteRate()));
+        lineBuilder.append("m5_rate", "%f", convertRate(timer.getFiveMinuteRate()));
+        lineBuilder.append("m15_rate", "%f", convertRate(timer.getFifteenMinuteRate()));
+        lineBuilder.append("rate_unit", "calls/%s", getRateUnit());
+        lineBuilder.append("duration_unit", "%s", getDurationUnit());
+
+        reportFormattedValues(timestamp,
+                name,
+                lineBuilder.getLabels(),
+                lineBuilder.getFormattedValues(locale));
     }
 
     private void reportMeter(long timestamp, String name, Meter meter) {
-        report(timestamp,
-               name,
-               "count,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit",
-               "%d,%f,%f,%f,%f,events/%s",
-               meter.getCount(),
-               convertRate(meter.getMeanRate()),
-               convertRate(meter.getOneMinuteRate()),
-               convertRate(meter.getFiveMinuteRate()),
-               convertRate(meter.getFifteenMinuteRate()),
-               getRateUnit());
+
+        String formattedLine = String.format(locale, "%d,%f,%f,%f,%f,events/%s",
+                                                meter.getCount(),
+                                                convertRate(meter.getMeanRate()),
+                                                convertRate(meter.getOneMinuteRate()),
+                                                convertRate(meter.getFiveMinuteRate()),
+                                                convertRate(meter.getFifteenMinuteRate()),
+                                                getRateUnit());
+
+        reportFormattedValues(timestamp, name, "count,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit", formattedLine);
     }
 
     private void reportHistogram(long timestamp, String name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
 
-        report(timestamp,
-               name,
-               "count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999",
-               "%d,%d,%f,%d,%f,%f,%f,%f,%f,%f,%f",
-               histogram.getCount(),
-               snapshot.getMax(),
-               snapshot.getMean(),
-               snapshot.getMin(),
-               snapshot.getStdDev(),
-               snapshot.getMedian(),
-               snapshot.get75thPercentile(),
-               snapshot.get95thPercentile(),
-               snapshot.get98thPercentile(),
-               snapshot.get99thPercentile(),
-               snapshot.get999thPercentile());
+        CsvLineBuilder lineBuilder = new CsvLineBuilder();
+        lineBuilder.append("count", "%d", histogram.getCount());
+        lineBuilder.append("max", "%d", snapshot.getMax());
+        lineBuilder.append("mean", "%f", snapshot.getMean());
+        lineBuilder.append("min", "%d", snapshot.getMin());
+        lineBuilder.append("stddev", "%f", snapshot.getStdDev());
+
+        for (Quantile quantile : quantiles) {
+            lineBuilder.append(quantile.getName(), "%f", snapshot.getValue(quantile.getValue()));
+        }
+
+        reportFormattedValues(timestamp,
+                name,
+                lineBuilder.getLabels(),
+                lineBuilder.getFormattedValues(locale));
     }
 
     private void reportCounter(long timestamp, String name, Counter counter) {
@@ -235,6 +283,10 @@ public class CsvReporter extends ScheduledReporter {
     }
 
     private void report(long timestamp, String name, String header, String line, Object... values) {
+        reportFormattedValues(timestamp, name, header, String.format(line, values));
+    }
+
+    private void reportFormattedValues(long timestamp, String name, String header, String formattedValues) {
         try {
             final File file = new File(directory, sanitize(name) + ".csv");
             final boolean fileAlreadyExists = file.exists();
@@ -244,7 +296,7 @@ public class CsvReporter extends ScheduledReporter {
                     if (!fileAlreadyExists) {
                         out.println("t," + header);
                     }
-                    out.printf(locale, String.format(locale, "%d,%s%n", timestamp, line), values);
+                    out.printf(locale, String.format(locale, "%d,%s%n", timestamp, formattedValues));
                 } finally {
                     out.close();
                 }

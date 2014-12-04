@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
@@ -38,6 +40,7 @@ public class GraphiteReporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
+        private List<Quantile> quantiles;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -46,6 +49,7 @@ public class GraphiteReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
+            this.quantiles = Quantiles.defaultQuantiles();
         }
 
         /**
@@ -104,6 +108,18 @@ public class GraphiteReporter extends ScheduledReporter {
         }
 
         /**
+         * Add custom percentil to the set of reported percentils.
+         *
+         * @param name Name of the percentil (i.e. p99999)
+         * @param value Value of the percentil (i.e. 0.99999)
+         * @return {@code this}
+         */
+        public Builder withAdditionalPercentil(String name, double value) {
+            this.quantiles.add(new Quantile(name, value));
+            return this;
+        }
+
+        /**
          * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
          * given {@link GraphiteSender}.
          *
@@ -117,7 +133,8 @@ public class GraphiteReporter extends ScheduledReporter {
                                         prefix,
                                         rateUnit,
                                         durationUnit,
-                                        filter);
+                                        filter,
+                    quantiles);
         }
     }
 
@@ -126,6 +143,8 @@ public class GraphiteReporter extends ScheduledReporter {
     private final GraphiteSender graphite;
     private final Clock clock;
     private final String prefix;
+    private final List<Quantile> quantiles;
+
 
     private GraphiteReporter(MetricRegistry registry,
                              GraphiteSender graphite,
@@ -133,11 +152,13 @@ public class GraphiteReporter extends ScheduledReporter {
                              String prefix,
                              TimeUnit rateUnit,
                              TimeUnit durationUnit,
-                             MetricFilter filter) {
+                             MetricFilter filter,
+                             List<Quantile> quantiles) {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
+        this.quantiles = quantiles;
     }
 
     @Override
@@ -207,24 +228,12 @@ public class GraphiteReporter extends ScheduledReporter {
         graphite.send(prefix(name, "stddev"),
                       format(convertDuration(snapshot.getStdDev())),
                       timestamp);
-        graphite.send(prefix(name, "p50"),
-                      format(convertDuration(snapshot.getMedian())),
-                      timestamp);
-        graphite.send(prefix(name, "p75"),
-                      format(convertDuration(snapshot.get75thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p95"),
-                      format(convertDuration(snapshot.get95thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p98"),
-                      format(convertDuration(snapshot.get98thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p99"),
-                      format(convertDuration(snapshot.get99thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p999"),
-                      format(convertDuration(snapshot.get999thPercentile())),
-                      timestamp);
+
+        for (Quantile quantil: quantiles) {
+            graphite.send(prefix(name, quantil.getName()),
+                    format(convertDuration(snapshot.getValue(quantil.getValue()))),
+                    timestamp);
+        }
 
         reportMetered(name, timer, timestamp);
     }
@@ -252,12 +261,10 @@ public class GraphiteReporter extends ScheduledReporter {
         graphite.send(prefix(name, "mean"), format(snapshot.getMean()), timestamp);
         graphite.send(prefix(name, "min"), format(snapshot.getMin()), timestamp);
         graphite.send(prefix(name, "stddev"), format(snapshot.getStdDev()), timestamp);
-        graphite.send(prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
-        graphite.send(prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
-        graphite.send(prefix(name, "p95"), format(snapshot.get95thPercentile()), timestamp);
-        graphite.send(prefix(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
-        graphite.send(prefix(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
-        graphite.send(prefix(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
+
+        for (Quantile quantile : quantiles) {
+            graphite.send(prefix(name, quantile.getName()), format(snapshot.getValue(quantile.getValue())), timestamp);
+        }
     }
 
     private void reportCounter(String name, Counter counter, long timestamp) throws IOException {
