@@ -23,6 +23,8 @@ public class GraphiteReporterTest {
                                                               .convertRatesTo(TimeUnit.SECONDS)
                                                               .convertDurationsTo(TimeUnit.MILLISECONDS)
                                                               .filter(MetricFilter.ALL)
+                                                              .withQuantile("p233", 0.233)
+                                                              .withQuantile("p9988", 0.9988)
                                                               .build(graphite);
 
     @Before
@@ -186,6 +188,8 @@ public class GraphiteReporterTest {
         when(snapshot.getValue(0.98)).thenReturn(9.0);
         when(snapshot.getValue(0.99)).thenReturn(10.0);
         when(snapshot.getValue(0.999)).thenReturn(11.0);
+        when(snapshot.getValue(0.233)).thenReturn(3.0);
+        when(snapshot.getValue(0.9988)).thenReturn(17.0);
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
@@ -209,6 +213,53 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.histogram.p98", "9.00", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.p99", "10.00", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.p999", "11.00", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p233", "3.00", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p9988", "17.00", timestamp);
+        inOrder.verify(graphite).flush();
+
+        verifyNoMoreInteractions(graphite);
+    }
+
+    @Test
+    public void reportsHistogramsWithOnlyOneQuantile() throws Exception {
+        final Histogram histogram = mock(Histogram.class);
+        when(histogram.getCount()).thenReturn(1L);
+
+        final Snapshot snapshot = mock(Snapshot.class);
+        when(snapshot.getMax()).thenReturn(2L);
+        when(snapshot.getMean()).thenReturn(3.0);
+        when(snapshot.getMin()).thenReturn(4L);
+        when(snapshot.getStdDev()).thenReturn(5.0);
+
+        when(snapshot.getValue(0.233)).thenReturn(3.0);
+
+        when(histogram.getSnapshot()).thenReturn(snapshot);
+
+        GraphiteReporter reporter = GraphiteReporter.forRegistry(registry)
+                .withClock(clock)
+                .prefixedWith("prefix")
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .filter(MetricFilter.ALL)
+                .withNoQuantiles()
+                .withQuantile("p233", 0.233)
+                .build(graphite);
+
+        reporter.report(this.<Gauge>map(),
+                this.<Counter>map(),
+                this.<Histogram>map("histogram", histogram),
+                this.<Meter>map(),
+                this.<Timer>map());
+
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).isConnected();
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send("prefix.histogram.count", "1", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.max", "2", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.mean", "3.00", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.min", "4", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.stddev", "5.00", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p233", "3.00", timestamp);
         inOrder.verify(graphite).flush();
 
         verifyNoMoreInteractions(graphite);
@@ -262,6 +313,8 @@ public class GraphiteReporterTest {
         when(snapshot.getValue(0.98)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
         when(snapshot.getValue(0.99)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
         when(snapshot.getValue(0.999)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(1000));
+        when(snapshot.getValue(0.233)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(100));
+        when(snapshot.getValue(0.9988)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(2200));
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
@@ -284,6 +337,8 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.timer.p98", "800.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.p99", "900.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.p999", "1000.00", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.p233", "100.00", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.p9988", "2200.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.count", "1", timestamp);
         inOrder.verify(graphite).send("prefix.timer.m1_rate", "3.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.m5_rate", "4.00", timestamp);

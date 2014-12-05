@@ -37,6 +37,8 @@ public class CsvReporterTest {
                                    .convertDurationsTo(TimeUnit.MILLISECONDS)
                                    .withClock(clock)
                                    .filter(MetricFilter.ALL)
+                                   .withQuantile("p233", 0.233)
+                                   .withQuantile("p9988", 0.9988)
                                    .build(dataDirectory);
     }
 
@@ -92,6 +94,8 @@ public class CsvReporterTest {
         when(snapshot.getValue(0.98)).thenReturn(9.0);
         when(snapshot.getValue(0.99)).thenReturn(10.0);
         when(snapshot.getValue(0.999)).thenReturn(11.0);
+        when(snapshot.getValue(0.233)).thenReturn(3.0);
+        when(snapshot.getValue(0.9988)).thenReturn(19.0);
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
@@ -103,8 +107,8 @@ public class CsvReporterTest {
 
         assertThat(fileContents("test.histogram.csv"))
                 .isEqualTo(csv(
-                        "t,count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999",
-                        "19910191,1,2,3.000000,4,5.000000,6.000000,7.000000,8.000000,9.000000,10.000000,11.000000"
+                        "t,count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,p233,p9988",
+                        "19910191,1,2,3.000000,4,5.000000,6.000000,7.000000,8.000000,9.000000,10.000000,11.000000,3.000000,19.000000"
                 ));
     }
 
@@ -150,6 +154,8 @@ public class CsvReporterTest {
         when(snapshot.getValue(0.98)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
         when(snapshot.getValue(0.99)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
         when(snapshot.getValue(0.999)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(1000));
+        when(snapshot.getValue(0.233)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(100));
+        when(snapshot.getValue(0.9988)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(2290));
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
@@ -161,8 +167,50 @@ public class CsvReporterTest {
 
         assertThat(fileContents("test.another.timer.csv"))
                 .isEqualTo(csv(
-                        "t,count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
-                        "19910191,1,100.000000,200.000000,300.000000,400.000000,500.000000,600.000000,700.000000,800.000000,900.000000,1000.000000,2.000000,3.000000,4.000000,5.000000,calls/second,milliseconds"
+                        "t,count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,p233,p9988,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
+                        "19910191,1,100.000000,200.000000,300.000000,400.000000,500.000000,600.000000,700.000000,800.000000,900.000000,1000.000000,100.000000,2290.000000,2.000000,3.000000,4.000000,5.000000,calls/second,milliseconds"
+                ));
+    }
+
+
+    @Test
+    public void reportsTimerValuesWithOnlyOneQuantile() throws Exception {
+        final Timer timer = mock(Timer.class);
+        when(timer.getCount()).thenReturn(1L);
+        when(timer.getMeanRate()).thenReturn(2.0);
+        when(timer.getOneMinuteRate()).thenReturn(3.0);
+        when(timer.getFiveMinuteRate()).thenReturn(4.0);
+        when(timer.getFifteenMinuteRate()).thenReturn(5.0);
+
+        final Snapshot snapshot = mock(Snapshot.class);
+        when(snapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));
+        when(snapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));
+        when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
+        when(snapshot.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));
+        when(snapshot.getValue(0.233)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(100));
+
+        when(timer.getSnapshot()).thenReturn(snapshot);
+
+        CsvReporter reporter = CsvReporter.forRegistry(registry)
+                .formatFor(Locale.US)
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .withClock(clock)
+                .filter(MetricFilter.ALL)
+                .withNoQuantiles()
+                .withQuantile("p233", 0.233)
+                .build(dataDirectory);
+
+        reporter.report(this.<Gauge>map(),
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                this.<Meter>map(),
+                map("test.another.timer", timer));
+
+        assertThat(fileContents("test.another.timer.csv"))
+                .isEqualTo(csv(
+                        "t,count,max,mean,min,stddev,p233,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
+                        "19910191,1,100.000000,200.000000,300.000000,400.000000,100.000000,2.000000,3.000000,4.000000,5.000000,calls/second,milliseconds"
                 ));
     }
 

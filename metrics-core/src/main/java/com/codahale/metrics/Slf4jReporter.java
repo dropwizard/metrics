@@ -110,6 +110,29 @@ public class Slf4jReporter extends ScheduledReporter {
             return this;
         }
 
+
+        /**
+         * Add custom quantile to the set of reported quantiles.
+         *
+         * @param name Name of the quantile (i.e. p99999)
+         * @param value Value of the quantile (i.e. 0.99999)
+         * @return {@code this}
+         */
+        public Builder withQuantile(String name, double value) {
+            this.quantiles.add(new Quantile(name, value));
+            return this;
+        }
+
+        /**
+         * Removes all quantiles from the list of reported quantiles including default ones.
+         *
+         * @return {@code this}
+         */
+        public Builder withNoQuantiles() {
+            this.quantiles.clear();
+            return this;
+        }
+
         /**
          * Use Logging Level when reporting.
          *

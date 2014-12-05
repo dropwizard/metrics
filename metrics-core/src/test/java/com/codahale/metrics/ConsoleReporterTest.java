@@ -29,6 +29,8 @@ public class ConsoleReporterTest {
                                                             .convertRatesTo(TimeUnit.SECONDS)
                                                             .convertDurationsTo(TimeUnit.MILLISECONDS)
                                                             .filter(MetricFilter.ALL)
+                                                            .withQuantile("p233", 0.233)
+                                                            .withQuantile("p9988", 0.9988)
                                                             .build();
 
     @Before
@@ -98,6 +100,9 @@ public class ConsoleReporterTest {
         when(snapshot.getValue(0.98)).thenReturn(9.0);
         when(snapshot.getValue(0.99)).thenReturn(10.0);
         when(snapshot.getValue(0.999)).thenReturn(11.0);
+        when(snapshot.getValue(0.233)).thenReturn(3.0);
+        when(snapshot.getValue(0.9988)).thenReturn(17.0);
+
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
@@ -124,6 +129,8 @@ public class ConsoleReporterTest {
                         "              98% <= 9.00",
                         "              99% <= 10.00",
                         "            99.9% <= 11.00",
+                        "            23.3% <= 3.00",
+                        "           99.88% <= 17.00",
                         "",
                         ""
                 ));
@@ -181,6 +188,9 @@ public class ConsoleReporterTest {
         when(snapshot.getValue(0.99)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
         when(snapshot.getValue(0.999)).thenReturn((double) TimeUnit.MILLISECONDS
                                                                         .toNanos(1000));
+        when(snapshot.getValue(0.233)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(100));
+        when(snapshot.getValue(0.9988)).thenReturn((double) TimeUnit.MILLISECONDS
+                .toNanos(2000));
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
@@ -211,6 +221,65 @@ public class ConsoleReporterTest {
                         "              98% <= 800.00 milliseconds",
                         "              99% <= 900.00 milliseconds",
                         "            99.9% <= 1000.00 milliseconds",
+                        "            23.3% <= 100.00 milliseconds",
+                        "           99.88% <= 2000.00 milliseconds",
+                        "",
+                        ""
+                ));
+    }
+
+    @Test
+    public void reportsTimerValuesWithOnlyOneQuantile() throws Exception {
+        final Timer timer = mock(Timer.class);
+        when(timer.getCount()).thenReturn(1L);
+        when(timer.getMeanRate()).thenReturn(2.0);
+        when(timer.getOneMinuteRate()).thenReturn(3.0);
+        when(timer.getFiveMinuteRate()).thenReturn(4.0);
+        when(timer.getFifteenMinuteRate()).thenReturn(5.0);
+
+        final Snapshot snapshot = mock(Snapshot.class);
+        when(snapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));
+        when(snapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));
+        when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
+        when(snapshot.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));
+        when(snapshot.getValue(0.233)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(100));
+
+        when(timer.getSnapshot()).thenReturn(snapshot);
+
+        ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)
+                .outputTo(output)
+                .formattedFor(Locale.US)
+                .withClock(clock)
+                .formattedFor(TimeZone.getTimeZone("PST"))
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .filter(MetricFilter.ALL)
+                .withNoQuantiles()
+                .withQuantile("p233", 0.233)
+                .build();
+
+        reporter.report(this.<Gauge>map(),
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                this.<Meter>map(),
+                map("test.another.timer", timer));
+
+        assertThat(consoleOutput())
+                .isEqualTo(lines(
+                        "3/17/13 6:04:36 PM =============================================================",
+                        "",
+                        "-- Timers ----------------------------------------------------------------------",
+                        "test.another.timer",
+                        "             count = 1",
+                        "         mean rate = 2.00 calls/second",
+                        "     1-minute rate = 3.00 calls/second",
+                        "     5-minute rate = 4.00 calls/second",
+                        "    15-minute rate = 5.00 calls/second",
+                        "               min = 300.00 milliseconds",
+                        "               max = 100.00 milliseconds",
+                        "              mean = 200.00 milliseconds",
+                        "            stddev = 400.00 milliseconds",
+                        "            23.3% <= 100.00 milliseconds",
                         "",
                         ""
                 ));

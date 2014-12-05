@@ -21,6 +21,8 @@ public class Slf4jReporterTest {
             .convertDurationsTo(TimeUnit.MILLISECONDS)
             .withLoggingLevel(Slf4jReporter.LoggingLevel.INFO)
             .filter(MetricFilter.ALL)
+            .withQuantile("p233", 0.233)
+            .withQuantile("p9988", 0.9988)
             .build();
 
     private final Slf4jReporter errorReporter = Slf4jReporter.forRegistry(registry)
@@ -30,6 +32,8 @@ public class Slf4jReporterTest {
             .convertDurationsTo(TimeUnit.MILLISECONDS)
             .withLoggingLevel(Slf4jReporter.LoggingLevel.ERROR)
             .filter(MetricFilter.ALL)
+            .withQuantile("p233", 0.233)
+            .withQuantile("p9988", 0.9988)
             .build();
 
     @Test
@@ -73,6 +77,8 @@ public class Slf4jReporterTest {
         when(snapshot.getValue(0.98)).thenReturn(9.0);
         when(snapshot.getValue(0.99)).thenReturn(10.0);
         when(snapshot.getValue(0.999)).thenReturn(11.0);
+        when(snapshot.getValue(0.233)).thenReturn(3.0);
+        when(snapshot.getValue(0.9988)).thenReturn(17.0);
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
@@ -83,7 +89,7 @@ public class Slf4jReporterTest {
                 this.<Timer>map());
 
         verify(logger).error(marker,
-                "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, p50={}, p75={}, p95={}, p98={}, p99={}, p999={}",
+                "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, p50={}, p75={}, p95={}, p98={}, p99={}, p999={}, p233={}, p9988={}",
                 "test.histogram",
                 1L,
                 4L,
@@ -95,7 +101,9 @@ public class Slf4jReporterTest {
                 8.0,
                 9.0,
                 10.0,
-                11.0);
+                11.0,
+                3.0,
+                17.0);
     }
 
     @Test
@@ -146,6 +154,9 @@ public class Slf4jReporterTest {
         when(snapshot.getValue(0.99)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
         when(snapshot.getValue(0.999)).thenReturn((double) TimeUnit.MILLISECONDS
                 .toNanos(1000));
+        when(snapshot.getValue(0.233)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(100));
+        when(snapshot.getValue(0.9988)).thenReturn((double) TimeUnit.MILLISECONDS
+                .toNanos(2000));
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
@@ -156,7 +167,7 @@ public class Slf4jReporterTest {
                 map("test.another.timer", timer));
 
         verify(logger).error(marker,
-                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, p50={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
+                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, p50={}, p75={}, p95={}, p98={}, p99={}, p999={}, p233={}, p9988={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
                 "test.another.timer",
                 1L,
                 300.0,
@@ -169,6 +180,8 @@ public class Slf4jReporterTest {
                 800.0,
                 900.0,
                 1000.0,
+                100.0,
+                2000.0,
                 2.0,
                 3.0,
                 4.0,
@@ -218,6 +231,8 @@ public class Slf4jReporterTest {
         when(snapshot.getValue(0.98)).thenReturn(9.0);
         when(snapshot.getValue(0.99)).thenReturn(10.0);
         when(snapshot.getValue(0.999)).thenReturn(11.0);
+        when(snapshot.getValue(0.233)).thenReturn(3.0);
+        when(snapshot.getValue(0.9988)).thenReturn(17.0);
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
@@ -228,7 +243,7 @@ public class Slf4jReporterTest {
                 this.<Timer>map());
 
         verify(logger).info(marker,
-                "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, p50={}, p75={}, p95={}, p98={}, p99={}, p999={}",
+                "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, p50={}, p75={}, p95={}, p98={}, p99={}, p999={}, p233={}, p9988={}",
                 "test.histogram",
                 1L,
                 4L,
@@ -240,7 +255,51 @@ public class Slf4jReporterTest {
                 8.0,
                 9.0,
                 10.0,
-                11.0);
+                11.0,
+                3.0,
+                17.0);
+    }
+
+    @Test
+    public void reportsHistogramValuesWithOnlyOneQuantile() throws Exception {
+        final Histogram histogram = mock(Histogram.class);
+        when(histogram.getCount()).thenReturn(1L);
+
+        final Snapshot snapshot = mock(Snapshot.class);
+        when(snapshot.getMax()).thenReturn(2L);
+        when(snapshot.getMean()).thenReturn(3.0);
+        when(snapshot.getMin()).thenReturn(4L);
+        when(snapshot.getStdDev()).thenReturn(5.0);
+        when(snapshot.getValue(0.233)).thenReturn(3.0);
+
+        when(histogram.getSnapshot()).thenReturn(snapshot);
+
+        Slf4jReporter infoReporter = Slf4jReporter.forRegistry(registry)
+                .outputTo(logger)
+                .markWith(marker)
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .withLoggingLevel(Slf4jReporter.LoggingLevel.INFO)
+                .filter(MetricFilter.ALL)
+                .withNoQuantiles()
+                .withQuantile("p233", 0.233)
+                .build();
+
+        infoReporter.report(this.<Gauge>map(),
+                this.<Counter>map(),
+                map("test.histogram", histogram),
+                this.<Meter>map(),
+                this.<Timer>map());
+
+        verify(logger).info(marker,
+                "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, p233={}",
+                "test.histogram",
+                1L,
+                4L,
+                2L,
+                3.0,
+                5.0,
+                3.0);
     }
 
     @Test
@@ -291,7 +350,9 @@ public class Slf4jReporterTest {
         when(snapshot.getValue(0.99)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
         when(snapshot.getValue(0.999)).thenReturn((double) TimeUnit.MILLISECONDS
                 .toNanos(1000));
-
+        when(snapshot.getValue(0.233)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(100));
+        when(snapshot.getValue(0.9988)).thenReturn((double) TimeUnit.MILLISECONDS
+                .toNanos(2000));
         when(timer.getSnapshot()).thenReturn(snapshot);
 
         infoReporter.report(this.<Gauge>map(),
@@ -301,7 +362,7 @@ public class Slf4jReporterTest {
                 map("test.another.timer", timer));
 
         verify(logger).info(marker,
-                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, p50={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
+                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, p50={}, p75={}, p95={}, p98={}, p99={}, p999={}, p233={}, p9988={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
                 "test.another.timer",
                 1L,
                 300.0,
@@ -314,6 +375,8 @@ public class Slf4jReporterTest {
                 800.0,
                 900.0,
                 1000.0,
+                100.0,
+                2000.0,
                 2.0,
                 3.0,
                 4.0,

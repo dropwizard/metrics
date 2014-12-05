@@ -22,6 +22,8 @@ public class GangliaReporterTest {
                                                             .convertRatesTo(TimeUnit.SECONDS)
                                                             .convertDurationsTo(TimeUnit.MILLISECONDS)
                                                             .filter(MetricFilter.ALL)
+                                                            .withQuantile("p233", 0.233)
+                                                            .withQuantile("p9988", 0.9988)
                                                             .build(ganglia);
 
     @Test
@@ -152,6 +154,8 @@ public class GangliaReporterTest {
         when(snapshot.getValue(0.98)).thenReturn(9.0);
         when(snapshot.getValue(0.99)).thenReturn(10.0);
         when(snapshot.getValue(0.999)).thenReturn(11.0);
+        when(snapshot.getValue(0.233)).thenReturn(3.0);
+        when(snapshot.getValue(0.9988)).thenReturn(17.0);
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
@@ -172,6 +176,49 @@ public class GangliaReporterTest {
         verify(ganglia).announce("m.test.histogram.p98", "9.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
         verify(ganglia).announce("m.test.histogram.p99", "10.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
         verify(ganglia).announce("m.test.histogram.p999", "11.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.p233", "3.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.p9988", "17.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verifyNoMoreInteractions(ganglia);
+    }
+
+    @Test
+    public void reportsHistogramValuesWithOnlyOneQuantile() throws Exception {
+        final Histogram histogram = mock(Histogram.class);
+        when(histogram.getCount()).thenReturn(1L);
+
+        final Snapshot snapshot = mock(Snapshot.class);
+        when(snapshot.getMax()).thenReturn(2L);
+        when(snapshot.getMean()).thenReturn(3.0);
+        when(snapshot.getMin()).thenReturn(4L);
+        when(snapshot.getStdDev()).thenReturn(5.0);
+
+        when(snapshot.getValue(0.233)).thenReturn(3.0);
+
+        when(histogram.getSnapshot()).thenReturn(snapshot);
+
+        GangliaReporter reporter = GangliaReporter.forRegistry(registry)
+                .prefixedWith("m")
+                .withTMax(60)
+                .withDMax(0)
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .filter(MetricFilter.ALL)
+                .withNoQuantiles()
+                .withQuantile("p233", 0.233)
+                .build(ganglia);
+
+        reporter.report(this.<Gauge>map(),
+                this.<Counter>map(),
+                map("test.histogram", histogram),
+                this.<Meter>map(),
+                this.<Timer>map());
+
+        verify(ganglia).announce("m.test.histogram.count", "1", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.max", "2", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.mean", "3.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.min", "4", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.stddev", "5.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.histogram.p233", "3.0", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0, "test");
         verifyNoMoreInteractions(ganglia);
     }
 
@@ -219,6 +266,8 @@ public class GangliaReporterTest {
         when(snapshot.getValue(0.98)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
         when(snapshot.getValue(0.99)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
         when(snapshot.getValue(0.999)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(1000));
+        when(snapshot.getValue(0.233)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(100));
+        when(snapshot.getValue(0.9988)).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(2000));
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
@@ -238,6 +287,8 @@ public class GangliaReporterTest {
         verify(ganglia).announce("m.test.another.timer.p98", "800.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
         verify(ganglia).announce("m.test.another.timer.p99", "900.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
         verify(ganglia).announce("m.test.another.timer.p999", "1000.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.p233", "100.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
+        verify(ganglia).announce("m.test.another.timer.p9988", "2000.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
 
         verify(ganglia).announce("m.test.another.timer.count", "1", GMetricType.DOUBLE, "calls", GMetricSlope.BOTH, 60, 0, "test.another");
         verify(ganglia).announce("m.test.another.timer.mean_rate", "2.0", GMetricType.DOUBLE, "calls/second", GMetricSlope.BOTH, 60, 0, "test.another");

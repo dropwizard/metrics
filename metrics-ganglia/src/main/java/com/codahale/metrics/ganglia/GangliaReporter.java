@@ -135,8 +135,18 @@ public class GangliaReporter extends ScheduledReporter {
          * @param value Value of the quantile (i.e. 0.99999)
          * @return {@code this}
          */
-        public Builder withCustomQuantile(String name, double value) {
+        public Builder withQuantile(String name, double value) {
             this.quantiles.add(new Quantile(name, value));
+            return this;
+        }
+
+        /**
+         * Removes all quantiles from the list of reported quantiles including default ones.
+         *
+         * @return {@code this}
+         */
+        public Builder withNoQuantiles() {
+            this.quantiles.clear();
             return this;
         }
 

@@ -14,13 +14,4 @@ public class Quantiles {
         result.add(new Quantile("p999", 0.999));
         return result;
     }
-
-    public static List<String> names(List<Quantile> quantiles) {
-        List<String> result = new ArrayList<String>();
-        for (Quantile quantile : quantiles) {
-            result.add(quantile.getName());
-        }
-        return result;
-    }
-
 }
