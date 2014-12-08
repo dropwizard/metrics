@@ -3,6 +3,7 @@ package com.codahale.metrics.jetty9;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.RatioGauge;
 import com.codahale.metrics.Timer;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.server.AsyncContextState;
@@ -131,6 +132,55 @@ public class InstrumentedHandler extends HandlerWrapper {
         this.connectRequests = metricRegistry.timer(name(prefix, "connect-requests"));
         this.moveRequests = metricRegistry.timer(name(prefix, "move-requests"));
         this.otherRequests = metricRegistry.timer(name(prefix, "other-requests"));
+
+        metricRegistry.register(name(prefix, "percent-4xx-1m"), new RatioGauge() {
+            @Override
+            protected Ratio getRatio() {
+                return Ratio.of(responses[3].getOneMinuteRate(),
+                        requests.getOneMinuteRate());
+            }
+        });
+
+        metricRegistry.register(name(prefix, "percent-4xx-5m"), new RatioGauge() {
+            @Override
+            protected Ratio getRatio() {
+                return Ratio.of(responses[3].getFiveMinuteRate(),
+                        requests.getFiveMinuteRate());
+            }
+        });
+
+        metricRegistry.register(name(prefix, "percent-4xx-15m"), new RatioGauge() {
+            @Override
+            protected Ratio getRatio() {
+                return Ratio.of(responses[3].getFifteenMinuteRate(),
+                        requests.getFifteenMinuteRate());
+            }
+        });
+
+        metricRegistry.register(name(prefix, "percent-5xx-1m"), new RatioGauge() {
+            @Override
+            protected Ratio getRatio() {
+                return Ratio.of(responses[4].getOneMinuteRate(),
+                        requests.getOneMinuteRate());
+            }
+        });
+
+        metricRegistry.register(name(prefix, "percent-5xx-5m"), new RatioGauge() {
+            @Override
+            protected Ratio getRatio() {
+                return Ratio.of(responses[4].getFiveMinuteRate(),
+                        requests.getFiveMinuteRate());
+            }
+        });
+
+        metricRegistry.register(name(prefix, "percent-5xx-15m"), new RatioGauge() {
+            @Override
+            protected Ratio getRatio() {
+                return Ratio.of(responses[4].getFifteenMinuteRate(),
+                        requests.getFifteenMinuteRate());
+            }
+        });
+
 
         this.listener = new AsyncListener() {
             private long startTime;
