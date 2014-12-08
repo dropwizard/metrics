@@ -41,8 +41,8 @@ public class GraphiteUDP implements GraphiteSender {
      * @param address the address of the Carbon server
      */
     public GraphiteUDP(InetSocketAddress address) {
-        this.hostname = null;
-        this.port = -1;
+        this.hostname = address.getHostString();
+        this.port = address.getPort();
         this.address = address;
     }
 
@@ -58,7 +58,7 @@ public class GraphiteUDP implements GraphiteSender {
         }
 
         // Resolve hostname
-        if (hostname != null) {
+        if (address == null) {
             address = new InetSocketAddress(hostname, port);
         }
 
@@ -107,6 +107,7 @@ public class GraphiteUDP implements GraphiteSender {
 
     @Override
     public void close() throws IOException {
+        address = null;
         // Leave channel & socket open for next metrics
     }
 

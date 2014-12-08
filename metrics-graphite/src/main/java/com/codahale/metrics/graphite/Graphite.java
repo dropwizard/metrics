@@ -1,8 +1,10 @@
 package com.codahale.metrics.graphite;
 
 import javax.net.SocketFactory;
-
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -19,10 +21,10 @@ public class Graphite implements GraphiteSender {
 
     private final String hostname;
     private final int port;
-    private final InetSocketAddress address;
     private final SocketFactory socketFactory;
     private final Charset charset;
 
+    private InetSocketAddress address;
     private Socket socket;
     private Writer writer;
     private int failures;
@@ -95,8 +97,8 @@ public class Graphite implements GraphiteSender {
      * @param charset       the character set used by the server
      */
     public Graphite(InetSocketAddress address, SocketFactory socketFactory, Charset charset) {
-        this.hostname = null;
-        this.port = -1;
+        this.hostname = address.getHostString();
+        this.port = address.getPort();
         this.address = address;
         this.socketFactory = socketFactory;
         this.charset = charset;
@@ -107,7 +109,6 @@ public class Graphite implements GraphiteSender {
         if (socket != null) {
             throw new IllegalStateException("Already connected");
         }
-        InetSocketAddress address = this.address;
         if (address == null) {
             address = new InetSocketAddress(hostname, port);
         }
@@ -121,7 +122,7 @@ public class Graphite implements GraphiteSender {
 
     @Override
     public boolean isConnected() {
-    		return socket != null && socket.isConnected() && !socket.isClosed();
+        return socket != null && socket.isConnected() && !socket.isClosed();
     }
 
     @Override
@@ -165,6 +166,7 @@ public class Graphite implements GraphiteSender {
         } finally {
             this.socket = null;
             this.writer = null;
+            this.address = null;
         }
     }
 
