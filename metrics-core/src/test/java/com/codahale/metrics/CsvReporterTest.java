@@ -134,6 +134,7 @@ public class CsvReporterTest {
     public void reportsTimerValues() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
+        when(timer.getTotalDuration()).thenReturn(TimeUnit.MILLISECONDS.toNanos(600));
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
         when(timer.getFiveMinuteRate()).thenReturn(4.0);
@@ -161,8 +162,8 @@ public class CsvReporterTest {
 
         assertThat(fileContents("test.another.timer.csv"))
                 .isEqualTo(csv(
-                        "t,count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
-                        "19910191,1,100.000000,200.000000,300.000000,400.000000,500.000000,600.000000,700.000000,800.000000,900.000000,1000.000000,2.000000,3.000000,4.000000,5.000000,calls/second,milliseconds"
+                        "t,count,total,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
+                        "19910191,1,600.000000,100.000000,200.000000,300.000000,400.000000,500.000000,600.000000,700.000000,800.000000,900.000000,1000.000000,2.000000,3.000000,4.000000,5.000000,calls/second,milliseconds"
                 ));
     }
 

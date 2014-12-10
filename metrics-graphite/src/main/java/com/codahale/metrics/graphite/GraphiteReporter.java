@@ -201,6 +201,7 @@ public class GraphiteReporter extends ScheduledReporter {
     private void reportTimer(String name, Timer timer, long timestamp) throws IOException {
         final Snapshot snapshot = timer.getSnapshot();
 
+        graphite.send(prefix(name, "total"), format(convertDuration(timer.getTotalDuration())), timestamp);
         graphite.send(prefix(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
         graphite.send(prefix(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
         graphite.send(prefix(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);

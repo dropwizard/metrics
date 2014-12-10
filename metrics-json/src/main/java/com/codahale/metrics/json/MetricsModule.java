@@ -137,6 +137,7 @@ public class MetricsModule extends Module {
             json.writeStartObject();
             final Snapshot snapshot = timer.getSnapshot();
             json.writeNumberField("count", timer.getCount());
+            json.writeNumberField("total", timer.getTotalDuration() * durationFactor);
             json.writeNumberField("max", snapshot.getMax() * durationFactor);
             json.writeNumberField("mean", snapshot.getMean() * durationFactor);
             json.writeNumberField("min", snapshot.getMin() * durationFactor);

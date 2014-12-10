@@ -206,6 +206,7 @@ public class GangliaReporter extends ScheduledReporter {
         try {
             final Snapshot snapshot = timer.getSnapshot();
 
+            announce(prefix(sanitizedName, "total"), group, convertDuration(timer.getTotalDuration()), getDurationUnit());
             announce(prefix(sanitizedName, "max"), group, convertDuration(snapshot.getMax()), getDurationUnit());
             announce(prefix(sanitizedName, "mean"), group, convertDuration(snapshot.getMean()), getDurationUnit());
             announce(prefix(sanitizedName, "min"), group, convertDuration(snapshot.getMin()), getDurationUnit());

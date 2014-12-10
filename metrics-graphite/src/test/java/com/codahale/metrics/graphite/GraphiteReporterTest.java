@@ -245,6 +245,7 @@ public class GraphiteReporterTest {
     public void reportsTimers() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
+        when(timer.getTotalDuration()).thenReturn(TimeUnit.MILLISECONDS.toNanos(600));
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
         when(timer.getFiveMinuteRate()).thenReturn(4.0);
@@ -274,6 +275,7 @@ public class GraphiteReporterTest {
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send("prefix.timer.total", "600.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.max", "100.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.mean", "200.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.min", "300.00", timestamp);

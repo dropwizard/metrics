@@ -128,7 +128,7 @@ public class Slf4jReporterTest {
     public void reportsTimerValuesAtError() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
-
+        when(timer.getTotalDuration()).thenReturn(TimeUnit.MILLISECONDS.toNanos(600));
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
         when(timer.getFiveMinuteRate()).thenReturn(4.0);
@@ -156,9 +156,10 @@ public class Slf4jReporterTest {
                 map("test.another.timer", timer));
 
         verify(logger).error(marker,
-                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
+                "type=TIMER, name={}, count={}, total={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
                 "test.another.timer",
                 1L,
+                600.0,
                 300.0,
                 100.0,
                 200.0,
@@ -273,7 +274,7 @@ public class Slf4jReporterTest {
     public void reportsTimerValues() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
-
+        when(timer.getTotalDuration()).thenReturn(TimeUnit.MILLISECONDS.toNanos(600));
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
         when(timer.getFiveMinuteRate()).thenReturn(4.0);
@@ -301,9 +302,10 @@ public class Slf4jReporterTest {
                 map("test.another.timer", timer));
 
         verify(logger).info(marker,
-                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
+                "type=TIMER, name={}, count={}, total={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
                 "test.another.timer",
                 1L,
+                600.0,
                 300.0,
                 100.0,
                 200.0,

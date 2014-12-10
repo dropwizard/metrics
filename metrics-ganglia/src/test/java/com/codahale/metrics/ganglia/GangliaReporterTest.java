@@ -201,7 +201,7 @@ public class GangliaReporterTest {
     public void reportsTimerValues() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
-
+        when(timer.getTotalDuration()).thenReturn(TimeUnit.MILLISECONDS.toNanos(600));
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
         when(timer.getFiveMinuteRate()).thenReturn(4.0);
@@ -227,6 +227,7 @@ public class GangliaReporterTest {
                         this.<Meter>map(),
                         map("test.another.timer", timer));
 
+        verify(ganglia).announce("m.test.another.timer.total", "600.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
         verify(ganglia).announce("m.test.another.timer.max", "100.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
         verify(ganglia).announce("m.test.another.timer.mean", "200.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");
         verify(ganglia).announce("m.test.another.timer.min", "300.0", GMetricType.DOUBLE, "milliseconds", GMetricSlope.BOTH, 60, 0, "test.another");

@@ -164,6 +164,7 @@ public class ConsoleReporterTest {
     public void reportsTimerValues() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
+        when(timer.getTotalDuration()).thenReturn(TimeUnit.MILLISECONDS.toNanos(600));
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
         when(timer.getFiveMinuteRate()).thenReturn(4.0);
@@ -197,6 +198,7 @@ public class ConsoleReporterTest {
                         "-- Timers ----------------------------------------------------------------------",
                         "test.another.timer",
                         "             count = 1",
+                        "             total = 600.00 milliseconds",
                         "         mean rate = 2.00 calls/second",
                         "     1-minute rate = 3.00 calls/second",
                         "     5-minute rate = 4.00 calls/second",

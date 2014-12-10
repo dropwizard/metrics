@@ -257,6 +257,7 @@ public class ConsoleReporter extends ScheduledReporter {
     private void printTimer(Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
         output.printf(locale, "             count = %d%n", timer.getCount());
+        output.printf(locale, "             total = %2.2f %s%n", convertDuration(timer.getTotalDuration()), getDurationUnit());
         output.printf(locale, "         mean rate = %2.2f calls/%s%n", convertRate(timer.getMeanRate()), getRateUnit());
         output.printf(locale, "     1-minute rate = %2.2f calls/%s%n", convertRate(timer.getOneMinuteRate()), getRateUnit());
         output.printf(locale, "     5-minute rate = %2.2f calls/%s%n", convertRate(timer.getFiveMinuteRate()), getRateUnit());

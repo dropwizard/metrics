@@ -125,6 +125,7 @@ public class MetricsModuleTest {
     public void serializesTimers() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
+        when(timer.getTotalDuration()).thenReturn(TimeUnit.MILLISECONDS.toNanos(600));
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
         when(timer.getFiveMinuteRate()).thenReturn(4.0);
@@ -153,6 +154,7 @@ public class MetricsModuleTest {
         assertThat(mapper.writeValueAsString(timer))
                 .isEqualTo("{" +
                                    "\"count\":1," +
+                                   "\"total\":600.0," +
                                    "\"max\":100.0," +
                                    "\"mean\":200.0," +
                                    "\"min\":300.0," +
@@ -176,6 +178,7 @@ public class MetricsModuleTest {
         assertThat(fullMapper.writeValueAsString(timer))
                 .isEqualTo("{" +
                                    "\"count\":1," +
+                                   "\"total\":600.0," +
                                    "\"max\":100.0," +
                                    "\"mean\":200.0," +
                                    "\"min\":300.0," +

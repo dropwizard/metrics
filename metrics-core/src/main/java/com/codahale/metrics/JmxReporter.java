@@ -383,6 +383,8 @@ public class JmxReporter implements Reporter, Closeable {
     // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface JmxTimerMBean extends JmxMeterMBean {
+        double getTotalDuration();
+
         double getMin();
 
         double getMax();
@@ -421,6 +423,11 @@ public class JmxReporter implements Reporter, Closeable {
             this.metric = metric;
             this.durationFactor = 1.0 / durationUnit.toNanos(1);
             this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
+        }
+
+        @Override
+        public double getTotalDuration() {
+            return metric.getTotalDuration() * durationFactor;
         }
 
         @Override
