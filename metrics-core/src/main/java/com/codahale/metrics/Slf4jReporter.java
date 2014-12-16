@@ -28,7 +28,7 @@ public class Slf4jReporter extends ScheduledReporter {
     public enum LoggingLevel {TRACE, DEBUG, INFO, WARN, ERROR}
 
     /**
-     * A builder for {@link CsvReporter} instances. Defaults to logging to {@code metrics}, not
+     * A builder for {@link Slf4jReporter} instances. Defaults to logging to {@code metrics}, not
      * using a marker, converting rates to events/second, converting durations to milliseconds, and
      * not filtering metrics.
      */
