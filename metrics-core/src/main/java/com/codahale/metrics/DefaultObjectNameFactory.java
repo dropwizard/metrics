@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class DefaultObjectNameFactory implements ObjectNameFactory {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(JmxReporter.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultObjectNameFactory.class);
 
 	@Override
 	public ObjectName createName(String type, String domain, String name) {
