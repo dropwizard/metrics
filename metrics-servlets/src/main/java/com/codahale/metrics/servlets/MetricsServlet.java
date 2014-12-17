@@ -169,11 +169,14 @@ public class MetricsServlet extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_OK);
         
         final OutputStream output = resp.getOutputStream();
+        final String metricType = req.getParameter("type");
+        final String metricKey = req.getParameter("key");
         try {
             if (jsonpParamName != null && req.getParameter(jsonpParamName) != null) {
-                getWriter(req).writeValue(output, new JSONPObject(req.getParameter(jsonpParamName), registry));
+                getWriter(req).writeValue(output,new JSONPObject(req.getParameter(jsonpParamName), 
+                        filterByMetricTypeAndKey(metricType, metricKey, registry)));
             } else {
-                getWriter(req).writeValue(output, registry);
+                getWriter(req).writeValue(output, filterByMetricTypeAndKey(metricType, metricKey, registry));
             }
         } finally {
             output.close();
@@ -186,6 +189,24 @@ public class MetricsServlet extends HttpServlet {
             return mapper.writerWithDefaultPrettyPrinter();
         }
         return mapper.writer();
+    }
+    
+    private Object filterByMetricTypeAndKey(String metricType, String metricKey,MetricRegistry metricRegistry) {
+
+        boolean isMetricKeyNullOrEmpty = metricKey == null || "".equals(metricKey);
+        
+        if ("gauges".equals(metricType)) {
+            return isMetricKeyNullOrEmpty ? metricRegistry.getGauges() : metricRegistry.getGauges().get(metricKey);
+        } else if ("counters".equals(metricType)) {
+            return isMetricKeyNullOrEmpty ? metricRegistry.getCounters() : metricRegistry.getCounters().get(metricKey);
+        } else if ("histograms".equals(metricType)) {
+            return isMetricKeyNullOrEmpty ? metricRegistry.getHistograms() : metricRegistry.getHistograms().get(
+                    metricKey);
+        } else if ("meters".equals(metricType)) {
+            return isMetricKeyNullOrEmpty ? metricRegistry.getMeters() : metricRegistry.getMeters().get(metricKey);
+        } else {
+            return metricRegistry;
+        }
     }
 
     private TimeUnit parseTimeUnit(String value, TimeUnit defaultValue) {
