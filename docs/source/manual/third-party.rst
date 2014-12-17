@@ -25,3 +25,4 @@ the many third-party libraries which extend Metrics:
 * `metrics-aspectj <https://github.com/astefanutti/metrics-aspectj>`_ provides integration with `AspectJ <http://eclipse.org/aspectj/>`_
 * `camel-metrics <https://github.com/InitiumIo/camel-metrics>`_ provides component for your `Apache Camel <https://camel.apache.org/>`_ route
 * `metrics-splunk <https://github.com/zenmoto/metrics-splunk>`_ provides a reporter for `Splunk <http://www.splunk.com/>`_
+* `metrics-spark-reporter <https://github.com/ippontech/metrics-spark-reporter>`_ provides a reporter for `Apache Spark Streaming <https://spark.apache.org/streaming/>`_.
