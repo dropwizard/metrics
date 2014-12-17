@@ -220,6 +220,31 @@ public class MetricsServletTest extends AbstractServletTest {
     }
 
     @Test
+    public void filterMetrics() throws Exception {
+        request.setURI("/metrics?pretty=true&type=meters&key=m");
+        processRequest();
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(response.get("Access-Control-Allow-Origin")).isEqualTo("*");
+        assertThat(response.getContent()).isEqualTo(
+                String.format("{%n" + "  \"count\" : 1,%n" + "  \"m15_rate\" : 0.0,%n" + "  \"m1_rate\" : 0.0,%n"
+                        + "  \"m5_rate\" : 0.0,%n" + "  \"mean_rate\" : 3333333.3333333335,%n"
+                        + "  \"units\" : \"events/second\"%n" + "}"));
+        assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
+    }
+
+    @Test
+    public void filterMetricsMissingKey() throws Exception {
+        request.setURI("/metrics?pretty=true&type=meters&key=");
+        processRequest();
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(response.get("Access-Control-Allow-Origin")).isEqualTo("*");
+        assertThat(response.getContent()).isEqualTo(String.format("{%n  \"m\" : {%n" + "    \"count\" : 1,%n" + "    \"m15_rate\" : 0.0,%n" + "    \"m1_rate\" : 0.0,%n"
+                + "    \"m5_rate\" : 0.0,%n" + "    \"mean_rate\" : 3333333.3333333335,%n"
+                + "    \"units\" : \"events/second\"%n" + "  }%n}"));
+        assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
+    }
+    
+    @Test
     public void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
         final MetricRegistry metricRegistry = mock(MetricRegistry.class);
         final ServletContext servletContext = mock(ServletContext.class);
