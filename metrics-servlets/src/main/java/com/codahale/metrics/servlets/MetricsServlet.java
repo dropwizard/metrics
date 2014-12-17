@@ -21,26 +21,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 /**
- * A servlet which returns the metrics in a given registry as an
- * {@code application/json} response.
+ * A servlet which returns the metrics in a given registry as an {@code application/json} response.
  */
 public class MetricsServlet extends HttpServlet {
     /**
-     * An abstract {@link ServletContextListener} which allows you to
-     * programmatically inject the {@link MetricRegistry}, rate and duration
-     * units, and allowed origin for {@link MetricsServlet}.
+     * An abstract {@link ServletContextListener} which allows you to programmatically inject the {@link MetricRegistry}
+     * , rate and duration units, and allowed origin for {@link MetricsServlet}.
      */
-    public static abstract class ContextListener implements
-            ServletContextListener {
+    public static abstract class ContextListener implements ServletContextListener {
         /**
-         * Returns the {@link MetricRegistry} to inject into the servlet
-         * context.
+         * Returns the {@link MetricRegistry} to inject into the servlet context.
          */
         protected abstract MetricRegistry getMetricRegistry();
 
         /**
-         * Returns the {@link TimeUnit} to which rates should be converted, or
-         * {@code null} if the default should be used.
+         * Returns the {@link TimeUnit} to which rates should be converted, or {@code null} if the default should be
+         * used.
          */
         protected TimeUnit getRateUnit() {
             // use the default
@@ -48,8 +44,8 @@ public class MetricsServlet extends HttpServlet {
         }
 
         /**
-         * Returns the {@link TimeUnit} to which durations should be converted,
-         * or {@code null} if the default should be used.
+         * Returns the {@link TimeUnit} to which durations should be converted, or {@code null} if the default should be
+         * used.
          */
         protected TimeUnit getDurationUnit() {
             // use the default
@@ -65,8 +61,8 @@ public class MetricsServlet extends HttpServlet {
         }
 
         /**
-         * Returns the {@link MetricFilter} that shall be used to filter
-         * metrics, or {@link MetricFilter#ALL} if the default should be used.
+         * Returns the {@link MetricFilter} that shall be used to filter metrics, or {@link MetricFilter#ALL} if the
+         * default should be used.
          */
         protected MetricFilter getMetricFilter() {
             // use the default
@@ -89,18 +85,12 @@ public class MetricsServlet extends HttpServlet {
         }
     }
 
-    public static final String RATE_UNIT = MetricsServlet.class
-            .getCanonicalName() + ".rateUnit";
-    public static final String DURATION_UNIT = MetricsServlet.class
-            .getCanonicalName() + ".durationUnit";
-    public static final String SHOW_SAMPLES = MetricsServlet.class
-            .getCanonicalName() + ".showSamples";
-    public static final String METRICS_REGISTRY = MetricsServlet.class
-            .getCanonicalName() + ".registry";
-    public static final String ALLOWED_ORIGIN = MetricsServlet.class
-            .getCanonicalName() + ".allowedOrigin";
-    public static final String METRIC_FILTER = MetricsServlet.class
-            .getCanonicalName() + ".metricFilter";
+    public static final String RATE_UNIT = MetricsServlet.class.getCanonicalName() + ".rateUnit";
+    public static final String DURATION_UNIT = MetricsServlet.class.getCanonicalName() + ".durationUnit";
+    public static final String SHOW_SAMPLES = MetricsServlet.class.getCanonicalName() + ".showSamples";
+    public static final String METRICS_REGISTRY = MetricsServlet.class.getCanonicalName() + ".registry";
+    public static final String ALLOWED_ORIGIN = MetricsServlet.class.getCanonicalName() + ".allowedOrigin";
+    public static final String METRIC_FILTER = MetricsServlet.class.getCanonicalName() + ".metricFilter";
 
     private static final long serialVersionUID = 1049773947734939602L;
     private static final String CONTENT_TYPE = "application/json";
@@ -126,31 +116,24 @@ public class MetricsServlet extends HttpServlet {
             if (registryAttr instanceof MetricRegistry) {
                 this.registry = (MetricRegistry) registryAttr;
             } else {
-                throw new ServletException(
-                        "Couldn't find a MetricRegistry instance.");
+                throw new ServletException("Couldn't find a MetricRegistry instance.");
             }
         }
 
-        final TimeUnit rateUnit = parseTimeUnit(
-                context.getInitParameter(RATE_UNIT), TimeUnit.SECONDS);
-        final TimeUnit durationUnit = parseTimeUnit(
-                context.getInitParameter(DURATION_UNIT), TimeUnit.SECONDS);
-        final boolean showSamples = Boolean.parseBoolean(context
-                .getInitParameter(SHOW_SAMPLES));
-        MetricFilter filter = (MetricFilter) context
-                .getAttribute(METRIC_FILTER);
+        final TimeUnit rateUnit = parseTimeUnit(context.getInitParameter(RATE_UNIT), TimeUnit.SECONDS);
+        final TimeUnit durationUnit = parseTimeUnit(context.getInitParameter(DURATION_UNIT), TimeUnit.SECONDS);
+        final boolean showSamples = Boolean.parseBoolean(context.getInitParameter(SHOW_SAMPLES));
+        MetricFilter filter = (MetricFilter) context.getAttribute(METRIC_FILTER);
         if (filter == null) {
             filter = MetricFilter.ALL;
         }
-        this.mapper = new ObjectMapper().registerModule(new MetricsModule(
-                rateUnit, durationUnit, showSamples, filter));
+        this.mapper = new ObjectMapper().registerModule(new MetricsModule(rateUnit, durationUnit, showSamples, filter));
 
         this.allowedOrigin = config.getInitParameter(ALLOWED_ORIGIN);
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType(CONTENT_TYPE);
         if (allowedOrigin != null) {
             resp.setHeader("Access-Control-Allow-Origin", allowedOrigin);
@@ -162,15 +145,13 @@ public class MetricsServlet extends HttpServlet {
         final String metricType = req.getParameter("type");
         final String metricKey = req.getParameter("key");
         try {
-            getWriter(req).writeValue(output,
-                    filterMetricKey(registry, metricType, metricKey));
+            getWriter(req).writeValue(output, filterMetricKey(registry, metricType, metricKey));
         } finally {
             output.close();
         }
     }
 
-    private Object filterMetricKey(MetricRegistry metricRegistry,
-            String metricType, String metricKey) {
+    private Object filterMetricKey(MetricRegistry metricRegistry, String metricType, String metricKey) {
 
         if ("gauges".equals(metricType)) {
             return metricRegistry.getGauges().get(metricKey);
@@ -186,8 +167,7 @@ public class MetricsServlet extends HttpServlet {
     }
 
     private ObjectWriter getWriter(HttpServletRequest request) {
-        final boolean prettyPrint = Boolean.parseBoolean(request
-                .getParameter("pretty"));
+        final boolean prettyPrint = Boolean.parseBoolean(request.getParameter("pretty"));
         if (prettyPrint) {
             return mapper.writerWithDefaultPrettyPrinter();
         }
@@ -196,8 +176,7 @@ public class MetricsServlet extends HttpServlet {
 
     private TimeUnit parseTimeUnit(String value, TimeUnit defaultValue) {
         try {
-            return TimeUnit.valueOf(String.valueOf(value)
-                    .toUpperCase(Locale.US));
+            return TimeUnit.valueOf(String.valueOf(value).toUpperCase(Locale.US));
         } catch (IllegalArgumentException e) {
             return defaultValue;
         }
