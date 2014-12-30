@@ -12,6 +12,7 @@ the many third-party libraries which extend Metrics:
 * `sematext-metrics-reporter <https://github.com/sematext/sematext-metrics-reporter>`_ provides a reporter for `SPM <http://sematext.com/spm/index.html>`_.
 * `wicket-metrics <https://github.com/NitorCreations/wicket-metrics>`_ provides easy integration for your `Wicket <http://wicket.apache.org/>`_ application.
 * `metrics-guice <https://github.com/palominolabs/metrics-guice>`_ provides integration with `Guice <https://code.google.com/p/google-guice/>`_.
+* `metrics-guice-servlet <https://github.com/palominolabs/metrics-guice-servlet>`_ provides `Guice Servlet <https://github.com/google/guice/wiki/Servlets>`_ integration with AdminServlet.
 * `metrics-scala <https://github.com/erikvanoosten/metrics-scala>`_ provides an API optimized for Scala.
 * `metrics-clojure <https://github.com/sjl/metrics-clojure>`_ provides an API optimized for Clojure.
 * `metrics-cassandra <https://github.com/brndnmtthws/metrics-cassandra>`_ provides a reporter for `Apache Cassandra <https://cassandra.apache.org/>`_.
@@ -26,3 +27,6 @@ the many third-party libraries which extend Metrics:
 * `camel-metrics <https://github.com/InitiumIo/camel-metrics>`_ provides component for your `Apache Camel <https://camel.apache.org/>`_ route
 * `metrics-splunk <https://github.com/zenmoto/metrics-splunk>`_ provides a reporter for `Splunk <http://www.splunk.com/>`_
 * `metrics-spark-reporter <https://github.com/ippontech/metrics-spark-reporter>`_ provides a reporter for `Apache Spark Streaming <https://spark.apache.org/streaming/>`_.
+* `jersey-metrics-filter <https://github.com/palominolabs/jersey-metrics-filter>`_ provides integration with Jersey 1.
+* `metrics-new-relic <https://github.com/palominolabs/metrics-new-relic>`_ provides a reporter which sends data to New Relic.
+* `hdrhistogram-metrics-reservoir <https://bitbucket.org/marshallpierce/hdrhistogram-metrics-reservoir>`_ provides a Histogram reservoir backed by `HdrHistogram <http://hdrhistogram.org/>`_.
