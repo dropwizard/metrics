@@ -11,8 +11,7 @@ import java.util.regex.Pattern;
  * A client to a Carbon server using unconnected UDP
  */
 public class GraphiteUDP implements GraphiteSender {
-
-    private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
+    public static final Pattern DISALLOWED_CHARS = Pattern.compile("[^a-zA-Z0-9!#\\$%&\"'\\*\\+\\-:;<=>\\?@\\[\\\\\\]\\^_`\\|~.]");
 
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
@@ -111,7 +110,7 @@ public class GraphiteUDP implements GraphiteSender {
     }
 
     protected String sanitize(String s) {
-        return WHITESPACE.matcher(s).replaceAll("-");
+		return DISALLOWED_CHARS.matcher(s).replaceAll("-");
     }
 
 }
