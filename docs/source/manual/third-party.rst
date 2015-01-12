@@ -30,3 +30,4 @@ the many third-party libraries which extend Metrics:
 * `jersey-metrics-filter <https://github.com/palominolabs/jersey-metrics-filter>`_ provides integration with Jersey 1.
 * `metrics-new-relic <https://github.com/palominolabs/metrics-new-relic>`_ provides a reporter which sends data to New Relic.
 * `hdrhistogram-metrics-reservoir <https://bitbucket.org/marshallpierce/hdrhistogram-metrics-reservoir>`_ provides a Histogram reservoir backed by `HdrHistogram <http://hdrhistogram.org/>`_.
+* `metrics-instrumental <https://github.com/egineering-llc/metrics-instrumental>`_ provides a reporter to send data to `Instrumental <http://instrumentalapp.com/>`_.
