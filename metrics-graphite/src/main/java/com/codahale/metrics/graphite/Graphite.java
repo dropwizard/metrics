@@ -129,18 +129,24 @@ public class Graphite implements GraphiteSender {
 
     @Override
     public boolean isConnected() {
-    		return socket != null && socket.isConnected() && !socket.isClosed();
+    	return socket != null && socket.isConnected() && !socket.isClosed();
     }
 
     @Override
     public void send(String name, String value, long timestamp) throws IOException {
+        final Writer localWriter = this.writer;
+
+        if (localWriter == null) {
+            throw new IllegalStateException( "Unable to acquire writer. Call connect() first." );
+        }
+
         try {
-            writer.write(sanitize(name));
-            writer.write(' ');
-            writer.write(sanitize(value));
-            writer.write(' ');
-            writer.write(Long.toString(timestamp));
-            writer.write('\n');
+            localWriter.write( sanitize( name ) );
+            localWriter.write( ' ' );
+            localWriter.write( sanitize( value ) );
+            localWriter.write( ' ' );
+            localWriter.write( Long.toString( timestamp ) );
+            localWriter.write( '\n' );
             this.failures = 0;
         } catch (IOException e) {
             failures++;

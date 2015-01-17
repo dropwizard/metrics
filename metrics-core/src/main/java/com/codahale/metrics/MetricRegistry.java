@@ -452,6 +452,6 @@ public class MetricRegistry implements MetricSet {
 
         T newMetric();
 
-        boolean isInstance(Metric metric);
+        boolean isInstance(@Nullable Metric metric);
     }
 }

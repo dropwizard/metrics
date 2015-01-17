@@ -262,11 +262,16 @@ public class PickledGraphite implements GraphiteSender {
     private void writeMetrics() throws IOException {
         if (metrics.size() > 0) {
             try {
+                final Socket localSocket = this.socket;
+                if (localSocket == null) {
+                    throw new IllegalStateException( "Unable to acquire the socket. Call connect() first." );
+                }
+
                 byte[] payload = pickleMetrics(metrics);
                 byte[] header = ByteBuffer.allocate(4).putInt(payload.length).array();
 
                 @SuppressWarnings("resource")
-                OutputStream outputStream = socket.getOutputStream();
+                OutputStream outputStream = localSocket.getOutputStream();
                 outputStream.write(header);
                 outputStream.write(payload);
                 outputStream.flush();

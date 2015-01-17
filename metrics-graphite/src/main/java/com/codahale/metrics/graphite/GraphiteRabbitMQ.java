@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 public class GraphiteRabbitMQ implements GraphiteSender {
 
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
-
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private static final Integer DEFAULT_RABBIT_CONNECTION_TIMEOUT_MS = 500;
@@ -65,13 +64,13 @@ public class GraphiteRabbitMQ implements GraphiteSender {
             final String exchange) {
 
         this(rabbitHost,
-                rabbitPort,
-                rabbitUsername,
-                rabbitPassword,
-                exchange,
-                DEFAULT_RABBIT_CONNECTION_TIMEOUT_MS,
-                DEFAULT_RABBIT_SOCKET_TIMEOUT_MS,
-                DEFAULT_RABBIT_REQUESTED_HEARTBEAT_SEC);
+             rabbitPort,
+             rabbitUsername,
+             rabbitPassword,
+             exchange,
+             DEFAULT_RABBIT_CONNECTION_TIMEOUT_MS,
+             DEFAULT_RABBIT_SOCKET_TIMEOUT_MS,
+             DEFAULT_RABBIT_REQUESTED_HEARTBEAT_SEC);
     }
 
     /**
@@ -133,6 +132,12 @@ public class GraphiteRabbitMQ implements GraphiteSender {
 
     @Override
     public void send(String name, String value, long timestamp) throws IOException {
+        final Channel localChannel = this.channel;
+
+        if (localChannel == null) {
+            throw new IllegalStateException( "Unable to acquire channel. Call connect() first." );
+        }
+
         try {
             final String sanitizedName = sanitize(name);
             final String sanitizedValue = sanitize(value);
@@ -143,7 +148,7 @@ public class GraphiteRabbitMQ implements GraphiteSender {
                             .append(sanitizedValue).append(' ')
                             .append(Long.toString(timestamp)).append('\n').toString();
 
-            channel.basicPublish(exchange, sanitizedName, null, message.getBytes(UTF_8));
+            localChannel.basicPublish(exchange, sanitizedName, null, message.getBytes(UTF_8));
         } catch (IOException e) {
             failures++;
             throw e;

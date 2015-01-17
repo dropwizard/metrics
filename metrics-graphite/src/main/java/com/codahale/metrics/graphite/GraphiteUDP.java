@@ -84,6 +84,12 @@ public class GraphiteUDP implements GraphiteSender {
             connect();
         }
 
+        final DatagramChannel localChannel = this.datagramChannel;
+        if (localChannel == null) {
+            // Should not happen, unless you run into data visibility issues between threads.
+            throw new IllegalStateException( "Unable to acquire DatagramChannel. Check for concurrent access." );
+        }
+
         try {
             StringBuilder buf = new StringBuilder();
             buf.append(sanitize(name));
@@ -92,9 +98,12 @@ public class GraphiteUDP implements GraphiteSender {
             buf.append(' ');
             buf.append(Long.toString(timestamp));
             buf.append('\n');
+
             String str = buf.toString();
             ByteBuffer byteBuffer = ByteBuffer.wrap(str.getBytes(UTF_8));
-            datagramChannel.send(byteBuffer, address);
+
+            localChannel.send(byteBuffer, address);
+
             this.failures = 0;
         } catch (IOException e) {
             failures++;
