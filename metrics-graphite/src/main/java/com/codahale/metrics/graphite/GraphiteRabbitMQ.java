@@ -5,14 +5,17 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DefaultSocketConfigurator;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 /**
- * A rabbit-mq client to a Carbon server.
+ * A rabbit-mq client to a Carbon server. Assumes payload is in UTF-8.
  */
+@NotThreadSafe
 public class GraphiteRabbitMQ implements GraphiteSender {
 
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
@@ -24,7 +27,11 @@ public class GraphiteRabbitMQ implements GraphiteSender {
     private static final Integer DEFAULT_RABBIT_REQUESTED_HEARTBEAT_SEC = 10;
 
     private ConnectionFactory connectionFactory;
+
+    @CheckForNull
     private Connection connection;
+
+    @CheckForNull
     private Channel channel;
     private String exchange;
 

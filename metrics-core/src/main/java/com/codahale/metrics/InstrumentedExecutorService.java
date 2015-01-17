@@ -194,8 +194,8 @@ public class InstrumentedExecutorService implements ExecutorService {
     }
 
     @Override
-    public boolean awaitTermination(long l, TimeUnit timeUnit) throws InterruptedException {
-        return delegate.awaitTermination(l, timeUnit);
+    public boolean awaitTermination(long duration, TimeUnit unit) throws InterruptedException {
+        return delegate.awaitTermination(duration, unit);
     }
 
     private class InstrumentedRunnable implements Runnable {

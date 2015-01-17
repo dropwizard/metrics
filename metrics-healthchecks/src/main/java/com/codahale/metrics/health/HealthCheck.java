@@ -1,5 +1,8 @@
 package com.codahale.metrics.health;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+
 /**
  * A health check for a component of your application.
  */
@@ -80,10 +83,14 @@ public abstract class HealthCheck {
         }
 
         private final boolean healthy;
+
+        @CheckForNull
         private final String message;
+
+        @CheckForNull
         private final Throwable error;
 
-        private Result(boolean isHealthy, String message, Throwable error) {
+        private Result(boolean isHealthy, @Nullable String message, @Nullable Throwable error) {
             this.healthy = isHealthy;
             this.message = message;
             this.error = error;
@@ -105,6 +112,7 @@ public abstract class HealthCheck {
          *
          * @return any additional message for the result, or {@code null}
          */
+        @CheckForNull
         public String getMessage() {
             return message;
         }
@@ -114,6 +122,7 @@ public abstract class HealthCheck {
          *
          * @return any exception for the result, or {@code null}
          */
+        @CheckForNull
         public Throwable getError() {
             return error;
         }

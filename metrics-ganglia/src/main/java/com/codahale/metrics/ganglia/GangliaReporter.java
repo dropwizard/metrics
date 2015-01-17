@@ -10,6 +10,8 @@ import info.ganglia.gmetric4j.gmetric.GangliaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
@@ -150,15 +152,18 @@ public class GangliaReporter extends ScheduledReporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GangliaReporter.class);
 
+    @CheckForNull
     private final GMetric gmetric;
+
+    @CheckForNull
     private final GMetric[] gmetrics;
     private final String prefix;
     private final int tMax;
     private final int dMax;
 
     private GangliaReporter(MetricRegistry registry,
-                            GMetric gmetric,
-                            GMetric[] gmetrics,
+                            @Nullable GMetric gmetric,
+                            @Nullable GMetric[] gmetrics,
                             String prefix,
                             int tMax,
                             int dMax,
@@ -316,7 +321,7 @@ public class GangliaReporter extends ScheduledReporter {
     private void announce(String name, String group, String value, GMetricType type, String units) throws GangliaException {
         if (gmetric != null) {
             gmetric.announce(name, value, type, units, GMetricSlope.BOTH, tMax, dMax, group);
-        } else {
+        } else if (gmetrics != null) {
             for (GMetric gmetric : gmetrics) {
                 gmetric.announce(name, value, type, units, GMetricSlope.BOTH, tMax, dMax, group);
             }

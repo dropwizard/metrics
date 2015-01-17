@@ -9,6 +9,7 @@ import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -70,7 +71,7 @@ public class InstrumentedAppender extends AbstractAppender {
      * @param ignoreExceptions If true, exceptions will be logged and suppressed. If false errors will be
      * logged and then passed to the application.
      */
-    public InstrumentedAppender(MetricRegistry registry, Filter filter, Layout<? extends Serializable> layout, boolean ignoreExceptions) {
+    public InstrumentedAppender(MetricRegistry registry, @Nullable Filter filter, @Nullable Layout<? extends Serializable> layout, boolean ignoreExceptions) {
         super(name(Appender.class), filter, layout, ignoreExceptions);
         this.registry = registry;
     }

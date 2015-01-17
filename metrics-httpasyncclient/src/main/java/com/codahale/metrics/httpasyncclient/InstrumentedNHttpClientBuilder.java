@@ -15,12 +15,17 @@ import org.apache.http.nio.protocol.HttpAsyncRequestProducer;
 import org.apache.http.nio.protocol.HttpAsyncResponseConsumer;
 import org.apache.http.protocol.HttpContext;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+
 public class InstrumentedNHttpClientBuilder extends HttpAsyncClientBuilder {
     private final MetricRegistry metricRegistry;
-    private final String name;
     private final HttpClientMetricNameStrategy metricNameStrategy;
 
-    public InstrumentedNHttpClientBuilder(MetricRegistry metricRegistry, HttpClientMetricNameStrategy metricNameStrategy, String name) {
+    @CheckForNull
+    private final String name;
+
+    public InstrumentedNHttpClientBuilder(MetricRegistry metricRegistry, HttpClientMetricNameStrategy metricNameStrategy, @Nullable String name) {
         super();
         this.metricRegistry = metricRegistry;
         this.metricNameStrategy = metricNameStrategy;

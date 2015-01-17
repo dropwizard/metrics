@@ -6,6 +6,7 @@ import com.codahale.metrics.RatioGauge;
 import org.eclipse.jetty.util.annotation.Name;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
+import javax.annotation.Nullable;
 import java.util.concurrent.BlockingQueue;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -39,7 +40,7 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
                                         @Name("maxThreads") int maxThreads,
                                         @Name("minThreads") int minThreads,
                                         @Name("idleTimeout") int idleTimeout,
-                                        @Name("queue") BlockingQueue<Runnable> queue) {
+                                        @Name("queue") @Nullable BlockingQueue<Runnable> queue) {
         super(maxThreads, minThreads, idleTimeout, queue);
         this.metricRegistry = registry;
     }

@@ -1,5 +1,7 @@
 package com.codahale.metrics.graphite;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -8,19 +10,24 @@ import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 /**
- * A client to a Carbon server using unconnected UDP
+ * A client to a Carbon server using unconnected UDP. Assumes payload is in UTF-8.
  */
+@NotThreadSafe
 public class GraphiteUDP implements GraphiteSender {
 
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
-
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
+    @CheckForNull
     private final String hostname;
     private final int port;
+
+    @CheckForNull
     private InetSocketAddress address;
 
+    @CheckForNull
     private DatagramChannel datagramChannel = null;
+
     private int failures;
 
     /**

@@ -12,6 +12,8 @@ import org.eclipse.jetty.server.HttpChannelState;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 import javax.servlet.ServletException;
@@ -30,6 +32,8 @@ public class InstrumentedHandler extends HandlerWrapper {
     private final MetricRegistry metricRegistry;
 
     private String name;
+
+    @CheckForNull
     private final String prefix;
 
     // the requests handled by this handler, excluding active
@@ -85,7 +89,7 @@ public class InstrumentedHandler extends HandlerWrapper {
 	 * @param prefix     the prefix to use for the metrics names
 	 *
 	 */
-	public InstrumentedHandler(MetricRegistry registry, String prefix) {
+	public InstrumentedHandler(MetricRegistry registry, @Nullable String prefix) {
 		this.metricRegistry = registry;
 		this.prefix = prefix;
 	}

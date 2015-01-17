@@ -12,6 +12,8 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.conn.SystemDefaultDnsResolver;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -30,6 +32,8 @@ public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientCo
     }
 
     private final MetricRegistry metricsRegistry;
+
+    @CheckForNull
     private final String name;
 
     public InstrumentedHttpClientConnectionManager(MetricRegistry metricRegistry) {
@@ -51,12 +55,12 @@ public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientCo
 
     public InstrumentedHttpClientConnectionManager(MetricRegistry metricsRegistry,
                                                    Registry<ConnectionSocketFactory> socketFactoryRegistry,
-                                                   HttpConnectionFactory<HttpRoute,ManagedHttpClientConnection> connFactory,
-                                                   SchemePortResolver schemePortResolver,
+                                                   @Nullable HttpConnectionFactory<HttpRoute,ManagedHttpClientConnection> connFactory,
+                                                   @Nullable SchemePortResolver schemePortResolver,
                                                    DnsResolver dnsResolver,
                                                    long connTTL,
                                                    TimeUnit connTTLTimeUnit,
-                                                   String name) {
+                                                   @Nullable String name) {
         super(socketFactoryRegistry, connFactory, schemePortResolver, dnsResolver, connTTL, connTTLTimeUnit);
         this.metricsRegistry = metricsRegistry;
         this.name = name;

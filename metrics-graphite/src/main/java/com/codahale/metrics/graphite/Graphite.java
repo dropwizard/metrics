@@ -1,5 +1,7 @@
 package com.codahale.metrics.graphite;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.net.SocketFactory;
 
 import java.io.*;
@@ -12,6 +14,7 @@ import java.util.regex.Pattern;
 /**
  * A client to a Carbon server via TCP.
  */
+@NotThreadSafe
 public class Graphite implements GraphiteSender {
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
     // this may be optimistic about Carbon/Graphite
@@ -19,11 +22,16 @@ public class Graphite implements GraphiteSender {
 
     private final String hostname;
     private final int port;
-    private final InetSocketAddress address;
     private final SocketFactory socketFactory;
     private final Charset charset;
 
+    @CheckForNull
+    private final InetSocketAddress address;
+
+    @CheckForNull
     private Socket socket;
+
+    @CheckForNull
     private Writer writer;
     private int failures;
 

@@ -1,5 +1,7 @@
 package com.codahale.metrics;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -16,7 +18,7 @@ public class MetricRegistry implements MetricSet {
      * @param names    the remaining elements of the name
      * @return {@code name} and {@code names} concatenated by periods
      */
-    public static String name(String name, String... names) {
+    public static String name(@Nullable String name, @Nullable String... names) {
         final StringBuilder builder = new StringBuilder();
         append(builder, name);
         if (names != null) {
@@ -35,11 +37,11 @@ public class MetricRegistry implements MetricSet {
      * @param names    the remaining elements of the name
      * @return {@code klass} and {@code names} concatenated by periods
      */
-    public static String name(Class<?> klass, String... names) {
+    public static String name(Class<?> klass, @Nullable String... names) {
         return name(klass.getName(), names);
     }
 
-    private static void append(StringBuilder builder, String part) {
+    private static void append(StringBuilder builder, @Nullable String part) {
         if (part != null && !part.isEmpty()) {
             if (builder.length() > 0) {
                 builder.append('.');
@@ -381,7 +383,7 @@ public class MetricRegistry implements MetricSet {
         }
     }
 
-    private void registerAll(String prefix, MetricSet metrics) throws IllegalArgumentException {
+    private void registerAll(@Nullable String prefix, MetricSet metrics) throws IllegalArgumentException {
         for (Map.Entry<String, Metric> entry : metrics.getMetrics().entrySet()) {
             if (entry.getValue() instanceof MetricSet) {
                 registerAll(name(prefix, entry.getKey()), (MetricSet) entry.getValue());

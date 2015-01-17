@@ -3,6 +3,8 @@ package com.codahale.metrics.graphite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.net.SocketFactory;
 
 import java.io.BufferedWriter;
@@ -23,6 +25,7 @@ import java.util.regex.Pattern;
 /**
  * A client to a Carbon server that sends all metrics after they have been pickled in configurable sized batches
  */
+@NotThreadSafe
 public class PickledGraphite implements GraphiteSender {
 
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
@@ -37,11 +40,16 @@ public class PickledGraphite implements GraphiteSender {
 
     private final String hostname;
     private final int port;
+
+    @CheckForNull
     private final InetSocketAddress address;
     private final SocketFactory socketFactory;
     private final Charset charset;
 
+    @CheckForNull
     private Socket socket;
+
+    @CheckForNull
     private Writer writer;
     private int failures;
 

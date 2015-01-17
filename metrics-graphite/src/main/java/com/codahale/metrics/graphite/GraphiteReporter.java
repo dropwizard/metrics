@@ -4,6 +4,7 @@ import com.codahale.metrics.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -148,7 +149,7 @@ public class GraphiteReporter extends ScheduledReporter {
                        SortedMap<String, Timer> timers) {
         final long timestamp = clock.getTime() / 1000;
 
-        // oh it'd be lovely to use Java 7 here
+        // oh it'd be lovely to use Java 8 here
         try {
             if (!graphite.isConnected()) {
     	          graphite.connect();
@@ -271,6 +272,7 @@ public class GraphiteReporter extends ScheduledReporter {
         }
     }
 
+    @CheckForNull
     private String format(Object o) {
         if (o instanceof Float) {
             return format(((Float) o).doubleValue());

@@ -9,11 +9,15 @@ import org.apache.http.HttpResponse;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestExecutor;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 
 public class InstrumentedHttpRequestExecutor extends HttpRequestExecutor {
     private final MetricRegistry registry;
     private final HttpClientMetricNameStrategy metricNameStrategy;
+
+    @CheckForNull
     private final String name;
 
     public InstrumentedHttpRequestExecutor(MetricRegistry registry,
@@ -23,13 +27,13 @@ public class InstrumentedHttpRequestExecutor extends HttpRequestExecutor {
 
     public InstrumentedHttpRequestExecutor(MetricRegistry registry,
                                            HttpClientMetricNameStrategy metricNameStrategy,
-                                           String name) {
+                                           @Nullable String name) {
         this(registry, metricNameStrategy, name, HttpRequestExecutor.DEFAULT_WAIT_FOR_CONTINUE);
     }
 
     public InstrumentedHttpRequestExecutor(MetricRegistry registry,
                                            HttpClientMetricNameStrategy metricNameStrategy,
-                                           String name,
+                                           @Nullable String name,
                                            int waitForContinue) {
         super(waitForContinue);
         this.registry = registry;

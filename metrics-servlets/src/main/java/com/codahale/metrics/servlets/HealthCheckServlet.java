@@ -6,6 +6,7 @@ import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.codahale.metrics.json.HealthCheckModule;
 
+import javax.annotation.Nullable;
 import javax.servlet.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ public class HealthCheckServlet extends HttpServlet {
          * @return the {@link ExecutorService} to inject into the servlet context, or {@code null}
          * if the health checks should be run in the servlet worker thread.
          */
+        @Nullable
         protected ExecutorService getExecutorService() {
             // don't use a thread pool by default
             return null;

@@ -1,5 +1,6 @@
 package com.codahale.metrics.servlets;
 
+import javax.annotation.Nullable;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -110,7 +111,8 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
-    private static String getParam(String initParam, String defaultValue) {
+    @Nullable
+    private static String getParam(@Nullable String initParam, @Nullable String defaultValue) {
         return initParam == null ? defaultValue : initParam;
     }
 }
