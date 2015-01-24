@@ -50,9 +50,9 @@ public class ThreadStatesGaugeSet implements MetricSet {
 
         for (final Thread.State state : Thread.State.values()) {
             gauges.put(name(state.toString().toLowerCase(), "count"),
-                       new Gauge<Object>() {
+                       new Gauge<Integer>() {
                            @Override
-                           public Object getValue() {
+                           public Integer getValue() {
                                return getThreadCount(state);
                            }
                        });
