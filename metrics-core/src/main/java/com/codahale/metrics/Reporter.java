@@ -1,8 +1,14 @@
 package com.codahale.metrics;
 
-/*
- * A tag interface to indicate that a class is a Reporter.
- */
-public interface Reporter {
+import java.io.Closeable;
 
+/**
+ * Base interface for all reporter implementations.
+ */
+public interface Reporter extends Closeable {
+
+    /**
+     * Stops the reporter.
+     */
+    void stop();
 }

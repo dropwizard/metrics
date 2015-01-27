@@ -1,6 +1,5 @@
 package com.codahale.metrics;
 
-import java.io.Closeable;
 import java.util.Locale;
 import java.util.SortedMap;
 import java.util.concurrent.Executors;
@@ -20,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * @see CsvReporter
  * @see Slf4jReporter
  */
-public abstract class ScheduledReporter implements Closeable, Reporter {
+public abstract class ScheduledReporter implements Reporter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScheduledReporter.class);
 
