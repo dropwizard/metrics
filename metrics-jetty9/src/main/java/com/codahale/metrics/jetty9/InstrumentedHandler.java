@@ -183,8 +183,6 @@ public class InstrumentedHandler extends HandlerWrapper {
 
 
         this.listener = new AsyncListener() {
-            private long startTime;
-
             @Override
             public void onTimeout(AsyncEvent event) throws IOException {
                 asyncTimeouts.mark();
@@ -192,7 +190,6 @@ public class InstrumentedHandler extends HandlerWrapper {
 
             @Override
             public void onStartAsync(AsyncEvent event) throws IOException {
-                startTime = System.currentTimeMillis();
                 event.getAsyncContext().addListener(this);
             }
 
@@ -203,9 +200,8 @@ public class InstrumentedHandler extends HandlerWrapper {
             @Override
             public void onComplete(AsyncEvent event) throws IOException {
                 final AsyncContextState state = (AsyncContextState) event.getAsyncContext();
-                final HttpServletRequest request = (HttpServletRequest) state.getRequest();
-                final HttpServletResponse response = (HttpServletResponse) state.getResponse();
-                updateResponses(request, response, startTime);
+                final Request request = (Request) state.getRequest();
+                updateResponses(request);
                 if (state.getHttpChannelState().getState() != HttpChannelState.State.DISPATCHED) {
                     activeSuspended.dec();
                 }
@@ -251,7 +247,7 @@ public class InstrumentedHandler extends HandlerWrapper {
                 }
                 activeSuspended.inc();
             } else if (state.isInitial()) {
-                updateResponses(httpRequest, httpResponse, start);
+                updateResponses(request);
             }
             // else onCompletion will handle it.
         }
@@ -287,13 +283,13 @@ public class InstrumentedHandler extends HandlerWrapper {
         }
     }
 
-    private void updateResponses(HttpServletRequest request, HttpServletResponse response, long start) {
-        final int responseStatus = response.getStatus() / 100;
-        if (responseStatus >= 1 && responseStatus <= 5) {
-            responses[responseStatus - 1].mark();
+    private void updateResponses(Request request) {
+        final int response = request.getResponse().getStatus() / 100;
+        if (response >= 1 && response <= 5) {
+            responses[response - 1].mark();
         }
         activeRequests.dec();
-        final long elapsedTime = System.currentTimeMillis() - start;
+        final long elapsedTime = System.currentTimeMillis() - request.getTimeStamp();
         requests.update(elapsedTime, TimeUnit.MILLISECONDS);
         requestTimer(request.getMethod()).update(elapsedTime, TimeUnit.MILLISECONDS);
     }
