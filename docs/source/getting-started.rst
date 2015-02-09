@@ -118,6 +118,10 @@ So the complete Getting Started is
     <artifactId>sample</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Example project for Metrics</name>
+    
+    </properties>
+        <metrics.version>|release|</metrics.version>
+    </properties>
 
     <dependencies>
       <dependency>
