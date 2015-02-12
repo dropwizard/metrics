@@ -17,6 +17,7 @@ public class Slf4jReporterTest {
     private final Slf4jReporter infoReporter = Slf4jReporter.forRegistry(registry)
             .outputTo(logger)
             .markWith(marker)
+            .prefixedWith("prefix")
             .convertRatesTo(TimeUnit.SECONDS)
             .convertDurationsTo(TimeUnit.MILLISECONDS)
             .withLoggingLevel(Slf4jReporter.LoggingLevel.INFO)
@@ -185,7 +186,7 @@ public class Slf4jReporterTest {
                 this.<Meter>map(),
                 this.<Timer>map());
 
-        verify(logger).info(marker, "type=GAUGE, name={}, value={}", new Object[]{"gauge", "value"});
+        verify(logger).info(marker, "type=GAUGE, name={}, value={}", new Object[]{"prefix.gauge", "value"});
     }
 
     @Test
@@ -199,7 +200,7 @@ public class Slf4jReporterTest {
                 this.<Meter>map(),
                 this.<Timer>map());
 
-        verify(logger).info(marker, "type=COUNTER, name={}, count={}", new Object[]{"test.counter", 100L});
+        verify(logger).info(marker, "type=COUNTER, name={}, count={}", new Object[]{"prefix.test.counter", 100L});
     }
 
     @Test
@@ -229,7 +230,7 @@ public class Slf4jReporterTest {
 
         verify(logger).info(marker,
                 "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
-                "test.histogram",
+                "prefix.test.histogram",
                 1L,
                 4L,
                 2L,
@@ -260,7 +261,7 @@ public class Slf4jReporterTest {
 
         verify(logger).info(marker,
                 "type=METER, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
-                "test.meter",
+                "prefix.test.meter",
                 1L,
                 2.0,
                 3.0,
@@ -302,7 +303,7 @@ public class Slf4jReporterTest {
 
         verify(logger).info(marker,
                 "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
-                "test.another.timer",
+                "prefix.test.another.timer",
                 1L,
                 300.0,
                 100.0,
