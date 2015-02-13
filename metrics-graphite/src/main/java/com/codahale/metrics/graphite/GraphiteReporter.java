@@ -38,6 +38,7 @@ public class GraphiteReporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
+        private MetricValueFilter valueFilter;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -46,6 +47,7 @@ public class GraphiteReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
+            this.valueFilter = MetricValueFilter.ALL;
         }
 
         /**
@@ -104,6 +106,18 @@ public class GraphiteReporter extends ScheduledReporter {
         }
 
         /**
+         * Only report values which match the given filter.
+         * See {@link Value}, {@link ValueFilter}
+         *
+         * @param valueFilter a {@link MetricValueFilter}
+         * @return {@code this}
+         */
+        public Builder valueFilter(MetricValueFilter valueFilter) {
+            this.valueFilter = valueFilter;
+            return this;
+        }
+
+        /**
          * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
          * given {@link GraphiteSender}.
          *
@@ -117,7 +131,8 @@ public class GraphiteReporter extends ScheduledReporter {
                                         prefix,
                                         rateUnit,
                                         durationUnit,
-                                        filter);
+                                        filter,
+                                        valueFilter);
         }
     }
 
@@ -126,6 +141,7 @@ public class GraphiteReporter extends ScheduledReporter {
     private final GraphiteSender graphite;
     private final Clock clock;
     private final String prefix;
+    private final MetricValueFilter valueFilter;
 
     private GraphiteReporter(MetricRegistry registry,
                              GraphiteSender graphite,
@@ -133,11 +149,13 @@ public class GraphiteReporter extends ScheduledReporter {
                              String prefix,
                              TimeUnit rateUnit,
                              TimeUnit durationUnit,
-                             MetricFilter filter) {
+                             MetricFilter filter,
+                             MetricValueFilter valueFilter) {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
+        this.valueFilter = valueFilter;
     }
 
     @Override
@@ -201,63 +219,75 @@ public class GraphiteReporter extends ScheduledReporter {
     private void reportTimer(String name, Timer timer, long timestamp) throws IOException {
         final Snapshot snapshot = timer.getSnapshot();
 
-        graphite.send(prefix(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
-        graphite.send(prefix(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
-        graphite.send(prefix(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);
-        graphite.send(prefix(name, "stddev"),
-                      format(convertDuration(snapshot.getStdDev())),
-                      timestamp);
-        graphite.send(prefix(name, "p50"),
-                      format(convertDuration(snapshot.getMedian())),
-                      timestamp);
-        graphite.send(prefix(name, "p75"),
-                      format(convertDuration(snapshot.get75thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p95"),
-                      format(convertDuration(snapshot.get95thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p98"),
-                      format(convertDuration(snapshot.get98thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p99"),
-                      format(convertDuration(snapshot.get99thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p999"),
-                      format(convertDuration(snapshot.get999thPercentile())),
-                      timestamp);
-
-        reportMetered(name, timer, timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_MAX))
+            graphite.send(prefix(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_MEAN))
+            graphite.send(prefix(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_MIN))
+            graphite.send(prefix(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_STDDEV))
+            graphite.send(prefix(name, "stddev"),format(convertDuration(snapshot.getStdDev())),timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_P50))
+            graphite.send(prefix(name, "p50"),format(convertDuration(snapshot.getMedian())),timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_P75))
+            graphite.send(prefix(name, "p75"),format(convertDuration(snapshot.get75thPercentile())),timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_P95))
+            graphite.send(prefix(name, "p95"),format(convertDuration(snapshot.get95thPercentile())),timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_P98))
+            graphite.send(prefix(name, "p98"),format(convertDuration(snapshot.get98thPercentile())),timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_P99))
+            graphite.send(prefix(name, "p99"),format(convertDuration(snapshot.get99thPercentile())),timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_P999))
+            graphite.send(prefix(name, "p999"),format(convertDuration(snapshot.get999thPercentile())),timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_COUNT))
+            graphite.send(prefix(name, "count"), format(timer.getCount()), timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_M1_RATE))
+            graphite.send(prefix(name, "m1_rate"),format(convertRate(timer.getOneMinuteRate())),timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_M5_RATE))
+            graphite.send(prefix(name, "m5_rate"),format(convertRate(timer.getFiveMinuteRate())),timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_M15_RATE))
+            graphite.send(prefix(name, "m15_rate"),format(convertRate(timer.getFifteenMinuteRate())),timestamp);
+        if (valueFilter.isReportingOn(Value.TIMER_MEAN_RATE))
+            graphite.send(prefix(name, "mean_rate"),format(convertRate(timer.getMeanRate())),timestamp);
     }
 
     private void reportMetered(String name, Metered meter, long timestamp) throws IOException {
-        graphite.send(prefix(name, "count"), format(meter.getCount()), timestamp);
-        graphite.send(prefix(name, "m1_rate"),
-                      format(convertRate(meter.getOneMinuteRate())),
-                      timestamp);
-        graphite.send(prefix(name, "m5_rate"),
-                      format(convertRate(meter.getFiveMinuteRate())),
-                      timestamp);
-        graphite.send(prefix(name, "m15_rate"),
-                      format(convertRate(meter.getFifteenMinuteRate())),
-                      timestamp);
-        graphite.send(prefix(name, "mean_rate"),
-                      format(convertRate(meter.getMeanRate())),
-                      timestamp);
+        if (valueFilter.isReportingOn(Value.METER_COUNT))
+            graphite.send(prefix(name, "count"), format(meter.getCount()), timestamp);
+        if (valueFilter.isReportingOn(Value.METER_M1_RATE))
+            graphite.send(prefix(name, "m1_rate"),format(convertRate(meter.getOneMinuteRate())),timestamp);
+        if (valueFilter.isReportingOn(Value.METER_M5_RATE))
+            graphite.send(prefix(name, "m5_rate"),format(convertRate(meter.getFiveMinuteRate())),timestamp);
+        if (valueFilter.isReportingOn(Value.METER_M15_RATE))
+            graphite.send(prefix(name, "m15_rate"),format(convertRate(meter.getFifteenMinuteRate())),timestamp);
+        if (valueFilter.isReportingOn(Value.METER_MEAN_RATE))
+            graphite.send(prefix(name, "mean_rate"),format(convertRate(meter.getMeanRate())),timestamp);
     }
 
     private void reportHistogram(String name, Histogram histogram, long timestamp) throws IOException {
         final Snapshot snapshot = histogram.getSnapshot();
-        graphite.send(prefix(name, "count"), format(histogram.getCount()), timestamp);
-        graphite.send(prefix(name, "max"), format(snapshot.getMax()), timestamp);
-        graphite.send(prefix(name, "mean"), format(snapshot.getMean()), timestamp);
-        graphite.send(prefix(name, "min"), format(snapshot.getMin()), timestamp);
-        graphite.send(prefix(name, "stddev"), format(snapshot.getStdDev()), timestamp);
-        graphite.send(prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
-        graphite.send(prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
-        graphite.send(prefix(name, "p95"), format(snapshot.get95thPercentile()), timestamp);
-        graphite.send(prefix(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
-        graphite.send(prefix(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
-        graphite.send(prefix(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
+        if (valueFilter.isReportingOn(Value.HISTOGRAM_COUNT))
+            graphite.send(prefix(name, "count"), format(histogram.getCount()), timestamp);
+        if (valueFilter.isReportingOn(Value.HISTOGRAM_MAX))
+            graphite.send(prefix(name, "max"), format(snapshot.getMax()), timestamp);
+        if (valueFilter.isReportingOn(Value.HISTOGRAM_MEAN))
+            graphite.send(prefix(name, "mean"), format(snapshot.getMean()), timestamp);
+        if (valueFilter.isReportingOn(Value.HISTOGRAM_MIN))
+            graphite.send(prefix(name, "min"), format(snapshot.getMin()), timestamp);
+        if (valueFilter.isReportingOn(Value.HISTOGRAM_STDDEV))
+            graphite.send(prefix(name, "stddev"), format(snapshot.getStdDev()), timestamp);
+        if (valueFilter.isReportingOn(Value.HISTOGRAM_P50))
+            graphite.send(prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
+        if (valueFilter.isReportingOn(Value.HISTOGRAM_P75))
+            graphite.send(prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
+        if (valueFilter.isReportingOn(Value.HISTOGRAM_P95))
+            graphite.send(prefix(name, "p95"), format(snapshot.get95thPercentile()), timestamp);
+        if (valueFilter.isReportingOn(Value.HISTOGRAM_P98))
+            graphite.send(prefix(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
+        if (valueFilter.isReportingOn(Value.HISTOGRAM_P99))
+            graphite.send(prefix(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
+        if (valueFilter.isReportingOn(Value.HISTOGRAM_P999))
+            graphite.send(prefix(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
     }
 
     private void reportCounter(String name, Counter counter, long timestamp) throws IOException {
