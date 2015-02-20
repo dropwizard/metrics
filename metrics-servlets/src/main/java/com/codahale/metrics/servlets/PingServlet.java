@@ -25,7 +25,7 @@ public class PingServlet extends HttpServlet {
         resp.setContentType(CONTENT_TYPE);
         final PrintWriter writer = resp.getWriter();
         try {
-            writer.println(CONTENT);
+            writer.print(CONTENT);
         } finally {
             writer.close();
         }
