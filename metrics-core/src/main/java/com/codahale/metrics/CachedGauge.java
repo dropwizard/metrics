@@ -10,9 +10,10 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class CachedGauge<T> implements Gauge<T> {
     private final Clock clock;
-    private final AtomicLong reloadAt;
     private final long timeoutNS;
 
+    // Value 0 means "not yet initialized".
+    private volatile long reloadAt;
     private volatile T value;
 
     /**
@@ -33,8 +34,10 @@ public abstract class CachedGauge<T> implements Gauge<T> {
      * @param timeoutUnit    the unit of {@code timeout}
      */
     protected CachedGauge(Clock clock, long timeout, TimeUnit timeoutUnit) {
+        if (timeout <= 0) {
+            throw new IllegalArgumentException("Timeout must be > 0");
+        }
         this.clock = clock;
-        this.reloadAt = new AtomicLong(0);
         this.timeoutNS = timeoutUnit.toNanos(timeout);
     }
 
@@ -47,22 +50,22 @@ public abstract class CachedGauge<T> implements Gauge<T> {
 
     @Override
     public T getValue() {
-        if (shouldLoad()) {
-            this.value = loadValue();
+        // Variant of Double Checked Locking.
+        long nanos = reloadAt;
+        long now = clock.getTick();
+        if (nanos == 0 || now - nanos >= 0) {
+            synchronized (this) {
+                if (nanos == reloadAt) {
+                    T t = loadValue();
+                    value = t;
+                    nanos = now + this.timeoutNS;
+                    // In the very unlikely event that nanos is 0, set it to 1;
+                    // no one will notice 1 ns of tardiness.
+                    reloadAt = (nanos == 0) ? 1 : nanos;
+                    return t;
+                }
+            }
         }
         return value;
-    }
-
-    private boolean shouldLoad() {
-        for (; ; ) {
-            final long time = clock.getTick();
-            final long current = reloadAt.get();
-            if (current > time) {
-                return false;
-            }
-            if (reloadAt.compareAndSet(current, time + timeoutNS)) {
-                return true;
-            }
-        }
     }
 }

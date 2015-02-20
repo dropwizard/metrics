@@ -1,8 +1,12 @@
 package com.codahale.metrics;
 
+import junit.framework.Assert;
+import org.assertj.core.util.Throwables;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,5 +40,39 @@ public class CachedGaugeTest {
 
         assertThat(gauge.getValue())
                 .isEqualTo(2);
+    }
+
+    @Test
+    public void shouldBeNonNullCachedValueOnConcurrentAccess() throws Throwable {
+        final CachedGauge<Integer> gauge = new CachedGauge<Integer>(10, TimeUnit.SECONDS) {
+            public Integer loadValue() {
+                return 10;
+            }
+        };
+
+        ExecutorService executorService = Executors.newFixedThreadPool(100);
+        List<Future<?>> futureList = new ArrayList<Future<?>>();
+        for (int i = 0; i < 100; i++) {
+            Future<?> future = executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    assertThat(gauge.getValue()).isNotNull();
+                }
+            });
+            futureList.add(future);
+        }
+
+        for (Future<?> future : futureList) {
+            try {
+                future.get();
+            } catch (ExecutionException e) {
+                throw e.getCause();
+            }
+        }
+
+        executorService.shutdown();
+        if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
+            executorService.shutdownNow();
+        }
     }
 }
