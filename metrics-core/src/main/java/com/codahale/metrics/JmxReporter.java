@@ -173,6 +173,8 @@ public class JmxReporter implements Reporter, Closeable {
     @SuppressWarnings("UnusedDeclaration")
     public interface JmxGaugeMBean extends MetricMBean {
         Object getValue();
+        long getLong();
+        double getDouble();
     }
     // CHECKSTYLE:ON
 
@@ -187,6 +189,22 @@ public class JmxReporter implements Reporter, Closeable {
         @Override
         public Object getValue() {
             return metric.getValue();
+        }
+        @Override
+        public long getLong() {
+            Object value = getValue();
+            if(value instanceof Long) {
+                return (Long) value;
+            }
+            return 0;
+        }
+        @Override
+        public double getDouble() {
+            Object value = getValue();
+            if(value instanceof Double) {
+                return (Double) value;
+            }
+            return 0.0;
         }
     }
 
