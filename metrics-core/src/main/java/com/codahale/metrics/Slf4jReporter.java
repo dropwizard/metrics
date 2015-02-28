@@ -208,7 +208,7 @@ public class Slf4jReporter extends ScheduledReporter {
         loggerProxy.log(marker,
                 "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, " +
                         "p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, " +
-                        "m15={}, rate_unit={}, duration_unit={}",
+                        "m15={}, concurrent={}, max_concurrent={}, rate_unit={}, duration_unit={}",
                 prefix(name),
                 timer.getCount(),
                 convertDuration(snapshot.getMin()),
@@ -225,6 +225,8 @@ public class Slf4jReporter extends ScheduledReporter {
                 convertRate(timer.getOneMinuteRate()),
                 convertRate(timer.getFiveMinuteRate()),
                 convertRate(timer.getFifteenMinuteRate()),
+                timer.getConcurrent(),
+                timer.getMaxConcurrent(),
                 getRateUnit(),
                 getDurationUnit());
     }

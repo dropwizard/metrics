@@ -272,6 +272,9 @@ public class ConsoleReporter extends ScheduledReporter {
         output.printf(locale, "              98%% <= %2.2f %s%n", convertDuration(snapshot.get98thPercentile()), getDurationUnit());
         output.printf(locale, "              99%% <= %2.2f %s%n", convertDuration(snapshot.get99thPercentile()), getDurationUnit());
         output.printf(locale, "            99.9%% <= %2.2f %s%n", convertDuration(snapshot.get999thPercentile()), getDurationUnit());
+
+        output.printf(locale, "        concurrent = %d%n", timer.getConcurrent());
+        output.printf(locale, "    max concurrent = %d%n", timer.getMaxConcurrent());
     }
 
     private void printWithBanner(String s, char c) {

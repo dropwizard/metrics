@@ -402,6 +402,10 @@ public class JmxReporter implements Reporter, Closeable {
         double get99thPercentile();
 
         double get999thPercentile();
+        
+        long getConcurrent();
+        
+        long getMaxConcurrent();
 
         long[] values();
         String getDurationUnit();
@@ -471,6 +475,16 @@ public class JmxReporter implements Reporter, Closeable {
         @Override
         public double get999thPercentile() {
             return metric.getSnapshot().get999thPercentile() * durationFactor;
+        }
+
+        @Override
+        public long getConcurrent() {
+            return metric.getConcurrent();
+        }
+        
+        @Override
+        public long getMaxConcurrent() {
+            return metric.getMaxConcurrent();
         }
 
         @Override
