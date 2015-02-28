@@ -3,6 +3,7 @@ package com.codahale.metrics;
 import java.io.Closeable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A timer metric which aggregates timing durations and provides duration statistics, plus
@@ -32,6 +33,7 @@ public class Timer implements Metered, Sampling {
          */
         public long stop() {
             final long elapsed = clock.getTick() - startTime;
+            timer.concurrent.decrementAndGet();
             timer.update(elapsed, TimeUnit.NANOSECONDS);
             return elapsed;
         }
@@ -46,6 +48,8 @@ public class Timer implements Metered, Sampling {
     private final Meter meter;
     private final Histogram histogram;
     private final Clock clock;
+    private final AtomicLong concurrent;
+    private final AtomicLong maxConcurrent;
 
     /**
      * Creates a new {@link Timer} using an {@link ExponentiallyDecayingReservoir} and the default
@@ -74,6 +78,8 @@ public class Timer implements Metered, Sampling {
         this.meter = new Meter(clock);
         this.clock = clock;
         this.histogram = new Histogram(reservoir);
+        this.concurrent = new AtomicLong(0);
+        this.maxConcurrent = new AtomicLong(0);
     }
 
     /**
@@ -97,9 +103,14 @@ public class Timer implements Metered, Sampling {
      */
     public <T> T time(Callable<T> event) throws Exception {
         final long startTime = clock.getTick();
+        long temp = concurrent.incrementAndGet();
+        if (temp > maxConcurrent.get()) {
+            maxConcurrent.set(temp);
+        }
         try {
             return event.call();
         } finally {
+            concurrent.decrementAndGet();
             update(clock.getTick() - startTime);
         }
     }
@@ -111,6 +122,10 @@ public class Timer implements Metered, Sampling {
      * @see Context
      */
     public Context time() {
+        long temp = concurrent.incrementAndGet();
+        if (temp > maxConcurrent.get()) {
+            maxConcurrent.set(temp);
+        }
         return new Context(this, clock);
     }
 
@@ -142,6 +157,14 @@ public class Timer implements Metered, Sampling {
     @Override
     public Snapshot getSnapshot() {
         return histogram.getSnapshot();
+    }
+    
+    public long getConcurrent() {
+        return concurrent.get();
+    }
+
+    public long getMaxConcurrent() {
+        return maxConcurrent.get();
     }
 
     private void update(long duration) {
