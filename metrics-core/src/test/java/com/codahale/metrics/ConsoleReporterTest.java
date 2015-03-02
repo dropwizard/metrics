@@ -211,6 +211,8 @@ public class ConsoleReporterTest {
                         "              98% <= 800.00 milliseconds",
                         "              99% <= 900.00 milliseconds",
                         "            99.9% <= 1000.00 milliseconds",
+                        "        concurrent = 0",
+                        "    max concurrent = 0",
                         "",
                         ""
                 ));
