@@ -10,7 +10,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * @see EWMA
  */
 public class Meter implements Metered {
-    private static final long TICK_INTERVAL = TimeUnit.SECONDS.toNanos(5);
+    private static final long DEFAULT_TICK_INTERVAL = 5;
+    private final long tickInterval;
 
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
     private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
@@ -31,12 +32,38 @@ public class Meter implements Metered {
     /**
      * Creates a new {@link Meter}.
      *
+     * @param tickInterval      tick interval for rate
+     */
+    public Meter(int tickInterval) {
+        this.clock = Clock.defaultClock();
+        this.startTime = this.clock.getTick();
+        this.lastTick = new AtomicLong(startTime);
+        this.tickInterval = TimeUnit.SECONDS.toNanos(tickInterval);
+    }
+
+    /**
+     * Creates a new {@link Meter}.
+     *
+     * @param clock      the clock to use for the meter ticks
+     * @param tickInterval      tick interval for rate
+     */
+    public Meter(Clock clock, int tickInterval) {
+        this.clock = clock;
+        this.startTime = this.clock.getTick();
+        this.lastTick = new AtomicLong(startTime);
+        this.tickInterval = TimeUnit.SECONDS.toNanos(tickInterval);
+    }
+
+    /**
+     * Creates a new {@link Meter}.
+     *
      * @param clock      the clock to use for the meter ticks
      */
     public Meter(Clock clock) {
         this.clock = clock;
         this.startTime = this.clock.getTick();
         this.lastTick = new AtomicLong(startTime);
+        this.tickInterval = TimeUnit.SECONDS.toNanos(DEFAULT_TICK_INTERVAL);
     }
 
     /**
@@ -63,10 +90,10 @@ public class Meter implements Metered {
         final long oldTick = lastTick.get();
         final long newTick = clock.getTick();
         final long age = newTick - oldTick;
-        if (age > TICK_INTERVAL) {
-            final long newIntervalStartTick = newTick - age % TICK_INTERVAL;
+        if (age > tickInterval) {
+            final long newIntervalStartTick = newTick - age % tickInterval;
             if (lastTick.compareAndSet(oldTick, newIntervalStartTick)) {
-                final long requiredTicks = age / TICK_INTERVAL;
+                final long requiredTicks = age / tickInterval;
                 for (long i = 0; i < requiredTicks; i++) {
                     m1Rate.tick();
                     m5Rate.tick();
