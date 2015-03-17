@@ -1,6 +1,7 @@
 package com.codahale.metrics.graphite;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.failBecauseExceptionWasNotThrown;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.*;
@@ -25,6 +26,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PickledGraphiteTest {
     private final SocketFactory socketFactory = mock(SocketFactory.class);
@@ -49,6 +51,32 @@ public class PickledGraphiteTest {
 
     @Before
     public void setUp() throws Exception {
+        final AtomicBoolean connected = new AtomicBoolean(true);
+        final AtomicBoolean closed = new AtomicBoolean(false);
+
+        when(socket.isConnected()).thenAnswer(new Answer<Boolean>() {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                return connected.get();
+            }
+        });
+
+        when(socket.isClosed()).thenAnswer(new Answer<Boolean>() {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                return closed.get();
+            }
+        });
+
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                connected.set(false);
+                closed.set(true);
+                return null;
+            }
+        }).when(socket).close();
+
         when(socket.getOutputStream()).thenReturn(output);
 
         // Mock behavior of socket.getOutputStream().close() calling socket.close();
@@ -128,6 +156,18 @@ public class PickledGraphiteTest {
 
         assertThat(unpickleOutput())
             .isEqualTo("name value-woo 100\n");
+    }
+
+    @Test
+    public void doesNotAllowDoubleConnections() throws Exception {
+        graphite.connect();
+        try {
+            graphite.connect();
+            failBecauseExceptionWasNotThrown(IllegalStateException.class);
+        } catch (IllegalStateException e) {
+            assertThat(e.getMessage())
+                    .isEqualTo("Already connected");
+        }
     }
 
     String unpickleOutput() throws Exception {
