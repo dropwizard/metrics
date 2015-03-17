@@ -12,6 +12,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.failBecauseExceptionWasNotThrown;
@@ -32,6 +33,32 @@ public class GraphiteTest {
 
     @Before
     public void setUp() throws Exception {
+        final AtomicBoolean connected = new AtomicBoolean(true);
+        final AtomicBoolean closed = new AtomicBoolean(false);
+
+        when(socket.isConnected()).thenAnswer(new Answer<Boolean>() {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                return connected.get();
+            }
+        });
+
+        when(socket.isClosed()).thenAnswer(new Answer<Boolean>() {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                return closed.get();
+            }
+        });
+
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                connected.set(false);
+                closed.set(true);
+                return null;
+            }
+        }).when(socket).close();
+
         when(socket.getOutputStream()).thenReturn(output);
 
         // Mock behavior of socket.getOutputStream().close() calling socket.close();
