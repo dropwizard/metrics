@@ -182,24 +182,26 @@ public class Slf4jReporter extends ScheduledReporter {
                        SortedMap<String, Histogram> histograms,
                        SortedMap<String, Meter> meters,
                        SortedMap<String, Timer> timers) {
-        for (Entry<String, Gauge> entry : gauges.entrySet()) {
-            logGauge(entry.getKey(), entry.getValue());
-        }
+        if (loggerProxy.isEnabled(marker)) {
+            for (Entry<String, Gauge> entry : gauges.entrySet()) {
+                logGauge(entry.getKey(), entry.getValue());
+            }
 
-        for (Entry<String, Counter> entry : counters.entrySet()) {
-            logCounter(entry.getKey(), entry.getValue());
-        }
+            for (Entry<String, Counter> entry : counters.entrySet()) {
+                logCounter(entry.getKey(), entry.getValue());
+            }
 
-        for (Entry<String, Histogram> entry : histograms.entrySet()) {
-            logHistogram(entry.getKey(), entry.getValue());
-        }
+            for (Entry<String, Histogram> entry : histograms.entrySet()) {
+                logHistogram(entry.getKey(), entry.getValue());
+            }
 
-        for (Entry<String, Meter> entry : meters.entrySet()) {
-            logMeter(entry.getKey(), entry.getValue());
-        }
+            for (Entry<String, Meter> entry : meters.entrySet()) {
+                logMeter(entry.getKey(), entry.getValue());
+            }
 
-        for (Entry<String, Timer> entry : timers.entrySet()) {
-            logTimer(entry.getKey(), entry.getValue());
+            for (Entry<String, Timer> entry : timers.entrySet()) {
+                logTimer(entry.getKey(), entry.getValue());
+            }
         }
     }
 
@@ -286,6 +288,8 @@ public class Slf4jReporter extends ScheduledReporter {
         }
 
         abstract void log(Marker marker, String format, Object... arguments);
+
+        abstract boolean isEnabled(Marker marker);
     }
 
     /* private class to allow logger configuration */
@@ -297,6 +301,11 @@ public class Slf4jReporter extends ScheduledReporter {
         @Override
         public void log(Marker marker, String format, Object... arguments) {
             logger.debug(marker, format, arguments);
+        }
+
+        @Override
+        public boolean isEnabled(Marker marker) {
+            return logger.isDebugEnabled(marker);
         }
     }
 
@@ -311,6 +320,10 @@ public class Slf4jReporter extends ScheduledReporter {
             logger.trace(marker, format, arguments);
         }
 
+        @Override
+        public boolean isEnabled(Marker marker) {
+            return logger.isTraceEnabled(marker);
+        }
     }
 
     /* private class to allow logger configuration */
@@ -322,6 +335,11 @@ public class Slf4jReporter extends ScheduledReporter {
         @Override
         public void log(Marker marker, String format, Object... arguments) {
             logger.info(marker, format, arguments);
+        }
+
+        @Override
+        public boolean isEnabled(Marker marker) {
+            return logger.isInfoEnabled(marker);
         }
     }
 
@@ -335,6 +353,11 @@ public class Slf4jReporter extends ScheduledReporter {
         public void log(Marker marker, String format, Object... arguments) {
             logger.warn(marker, format, arguments);
         }
+
+        @Override
+        public boolean isEnabled(Marker marker) {
+            return logger.isWarnEnabled(marker);
+        }
     }
 
     /* private class to allow logger configuration */
@@ -346,6 +369,11 @@ public class Slf4jReporter extends ScheduledReporter {
         @Override
         public void log(Marker marker, String format, Object... arguments) {
             logger.error(marker, format, arguments);
+        }
+
+        @Override
+        public boolean isEnabled(Marker marker) {
+            return logger.isErrorEnabled(marker);
         }
     }
 
