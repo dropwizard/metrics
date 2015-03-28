@@ -15,6 +15,8 @@ public class Meter implements Metered {
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
     private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
     private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
+    private final EWMA m60Rate = EWMA.hourlyMinuteEWMA();
+    private final EWMA mDailyRate = EWMA.dailyEWMA();
 
     private final LongAdder count = new LongAdder();
     private final long startTime;
@@ -57,6 +59,8 @@ public class Meter implements Metered {
         m1Rate.update(n);
         m5Rate.update(n);
         m15Rate.update(n);
+        m60Rate.update(n);
+        mDailyRate.update(n);
     }
 
     private void tickIfNecessary() {
@@ -71,6 +75,8 @@ public class Meter implements Metered {
                     m1Rate.tick();
                     m5Rate.tick();
                     m15Rate.tick();
+                    m60Rate.tick();
+                    mDailyRate.tick();
                 }
             }
         }
@@ -91,6 +97,18 @@ public class Meter implements Metered {
     public double getFiveMinuteRate() {
         tickIfNecessary();
         return m5Rate.getRate(TimeUnit.SECONDS);
+    }
+
+    @Override
+    public double getDailyRate() {
+        tickIfNecessary();
+        return mDailyRate.getRate(TimeUnit.SECONDS);
+    }
+
+    @Override
+    public double getHourlyRate() {
+        tickIfNecessary();
+        return m60Rate.getRate(TimeUnit.SECONDS);
     }
 
     @Override
