@@ -19,9 +19,13 @@ public class EWMA {
     private static final int ONE_MINUTE = 1;
     private static final int FIVE_MINUTES = 5;
     private static final int FIFTEEN_MINUTES = 15;
+    private static final int SIXTY_MINUTES = 60;
+    private static final int DAILY_MINUTES = 60 * 24;
     private static final double M1_ALPHA = 1 - exp(-INTERVAL / SECONDS_PER_MINUTE / ONE_MINUTE);
     private static final double M5_ALPHA = 1 - exp(-INTERVAL / SECONDS_PER_MINUTE / FIVE_MINUTES);
     private static final double M15_ALPHA = 1 - exp(-INTERVAL / SECONDS_PER_MINUTE / FIFTEEN_MINUTES);
+    private static final double M60_ALPHA = 1 - exp(-INTERVAL / SECONDS_PER_MINUTE / SIXTY_MINUTES);
+    private static final double MDAILY_ALPHA = 1 - exp(-INTERVAL / SECONDS_PER_MINUTE / DAILY_MINUTES);
 
     private volatile boolean initialized = false;
     private volatile double rate = 0.0;
@@ -57,6 +61,26 @@ public class EWMA {
      */
     public static EWMA fifteenMinuteEWMA() {
         return new EWMA(M15_ALPHA, INTERVAL, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Creates a new EWMA which is equivalent to the UNIX hourly load average and which
+     * expects to be ticked every 5 seconds.
+     *
+     * @return a hourly EWMA
+     */
+    public static EWMA hourlyMinuteEWMA() {
+        return new EWMA(M60_ALPHA, INTERVAL, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Creates a new EWMA which is equivalent to the UNIX daily load average and which
+     * expects to be ticked every 5 seconds.
+     *
+     * @return a daily EWMA
+     */
+    public static EWMA dailyEWMA() {
+        return new EWMA(MDAILY_ALPHA, INTERVAL, TimeUnit.SECONDS);
     }
 
     /**
