@@ -32,3 +32,4 @@ the many third-party libraries which extend Metrics:
 * `hdrhistogram-metrics-reservoir <https://bitbucket.org/marshallpierce/hdrhistogram-metrics-reservoir>`_ provides a Histogram reservoir backed by `HdrHistogram <http://hdrhistogram.org/>`_.
 * `metrics-instrumental <https://github.com/egineering-llc/metrics-instrumental>`_ provides a reporter to send data to `Instrumental <http://instrumentalapp.com/>`_.
 * `hdrhistogram-metrics-reservoir <https://bitbucket.org/marshallpierce/hdrhistogram-metrics-reservoir>`_ a Metrics reservoir implementation backed by `HdrHistogram <http://hdrhistogram.org/>`_.
+* `metrics-play <https://github.com/kenshoo/metrics-play>`_ provides an integration with the Play Framework
