@@ -42,7 +42,7 @@ public class Slf4jReporterTest {
                 this.<Meter>map(),
                 this.<Timer>map());
 
-        verify(logger).error(marker, "type=GAUGE, name={}, value={}", new Object[]{"gauge", "value"});
+        verify(logger).error(marker, "type={}, name={}, value={}", new Object[]{"GAUGE", "gauge", "value"});
     }
 
     @Test
@@ -57,7 +57,7 @@ public class Slf4jReporterTest {
                 this.<Meter>map(),
                 this.<Timer>map());
 
-        verify(logger).error(marker, "type=COUNTER, name={}, count={}", new Object[]{"test.counter", 100L});
+        verify(logger).error(marker, "type={}, name={}, count={}", new Object[]{"COUNTER", "test.counter", 100L});
     }
 
     @Test
@@ -87,7 +87,8 @@ public class Slf4jReporterTest {
                 this.<Timer>map());
 
         verify(logger).error(marker,
-                "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
+                "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
+                "HISTOGRAM",
                 "test.histogram",
                 1L,
                 4L,
@@ -119,7 +120,8 @@ public class Slf4jReporterTest {
                 this.<Timer>map());
 
         verify(logger).error(marker,
-                "type=METER, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
+                "type={}, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
+                "METER",
                 "test.meter",
                 1L,
                 2.0,
@@ -163,7 +165,8 @@ public class Slf4jReporterTest {
                 map("test.another.timer", timer));
 
         verify(logger).error(marker,
-                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
+                "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
+                "TIMER",
                 "test.another.timer",
                 1L,
                 300.0,
@@ -193,7 +196,7 @@ public class Slf4jReporterTest {
                 this.<Meter>map(),
                 this.<Timer>map());
 
-        verify(logger).info(marker, "type=GAUGE, name={}, value={}", new Object[]{"prefix.gauge", "value"});
+        verify(logger).info(marker, "type={}, name={}, value={}", new Object[]{"GAUGE", "prefix.gauge", "value"});
     }
 
     @Test
@@ -208,7 +211,7 @@ public class Slf4jReporterTest {
                 this.<Meter>map(),
                 this.<Timer>map());
 
-        verify(logger).info(marker, "type=COUNTER, name={}, count={}", new Object[]{"prefix.test.counter", 100L});
+        verify(logger).info(marker, "type={}, name={}, count={}", new Object[]{"COUNTER", "prefix.test.counter", 100L});
     }
 
     @Test
@@ -238,7 +241,8 @@ public class Slf4jReporterTest {
                 this.<Timer>map());
 
         verify(logger).info(marker,
-                "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
+                "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
+                "HISTOGRAM",
                 "prefix.test.histogram",
                 1L,
                 4L,
@@ -270,7 +274,8 @@ public class Slf4jReporterTest {
                 this.<Timer>map());
 
         verify(logger).info(marker,
-                "type=METER, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
+                "type={}, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
+                "METER",
                 "prefix.test.meter",
                 1L,
                 2.0,
@@ -313,7 +318,8 @@ public class Slf4jReporterTest {
                 map("test.another.timer", timer));
 
         verify(logger).info(marker,
-                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
+                "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
+                "TIMER",
                 "prefix.test.another.timer",
                 1L,
                 300.0,
