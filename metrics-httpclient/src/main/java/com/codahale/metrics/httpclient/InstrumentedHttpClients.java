@@ -4,7 +4,7 @@ import com.codahale.metrics.MetricRegistry;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import static com.codahale.metrics.httpclient.HttpClientMetricNameStrategies.METHOD_ONLY;
+import static com.codahale.metrics.httpclient.HttpRequestMetricNameStrategies.METHOD_ONLY;
 
 public class InstrumentedHttpClients {
     private InstrumentedHttpClients() {
@@ -16,7 +16,7 @@ public class InstrumentedHttpClients {
     }
 
     public static CloseableHttpClient createDefault(MetricRegistry metricRegistry,
-                                                    HttpClientMetricNameStrategy metricNameStrategy) {
+                                                    HttpRequestMetricNameStrategy metricNameStrategy) {
         return custom(metricRegistry, metricNameStrategy).build();
     }
 
@@ -25,7 +25,7 @@ public class InstrumentedHttpClients {
     }
 
     public static HttpClientBuilder custom(MetricRegistry metricRegistry,
-                                           HttpClientMetricNameStrategy metricNameStrategy) {
+                                           HttpRequestMetricNameStrategy metricNameStrategy) {
         return HttpClientBuilder.create()
                 .setRequestExecutor(new InstrumentedHttpRequestExecutor(metricRegistry, metricNameStrategy))
                 .setConnectionManager(new InstrumentedHttpClientConnectionManager(metricRegistry));

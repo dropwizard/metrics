@@ -1,5 +1,6 @@
 package com.codahale.metrics.httpclient;
 
+import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricRegistryListener;
 import com.codahale.metrics.Timer;
@@ -15,8 +16,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 public class InstrumentedHttpClientsTest {
-    private final HttpClientMetricNameStrategy metricNameStrategy =
-            mock(HttpClientMetricNameStrategy.class);
+    private final HttpRequestMetricNameStrategy metricNameStrategy =
+            mock(HttpRequestMetricNameStrategy.class);
     private final MetricRegistryListener registryListener =
             mock(MetricRegistryListener.class);
     private final MetricRegistry metricRegistry = new MetricRegistry();
@@ -31,13 +32,19 @@ public class InstrumentedHttpClientsTest {
     @Test
     public void registersExpectedMetricsGivenNameStrategy() throws Exception {
         final HttpGet get = new HttpGet("http://example.com?q=anything");
-        final String metricName = "some.made.up.metric.name";
+        final String metricNameActive = "some.made.up.metric.name.active";
+        final String metricNameDuration = "some.made.up.metric.name.duration";
 
-        when(metricNameStrategy.getNameFor(anyString(), any(HttpRequest.class)))
-                .thenReturn(metricName);
+
+        when(metricNameStrategy.getNameForActive(isA(Class.class), anyString(), any(HttpRequest.class)))
+                .thenReturn(metricNameActive);
+        when(metricNameStrategy.getNameForDuration(isA(Class.class), anyString(), any(HttpRequest.class)))
+                .thenReturn(metricNameDuration);
 
         client.execute(get);
 
-        verify(registryListener).onTimerAdded(eq(metricName), any(Timer.class));
+        verify(registryListener).onCounterAdded(eq(metricNameActive), any(Counter.class));
+        verify(registryListener).onTimerAdded(eq(metricNameDuration), any(Timer.class));
+
     }
 }
