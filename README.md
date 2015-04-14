@@ -1,4 +1,4 @@
-Metrics [![Build Status](https://secure.travis-ci.org/dropwizard/metrics.png)](http://travis-ci.org/dropwizard/metrics)
+Metrics [![Build Status](https://secure.travis-ci.org/dropwizard/metrics.png)](http://travis-ci.org/dropwizard/metrics) [![codecov.io](https://codecov.io/github/dropwizard/metrics/coverage.svg?branch=master)](https://codecov.io/github/dropwizard/metrics?branch=master)
 =======
 
 *Capturing JVM- and application-level metrics. So you know what's going on.*
