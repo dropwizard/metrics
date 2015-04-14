@@ -38,8 +38,8 @@ public class HealthCheckRegistry {
      *
      * @param name the name of the {@link HealthCheck} instance
      */
-    public void unregister(String name) {
-        healthChecks.remove(name);
+    public HealthCheck unregister(String name) {
+        return healthChecks.remove(name);
     }
 
     /**
