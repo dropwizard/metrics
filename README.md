@@ -1,5 +1,9 @@
-Metrics [![Build Status](https://secure.travis-ci.org/dropwizard/metrics.png)](http://travis-ci.org/dropwizard/metrics)
+Metrics
 =======
+
+[![Build Status](https://img.shields.io/travis/dropwizard/metrics.svg?style=flat-square)](https://travis-ci.org/dropwizard/metrics)
+![Maven Central](https://img.shields.io/maven-central/v/io.dropwizard.metrics/metrics-core.svg?style=flat-square)
+![GitHub license](https://img.shields.io/github/license/dropwizard/metrics.svg?style=flat-square)
 
 *Capturing JVM- and application-level metrics. So you know what's going on.*
 
