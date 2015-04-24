@@ -10,7 +10,7 @@ import java.io.IOException;
 
 @Path("/")
 @Produces(MediaType.TEXT_PLAIN)
-public class InstrumentedResource {
+public class InstrumentedResource implements InstrumentedResourceInterface {
     @GET
     @Timed
     @Path("/timed")
@@ -18,11 +18,33 @@ public class InstrumentedResource {
         return "yay";
     }
 
+    @Override
+    public String timedInInterface() {
+        return "yay-interface";
+    }
+
+    @Override
+    @Timed
+    public String timedInImplementation() {
+        return "yay-implementation";
+    }
+
     @GET
     @Metered
     @Path("/metered")
     public String metered() {
         return "woo";
+    }
+
+    @Override
+    public String meteredInInterface() {
+        return "woo-interface";
+    }
+
+    @Override
+    @Metered
+    public String meteredInImplementation() {
+        return "woo-implementation";
     }
 
     @GET
@@ -33,5 +55,22 @@ public class InstrumentedResource {
             throw new IOException("AUGH");
         }
         return "fuh";
+    }
+
+    @Override
+    public String exceptionMeteredInInterface(boolean splode) throws IOException {
+        if (splode) {
+            throw new IOException("AUGH");
+        }
+        return "fuh-interface";
+    }
+
+    @Override
+    @ExceptionMetered(cause = IOException.class)
+    public String exceptionMeteredInImplementation(boolean splode) throws IOException {
+        if (splode) {
+            throw new IOException("AUGH");
+        }
+        return "fuh-implementation";
     }
 }

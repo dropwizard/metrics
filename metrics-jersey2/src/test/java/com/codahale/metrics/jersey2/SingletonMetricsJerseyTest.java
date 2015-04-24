@@ -1,12 +1,14 @@
 package com.codahale.metrics.jersey2;
 
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.jersey2.resources.InstrumentedResource;
 import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.junit.Assert;
 import org.junit.Test;
 
 import javax.ws.rs.NotFoundException;
@@ -14,6 +16,7 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,6 +60,30 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
+    public void timedMethodsInInterfaceAreTimed() {
+        assertThat(target("timed-in-interface")
+                .request()
+                .get(String.class))
+                .isEqualTo("yay-interface");
+
+        Metric metric = findMetric("timedInInterface");
+        assertThat(metric).isInstanceOf(Timer.class);
+        assertThat(((Timer) metric).getCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void timedMethodsInImplementationAreTimed() {
+        assertThat(target("timed-in-implementation")
+                .request()
+                .get(String.class))
+                .isEqualTo("yay-implementation");
+
+        Metric metric = findMetric("timedInImplementation");
+        assertThat(metric).isInstanceOf(Timer.class);
+        assertThat(((Timer) metric).getCount()).isEqualTo(1);
+    }
+
+    @Test
     public void meteredMethodsAreMetered() {
         assertThat(target("metered")
                 .request()
@@ -65,6 +92,30 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
 
         final Meter meter = registry.meter(name(InstrumentedResource.class, "metered"));
         assertThat(meter.getCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void meteredMethodsInInterfaceAreMetered() {
+        assertThat(target("metered-in-interface")
+                .request()
+                .get(String.class))
+                .isEqualTo("woo-interface");
+
+        Metric metric = findMetric("meteredInInterface");
+        assertThat(metric).isInstanceOf(Meter.class);
+        assertThat(((Meter) metric).getCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void meteredMethodsInImplementationAreMetered() {
+        assertThat(target("metered-in-implementation")
+                .request()
+                .get(String.class))
+                .isEqualTo("woo-implementation");
+
+        Metric metric = findMetric("meteredInImplementation");
+        assertThat(metric).isInstanceOf(Meter.class);
+        assertThat(((Meter) metric).getCount()).isEqualTo(1);
     }
 
     @Test
@@ -95,6 +146,52 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
+    public void exceptionMeteredMethodsInInterfaceAreExceptionMetered() {
+        assertThat(target("exception-metered-in-interface")
+                .request()
+                .get(String.class))
+                .isEqualTo("fuh-interface");
+
+        Metric metric = findMetric("exceptionMeteredInInterface.exceptions");
+        assertThat(metric).isInstanceOf(Meter.class);
+        assertThat(((Meter) metric).getCount()).isEqualTo(0);
+
+        try {
+            target("exception-metered-in-interface")
+                    .queryParam("splode", true)
+                    .request()
+                    .get(String.class);
+            failBecauseExceptionWasNotThrown(ProcessingException.class);
+        } catch (ProcessingException e) {
+            assertThat(e.getCause()).isInstanceOf(IOException.class);
+        }
+        assertThat(((Meter) metric).getCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void exceptionMeteredMethodsInImplementationAreExceptionMetered() {
+        assertThat(target("exception-metered-in-implementation")
+                .request()
+                .get(String.class))
+                .isEqualTo("fuh-implementation");
+
+        Metric metric = findMetric("exceptionMeteredInImplementation.exceptions");
+        assertThat(metric).isInstanceOf(Meter.class);
+        assertThat(((Meter) metric).getCount()).isEqualTo(0);
+
+        try {
+            target("exception-metered-in-implementation")
+                    .queryParam("splode", true)
+                    .request()
+                    .get(String.class);
+            failBecauseExceptionWasNotThrown(ProcessingException.class);
+        } catch (ProcessingException e) {
+            assertThat(e.getCause()).isInstanceOf(IOException.class);
+        }
+        assertThat(((Meter) metric).getCount()).isEqualTo(1);
+    }
+
+    @Test
     public void testResourceNotFound() {
         final Response response = target().path("not-found").request().get();
         assertThat(response.getStatus()).isEqualTo(404);
@@ -105,5 +202,15 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
         } catch (NotFoundException e) {
             assertThat(e.getMessage()).isEqualTo("HTTP 404 Not Found");
         }
+    }
+
+    private Metric findMetric(final String name) {
+        for (Map.Entry<String, Metric> entry : registry.getMetrics().entrySet()) {
+            if (entry.getKey().endsWith(name)) {
+                return entry.getValue();
+            }
+        }
+        Assert.fail("No metric with this name found.");
+        throw new IllegalArgumentException();
     }
 }

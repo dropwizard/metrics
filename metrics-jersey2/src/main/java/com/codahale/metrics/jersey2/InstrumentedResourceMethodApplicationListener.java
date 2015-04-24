@@ -194,7 +194,11 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     private void registerTimedAnnotations(final ImmutableMap.Builder<Method, Timer> builder,
                                           final ResourceMethod method) {
         final Method definitionMethod = method.getInvocable().getDefinitionMethod();
-        final Timed annotation = definitionMethod.getAnnotation(Timed.class);
+        Timed annotation = definitionMethod.getAnnotation(Timed.class);
+
+        if (annotation == null) {
+            annotation = method.getInvocable().getHandlingMethod().getAnnotation(Timed.class);
+        }
 
         if (annotation != null) {
             builder.put(definitionMethod, timerMetric(this.metrics, method, annotation));
@@ -204,7 +208,11 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     private void registerMeteredAnnotations(final ImmutableMap.Builder<Method, Meter> builder,
                                             final ResourceMethod method) {
         final Method definitionMethod = method.getInvocable().getDefinitionMethod();
-        final Metered annotation = definitionMethod.getAnnotation(Metered.class);
+        Metered annotation = definitionMethod.getAnnotation(Metered.class);
+
+        if (annotation == null) {
+            annotation = method.getInvocable().getHandlingMethod().getAnnotation(Metered.class);
+        }
 
         if (annotation != null) {
             builder.put(definitionMethod, meterMetric(metrics, method, annotation));
@@ -214,7 +222,11 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     private void registerExceptionMeteredAnnotations(final ImmutableMap.Builder<Method, ExceptionMeterMetric> builder,
                                                      final ResourceMethod method) {
         final Method definitionMethod = method.getInvocable().getDefinitionMethod();
-        final ExceptionMetered annotation = definitionMethod.getAnnotation(ExceptionMetered.class);
+        ExceptionMetered annotation = definitionMethod.getAnnotation(ExceptionMetered.class);
+
+        if (annotation == null) {
+            annotation = method.getInvocable().getHandlingMethod().getAnnotation(ExceptionMetered.class);
+        }
 
         if (annotation != null) {
             builder.put(definitionMethod, new ExceptionMeterMetric(metrics, method, annotation));
