@@ -18,6 +18,7 @@ public class MemoryUsageGaugeSetTest {
     private final MemoryUsage nonHeap = mock(MemoryUsage.class);
     private final MemoryUsage pool = mock(MemoryUsage.class);
     private final MemoryUsage weirdPool = mock(MemoryUsage.class);
+    private final MemoryUsage weirdCollection = mock(MemoryUsage.class);
     private final MemoryMXBean mxBean = mock(MemoryMXBean.class);
     private final MemoryPoolMXBean memoryPool = mock(MemoryPoolMXBean.class);
     private final MemoryPoolMXBean weirdMemoryPool = mock(MemoryPoolMXBean.class);
@@ -48,6 +49,8 @@ public class MemoryUsageGaugeSetTest {
         when(weirdPool.getUsed()).thenReturn(300L);
         when(weirdPool.getMax()).thenReturn(-1L);
 
+        when(weirdCollection.getUsed()).thenReturn(290L);
+
         when(mxBean.getHeapMemoryUsage()).thenReturn(heap);
         when(mxBean.getNonHeapMemoryUsage()).thenReturn(nonHeap);
 
@@ -55,6 +58,7 @@ public class MemoryUsageGaugeSetTest {
         when(memoryPool.getName()).thenReturn("Big Pool");
 
         when(weirdMemoryPool.getUsage()).thenReturn(weirdPool);
+        when(weirdMemoryPool.getCollectionUsage()).thenReturn(weirdCollection);
         when(weirdMemoryPool.getName()).thenReturn("Weird Pool");
     }
 
@@ -81,9 +85,11 @@ public class MemoryUsageGaugeSetTest {
                         "pools.Big-Pool.used",
                         "pools.Big-Pool.usage",
                         "pools.Big-Pool.max",
+                        "pools.Big-Pool.used-after-gc",
                         "pools.Weird-Pool.init",
                         "pools.Weird-Pool.committed",
                         "pools.Weird-Pool.used",
+                        "pools.Weird-Pool.used-after-gc",
                         "pools.Weird-Pool.usage",
                         "pools.Weird-Pool.max");
     }
@@ -246,6 +252,14 @@ public class MemoryUsageGaugeSetTest {
 
         assertThat(gauge.getValue())
                 .isEqualTo(-1L);
+    }
+
+    @Test
+    public void hasAGaugeForWeirdCollectionPoolUsed() throws Exception {
+        final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.used-after-gc");
+
+        assertThat(gauge.getValue())
+                .isEqualTo(290L);
     }
 
     @Test
