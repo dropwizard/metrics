@@ -221,7 +221,7 @@ public class MetricsServletTest extends AbstractServletTest {
 
     @Test
     public void filterMetrics() throws Exception {
-        request.setURI("/metrics?pretty=true&type=meters&key=m");
+        request.setURI("/metrics?pretty=true&type=&name=m");
         processRequest();
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(response.get("Access-Control-Allow-Origin")).isEqualTo("*");
@@ -233,8 +233,8 @@ public class MetricsServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void filterMetricsMissingKey() throws Exception {
-        request.setURI("/metrics?pretty=true&type=meters&key=");
+    public void filterMetricsMissingName() throws Exception {
+        request.setURI("/metrics?pretty=true&type=meters&namek=");
         processRequest();
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(response.get("Access-Control-Allow-Origin")).isEqualTo("*");
@@ -243,7 +243,7 @@ public class MetricsServletTest extends AbstractServletTest {
                 + "    \"units\" : \"events/second\"%n" + "  }%n}"));
         assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
     }
-    
+
     @Test
     public void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
         final MetricRegistry metricRegistry = mock(MetricRegistry.class);
