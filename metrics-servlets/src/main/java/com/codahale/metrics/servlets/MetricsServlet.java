@@ -3,6 +3,7 @@ package com.codahale.metrics.servlets;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Locale;
+import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletConfig;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.json.MetricsModule;
@@ -167,17 +169,14 @@ public class MetricsServlet extends HttpServlet {
         }
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
         resp.setStatus(HttpServletResponse.SC_OK);
-        
+
         final OutputStream output = resp.getOutputStream();
-        final String metricType = req.getParameter("type");
-        final String metricKey = req.getParameter("key");
         try {
+            Object outputValue = filter(registry, req.getParameter("type"), req.getParameter("name"));
             if (jsonpParamName != null && req.getParameter(jsonpParamName) != null) {
-                getWriter(req).writeValue(output,new JSONPObject(req.getParameter(jsonpParamName), 
-                        filterByMetricTypeAndKey(metricType, metricKey, registry)));
-            } else {
-                getWriter(req).writeValue(output, filterByMetricTypeAndKey(metricType, metricKey, registry));
+                outputValue = new JSONPObject(req.getParameter(jsonpParamName), outputValue);
             }
+            getWriter(req).writeValue(output, outputValue);
         } finally {
             output.close();
         }
@@ -190,23 +189,33 @@ public class MetricsServlet extends HttpServlet {
         }
         return mapper.writer();
     }
-    
-    private Object filterByMetricTypeAndKey(String metricType, String metricKey,MetricRegistry metricRegistry) {
 
-        boolean isMetricKeyNullOrEmpty = metricKey == null || "".equals(metricKey);
-        
-        if ("gauges".equals(metricType)) {
-            return isMetricKeyNullOrEmpty ? metricRegistry.getGauges() : metricRegistry.getGauges().get(metricKey);
-        } else if ("counters".equals(metricType)) {
-            return isMetricKeyNullOrEmpty ? metricRegistry.getCounters() : metricRegistry.getCounters().get(metricKey);
-        } else if ("histograms".equals(metricType)) {
-            return isMetricKeyNullOrEmpty ? metricRegistry.getHistograms() : metricRegistry.getHistograms().get(
-                    metricKey);
-        } else if ("meters".equals(metricType)) {
-            return isMetricKeyNullOrEmpty ? metricRegistry.getMeters() : metricRegistry.getMeters().get(metricKey);
-        } else {
-            return metricRegistry;
+    private Object filter(MetricRegistry metricRegistry, String type, String name) throws ServletException {
+        boolean filterByType = type != null && !type.isEmpty();
+        boolean filterByName = name != null && !name.isEmpty();
+
+        if (filterByName) {
+            return metricRegistry.getMetrics().get(name);
         }
+
+        if (filterByType) {
+            SortedMap<String, ? extends Metric> metrics;
+            if ("gauges".equals(type)) {
+                metrics = metricRegistry.getGauges();
+            } else if ("counters".equals(type)) {
+                metrics = metricRegistry.getCounters();
+            } else if ("histograms".equals(type)) {
+                metrics = metricRegistry.getHistograms();
+            } else if ("meters".equals(type)) {
+                metrics = metricRegistry.getMeters();
+            } else {
+                throw new ServletException("Invalid metric type");
+            }
+
+            return metrics;
+        }
+
+        return metricRegistry;
     }
 
     private TimeUnit parseTimeUnit(String value, TimeUnit defaultValue) {
