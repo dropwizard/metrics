@@ -55,6 +55,9 @@ public class MemoryUsageGaugeSetTest {
         when(mxBean.getNonHeapMemoryUsage()).thenReturn(nonHeap);
 
         when(memoryPool.getUsage()).thenReturn(pool);
+        // Mock that "Big Pool" is a non-collected pool therefore doesn't
+        // have collection usage statistics.
+        when(memoryPool.getCollectionUsage()).thenReturn(null);
         when(memoryPool.getName()).thenReturn("Big Pool");
 
         when(weirdMemoryPool.getUsage()).thenReturn(weirdPool);
@@ -85,7 +88,7 @@ public class MemoryUsageGaugeSetTest {
                         "pools.Big-Pool.used",
                         "pools.Big-Pool.usage",
                         "pools.Big-Pool.max",
-                        "pools.Big-Pool.used-after-gc",
+                        // skip in non-collected pools - "pools.Big-Pool.used-after-gc",
                         "pools.Weird-Pool.init",
                         "pools.Weird-Pool.committed",
                         "pools.Weird-Pool.used",

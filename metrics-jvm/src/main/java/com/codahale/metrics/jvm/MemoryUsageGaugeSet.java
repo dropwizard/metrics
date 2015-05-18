@@ -178,12 +178,15 @@ public class MemoryUsageGaugeSet implements MetricSet {
                 }
             });
 
-            gauges.put(name(poolName, "used-after-gc"),new Gauge<Long>() {
-                @Override
-                public Long getValue() {
-                    return pool.getCollectionUsage().getUsed();
-                }
-            });
+            // Only register GC usage metrics if the memory pool supports usage statistics.
+            if (pool.getCollectionUsage() != null) {
+            	gauges.put(name(poolName, "used-after-gc"),new Gauge<Long>() {
+                    @Override
+                    public Long getValue() {
+                        return pool.getCollectionUsage().getUsed();
+                    }
+                });
+            }
 
             gauges.put(name(poolName, "init"),new Gauge<Long>() {
                 @Override
