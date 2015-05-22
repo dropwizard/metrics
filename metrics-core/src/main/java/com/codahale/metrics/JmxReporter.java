@@ -341,7 +341,7 @@ public class JmxReporter implements Reporter, Closeable {
             super(objectName);
             this.metric = metric;
             this.rateFactor = rateUnit.toSeconds(1);
-            this.rateUnit = "events/" + calculateRateUnit(rateUnit);
+            this.rateUnit = ("events/" + calculateRateUnit(rateUnit)).intern();
         }
 
         @Override
