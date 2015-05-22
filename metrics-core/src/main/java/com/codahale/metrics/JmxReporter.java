@@ -333,7 +333,6 @@ public class JmxReporter implements Reporter, Closeable {
     //CHECKSTYLE:ON
 
     private static class JmxMeter extends AbstractBean implements JmxMeterMBean {
-
         private final Metered metric;
         private final double rateFactor;
         private final String rateUnit;
