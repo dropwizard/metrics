@@ -8,7 +8,6 @@ import javax.management.*;
 import java.io.Closeable;
 import java.lang.management.ManagementFactory;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -334,9 +333,6 @@ public class JmxReporter implements Reporter, Closeable {
     //CHECKSTYLE:ON
 
     private static class JmxMeter extends AbstractBean implements JmxMeterMBean {
-
-        private static final Map<TimeUnit, String> RATE_UNITS = new HashMap<TimeUnit, String>();
-
         private final Metered metric;
         private final double rateFactor;
         private final String rateUnit;
@@ -345,11 +341,7 @@ public class JmxReporter implements Reporter, Closeable {
             super(objectName);
             this.metric = metric;
             this.rateFactor = rateUnit.toSeconds(1);
-            if (!RATE_UNITS.containsKey(rateUnit))
-            {
-              RATE_UNITS.put(rateUnit, "events/" + calculateRateUnit(rateUnit));
-            }
-            this.rateUnit = RATE_UNITS.get(rateUnit);
+            this.rateUnit = ("events/" + calculateRateUnit(rateUnit)).intern();
         }
 
         @Override
