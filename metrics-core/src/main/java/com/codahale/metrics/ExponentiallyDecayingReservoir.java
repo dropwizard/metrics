@@ -48,6 +48,15 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
      * Creates a new {@link ExponentiallyDecayingReservoir}.
      *
      * @param size  the number of samples to keep in the sampling reservoir
+     */
+    public ExponentiallyDecayingReservoir(int size) {
+        this(size, DEFAULT_ALPHA);
+    }
+
+    /**
+     * Creates a new {@link ExponentiallyDecayingReservoir}.
+     *
+     * @param size  the number of samples to keep in the sampling reservoir
      * @param alpha the exponential decay factor; the higher this is, the more biased the reservoir
      *              will be towards newer values
      */

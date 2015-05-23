@@ -9,6 +9,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * A registry of metric instances.
  */
 public class MetricRegistry implements MetricSet {
+
+    private static final int DEFAULT_SNAPHOT_SIZE = 1028;
+
+    private final int snapshotSize;
+
     /**
      * Concatenates elements to form a dotted name, eliding any null values or empty strings.
      *
@@ -55,9 +60,18 @@ public class MetricRegistry implements MetricSet {
      * Creates a new {@link MetricRegistry}.
      */
     public MetricRegistry() {
+        this(DEFAULT_SNAPHOT_SIZE);
+    }
+
+    /**
+     * Creates a new {@link MetricRegistry}.
+     */
+    public MetricRegistry(int snapshotSize) {
+        this.snapshotSize = snapshotSize;
         this.metrics = buildMap();
         this.listeners = new CopyOnWriteArrayList<MetricRegistryListener>();
     }
+
 
     /**
      * Creates a new {@link ConcurrentMap} implementation for use inside the registry. Override this
@@ -314,7 +328,7 @@ public class MetricRegistry implements MetricSet {
             return (T) metric;
         } else if (metric == null) {
             try {
-                return register(name, builder.newMetric());
+                return register(name, builder.newMetric(snapshotSize));
             } catch (IllegalArgumentException e) {
                 final Metric added = metrics.get(name);
                 if (builder.isInstance(added)) {
@@ -402,7 +416,7 @@ public class MetricRegistry implements MetricSet {
     private interface MetricBuilder<T extends Metric> {
         MetricBuilder<Counter> COUNTERS = new MetricBuilder<Counter>() {
             @Override
-            public Counter newMetric() {
+            public Counter newMetric(int snapshotSize) {
                 return new Counter();
             }
 
@@ -414,8 +428,8 @@ public class MetricRegistry implements MetricSet {
 
         MetricBuilder<Histogram> HISTOGRAMS = new MetricBuilder<Histogram>() {
             @Override
-            public Histogram newMetric() {
-                return new Histogram(new ExponentiallyDecayingReservoir());
+            public Histogram newMetric(int snapshotSize) {
+                return new Histogram(new ExponentiallyDecayingReservoir(snapshotSize));
             }
 
             @Override
@@ -426,7 +440,7 @@ public class MetricRegistry implements MetricSet {
 
         MetricBuilder<Meter> METERS = new MetricBuilder<Meter>() {
             @Override
-            public Meter newMetric() {
+            public Meter newMetric(int snapshotSize) {
                 return new Meter();
             }
 
@@ -438,8 +452,8 @@ public class MetricRegistry implements MetricSet {
 
         MetricBuilder<Timer> TIMERS = new MetricBuilder<Timer>() {
             @Override
-            public Timer newMetric() {
-                return new Timer();
+            public Timer newMetric(int snapshotSize) {
+                return new Timer(new ExponentiallyDecayingReservoir(snapshotSize));
             }
 
             @Override
@@ -448,7 +462,7 @@ public class MetricRegistry implements MetricSet {
             }
         };
 
-        T newMetric();
+        T newMetric(int snapshotSize);
 
         boolean isInstance(Metric metric);
     }
