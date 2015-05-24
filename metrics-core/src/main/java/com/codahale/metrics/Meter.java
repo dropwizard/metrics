@@ -97,10 +97,9 @@ public class Meter implements Metered {
     public double getMeanRate() {
         if (getCount() == 0) {
             return 0.0;
-        } else {
-            final double elapsed = (clock.getTick() - startTime);
-            return getCount() / elapsed * TimeUnit.SECONDS.toNanos(1);
         }
+        final double elapsed = (clock.getTick() - startTime);
+        return getCount() / elapsed * TimeUnit.SECONDS.toNanos(1);
     }
 
     @Override
