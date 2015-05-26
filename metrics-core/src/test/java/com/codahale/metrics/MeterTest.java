@@ -55,4 +55,31 @@ public class MeterTest {
         assertThat(meter.getFifteenMinuteRate())
                 .isEqualTo(0.1988, offset(0.001));
     }
+
+    @Test
+    public void testAdditionalRatesNoEvents () throws Exception {
+        meter.addRate(3600);
+        meter.addRate(86400);
+
+        assertThat(meter.getAdditionalRate(3600))
+                .isEqualTo(0.0);
+
+        assertThat(meter.getAdditionalRate(86400))
+                .isEqualTo(0.0);
+    }
+
+    @Test
+    public void testAdditionalRatesWithEvents () throws Exception {
+        meter.addRate(3600);
+        meter.addRate(86400);
+
+        meter.mark();
+        meter.mark(2);
+
+        assertThat(meter.getAdditionalRate(3600))
+                .isEqualTo(0.199722, offset(0.00001));
+
+        assertThat(meter.getAdditionalRate(86400))
+                .isEqualTo(0.199988, offset(0.00001));
+    }
 }
