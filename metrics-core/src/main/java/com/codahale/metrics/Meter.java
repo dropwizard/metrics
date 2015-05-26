@@ -1,7 +1,11 @@
 package com.codahale.metrics;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static java.lang.Math.exp;
 
 /**
  * A meter metric which measures mean throughput and one-, five-, and fifteen-minute
@@ -15,6 +19,8 @@ public class Meter implements Metered {
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
     private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
     private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
+
+    private final Map<Long, EWMA> additionalRates = new HashMap<Long, EWMA>();
 
     private final LongAdder count = new LongAdder();
     private final long startTime;
@@ -39,6 +45,12 @@ public class Meter implements Metered {
         this.lastTick = new AtomicLong(startTime);
     }
 
+    public void addRate (long ratePeriod) {
+        double alpha = 1 - exp(-5.0 / ((double) ratePeriod));
+
+        this.additionalRates.put(ratePeriod, new EWMA(alpha, 5, TimeUnit.SECONDS));
+    }
+
     /**
      * Mark the occurrence of an event.
      */
@@ -57,6 +69,9 @@ public class Meter implements Metered {
         m1Rate.update(n);
         m5Rate.update(n);
         m15Rate.update(n);
+        for ( EWMA additionalRate : this.additionalRates.values() ) {
+            additionalRate.update(n);
+        }
     }
 
     private void tickIfNecessary() {
@@ -71,6 +86,9 @@ public class Meter implements Metered {
                     m1Rate.tick();
                     m5Rate.tick();
                     m15Rate.tick();
+                    for ( EWMA additionalRate : this.additionalRates.values() ) {
+                        additionalRate.tick();
+                    }
                 }
             }
         }
@@ -107,5 +125,10 @@ public class Meter implements Metered {
     public double getOneMinuteRate() {
         tickIfNecessary();
         return m1Rate.getRate(TimeUnit.SECONDS);
+    }
+
+    public double getAdditionalRate(long ratePeriod) {
+        tickIfNecessary();
+        return this.additionalRates.get(ratePeriod).getRate(TimeUnit.SECONDS);
     }
 }
