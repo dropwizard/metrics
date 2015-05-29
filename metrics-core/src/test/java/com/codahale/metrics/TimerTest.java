@@ -70,6 +70,25 @@ public class TimerTest {
     }
 
     @Test
+    public void timesRunnableInstances() throws Exception {
+        final boolean[] called = {false};
+        timer.time(new Runnable() {
+            @Override
+            public void run() {
+                called[0] = true;
+            }
+        });
+
+        assertThat(timer.getCount())
+                .isEqualTo(1);
+
+        assertThat(called[0])
+                .isTrue();
+
+        verify(reservoir).update(50000000);
+    }
+
+    @Test
     public void timesContexts() throws Exception {
         timer.time().stop();
 
