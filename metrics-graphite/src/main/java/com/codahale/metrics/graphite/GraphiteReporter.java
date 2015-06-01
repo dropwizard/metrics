@@ -226,6 +226,13 @@ public class GraphiteReporter extends ScheduledReporter {
                       format(convertDuration(snapshot.get999thPercentile())),
                       timestamp);
 
+        graphite.send(prefix(name, "concurrent"), 
+                      format(timer.getConcurrent()), 
+                      timestamp);
+        graphite.send(prefix(name, "maxconcurrent"), 
+                      format(timer.getMaxConcurrent()), 
+                      timestamp);
+
         reportMetered(name, timer, timestamp);
     }
 

@@ -163,7 +163,7 @@ public class Slf4jReporterTest {
                 map("test.another.timer", timer));
 
         verify(logger).error(marker,
-                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
+                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, concurrent={}, max_concurrent={}, rate_unit={}, duration_unit={}",
                 "test.another.timer",
                 1L,
                 300.0,
@@ -180,6 +180,8 @@ public class Slf4jReporterTest {
                 3.0,
                 4.0,
                 5.0,
+                0L,
+                0L,
                 "events/second",
                 "milliseconds");
     }
@@ -313,7 +315,7 @@ public class Slf4jReporterTest {
                 map("test.another.timer", timer));
 
         verify(logger).info(marker,
-                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
+                "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, concurrent={}, max_concurrent={}, rate_unit={}, duration_unit={}",
                 "prefix.test.another.timer",
                 1L,
                 300.0,
@@ -330,6 +332,8 @@ public class Slf4jReporterTest {
                 3.0,
                 4.0,
                 5.0,
+                0L,
+                0L,
                 "events/second",
                 "milliseconds");
     }

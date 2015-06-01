@@ -284,6 +284,8 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.timer.p98", "800.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.p99", "900.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.p999", "1000.00", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.concurrent", "0", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.maxconcurrent", "0", timestamp);
         inOrder.verify(graphite).send("prefix.timer.count", "1", timestamp);
         inOrder.verify(graphite).send("prefix.timer.m1_rate", "3.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.m5_rate", "4.00", timestamp);
