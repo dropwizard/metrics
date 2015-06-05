@@ -45,10 +45,15 @@ public class SharedMetricRegistries {
     }
 
     public synchronized static MetricRegistry setDefault(String name) {
+        final MetricRegistry registry = getOrCreate(name);
+        return setDefault(name, registry);
+    }
+
+    public static MetricRegistry setDefault(String name, MetricRegistry metricRegistry) {
         if (defaultRegistryName == null) {
-            final MetricRegistry registry = getOrCreate(name);
             defaultRegistryName = name;
-            return registry;
+            add(name, metricRegistry);
+            return metricRegistry;
         }
         throw new IllegalStateException("Default metric registry name is already set.");
     }

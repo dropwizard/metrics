@@ -22,7 +22,7 @@ public class SharedMetricRegistriesTest {
     }
 
     @Test
-    public void memoizesRegistriesByName() throws Exception {
+    public void memorizesRegistriesByName() throws Exception {
         final MetricRegistry one = SharedMetricRegistries.getOrCreate("one");
         final MetricRegistry two = SharedMetricRegistries.getOrCreate("one");
 
@@ -90,5 +90,14 @@ public class SharedMetricRegistriesTest {
             assertThat(e).isInstanceOf(IllegalStateException.class);
             assertThat(e.getMessage()).isEqualTo("Default metric registry name is already set.");
         }
+    }
+
+    @Test
+    public void setsDefaultExistingRegistries() throws Exception {
+        final String defaultName = "default";
+        final MetricRegistry registry = new MetricRegistry();
+        assertThat(SharedMetricRegistries.setDefault(defaultName, registry)).isEqualTo(registry);
+        assertThat(SharedMetricRegistries.getDefault()).isEqualTo(registry);
+        assertThat(SharedMetricRegistries.getOrCreate(defaultName)).isEqualTo(registry);
     }
 }
