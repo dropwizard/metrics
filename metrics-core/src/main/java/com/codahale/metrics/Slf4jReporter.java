@@ -161,7 +161,7 @@ public class Slf4jReporter extends ScheduledReporter {
 
     private final LoggerProxy loggerProxy;
     private final Marker marker;
-    private final String prefix;
+    private final MetricName prefix;
 
     private Slf4jReporter(MetricRegistry registry,
                           LoggerProxy loggerProxy,
@@ -173,39 +173,39 @@ public class Slf4jReporter extends ScheduledReporter {
         super(registry, "logger-reporter", filter, rateUnit, durationUnit);
         this.loggerProxy = loggerProxy;
         this.marker = marker;
-        this.prefix = prefix;
+        this.prefix = MetricName.build(prefix);
     }
 
     @Override
-    public void report(SortedMap<String, Gauge> gauges,
-                       SortedMap<String, Counter> counters,
-                       SortedMap<String, Histogram> histograms,
-                       SortedMap<String, Meter> meters,
-                       SortedMap<String, Timer> timers) {
+    public void report(SortedMap<MetricName, Gauge> gauges,
+                       SortedMap<MetricName, Counter> counters,
+                       SortedMap<MetricName, Histogram> histograms,
+                       SortedMap<MetricName, Meter> meters,
+                       SortedMap<MetricName, Timer> timers) {
         if (loggerProxy.isEnabled(marker)) {
-            for (Entry<String, Gauge> entry : gauges.entrySet()) {
+            for (Entry<MetricName, Gauge> entry : gauges.entrySet()) {
                 logGauge(entry.getKey(), entry.getValue());
             }
 
-            for (Entry<String, Counter> entry : counters.entrySet()) {
+            for (Entry<MetricName, Counter> entry : counters.entrySet()) {
                 logCounter(entry.getKey(), entry.getValue());
             }
 
-            for (Entry<String, Histogram> entry : histograms.entrySet()) {
+            for (Entry<MetricName, Histogram> entry : histograms.entrySet()) {
                 logHistogram(entry.getKey(), entry.getValue());
             }
 
-            for (Entry<String, Meter> entry : meters.entrySet()) {
+            for (Entry<MetricName, Meter> entry : meters.entrySet()) {
                 logMeter(entry.getKey(), entry.getValue());
             }
 
-            for (Entry<String, Timer> entry : timers.entrySet()) {
+            for (Entry<MetricName, Timer> entry : timers.entrySet()) {
                 logTimer(entry.getKey(), entry.getValue());
             }
         }
     }
 
-    private void logTimer(String name, Timer timer) {
+    private void logTimer(MetricName name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
         loggerProxy.log(marker,
                 "type=TIMER, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, " +
@@ -231,7 +231,7 @@ public class Slf4jReporter extends ScheduledReporter {
                 getDurationUnit());
     }
 
-    private void logMeter(String name, Meter meter) {
+    private void logMeter(MetricName name, Meter meter) {
         loggerProxy.log(marker,
                 "type=METER, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
                 prefix(name),
@@ -243,7 +243,7 @@ public class Slf4jReporter extends ScheduledReporter {
                 getRateUnit());
     }
 
-    private void logHistogram(String name, Histogram histogram) {
+    private void logHistogram(MetricName name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
         loggerProxy.log(marker,
                 "type=HISTOGRAM, name={}, count={}, min={}, max={}, mean={}, stddev={}, " +
@@ -262,11 +262,11 @@ public class Slf4jReporter extends ScheduledReporter {
                 snapshot.get999thPercentile());
     }
 
-    private void logCounter(String name, Counter counter) {
+    private void logCounter(MetricName name, Counter counter) {
         loggerProxy.log(marker, "type=COUNTER, name={}, count={}", prefix(name), counter.getCount());
     }
 
-    private void logGauge(String name, Gauge gauge) {
+    private void logGauge(MetricName name, Gauge gauge) {
         loggerProxy.log(marker, "type=GAUGE, name={}, value={}", prefix(name), gauge.getValue());
     }
 
@@ -275,8 +275,8 @@ public class Slf4jReporter extends ScheduledReporter {
         return "events/" + super.getRateUnit();
     }
 
-    private String prefix(String... components) {
-        return MetricRegistry.name(prefix, components);
+    private String prefix(MetricName name, String... components) {
+        return MetricName.join(MetricName.join(prefix, name), MetricName.build(components)).getKey();
     }
 
     /* private class to allow logger configuration */

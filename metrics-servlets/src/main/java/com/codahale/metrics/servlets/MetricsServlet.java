@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -195,11 +196,11 @@ public class MetricsServlet extends HttpServlet {
         boolean filterByName = name != null && !name.isEmpty();
 
         if (filterByName) {
-            return metricRegistry.getMetrics().get(name);
+            return metricRegistry.getMetrics().get(MetricName.build(name));
         }
 
         if (filterByType) {
-            SortedMap<String, ? extends Metric> metrics;
+            SortedMap<MetricName, ? extends Metric> metrics;
             if ("gauges".equals(type)) {
                 metrics = metricRegistry.getGauges();
             } else if ("counters".equals(type)) {

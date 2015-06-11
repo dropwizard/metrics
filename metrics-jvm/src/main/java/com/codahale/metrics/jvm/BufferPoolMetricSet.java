@@ -2,13 +2,16 @@ package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.JmxAttributeGauge;
 import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,12 +36,13 @@ public class BufferPoolMetricSet implements MetricSet {
     }
 
     @Override
-    public Map<String, Metric> getMetrics() {
-        final Map<String, Metric> gauges = new HashMap<String, Metric>();
+    public Map<MetricName, Metric> getMetrics() {
+        final Map<MetricName, Metric> gauges = new HashMap<MetricName, Metric>();
         for (String pool : POOLS) {
             for (int i = 0; i < ATTRIBUTES.length; i++) {
                 final String attribute = ATTRIBUTES[i];
                 final String name = NAMES[i];
+
                 try {
                     final ObjectName on = new ObjectName("java.nio:type=BufferPool,name=" + pool);
                     mBeanServer.getMBeanInfo(on);

@@ -2,6 +2,7 @@ package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricSet;
 
 import java.lang.management.ClassLoadingMXBean;
@@ -25,17 +26,17 @@ public class ClassLoadingGaugeSet implements MetricSet {
     }
 
     @Override
-    public Map<String, Metric> getMetrics() {
-        final Map<String, Metric> gauges = new HashMap<String, Metric>();
+    public Map<MetricName, Metric> getMetrics() {
+        final Map<MetricName, Metric> gauges = new HashMap<MetricName, Metric>();
 
-        gauges.put("loaded", new Gauge<Long>() {
+        gauges.put(MetricName.build("loaded"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return mxBean.getTotalLoadedClassCount();
             }
         });
 
-        gauges.put("unloaded", new Gauge<Long>() {
+        gauges.put(MetricName.build("unloaded"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return mxBean.getUnloadedClassCount();

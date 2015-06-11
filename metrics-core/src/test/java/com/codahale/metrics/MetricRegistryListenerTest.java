@@ -6,6 +6,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 public class MetricRegistryListenerTest {
+    private static final MetricName BLAH = MetricName.build("blah");
+    
     private final Gauge gauge = mock(Gauge.class);
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
@@ -17,45 +19,45 @@ public class MetricRegistryListenerTest {
 
     @Test
     public void noOpsOnGaugeAdded() throws Exception {
-        listener.onGaugeAdded("blah", gauge);
+        listener.onGaugeAdded(BLAH, gauge);
 
         verifyZeroInteractions(gauge);
     }
 
     @Test
     public void noOpsOnCounterAdded() throws Exception {
-        listener.onCounterAdded("blah", counter);
+        listener.onCounterAdded(BLAH, counter);
 
         verifyZeroInteractions(counter);
     }
 
     @Test
     public void noOpsOnHistogramAdded() throws Exception {
-        listener.onHistogramAdded("blah", histogram);
+        listener.onHistogramAdded(BLAH, histogram);
 
         verifyZeroInteractions(histogram);
     }
 
     @Test
     public void noOpsOnMeterAdded() throws Exception {
-        listener.onMeterAdded("blah", meter);
+        listener.onMeterAdded(BLAH, meter);
 
         verifyZeroInteractions(meter);
     }
 
     @Test
     public void noOpsOnTimerAdded() throws Exception {
-        listener.onTimerAdded("blah", timer);
+        listener.onTimerAdded(BLAH, timer);
 
         verifyZeroInteractions(timer);
     }
 
     @Test
     public void doesNotExplodeWhenMetricsAreRemoved() throws Exception {
-        listener.onGaugeRemoved("blah");
-        listener.onCounterRemoved("blah");
-        listener.onHistogramRemoved("blah");
-        listener.onMeterRemoved("blah");
-        listener.onTimerRemoved("blah");
+        listener.onGaugeRemoved(BLAH);
+        listener.onCounterRemoved(BLAH);
+        listener.onHistogramRemoved(BLAH);
+        listener.onMeterRemoved(BLAH);
+        listener.onTimerRemoved(BLAH);
     }
 }

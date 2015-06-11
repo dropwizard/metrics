@@ -11,7 +11,8 @@ public class DefaultObjectNameFactory implements ObjectNameFactory {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultObjectNameFactory.class);
 
 	@Override
-	public ObjectName createName(String type, String domain, String name) {
+	public ObjectName createName(String type, String domain, MetricName metricName) {
+	    String name = metricName.getKey();
 		try {
 			ObjectName objectName = new ObjectName(domain, "name", name);
 			if (objectName.isPattern()) {

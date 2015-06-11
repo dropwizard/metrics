@@ -9,7 +9,7 @@ public interface MetricFilter {
      */
     MetricFilter ALL = new MetricFilter() {
         @Override
-        public boolean matches(String name, Metric metric) {
+        public boolean matches(MetricName name, Metric metric) {
             return true;
         }
     };
@@ -21,5 +21,5 @@ public interface MetricFilter {
      * @param metric    the metric
      * @return {@code true} if the metric matches the filter
      */
-    boolean matches(String name, Metric metric);
+    boolean matches(MetricName name, Metric metric);
 }

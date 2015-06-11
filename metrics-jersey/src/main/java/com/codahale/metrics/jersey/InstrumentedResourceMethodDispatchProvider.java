@@ -5,6 +5,7 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.ExceptionMetered;
@@ -104,14 +105,14 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
 
         if (method.getMethod().isAnnotationPresent(Timed.class)) {
             final Timed annotation = method.getMethod().getAnnotation(Timed.class);
-            final String name = chooseName(annotation.name(), annotation.absolute(), method);
+            final MetricName name = chooseName(annotation.name(), annotation.absolute(), method);
             final Timer timer = registry.timer(name);
             dispatcher = new TimedRequestDispatcher(dispatcher, timer);
         }
 
         if (method.getMethod().isAnnotationPresent(Metered.class)) {
             final Metered annotation = method.getMethod().getAnnotation(Metered.class);
-            final String name = chooseName(annotation.name(), annotation.absolute(), method);
+            final MetricName name = chooseName(annotation.name(), annotation.absolute(), method);
             final Meter meter = registry.meter(name);
             dispatcher = new MeteredRequestDispatcher(dispatcher, meter);
         }
@@ -119,7 +120,7 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
         if (method.getMethod().isAnnotationPresent(ExceptionMetered.class)) {
             final ExceptionMetered annotation = method.getMethod()
                                                       .getAnnotation(ExceptionMetered.class);
-            final String name = chooseName(annotation.name(),
+            final MetricName name = chooseName(annotation.name(),
                                            annotation.absolute(),
                                            method,
                                            ExceptionMetered.DEFAULT_NAME_SUFFIX);
@@ -132,15 +133,17 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
         return dispatcher;
     }
 
-    private String chooseName(String explicitName, boolean absolute, AbstractResourceMethod method, String... suffixes) {
+    private MetricName chooseName(String explicitName, boolean absolute, AbstractResourceMethod method, String... suffixes) {
         if (explicitName != null && !explicitName.isEmpty()) {
             if (absolute) {
-                return explicitName;
+                return MetricName.build(explicitName);
             }
             return name(method.getDeclaringResource().getResourceClass(), explicitName);
         }
-        return name(name(method.getDeclaringResource().getResourceClass(),
-                         method.getMethod().getName()),
-                    suffixes);
+
+        final MetricName base = name(method.getDeclaringResource().getResourceClass(),
+                method.getMethod().getName());
+
+        return MetricName.join(base, MetricName.build(suffixes));
     }
 }

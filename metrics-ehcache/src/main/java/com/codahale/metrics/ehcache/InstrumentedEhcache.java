@@ -1,8 +1,10 @@
 package com.codahale.metrics.ehcache;
 
 import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
@@ -117,8 +119,8 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
      */
     public static Ehcache instrument(MetricRegistry registry, final Ehcache cache) {
 
-        final String prefix = name(cache.getClass(), cache.getName());
-        registry.register(name(prefix, "hits"),
+        final MetricName prefix = name(cache.getClass(), cache.getName());
+        registry.register(prefix.resolve("hits"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -126,7 +128,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "in-memory-hits"),
+        registry.register(prefix.resolve("in-memory-hits"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -134,7 +136,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "off-heap-hits"),
+        registry.register(prefix.resolve("off-heap-hits"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -142,7 +144,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "on-disk-hits"),
+        registry.register(prefix.resolve("on-disk-hits"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -150,7 +152,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "misses"),
+        registry.register(prefix.resolve("misses"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -158,7 +160,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "in-memory-misses"),
+        registry.register(prefix.resolve("in-memory-misses"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -166,7 +168,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "off-heap-misses"),
+        registry.register(prefix.resolve("off-heap-misses"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -174,7 +176,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "on-disk-misses"),
+        registry.register(prefix.resolve("on-disk-misses"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -182,7 +184,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "objects"),
+        registry.register(prefix.resolve("objects"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -190,7 +192,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "in-memory-objects"),
+        registry.register(prefix.resolve("in-memory-objects"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -198,7 +200,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "off-heap-objects"),
+        registry.register(prefix.resolve("off-heap-objects"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -206,7 +208,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "on-disk-objects"),
+        registry.register(prefix.resolve("on-disk-objects"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -214,7 +216,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "mean-get-time"),
+        registry.register(prefix.resolve("mean-get-time"),
                           new Gauge<Double>() {
                               @Override
                               public Double getValue() {
@@ -222,7 +224,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "mean-search-time"),
+        registry.register(prefix.resolve("mean-search-time"),
                           new Gauge<Double>() {
                               @Override
                               public Double getValue() {
@@ -230,7 +232,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "eviction-count"),
+        registry.register(prefix.resolve("eviction-count"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
@@ -238,7 +240,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "searches-per-second"),
+        registry.register(prefix.resolve("searches-per-second"),
                           new Gauge<Double>() {
                               @Override
                               public Double getValue() {
@@ -246,7 +248,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
                               }
                           });
 
-        registry.register(name(prefix, "writer-queue-size"),
+        registry.register(prefix.resolve("writer-queue-size"),
                           new Gauge<Long>() {
                               @Override
                               public Long getValue() {
