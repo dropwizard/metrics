@@ -102,7 +102,7 @@ public class JmxReporterTest {
     	ObjectName n = new ObjectName(name + ":name=dummy");
     	try {
     		String widgetName = "something";
-    		when(mockObjectNameFactory.createName(any(String.class), any(String.class), any(String.class))).thenReturn(n);
+    		when(mockObjectNameFactory.createName(any(String.class), any(String.class), any(MetricName.class))).thenReturn(n);
     		Gauge aGauge = mock(Gauge.class);
             when(aGauge.getValue()).thenReturn(1);
 
@@ -113,7 +113,7 @@ public class JmxReporterTest {
 	                .build();
 	        registry.register(widgetName, aGauge);
 	        reporter.start();
-	        verify(mockObjectNameFactory).createName(eq("gauges"), any(String.class), eq("something"));
+	        verify(mockObjectNameFactory).createName(eq("gauges"), any(String.class), eq(MetricName.build("something")));
 	        //verifyNoMoreInteractions(mockObjectNameFactory);
     	} finally {
     		reporter.stop();
@@ -273,7 +273,7 @@ public class JmxReporterTest {
     }
 
     private AttributeList getAttributes(String name, String... attributeNames) throws JMException {
-    	ObjectName n = concreteObjectNameFactory.createName("only-for-logging-error", this.name, name);
+    	ObjectName n = concreteObjectNameFactory.createName("only-for-logging-error", this.name, MetricName.build(name));
         return mBeanServer.getAttributes(n, attributeNames);
     }
 

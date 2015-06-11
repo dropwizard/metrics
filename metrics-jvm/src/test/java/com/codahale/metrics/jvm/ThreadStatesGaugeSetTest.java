@@ -1,6 +1,8 @@
 package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricName;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,6 +30,17 @@ public class ThreadStatesGaugeSetTest {
 
     private final Set<String> deadlocks = new HashSet<String>();
 
+    private static final MetricName TERMINATED_COUNT = MetricName.build("terminated.count");
+    private static final MetricName NEW_COUNT = MetricName.build("new.count");
+    private static final MetricName COUNT = MetricName.build("count");
+    private static final MetricName TIMED_WAITING_COUNT = MetricName.build("timed_waiting.count");
+    private static final MetricName DEADLOCKS = MetricName.build("deadlocks");
+    private static final MetricName BLOCKED_COUNT = MetricName.build("blocked.count");
+    private static final MetricName WAITING_COUNT = MetricName.build("waiting.count");
+    private static final MetricName DAEMON_COUNT = MetricName.build("daemon.count");
+    private static final MetricName RUNNABLE_COUNT = MetricName.build("runnable.count");
+    private static final MetricName DEADLOCK_COUNT = MetricName.build("deadlock.count");
+
     @Before
     public void setUp() throws Exception {
         deadlocks.add("yay");
@@ -54,69 +67,69 @@ public class ThreadStatesGaugeSetTest {
     @Test
     public void hasASetOfGauges() throws Exception {
         assertThat(gauges.getMetrics().keySet())
-                .containsOnly("terminated.count",
-                              "new.count",
-                              "count",
-                              "timed_waiting.count",
-                              "deadlocks",
-                              "blocked.count",
-                              "waiting.count",
-                              "daemon.count",
-                              "runnable.count",
-                              "deadlock.count");
+                .containsOnly(TERMINATED_COUNT,
+                              NEW_COUNT,
+                              COUNT,
+                              TIMED_WAITING_COUNT,
+                              DEADLOCKS,
+                              BLOCKED_COUNT,
+                              WAITING_COUNT,
+                              DAEMON_COUNT,
+                              RUNNABLE_COUNT,
+                              DEADLOCK_COUNT);
     }
 
     @Test
     public void hasAGaugeForEachThreadState() throws Exception {
-        assertThat(((Gauge) gauges.getMetrics().get("new.count")).getValue())
+        assertThat(((Gauge) gauges.getMetrics().get(NEW_COUNT)).getValue())
                 .isEqualTo(1);
 
-        assertThat(((Gauge) gauges.getMetrics().get("runnable.count")).getValue())
+        assertThat(((Gauge) gauges.getMetrics().get(RUNNABLE_COUNT)).getValue())
                 .isEqualTo(1);
 
-        assertThat(((Gauge) gauges.getMetrics().get("blocked.count")).getValue())
+        assertThat(((Gauge) gauges.getMetrics().get(BLOCKED_COUNT)).getValue())
                 .isEqualTo(1);
 
-        assertThat(((Gauge) gauges.getMetrics().get("waiting.count")).getValue())
+        assertThat(((Gauge) gauges.getMetrics().get(WAITING_COUNT)).getValue())
                 .isEqualTo(1);
 
-        assertThat(((Gauge) gauges.getMetrics().get("timed_waiting.count")).getValue())
+        assertThat(((Gauge) gauges.getMetrics().get(TIMED_WAITING_COUNT)).getValue())
                 .isEqualTo(1);
 
-        assertThat(((Gauge) gauges.getMetrics().get("terminated.count")).getValue())
+        assertThat(((Gauge) gauges.getMetrics().get(TERMINATED_COUNT)).getValue())
                 .isEqualTo(1);
     }
 
     @Test
     public void hasAGaugeForTheNumberOfThreads() throws Exception {
-        assertThat(((Gauge) gauges.getMetrics().get("count")).getValue())
+        assertThat(((Gauge) gauges.getMetrics().get(COUNT)).getValue())
                 .isEqualTo(12);
     }
 
     @Test
     public void hasAGaugeForTheNumberOfDaemonThreads() throws Exception {
-        assertThat(((Gauge) gauges.getMetrics().get("daemon.count")).getValue())
+        assertThat(((Gauge) gauges.getMetrics().get(DAEMON_COUNT)).getValue())
                 .isEqualTo(13);
     }
 
     @Test
     public void hasAGaugeForAnyDeadlocks() throws Exception {
-        assertThat(((Gauge) gauges.getMetrics().get("deadlocks")).getValue())
+        assertThat(((Gauge) gauges.getMetrics().get(DEADLOCKS)).getValue())
                 .isEqualTo(deadlocks);
     }
 
     @Test
     public void hasAGaugeForAnyDeadlockCount() throws Exception {
-        assertThat(((Gauge) gauges.getMetrics().get("deadlock.count")).getValue())
+        assertThat(((Gauge) gauges.getMetrics().get(DEADLOCK_COUNT)).getValue())
                 .isEqualTo(1);
     }
 
     @Test
     public void autoDiscoversTheMXBeans() throws Exception {
         final ThreadStatesGaugeSet set = new ThreadStatesGaugeSet();
-        assertThat(((Gauge) set.getMetrics().get("count")).getValue())
+        assertThat(((Gauge) set.getMetrics().get(COUNT)).getValue())
                 .isNotNull();
-        assertThat(((Gauge) set.getMetrics().get("deadlocks")).getValue())
+        assertThat(((Gauge) set.getMetrics().get(DEADLOCKS)).getValue())
                 .isNotNull();
     }
 }

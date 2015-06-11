@@ -320,13 +320,13 @@ public class GraphiteReporterTest {
         verifyNoMoreInteractions(graphite);
     }
 
-    private <T> SortedMap<String, T> map() {
-        return new TreeMap<String, T>();
+    private <T> SortedMap<MetricName, T> map() {
+        return new TreeMap<MetricName, T>();
     }
 
-    private <T> SortedMap<String, T> map(String name, T metric) {
-        final TreeMap<String, T> map = new TreeMap<String, T>();
-        map.put(name, metric);
+    private <T> SortedMap<MetricName, T> map(String name, T metric) {
+        final TreeMap<MetricName, T> map = new TreeMap<MetricName, T>();
+        map.put(MetricName.build(name), metric);
         return map;
     }
 

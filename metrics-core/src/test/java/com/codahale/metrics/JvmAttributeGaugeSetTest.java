@@ -27,12 +27,15 @@ public class JvmAttributeGaugeSetTest {
     @Test
     public void hasASetOfGauges() throws Exception {
         assertThat(gauges.getMetrics().keySet())
-                .containsOnly("vendor", "name", "uptime");
+                .containsOnly(
+                        MetricName.build("vendor"),
+                        MetricName.build("name"),
+                        MetricName.build("uptime"));
     }
 
     @Test
     public void hasAGaugeForTheJVMName() throws Exception {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("name");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(MetricName.build("name"));
 
         assertThat(gauge.getValue())
                 .isEqualTo("9928@example.com");
@@ -40,7 +43,7 @@ public class JvmAttributeGaugeSetTest {
 
     @Test
     public void hasAGaugeForTheJVMVendor() throws Exception {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("vendor");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(MetricName.build("vendor"));
 
         assertThat(gauge.getValue())
                 .isEqualTo("Oracle Corporation Java HotSpot(TM) 64-Bit Server VM 23.7-b01 (1.7)");
@@ -48,7 +51,7 @@ public class JvmAttributeGaugeSetTest {
 
     @Test
     public void hasAGaugeForTheJVMUptime() throws Exception {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("uptime");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(MetricName.build("uptime"));
 
         assertThat(gauge.getValue())
                 .isEqualTo(100L);
@@ -56,7 +59,7 @@ public class JvmAttributeGaugeSetTest {
 
     @Test
     public void autoDiscoversTheRuntimeBean() throws Exception {
-        final Gauge gauge = (Gauge) new JvmAttributeGaugeSet().getMetrics().get("uptime");
+        final Gauge gauge = (Gauge) new JvmAttributeGaugeSet().getMetrics().get(MetricName.build("uptime"));
 
         assertThat((Long) gauge.getValue())
                 .isPositive();

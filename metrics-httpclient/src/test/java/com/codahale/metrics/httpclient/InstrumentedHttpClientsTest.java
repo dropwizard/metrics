@@ -1,8 +1,10 @@
 package com.codahale.metrics.httpclient;
 
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricRegistryListener;
 import com.codahale.metrics.Timer;
+
 import org.apache.http.HttpRequest;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -31,7 +33,7 @@ public class InstrumentedHttpClientsTest {
     @Test
     public void registersExpectedMetricsGivenNameStrategy() throws Exception {
         final HttpGet get = new HttpGet("http://example.com?q=anything");
-        final String metricName = "some.made.up.metric.name";
+        final MetricName metricName = MetricName.build("some.made.up.metric.name");
 
         when(metricNameStrategy.getNameFor(anyString(), any(HttpRequest.class)))
                 .thenReturn(metricName);

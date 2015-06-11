@@ -25,11 +25,11 @@ public class ScheduledReporterTest {
                                   TimeUnit.SECONDS,
                                   TimeUnit.MILLISECONDS) {
                 @Override
-                public void report(SortedMap<String, Gauge> gauges,
-                                   SortedMap<String, Counter> counters,
-                                   SortedMap<String, Histogram> histograms,
-                                   SortedMap<String, Meter> meters,
-                                   SortedMap<String, Timer> timers) {
+                public void report(SortedMap<MetricName, Gauge> gauges,
+                                   SortedMap<MetricName, Counter> counters,
+                                   SortedMap<MetricName, Histogram> histograms,
+                                   SortedMap<MetricName, Meter> meters,
+                                   SortedMap<MetricName, Timer> timers) {
                     // nothing doing!
                 }
             }
@@ -63,9 +63,9 @@ public class ScheduledReporterTest {
         );
     }
 
-    private <T> SortedMap<String, T> map(String name, T value) {
-        final SortedMap<String, T> map = new TreeMap<String, T>();
-        map.put(name, value);
+    private <T> SortedMap<MetricName, T> map(String name, T value) {
+        final SortedMap<MetricName, T> map = new TreeMap<MetricName, T>();
+        map.put(MetricName.build(name), value);
         return map;
     }
 }

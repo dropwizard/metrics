@@ -29,17 +29,17 @@ public class JvmAttributeGaugeSet implements MetricSet {
     }
 
     @Override
-    public Map<String, Metric> getMetrics() {
-        final Map<String, Metric> gauges = new HashMap<String, Metric>();
+    public Map<MetricName, Metric> getMetrics() {
+        final Map<MetricName, Metric> gauges = new HashMap<MetricName, Metric>();
 
-        gauges.put("name", new Gauge<String>() {
+        gauges.put(MetricName.build("name"), new Gauge<String>() {
             @Override
             public String getValue() {
                 return runtime.getName();
             }
         });
 
-        gauges.put("vendor", new Gauge<String>() {
+        gauges.put(MetricName.build("vendor"), new Gauge<String>() {
             @Override
             public String getValue() {
                 return String.format(Locale.US,
@@ -51,7 +51,7 @@ public class JvmAttributeGaugeSet implements MetricSet {
             }
         });
 
-        gauges.put("uptime", new Gauge<Long>() {
+        gauges.put(MetricName.build("uptime"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return runtime.getUptime();

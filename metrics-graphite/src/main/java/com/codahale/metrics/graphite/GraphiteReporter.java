@@ -125,7 +125,7 @@ public class GraphiteReporter extends ScheduledReporter {
 
     private final GraphiteSender graphite;
     private final Clock clock;
-    private final String prefix;
+    private final MetricName prefix;
 
     private GraphiteReporter(MetricRegistry registry,
                              GraphiteSender graphite,
@@ -137,15 +137,15 @@ public class GraphiteReporter extends ScheduledReporter {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit);
         this.graphite = graphite;
         this.clock = clock;
-        this.prefix = prefix;
+        this.prefix = MetricName.build(prefix);
     }
 
     @Override
-    public void report(SortedMap<String, Gauge> gauges,
-                       SortedMap<String, Counter> counters,
-                       SortedMap<String, Histogram> histograms,
-                       SortedMap<String, Meter> meters,
-                       SortedMap<String, Timer> timers) {
+    public void report(SortedMap<MetricName, Gauge> gauges,
+                       SortedMap<MetricName, Counter> counters,
+                       SortedMap<MetricName, Histogram> histograms,
+                       SortedMap<MetricName, Meter> meters,
+                       SortedMap<MetricName, Timer> timers) {
         final long timestamp = clock.getTime() / 1000;
 
         // oh it'd be lovely to use Java 7 here
@@ -154,23 +154,23 @@ public class GraphiteReporter extends ScheduledReporter {
     	          graphite.connect();
             }
 
-            for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
+            for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
                 reportGauge(entry.getKey(), entry.getValue(), timestamp);
             }
 
-            for (Map.Entry<String, Counter> entry : counters.entrySet()) {
+            for (Map.Entry<MetricName, Counter> entry : counters.entrySet()) {
                 reportCounter(entry.getKey(), entry.getValue(), timestamp);
             }
 
-            for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
+            for (Map.Entry<MetricName, Histogram> entry : histograms.entrySet()) {
                 reportHistogram(entry.getKey(), entry.getValue(), timestamp);
             }
 
-            for (Map.Entry<String, Meter> entry : meters.entrySet()) {
+            for (Map.Entry<MetricName, Meter> entry : meters.entrySet()) {
                 reportMetered(entry.getKey(), entry.getValue(), timestamp);
             }
 
-            for (Map.Entry<String, Timer> entry : timers.entrySet()) {
+            for (Map.Entry<MetricName, Timer> entry : timers.entrySet()) {
                 reportTimer(entry.getKey(), entry.getValue(), timestamp);
             }
 
@@ -198,7 +198,7 @@ public class GraphiteReporter extends ScheduledReporter {
         }
     }
 
-    private void reportTimer(String name, Timer timer, long timestamp) throws IOException {
+    private void reportTimer(MetricName name, Timer timer, long timestamp) throws IOException {
         final Snapshot snapshot = timer.getSnapshot();
 
         graphite.send(prefix(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
@@ -229,7 +229,7 @@ public class GraphiteReporter extends ScheduledReporter {
         reportMetered(name, timer, timestamp);
     }
 
-    private void reportMetered(String name, Metered meter, long timestamp) throws IOException {
+    private void reportMetered(MetricName name, Metered meter, long timestamp) throws IOException {
         graphite.send(prefix(name, "count"), format(meter.getCount()), timestamp);
         graphite.send(prefix(name, "m1_rate"),
                       format(convertRate(meter.getOneMinuteRate())),
@@ -245,7 +245,7 @@ public class GraphiteReporter extends ScheduledReporter {
                       timestamp);
     }
 
-    private void reportHistogram(String name, Histogram histogram, long timestamp) throws IOException {
+    private void reportHistogram(MetricName name, Histogram histogram, long timestamp) throws IOException {
         final Snapshot snapshot = histogram.getSnapshot();
         graphite.send(prefix(name, "count"), format(histogram.getCount()), timestamp);
         graphite.send(prefix(name, "max"), format(snapshot.getMax()), timestamp);
@@ -260,11 +260,11 @@ public class GraphiteReporter extends ScheduledReporter {
         graphite.send(prefix(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
     }
 
-    private void reportCounter(String name, Counter counter, long timestamp) throws IOException {
+    private void reportCounter(MetricName name, Counter counter, long timestamp) throws IOException {
         graphite.send(prefix(name, "count"), format(counter.getCount()), timestamp);
     }
 
-    private void reportGauge(String name, Gauge gauge, long timestamp) throws IOException {
+    private void reportGauge(MetricName name, Gauge gauge, long timestamp) throws IOException {
         final String value = format(gauge.getValue());
         if (value != null) {
             graphite.send(prefix(name), value, timestamp);
@@ -288,8 +288,8 @@ public class GraphiteReporter extends ScheduledReporter {
         return null;
     }
 
-    private String prefix(String... components) {
-        return MetricRegistry.name(prefix, components);
+    private String prefix(MetricName name, String... components) {
+        return MetricName.join(MetricName.join(prefix, name), MetricName.build(components)).getKey();
     }
 
     private String format(long n) {

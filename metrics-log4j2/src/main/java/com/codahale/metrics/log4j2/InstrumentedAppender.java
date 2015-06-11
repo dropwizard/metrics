@@ -71,7 +71,7 @@ public class InstrumentedAppender extends AbstractAppender {
      * logged and then passed to the application.
      */
     public InstrumentedAppender(MetricRegistry registry, Filter filter, Layout<? extends Serializable> layout, boolean ignoreExceptions) {
-        super(name(Appender.class), filter, layout, ignoreExceptions);
+        super(Appender.class.getName(), filter, layout, ignoreExceptions);
         this.registry = registry;
     }
 

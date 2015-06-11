@@ -1,12 +1,15 @@
 package com.codahale.metrics.jersey2;
 
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
+
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
+
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceMethod;
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
@@ -15,6 +18,7 @@ import org.glassfish.jersey.server.monitoring.RequestEvent;
 import org.glassfish.jersey.server.monitoring.RequestEventListener;
 
 import javax.ws.rs.ext.Provider;
+
 import java.lang.reflect.Method;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -62,7 +66,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         public ExceptionMeterMetric(final MetricRegistry registry,
                                     final ResourceMethod method,
                                     final ExceptionMetered exceptionMetered) {
-            final String name = chooseName(exceptionMetered.name(),
+            final MetricName name = chooseName(exceptionMetered.name(),
                     exceptionMetered.absolute(), method, ExceptionMetered.DEFAULT_NAME_SUFFIX);
             this.meter = registry.meter(name);
             this.cause = exceptionMetered.cause();
@@ -224,27 +228,26 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     private static Timer timerMetric(final MetricRegistry registry,
                                      final ResourceMethod method,
                                      final Timed timed) {
-        final String name = chooseName(timed.name(), timed.absolute(), method);
+        final MetricName name = chooseName(timed.name(), timed.absolute(), method);
         return registry.timer(name);
     }
 
     private static Meter meterMetric(final MetricRegistry registry,
                                      final ResourceMethod method,
                                      final Metered metered) {
-        final String name = chooseName(metered.name(), metered.absolute(), method);
+        final MetricName name = chooseName(metered.name(), metered.absolute(), method);
         return registry.meter(name);
     }
 
-    protected static String chooseName(final String explicitName, final boolean absolute, final ResourceMethod method, final String... suffixes) {
+    protected static MetricName chooseName(final String explicitName, final boolean absolute, final ResourceMethod method, final String... suffixes) {
         if (explicitName != null && !explicitName.isEmpty()) {
             if (absolute) {
-                return explicitName;
+                return MetricName.build(explicitName);
             }
             return name(method.getInvocable().getDefinitionMethod().getDeclaringClass(), explicitName);
         }
 
-        return name(name(method.getInvocable().getDefinitionMethod().getDeclaringClass(),
-                        method.getInvocable().getDefinitionMethod().getName()),
-                suffixes);
+        Method definitionMethod = method.getInvocable().getDefinitionMethod();
+        return MetricName.join(name(definitionMethod.getDeclaringClass(), definitionMethod.getName()), MetricName.build(suffixes));
     }
 }
