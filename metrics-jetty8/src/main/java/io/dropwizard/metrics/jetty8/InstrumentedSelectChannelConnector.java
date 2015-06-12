@@ -1,0 +1,68 @@
+package io.dropwizard.metrics.jetty8;
+
+import static io.dropwizard.metrics.MetricRegistry.name;
+
+import org.eclipse.jetty.io.Connection;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+
+import io.dropwizard.metrics.Clock;
+import io.dropwizard.metrics.Counter;
+import io.dropwizard.metrics.Meter;
+import io.dropwizard.metrics.MetricRegistry;
+import io.dropwizard.metrics.Timer;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+public class InstrumentedSelectChannelConnector extends SelectChannelConnector {
+    private final Timer duration;
+    private final Meter accepts, connects, disconnects;
+    private final Counter connections;
+    private final Clock clock;
+
+    public InstrumentedSelectChannelConnector(MetricRegistry registry,
+                                              int port,
+                                              Clock clock) {
+        super();
+        this.clock = clock;
+        setPort(port);
+
+        this.duration = registry.timer(name(SelectChannelConnector.class,
+                                            Integer.toString(port),
+                                            "connection-duration"));
+        this.accepts = registry.meter(name(SelectChannelConnector.class,
+                                           Integer.toString(port),
+                                           "accepts"));
+        this.connects = registry.meter(name(SelectChannelConnector.class,
+                                            Integer.toString(port),
+                                            "connects"));
+        this.disconnects = registry.meter(name(SelectChannelConnector.class,
+                                               Integer.toString(port),
+                                               "disconnects"));
+        this.connections = registry.counter(name(SelectChannelConnector.class,
+                                                 Integer.toString(port),
+                                                 "active-connections"));
+    }
+
+    @Override
+    public void accept(int acceptorID) throws IOException {
+        super.accept(acceptorID);
+        accepts.mark();
+    }
+
+    @Override
+    protected void connectionOpened(Connection connection) {
+        connections.inc();
+        super.connectionOpened(connection);
+        connects.mark();
+    }
+
+    @Override
+    protected void connectionClosed(Connection connection) {
+        super.connectionClosed(connection);
+        disconnects.mark();
+        final long duration = clock.getTime() - connection.getTimeStamp();
+        this.duration.update(duration, TimeUnit.MILLISECONDS);
+        connections.dec();
+    }
+}

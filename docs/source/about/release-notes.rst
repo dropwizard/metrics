@@ -4,6 +4,19 @@
 Release Notes
 #############
 
+.. _rel-4.0.0:
+
+v4.0.0: TBD
+===================
+
+* Package name is now ``io.dropwizard.metrics``
+* Tagged metrics
+
+.. _missing-releases:
+
+Missing v3.0.2 - v3.1.2
+=======================
+
 .. _rel-3.0.1:
 
 v3.0.1: Jul 23 2013
