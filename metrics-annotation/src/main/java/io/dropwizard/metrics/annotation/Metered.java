@@ -26,14 +26,21 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
 public @interface Metered {
+
     /**
-     * @return The name of the meter.
+     * @return The meter's name.
      */
     String name() default "";
+
+    /**
+     * @return The meter's tags.
+     */
+    String[] tags() default {};
 
     /**
      * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
      * relative to the annotated class. When annotating a class, this must be {@code false}.
      */
     boolean absolute() default false;
+
 }

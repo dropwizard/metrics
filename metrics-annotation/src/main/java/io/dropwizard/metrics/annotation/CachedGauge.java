@@ -30,9 +30,14 @@ import java.util.concurrent.TimeUnit;
 public @interface CachedGauge {
 
     /**
-     * @return The name of the counter.
+     * @return The gauge's name.
      */
     String name() default "";
+
+    /**
+     * @return The gauge's tags.
+     */
+    String[] tags() default {};
 
     /**
      * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name

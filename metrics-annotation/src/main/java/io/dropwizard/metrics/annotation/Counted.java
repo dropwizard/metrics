@@ -31,9 +31,14 @@ import java.lang.annotation.Target;
 public @interface Counted {
 
     /**
-     * @return The name of the counter.
+     * @return The counter's name.
      */
     String name() default "";
+
+    /**
+     * @return The counter's tags.
+     */
+    String[] tags() default {};
 
     /**
      * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
