@@ -81,7 +81,7 @@ public class JmxReporter implements Reporter, Closeable {
         	this.objectNameFactory = onFactory;
         	return this;
         }
-        
+
         /**
          * Convert durations to the given time unit.
          *
@@ -328,6 +328,10 @@ public class JmxReporter implements Reporter, Closeable {
 
         double getFifteenMinuteRate();
 
+        double getHourlyRate();
+
+        double getDailyRate();
+
         String getRateUnit();
     }
     //CHECKSTYLE:ON
@@ -367,6 +371,16 @@ public class JmxReporter implements Reporter, Closeable {
         @Override
         public double getFifteenMinuteRate() {
             return metric.getFifteenMinuteRate() * rateFactor;
+        }
+
+        @Override
+        public double getHourlyRate() {
+            return metric.getHourlyRate() * rateFactor;
+        }
+
+        @Override
+        public double getDailyRate() {
+            return metric.getDailyRate() * rateFactor;
         }
 
         @Override
@@ -702,7 +716,7 @@ public class JmxReporter implements Reporter, Closeable {
                         String domain,
                         MetricRegistry registry,
                         MetricFilter filter,
-                        MetricTimeUnits timeUnits, 
+                        MetricTimeUnits timeUnits,
                         ObjectNameFactory objectNameFactory) {
         this.registry = registry;
         this.listener = new JmxListener(mBeanServer, domain, filter, timeUnits, objectNameFactory);
