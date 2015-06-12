@@ -26,14 +26,21 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
 public @interface Timed {
+
     /**
-     * @return The name of the timer.
+     * @return The timer's name.
      */
     String name() default "";
+
+    /**
+     * @return The timer's tags.
+     */
+    String[] tags() default {};
 
     /**
      * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
      * relative to the annotated class. When annotating a class, this must be {@code false}.
      */
     boolean absolute() default false;
+
 }

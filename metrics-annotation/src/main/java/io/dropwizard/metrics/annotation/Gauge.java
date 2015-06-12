@@ -22,14 +22,21 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE })
 public @interface Gauge {
+
     /**
      * @return The gauge's name.
      */
     String name() default "";
 
     /**
+     * @return The gauge's tags.
+     */
+    String[] tags() default {};
+
+    /**
      * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
      * relative to the annotated class.
      */
     boolean absolute() default false;
+
 }

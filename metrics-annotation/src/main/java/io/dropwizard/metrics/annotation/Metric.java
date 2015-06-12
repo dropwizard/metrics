@@ -50,9 +50,14 @@ import java.lang.annotation.Target;
 public @interface Metric {
 
     /**
-     * @return The name of the metric.
+     * @return The metric's name.
      */
     String name() default "";
+
+    /**
+     * @return The metric's tags.
+     */
+    String[] tags() default {};
 
     /**
      * @return If {@code true}, use the given name as an absolute name. If {@code false},
