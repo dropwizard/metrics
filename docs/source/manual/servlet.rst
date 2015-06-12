@@ -6,14 +6,14 @@ Instrumenting Web Applications
 
 The ``metrics-servlet`` module provides a Servlet filter which has meters for status codes, a
 counter for the number of active requests, and a timer for request duration. By default the filter
-will use ``com.codahale.metrics.servlet.InstrumentedFilter`` as the base name of the metrics.
+will use ``io.dropwizard.metrics.servlet.InstrumentedFilter`` as the base name of the metrics.
 You can use the filter in your ``web.xml`` like this:
 
 .. code-block:: xml
 
     <filter>
         <filter-name>instrumentedFilter</filter-name>
-        <filter-class>com.codahale.metrics.servlet.InstrumentedFilter</filter-class>
+        <filter-class>io.dropwizard.metrics.servlet.InstrumentedFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>instrumentedFilter</filter-name>
@@ -29,7 +29,7 @@ multiple url patterns and give each a unique name.
 
     <filter>
         <filter-name>instrumentedFilter</filter-name>
-        <filter-class>com.codahale.metrics.servlet.InstrumentedFilter</filter-class>
+        <filter-class>io.dropwizard.metrics.servlet.InstrumentedFilter</filter-class>
         <init-param>
             <param-name>name-prefix</param-name>
             <param-value>authentication</param-value>
@@ -41,7 +41,7 @@ multiple url patterns and give each a unique name.
     </filter-mapping>
 
 You will need to add your ``MetricRegistry`` to the servlet context as an attribute named
-``com.codahale.metrics.servlet.InstrumentedFilter.registry``. You can do this using the Servlet API
+``io.dropwizard.metrics.servlet.InstrumentedFilter.registry``. You can do this using the Servlet API
 by extending ``InstrumentedFilterContextListener``:
 
 .. code-block:: java

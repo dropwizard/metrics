@@ -12,7 +12,7 @@
     memoryStoreEvictionPolicy="LFU"
     transactionalMode="off">
 
-    <cacheDecoratorFactory class="com.codahale.metrics.ehcache.InstrumentedCacheDecoratorFactory"
+    <cacheDecoratorFactory class="io.dropwizard.metrics.ehcache.InstrumentedCacheDecoratorFactory"
                            properties="metric-registry-name=cache-metrics" />
 
     </cache>
