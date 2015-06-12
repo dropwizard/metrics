@@ -31,7 +31,7 @@ public class PingServletTest extends AbstractServletTest {
     @Test
     public void returnsPong() throws Exception {
         assertThat(response.getContent())
-                .isEqualTo(String.format("pong%n"));
+                .isEqualTo(String.format("pong"));
     }
 
     @Test
