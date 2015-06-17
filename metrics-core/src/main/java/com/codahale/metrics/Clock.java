@@ -37,12 +37,17 @@ public abstract class Clock {
     }
 
     /**
-     * A clock implementation which returns the current time in epoch nanoseconds.
+     * A clock implementation which returns the elapsed time in nanoseconds.
      */
     public static class UserTimeClock extends Clock {
+        // System.nanoTime can be arbitrary, so offset from a starting point
+        // so the values are not very large (or negative.) All we want is
+        // elapsed time.
+        private static final long OFFSET = System.nanoTime();
+
         @Override
         public long getTick() {
-            return System.nanoTime();
+            return System.nanoTime() - OFFSET;
         }
     }
 
