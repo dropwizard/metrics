@@ -9,6 +9,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
 import java.lang.management.ManagementFactory;
+import java.util.Set;
 
 /**
  * A {@link Gauge} implementation which queries an {@link MBeanServerConnection} for an attribute of an object.
@@ -44,11 +45,21 @@ public class JmxAttributeGauge implements Gauge<Object> {
     @Override
     public Object getValue() {
         try {
-            return mBeanServerConn.getAttribute(objectName, attributeName);
+            return mBeanServerConn.getAttribute(getObjectName(), attributeName);
         } catch (IOException e) {
             return null;
         } catch (JMException e) {
             return null;
         }
+    }
+
+    private ObjectName getObjectName() throws IOException {
+        if (objectName.isPattern()) {
+            Set<ObjectName> foundNames = mBeanServerConn.queryNames(objectName, null);
+            if (foundNames.size() == 1) {
+                return foundNames.iterator().next();
+            }
+        }
+        return objectName;
     }
 }
