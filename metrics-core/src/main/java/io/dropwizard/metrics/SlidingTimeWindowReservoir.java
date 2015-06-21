@@ -14,8 +14,12 @@ import java.util.concurrent.atomic.AtomicLong;
  * in the last {@code N} seconds (or other time unit).
  */
 public class SlidingTimeWindowReservoir implements Reservoir {
+
     // allow for this many duplicate ticks before overwriting measurements
-    private static final int COLLISION_BUFFER = 256;
+    private static final int COLLISION_BITWIDTH = 8;
+    private static final int COLLISION_BUFFER = 1 << COLLISION_BITWIDTH;
+    private static final long COLLISION_MODULO = (1L << (63 - COLLISION_BITWIDTH)) - 1;
+
     // only trim on updating once every N
     private static final int TRIM_THRESHOLD = 256;
 
@@ -46,7 +50,7 @@ public class SlidingTimeWindowReservoir implements Reservoir {
         this.clock = clock;
         this.measurements = new ConcurrentSkipListMap<Long, Long>();
         this.window = windowUnit.toNanos(window) * COLLISION_BUFFER;
-        this.lastTick = new AtomicLong(clock.getTick() * COLLISION_BUFFER);
+        this.lastTick = new AtomicLong((clock.getTick() % COLLISION_MODULO) * COLLISION_BUFFER);
         this.count = new AtomicLong();
     }
 
@@ -73,7 +77,7 @@ public class SlidingTimeWindowReservoir implements Reservoir {
     private long getTick() {
         for (; ; ) {
             final long oldTick = lastTick.get();
-            final long tick = clock.getTick() * COLLISION_BUFFER;
+            final long tick = (clock.getTick() % COLLISION_MODULO) * COLLISION_BUFFER;
             // ensure the tick is strictly incrementing even if there are duplicate ticks
             final long newTick = tick - oldTick > 0 ? tick : oldTick + 1;
             if (lastTick.compareAndSet(oldTick, newTick)) {
