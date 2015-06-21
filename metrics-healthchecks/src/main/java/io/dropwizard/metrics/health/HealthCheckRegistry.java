@@ -102,6 +102,7 @@ public class HealthCheckRegistry {
                 results.put(entry.getKey(), entry.getValue().get());
             } catch (Exception e) {
                 LOGGER.warn("Error executing health check {}", entry.getKey(), e);
+                results.put(entry.getKey(), HealthCheck.Result.unhealthy(e));
             }
         }
         return Collections.unmodifiableSortedMap(results);

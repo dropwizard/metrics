@@ -13,6 +13,8 @@ public class SharedMetricRegistries {
     private static final ConcurrentMap<String, MetricRegistry> REGISTRIES =
             new ConcurrentHashMap<String, MetricRegistry>();
 
+    private static volatile String defaultRegistryName = null;
+
     private SharedMetricRegistries() { /* singleton */ }
 
     public static void clear() {
@@ -42,5 +44,26 @@ public class SharedMetricRegistries {
             return raced;
         }
         return existing;
+    }
+
+    public synchronized static MetricRegistry setDefault(String name) {
+        final MetricRegistry registry = getOrCreate(name);
+        return setDefault(name, registry);
+    }
+
+    public static MetricRegistry setDefault(String name, MetricRegistry metricRegistry) {
+        if (defaultRegistryName == null) {
+            defaultRegistryName = name;
+            add(name, metricRegistry);
+            return metricRegistry;
+        }
+        throw new IllegalStateException("Default metric registry name is already set.");
+    }
+
+    public static MetricRegistry getDefault() {
+        if (defaultRegistryName != null) {
+            return getOrCreate(defaultRegistryName);
+        }
+        throw new IllegalStateException("Default registry name has not been set.");
     }
 }
