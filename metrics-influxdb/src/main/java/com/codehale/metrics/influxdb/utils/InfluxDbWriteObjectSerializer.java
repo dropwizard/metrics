@@ -3,15 +3,14 @@ package com.codehale.metrics.influxdb.utils;
 import java.io.IOException;
 import java.util.Map;
 
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.Version;
-import org.codehaus.jackson.map.JsonSerializer;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializerProvider;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.codehaus.jackson.map.module.SimpleModule;
-
 import com.codehale.metrics.influxdb.data.InfluxDbWriteObject;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
 public class InfluxDbWriteObjectSerializer {
 
@@ -34,9 +33,9 @@ public class InfluxDbWriteObjectSerializer {
 
     public InfluxDbWriteObjectSerializer() {
         objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonSerialize.Inclusion.NON_EMPTY);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 
-        final SimpleModule module = new SimpleModule("SimpleModule", new Version(1, 0, 0, null));
+        final SimpleModule module = new SimpleModule("SimpleModule", new Version(1, 0, 0, null, null, null));
         module.addSerializer(Map.class, new MapSerializer());
         objectMapper.registerModule(module);
     }
