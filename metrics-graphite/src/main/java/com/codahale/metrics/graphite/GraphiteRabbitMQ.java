@@ -14,8 +14,7 @@ import java.util.regex.Pattern;
  * A rabbit-mq client to a Carbon server.
  */
 public class GraphiteRabbitMQ implements GraphiteSender {
-
-    private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
+    public static final Pattern DISALLOWED_CHARS = Pattern.compile("[^a-zA-Z0-9!#\\$%&\"'\\*\\+\\-:;<=>\\?@\\[\\\\\\]\\^_`\\|~.]");
 
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
@@ -161,7 +160,7 @@ public class GraphiteRabbitMQ implements GraphiteSender {
     }
 
     public String sanitize(String s) {
-        return WHITESPACE.matcher(s).replaceAll("-");
+        return DISALLOWED_CHARS.matcher(s).replaceAll("-");
     }
 
 }

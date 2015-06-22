@@ -24,8 +24,8 @@ import java.util.regex.Pattern;
  * A client to a Carbon server that sends all metrics after they have been pickled in configurable sized batches
  */
 public class PickledGraphite implements GraphiteSender {
+    public static final Pattern DISALLOWED_CHARS = Pattern.compile("[^a-zA-Z0-9!#\\$%&\"'\\*\\+\\-:;<=>\\?@\\[\\\\\\]\\^_`\\|~.]");
 
-    private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PickledGraphite.class);
@@ -360,7 +360,7 @@ public class PickledGraphite implements GraphiteSender {
     }
 
     protected String sanitize(String s) {
-        return WHITESPACE.matcher(s).replaceAll("-");
+		return DISALLOWED_CHARS.matcher(s).replaceAll("-");
     }
 
 }
