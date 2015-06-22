@@ -312,6 +312,25 @@ public class GraphiteReporterTest {
     }
 
     @Test
+    public void ignoresExceptionsFromGauges() throws Exception {
+        final Gauge brokenGauge = mock(Gauge.class);
+        when(brokenGauge.getValue()).thenThrow(new RuntimeException("I'm broken"));
+
+        reporter.report(map("brokenGauge", brokenGauge),
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                this.<Meter>map(),
+                this.<Timer>map());
+
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).isConnected();
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).close();
+
+        verifyNoMoreInteractions(graphite);
+    }
+
+    @Test
     public void closesConnectionOnReporterStop() throws Exception {
         reporter.stop();
 
