@@ -18,11 +18,36 @@ public class Timer implements Metered, Sampling {
         private final Timer timer;
         private final Clock clock;
         private final long startTime;
+        private long pauseTime;
+        private long idleTime;
 
         private Context(Timer timer, Clock clock) {
             this.timer = timer;
             this.clock = clock;
             this.startTime = clock.getTick();
+            this.pauseTime = 0;
+            this.idleTime = 0;
+        }
+
+        /**
+         * Pauses the Timer
+         */
+        public void pause() {
+            if (pauseTime != 0) {
+                throw new IllegalStateException("Invalid call sequence. Timer.Context pause() called twice.");
+            }
+            pauseTime = clock.getTick();
+        }
+
+        /**
+         * Resumes Timer after a pause
+         */
+        public void resume() {
+            if (pauseTime == 0) {
+                throw new IllegalStateException("Invalid call sequence. Timer.Context resume() called without a previous call to pause().");
+            }
+            idleTime += clock.getTick() - pauseTime;
+            pauseTime = 0;
         }
 
         /**
@@ -31,7 +56,7 @@ public class Timer implements Metered, Sampling {
          * @return the elapsed time in nanoseconds
          */
         public long stop() {
-            final long elapsed = clock.getTick() - startTime;
+            final long elapsed = clock.getTick() - startTime - idleTime;
             timer.update(elapsed, TimeUnit.NANOSECONDS);
             return elapsed;
         }
