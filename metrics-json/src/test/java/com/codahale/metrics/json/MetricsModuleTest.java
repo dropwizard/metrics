@@ -58,6 +58,7 @@ public class MetricsModuleTest {
         when(snapshot.getMax()).thenReturn(2L);
         when(snapshot.getMean()).thenReturn(3.0);
         when(snapshot.getMin()).thenReturn(4L);
+        when(snapshot.size()).thenReturn(5);
         when(snapshot.getStdDev()).thenReturn(5.0);
         when(snapshot.getMedian()).thenReturn(6.0);
         when(snapshot.get75thPercentile()).thenReturn(7.0);
@@ -75,6 +76,7 @@ public class MetricsModuleTest {
                                    "\"max\":2," +
                                    "\"mean\":3.0," +
                                    "\"min\":4," +
+                                   "\"size\":5," +
                                    "\"p50\":6.0," +
                                    "\"p75\":7.0," +
                                    "\"p95\":8.0," +
@@ -92,6 +94,7 @@ public class MetricsModuleTest {
                                    "\"max\":2," +
                                    "\"mean\":3.0," +
                                    "\"min\":4," +
+                                   "\"size\":5," +
                                    "\"p50\":6.0," +
                                    "\"p75\":7.0," +
                                    "\"p95\":8.0," +

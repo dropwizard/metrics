@@ -84,7 +84,7 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
                         "\"c\":{\"count\":1}" +
                         "}," +
                         "\"histograms\":{" +
-                        "\"h\":{\"count\":1,\"max\":1,\"mean\":1.0,\"min\":1,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0}" +
+                        "\"h\":{\"count\":1,\"max\":1,\"mean\":1.0,\"min\":1,\"size\":1,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0}" +
                         "}," +
                         "\"meters\":{" +
                         "\"m\":{\"count\":1,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":2.0E8,\"units\":\"events/minute\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1000.0,\"mean\":1000.0,\"min\":1000.0,\"p50\":1000.0,\"p75\":1000.0,\"p95\":1000.0,\"p98\":1000.0,\"p99\":1000.0,\"p999\":1000.0,\"stddev\":0.0,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":6.0E8,\"duration_units\":\"milliseconds\",\"rate_units\":\"calls/minute\"}" +
@@ -123,6 +123,7 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
                         "      \"max\" : 1,%n" +
                         "      \"mean\" : 1.0,%n" +
                         "      \"min\" : 1,%n" +
+                        "      \"size\" : 1,%n" +
                         "      \"p50\" : 1.0,%n" +
                         "      \"p75\" : 1.0,%n" +
                         "      \"p95\" : 1.0,%n" +

@@ -71,6 +71,7 @@ public class MetricsModule extends Module {
             json.writeNumberField("max", snapshot.getMax());
             json.writeNumberField("mean", snapshot.getMean());
             json.writeNumberField("min", snapshot.getMin());
+            json.writeNumberField("size", snapshot.size());
             json.writeNumberField("p50", snapshot.getMedian());
             json.writeNumberField("p75", snapshot.get75thPercentile());
             json.writeNumberField("p95", snapshot.get95thPercentile());
