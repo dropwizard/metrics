@@ -147,6 +147,16 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
+     * Creates a new {@link Spiral} and registers it under the given name.
+     *
+     * @param name the name of the metric
+     * @return a new {@link Spiral}
+     */
+    public Spiral spiral(String name) {
+        return getOrAdd(name, MetricBuilder.SPIRALS);
+    }
+
+    /**
      * Removes the metric with the given name.
      *
      * @param name the name of the metric
@@ -443,6 +453,18 @@ public class MetricRegistry implements MetricSet {
             @Override
             public boolean isInstance(Metric metric) {
                 return Timer.class.isInstance(metric);
+            }
+        };
+
+        MetricBuilder<Spiral> SPIRALS = new MetricBuilder<Spiral>() {
+            @Override
+            public Spiral newMetric() {
+                return new Spiral();
+            }
+
+            @Override
+            public boolean isInstance(Metric metric) {
+                return Spiral.class.isInstance(metric);
             }
         };
 
