@@ -65,6 +65,13 @@ public class SlidingTimeWindowReservoir implements Reservoir {
         return new UniformSnapshot(measurements.values());
     }
 
+    @Override
+    public void reset() {
+        measurements.clear();
+        lastTick.set(clock.getTick() * COLLISION_BUFFER);
+        count.set(0L);
+    }
+
     private long getTick() {
         for (; ; ) {
             final long oldTick = lastTick.get();

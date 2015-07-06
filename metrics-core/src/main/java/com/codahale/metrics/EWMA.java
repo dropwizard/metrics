@@ -103,4 +103,11 @@ public class EWMA {
     public double getRate(TimeUnit rateUnit) {
         return rate * (double) rateUnit.toNanos(1);
     }
+
+    /**
+     * Reset the EWMA
+     */
+    public void reset() {
+        uncounted.reset();
+    }
 }

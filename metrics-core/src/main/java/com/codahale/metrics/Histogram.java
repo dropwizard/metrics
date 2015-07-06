@@ -6,9 +6,10 @@ package com.codahale.metrics;
  * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately computing running
  *      variance</a>
  */
-public class Histogram implements Metric, Sampling, Counting {
+public class Histogram implements Metric, Sampling, Counting, Toggleable {
     private final Reservoir reservoir;
     private final LongAdder count;
+    private boolean enabled = true;
 
     /**
      * Creates a new {@link Histogram} with the given reservoir.
@@ -35,8 +36,10 @@ public class Histogram implements Metric, Sampling, Counting {
      * @param value the length of the value
      */
     public void update(long value) {
-        count.increment();
-        reservoir.update(value);
+        if (enabled) {
+            count.increment();
+            reservoir.update(value);
+        }
     }
 
     /**
@@ -52,5 +55,18 @@ public class Histogram implements Metric, Sampling, Counting {
     @Override
     public Snapshot getSnapshot() {
         return reservoir.getSnapshot();
+    }
+
+    /**
+     * Enable and disable this metric
+     * @param enabled new value for enabled
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+        if (!enabled) {
+            count.reset();
+            reservoir.reset();
+        }
+        this.enabled = enabled;
     }
 }

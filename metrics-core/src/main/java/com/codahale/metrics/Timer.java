@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
  * A timer metric which aggregates timing durations and provides duration statistics, plus
  * throughput statistics via {@link Meter}.
  */
-public class Timer implements Metered, Sampling {
+public class Timer implements Metered, Sampling, Toggleable {
     /**
      * A timing context.
      *
@@ -46,6 +46,7 @@ public class Timer implements Metered, Sampling {
     private final Meter meter;
     private final Histogram histogram;
     private final Clock clock;
+    private boolean enabled = true;
 
     /**
      * Creates a new {@link Timer} using an {@link ExponentiallyDecayingReservoir} and the default
@@ -160,9 +161,18 @@ public class Timer implements Metered, Sampling {
     }
 
     private void update(long duration) {
-        if (duration >= 0) {
-            histogram.update(duration);
-            meter.mark();
+        if (enabled) {
+            if (duration >= 0) {
+                histogram.update(duration);
+                meter.mark();
+            }
         }
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        meter.setEnabled(enabled);
+        histogram.setEnabled(enabled);
+        this.enabled = enabled;
     }
 }

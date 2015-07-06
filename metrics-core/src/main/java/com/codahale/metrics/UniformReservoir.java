@@ -86,4 +86,12 @@ public class UniformReservoir implements Reservoir {
         }
         return new UniformSnapshot(copy);
     }
+
+    @Override
+    public void reset() {
+        for (int i = 0; i < values.length(); i++) {
+            values.set(i, 0);
+        }
+        count.set(0);
+    }
 }

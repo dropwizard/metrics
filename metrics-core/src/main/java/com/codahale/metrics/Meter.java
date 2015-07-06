@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @see EWMA
  */
-public class Meter implements Metered {
+public class Meter implements Metered, Toggleable {
     private static final long TICK_INTERVAL = TimeUnit.SECONDS.toNanos(5);
 
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
@@ -20,6 +20,8 @@ public class Meter implements Metered {
     private final long startTime;
     private final AtomicLong lastTick;
     private final Clock clock;
+
+    private boolean enabled = true;
 
     /**
      * Creates a new {@link Meter}.
@@ -52,11 +54,13 @@ public class Meter implements Metered {
      * @param n the number of events
      */
     public void mark(long n) {
-        tickIfNecessary();
-        count.add(n);
-        m1Rate.update(n);
-        m5Rate.update(n);
-        m15Rate.update(n);
+        if (enabled) {
+            tickIfNecessary();
+            count.add(n);
+            m1Rate.update(n);
+            m5Rate.update(n);
+            m15Rate.update(n);
+        }
     }
 
     private void tickIfNecessary() {
@@ -107,5 +111,20 @@ public class Meter implements Metered {
     public double getOneMinuteRate() {
         tickIfNecessary();
         return m1Rate.getRate(TimeUnit.SECONDS);
+    }
+
+    /**
+     * Enable and disable this metric
+     * @param enabled new value for enabled
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+        if (!enabled) {
+            m1Rate.reset();
+            m5Rate.reset();
+            m15Rate.reset();
+            count.reset();
+        }
+        this.enabled = enabled;
     }
 }

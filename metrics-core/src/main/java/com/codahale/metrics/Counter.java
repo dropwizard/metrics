@@ -3,8 +3,9 @@ package com.codahale.metrics;
 /**
  * An incrementing and decrementing counter metric.
  */
-public class Counter implements Metric, Counting {
+public class Counter implements Metric, Counting, Toggleable {
     private final LongAdder count;
+    private boolean enabled = true;
 
     public Counter() {
         this.count = new LongAdder();
@@ -23,7 +24,9 @@ public class Counter implements Metric, Counting {
      * @param n the amount by which the counter will be increased
      */
     public void inc(long n) {
-        count.add(n);
+        if (enabled) {
+            count.add(n);
+        }
     }
 
     /**
@@ -39,7 +42,9 @@ public class Counter implements Metric, Counting {
      * @param n the amount by which the counter will be decreased
      */
     public void dec(long n) {
-        count.add(-n);
+        if (enabled) {
+            count.add(-n);
+        }
     }
 
     /**
@@ -50,5 +55,17 @@ public class Counter implements Metric, Counting {
     @Override
     public long getCount() {
         return count.sum();
+    }
+
+    /**
+     * Enable and disable this metric
+     * @param enabled new value for enabled
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+        if (!enabled) {
+            count.reset();
+        }
+        this.enabled = enabled;
     }
 }
