@@ -52,6 +52,20 @@ public class MetricRegistry implements MetricSet {
     private final List<MetricRegistryListener> listeners;
 
     /**
+     * Enable and disable all metrics in this registry
+     * @param enabled new value for enabled
+     */
+    public void setEnable(boolean enabled) {
+        Set<String> keys = metrics.keySet();
+        for (String key : keys) {
+            Metric metric = metrics.get(key);
+            if (metric instanceof Toggleable) {
+                ((Toggleable) metric).setEnabled(enabled);
+            }
+        }
+    }
+
+    /**
      * Creates a new {@link MetricRegistry}.
      */
     public MetricRegistry() {

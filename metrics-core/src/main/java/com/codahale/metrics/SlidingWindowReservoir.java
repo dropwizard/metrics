@@ -1,5 +1,7 @@
 package com.codahale.metrics;
 
+import java.util.Arrays;
+
 import static java.lang.Math.min;
 
 /**
@@ -39,5 +41,11 @@ public class SlidingWindowReservoir implements Reservoir {
             }
         }
         return new UniformSnapshot(values);
+    }
+
+    @Override
+    public synchronized void reset() {
+        this.count = 0;
+        Arrays.fill(measurements, 0L);
     }
 }

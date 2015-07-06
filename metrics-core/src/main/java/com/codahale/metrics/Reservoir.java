@@ -24,4 +24,9 @@ public interface Reservoir {
      * @return a snapshot of the reservoir's values
      */
     Snapshot getSnapshot();
+
+    /**
+     * Reset the current reservoir
+     */
+    void reset();
 }

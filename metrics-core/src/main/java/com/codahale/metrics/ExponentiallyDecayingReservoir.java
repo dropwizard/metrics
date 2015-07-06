@@ -74,6 +74,17 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
         this.nextScaleTime = new AtomicLong(clock.getTick() + RESCALE_THRESHOLD);
     }
 
+    /**
+     * Reset the values
+     */
+    @Override
+    public void reset() {
+        values.clear();
+        count.set(0L);
+        startTime = currentTimeInSeconds();
+        nextScaleTime.set(clock.getTick() + RESCALE_THRESHOLD);
+    }
+
     @Override
     public int size() {
         return (int) min(size, count.get());
