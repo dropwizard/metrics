@@ -99,7 +99,10 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
             final double priority = itemWeight / (1.0d - ThreadLocalRandom.current().nextDouble());
 
             final long newCount = count.incrementAndGet();
-            if (newCount <= size) {
+            if (newCount < 0l) {
+                count.set(size+1l);
+            }
+            if (newCount > 0l && newCount <= size) {
                 values.put(priority, sample);
             } else {
                 Double first = values.firstKey();
