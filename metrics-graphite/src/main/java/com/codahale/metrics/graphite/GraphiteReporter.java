@@ -38,6 +38,7 @@ public class GraphiteReporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
+        private boolean reportError;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -46,6 +47,7 @@ public class GraphiteReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
+            this.reportError = true;
         }
 
         /**
@@ -104,6 +106,17 @@ public class GraphiteReporter extends ScheduledReporter {
         }
 
         /**
+         * Remove the log is Graphite is down if set to false.
+         *
+         * @param reportError true if report errors (default), false otherwise.
+         * @return {@code this}
+         */
+        public Builder reportError(boolean reportError) {
+            this.reportError = reportError;
+            return this;
+        }
+
+        /**
          * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
          * given {@link GraphiteSender}.
          *
@@ -117,7 +130,8 @@ public class GraphiteReporter extends ScheduledReporter {
                                         prefix,
                                         rateUnit,
                                         durationUnit,
-                                        filter);
+                                        filter,
+                                        reportError);
         }
     }
 
@@ -126,6 +140,7 @@ public class GraphiteReporter extends ScheduledReporter {
     private final GraphiteSender graphite;
     private final Clock clock;
     private final String prefix;
+    private final boolean reportError;
 
     private GraphiteReporter(MetricRegistry registry,
                              GraphiteSender graphite,
@@ -133,11 +148,13 @@ public class GraphiteReporter extends ScheduledReporter {
                              String prefix,
                              TimeUnit rateUnit,
                              TimeUnit durationUnit,
-                             MetricFilter filter) {
+                             MetricFilter filter,
+                             boolean reportError) {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
+        this.reportError = reportError;
     }
 
     @Override
@@ -176,11 +193,15 @@ public class GraphiteReporter extends ScheduledReporter {
 
             graphite.flush();
         } catch (IOException e) {
-            LOGGER.warn("Unable to report to Graphite", graphite, e);
+            if (reportError) {
+                LOGGER.warn("Unable to report to Graphite", graphite, e);
+            }
             try {
                 graphite.close();
             } catch (IOException e1) {
-                LOGGER.warn("Error closing Graphite", graphite, e1);
+                if (reportError) {
+                    LOGGER.warn("Error closing Graphite", graphite, e1);
+                }
             }
         }
     }
