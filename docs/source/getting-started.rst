@@ -398,5 +398,5 @@ In addition to JMX and HTTP, Metrics also has reporters for the following output
 * ``STDOUT``, using :ref:`ConsoleReporter <man-core-reporters-console>` from ``metrics-core``
 * ``CSV`` files, using :ref:`CsvReporter <man-core-reporters-csv>` from ``metrics-core``
 * SLF4J loggers, using :ref:`Slf4jReporter <man-core-reporters-slf4j>` from ``metrics-core``
-* Ganglia, using :ref:`GangliaReporter <manual-ganglia>` from ``metrics-ganglia``
 * Graphite, using :ref:`GraphiteReporter <manual-graphite>` from ``metrics-graphite``
+* InfluxDB, using :ref:`InfluxDbReporter <manual-influxdb>` from ``metrics-influxdb``

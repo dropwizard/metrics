@@ -407,8 +407,7 @@ Metrics has other reporter implementations, too:
 * :ref:`MetricsServlet <manual-servlets>` is a servlet which not only exposes your metrics as a JSON
   object, but it also runs your health checks, performs thread dumps, and exposes valuable JVM-level
   and OS-level information.
-* :ref:`GangliaReporter <manual-ganglia>` allows you to constantly stream metrics data to your
-  Ganglia servers.
 * :ref:`GraphiteReporter <manual-graphite>` allows you to constantly stream metrics data to your
   Graphite servers.
+* :ref:`InfluxDbReporter <manual-influxdb>` streams data to InfluxDB
 

@@ -262,9 +262,9 @@ texinfo_documents = [
 
 # Bibliographic Dublin Core info.
 epub_title = u'Metrics'
-epub_author = u'Coda Hale'
-epub_publisher = u'Coda Hale'
-epub_copyright = u'2012, Coda Hale'
+epub_author = u'Dropwizard Team'
+epub_publisher = u'Dropwizard Team'
+epub_copyright = u'2010-2014, Coda Hale, Yammer Inc., 2014-2015 Dropwizard Team'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.
