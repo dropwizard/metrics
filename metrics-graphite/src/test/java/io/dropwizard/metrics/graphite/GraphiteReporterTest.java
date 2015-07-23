@@ -326,6 +326,25 @@ public class GraphiteReporterTest {
     }
 
     @Test
+    public void closesConnectionIfAnUnexpectedExceptionOccurs() throws Exception {
+        final Gauge gauge = mock(Gauge.class);
+        when(gauge.getValue()).thenThrow(new RuntimeException("kaboom"));
+
+        reporter.report(map("gauge", gauge),
+                        this.<Counter>map(),
+                        this.<Histogram>map(),
+                        this.<Meter>map(),
+                        this.<Timer>map());
+
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).isConnected();
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).close();
+
+        verifyNoMoreInteractions(graphite);
+    }
+
+    @Test
     public void closesConnectionOnReporterStop() throws Exception {
         reporter.stop();
 
