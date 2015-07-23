@@ -50,6 +50,7 @@ public class AdminServletTest extends AbstractServletTest {
                                 "    <li><a href=\"/context/admin/ping\">Ping</a></li>%n" +
                                 "    <li><a href=\"/context/admin/threads\">Threads</a></li>%n" +
                                 "    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n" +
+                                "    <li><a href=\"/context/admin/package-version\">Package version</a></li>%n" +
                                 "  </ul>%n" +
                                 "</body>%n" +
                                 "</html>%n"
