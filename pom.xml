@@ -21,20 +21,15 @@
         <module>metrics-core</module>
         <module>metrics-healthchecks</module>
         <module>metrics-ehcache</module>
-        <module>metrics-ganglia</module>
         <module>metrics-graphite</module>
         <module>metrics-httpclient</module>
         <module>metrics-httpasyncclient</module>
         <module>metrics-influxdb</module>
         <module>metrics-jdbi</module>
-        <module>metrics-jersey</module>
         <module>metrics-jersey2</module>
-        <module>metrics-jetty8</module>
         <module>metrics-jetty9</module>
-        <module>metrics-jetty9-legacy</module>
         <module>metrics-json</module>
         <module>metrics-jvm</module>
-        <module>metrics-log4j</module>
         <module>metrics-log4j2</module>
         <module>metrics-logback</module>
         <module>metrics-servlet</module>
