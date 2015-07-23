@@ -4,14 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.codahale.metrics.ConsoleReporter;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.ScheduledReporter;
-import com.codahale.metrics.Timer;
-import com.codehale.metrics.influxdb.InfluxDbHttpSender;
-import com.codehale.metrics.influxdb.InfluxDbReporter;
+import io.dropwizard.metrics.ConsoleReporter;
+import io.dropwizard.metrics.Meter;
+import io.dropwizard.metrics.MetricFilter;
+import io.dropwizard.metrics.MetricName;
+import io.dropwizard.metrics.MetricRegistry;
+import io.dropwizard.metrics.ScheduledReporter;
+import io.dropwizard.metrics.Timer;
+import io.dropwizard.metrics.influxdb.InfluxDbHttpSender;
+import io.dropwizard.metrics.influxdb.InfluxDbReporter;
 
 public final class SendToLocalInfluxDB {
     private SendToLocalInfluxDB() {
@@ -27,10 +28,7 @@ public final class SendToLocalInfluxDB {
             consoleReporter = startConsoleReporter(registry);
             influxDbReporter = startInfluxDbReporter(registry);
 
-            final Meter myMeter = registry.meter("testMetric");
-            final Map<String, String> tags = new HashMap<>();
-            tags.put("env", "test");
-            influxDbReporter.putTagsForMetric("testMetric", tags);
+            final Meter myMeter = registry.meter(MetricName.build("testMetric").tagged("env", "test"));
 
             final Timer myTimer = registry.timer("testTimer");
             context = myTimer.time();
