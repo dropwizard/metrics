@@ -111,9 +111,9 @@ public class MetricsModule extends Module {
                               SerializerProvider provider) throws IOException {
             json.writeStartObject();
             json.writeNumberField("count", meter.getCount());
-            json.writeNumberField("m15_rate", meter.getFifteenMinuteRate() * rateFactor);
             json.writeNumberField("m1_rate", meter.getOneMinuteRate() * rateFactor);
             json.writeNumberField("m5_rate", meter.getFiveMinuteRate() * rateFactor);
+            json.writeNumberField("m15_rate", meter.getFifteenMinuteRate() * rateFactor);
             json.writeNumberField("mean_rate", meter.getMeanRate() * rateFactor);
             json.writeStringField("units", rateUnit);
             json.writeEndObject();
@@ -166,9 +166,9 @@ public class MetricsModule extends Module {
             }
 
             json.writeNumberField("stddev", snapshot.getStdDev() * durationFactor);
-            json.writeNumberField("m15_rate", timer.getFifteenMinuteRate() * rateFactor);
             json.writeNumberField("m1_rate", timer.getOneMinuteRate() * rateFactor);
             json.writeNumberField("m5_rate", timer.getFiveMinuteRate() * rateFactor);
+            json.writeNumberField("m15_rate", timer.getFifteenMinuteRate() * rateFactor);
             json.writeNumberField("mean_rate", timer.getMeanRate() * rateFactor);
             json.writeStringField("duration_units", durationUnit);
             json.writeStringField("rate_units", rateUnit);
