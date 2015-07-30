@@ -40,12 +40,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <servlet.version>3.1.0</servlet.version>
-        <slf4j.version>1.7.9</slf4j.version>
-        <jackson.version>2.4.2</jackson.version>
-        <jetty8.version>8.1.11.v20130520</jetty8.version>
-        <jetty9.legacy.version>9.0.4.v20130625</jetty9.legacy.version>
-        <jetty9.version>9.2.2.v20140723</jetty9.version>
-        <rabbitmq.version>3.3.5</rabbitmq.version>
+        <slf4j.version>1.7.12</slf4j.version>
+        <jackson.version>2.6.0</jackson.version>
+        <jetty9.version>9.2.12.v20150709</jetty9.version>
+        <rabbitmq.version>3.5.4</rabbitmq.version>
+        <junit.version>4.12</junit.version>
     </properties>
 
     <developers>
@@ -107,6 +106,12 @@
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -118,19 +123,17 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>1.6.1</version>
+            <version>3.1.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
+            <version>1.10.19</version>
             <scope>test</scope>
         </dependency>
         <dependency>

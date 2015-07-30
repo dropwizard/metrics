@@ -8,6 +8,7 @@ import com.rabbitmq.client.DefaultSocketConfigurator;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
 /**
@@ -93,7 +94,7 @@ public class GraphiteRabbitMQ implements GraphiteSender {
 
         this.connectionFactory = new ConnectionFactory();
 
-	connectionFactory.setSocketConfigurator(new DefaultSocketConfigurator() {
+        connectionFactory.setSocketConfigurator(new DefaultSocketConfigurator() {
             @Override
             public void configure(Socket socket) throws IOException {
                 super.configure(socket);
@@ -115,7 +116,12 @@ public class GraphiteRabbitMQ implements GraphiteSender {
             throw new IllegalStateException("Already connected");
         }
 
-        connection = connectionFactory.newConnection();
+        try {
+            connection = connectionFactory.newConnection();
+        } catch (TimeoutException e) {
+            throw new IOException(e);
+        }
+
         channel = connection.createChannel();
     }
 
