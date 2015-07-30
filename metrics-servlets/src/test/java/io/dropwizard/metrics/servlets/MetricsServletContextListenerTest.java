@@ -92,7 +92,7 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
                         "\"h\":{\"count\":1,\"max\":1,\"mean\":1.0,\"min\":1,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0}" +
                         "}," +
                         "\"meters\":{" +
-                        "\"m\":{\"count\":1,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":2.0E8,\"units\":\"events/minute\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1000.0,\"mean\":1000.0,\"min\":1000.0,\"p50\":1000.0,\"p75\":1000.0,\"p95\":1000.0,\"p98\":1000.0,\"p99\":1000.0,\"p999\":1000.0,\"stddev\":0.0,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":6.0E8,\"duration_units\":\"milliseconds\",\"rate_units\":\"calls/minute\"}" +
+                        "\"m\":{\"count\":1,\"m1_rate\":0.0,\"m5_rate\":0.0,\"m15_rate\":0.0,\"mean_rate\":2.0E8,\"units\":\"events/minute\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1000.0,\"mean\":1000.0,\"min\":1000.0,\"p50\":1000.0,\"p75\":1000.0,\"p95\":1000.0,\"p98\":1000.0,\"p99\":1000.0,\"p999\":1000.0,\"stddev\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"m15_rate\":0.0,\"mean_rate\":6.0E8,\"duration_units\":\"milliseconds\",\"rate_units\":\"calls/minute\"}" +
                         "}" +
                         "}");
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
@@ -140,9 +140,9 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
                         "  \"meters\" : {%n" +
                         "    \"m\" : {%n" +
                         "      \"count\" : 1,%n" +
-                        "      \"m15_rate\" : 0.0,%n" +
                         "      \"m1_rate\" : 0.0,%n" +
                         "      \"m5_rate\" : 0.0,%n" +
+                        "      \"m15_rate\" : 0.0,%n" +
                         "      \"mean_rate\" : 2.0E8,%n" +
                         "      \"units\" : \"events/minute\"%n" +
                         "    }%n" +
@@ -160,9 +160,9 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
                         "      \"p99\" : 1000.0,%n" +
                         "      \"p999\" : 1000.0,%n" +
                         "      \"stddev\" : 0.0,%n" +
-                        "      \"m15_rate\" : 0.0,%n" +
                         "      \"m1_rate\" : 0.0,%n" +
                         "      \"m5_rate\" : 0.0,%n" +
+                        "      \"m15_rate\" : 0.0,%n" +
                         "      \"mean_rate\" : 6.0E8,%n" +
                         "      \"duration_units\" : \"milliseconds\",%n" +
                         "      \"rate_units\" : \"calls/minute\"%n" +
