@@ -125,9 +125,9 @@ public class MetricsModuleTest {
         assertThat(mapper.writeValueAsString(meter))
                 .isEqualTo("{" +
                                    "\"count\":1," +
-                                   "\"m15_rate\":3.0," +
                                    "\"m1_rate\":5.0," +
                                    "\"m5_rate\":4.0," +
+                                   "\"m15_rate\":3.0," +
                                    "\"mean_rate\":2.0," +
                                    "\"units\":\"events/second\"}");
     }
@@ -174,9 +174,9 @@ public class MetricsModuleTest {
                                    "\"p99\":900.0," +
                                    "\"p999\":1000.0," +
                                    "\"stddev\":400.0," +
-                                   "\"m15_rate\":5.0," +
                                    "\"m1_rate\":3.0," +
                                    "\"m5_rate\":4.0," +
+                                   "\"m15_rate\":5.0," +
                                    "\"mean_rate\":2.0," +
                                    "\"duration_units\":\"milliseconds\"," +
                                    "\"rate_units\":\"calls/second\"}");
@@ -198,9 +198,9 @@ public class MetricsModuleTest {
                                    "\"p999\":1000.0," +
                                    "\"values\":[1.0,2.0,3.0]," +
                                    "\"stddev\":400.0," +
-                                   "\"m15_rate\":5.0," +
                                    "\"m1_rate\":3.0," +
                                    "\"m5_rate\":4.0," +
+                                   "\"m15_rate\":5.0," +
                                    "\"mean_rate\":2.0," +
                                    "\"duration_units\":\"milliseconds\"," +
                                    "\"rate_units\":\"calls/second\"}");

@@ -81,7 +81,7 @@ public class MetricsServletTest extends AbstractServletTest {
                                        "\"h\":{\"count\":1,\"max\":1,\"mean\":1.0,\"min\":1,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0}" +
                                    "}," +
                                    "\"meters\":{" +
-                                       "\"m\":{\"count\":1,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":3333333.3333333335,\"units\":\"events/second\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1.0,\"mean\":1.0,\"min\":1.0,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":1.0E7,\"duration_units\":\"seconds\",\"rate_units\":\"calls/second\"}" +
+                                       "\"m\":{\"count\":1,\"m1_rate\":0.0,\"m5_rate\":0.0,\"m15_rate\":0.0,\"mean_rate\":3333333.3333333335,\"units\":\"events/second\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1.0,\"mean\":1.0,\"min\":1.0,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"m15_rate\":0.0,\"mean_rate\":1.0E7,\"duration_units\":\"seconds\",\"rate_units\":\"calls/second\"}" +
                                    "}" +
                                "}");
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
@@ -112,7 +112,7 @@ public class MetricsServletTest extends AbstractServletTest {
                                        "\"h\":{\"count\":1,\"max\":1,\"mean\":1.0,\"min\":1,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0}" +
                                    "}," +
                                    "\"meters\":{" +
-                                       "\"m\":{\"count\":1,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":3333333.3333333335,\"units\":\"events/second\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1.0,\"mean\":1.0,\"min\":1.0,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":1.0E7,\"duration_units\":\"seconds\",\"rate_units\":\"calls/second\"}" +
+                                       "\"m\":{\"count\":1,\"m1_rate\":0.0,\"m5_rate\":0.0,\"m15_rate\":0.0,\"mean_rate\":3333333.3333333335,\"units\":\"events/second\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1.0,\"mean\":1.0,\"min\":1.0,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"m15_rate\":0.0,\"mean_rate\":1.0E7,\"duration_units\":\"seconds\",\"rate_units\":\"calls/second\"}" +
                                    "}" +
                                "}");
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
@@ -143,7 +143,7 @@ public class MetricsServletTest extends AbstractServletTest {
                                        "\"h\":{\"count\":1,\"max\":1,\"mean\":1.0,\"min\":1,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0}" +
                                    "}," +
                                    "\"meters\":{" +
-                                       "\"m\":{\"count\":1,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":3333333.3333333335,\"units\":\"events/second\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1.0,\"mean\":1.0,\"min\":1.0,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":1.0E7,\"duration_units\":\"seconds\",\"rate_units\":\"calls/second\"}" +
+                                       "\"m\":{\"count\":1,\"m1_rate\":0.0,\"m5_rate\":0.0,\"m15_rate\":0.0,\"mean_rate\":3333333.3333333335,\"units\":\"events/second\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1.0,\"mean\":1.0,\"min\":1.0,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"m15_rate\":0.0,\"mean_rate\":1.0E7,\"duration_units\":\"seconds\",\"rate_units\":\"calls/second\"}" +
                                    "}" +
                                "})");
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
@@ -191,9 +191,9 @@ public class MetricsServletTest extends AbstractServletTest {
                                                  "  \"meters\" : {%n" +
                                                  "    \"m\" : {%n" +
                                                  "      \"count\" : 1,%n" +
-                                                 "      \"m15_rate\" : 0.0,%n" +
                                                  "      \"m1_rate\" : 0.0,%n" +
                                                  "      \"m5_rate\" : 0.0,%n" +
+                                                 "      \"m15_rate\" : 0.0,%n" +
                                                  "      \"mean_rate\" : 3333333.3333333335,%n" +
                                                  "      \"units\" : \"events/second\"%n" +
                                                  "    }%n" +
@@ -211,9 +211,9 @@ public class MetricsServletTest extends AbstractServletTest {
                                                  "      \"p99\" : 1.0,%n" +
                                                  "      \"p999\" : 1.0,%n" +
                                                  "      \"stddev\" : 0.0,%n" +
-                                                 "      \"m15_rate\" : 0.0,%n" +
                                                  "      \"m1_rate\" : 0.0,%n" +
                                                  "      \"m5_rate\" : 0.0,%n" +
+                                                 "      \"m15_rate\" : 0.0,%n" +
                                                  "      \"mean_rate\" : 1.0E7,%n" +
                                                  "      \"duration_units\" : \"seconds\",%n" +
                                                  "      \"rate_units\" : \"calls/second\"%n" +
@@ -231,9 +231,14 @@ public class MetricsServletTest extends AbstractServletTest {
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(response.get("Access-Control-Allow-Origin")).isEqualTo("*");
         assertThat(response.getContent()).isEqualTo(
-                String.format("{%n" + "  \"count\" : 1,%n" + "  \"m15_rate\" : 0.0,%n" + "  \"m1_rate\" : 0.0,%n"
-                        + "  \"m5_rate\" : 0.0,%n" + "  \"mean_rate\" : 3333333.3333333335,%n"
-                        + "  \"units\" : \"events/second\"%n" + "}"));
+                String.format("{%n"
+                		+ "  \"count\" : 1,%n"
+                		+ "  \"m1_rate\" : 0.0,%n"
+                        + "  \"m5_rate\" : 0.0,%n"
+                		+ "  \"m15_rate\" : 0.0,%n"
+                		+ "  \"mean_rate\" : 3333333.3333333335,%n"
+                        + "  \"units\" : \"events/second\"%n"
+                		+ "}"));
         assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
     }
 
@@ -243,9 +248,14 @@ public class MetricsServletTest extends AbstractServletTest {
         processRequest();
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(response.get("Access-Control-Allow-Origin")).isEqualTo("*");
-        assertThat(response.getContent()).isEqualTo(String.format("{%n  \"m\" : {%n" + "    \"count\" : 1,%n" + "    \"m15_rate\" : 0.0,%n" + "    \"m1_rate\" : 0.0,%n"
-                + "    \"m5_rate\" : 0.0,%n" + "    \"mean_rate\" : 3333333.3333333335,%n"
-                + "    \"units\" : \"events/second\"%n" + "  }%n}"));
+        assertThat(response.getContent()).isEqualTo(String.format("{%n  \"m\" : {%n"
+        		+ "    \"count\" : 1,%n"
+        		+ "    \"m1_rate\" : 0.0,%n"
+                + "    \"m5_rate\" : 0.0,%n"
+        		+ "    \"m15_rate\" : 0.0,%n"
+        		+ "    \"mean_rate\" : 3333333.3333333335,%n"
+                + "    \"units\" : \"events/second\"%n"
+        		+ "  }%n}"));
         assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
     }
 
