@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class GraphiteReporter extends ScheduledReporter {
 	
-	private boolean reconnect;
+	private boolean reconnect = true;
 	
     /**
      * Returns a new {@link Builder} for {@link GraphiteReporter}.
