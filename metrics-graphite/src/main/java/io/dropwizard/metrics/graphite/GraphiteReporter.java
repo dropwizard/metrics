@@ -29,6 +29,9 @@ import java.util.concurrent.TimeUnit;
  * @see <a href="http://graphite.wikidot.com/">Graphite - Scalable Realtime Graphing</a>
  */
 public class GraphiteReporter extends ScheduledReporter {
+	
+	private boolean reconnect;
+	
     /**
      * Returns a new {@link Builder} for {@link GraphiteReporter}.
      *
@@ -186,10 +189,13 @@ public class GraphiteReporter extends ScheduledReporter {
             for (Map.Entry<MetricName, Timer> entry : timers.entrySet()) {
                 reportTimer(entry.getKey(), entry.getValue(), timestamp);
             }
-
             graphite.flush();
         } catch (Throwable t) {
             LOGGER.warn("Unable to report to Graphite", graphite, t);
+            if(!reconnect) {
+                LOGGER.warn("Not trying to reconnect, stopping scheduler", graphite, t);
+            	stop();
+            }
             closeGraphiteConnection();
         }
     }
@@ -318,4 +324,12 @@ public class GraphiteReporter extends ScheduledReporter {
         // US-formatted digits
         return String.format(Locale.US, "%2.2f", v);
     }
+
+	public boolean isReconnect() {
+		return reconnect;
+	}
+
+	public void setReconnect(boolean reconnect) {
+		this.reconnect = reconnect;
+	}
 }
