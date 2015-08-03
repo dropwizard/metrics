@@ -35,4 +35,9 @@ public class InstrumentedResource {
         }
         return "fuh";
     }
+
+    @Path("/subresource")
+    public InstrumentedSubResource locateSubResource() {
+        return new InstrumentedSubResource();
+    }
 }
