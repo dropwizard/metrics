@@ -35,6 +35,7 @@
         <module>metrics-servlet</module>
         <module>metrics-servlets</module>
         <module>metrics-adapter</module>
+        <module>metrics-java8</module>
     </modules>
 
     <properties>

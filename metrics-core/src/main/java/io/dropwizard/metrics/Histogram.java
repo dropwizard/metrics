@@ -25,7 +25,7 @@ public class Histogram implements Metric, Sampling, Counting {
      */
     public Histogram(Reservoir reservoir) {
         this.reservoir = reservoir;
-        this.count = new LongAdder();
+        this.count = new LongAdderImpl();
     }
 
     /**

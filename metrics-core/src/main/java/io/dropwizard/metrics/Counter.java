@@ -11,7 +11,7 @@ public class Counter implements Metric, Counting {
     private final LongAdder count;
 
     public Counter() {
-        this.count = new LongAdder();
+        this.count = new LongAdderImpl();
     }
 
     /**
