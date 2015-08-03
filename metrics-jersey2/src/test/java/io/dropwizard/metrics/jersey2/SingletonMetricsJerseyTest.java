@@ -112,4 +112,16 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
             assertThat(e.getMessage()).isEqualTo("HTTP 404 Not Found");
         }
     }
+
+    @Test
+    public void subresourcesFromLocatorsRegisterMetrics() {
+        assertThat(target("subresource/timed")
+                .request()
+                .get(String.class))
+                .isEqualTo("yay");
+
+        final Timer timer = registry.timer(name(InstrumentedSubResource.class, "timed"));
+        assertThat(timer.getCount()).isEqualTo(1);
+
+    }
 }
