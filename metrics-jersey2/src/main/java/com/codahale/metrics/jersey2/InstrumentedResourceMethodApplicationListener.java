@@ -19,7 +19,7 @@ import javax.ws.rs.core.Configuration;
 import javax.ws.rs.ext.Provider;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -37,9 +37,9 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class InstrumentedResourceMethodApplicationListener implements ApplicationEventListener, ModelProcessor {
 
     private final MetricRegistry metrics;
-    private Map<Method, Timer> timers = new ConcurrentHashMap<>();
-    private Map<Method, Meter> meters = new ConcurrentHashMap<>();
-    private Map<Method, ExceptionMeterMetric> exceptionMeters = new ConcurrentHashMap<>();
+    private ConcurrentMap<Method, Timer> timers = new ConcurrentHashMap<>();
+    private ConcurrentMap<Method, Meter> meters = new ConcurrentHashMap<>();
+    private ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters = new ConcurrentHashMap<>();
 
     /**
      * Construct an application event listener using the given metrics registry.
@@ -74,10 +74,10 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private static class TimerRequestEventListener implements RequestEventListener {
-        private final Map<Method, Timer> timers;
+        private final ConcurrentMap<Method, Timer> timers;
         private Timer.Context context = null;
 
-        public TimerRequestEventListener(final Map<Method, Timer> timers) {
+        public TimerRequestEventListener(final ConcurrentMap<Method, Timer> timers) {
             this.timers = timers;
         }
 
@@ -98,9 +98,9 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private static class MeterRequestEventListener implements RequestEventListener {
-        private final Map<Method, Meter> meters;
+        private final ConcurrentMap<Method, Meter> meters;
 
-        public MeterRequestEventListener(final Map<Method, Meter> meters) {
+        public MeterRequestEventListener(final ConcurrentMap<Method, Meter> meters) {
             this.meters = meters;
         }
 
@@ -117,9 +117,9 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private static class ExceptionMeterRequestEventListener implements RequestEventListener {
-        private final Map<Method, ExceptionMeterMetric> exceptionMeters;
+        private final ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters;
 
-        public ExceptionMeterRequestEventListener(final Map<Method, ExceptionMeterMetric> exceptionMeters) {
+        public ExceptionMeterRequestEventListener(final ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters) {
             this.exceptionMeters = exceptionMeters;
         }
 
