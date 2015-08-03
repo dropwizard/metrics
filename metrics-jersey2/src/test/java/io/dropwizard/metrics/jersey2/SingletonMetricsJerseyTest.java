@@ -8,7 +8,7 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
 
 import io.dropwizard.metrics.jersey2.resources.InstrumentedResource;
-
+import io.dropwizard.metrics.jersey2.resources.InstrumentedSubResource;
 import io.dropwizard.metrics.jersey2.InstrumentedResourceMethodApplicationListener;
 import io.dropwizard.metrics.jersey2.MetricsFeature;
 import io.dropwizard.metrics.Meter;
