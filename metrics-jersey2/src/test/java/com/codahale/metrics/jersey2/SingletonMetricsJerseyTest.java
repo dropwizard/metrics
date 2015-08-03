@@ -4,6 +4,7 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.jersey2.resources.InstrumentedResource;
+import com.codahale.metrics.jersey2.resources.InstrumentedSubResource;
 import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
@@ -105,5 +106,17 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
         } catch (NotFoundException e) {
             assertThat(e.getMessage()).isEqualTo("HTTP 404 Not Found");
         }
+    }
+
+    @Test
+    public void subresourcesFromLocatorsRegisterMetrics() {
+        assertThat(target("subresource/timed")
+                .request()
+                .get(String.class))
+                .isEqualTo("yay");
+
+        final Timer timer = registry.timer(name(InstrumentedSubResource.class, "timed"));
+        assertThat(timer.getCount()).isEqualTo(1);
+
     }
 }
