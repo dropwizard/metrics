@@ -1,10 +1,9 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.MetricRegistry;
-
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A map of shared, named metric registries.
@@ -13,7 +12,7 @@ public class SharedMetricRegistries {
     private static final ConcurrentMap<String, MetricRegistry> REGISTRIES =
             new ConcurrentHashMap<String, MetricRegistry>();
 
-    private static volatile String defaultRegistryName = null;
+    private static final AtomicReference<MetricRegistry> defaultRegistry = new AtomicReference<MetricRegistry>();
 
     private SharedMetricRegistries() { /* singleton */ }
 
@@ -46,24 +45,24 @@ public class SharedMetricRegistries {
         return existing;
     }
 
-    public synchronized static MetricRegistry setDefault(String name) {
-        final MetricRegistry registry = getOrCreate(name);
-        return setDefault(name, registry);
-    }
-
-    public static MetricRegistry setDefault(String name, MetricRegistry metricRegistry) {
-        if (defaultRegistryName == null) {
-            defaultRegistryName = name;
-            add(name, metricRegistry);
-            return metricRegistry;
+    /**
+     * @param registry the default registry
+     * @throws IllegalStateException if the default has already been set
+     */
+    public static void setDefault(final MetricRegistry registry) {
+        if (defaultRegistry.compareAndSet(null, registry) == false) {
+            throw new IllegalStateException("Default registry has already been set.");
         }
-        throw new IllegalStateException("Default metric registry name is already set.");
     }
 
+    /**
+     * @return the default registry
+     * @throws IllegalStateException if the default has not been set
+     */
     public static MetricRegistry getDefault() {
-        if (defaultRegistryName != null) {
-            return getOrCreate(defaultRegistryName);
+        if (defaultRegistry.get() != null) {
+            return defaultRegistry.get();
         }
-        throw new IllegalStateException("Default registry name has not been set.");
+        throw new IllegalStateException("Default registry has not been set.");
     }
 }

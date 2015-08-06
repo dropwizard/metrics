@@ -8,19 +8,9 @@ import io.dropwizard.metrics.SharedMetricRegistries;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-
 public class SharedMetricRegistriesTest {
     @Before
     public void setUp() throws Exception {
-        // Unset the defaultRegistryName field between tests for better isolation.
-        final Field field = SharedMetricRegistries.class.getDeclaredField("defaultRegistryName");
-        field.setAccessible(true);
-        final Field modfiers = Field.class.getDeclaredField("modifiers");
-        modfiers.setAccessible(true);
-        modfiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-        field.set(null, null);
         SharedMetricRegistries.clear();
     }
 
@@ -66,41 +56,26 @@ public class SharedMetricRegistriesTest {
     }
 
     @Test
-    public void errorsWhenDefaultUnset() throws Exception {
+    public void defaultRegistry () {
+        // Verify that an error is thrown when default is not set
         try {
             SharedMetricRegistries.getDefault();
         } catch (final Exception e) {
             assertThat(e).isInstanceOf(IllegalStateException.class);
-            assertThat(e.getMessage()).isEqualTo("Default registry name has not been set.");
+            assertThat(e.getMessage()).isEqualTo("Default registry has not been set.");
         }
-    }
-
-    @Test
-    public void createsDefaultRegistries() throws Exception {
-        final String defaultName = "default";
-        final MetricRegistry registry = SharedMetricRegistries.setDefault(defaultName);
-        assertThat(registry).isNotNull();
+    
+        // Verify that default can be set
+        final MetricRegistry registry = new MetricRegistry();
+        SharedMetricRegistries.setDefault(registry);
         assertThat(SharedMetricRegistries.getDefault()).isEqualTo(registry);
-        assertThat(SharedMetricRegistries.getOrCreate(defaultName)).isEqualTo(registry);
-    }
-
-    @Test
-    public void errorsWhenDefaultAlreadySet() throws Exception {
+    
+        // Verify that default can not be set again
         try {
-            SharedMetricRegistries.setDefault("foobah");
-            SharedMetricRegistries.setDefault("borg");
+            SharedMetricRegistries.setDefault(new MetricRegistry());
         } catch (final Exception e) {
             assertThat(e).isInstanceOf(IllegalStateException.class);
-            assertThat(e.getMessage()).isEqualTo("Default metric registry name is already set.");
+            assertThat(e.getMessage()).isEqualTo("Default registry has already been set.");
         }
-    }
-
-    @Test
-    public void setsDefaultExistingRegistries() throws Exception {
-        final String defaultName = "default";
-        final MetricRegistry registry = new MetricRegistry();
-        assertThat(SharedMetricRegistries.setDefault(defaultName, registry)).isEqualTo(registry);
-        assertThat(SharedMetricRegistries.getDefault()).isEqualTo(registry);
-        assertThat(SharedMetricRegistries.getOrCreate(defaultName)).isEqualTo(registry);
     }
 }
