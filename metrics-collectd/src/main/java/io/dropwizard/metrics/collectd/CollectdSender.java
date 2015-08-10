@@ -29,11 +29,14 @@ public interface CollectdSender extends Closeable {
 	 * Flushes buffer, if applicable
 	 *
 	 * @throws IOException
+	 *             if there was an error flushing the buffer
 	 */
 	void flush() throws IOException;
 
 	/**
 	 * Returns true if ready to send data
+	 *
+	 * @return a flag indicating whether the connection is still open
 	 */
 	boolean isConnected();
 }

@@ -91,7 +91,7 @@ public class Collectd implements CollectdSender {
 	 *
 	 * @param address
 	 *            the address of the Collectd server
-	 * @param datagramChannel
+	 * @param datagramChannelFactory
 	 *            the datagramChannel factory
 	 */
 	public Collectd(final InetSocketAddress address, final DatagramChannelFactory datagramChannelFactory) {
@@ -104,8 +104,10 @@ public class Collectd implements CollectdSender {
 	 *
 	 * @param address
 	 *            the address of the Collectd server
-	 * @param socketFactory
+	 * @param datagramChannelFactory
 	 *            the datagramChannel factory
+	 * @param packetSize
+	 *            the maximum packet size for the datagram
 	 */
 	public Collectd(final InetSocketAddress address, final DatagramChannelFactory datagramChannelFactory,
 			final int packetSize) {
