@@ -1,0 +1,4 @@
+histogram		count:GAUGE:0:U, max:GAUGE:U:U, mean:GAUGE:U:U, min:GAUGE:U:U, stddev:GAUGE:0:U, p50:GAUGE:U:U, p75:GAUGE:U:U, p95:GAUGE:U:U, p98:GAUGE:U:U, p99:GAUGE:U:U, p999:GAUGE:U:U
+metered		count:GAUGE:0:U, m1_rate:GAUGE:0:U, m5_rate:GAUGE:0:U, m15_rate:GAUGE:0:U, mean_rate:GAUGE:0:U
+timer		max:GAUGE:U:U, mean:GAUGE:U:U, min:GAUGE:U:U, stddev:GAUGE:0:U, p50:GAUGE:U:U, p75:GAUGE:U:U, p95:GAUGE:U:U, p98:GAUGE:U:U, p99:GAUGE:U:U, p999:GAUGE:U:U
+
