@@ -41,7 +41,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Metrics'
-copyright = u'2010-2014, Coda Hale, Yammer Inc.'
+copyright = u'2010-2014, Coda Hale, Yammer Inc., 2014-2015 Dropwizard Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -262,9 +262,9 @@ texinfo_documents = [
 
 # Bibliographic Dublin Core info.
 epub_title = u'Metrics'
-epub_author = u'Coda Hale'
-epub_publisher = u'Coda Hale'
-epub_copyright = u'2012, Coda Hale'
+epub_author = u'Dropwizard Team'
+epub_publisher = u'Dropwizard Team'
+epub_copyright = u'2010-2014, Coda Hale, Yammer Inc., 2014-2015 Dropwizard Team'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.
