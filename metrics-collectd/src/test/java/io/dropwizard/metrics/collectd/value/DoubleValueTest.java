@@ -15,7 +15,7 @@ public abstract class DoubleValueTest<D extends DoubleValue> extends ValueTest<D
 	@Test
 	public void shouldEncodeTheInitialValueAsBytes() {
 		assertThat(value.getValue(),
-				is(ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putDouble(initialMetric).array()));
+				is(ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putDouble(initialMetric)));
 	}
 
 	@Override

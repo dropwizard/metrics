@@ -46,7 +46,7 @@ public class Values extends Part {
 			buffer.put(value.getDataType().getCode());
 		}
 		for (final Value value : values) {
-			buffer.put(value.getValue());
+			buffer.put(value.getValue().array());
 		}
 	}
 }

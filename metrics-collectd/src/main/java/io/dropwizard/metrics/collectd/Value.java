@@ -19,19 +19,19 @@ public abstract class Value {
 	 * ABSOLUTE → network (big endian) unsigned integer
 	 * </pre>
 	 */
-	private final byte[] value;
+	private final ByteBuffer value;
 	private final DataType dataType;
 
 	protected Value(final DataType dataType, final ByteBuffer value) {
 		this.dataType = dataType;
-		this.value = value.array();
+		this.value = value;
 	}
 
 	public DataType getDataType() {
 		return dataType;
 	}
 
-	public byte[] getValue() {
+	public ByteBuffer getValue() {
 		return value;
 	}
 }

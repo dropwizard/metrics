@@ -96,7 +96,7 @@ public class ValuesTest extends PartTest<Values> {
 
 		final byte[] actual = buf.array();
 		for (int i = 0; i < values.size(); i++) {
-			final byte[] expected = values.get(i).getValue();
+			final byte[] expected = values.get(i).getValue().array();
 			for (int j = 0, k = 6 + values.size() + i * 8; j < expected.length; j++, k++) {
 				assertThat(actual[k], is(expected[j]));
 			}

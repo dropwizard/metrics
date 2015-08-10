@@ -14,8 +14,7 @@ public abstract class LongValueTest<L extends LongValue> extends ValueTest<L> {
 
 	@Test
 	public void shouldEncodeTheInitialValueAsBytes() {
-		assertThat(value.getValue(),
-				is(ByteBuffer.allocate(8).order(ByteOrder.BIG_ENDIAN).putLong(initialMetric).array()));
+		assertThat(value.getValue(), is(ByteBuffer.allocate(8).order(ByteOrder.BIG_ENDIAN).putLong(initialMetric)));
 	}
 
 	@Override
