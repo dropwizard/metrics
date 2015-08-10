@@ -1,6 +1,6 @@
 <FindBugsFilter>
     <Match>
-        <Package name="com.codahale.metrics.benchmarks.generated" />
+        <Package name="io.dropwizard.metrics.benchmarks.generated" />
     </Match>
     <Match>
         <Package name="org.openjdk.jmh.infra.generated" />
