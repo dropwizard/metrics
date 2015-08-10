@@ -1,7 +1,9 @@
-package com.codahale.metrics;
+package io.dropwizard.metrics;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import io.dropwizard.metrics.CounterMeter;
 
 import java.util.concurrent.TimeUnit;
 
