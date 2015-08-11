@@ -1,0 +1,6 @@
+<FindBugsFilter>
+	<Match>
+		<Class name="com.codahale.metrics.Metric" />
+		<Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE" />
+	</Match>
+</FindBugsFilter>
