@@ -34,6 +34,7 @@
         <module>metrics-logback</module>
         <module>metrics-servlet</module>
         <module>metrics-servlets</module>
+        <module>metrics-adaptor</module>
     </modules>
 
     <properties>
