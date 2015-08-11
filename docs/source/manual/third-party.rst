@@ -35,3 +35,4 @@ the many third-party libraries which extend Metrics:
 * `metrics-play <https://github.com/kenshoo/metrics-play>`_ provides an integration with the Play Framework
 * `metrics-kafka <https://github.com/hengyunabc/metrics-kafka>`_ provides a reporter for Kafka
 * `metrics-zabbiz <https://github.com/hengyunabc/metrics-zabbix>`_ provides a reporter for Zabbix
+* `finagle-metrics <https://github.com/rlazoti/finagle-metrics>`_ provides a reporter for a finagle service.
