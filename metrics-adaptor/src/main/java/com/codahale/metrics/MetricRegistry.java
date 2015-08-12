@@ -138,7 +138,7 @@ public class MetricRegistry {
 	}
 
 	public SortedMap<String, Histogram> getHistograms(MetricFilter filter) {
-		return adaptMetrics(Histogram.class, reg.getCounters(transformFilter(filter)));
+		return adaptMetrics(Histogram.class, reg.getHistograms(transformFilter(filter)));
 	}
 
 	public SortedMap<String, Meter> getMeters() {
@@ -146,7 +146,7 @@ public class MetricRegistry {
 	}
 
 	public SortedMap<String, Meter> getMeters(MetricFilter filter) {
-		return adaptMetrics(Meter.class, reg.getCounters(transformFilter(filter)));
+		return adaptMetrics(Meter.class, reg.getMeters(transformFilter(filter)));
 	}
 
 	public SortedMap<String, Timer> getTimers() {
@@ -154,7 +154,7 @@ public class MetricRegistry {
 	}
 
 	public SortedMap<String, Timer> getTimers(MetricFilter filter) {
-		return adaptMetrics(Timer.class, reg.getCounters(transformFilter(filter)));
+		return adaptMetrics(Timer.class, reg.getTimers(transformFilter(filter)));
 	}
 
 	private io.dropwizard.metrics.MetricFilter transformFilter(final MetricFilter filter) {
