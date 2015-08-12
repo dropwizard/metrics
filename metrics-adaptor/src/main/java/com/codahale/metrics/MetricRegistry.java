@@ -4,6 +4,7 @@ import java.util.Map;
 
 import io.dropwizard.metrics.MetricName;
 
+@Deprecated
 public class MetricRegistry {
 	final io.dropwizard.metrics.MetricRegistry reg;
 	

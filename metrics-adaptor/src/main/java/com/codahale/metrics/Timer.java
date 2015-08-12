@@ -7,8 +7,8 @@ import java.util.concurrent.TimeUnit;
 import io.dropwizard.metrics.Metered;
 import io.dropwizard.metrics.Sampling;
 import io.dropwizard.metrics.Snapshot;
-import io.dropwizard.metrics.Timer.Context;
 
+@Deprecated
 public class Timer implements Metered, Metric, Sampling {
 	final io.dropwizard.metrics.Timer timer;
 
