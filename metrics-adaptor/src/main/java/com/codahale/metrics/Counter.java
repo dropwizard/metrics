@@ -2,6 +2,7 @@ package com.codahale.metrics;
 
 import io.dropwizard.metrics.Counting;
 
+@Deprecated
 public class Counter implements Metric, Counting {
 	final io.dropwizard.metrics.Counter counter;
 

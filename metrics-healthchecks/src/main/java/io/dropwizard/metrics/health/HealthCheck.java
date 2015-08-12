@@ -83,7 +83,7 @@ public abstract class HealthCheck {
         private final String message;
         private final Throwable error;
 
-        private Result(boolean isHealthy, String message, Throwable error) {
+        protected Result(boolean isHealthy, String message, Throwable error) {
             this.healthy = isHealthy;
             this.message = message;
             this.error = error;

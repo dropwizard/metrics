@@ -4,6 +4,7 @@ import io.dropwizard.metrics.Counting;
 import io.dropwizard.metrics.Sampling;
 import io.dropwizard.metrics.Snapshot;
 
+@Deprecated
 public class Histogram implements Metric, Sampling, Counting {
 	final io.dropwizard.metrics.Histogram hist;
 

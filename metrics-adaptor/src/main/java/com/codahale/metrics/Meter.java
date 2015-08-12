@@ -2,6 +2,7 @@ package com.codahale.metrics;
 
 import io.dropwizard.metrics.Metered;
 
+@Deprecated
 public class Meter implements Metered, Metric {
 	final io.dropwizard.metrics.Meter meter;
 
