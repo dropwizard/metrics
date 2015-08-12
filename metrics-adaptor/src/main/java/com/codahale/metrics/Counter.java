@@ -9,6 +9,9 @@ public class Counter implements Metric, Counting {
 	public Counter(io.dropwizard.metrics.Counter counter) {
 		this.counter = counter;
 	}
+	public Counter() {
+		this.counter = new io.dropwizard.metrics.Counter();
+	}
 
 	public void inc() {
 		counter.inc(1);

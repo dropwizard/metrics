@@ -1,6 +1,7 @@
 package com.codahale.metrics;
 
 import io.dropwizard.metrics.Counting;
+import io.dropwizard.metrics.Reservoir;
 import io.dropwizard.metrics.Sampling;
 import io.dropwizard.metrics.Snapshot;
 
@@ -11,6 +12,9 @@ public class Histogram implements Metric, Sampling, Counting {
 	public Histogram(io.dropwizard.metrics.Histogram hist) {
 		this.hist = hist;
 	}
+	public Histogram(Reservoir reservoir) {
+		this.hist = new io.dropwizard.metrics.Histogram(reservoir);
+    }
 
 	public void update(int value) {
 		hist.update(value);
