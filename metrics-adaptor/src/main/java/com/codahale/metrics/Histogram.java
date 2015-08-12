@@ -3,7 +3,6 @@ package com.codahale.metrics;
 import io.dropwizard.metrics.Counting;
 import io.dropwizard.metrics.Reservoir;
 import io.dropwizard.metrics.Sampling;
-import io.dropwizard.metrics.Snapshot;
 
 @Deprecated
 public class Histogram implements Metric, Sampling, Counting {
@@ -31,6 +30,6 @@ public class Histogram implements Metric, Sampling, Counting {
 
 	@Override
 	public Snapshot getSnapshot() {
-		return hist.getSnapshot();
+		return new Snapshot(hist.getSnapshot());
 	}
 }

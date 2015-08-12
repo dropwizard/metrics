@@ -11,4 +11,8 @@
 		<Class name="com.codahale.metrics.CachedGauge" />
 		<Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS" />
 	</Match>
+	<Match>
+		<Class name="com.codahale.metrics.Snapshot" />
+		<Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS" />
+	</Match>
 </FindBugsFilter>

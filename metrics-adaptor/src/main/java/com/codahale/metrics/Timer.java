@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.dropwizard.metrics.Metered;
 import io.dropwizard.metrics.Sampling;
-import io.dropwizard.metrics.Snapshot;
 
 @Deprecated
 public class Timer implements Metered, Metric, Sampling {
@@ -35,7 +34,7 @@ public class Timer implements Metered, Metric, Sampling {
 
 	@Override
 	public Snapshot getSnapshot() {
-		return timer.getSnapshot();
+		return new Snapshot(timer.getSnapshot());
 	}
 
 	@Override
