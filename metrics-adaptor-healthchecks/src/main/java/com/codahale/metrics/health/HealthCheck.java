@@ -1,5 +1,10 @@
 package com.codahale.metrics.health;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 @Deprecated
 public abstract class HealthCheck extends io.dropwizard.metrics.health.HealthCheck {
 
@@ -33,6 +38,22 @@ public abstract class HealthCheck extends io.dropwizard.metrics.health.HealthChe
 
 		private Result(boolean isHealthy, String message, Throwable error) {
 			super(isHealthy, message, error);
+		}
+		
+		public static Result of(io.dropwizard.metrics.health.HealthCheck.Result res){
+			if(res instanceof Result){
+				return (Result) res;
+			} else {
+				return new Result(res.isHealthy(), res.getMessage(), res.getError());
+			}
+		}
+		public static SortedMap<String, Result> of(SortedMap<String, io.dropwizard.metrics.health.HealthCheck.Result> results){
+			SortedMap<String, Result> items = new TreeMap<>();
+			for(Map.Entry<String, io.dropwizard.metrics.health.HealthCheck.Result> result: results.entrySet()){
+				items.put(result.getKey(), of(result.getValue()));
+			}
+			
+			return Collections.unmodifiableSortedMap(items);
 		}
 	}
 

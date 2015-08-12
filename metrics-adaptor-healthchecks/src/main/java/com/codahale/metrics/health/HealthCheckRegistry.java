@@ -1,7 +1,5 @@
 package com.codahale.metrics.health;
 
-import io.dropwizard.metrics.health.HealthCheck;
-
 import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -32,15 +30,14 @@ public class HealthCheckRegistry {
 	}
 
 	public HealthCheck.Result runHealthCheck(String name) throws NoSuchElementException {
-		return reg.runHealthCheck(name);
+		return HealthCheck.Result.of(reg.runHealthCheck(name));
 	}
 
 	public SortedMap<String, HealthCheck.Result> runHealthChecks() {
-		return reg.runHealthChecks();
+		return HealthCheck.Result.of(reg.runHealthChecks());
 	}
 
-	public SortedMap<String, HealthCheck.Result> runHealthChecks(
-			ExecutorService executor) {
-		return reg.runHealthChecks(executor);
+	public SortedMap<String, HealthCheck.Result> runHealthChecks(ExecutorService executor) {
+		return HealthCheck.Result.of(reg.runHealthChecks(executor));
 	}
 }
