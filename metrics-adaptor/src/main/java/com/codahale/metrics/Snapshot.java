@@ -2,6 +2,7 @@ package com.codahale.metrics;
 
 import java.io.OutputStream;
 
+@Deprecated
 public class Snapshot extends io.dropwizard.metrics.Snapshot {
 	final io.dropwizard.metrics.Snapshot snap;
 	
