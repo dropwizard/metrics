@@ -52,8 +52,9 @@ public class MetricRegistry {
 
 	private void registerAll(MetricName prefix, MetricSet metrics)
 			throws IllegalArgumentException {
-		if (prefix == null)
+		if (prefix == null) {
 			prefix = MetricName.EMPTY;
+		}
 
 		for (Map.Entry<String, Metric> entry : metrics.getMetrics().entrySet()) {
 			if (entry.getValue() instanceof MetricSet) {
@@ -173,27 +174,27 @@ public class MetricRegistry {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Metric adaptMetric(final io.dropwizard.metrics.Metric metric) throws ClassNotFoundException {
-		if(metric instanceof Metric){
+		if (metric instanceof Metric) {
 			return (Metric) metric;
-		} else if(metric instanceof io.dropwizard.metrics.Counter){
+		} else if (metric instanceof io.dropwizard.metrics.Counter) {
 			return new Counter((io.dropwizard.metrics.Counter) metric);
-		} else if(metric instanceof io.dropwizard.metrics.Histogram){
+		} else if (metric instanceof io.dropwizard.metrics.Histogram) {
 			return new Histogram((io.dropwizard.metrics.Histogram) metric);
-		} else if(metric instanceof io.dropwizard.metrics.Meter){
+		} else if (metric instanceof io.dropwizard.metrics.Meter) {
 			return new Meter((io.dropwizard.metrics.Meter) metric);
-		} else if(metric instanceof io.dropwizard.metrics.Timer){
+		} else if (metric instanceof io.dropwizard.metrics.Timer) {
 			return new Timer((io.dropwizard.metrics.Timer) metric);
-		} else if(metric instanceof io.dropwizard.metrics.Gauge){
+		} else if (metric instanceof io.dropwizard.metrics.Gauge) {
 			return new Gauge((io.dropwizard.metrics.Gauge) metric);
 		}
 		
-		throw new ClassNotFoundException("Can't find adaptor class for metric of type "+ metric.getClass().getName());
+		throw new ClassNotFoundException("Can't find adapter class for metric of type " + metric.getClass().getName());
 	}
 
 	@SuppressWarnings("unchecked")
 	private <T extends Metric, A extends io.dropwizard.metrics.Metric> SortedMap<String, T> adaptMetrics(final Class<T> klass, final SortedMap<MetricName, A> metrics) {
 		SortedMap<String, T> items = new TreeMap<>();
-		for(Map.Entry<MetricName, A> metric: metrics.entrySet()){
+		for (Map.Entry<MetricName, A> metric: metrics.entrySet()) {
 			try {
 				items.put(metric.getKey().getKey(), (T) adaptMetric(metric.getValue()));
 			} catch (ClassNotFoundException e) {

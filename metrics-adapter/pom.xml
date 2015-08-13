@@ -7,7 +7,7 @@
 		<version>4.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>metrics-adaptor</artifactId>
+	<artifactId>metrics-adapter</artifactId>
 
 	<dependencies>
 		<dependency>
