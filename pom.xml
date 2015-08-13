@@ -35,7 +35,6 @@
         <module>metrics-servlet</module>
         <module>metrics-servlets</module>
         <module>metrics-adaptor</module>
-        <module>metrics-adaptor-healthchecks</module>
     </modules>
 
     <properties>
