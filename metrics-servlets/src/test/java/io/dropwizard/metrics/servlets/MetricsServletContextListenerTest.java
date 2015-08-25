@@ -81,7 +81,7 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
                 .isEqualTo(allowedOrigin);
         assertThat(response.getContent())
                 .isEqualTo("{" +
-                        "\"version\":\"3.0.0\"," +
+                        "\"version\":\"4.0.0\"," +
                         "\"gauges\":{" +
                         "\"g1\":{\"value\":100}" +
                         "}," +
@@ -111,7 +111,7 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
                 .isEqualTo(allowedOrigin);
         assertThat(response.getContent())
                 .isEqualTo(String.format("{%n" +
-                        "  \"version\" : \"3.0.0\",%n" +
+                        "  \"version\" : \"4.0.0\",%n" +
                         "  \"gauges\" : {%n" +
                         "    \"g1\" : {%n" +
                         "      \"value\" : 100%n" +
