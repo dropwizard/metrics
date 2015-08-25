@@ -23,7 +23,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class MetricsModule extends Module {
-    static final Version VERSION = new Version(3, 0, 0, "", "io.dropwizard.metrics", "metrics-json");
+    static final Version VERSION = new Version(4, 0, 0, "", "io.dropwizard.metrics", "metrics-json");
 
     private static class GaugeSerializer extends StdSerializer<Gauge> {
         private GaugeSerializer() {
