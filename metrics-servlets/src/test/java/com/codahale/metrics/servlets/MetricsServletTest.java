@@ -65,7 +65,7 @@ public class MetricsServletTest extends AbstractServletTest {
                 .isEqualTo("*");
         assertThat(response.getContent())
                 .isEqualTo("{" +
-                                   "\"version\":\"3.0.0\"," +
+                                   "\"version\":\"3.1.3\"," +
                                    "\"gauges\":{" +
                                        "\"g1\":{\"value\":100}" +
                                    "}," +
@@ -96,7 +96,7 @@ public class MetricsServletTest extends AbstractServletTest {
                 .isEqualTo("*");
         assertThat(response.getContent())
                 .isEqualTo("{" +
-                                   "\"version\":\"3.0.0\"," +
+                                   "\"version\":\"3.1.3\"," +
                                    "\"gauges\":{" +
                                        "\"g1\":{\"value\":100}" +
                                    "}," +
@@ -127,7 +127,7 @@ public class MetricsServletTest extends AbstractServletTest {
                 .isEqualTo("*");
         assertThat(response.getContent())
                 .isEqualTo(callbackParamVal + "({" +
-                                   "\"version\":\"3.0.0\"," +
+                                   "\"version\":\"3.1.3\"," +
                                    "\"gauges\":{" +
                                        "\"g1\":{\"value\":100}" +
                                    "}," +
@@ -157,7 +157,7 @@ public class MetricsServletTest extends AbstractServletTest {
                 .isEqualTo("*");
         assertThat(response.getContent())
                 .isEqualTo(String.format("{%n" +
-                                                 "  \"version\" : \"3.0.0\",%n" +
+                                                 "  \"version\" : \"3.1.3\",%n" +
                                                  "  \"gauges\" : {%n" +
                                                  "    \"g1\" : {%n" +
                                                  "      \"value\" : 100%n" +
