@@ -15,7 +15,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class MetricsModule extends Module {
-    static final Version VERSION = new Version(3, 0, 0, "", "com.codahale.metrics", "metrics-json");
+    static final Version VERSION = new Version(3, 1, 3, "", "com.codahale.metrics", "metrics-json");
 
     private static class GaugeSerializer extends StdSerializer<Gauge> {
         private GaugeSerializer() {
