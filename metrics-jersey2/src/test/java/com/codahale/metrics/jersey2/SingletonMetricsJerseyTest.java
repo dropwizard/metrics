@@ -3,7 +3,10 @@ package com.codahale.metrics.jersey2;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.codahale.metrics.jersey2.resources.InstrumentedChildResource;
+import com.codahale.metrics.jersey2.resources.InstrumentedParentResource;
 import com.codahale.metrics.jersey2.resources.InstrumentedResource;
+import com.codahale.metrics.jersey2.resources.InstrumentedSecondChildResource;
 import com.codahale.metrics.jersey2.resources.InstrumentedSubResource;
 import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -41,6 +44,8 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
         ResourceConfig config = new ResourceConfig();
         config = config.register(new MetricsFeature(this.registry));
         config = config.register(InstrumentedResource.class);
+        config = config.register(InstrumentedChildResource.class);
+        config = config.register(InstrumentedSecondChildResource.class);
 
         return config;
     }
@@ -53,6 +58,18 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
                 .isEqualTo("yay");
 
         final Timer timer = registry.timer(name(InstrumentedResource.class, "timed"));
+
+        assertThat(timer.getCount()).isEqualTo(1);
+    }
+    
+    @Test
+    public void childTimedMethodsAreTimed() {
+        assertThat(target("/child/timed")
+                .request()
+                .get(String.class))
+                .isEqualTo("yay");
+
+        final Timer timer = registry.timer(name(InstrumentedParentResource.class, "timed"));
 
         assertThat(timer.getCount()).isEqualTo(1);
     }

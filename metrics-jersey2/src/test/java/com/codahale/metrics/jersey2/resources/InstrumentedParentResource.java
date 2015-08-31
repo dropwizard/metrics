@@ -6,12 +6,11 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 @Produces(MediaType.TEXT_PLAIN)
-public class InstrumentedSubResource {
+public class InstrumentedParentResource {
     @GET
     @Timed
     @Path("/timed")
     public String timed() {
         return "yay";
     }
-
 }
