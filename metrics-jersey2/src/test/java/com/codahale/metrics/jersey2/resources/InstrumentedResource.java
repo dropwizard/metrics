@@ -19,6 +19,20 @@ public class InstrumentedResource {
     }
 
     @GET
+    @Timed(absolute = true, name = "absoluteTimed")
+    @Path("/timed/absolute")
+    public String timedAbsolute() {
+        return "yay";
+    }
+
+    @GET
+    @Timed(name="namedTimed")
+    @Path("/timed/named")
+    public String timedNamed() {
+        return "yay";
+    }
+
+    @GET
     @Metered
     @Path("/metered")
     public String metered() {
@@ -26,9 +40,43 @@ public class InstrumentedResource {
     }
 
     @GET
+    @Metered(absolute = true, name = "absoluteMetered")
+    @Path("/metered/absolute")
+    public String meteredAbsolute() {
+        return "woo";
+    }
+
+    @GET
+    @Metered(name = "namedMetered")
+    @Path("/metered/named")
+    public String meteredNamed() {
+        return "woo";
+    }
+
+    @GET
     @ExceptionMetered(cause = IOException.class)
     @Path("/exception-metered")
     public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode) throws IOException {
+        if (splode) {
+            throw new IOException("AUGH");
+        }
+        return "fuh";
+    }
+
+    @GET
+    @ExceptionMetered(cause = IOException.class, absolute = true, name = "absoluteExceptionMetered")
+    @Path("/exception-metered/absolute")
+    public String absoluteExceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode) throws IOException {
+        if (splode) {
+            throw new IOException("AUGH");
+        }
+        return "fuh";
+    }
+
+    @GET
+    @ExceptionMetered(cause = IOException.class, name = "namedExceptionMeteredOtherName")
+    @Path("/exception-metered/named")
+    public String namedExceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode) throws IOException {
         if (splode) {
             throw new IOException("AUGH");
         }

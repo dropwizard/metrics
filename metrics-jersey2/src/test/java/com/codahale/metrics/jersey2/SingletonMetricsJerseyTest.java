@@ -4,7 +4,6 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.jersey2.resources.InstrumentedChildResource;
-import com.codahale.metrics.jersey2.resources.InstrumentedParentResource;
 import com.codahale.metrics.jersey2.resources.InstrumentedResource;
 import com.codahale.metrics.jersey2.resources.InstrumentedSecondChildResource;
 import com.codahale.metrics.jersey2.resources.InstrumentedSubResource;
@@ -61,7 +60,31 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
 
         assertThat(timer.getCount()).isEqualTo(1);
     }
-    
+
+    @Test
+    public void absoluteTimedMethodsAreTimed() {
+        assertThat(target("timed/absolute")
+                .request()
+                .get(String.class))
+                .isEqualTo("yay");
+
+        final Timer timer = registry.timer("absoluteTimed");
+
+        assertThat(timer.getCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void namedTimedMethodsAreTimed() {
+        assertThat(target("timed/named")
+                .request()
+                .get(String.class))
+                .isEqualTo("yay");
+
+        final Timer timer = registry.timer(name(InstrumentedResource.class, "namedTimed"));
+
+        assertThat(timer.getCount()).isEqualTo(1);
+    }
+
     @Test
     public void childTimedMethodsAreTimed() {
         assertThat(target("/child/timed")
@@ -69,7 +92,7 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
                 .get(String.class))
                 .isEqualTo("yay");
 
-        final Timer timer = registry.timer(name(InstrumentedParentResource.class, "timed"));
+        final Timer timer = registry.timer(name(InstrumentedChildResource.class, "timed"));
 
         assertThat(timer.getCount()).isEqualTo(1);
     }
@@ -82,6 +105,28 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
                 .isEqualTo("woo");
 
         final Meter meter = registry.meter(name(InstrumentedResource.class, "metered"));
+        assertThat(meter.getCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void absoluteMeteredMethodsAreMetered() {
+        assertThat(target("metered/absolute")
+                .request()
+                .get(String.class))
+                .isEqualTo("woo");
+
+        final Meter meter = registry.meter("absoluteMetered");
+        assertThat(meter.getCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void namedMeteredMethodsAreMetered() {
+        assertThat(target("metered/named")
+                .request()
+                .get(String.class))
+                .isEqualTo("woo");
+
+        final Meter meter = registry.meter(name(InstrumentedResource.class, "namedMetered"));
         assertThat(meter.getCount()).isEqualTo(1);
     }
 
@@ -100,6 +145,57 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
 
         try {
             target("exception-metered")
+                    .queryParam("splode", true)
+                    .request()
+                    .get(String.class);
+
+            failBecauseExceptionWasNotThrown(ProcessingException.class);
+        } catch (ProcessingException e) {
+            assertThat(e.getCause()).isInstanceOf(IOException.class);
+        }
+
+        assertThat(meter.getCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void absoluteExceptionMeteredMethodsAreExceptionMetered() {
+        final Meter meter = registry.meter("absoluteExceptionMetered");
+
+        assertThat(target("exception-metered/absolute")
+                .request()
+                .get(String.class))
+                .isEqualTo("fuh");
+
+        assertThat(meter.getCount()).isZero();
+
+        try {
+            target("exception-metered/absolute")
+                    .queryParam("splode", true)
+                    .request()
+                    .get(String.class);
+
+            failBecauseExceptionWasNotThrown(ProcessingException.class);
+        } catch (ProcessingException e) {
+            assertThat(e.getCause()).isInstanceOf(IOException.class);
+        }
+
+        assertThat(meter.getCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void namedExceptionMeteredMethodsAreExceptionMetered() {
+        final Meter meter = registry.meter(name(InstrumentedResource.class,
+                "namedExceptionMeteredOtherName"));
+
+        assertThat(target("exception-metered/named")
+                .request()
+                .get(String.class))
+                .isEqualTo("fuh");
+
+        assertThat(meter.getCount()).isZero();
+
+        try {
+            target("exception-metered/named")
                     .queryParam("splode", true)
                     .request()
                     .get(String.class);

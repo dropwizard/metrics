@@ -16,6 +16,7 @@ import org.glassfish.jersey.server.monitoring.ApplicationEvent;
 import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
 import org.glassfish.jersey.server.monitoring.RequestEventListener;
+import org.omg.CORBA.DefinitionKind;
 
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.ext.Provider;
@@ -35,14 +36,13 @@ import static com.codahale.metrics.MetricRegistry.name;
  * request events indicating that the method is about to be invoked, or just got done
  * being invoked.
  */
-
 @Provider
 public class InstrumentedResourceMethodApplicationListener implements ApplicationEventListener, ModelProcessor {
 
     private final MetricRegistry metrics;
-    private ConcurrentMap<Method, Timer> timers = new ConcurrentHashMap<>();
-    private ConcurrentMap<Method, Meter> meters = new ConcurrentHashMap<>();
-    private ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Timer> timers = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Meter> meters = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, ExceptionMeterMetric> exceptionMeters = new ConcurrentHashMap<>();
 
     /**
      * Construct an application event listener using the given metrics registry.
@@ -68,29 +68,34 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
 
         public ExceptionMeterMetric(final MetricRegistry registry,
                                     final Class<?> handlerClass,
-                                    final ResourceMethod method,
+                                    final Method definitionMethod,
                                     final ExceptionMetered exceptionMetered) {
             final String name = chooseName(exceptionMetered.name(),
-                    exceptionMetered.absolute(), handlerClass, method, ExceptionMetered.DEFAULT_NAME_SUFFIX);
+                    exceptionMetered.absolute(), handlerClass, definitionMethod, ExceptionMetered.DEFAULT_NAME_SUFFIX);
             this.meter = registry.meter(name);
             this.cause = exceptionMetered.cause();
         }
     }
 
     private static class TimerRequestEventListener implements RequestEventListener {
-        private final ConcurrentMap<Method, Timer> timers;
+        private final ConcurrentMap<String, Timer> timers;
         private Timer.Context context = null;
 
-        public TimerRequestEventListener(final ConcurrentMap<Method, Timer> timers) {
+        public TimerRequestEventListener(final ConcurrentMap<String, Timer> timers) {
             this.timers = timers;
         }
 
         @Override
         public void onEvent(RequestEvent event) {
             if (event.getType() == RequestEvent.Type.RESOURCE_METHOD_START) {
-                final Timer timer = this.timers.get(event.getUriInfo()
-                        .getMatchedResourceMethod().getInvocable().getHandlingMethod());
-                if (timer != null) {
+                final ResourceMethod method = event.getUriInfo().getMatchedResourceMethod();
+                final Invocable methodInvocable = method.getInvocable();
+                final Method definitionMethod = methodInvocable.getDefinitionMethod();
+                final Timed annotation = definitionMethod.getAnnotation(Timed.class);
+
+                if (annotation != null) {
+                    final Class<?> handlerClass = methodInvocable.getHandler().getHandlerClass();
+                    final Timer timer = this.timers.get(chooseName(annotation.name(), annotation.absolute(), handlerClass, definitionMethod));
                     this.context = timer.time();
                 }
             } else if (event.getType() == RequestEvent.Type.RESOURCE_METHOD_FINISHED) {
@@ -102,18 +107,23 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private static class MeterRequestEventListener implements RequestEventListener {
-        private final ConcurrentMap<Method, Meter> meters;
+        private final ConcurrentMap<String, Meter> meters;
 
-        public MeterRequestEventListener(final ConcurrentMap<Method, Meter> meters) {
+        public MeterRequestEventListener(final ConcurrentMap<String, Meter> meters) {
             this.meters = meters;
         }
 
         @Override
         public void onEvent(RequestEvent event) {
             if (event.getType() == RequestEvent.Type.RESOURCE_METHOD_START) {
-                final Meter meter = this.meters.get(event.getUriInfo()
-                        .getMatchedResourceMethod().getInvocable().getDefinitionMethod());
-                if (meter != null) {
+                final ResourceMethod method = event.getUriInfo().getMatchedResourceMethod();
+                final Invocable methodInvocable = method.getInvocable();
+                final Method definitionMethod = methodInvocable.getDefinitionMethod();
+                final Metered annotation = definitionMethod.getAnnotation(Metered.class);
+
+                if (annotation != null) {
+                    final Class<?> handlerClass = methodInvocable.getHandler().getHandlerClass();
+                    final Meter meter = this.meters.get(chooseName(annotation.name(), annotation.absolute(), handlerClass, definitionMethod));
                     meter.mark();
                 }
             }
@@ -121,9 +131,9 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private static class ExceptionMeterRequestEventListener implements RequestEventListener {
-        private final ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters;
+        private final ConcurrentMap<String, ExceptionMeterMetric> exceptionMeters;
 
-        public ExceptionMeterRequestEventListener(final ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters) {
+        public ExceptionMeterRequestEventListener(final ConcurrentMap<String, ExceptionMeterMetric> exceptionMeters) {
             this.exceptionMeters = exceptionMeters;
         }
 
@@ -131,14 +141,21 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         public void onEvent(RequestEvent event) {
             if (event.getType() == RequestEvent.Type.ON_EXCEPTION) {
                 final ResourceMethod method = event.getUriInfo().getMatchedResourceMethod();
-                final ExceptionMeterMetric metric = (method != null) ?
-                        this.exceptionMeters.get(method.getInvocable().getDefinitionMethod()) : null;
 
-                if (metric != null) {
-                    if (metric.cause.isAssignableFrom(event.getException().getClass()) ||
-                            (event.getException().getCause() != null &&
-                                    metric.cause.isAssignableFrom(event.getException().getCause().getClass()))) {
-                        metric.meter.mark();
+                if (method != null) {
+                    final Invocable methodInvocable = method.getInvocable();
+                    final Method definitionMethod = methodInvocable.getDefinitionMethod();
+                    final ExceptionMetered annotation = definitionMethod.getAnnotation(ExceptionMetered.class);
+
+                    if (annotation != null) {
+                        final Class<?> handlerClass = methodInvocable.getHandler().getHandlerClass();
+                        final ExceptionMeterMetric metric = this.exceptionMeters.get(chooseName(annotation.name(), annotation.absolute(), handlerClass, definitionMethod));
+
+                        if (metric.cause.isAssignableFrom(event.getException().getClass()) ||
+                                (event.getException().getCause() != null &&
+                                        metric.cause.isAssignableFrom(event.getException().getCause().getClass()))) {
+                            metric.meter.mark();
+                        }
                     }
                 }
             }
@@ -209,55 +226,42 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
 
     private void registerTimedAnnotations(final ResourceMethod method) {
         final Invocable methodInvocable = method.getInvocable();
-        final Class<?> handlerClass = methodInvocable.getHandler().getHandlerClass();
-        final Method handlingMethod = methodInvocable.getHandlingMethod();
-        final Timed annotation = handlingMethod.getAnnotation(Timed.class);
+        final Method definitionMethod = methodInvocable.getDefinitionMethod();
+        final Timed annotation = definitionMethod.getAnnotation(Timed.class);
 
-        if (annotation != null) { 
-            timers.putIfAbsent(handlingMethod, timerMetric(this.metrics, handlerClass, method, annotation));
+        if (annotation != null) {
+            final Class<?> handlerClass = methodInvocable.getHandler().getHandlerClass();
+            String methodName = chooseName(annotation.name(), annotation.absolute(), handlerClass, definitionMethod);
+            timers.putIfAbsent(methodName, this.metrics.timer(methodName));
         }
     }
 
     private void registerMeteredAnnotations(final ResourceMethod method) {
         final Invocable methodInvocable = method.getInvocable();
-        final Class<?> handlerClass = methodInvocable.getHandler().getHandlerClass();
-        final Method handlingMethod = methodInvocable.getHandlingMethod();
-        final Metered annotation = handlingMethod.getAnnotation(Metered.class);
+        final Method definitionMethod = methodInvocable.getDefinitionMethod();
+        final Metered annotation = definitionMethod.getAnnotation(Metered.class);
 
-        if (annotation != null) { 
-            meters.putIfAbsent(handlingMethod, meterMetric(metrics, handlerClass, method, annotation));
+        if (annotation != null) {
+            final Class<?> handlerClass = methodInvocable.getHandler().getHandlerClass();
+            String methodName = chooseName(annotation.name(), annotation.absolute(), handlerClass, definitionMethod);
+            meters.putIfAbsent(methodName, this.metrics.meter(methodName));
         }
     }
 
     private void registerExceptionMeteredAnnotations(final ResourceMethod method) {
         final Invocable methodInvocable = method.getInvocable();
-        final Class<?> handlerClass = methodInvocable.getHandler().getHandlerClass();
-        final Method handlingMethod = methodInvocable.getHandlingMethod();
-        final ExceptionMetered annotation = handlingMethod.getAnnotation(ExceptionMetered.class);
+        final Method definitionMethod = methodInvocable.getDefinitionMethod();
+        final ExceptionMetered annotation = definitionMethod.getAnnotation(ExceptionMetered.class);
 
-        if (annotation != null) { 
-            exceptionMeters.putIfAbsent(handlingMethod, new ExceptionMeterMetric(metrics, handlerClass, method, annotation));
+        if (annotation != null) {
+            final Class<?> handlerClass = methodInvocable.getHandler().getHandlerClass();
+            String methodName = chooseName(annotation.name(), annotation.absolute(), handlerClass, definitionMethod);
+            exceptionMeters.putIfAbsent(methodName, new ExceptionMeterMetric(metrics, handlerClass, definitionMethod, annotation));
         }
     }
 
-    private static Timer timerMetric(final MetricRegistry registry,
-                                     final Class<?> handlerClass,
-                                     final ResourceMethod method,
-                                     final Timed timed) {
-        final String name = chooseName(timed.name(), timed.absolute(), handlerClass, method);
-        return registry.timer(name);
-    }
-
-    private static Meter meterMetric(final MetricRegistry registry,
-                                     final Class<?> handlerClass,
-                                     final ResourceMethod method,
-                                     final Metered metered) {
-        final String name = chooseName(metered.name(), metered.absolute(), handlerClass, method);
-        return registry.meter(name);
-    }
-
-    protected static String chooseName(final String explicitName, final boolean absolute, final Class<?> handlerClass, 
-                                     final ResourceMethod method, final String... suffixes) {
+    protected static String chooseName(final String explicitName, final boolean absolute, final Class<?> handlerClass,
+                                     final Method definitionMethod, final String... suffixes) {
         if (explicitName != null && !explicitName.isEmpty()) {
             if (absolute) {
                 return explicitName;
@@ -265,7 +269,6 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
             return name(handlerClass, explicitName);
         }
 
-        return name(name(handlerClass, method.getInvocable().getDefinitionMethod().getName()),
-                suffixes);
+        return name(name(handlerClass, definitionMethod.getName()), suffixes);
     }
 }
