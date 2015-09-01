@@ -6,7 +6,6 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
-
 import org.glassfish.jersey.server.model.Invocable;
 import org.glassfish.jersey.server.model.ModelProcessor;
 import org.glassfish.jersey.server.model.Resource;
@@ -16,11 +15,9 @@ import org.glassfish.jersey.server.monitoring.ApplicationEvent;
 import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
 import org.glassfish.jersey.server.monitoring.RequestEventListener;
-import org.omg.CORBA.DefinitionKind;
 
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.ext.Provider;
-
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
