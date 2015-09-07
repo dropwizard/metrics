@@ -124,7 +124,7 @@ public class Timer implements Metered, Sampling {
     /**
      * Returns the total elapsed duration.
      *
-     * @return the total elapsed duration
+     * @return the total elapsed duration in nanoseconds
      */
     public long getTotalDuration() {
         return totalDuration.getCount();
