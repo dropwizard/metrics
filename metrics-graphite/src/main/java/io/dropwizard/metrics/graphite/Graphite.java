@@ -112,7 +112,12 @@ public class Graphite implements GraphiteSender {
             address = new InetSocketAddress(hostname, port);
         }
         if (address.getAddress() == null) {
-            throw new UnknownHostException(address.getHostName());
+            // retry lookup, just in case the DNS changed
+            address = new InetSocketAddress(address.getHostName(),address.getPort());
+
+            if (address.getAddress() == null) {
+                throw new UnknownHostException(address.getHostName());
+            }
         }
 
         this.socket = socketFactory.createSocket(address.getAddress(), address.getPort());
