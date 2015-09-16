@@ -17,6 +17,7 @@
 
     <modules>
         <module>metrics-annotation</module>
+        <module>metrics-atsd</module>
         <module>metrics-benchmarks</module>
         <module>metrics-core</module>
         <module>metrics-healthchecks</module>
