@@ -262,12 +262,13 @@ public class AtsdReporter extends ScheduledReporter {
 
         private static String getHostname() {
             InputStream inputStream = null;
+            InputStreamReader input = null;
             try {
                 Process process = Runtime.getRuntime().exec("hostname");
                 process.waitFor();
                 StringBuilder hostname = new StringBuilder();
                 inputStream = process.getInputStream();
-                InputStreamReader input = new InputStreamReader(inputStream, Charset.defaultCharset());
+                input = new InputStreamReader(inputStream, Charset.defaultCharset());
                 char[] buffer = new char[DEFAULT_BUFFER_SIZE];
                 int n;
                 while (EOF != (n = input.read(buffer))) {
@@ -281,6 +282,13 @@ public class AtsdReporter extends ScheduledReporter {
                 if (inputStream != null) {
                     try {
                         inputStream.close();
+                    } catch (Exception ex) {
+                        LOGGER.warn("Unable to close stream", ex);
+                    }
+                }
+                if (input != null) {
+                    try {
+                        input.close();
                     } catch (Exception ex) {
                         LOGGER.warn("Unable to close stream", ex);
                     }

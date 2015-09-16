@@ -1,5 +1,6 @@
 package io.dropwizard.metrics.atsd;
 
+
 import io.dropwizard.metrics.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +52,6 @@ public class AtsdReporterTest {
 
     @Test
     public void reportsByteGaugeValues() throws Exception {
-        MetricName metric = new MetricName("prefix.gauge");
         reporter.report(map("gauge", gauge((byte) 1)),
                 this.<Counter>map(),
                 this.<Histogram>map(),
@@ -69,7 +69,6 @@ public class AtsdReporterTest {
 
     @Test
     public void reportsShortGaugeValues() throws Exception {
-        MetricName metric = new MetricName("prefix.gauge");
         reporter.report(map("gauge", gauge((short) 1)),
                 this.<Counter>map(),
                 this.<Histogram>map(),
@@ -87,7 +86,6 @@ public class AtsdReporterTest {
 
     @Test
     public void reportsIntegerGaugeValues() throws Exception {
-        MetricName metric = new MetricName("prefix.gauge");
         reporter.report(map("gauge", gauge(1)),
                 this.<Counter>map(),
                 this.<Histogram>map(),
