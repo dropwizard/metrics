@@ -145,7 +145,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                 executor.shutdownNow(); // Cancel currently executing tasks
                 // Wait a while for tasks to respond to being cancelled
                 if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-                    System.err.println(getClass().getSimpleName() + ": ScheduledExecutorService did not terminate");
+                    LOG.warn(getClass().getSimpleName() + ": ScheduledExecutorService did not terminate");
                 }
             }
         } catch (InterruptedException ie) {
