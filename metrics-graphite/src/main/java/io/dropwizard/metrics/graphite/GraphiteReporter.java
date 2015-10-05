@@ -198,7 +198,12 @@ public class GraphiteReporter extends ScheduledReporter {
         try {
             graphite.close();
         } catch (IOException e) {
-            LOGGER.warn("Error closing Graphite", graphite, e);
+            LOGGER.warn("Unable to report to Graphite", graphite, e);
+            try {
+                graphite.close();
+            } catch (IOException e1) {
+                LOGGER.warn("Error closing Graphite", graphite, e1);
+            }
         }
     }
 
