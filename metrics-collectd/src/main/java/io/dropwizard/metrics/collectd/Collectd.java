@@ -10,6 +10,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class Collectd {
 	 * Creates a new client which sends data to given address using UDP
 	 *
 	 * @param hostname
-	 *            The hostname of the Collectd server
+	 *            The hostname of the l server
 	 * @param port
 	 *            The port of the Collectd server
 	 */
@@ -224,7 +225,7 @@ public class Collectd {
 		}
 		int len = Network.HEADER_LEN + val.length() + 1;
 		writeHeader(buffer, type, len);
-		buffer.write(val.getBytes());
+		buffer.write(val.getBytes(StandardCharsets.US_ASCII));
 		buffer.write((byte) '\0');
 	}
 
