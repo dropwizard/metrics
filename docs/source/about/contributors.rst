@@ -8,6 +8,7 @@ Many, many thanks to:
 
 * `Alan Woodward <https://github.com/romseygeek>`_
 * `Alex Lambert <https://github.com/bifflabs>`_
+* `Andrey Rodionov <https://github.com/dernasherbrezon>`_
 * `Basil James Whitehouse III <https://github.com/basil3whitehouse>`_
 * `Benjamin Gehrels <https://github.com/BGehrels>`_
 * `Bernardo Gomez Palacio <https://github.com/berngp>`_

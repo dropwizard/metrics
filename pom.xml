@@ -22,6 +22,7 @@
         <module>metrics-healthchecks</module>
         <module>metrics-ehcache</module>
         <module>metrics-graphite</module>
+        <module>metrics-collectd</module>
         <module>metrics-httpclient</module>
         <module>metrics-httpasyncclient</module>
         <module>metrics-influxdb</module>
