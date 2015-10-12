@@ -10,6 +10,12 @@ There are many different ways to help contribute to the Metrics project.
 * Fixing open issues listed in the [issue tracker](https://github.com/dropwizard/metrics/issues?state=open)
 * Adding new features to the Metrics codebase
 
+Important
+===
+While third party integrations are essential to this project, currently we cannot accept pull requests for new third party
+integrations, as it has become burdensome to maintain modules which weren't written by the core developers. Please create
+your own repository, publish to maven, and open a pull request to add a link to `third-party.rst`.
+
 Guidelines
 ===
 When submitting a pull request, please make sure to fork the repository and create a
