@@ -42,11 +42,12 @@ public class InfluxDbHttpSender implements InfluxDbSender {
      * @param hostname   the influxDb hostname
      * @param port       the influxDb http port
      * @param database   the influxDb database to write to
-     * @param authString the authorization string to be used to connect to InfluxDb, of format username:password
+     * @param username   the username used to connect to influxDb
+     * @param password   the password used to connect to influxDb
      * @throws Exception exception while creating the influxDb sender(MalformedURLException)
      */
-    public InfluxDbHttpSender(final String hostname, final int port, final String database, final String authString) throws Exception {
-        this(hostname, port, database, authString, TimeUnit.MILLISECONDS);
+    public InfluxDbHttpSender(final String hostname, final int port, final String database, final String username, final String password) throws Exception {
+        this(hostname, port, database, username, password, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -55,24 +56,17 @@ public class InfluxDbHttpSender implements InfluxDbSender {
      * @param hostname      the influxDb hostname
      * @param port          the influxDb http port
      * @param database      the influxDb database to write to
-     * @param authString    the authorization string to be used to connect to InfluxDb, of format username:password
+     * @param username      the influxDb username
+     * @param password      the influxDb password
      * @param timePrecision the time precision of the metrics
      * @throws Exception exception while creating the influxDb sender(MalformedURLException)
      */
-    public InfluxDbHttpSender(final String hostname, final int port, final String database, final String authString,
+    public InfluxDbHttpSender(final String hostname, final int port, final String database, final String username, final String password,
                               final TimeUnit timePrecision) throws Exception {
         this.url = new URL("http", hostname, port, "/write");
         this.closeableHttpClient = HttpClients.createDefault();
-        //this is a bit ugly - would be nicer to configure "structured", e.g. username/pw as input
-        if (authString != null && !authString.isEmpty()) {
-            String[] parts = authString.split( ":" );
-            this.username = parts[0];
-            this.password = parts[1];
-        } else {
-            this.username = null;
-            this.password = null;
-        }
-
+        this.username = username;
+        this.password = password;
         this.influxDbWriteObject = new InfluxDbWriteObject(database, timePrecision);
         this.influxDbWriteObjectSerializer = new InfluxDbWriteObjectSerializer();
     }
