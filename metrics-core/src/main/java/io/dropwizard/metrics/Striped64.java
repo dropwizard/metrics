@@ -10,6 +10,7 @@ package io.dropwizard.metrics;
 
 import io.dropwizard.metrics.Striped64;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
 // CHECKSTYLE:OFF
@@ -132,7 +133,7 @@ abstract class Striped64 extends Number {
     }
 
     static final AtomicLongFieldUpdater<Striped64> baseUpdater = AtomicLongFieldUpdater.newUpdater(Striped64.class, "base");
-    static final AtomicLongFieldUpdater<Striped64> busyUpdater = AtomicLongFieldUpdater.newUpdater(Striped64.class, "busy");
+    static final AtomicIntegerFieldUpdater<Striped64> busyUpdater = AtomicIntegerFieldUpdater.newUpdater(Striped64.class, "busy");
 
     /**
      * Static per-thread hash codes. Shared across all instances to reduce ThreadLocal pollution and
