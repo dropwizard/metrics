@@ -57,7 +57,7 @@ public final class SendToLocalInfluxDB {
     }
 
     private static InfluxDbReporter startInfluxDbReporter(MetricRegistry registry) throws Exception {
-        final InfluxDbHttpSender influxDb = new InfluxDbHttpSender("127.0.0.1", 8086, "dropwizard", "root:root");
+        final InfluxDbHttpSender influxDb = new InfluxDbHttpSender("127.0.0.1", 8086, "dropwizard", "root", "root");
         final Map<String, String> tags = new HashMap<>();
         tags.put("host", "localhost");
         final InfluxDbReporter reporter = InfluxDbReporter
