@@ -1,29 +1,38 @@
 package io.dropwizard.metrics.influxdb;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.codec.binary.Base64;
-
 import io.dropwizard.metrics.influxdb.data.InfluxDbPoint;
 import io.dropwizard.metrics.influxdb.data.InfluxDbWriteObject;
 import io.dropwizard.metrics.influxdb.utils.InfluxDbWriteObjectSerializer;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * An implementation of InfluxDbSender that writes to InfluxDb via http.
  */
 public class InfluxDbHttpSender implements InfluxDbSender {
-    private static final Charset UTF_8 = StandardCharsets.UTF_8;
+    private final CloseableHttpClient closeableHttpClient;
     private final URL url;
-    // The base64 encoded authString.
-    private final String authStringEncoded;
+    private final String username;
+    private final String password;
     private final InfluxDbWriteObject influxDbWriteObject;
     private final InfluxDbWriteObjectSerializer influxDbWriteObjectSerializer;
 
@@ -33,11 +42,12 @@ public class InfluxDbHttpSender implements InfluxDbSender {
      * @param hostname   the influxDb hostname
      * @param port       the influxDb http port
      * @param database   the influxDb database to write to
-     * @param authString the authorization string to be used to connect to InfluxDb, of format username:password
+     * @param username   the username used to connect to influxDb
+     * @param password   the password used to connect to influxDb
      * @throws Exception exception while creating the influxDb sender(MalformedURLException)
      */
-    public InfluxDbHttpSender(final String hostname, final int port, final String database, final String authString) throws Exception {
-        this(hostname, port, database, authString, TimeUnit.MILLISECONDS);
+    public InfluxDbHttpSender(final String hostname, final int port, final String database, final String username, final String password) throws Exception {
+        this(hostname, port, database, username, password, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -46,20 +56,17 @@ public class InfluxDbHttpSender implements InfluxDbSender {
      * @param hostname      the influxDb hostname
      * @param port          the influxDb http port
      * @param database      the influxDb database to write to
-     * @param authString    the authorization string to be used to connect to InfluxDb, of format username:password
+     * @param username      the influxDb username
+     * @param password      the influxDb password
      * @param timePrecision the time precision of the metrics
      * @throws Exception exception while creating the influxDb sender(MalformedURLException)
      */
-    public InfluxDbHttpSender(final String hostname, final int port, final String database, final String authString,
+    public InfluxDbHttpSender(final String hostname, final int port, final String database, final String username, final String password,
                               final TimeUnit timePrecision) throws Exception {
         this.url = new URL("http", hostname, port, "/write");
-
-        if (authString != null && !authString.isEmpty()) {
-            this.authStringEncoded = Base64.encodeBase64String(authString.getBytes(UTF_8));
-        } else {
-            this.authStringEncoded = "";
-        }
-
+        this.closeableHttpClient = HttpClients.createDefault();
+        this.username = username;
+        this.password = password;
         this.influxDbWriteObject = new InfluxDbWriteObject(database, timePrecision);
         this.influxDbWriteObjectSerializer = new InfluxDbWriteObjectSerializer();
     }
@@ -81,30 +88,59 @@ public class InfluxDbHttpSender implements InfluxDbSender {
         }
     }
 
+    private RequestConfig getRequestConfig() {
+        return RequestConfig
+            .custom()
+            .setConnectTimeout(1000)
+            .setConnectionRequestTimeout(1000)
+            .build();
+    }
+
+    private HttpClientContext getHttpClientContext() {
+        HttpClientContext httpClientContext = null;
+        if (username != null && !username.isEmpty() && password != null && !password.isEmpty())
+        {
+            httpClientContext = HttpClientContext.create();
+            AuthScope authScope = new AuthScope(url.getHost(), url.getPort());
+            UsernamePasswordCredentials usernamePasswordCredentials = new UsernamePasswordCredentials(username, password);
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(authScope, usernamePasswordCredentials);
+            httpClientContext.setCredentialsProvider(credentialsProvider);
+        }
+
+        return httpClientContext;
+    }
+
     @Override
     public int writeData() throws Exception {
         final String json = influxDbWriteObjectSerializer.getJsonString(influxDbWriteObject);
-        final HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
-        if (authStringEncoded != null && !authStringEncoded.isEmpty()) {
-            con.setRequestProperty("Authorization", "Basic " + authStringEncoded);
-        }
-        con.setDoOutput(true);
-        con.setConnectTimeout(1000);
-        con.setReadTimeout(1000);
 
-        try (final OutputStream out = con.getOutputStream()) {
-            out.write(json.getBytes(UTF_8));
-            out.flush();
-        }
+        HttpPost httpPost = new HttpPost(this.url.toURI());
+        httpPost.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
 
-        int responseCode = con.getResponseCode();
+        httpPost.setConfig(getRequestConfig());
 
-        // Check if non 2XX response code.
-        if (responseCode / 100 != 2) {
-            throw new IOException("Server returned HTTP response code: " + responseCode + "for URL: " + url + " with content :'"
-                    + con.getResponseMessage() + "'");
-        }
+        Integer responseCode = closeableHttpClient.execute(httpPost, new ResponseHandler<Integer>()
+        {
+            @Override
+            public Integer handleResponse(HttpResponse httpResponse)
+                throws ClientProtocolException, IOException
+            {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
+                if (statusCode >= 200 && statusCode < 300) {
+                    return statusCode;
+                }
+                else {
+                    throw new ClientProtocolException("Server returned HTTP response code: " + statusCode
+                                                          + "for URL: " + url
+                                                          + " with content :'"
+                                                          + httpResponse.getStatusLine().getReasonPhrase() + "'" );
+                }
+
+            }
+        }, getHttpClientContext());
+
         return responseCode;
     }
 
