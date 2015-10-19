@@ -1,13 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Counting;
-import io.dropwizard.metrics.Histogram;
-import io.dropwizard.metrics.LongAdder;
-import io.dropwizard.metrics.Metric;
-import io.dropwizard.metrics.Reservoir;
-import io.dropwizard.metrics.Sampling;
-import io.dropwizard.metrics.Snapshot;
-
 /**
  * A metric which calculates the distribution of a value.
  *
@@ -25,7 +17,7 @@ public class Histogram implements Metric, Sampling, Counting {
      */
     public Histogram(Reservoir reservoir) {
         this.reservoir = reservoir;
-        this.count = new LongAdderImpl();
+        this.count = LongAdderFactory.create();
     }
 
     /**

@@ -1,8 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.EWMA;
-import io.dropwizard.metrics.LongAdder;
-
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.exp;
@@ -29,7 +26,7 @@ public class EWMA {
     private volatile boolean initialized = false;
     private volatile double rate = 0.0;
 
-    private final LongAdder uncounted = new LongAdderImpl();
+    private final LongAdder uncounted = LongAdderFactory.create();
     private final double alpha, interval;
 
     /**
