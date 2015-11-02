@@ -1,5 +1,8 @@
 package io.dropwizard.metrics;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.text.ParseException;
@@ -14,7 +17,13 @@ import java.util.Date;
  */
 public class FilePerDayCsvFileProvider implements CsvFileProvider {
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
+    private static final Logger LOGGER = LoggerFactory.getLogger(FilePerDayCsvFileProvider.class);
+    private static final ThreadLocal<SimpleDateFormat> DATE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyyMMdd");
+        }
+    };
 
     private Clock clock;
     private int numberOfDaysToKeep;
@@ -40,18 +49,25 @@ public class FilePerDayCsvFileProvider implements CsvFileProvider {
         for (String fileName : fileNames) {
             try {
                 String day = fileName.substring(fileName.lastIndexOf('_') + 1, fileName.length() - 4);
-                if (DATE_FORMAT.parse(day).before(oldestToKeep.getTime())) {
-                    new File(directory, fileName).delete();
+                if (DATE_FORMAT.get().parse(day).before(oldestToKeep.getTime())) {
+                    deleteFile(directory, fileName);
                 }
             } catch (ParseException e) {
-                e.printStackTrace();
+                LOGGER.debug("Unable to parse file name {} - ignoring file", fileName);
             }
         }
+    }
 
+    private void deleteFile(File directory, String fileName) {
+        File file = new File(directory, fileName);
+        boolean success = file.delete();
+        if (!success) {
+            LOGGER.warn("Unable to delete file {}", file.getAbsolutePath());
+        }
     }
 
     private String formatDate() {
-        return DATE_FORMAT.format(new Date(clock.getTime()));
+        return DATE_FORMAT.get().format(new Date(clock.getTime()));
     }
 
     private String sanitize(MetricName metricName) {
