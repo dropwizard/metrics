@@ -10,7 +10,6 @@ import io.dropwizard.metrics.Sampling;
 import io.dropwizard.metrics.Snapshot;
 import io.dropwizard.metrics.Timer;
 
-import java.io.Closeable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 

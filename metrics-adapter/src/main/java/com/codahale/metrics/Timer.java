@@ -11,7 +11,7 @@ import io.dropwizard.metrics.Sampling;
 public class Timer implements Metered, Metric, Sampling {
 	final io.dropwizard.metrics.Timer timer;
 
-	public static class Context implements AutoCloseable {
+	public static class Context implements Closeable {
 		final io.dropwizard.metrics.Timer.Context context;
 
 		public Context(io.dropwizard.metrics.Timer.Context context) {
