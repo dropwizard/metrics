@@ -7,15 +7,14 @@ import static org.junit.Assume.assumeThat;
 
 import org.junit.Test;
 
-public class LongAdderFactoryTest {
+public class Java8LongAdderFactoryTest {
 
     @Test
     public void test() {
-        assumeThat(Runtime.class.getPackage().getImplementationVersion(), startsWith("1.7"));
+        assumeThat(Runtime.class.getPackage().getImplementationVersion(), startsWith("1.8"));
 
         LongAdder longAdder = LongAdderFactory.create();
-        assertThat(longAdder, instanceOf(UnsafeLongAdderImpl.class));
-        assertThat(longAdder, instanceOf(UnsafeStriped64.class));
+        assertThat(longAdder, instanceOf(Java8LongAdderImpl.class));
     }
 
 }

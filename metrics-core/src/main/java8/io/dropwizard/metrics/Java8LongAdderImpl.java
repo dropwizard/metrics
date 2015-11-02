@@ -69,14 +69,9 @@ class Java8LongAdderImpl implements io.dropwizard.metrics.LongAdder {
 	}
 
 	@Override
-	public int hashCode() {
-		return delegate.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return delegate.equals(obj);
-	}
+    public int hashCode() {
+        return delegate.hashCode();
+    }
 
 	@Override
 	public String toString() {
