@@ -1,11 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Clock;
-import io.dropwizard.metrics.EWMA;
-import io.dropwizard.metrics.LongAdder;
-import io.dropwizard.metrics.Meter;
-import io.dropwizard.metrics.Metered;
-
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -22,7 +16,7 @@ public class Meter implements Metered {
     private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
     private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
 
-    private final LongAdder count = new LongAdder();
+    private final LongAdder count = LongAdderFactory.create();
     private final long startTime;
     private final AtomicLong lastTick;
     private final Clock clock;

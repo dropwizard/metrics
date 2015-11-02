@@ -1,9 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Counting;
-import io.dropwizard.metrics.LongAdder;
-import io.dropwizard.metrics.Metric;
-
 /**
  * An incrementing and decrementing counter metric.
  */
@@ -11,7 +7,7 @@ public class Counter implements Metric, Counting {
     private final LongAdder count;
 
     public Counter() {
-        this.count = new LongAdder();
+        this.count = LongAdderFactory.create();
     }
 
     /**
