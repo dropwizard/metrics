@@ -140,7 +140,7 @@ public class CsvReporter extends ScheduledReporter {
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CsvReporter.class);
-    private static final Charset UTF_8 = Charset.forName( "UTF-8" );
+    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private final File directory;
     private final Locale locale;
@@ -168,7 +168,7 @@ public class CsvReporter extends ScheduledReporter {
                        SortedMap<MetricName, Histogram> histograms,
                        SortedMap<MetricName, Meter> meters,
                        SortedMap<MetricName, Timer> timers) {
-        final long timestamp = TimeUnit.MILLISECONDS.toSeconds( clock.getTime() );
+        final long timestamp = TimeUnit.MILLISECONDS.toSeconds(clock.getTime());
 
         for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
             reportGauge(timestamp, entry.getKey(), entry.getValue());
@@ -223,10 +223,10 @@ public class CsvReporter extends ScheduledReporter {
                "count,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit",
                "%d,%f,%f,%f,%f,events/%s",
                meter.getCount(),
-               convertRate( meter.getMeanRate() ),
-               convertRate( meter.getOneMinuteRate() ),
-               convertRate( meter.getFiveMinuteRate() ),
-               convertRate( meter.getFifteenMinuteRate() ),
+               convertRate(meter.getMeanRate()),
+               convertRate(meter.getOneMinuteRate()),
+               convertRate(meter.getFiveMinuteRate()),
+               convertRate(meter.getFifteenMinuteRate()),
                getRateUnit());
     }
 
