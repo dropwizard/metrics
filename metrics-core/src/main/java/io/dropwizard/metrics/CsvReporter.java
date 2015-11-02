@@ -114,8 +114,7 @@ public class CsvReporter extends ScheduledReporter {
             return this;
         }
 
-        public Builder withCsvFileProvider( CsvFileProvider csvFileProvider )
-        {
+        public Builder withCsvFileProvider(CsvFileProvider csvFileProvider) {
             this.csvFileProvider = csvFileProvider;
             return this;
         }
