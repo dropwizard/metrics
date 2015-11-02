@@ -24,7 +24,7 @@ public class Timer implements Metered, Sampling {
      *
      * @see Timer#time()
      */
-    public static class Context implements Closeable {
+    public static class Context implements AutoCloseable {
         private final Timer timer;
         private final Clock clock;
         private final long startTime;
