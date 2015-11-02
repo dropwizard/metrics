@@ -5,18 +5,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import io.dropwizard.metrics.Clock;
-import io.dropwizard.metrics.Counter;
-import io.dropwizard.metrics.CsvReporter;
-import io.dropwizard.metrics.Gauge;
-import io.dropwizard.metrics.Histogram;
-import io.dropwizard.metrics.Meter;
-import io.dropwizard.metrics.MetricFilter;
-import io.dropwizard.metrics.MetricName;
-import io.dropwizard.metrics.MetricRegistry;
-import io.dropwizard.metrics.Snapshot;
-import io.dropwizard.metrics.Timer;
-
 import java.io.*;
 import java.nio.CharBuffer;
 import java.util.Locale;
@@ -25,8 +13,7 @@ import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class CsvReporterTest {
     @Rule public final TemporaryFolder folder = new TemporaryFolder();
@@ -176,6 +163,27 @@ public class CsvReporterTest {
                         "t,count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
                         "19910191,1,100.000000,200.000000,300.000000,400.000000,500.000000,600.000000,700.000000,800.000000,900.000000,1000.000000,2.000000,3.000000,4.000000,5.000000,calls/second,milliseconds"
                 ));
+    }
+
+    @Test
+    public void testCsvFileProviderIsUsed() {
+        CsvFileProvider fileProvider = mock(CsvFileProvider.class);
+        when(fileProvider.getFile(dataDirectory, MetricName.build("gauge"))).thenReturn(new File(dataDirectory, "guage.csv"));
+
+        CsvReporter reporter = CsvReporter.forRegistry(registry)
+                .withCsvFileProvider(fileProvider)
+                .build(dataDirectory);
+
+        final Gauge gauge = mock(Gauge.class);
+        when(gauge.getValue()).thenReturn(1);
+
+        reporter.report(map("gauge", gauge),
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                this.<Meter>map(),
+                this.<Timer>map());
+
+        verify(fileProvider).getFile(dataDirectory, MetricName.build("gauge"));
     }
 
     private String csv(String... lines) {
