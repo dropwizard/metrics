@@ -28,6 +28,10 @@ public class FilePerDayCsvFileProvider implements CsvFileProvider {
     private Clock clock;
     private int numberOfDaysToKeep;
 
+    public FilePerDayCsvFileProvider(int numberOfDaysToKeep) {
+        this(Clock.defaultClock(), numberOfDaysToKeep);
+    }
+
     public FilePerDayCsvFileProvider(Clock clock, int numberOfDaysToKeep) {
         this.clock = clock;
         this.numberOfDaysToKeep = numberOfDaysToKeep;
