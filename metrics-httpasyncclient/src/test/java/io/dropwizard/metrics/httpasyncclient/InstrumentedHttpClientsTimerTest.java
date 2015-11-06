@@ -4,6 +4,7 @@ import io.dropwizard.metrics.MetricName;
 import io.dropwizard.metrics.MetricRegistry;
 import io.dropwizard.metrics.Timer;
 import io.dropwizard.metrics.httpclient.HttpClientMetricNameStrategy;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.concurrent.FutureCallback;
@@ -20,24 +21,27 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class InstrumentedHttpClientsTimerTest {
+public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
 
-    private HttpAsyncClient hac;
-
-    @Mock
-    private MetricRegistry metricRegistry;
+    private HttpAsyncClient asyncHttpClient;
 
     @Mock
     private Timer.Context context;
 
+    @Mock
+    private MetricRegistry metricRegistry;
+
+
     @Before
     public void setUp() throws Exception {
-        CloseableHttpAsyncClient chac = new InstrumentedNHttpClientBuilder(metricRegistry, mock(HttpClientMetricNameStrategy.class)).build();
+        CloseableHttpAsyncClient chac = new InstrumentedNHttpClientBuilder(metricRegistry,
+                mock(HttpClientMetricNameStrategy.class)).build();
         chac.start();
-        hac = chac;
+        asyncHttpClient = chac;
 
         Timer timer = mock(Timer.class);
         when(timer.time()).thenReturn(context);
@@ -46,12 +50,13 @@ public class InstrumentedHttpClientsTimerTest {
 
     @Test
     public void timerIsStoppedCorrectly() throws Exception {
-        HttpGet get = new HttpGet("http://example.com?q=anything");
+        HttpHost host = startServerWithGlobalRequestHandler(STATUS_OK);
+        HttpGet get = new HttpGet("/?q=anything");
 
         // Timer hasn't been stopped prior to executing the request
         verify(context, never()).stop();
 
-        Future<HttpResponse> responseFuture = hac.execute(get, null);
+        Future<HttpResponse> responseFuture = asyncHttpClient.execute(host, get, null);
 
         // Timer should still be running
         verify(context, never()).stop();
@@ -66,15 +71,16 @@ public class InstrumentedHttpClientsTimerTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void timerIsStoppedCorrectlyWithProvidedFutureCallback() throws Exception {
-        HttpGet get = new HttpGet("http://example.com?q=something");
+    public void timerIsStoppedCorrectlyWithProvidedFutureCallbackCompleted() throws Exception {
+        HttpHost host = startServerWithGlobalRequestHandler(STATUS_OK);
+        HttpGet get = new HttpGet("/?q=something");
 
         FutureCallback<HttpResponse> futureCallback = mock(FutureCallback.class);
 
         // Timer hasn't been stopped prior to executing the request
         verify(context, never()).stop();
 
-        Future<HttpResponse> responseFuture = hac.execute(get, futureCallback);
+        Future<HttpResponse> responseFuture = asyncHttpClient.execute(host, get, futureCallback);
 
         // Timer should still be running
         verify(context, never()).stop();
@@ -89,4 +95,35 @@ public class InstrumentedHttpClientsTimerTest {
         verify(futureCallback, timeout(100).times(1)).completed(Matchers.<HttpResponse>anyObject());
         verify(context, timeout(100).times(1)).stop();
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void timerIsStoppedCorrectlyWithProvidedFutureCallbackFailed() throws Exception {
+        // There should be nothing listening on this port
+        HttpHost host = HttpHost.create(String.format("http://127.0.0.1:%d", findAvailableLocalPort()));
+        HttpGet get = new HttpGet("/?q=something");
+
+        FutureCallback<HttpResponse> futureCallback = mock(FutureCallback.class);
+
+        // Timer hasn't been stopped prior to executing the request
+        verify(context, never()).stop();
+
+        Future<HttpResponse> responseFuture = asyncHttpClient.execute(host, get, futureCallback);
+
+        // Timer should still be running
+        verify(context, never()).stop();
+
+        try {
+            responseFuture.get(20, TimeUnit.SECONDS);
+            fail("This should fail as the client should not be able to connect");
+        } catch (Exception e) {
+            // Ignore
+        }
+        // After the computation is complete timer must be stopped
+        // Materialzing the future and calling the future callback is not an atomic operation so
+        // we need to wait for callback to succeed
+        verify(futureCallback, timeout(100).times(1)).failed(Matchers.<Exception>anyObject());
+        verify(context, timeout(100).times(1)).stop();
+    }
+
 }
