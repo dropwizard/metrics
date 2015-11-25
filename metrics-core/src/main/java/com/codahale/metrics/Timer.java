@@ -19,7 +19,12 @@ public class Timer implements Metered, Sampling {
         private final Clock clock;
         private final long startTime;
 
-        private Context(Timer timer, Clock clock) {
+        /**
+         * Protected constructor for extension.
+         * @param timer the {@link Timer} implementation the context should reference
+         * @param clock the {@link Clock} implementation the context should reference
+         */
+        protected Context(Timer timer, Clock clock) {
             this.timer = timer;
             this.clock = clock;
             this.startTime = clock.getTick();

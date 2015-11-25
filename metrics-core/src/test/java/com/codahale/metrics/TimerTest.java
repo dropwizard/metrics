@@ -97,4 +97,12 @@ public class TimerTest {
 
         verifyZeroInteractions(reservoir);
     }
+
+    @Test
+    public void testTimerContextExtension() {
+        final Timer.Context subclass = new Timer.Context(timer, clock) {};
+        assertThat(subclass).isNotNull();
+        assertThat(subclass).isInstanceOf(Timer.Context.class);
+        assertThat(subclass.getClass()).isNotEqualTo(Timer.Context.class);
+    }
 }
