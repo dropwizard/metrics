@@ -252,7 +252,7 @@ public class PickledGraphite implements GraphiteSender {
      * 3. Clear out the list of metrics
      */
     private void writeMetrics() throws IOException {
-        if (metrics.size() > 0) {
+        if (!metrics.isEmpty()) {
             try {
                 byte[] payload = pickleMetrics(metrics);
                 byte[] header = ByteBuffer.allocate(4).putInt(payload.length).array();
