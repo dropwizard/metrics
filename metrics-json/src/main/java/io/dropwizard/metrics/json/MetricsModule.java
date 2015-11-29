@@ -182,7 +182,6 @@ public class MetricsModule extends Module {
     }
 
     private static class MetricRegistrySerializer extends StdSerializer<MetricRegistry> {
-        private static final long serialVersionUID = 7526472295622776158L;
         private final MetricFilter filter;
 
         private MetricRegistrySerializer(MetricFilter filter) {
