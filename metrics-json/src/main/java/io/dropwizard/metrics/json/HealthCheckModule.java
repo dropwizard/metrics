@@ -15,6 +15,7 @@ import java.util.Arrays;
 
 public class HealthCheckModule extends Module {
     private static class HealthCheckResultSerializer extends StdSerializer<HealthCheck.Result> {
+        private static final long serialVersionUID = 7926472295622776147L;
         private HealthCheckResultSerializer() {
             super(HealthCheck.Result.class);
         }
