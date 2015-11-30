@@ -37,3 +37,4 @@ the many third-party libraries which extend Metrics:
 * `metrics-kafka <https://github.com/hengyunabc/metrics-kafka>`_ provides a reporter for Kafka
 * `metrics-zabbiz <https://github.com/hengyunabc/metrics-zabbix>`_ provides a reporter for Zabbix
 * `finagle-metrics <https://github.com/rlazoti/finagle-metrics>`_ provides a reporter for a finagle service.
+* `metrics-atsd <https://github.com/axibase/metrics-atsd>`_ provides a reporter for `ATSD <https://axibase.com/products/axibase-time-series-database/>`_.
