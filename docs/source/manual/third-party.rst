@@ -38,3 +38,4 @@ the many third-party libraries which extend Metrics:
 * `metrics-zabbiz <https://github.com/hengyunabc/metrics-zabbix>`_ provides a reporter for Zabbix
 * `finagle-metrics <https://github.com/rlazoti/finagle-metrics>`_ provides a reporter for a finagle service.
 * `metrics-atsd <https://github.com/axibase/metrics-atsd>`_ provides a reporter for `ATSD <https://axibase.com/products/axibase-time-series-database/>`_.
+* `metrics-mongodb-reporter <https://github.com/aparnachaudhary/mongodb-metrics-reporter>`_ provides a reporter for `MongoDB <https://www.mongodb.org/>`_
