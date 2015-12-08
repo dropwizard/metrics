@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class ManifestServlet extends HttpServlet {
      * Will return cached version if manifest is in cache already,
      * or will read manifest from classpath and cache it
      * 
-     * @return
+     * @return String representing Manifest as plain text
      * @throws IOException
      */
     private String getManifestPlain() throws IOException {
@@ -80,11 +81,11 @@ public class ManifestServlet extends HttpServlet {
      * Reads stream by lines
      * 
      * @param in
-     * @return
+     * @return list of lines
      * @throws IOException
      */
     private List<String> readLines(InputStream in) throws IOException {
-    	BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, Charset.defaultCharset()));
     	List<String> result = new ArrayList<>();
     	String strLine;
     	while ((strLine = br.readLine()) != null) {
