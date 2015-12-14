@@ -2,19 +2,17 @@ package io.dropwizard.metrics.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-
-import io.dropwizard.metrics.json.HealthCheckModule;
-
 import io.dropwizard.metrics.health.HealthCheck;
 import io.dropwizard.metrics.health.HealthCheckRegistry;
+import io.dropwizard.metrics.json.HealthCheckModule;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.ExecutorService;
@@ -89,7 +87,13 @@ public class HealthCheckServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse resp) throws ServletException, IOException {
-        final SortedMap<String, HealthCheck.Result> results = runHealthChecks();
+        final Map<String, HealthCheck.Result> results;
+        String name = getHealthCheckName(req);
+        if (name != null) {
+            results = Collections.singletonMap(name, registry.runHealthCheck(name));
+        } else {
+            results = runHealthChecks();
+        }
         resp.setContentType(CONTENT_TYPE);
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
         if (results.isEmpty()) {
@@ -108,6 +112,18 @@ public class HealthCheckServlet extends HttpServlet {
         } finally {
             output.close();
         }
+    }
+
+    private String getHealthCheckName(HttpServletRequest request) {
+        String param = (String) request.getAttribute(AdminServlet.HEALTHCHECK_PARAM_ATTRIBUTE_KEY);
+        if (param != null) {
+            if (param.startsWith("/")) {
+                param = param.substring(1);
+            }
+            return param.isEmpty() ? null : param;
+        }
+
+        return null;
     }
 
     private ObjectWriter getWriter(HttpServletRequest request) {
