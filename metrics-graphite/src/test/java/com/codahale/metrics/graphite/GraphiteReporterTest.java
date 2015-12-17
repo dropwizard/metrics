@@ -39,10 +39,10 @@ public class GraphiteReporterTest {
                         this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite, never()).send("prefix.gauge", "value", timestamp);
         inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -56,10 +56,10 @@ public class GraphiteReporterTest {
                         this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1", timestamp);
         inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -73,10 +73,10 @@ public class GraphiteReporterTest {
                         this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1", timestamp);
         inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -90,10 +90,10 @@ public class GraphiteReporterTest {
                         this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1", timestamp);
         inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -107,10 +107,10 @@ public class GraphiteReporterTest {
                         this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1", timestamp);
         inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -124,10 +124,10 @@ public class GraphiteReporterTest {
                         this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1.10", timestamp);
         inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -141,10 +141,10 @@ public class GraphiteReporterTest {
                         this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1.10", timestamp);
         inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -161,10 +161,10 @@ public class GraphiteReporterTest {
                         this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.counter.count", "100", timestamp);
         inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -195,7 +195,6 @@ public class GraphiteReporterTest {
                         this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.histogram.count", "1", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.max", "2", timestamp);
@@ -209,6 +208,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.histogram.p99", "10.00", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.p999", "11.00", timestamp);
         inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -229,7 +229,6 @@ public class GraphiteReporterTest {
                         this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.meter.count", "1", timestamp);
         inOrder.verify(graphite).send("prefix.meter.m1_rate", "2.00", timestamp);
@@ -237,6 +236,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.meter.m15_rate", "4.00", timestamp);
         inOrder.verify(graphite).send("prefix.meter.mean_rate", "5.00", timestamp);
         inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -272,7 +272,6 @@ public class GraphiteReporterTest {
                         map("timer", timer));
 
         final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.timer.max", "100.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.mean", "200.00", timestamp);
@@ -290,6 +289,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.timer.m15_rate", "5.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.mean_rate", "2.00", timestamp);
         inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -304,9 +304,9 @@ public class GraphiteReporterTest {
             this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).close();
+
 
         verifyNoMoreInteractions(graphite);
     }
