@@ -1,17 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Counter;
-import io.dropwizard.metrics.ExponentiallyDecayingReservoir;
-import io.dropwizard.metrics.Gauge;
-import io.dropwizard.metrics.Histogram;
-import io.dropwizard.metrics.Meter;
-import io.dropwizard.metrics.Metric;
-import io.dropwizard.metrics.MetricFilter;
-import io.dropwizard.metrics.MetricRegistry;
-import io.dropwizard.metrics.MetricRegistryListener;
-import io.dropwizard.metrics.MetricSet;
-import io.dropwizard.metrics.Timer;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -88,7 +76,8 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * Given a {@link Metric}, registers it under the given name.
+     * Given a {@link Metric}, registers it under the given name. If the provided metric is a {@link MetricSet} then all
+     * the metrics hold by MetricSet are registered using {@link #registerAll(MetricName, MetricSet)}.
      *
      * @param name   the name of the metric
      * @param metric the metric
