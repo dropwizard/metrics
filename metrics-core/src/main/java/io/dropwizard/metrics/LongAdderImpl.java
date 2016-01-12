@@ -8,8 +8,6 @@
 
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Striped64;
-
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
 

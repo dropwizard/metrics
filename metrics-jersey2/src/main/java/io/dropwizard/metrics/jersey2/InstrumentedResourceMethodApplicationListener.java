@@ -21,12 +21,9 @@ import io.dropwizard.metrics.Timer;
 
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.core.Configuration;
-import javax.ws.rs.ext.Provider;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import java.lang.reflect.Method;
 
 /**
  * An application event listener that listens for Jersey application initialization to

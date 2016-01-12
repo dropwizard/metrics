@@ -1,7 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Snapshot;
-
 import java.io.OutputStream;
 
 /**

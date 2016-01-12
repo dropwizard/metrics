@@ -1,9 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Reservoir;
-import io.dropwizard.metrics.Snapshot;
-import io.dropwizard.metrics.UniformReservoir;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;

@@ -1,7 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Snapshot;
-
 /**
  * An object which samples values.
  */

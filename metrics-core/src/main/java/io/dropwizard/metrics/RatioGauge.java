@@ -1,6 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Gauge;
 import static java.lang.Double.isInfinite;
 import static java.lang.Double.isNaN;
 

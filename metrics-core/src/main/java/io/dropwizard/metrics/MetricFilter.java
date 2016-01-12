@@ -1,8 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Metric;
-import io.dropwizard.metrics.MetricFilter;
-
 /**
  * A filter used to determine whether or not a metric should be reported, among other things.
  */

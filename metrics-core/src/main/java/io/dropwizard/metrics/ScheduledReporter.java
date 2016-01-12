@@ -1,17 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.ConsoleReporter;
-import io.dropwizard.metrics.Counter;
-import io.dropwizard.metrics.CsvReporter;
-import io.dropwizard.metrics.Gauge;
-import io.dropwizard.metrics.Histogram;
-import io.dropwizard.metrics.Meter;
-import io.dropwizard.metrics.MetricFilter;
-import io.dropwizard.metrics.MetricRegistry;
-import io.dropwizard.metrics.ScheduledReporter;
-import io.dropwizard.metrics.Slf4jReporter;
-import io.dropwizard.metrics.Timer;
-
 import java.io.Closeable;
 import java.util.Locale;
 import java.util.SortedMap;

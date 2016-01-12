@@ -1,8 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Clock;
-import io.dropwizard.metrics.Gauge;
-
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 

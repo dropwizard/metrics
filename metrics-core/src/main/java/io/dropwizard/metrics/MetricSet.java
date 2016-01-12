@@ -1,9 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Metric;
-import io.dropwizard.metrics.MetricRegistry;
-import io.dropwizard.metrics.MetricSet;
-
 import java.util.Map;
 
 /**

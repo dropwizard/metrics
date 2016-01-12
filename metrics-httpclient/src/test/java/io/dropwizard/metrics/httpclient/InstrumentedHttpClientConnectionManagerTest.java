@@ -3,10 +3,7 @@ package io.dropwizard.metrics.httpclient;
 import org.junit.Assert;
 import org.junit.Test;
 
-import io.dropwizard.metrics.httpclient.InstrumentedHttpClientConnectionManager;
-
 import io.dropwizard.metrics.MetricRegistry;
-import io.dropwizard.metrics.Timer;
 
 
 public class InstrumentedHttpClientConnectionManagerTest {
