@@ -1,7 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Clock;
-import io.dropwizard.metrics.Timer;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 

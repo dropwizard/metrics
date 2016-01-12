@@ -14,9 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 
-import io.dropwizard.metrics.graphite.Graphite;
-import io.dropwizard.metrics.graphite.GraphiteReporter;
-
 import io.dropwizard.metrics.*;
 
 import java.net.UnknownHostException;

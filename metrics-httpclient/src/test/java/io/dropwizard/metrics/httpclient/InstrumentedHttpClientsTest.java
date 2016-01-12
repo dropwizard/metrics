@@ -6,9 +6,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.dropwizard.metrics.httpclient.HttpClientMetricNameStrategy;
-import io.dropwizard.metrics.httpclient.InstrumentedHttpClients;
-
 import io.dropwizard.metrics.MetricName;
 import io.dropwizard.metrics.MetricRegistry;
 import io.dropwizard.metrics.MetricRegistryListener;
