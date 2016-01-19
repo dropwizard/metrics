@@ -32,7 +32,7 @@ public class ThreadDump {
 
         for (int ti = threads.length - 1; ti >= 0; ti--) {
             final ThreadInfo t = threads[ti];
-            writer.printf("%s id=%d state=%s",
+            writer.printf("\"%s\" id=%d state=%s",
                           t.getThreadName(),
                           t.getThreadId(),
                           t.getThreadState());
