@@ -13,6 +13,7 @@ import java.util.concurrent.BlockingQueue;
 
 public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
     private final MetricRegistry metricRegistry;
+    private String prefix = QueuedThreadPool.class.getName();//not a final + origin prefix because of backward compatibility
 
     public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry) {
         this(registry, 200);
@@ -45,28 +46,36 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
         this.metricRegistry = registry;
     }
 
+    /**
+     * Sets the metrics prefix
+     * @param prefix a prefix to be used for metrics exposed by this thread pool
+     */
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
     @Override
     protected void doStart() throws Exception {
         super.doStart();
-        metricRegistry.register(name(QueuedThreadPool.class, getName(), "utilization"), new RatioGauge() {
+        metricRegistry.register(name(prefix, getName(), "utilization"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(getThreads() - getIdleThreads(), getThreads());
             }
         });
-        metricRegistry.register(name(QueuedThreadPool.class, getName(), "utilization-max"), new RatioGauge() {
+        metricRegistry.register(name(prefix, getName(), "utilization-max"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(getThreads() - getIdleThreads(), getMaxThreads());
             }
         });
-        metricRegistry.register(name(QueuedThreadPool.class, getName(), "size"), new Gauge<Integer>() {
+        metricRegistry.register(name(prefix, getName(), "size"), new Gauge<Integer>() {
             @Override
             public Integer getValue() {
                 return getThreads();
             }
         });
-        metricRegistry.register(name(QueuedThreadPool.class, getName(), "jobs"), new Gauge<Integer>() {
+        metricRegistry.register(name(prefix, getName(), "jobs"), new Gauge<Integer>() {
             @Override
             public Integer getValue() {
                 // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
