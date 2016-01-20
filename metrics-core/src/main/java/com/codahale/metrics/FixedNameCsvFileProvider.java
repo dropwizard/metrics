@@ -14,6 +14,9 @@ public class FixedNameCsvFileProvider implements CsvFileProvider {
     }
 
     protected String sanitize(String metricName) {
-        return metricName;
+        //Forward slash character is definitely illegal in both Windows and Linux
+        //https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
+        final String sanitizedName = metricName.replaceFirst("^/","").replaceAll("/",".");
+        return sanitizedName;
     }
 }
