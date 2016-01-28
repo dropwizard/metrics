@@ -27,6 +27,13 @@ public interface MetricRegistryListener extends EventListener {
         }
 
         @Override
+        public void onStatisticAdded(MetricName name, Statistic statistic) {
+        }
+
+        public void onStatisticRemoved(MetricName name) {
+        }
+
+        @Override
         public void onHistogramAdded(MetricName name, Histogram histogram) {
         }
 
@@ -80,6 +87,10 @@ public interface MetricRegistryListener extends EventListener {
      * @param name the counter's name
      */
     void onCounterRemoved(MetricName name);
+
+    void onStatisticAdded(MetricName name, Statistic statistic);
+
+    void onStatisticRemoved(MetricName name);
 
     /**
      * Called when a {@link Histogram} is added to the registry.

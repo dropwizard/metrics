@@ -52,6 +52,17 @@ class LongAdderImpl extends Striped64 implements LongAdder, Serializable {
     }
 
     /**
+     * Sets the given value
+     *
+     * @param x the value to set
+     */
+    @Override
+    public void set(long x) {
+        long diff = x - sum();
+        add(diff);
+    }
+
+    /**
      * Adds the given value.
      *
      * @param x the value to add

@@ -179,6 +179,7 @@ public class Slf4jReporter extends ScheduledReporter {
     @Override
     public void report(SortedMap<MetricName, Gauge> gauges,
                        SortedMap<MetricName, Counter> counters,
+                       SortedMap<MetricName, Statistic> statistics,
                        SortedMap<MetricName, Histogram> histograms,
                        SortedMap<MetricName, Meter> meters,
                        SortedMap<MetricName, Timer> timers) {
@@ -189,6 +190,10 @@ public class Slf4jReporter extends ScheduledReporter {
 
             for (Entry<MetricName, Counter> entry : counters.entrySet()) {
                 logCounter(entry.getKey(), entry.getValue());
+            }
+
+            for (Entry<MetricName, Statistic> entry : statistics.entrySet()) {
+                logStatistic(entry.getKey(), entry.getValue());
             }
 
             for (Entry<MetricName, Histogram> entry : histograms.entrySet()) {
@@ -245,6 +250,7 @@ public class Slf4jReporter extends ScheduledReporter {
                 getRateUnit());
     }
 
+
     private void logHistogram(MetricName name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
         loggerProxy.log(marker,
@@ -267,6 +273,10 @@ public class Slf4jReporter extends ScheduledReporter {
 
     private void logCounter(MetricName name, Counter counter) {
         loggerProxy.log(marker, "type={}, name={}, count={}", "COUNTER", prefix(name), counter.getCount());
+    }
+
+    private void logStatistic(MetricName name, Statistic statistic) {
+        loggerProxy.log(marker, "type={}, name={}, count={}", "STATISTIC", prefix(name), statistic.getCount());
     }
 
     private void logGauge(MetricName name, Gauge gauge) {

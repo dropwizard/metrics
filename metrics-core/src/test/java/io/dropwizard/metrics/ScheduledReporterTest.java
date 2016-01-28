@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 public class ScheduledReporterTest {
     private final Gauge gauge = mock(Gauge.class);
     private final Counter counter = mock(Counter.class);
+    private final Statistic statistic = mock(Statistic.class);
     private final Histogram histogram = mock(Histogram.class);
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
@@ -37,6 +38,7 @@ public class ScheduledReporterTest {
                 @Override
                 public void report(SortedMap<MetricName, Gauge> gauges,
                                    SortedMap<MetricName, Counter> counters,
+                                   SortedMap<MetricName, Statistic> statistics,
                                    SortedMap<MetricName, Histogram> histograms,
                                    SortedMap<MetricName, Meter> meters,
                                    SortedMap<MetricName, Timer> timers) {
@@ -49,6 +51,7 @@ public class ScheduledReporterTest {
     public void setUp() throws Exception {
         registry.register("gauge", gauge);
         registry.register("counter", counter);
+        registry.register("statistic", statistic);
         registry.register("histogram", histogram);
         registry.register("meter", meter);
         registry.register("timer", timer);
@@ -67,6 +70,7 @@ public class ScheduledReporterTest {
         verify(reporter, times(2)).report(
                 map("gauge", gauge),
                 map("counter", counter),
+                map("statistic", statistic),
                 map("histogram", histogram),
                 map("meter", meter),
                 map("timer", timer)

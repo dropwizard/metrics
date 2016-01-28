@@ -211,6 +211,28 @@ public class JmxReporter implements Reporter, Closeable {
         }
     }
 
+
+    // CHECKSTYLE:OFF
+    @SuppressWarnings("UnusedDeclaration")
+    public interface JmxStatisticMBean extends MetricMBean {
+        long getCount();
+    }
+    // CHECKSTYLE:ON
+
+    private static class JmxStatistic extends AbstractBean implements JmxStatisticMBean {
+        private final Statistic metric;
+
+        private JmxStatistic(Statistic metric, ObjectName objectName) {
+            super(objectName);
+            this.metric = metric;
+        }
+
+        @Override
+        public long getCount() {
+            return metric.getCount();
+        }
+    }
+
     // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface JmxHistogramMBean extends MetricMBean {
@@ -571,6 +593,32 @@ public class JmxReporter implements Reporter, Closeable {
                 LOGGER.debug("Unable to unregister counter", e);
             } catch (MBeanRegistrationException e) {
                 LOGGER.warn("Unable to unregister counter", e);
+            }
+        }
+
+        @Override
+        public void onStatisticAdded(MetricName name, Statistic statistic) {
+            try {
+                if (filter.matches(name, statistic)) {
+                    final ObjectName objectName = createName("statistics", name);
+                    registerMBean(new JmxStatistic(statistic, objectName), objectName);
+                }
+            } catch (InstanceAlreadyExistsException e) {
+                LOGGER.debug("Unable to register statistic", e);
+            } catch (JMException e) {
+                LOGGER.warn("Unable to register statistic", e);
+            }
+        }
+
+        @Override
+        public void onStatisticRemoved(MetricName name) {
+            try {
+                final ObjectName objectName = createName("statistics", name);
+                unregisterMBean(objectName);
+            } catch (InstanceNotFoundException e) {
+                LOGGER.debug("Unable to unregister statistic", e);
+            } catch (MBeanRegistrationException e) {
+                LOGGER.warn("Unable to unregister statistic", e);
             }
         }
 

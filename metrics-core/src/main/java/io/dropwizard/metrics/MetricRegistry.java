@@ -158,6 +158,12 @@ public class MetricRegistry implements MetricSet {
         return getOrAdd(name, MetricBuilder.HISTOGRAMS);
     }
 
+    public Statistic statistic(String name) { return statistic(MetricName.build(name)); }
+
+    public Statistic statistic(MetricName name) {
+        return getOrAdd(name, MetricBuilder.STATISTIC);
+    }
+
     /**
      * @see #meter(MetricName)
      */
@@ -296,6 +302,22 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
+     * Returns a map of all the statistics in the registry and their names.
+     *
+     * @return all the statistics in the registry
+     */
+    public SortedMap<MetricName, Statistic> getStatistic() { return getStatistic(MetricFilter.ALL); }
+
+    /**
+     * Returns a map of all the statistics in the registry and their names which match the given
+     * filter.
+     *
+     * @param filter    the metric filter to match
+     * @return all the statistics in the registry
+     */
+    public SortedMap<MetricName, Statistic> getStatistic(MetricFilter filter) { return getMetrics(Statistic.class, filter); }
+
+    /**
      * Returns a map of all the histograms in the registry and their names.
      *
      * @return all the histograms in the registry
@@ -394,7 +416,9 @@ public class MetricRegistry implements MetricSet {
             listener.onGaugeAdded(name, (Gauge<?>) metric);
         } else if (metric instanceof Counter) {
             listener.onCounterAdded(name, (Counter) metric);
-        } else if (metric instanceof Histogram) {
+        } else if (metric instanceof Statistic) {
+            listener.onStatisticAdded(name, (Statistic) metric);
+        }else if (metric instanceof Histogram) {
             listener.onHistogramAdded(name, (Histogram) metric);
         } else if (metric instanceof Meter) {
             listener.onMeterAdded(name, (Meter) metric);
@@ -416,6 +440,8 @@ public class MetricRegistry implements MetricSet {
             listener.onGaugeRemoved(name);
         } else if (metric instanceof Counter) {
             listener.onCounterRemoved(name);
+        } else if (metric instanceof Statistic) {
+            listener.onStatisticRemoved(name);
         } else if (metric instanceof Histogram) {
             listener.onHistogramRemoved(name);
         } else if (metric instanceof Meter) {
@@ -458,6 +484,18 @@ public class MetricRegistry implements MetricSet {
             @Override
             public boolean isInstance(Metric metric) {
                 return Counter.class.isInstance(metric);
+            }
+        };
+
+        MetricBuilder<Statistic> STATISTIC = new MetricBuilder<Statistic>() {
+            @Override
+            public Statistic newMetric() {
+                return new Statistic();
+            }
+
+            @Override
+            public boolean isInstance(Metric metric) {
+                return Statistic.class.isInstance(metric);
             }
         };
 

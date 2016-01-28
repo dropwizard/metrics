@@ -2,6 +2,8 @@ package io.dropwizard.metrics;
 
 interface LongAdder {
 
+    void set(long x);
+
     void add(long x);
 
     void increment();
