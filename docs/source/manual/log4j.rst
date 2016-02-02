@@ -22,3 +22,19 @@ You can add it to the root logger programmatically.
     Configuration config = context.getConfiguration();
     config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).addAppender(appender, level, filter);
     context.updateLoggers(config);
+
+You can also use standard log4j2 configuration, via plugin support:
+
+.. code-block:: xml
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <Configuration status="INFO" name="log4j2-config" packages="io.dropwizard.metrics.log4j2">
+    <Appenders>
+        <MetricsAppender name="metrics" registryName="shared-metrics-registry"/>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="metrics" />
+        </Root>
+    </Loggers>
+    </Configuration>
