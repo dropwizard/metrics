@@ -37,6 +37,7 @@ Reporters
 * `MetricCatcher <https://github.com/addthis/MetricCatcher>`_ turns JSON over UDP into Metrics so that non-jvm languages can know what's going on too.
 * `metrics-datadog <https://github.com/coursera/metrics-datadog>`_ provides a reporter to send data to `Datadog <http://www.datadoghq.com/>`_.
 * `metrics-elasticsearch-reporter <https://github.com/elasticsearch/elasticsearch-metrics-reporter-java>`_ provides a reporter for `Elasticsearch <http://www.elasticsearch.org/>`_.
+* `metrics-hadoop-metrics2-reporter <https://github.com/joshelser/dropwizard-hadoop-metrics2>`_ provides a reporter for `Hadoop Metrics2 <https://hadoop.apache.org/docs/r2.7.2/api/org/apache/hadoop/metrics2/package-summary.html>`_.
 * `metrics-influxdb <https://github.com/novaquark/metrics-influxdb>`_ provides a reporter which announces measurements to `InfluxDB <https://influxdata.com/>`_.
 * `metrics-instrumental <https://github.com/egineering-llc/metrics-instrumental>`_ provides a reporter to send data to `Instrumental <http://instrumentalapp.com/>`_.
 * `metrics-kafka <https://github.com/hengyunabc/metrics-kafka>`_ provides a reporter for `Kafka <http://kafka.apache.org/>`_.
