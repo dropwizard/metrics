@@ -21,20 +21,26 @@ Metric Registries
 =================
 
 The starting point for Metrics is the ``MetricRegistry`` class, which is a collection of all the
-metrics for your application (or a subset of your application). If your application is running
-alongside other applications in a single JVM instance (e.g., multiple WARs deployed to an
-application server), you should use per-application ``MetricRegistry`` instances with different
-names.
+metrics for your application (or a subset of your application).
+
+Generally you only need one ``MetricRegistry`` instance per application, although you may choose
+to use more if you want to organize your metrics in particular reporting groups.
+
+Global named registries can also be shared through the static ``SharedMetricRegistries`` class. This
+allows the same registry to be used in different sections of code without explicitly passing a ``MetricRegistry``
+instance around.
+
+Like all Metrics classes, ``SharedMetricRegistries`` is fully thread-safe.
 
 .. _man-core-names:
 
 Metric Names
 ============
 
-Each metric has a unique *name*, which is a simple dotted name, like ``com.example.Queue.size``.
-This flexibility allows you to encode a wide variety of context directly into a metric's name. If
-you have two instances of ``com.example.Queue``, you can give them more specific:
-``com.example.Queue.requests.size`` vs. ``com.example.Queue.responses.size``, for example.
+Each metric is associated with a ``MetricRegistry``, and has a unique *name* within that registry. This is a simple
+dotted name, like ``com.example.Queue.size``. This flexibility allows you to encode a wide variety of
+context directly into a metric's name. If you have two instances of ``com.example.Queue``, you can give
+them more specific: ``com.example.Queue.requests.size`` vs. ``com.example.Queue.responses.size``, for example.
 
 ``MetricRegistry`` has a set of static helper methods for easily creating names:
 
