@@ -2,18 +2,14 @@ package com.codahale.metrics.jersey2;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
-import com.codahale.metrics.jersey2.resources.InstrumentedResource;
-import com.codahale.metrics.jersey2.resources.InstrumentedSubResource;
-import org.glassfish.jersey.client.ClientResponse;
+import com.codahale.metrics.jersey2.resources.InstrumentedResourceExceptionMeteredPerClass;
+import com.codahale.metrics.jersey2.resources.InstrumentedSubResourceExceptionMeteredPerClass;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
 
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,9 +20,9 @@ import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 
 /**
  * Tests registering {@link InstrumentedResourceMethodApplicationListener} as a singleton
- * in a Jersey {@link org.glassfish.jersey.server.ResourceConfig}
+ * in a Jersey {@link ResourceConfig}
  */
-public class SingletonMetricsJerseyTest extends JerseyTest {
+public class SingletonMetricsExceptionMeteredPerClassJerseyTest extends JerseyTest {
     static {
         Logger.getLogger("org.glassfish.jersey").setLevel(Level.OFF);
     }
@@ -38,38 +34,16 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
         this.registry = new MetricRegistry();
 
         ResourceConfig config = new ResourceConfig();
+
         config = config.register(new MetricsFeature(this.registry));
-        config = config.register(InstrumentedResource.class);
+        config = config.register(InstrumentedResourceExceptionMeteredPerClass.class);
 
         return config;
     }
 
     @Test
-    public void timedMethodsAreTimed() {
-        assertThat(target("timed")
-                .request()
-                .get(String.class))
-                .isEqualTo("yay");
-
-        final Timer timer = registry.timer(name(InstrumentedResource.class, "timed"));
-
-        assertThat(timer.getCount()).isEqualTo(1);
-    }
-
-    @Test
-    public void meteredMethodsAreMetered() {
-        assertThat(target("metered")
-                .request()
-                .get(String.class))
-                .isEqualTo("woo");
-
-        final Meter meter = registry.meter(name(InstrumentedResource.class, "metered"));
-        assertThat(meter.getCount()).isEqualTo(1);
-    }
-
-    @Test
     public void exceptionMeteredMethodsAreExceptionMetered() {
-        final Meter meter = registry.meter(name(InstrumentedResource.class,
+        final Meter meter = registry.meter(name(InstrumentedResourceExceptionMeteredPerClass.class,
                 "exceptionMetered",
                 "exceptions"));
 
@@ -95,27 +69,30 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void testResourceNotFound() {
-        final Response response = target().path("not-found").request().get();
-        assertThat(response.getStatus()).isEqualTo(404);
-
-        try {
-            target().path("not-found").request().get(ClientResponse.class);
-            failBecauseExceptionWasNotThrown(NotFoundException.class);
-        } catch (NotFoundException e) {
-            assertThat(e.getMessage()).isEqualTo("HTTP 404 Not Found");
-        }
-    }
-
-    @Test
     public void subresourcesFromLocatorsRegisterMetrics() {
-        assertThat(target("subresource/timed")
+        final Meter meter = registry.meter(name(InstrumentedSubResourceExceptionMeteredPerClass.class,
+                "exceptionMetered",
+                "exceptions"));
+
+        assertThat(target("subresource/exception-metered")
                 .request()
                 .get(String.class))
-                .isEqualTo("yay");
+                .isEqualTo("fuh");
 
-        final Timer timer = registry.timer(name(InstrumentedSubResource.class, "timed"));
-        assertThat(timer.getCount()).isEqualTo(1);
+        assertThat(meter.getCount()).isZero();
 
+        try {
+            target("subresource/exception-metered")
+                    .queryParam("splode", true)
+                    .request()
+                    .get(String.class);
+
+            failBecauseExceptionWasNotThrown(ProcessingException.class);
+        } catch (ProcessingException e) {
+            assertThat(e.getCause()).isInstanceOf(IOException.class);
+        }
+
+        assertThat(meter.getCount()).isEqualTo(1);
     }
+
 }
