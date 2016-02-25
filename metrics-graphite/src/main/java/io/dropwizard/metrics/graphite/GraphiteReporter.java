@@ -294,35 +294,24 @@ public class GraphiteReporter extends ScheduledReporter {
     }
 
     private String format(Object o) {
-        if (o instanceof Float) {
-            return format(((Float) o).doubleValue());
-        } else if (o instanceof Double) {
-            return format(((Double) o).doubleValue());
-        } else if (o instanceof Byte) {
-            return format(((Byte) o).longValue());
-        } else if (o instanceof Short) {
-            return format(((Short) o).longValue());
-        } else if (o instanceof Integer) {
-            return format(((Integer) o).longValue());
-        } else if (o instanceof Long) {
-            return format(((Long) o).longValue());
-        } else if (o instanceof Number) {
-            return format(((Number) o).longValue());
+        String value = null;
+        if (o instanceof Number) {
+            Number n = (Number) o;
+            if (o instanceof Float || o instanceof Double) {
+                // the Carbon plaintext format is pretty underspecified, but it seems like it just wants
+                // US-formatted digits
+                value = String.format(Locale.US, "%2.2f", n.doubleValue());
+            } else {
+                value = Long.toString(n.longValue());
+            }
+        } else {
+            LOGGER.warn("Unable to format value for Graphite.", o);
         }
-        return null;
+        return value;
     }
 
     private String prefix(MetricName name, String... components) {
         return MetricName.join(MetricName.join(prefix, name), MetricName.build(components)).getKey();
     }
 
-    private String format(long n) {
-        return Long.toString(n);
-    }
-
-    private String format(double v) {
-        // the Carbon plaintext format is pretty underspecified, but it seems like it just wants
-        // US-formatted digits
-        return String.format(Locale.US, "%2.2f", v);
-    }
 }
