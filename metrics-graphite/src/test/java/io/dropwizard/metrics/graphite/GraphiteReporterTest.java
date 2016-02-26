@@ -43,7 +43,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void doesNotReportStringGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge("value")),
+        reporter.report(this.<Gauge<?>>map("gauge", gauge("value")),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -60,7 +60,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsByteGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge((byte) 1)),
+        reporter.report(this.<Gauge<?>>map("gauge", gauge((byte) 1)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -77,7 +77,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsShortGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge((short) 1)),
+        reporter.report(this.<Gauge<?>>map("gauge", gauge((short) 1)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -94,7 +94,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsIntegerGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(1)),
+        reporter.report(this.<Gauge<?>>map("gauge", gauge(1)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -111,7 +111,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsLongGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(1L)),
+        reporter.report(this.<Gauge<?>>map("gauge", gauge(1L)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -128,7 +128,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsFloatGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(1.1f)),
+        reporter.report(this.<Gauge<?>>map("gauge", gauge(1.1f)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -145,7 +145,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsDoubleGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(1.1)),
+        reporter.report(this.<Gauge<?>>map("gauge", gauge(1.1)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -165,8 +165,8 @@ public class GraphiteReporterTest {
         final Counter counter = mock(Counter.class);
         when(counter.getCount()).thenReturn(100L);
 
-        reporter.report(this.<Gauge>map(),
-                        this.<Counter>map("counter", counter),
+        reporter.report(this.<Gauge<?>>map(),
+                        this.map("counter", counter),
                         this.<Histogram>map(),
                         this.<Meter>map(),
                         this.<Timer>map());
@@ -199,7 +199,7 @@ public class GraphiteReporterTest {
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
-        reporter.report(this.<Gauge>map(),
+        reporter.report(this.<Gauge<?>>map(),
                         this.<Counter>map(),
                         this.<Histogram>map("histogram", histogram),
                         this.<Meter>map(),
@@ -233,10 +233,10 @@ public class GraphiteReporterTest {
         when(meter.getFifteenMinuteRate()).thenReturn(4.0);
         when(meter.getMeanRate()).thenReturn(5.0);
 
-        reporter.report(this.<Gauge>map(),
+        reporter.report(this.<Gauge<?>>map(),
                         this.<Counter>map(),
                         this.<Histogram>map(),
-                        this.<Meter>map("meter", meter),
+                        this.map("meter", meter),
                         this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
@@ -276,7 +276,7 @@ public class GraphiteReporterTest {
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
-        reporter.report(this.<Gauge>map(),
+        reporter.report(this.<Gauge<?>>map(),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -308,7 +308,7 @@ public class GraphiteReporterTest {
     @Test
     public void closesConnectionIfGraphiteIsUnavailable() throws Exception {
         doThrow(new UnknownHostException("UNKNOWN-HOST")).when(graphite).connect();
-        reporter.report(map("gauge", gauge(1)),
+        reporter.report(this.<Gauge<?>>map("gauge", gauge(1)),
             this.<Counter>map(),
             this.<Histogram>map(),
             this.<Meter>map(),
@@ -327,7 +327,7 @@ public class GraphiteReporterTest {
         final Gauge gauge = mock(Gauge.class);
         when(gauge.getValue()).thenThrow(new RuntimeException("kaboom"));
 
-        reporter.report(map("gauge", gauge),
+        reporter.report(this.<Gauge<?>>map("gauge", gauge),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),

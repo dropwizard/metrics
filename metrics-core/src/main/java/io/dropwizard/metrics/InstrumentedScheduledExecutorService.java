@@ -75,7 +75,7 @@ public class InstrumentedScheduledExecutorService implements ScheduledExecutorSe
     @Override
     public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
         scheduledOnce.mark();
-        return delegate.schedule(new InstrumentedCallable<V>(callable), delay, unit);
+        return delegate.schedule(new InstrumentedCallable<>(callable), delay, unit);
     }
 
     /**
@@ -142,7 +142,7 @@ public class InstrumentedScheduledExecutorService implements ScheduledExecutorSe
     @Override
     public <T> Future<T> submit(Callable<T> task) {
         submitted.mark();
-        return delegate.submit(new InstrumentedCallable<T>(task));
+        return delegate.submit(new InstrumentedCallable<>(task));
     }
 
     /**
@@ -204,9 +204,9 @@ public class InstrumentedScheduledExecutorService implements ScheduledExecutorSe
     }
 
     private <T> Collection<? extends Callable<T>> instrument(Collection<? extends Callable<T>> tasks) {
-        final List<InstrumentedCallable<T>> instrumented = new ArrayList<InstrumentedCallable<T>>(tasks.size());
+        final List<InstrumentedCallable<T>> instrumented = new ArrayList<>(tasks.size());
         for (Callable<T> task : tasks) {
-            instrumented.add(new InstrumentedCallable(task));
+            instrumented.add(new InstrumentedCallable<>(task));
         }
         return instrumented;
     }

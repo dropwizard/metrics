@@ -53,7 +53,7 @@ public class ConsoleReporterTest {
         final Gauge gauge = mock(Gauge.class);
         when(gauge.getValue()).thenReturn(1);
 
-        reporter.report(map("gauge", gauge),
+        reporter.report(this.<Gauge<?>>map("gauge", gauge),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -76,7 +76,7 @@ public class ConsoleReporterTest {
         final Counter counter = mock(Counter.class);
         when(counter.getCount()).thenReturn(100L);
 
-        reporter.report(this.<Gauge>map(),
+        reporter.report(this.<Gauge<?>>map(),
                         map("test.counter", counter),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -113,7 +113,7 @@ public class ConsoleReporterTest {
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
-        reporter.report(this.<Gauge>map(),
+        reporter.report(this.<Gauge<?>>map(),
                         this.<Counter>map(),
                         map("test.histogram", histogram),
                         this.<Meter>map(),
@@ -150,7 +150,7 @@ public class ConsoleReporterTest {
         when(meter.getFiveMinuteRate()).thenReturn(4.0);
         when(meter.getFifteenMinuteRate()).thenReturn(5.0);
 
-        reporter.report(this.<Gauge>map(),
+        reporter.report(this.<Gauge<?>>map(),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         map("test.meter", meter),
@@ -196,7 +196,7 @@ public class ConsoleReporterTest {
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
-        reporter.report(this.<Gauge>map(),
+        reporter.report(this.<Gauge<?>>map(),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),

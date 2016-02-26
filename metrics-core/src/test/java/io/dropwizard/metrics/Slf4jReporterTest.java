@@ -47,7 +47,7 @@ public class Slf4jReporterTest {
     @Test
     public void reportsGaugeValuesAtError() throws Exception {
         when(logger.isErrorEnabled(marker)).thenReturn(true);
-        errorReporter.report(map("gauge", gauge("value")),
+        errorReporter.report(this.<Gauge<?>>map("gauge", gauge("value")),
                 this.<Counter>map(),
                 this.<Histogram>map(),
                 this.<Meter>map(),
@@ -62,7 +62,7 @@ public class Slf4jReporterTest {
         when(counter.getCount()).thenReturn(100L);
         when(logger.isErrorEnabled(marker)).thenReturn(true);
 
-        errorReporter.report(this.<Gauge>map(),
+        errorReporter.report(this.<Gauge<?>>map(),
                 map("test.counter", counter),
                 this.<Histogram>map(),
                 this.<Meter>map(),
@@ -91,7 +91,7 @@ public class Slf4jReporterTest {
         when(histogram.getSnapshot()).thenReturn(snapshot);
         when(logger.isErrorEnabled(marker)).thenReturn(true);
 
-        errorReporter.report(this.<Gauge>map(),
+        errorReporter.report(this.<Gauge<?>>map(),
                 this.<Counter>map(),
                 map("test.histogram", histogram),
                 this.<Meter>map(),
@@ -124,7 +124,7 @@ public class Slf4jReporterTest {
         when(meter.getFifteenMinuteRate()).thenReturn(5.0);
         when(logger.isErrorEnabled(marker)).thenReturn(true);
 
-        errorReporter.report(this.<Gauge>map(),
+        errorReporter.report(this.<Gauge<?>>map(),
                 this.<Counter>map(),
                 this.<Histogram>map(),
                 map("test.meter", meter),
@@ -169,7 +169,7 @@ public class Slf4jReporterTest {
 
         when(logger.isErrorEnabled(marker)).thenReturn(true);
 
-        errorReporter.report(this.<Gauge>map(),
+        errorReporter.report(this.<Gauge<?>>map(),
                 this.<Counter>map(),
                 this.<Histogram>map(),
                 this.<Meter>map(),
@@ -201,7 +201,7 @@ public class Slf4jReporterTest {
     @Test
     public void reportsGaugeValues() throws Exception {
         when(logger.isInfoEnabled(marker)).thenReturn(true);
-        infoReporter.report(map("gauge", gauge("value")),
+        infoReporter.report(this.<Gauge<?>>map("gauge", gauge("value")),
                 this.<Counter>map(),
                 this.<Histogram>map(),
                 this.<Meter>map(),
@@ -216,7 +216,7 @@ public class Slf4jReporterTest {
         when(counter.getCount()).thenReturn(100L);
         when(logger.isInfoEnabled(marker)).thenReturn(true);
 
-        infoReporter.report(this.<Gauge>map(),
+        infoReporter.report(this.<Gauge<?>>map(),
                 map("test.counter", counter),
                 this.<Histogram>map(),
                 this.<Meter>map(),
@@ -245,7 +245,7 @@ public class Slf4jReporterTest {
         when(histogram.getSnapshot()).thenReturn(snapshot);
         when(logger.isInfoEnabled(marker)).thenReturn(true);
 
-        infoReporter.report(this.<Gauge>map(),
+        infoReporter.report(this.<Gauge<?>>map(),
                 this.<Counter>map(),
                 map("test.histogram", histogram),
                 this.<Meter>map(),
@@ -278,7 +278,7 @@ public class Slf4jReporterTest {
         when(meter.getFifteenMinuteRate()).thenReturn(5.0);
         when(logger.isInfoEnabled(marker)).thenReturn(true);
 
-        infoReporter.report(this.<Gauge>map(),
+        infoReporter.report(this.<Gauge<?>>map(),
                 this.<Counter>map(),
                 this.<Histogram>map(),
                 map("test.meter", meter),
@@ -322,7 +322,7 @@ public class Slf4jReporterTest {
         when(timer.getSnapshot()).thenReturn(snapshot);
         when(logger.isInfoEnabled(marker)).thenReturn(true);
 
-        infoReporter.report(this.<Gauge>map(),
+        infoReporter.report(this.<Gauge<?>>map(),
                 this.<Counter>map(),
                 this.<Histogram>map(),
                 this.<Meter>map(),
@@ -361,8 +361,8 @@ public class Slf4jReporterTest {
         return map;
     }
 
-    private <T> Gauge gauge(T value) {
-        final Gauge gauge = mock(Gauge.class);
+    private <T> Gauge<?> gauge(T value) {
+        final Gauge<?> gauge = mock(Gauge.class);
         when(gauge.getValue()).thenReturn(value);
         return gauge;
     }

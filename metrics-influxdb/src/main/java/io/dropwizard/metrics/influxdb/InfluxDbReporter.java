@@ -120,14 +120,14 @@ public final class InfluxDbReporter extends ScheduledReporter {
     }
 
     @Override
-    public void report(final SortedMap<MetricName, Gauge> gauges, final SortedMap<MetricName, Counter> counters,
+    public void report(final SortedMap<MetricName, Gauge<?>> gauges, final SortedMap<MetricName, Counter> counters,
                        final SortedMap<MetricName, Histogram> histograms, final SortedMap<MetricName, Meter> meters, final SortedMap<MetricName, Timer> timers) {
         final long now = System.currentTimeMillis();
 
         try {
             influxDb.flush();
 
-            for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
+            for (Map.Entry<MetricName, Gauge<?>> entry : gauges.entrySet()) {
                 reportGauge(entry.getKey(), entry.getValue(), now);
             }
 

@@ -154,7 +154,7 @@ public class GraphiteReporter extends ScheduledReporter {
     }
 
     @Override
-    public void report(SortedMap<MetricName, Gauge> gauges,
+    public void report(SortedMap<MetricName, Gauge<?>> gauges,
                        SortedMap<MetricName, Counter> counters,
                        SortedMap<MetricName, Histogram> histograms,
                        SortedMap<MetricName, Meter> meters,
@@ -167,7 +167,7 @@ public class GraphiteReporter extends ScheduledReporter {
     	          graphite.connect();
             }
 
-            for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
+            for (Map.Entry<MetricName, Gauge<?>> entry : gauges.entrySet()) {
                 reportGauge(entry.getKey(), entry.getValue(), timestamp);
             }
 

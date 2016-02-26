@@ -76,7 +76,7 @@ public class MetricRegistry implements MetricSet {
      */
     protected MetricRegistry(ConcurrentMap<MetricName, Metric> metricsMap) {
         this.metrics = metricsMap;
-        this.listeners = new CopyOnWriteArrayList<MetricRegistryListener>();
+        this.listeners = new CopyOnWriteArrayList<>();
     }
 
     /**
@@ -253,7 +253,7 @@ public class MetricRegistry implements MetricSet {
      * @return the names of all the metrics
      */
     public SortedSet<MetricName> getNames() {
-        return Collections.unmodifiableSortedSet(new TreeSet<MetricName>(metrics.keySet()));
+        return Collections.unmodifiableSortedSet(new TreeSet<>(metrics.keySet()));
     }
 
     /**
@@ -261,7 +261,7 @@ public class MetricRegistry implements MetricSet {
      *
      * @return all the gauges in the registry
      */
-    public SortedMap<MetricName, Gauge> getGauges() {
+    public SortedMap<MetricName, Gauge<?>> getGauges() {
         return getGauges(MetricFilter.ALL);
     }
 
@@ -271,8 +271,13 @@ public class MetricRegistry implements MetricSet {
      * @param filter    the metric filter to match
      * @return all the gauges in the registry
      */
-    public SortedMap<MetricName, Gauge> getGauges(MetricFilter filter) {
-        return getMetrics(Gauge.class, filter);
+    public SortedMap<MetricName, Gauge<?>> getGauges(MetricFilter filter) {
+        final SortedMap<MetricName, Gauge> metrics = getMetrics(Gauge.class, filter);
+        final SortedMap<MetricName, Gauge<?>> result = new TreeMap<>();
+        for (Map.Entry<MetricName, Gauge> entry : metrics.entrySet()) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
     }
 
     /**
@@ -373,7 +378,7 @@ public class MetricRegistry implements MetricSet {
 
     @SuppressWarnings("unchecked")
     private <T extends Metric> SortedMap<MetricName, T> getMetrics(Class<T> klass, MetricFilter filter) {
-        final TreeMap<MetricName, T> timers = new TreeMap<MetricName, T>();
+        final TreeMap<MetricName, T> timers = new TreeMap<>();
         for (Map.Entry<MetricName, Metric> entry : metrics.entrySet()) {
             if (klass.isInstance(entry.getValue()) && filter.matches(entry.getKey(),
                                                                      entry.getValue())) {

@@ -174,7 +174,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * @param meters     all of the meters in the registry
      * @param timers     all of the timers in the registry
      */
-    public abstract void report(SortedMap<MetricName, Gauge> gauges,
+    public abstract void report(SortedMap<MetricName, Gauge<?>> gauges,
                                 SortedMap<MetricName, Counter> counters,
                                 SortedMap<MetricName, Histogram> histograms,
                                 SortedMap<MetricName, Meter> meters,

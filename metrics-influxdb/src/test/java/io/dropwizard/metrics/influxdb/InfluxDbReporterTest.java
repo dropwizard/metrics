@@ -52,7 +52,7 @@ public class InfluxDbReporterTest {
         final Counter counter = mock(Counter.class);
         Mockito.when(counter.getCount()).thenReturn(100L);
 
-        reporter.report(this.<Gauge>map(), this.map("counter", counter), this.<Histogram>map(), this.<Meter>map(), this.<Timer>map());
+        reporter.report(this.<Gauge<?>>map(), this.map("counter", counter), this.<Histogram>map(), this.<Meter>map(), this.<Timer>map());
         final ArgumentCaptor<InfluxDbPoint> influxDbPointCaptor = ArgumentCaptor.forClass(InfluxDbPoint.class);
         Mockito.verify(influxDb, atLeastOnce()).appendPoints(influxDbPointCaptor.capture());
         InfluxDbPoint point = influxDbPointCaptor.getValue();
@@ -81,7 +81,7 @@ public class InfluxDbReporterTest {
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
-        reporter.report(this.<Gauge>map(), this.<Counter>map(), this.map("histogram", histogram), this.<Meter>map(), this.<Timer>map());
+        reporter.report(this.<Gauge<?>>map(), this.<Counter>map(), this.map("histogram", histogram), this.<Meter>map(), this.<Timer>map());
 
         final ArgumentCaptor<InfluxDbPoint> influxDbPointCaptor = ArgumentCaptor.forClass(InfluxDbPoint.class);
         Mockito.verify(influxDb, atLeastOnce()).appendPoints(influxDbPointCaptor.capture());
@@ -111,7 +111,7 @@ public class InfluxDbReporterTest {
         when(meter.getFifteenMinuteRate()).thenReturn(4.0);
         when(meter.getMeanRate()).thenReturn(5.0);
 
-        reporter.report(this.<Gauge>map(), this.<Counter>map(), this.<Histogram>map(), this.map("meter", meter), this.<Timer>map());
+        reporter.report(this.<Gauge<?>>map(), this.<Counter>map(), this.<Histogram>map(), this.map("meter", meter), this.<Timer>map());
 
         final ArgumentCaptor<InfluxDbPoint> influxDbPointCaptor = ArgumentCaptor.forClass(InfluxDbPoint.class);
         Mockito.verify(influxDb, atLeastOnce()).appendPoints(influxDbPointCaptor.capture());
@@ -150,7 +150,7 @@ public class InfluxDbReporterTest {
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
-        reporter.report(this.<Gauge>map(), this.<Counter>map(), this.<Histogram>map(), this.<Meter>map(), map("timer", timer));
+        reporter.report(this.<Gauge<?>>map(), this.<Counter>map(), this.<Histogram>map(), this.<Meter>map(), map("timer", timer));
 
         final ArgumentCaptor<InfluxDbPoint> influxDbPointCaptor = ArgumentCaptor.forClass(InfluxDbPoint.class);
         Mockito.verify(influxDb, atLeastOnce()).appendPoints(influxDbPointCaptor.capture());
@@ -178,7 +178,7 @@ public class InfluxDbReporterTest {
 
     @Test
     public void reportsIntegerGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(1)), this.<Counter>map(), this.<Histogram>map(), this.<Meter>map(), this.<Timer>map());
+        reporter.report(this.<Gauge<?>>map("gauge", gauge(1)), this.<Counter>map(), this.<Histogram>map(), this.<Meter>map(), this.<Timer>map());
 
         final ArgumentCaptor<InfluxDbPoint> influxDbPointCaptor = ArgumentCaptor.forClass(InfluxDbPoint.class);
         Mockito.verify(influxDb, atLeastOnce()).appendPoints(influxDbPointCaptor.capture());
@@ -192,7 +192,7 @@ public class InfluxDbReporterTest {
 
     @Test
     public void reportsLongGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(1L)), this.<Counter>map(), this.<Histogram>map(), this.<Meter>map(), this.<Timer>map());
+        reporter.report(this.<Gauge<?>>map("gauge", gauge(1L)), this.<Counter>map(), this.<Histogram>map(), this.<Meter>map(), this.<Timer>map());
 
         final ArgumentCaptor<InfluxDbPoint> influxDbPointCaptor = ArgumentCaptor.forClass(InfluxDbPoint.class);
         Mockito.verify(influxDb, atLeastOnce()).appendPoints(influxDbPointCaptor.capture());
@@ -206,7 +206,7 @@ public class InfluxDbReporterTest {
 
     @Test
     public void reportsFloatGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(1.1f)), this.<Counter>map(), this.<Histogram>map(), this.<Meter>map(), this.<Timer>map());
+        reporter.report(this.<Gauge<?>>map("gauge", gauge(1.1f)), this.<Counter>map(), this.<Histogram>map(), this.<Meter>map(), this.<Timer>map());
 
         final ArgumentCaptor<InfluxDbPoint> influxDbPointCaptor = ArgumentCaptor.forClass(InfluxDbPoint.class);
         Mockito.verify(influxDb, atLeastOnce()).appendPoints(influxDbPointCaptor.capture());
@@ -220,7 +220,7 @@ public class InfluxDbReporterTest {
 
     @Test
     public void reportsDoubleGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(1.1)), this.<Counter>map(), this.<Histogram>map(), this.<Meter>map(), this.<Timer>map());
+        reporter.report(this.<Gauge<?>>map("gauge", gauge(1.1)), this.<Counter>map(), this.<Histogram>map(), this.<Meter>map(), this.<Timer>map());
 
         final ArgumentCaptor<InfluxDbPoint> influxDbPointCaptor = ArgumentCaptor.forClass(InfluxDbPoint.class);
         Mockito.verify(influxDb, atLeastOnce()).appendPoints(influxDbPointCaptor.capture());
@@ -235,7 +235,7 @@ public class InfluxDbReporterTest {
     @Test
     public void reportsByteGaugeValues() throws Exception {
         reporter
-                .report(map("gauge", gauge((byte) 1)), this.<Counter>map(), this.<Histogram>map(), this.<Meter>map(), this.<Timer>map());
+                .report(this.<Gauge<?>>map("gauge", gauge((byte) 1)), this.<Counter>map(), this.<Histogram>map(), this.<Meter>map(), this.<Timer>map());
 
         final ArgumentCaptor<InfluxDbPoint> influxDbPointCaptor = ArgumentCaptor.forClass(InfluxDbPoint.class);
         Mockito.verify(influxDb, atLeastOnce()).appendPoints(influxDbPointCaptor.capture());
@@ -257,8 +257,8 @@ public class InfluxDbReporterTest {
         return map;
     }
 
-    private <T> Gauge gauge(T value) {
-        final Gauge gauge = mock(Gauge.class);
+    private <T> Gauge<?> gauge(T value) {
+        final Gauge<?> gauge = mock(Gauge.class);
         when(gauge.getValue()).thenReturn(value);
         return gauge;
     }

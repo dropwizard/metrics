@@ -41,10 +41,10 @@ public class CsvReporterTest {
 
     @Test
     public void reportsGaugeValues() throws Exception {
-        final Gauge gauge = mock(Gauge.class);
+        final Gauge<?> gauge = mock(Gauge.class);
         when(gauge.getValue()).thenReturn(1);
 
-        reporter.report(map("gauge", gauge),
+        reporter.report(this.<Gauge<?>>map("gauge", gauge),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -62,7 +62,7 @@ public class CsvReporterTest {
         final Counter counter = mock(Counter.class);
         when(counter.getCount()).thenReturn(100L);
 
-        reporter.report(this.<Gauge>map(),
+        reporter.report(this.<Gauge<?>>map(),
                         map("test.counter", counter),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -94,7 +94,7 @@ public class CsvReporterTest {
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
-        reporter.report(this.<Gauge>map(),
+        reporter.report(this.<Gauge<?>>map(),
                         this.<Counter>map(),
                         map("test.histogram", histogram),
                         this.<Meter>map(),
@@ -116,7 +116,7 @@ public class CsvReporterTest {
         when(meter.getFiveMinuteRate()).thenReturn(4.0);
         when(meter.getFifteenMinuteRate()).thenReturn(5.0);
 
-        reporter.report(this.<Gauge>map(),
+        reporter.report(this.<Gauge<?>>map(),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         map("test.meter", meter),
@@ -152,7 +152,7 @@ public class CsvReporterTest {
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
-        reporter.report(this.<Gauge>map(),
+        reporter.report(this.<Gauge<?>>map(),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -177,7 +177,7 @@ public class CsvReporterTest {
         final Gauge gauge = mock(Gauge.class);
         when(gauge.getValue()).thenReturn(1);
 
-        reporter.report(map("gauge", gauge),
+        reporter.report(this.<Gauge<?>>map("gauge", gauge),
                 this.<Counter>map(),
                 this.<Histogram>map(),
                 this.<Meter>map(),
@@ -213,11 +213,11 @@ public class CsvReporterTest {
     }
 
     private <T> SortedMap<MetricName, T> map() {
-        return new TreeMap<MetricName, T>();
+        return new TreeMap<>();
     }
 
     private <T> SortedMap<MetricName, T> map(String name, T metric) {
-        final TreeMap<MetricName, T> map = new TreeMap<MetricName, T>();
+        final TreeMap<MetricName, T> map = new TreeMap<>();
         map.put(MetricName.build(name), metric);
         return map;
     }

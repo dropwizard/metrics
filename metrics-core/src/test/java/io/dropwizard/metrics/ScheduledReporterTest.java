@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import static org.mockito.Mockito.*;
 
 public class ScheduledReporterTest {
-    private final Gauge gauge = mock(Gauge.class);
+    private final Gauge<?> gauge = mock(Gauge.class);
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
     private final Meter meter = mock(Meter.class);
@@ -35,7 +35,7 @@ public class ScheduledReporterTest {
                                   TimeUnit.SECONDS,
                                   TimeUnit.MILLISECONDS) {
                 @Override
-                public void report(SortedMap<MetricName, Gauge> gauges,
+                public void report(SortedMap<MetricName, Gauge<?>> gauges,
                                    SortedMap<MetricName, Counter> counters,
                                    SortedMap<MetricName, Histogram> histograms,
                                    SortedMap<MetricName, Meter> meters,
@@ -65,7 +65,7 @@ public class ScheduledReporterTest {
     public void pollsPeriodically() throws Exception {
         Thread.sleep(500);
         verify(reporter, times(2)).report(
-                map("gauge", gauge),
+                this.<Gauge<?>>map("gauge", gauge),
                 map("counter", counter),
                 map("histogram", histogram),
                 map("meter", meter),
@@ -74,7 +74,7 @@ public class ScheduledReporterTest {
     }
 
     private <T> SortedMap<MetricName, T> map(String name, T value) {
-        final SortedMap<MetricName, T> map = new TreeMap<MetricName, T>();
+        final SortedMap<MetricName, T> map = new TreeMap<>();
         map.put(MetricName.build(name), value);
         return map;
     }
