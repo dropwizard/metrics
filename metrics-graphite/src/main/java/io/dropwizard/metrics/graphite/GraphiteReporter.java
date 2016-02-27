@@ -287,10 +287,24 @@ public class GraphiteReporter extends ScheduledReporter {
     }
 
     private void reportGauge(MetricName name, Gauge gauge, long timestamp) throws IOException {
-        final String value = format(gauge.getValue());
-        if (value != null) {
-            graphite.send(prefix(name), value, timestamp);
+
+        String nameToReport;
+        String valueToReport;
+        Object value = gauge.getValue();
+
+        if (value instanceof Map) {
+            for (Object k : ((Map) value).keySet()) {
+                nameToReport = k.toString();
+                valueToReport = format(((Map) value).get(k));
+                graphite.send(prefix(name)+"."+nameToReport, valueToReport, timestamp);
+            }
+        } else {
+            valueToReport = format(gauge.getValue());
+            if (valueToReport != null) {
+                graphite.send(prefix(name), valueToReport, timestamp);
+            }
         }
+
     }
 
     private String format(Object o) {

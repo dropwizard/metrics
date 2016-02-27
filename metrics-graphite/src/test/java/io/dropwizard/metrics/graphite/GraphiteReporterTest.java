@@ -15,8 +15,10 @@ import org.junit.Test;
 import org.mockito.InOrder;
 
 import io.dropwizard.metrics.*;
+import org.python.google.common.collect.ImmutableMap;
 
 import java.net.UnknownHostException;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -155,6 +157,25 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).isConnected();
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1.10", timestamp);
+        inOrder.verify(graphite).flush();
+
+        verifyNoMoreInteractions(graphite);
+    }
+
+    @Test
+    public void reportsMapGaugeValues() throws Exception {
+        reporter.report(map("gauge", gauge(ImmutableMap.of("a", 1, "b", 2, "c", 3))),
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                this.<Meter>map(),
+                this.<Timer>map());
+
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).isConnected();
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send("prefix.gauge.a", "1", timestamp);
+        inOrder.verify(graphite).send("prefix.gauge.b", "2", timestamp);
+        inOrder.verify(graphite).send("prefix.gauge.c", "3", timestamp);
         inOrder.verify(graphite).flush();
 
         verifyNoMoreInteractions(graphite);
