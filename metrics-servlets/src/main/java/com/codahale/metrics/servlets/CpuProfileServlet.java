@@ -12,7 +12,7 @@ import org.joda.time.Duration;
 import com.papertrail.profiler.CpuProfile;
 
 /**
- * An HTTP servlets which outputs a {@link https://github.com/gperftools/gperftools} parseable response.
+ * An HTTP servlets which outputs a <a href="https://github.com/gperftools/gperftools">pprof</a> parseable response.
  */
 public class CpuProfileServlet extends HttpServlet {
     private static final long serialVersionUID = -668666696530287501L;
