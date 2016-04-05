@@ -27,6 +27,42 @@ public class SlidingTimeWindowReservoirTest {
     }
 
     @Test
+    public void storesMeasurementsWithDuplicateTicksTresholdNeg() throws Exception {
+        when(clock.getTick()).thenReturn(Long.MIN_VALUE / 256);
+        SlidingTimeWindowReservoir reservoir = new SlidingTimeWindowReservoir(10, TimeUnit.NANOSECONDS, clock);
+
+        reservoir.update(1);
+        reservoir.update(2);
+
+        assertThat(reservoir.getSnapshot().getValues())
+                .containsOnly(1, 2);
+    }
+
+    @Test
+    public void storesMeasurementsWithDuplicateTicksMinNeg() throws Exception {
+        when(clock.getTick()).thenReturn(Long.MIN_VALUE);
+        SlidingTimeWindowReservoir reservoir = new SlidingTimeWindowReservoir(10, TimeUnit.NANOSECONDS, clock);
+
+        reservoir.update(1);
+        reservoir.update(2);
+
+        assertThat(reservoir.getSnapshot().getValues())
+                .containsOnly(1, 2);
+    }
+
+    @Test
+    public void storesMeasurementsWithTresholdTicks() throws Exception {
+        // Won't fail on 4 bits, but still fails on default 8 bits
+        SlidingTimeWindowReservoir reservoir = new SlidingTimeWindowReservoir(10, TimeUnit.NANOSECONDS, clock, 4);
+
+        when(clock.getTick()).thenReturn(TimeUnit.DAYS.toNanos(416));
+        reservoir.update(1);
+
+        when(clock.getTick()).thenReturn(TimeUnit.DAYS.toNanos(417));
+        assertThat(reservoir.getSnapshot().getValues()).isEmpty();;
+    }
+
+    @Test
     public void boundsMeasurementsToATimeWindow() throws Exception {
         when(clock.getTick()).thenReturn(0L);
         reservoir.update(1);

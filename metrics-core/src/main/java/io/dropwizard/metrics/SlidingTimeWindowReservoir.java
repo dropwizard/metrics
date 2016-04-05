@@ -1,10 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Clock;
-import io.dropwizard.metrics.Reservoir;
-import io.dropwizard.metrics.SlidingTimeWindowReservoir;
-import io.dropwizard.metrics.Snapshot;
-
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -16,9 +11,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class SlidingTimeWindowReservoir implements Reservoir {
 
     // allow for this many duplicate ticks before overwriting measurements
-    private static final int COLLISION_BITWIDTH = 8;
-    private static final int COLLISION_BUFFER = 1 << COLLISION_BITWIDTH;
-    private static final long COLLISION_MODULO = (1L << (63 - COLLISION_BITWIDTH)) - 1;
+    private final int collisionBuffer;
+    private final long collisionModulo;
 
     // only trim on updating once every N
     private static final int TRIM_THRESHOLD = 256;
@@ -47,13 +41,39 @@ public class SlidingTimeWindowReservoir implements Reservoir {
      * @param clock      the {@link Clock} to use
      */
     public SlidingTimeWindowReservoir(long window, TimeUnit windowUnit, Clock clock) {
-        this.clock = clock;
-        this.measurements = new ConcurrentSkipListMap<Long, Long>();
-        this.window = windowUnit.toNanos(window) * COLLISION_BUFFER;
-        this.lastTick = new AtomicLong((clock.getTick() & COLLISION_MODULO) * COLLISION_BUFFER);
-        this.count = new AtomicLong();
+        this(window, windowUnit, clock, 8);
     }
 
+    /**
+     * Creates a new {@link SlidingTimeWindowReservoir} with the given window of time and collisionBitwidth.
+     * 
+     * @param window
+     * @param windowUnit
+     * @param clock
+     * @param collisionBitwidth
+     */
+    public SlidingTimeWindowReservoir(long window, TimeUnit windowUnit, int collisionBitwidth) {
+        this(window, windowUnit, Clock.defaultClock());
+    }
+    
+    /**
+     * Creates a new {@link SlidingTimeWindowReservoir} with the given clock, window of time and collisionBitwidth.
+     * 
+     * @param window
+     * @param windowUnit
+     * @param clock
+     * @param collisionBitwidth
+     */
+    public SlidingTimeWindowReservoir(long window, TimeUnit windowUnit, Clock clock, int collisionBitwidth) {
+        this.collisionBuffer = 1 << collisionBitwidth;
+        this.collisionModulo = (1L << (63 - collisionBitwidth)) - 1;
+        this.clock = clock;
+        this.measurements = new ConcurrentSkipListMap<Long, Long>();
+        this.window = windowUnit.toNanos(window) * collisionBuffer;
+        this.lastTick = new AtomicLong((clock.getTick() & collisionModulo) * collisionBuffer);
+        this.count = new AtomicLong();
+    }
+    
     @Override
     public int size() {
         trim();
@@ -77,7 +97,7 @@ public class SlidingTimeWindowReservoir implements Reservoir {
     private long getTick() {
         for (; ; ) {
             final long oldTick = lastTick.get();
-            final long tick = (clock.getTick() & COLLISION_MODULO) * COLLISION_BUFFER;
+            final long tick = (clock.getTick() & collisionModulo) * collisionBuffer;
             // ensure the tick is strictly incrementing even if there are duplicate ticks
             final long newTick = tick - oldTick > 0 ? tick : oldTick + 1;
             if (lastTick.compareAndSet(oldTick, newTick)) {
