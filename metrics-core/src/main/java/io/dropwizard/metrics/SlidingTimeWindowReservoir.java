@@ -47,10 +47,9 @@ public class SlidingTimeWindowReservoir implements Reservoir {
     /**
      * Creates a new {@link SlidingTimeWindowReservoir} with the given window of time and collisionBitwidth.
      * 
-     * @param window
-     * @param windowUnit
-     * @param clock
-     * @param collisionBitwidth
+     * @param window            the window of time
+     * @param windowUnit        the unit of {@code window}
+     * @param collisionBitwidth the bit size of the collision buffer (default is 8 which will yield 256 observations per nanosecond)
      */
     public SlidingTimeWindowReservoir(long window, TimeUnit windowUnit, int collisionBitwidth) {
         this(window, windowUnit, Clock.defaultClock(), collisionBitwidth);
@@ -59,10 +58,10 @@ public class SlidingTimeWindowReservoir implements Reservoir {
     /**
      * Creates a new {@link SlidingTimeWindowReservoir} with the given clock, window of time and collisionBitwidth.
      * 
-     * @param window
-     * @param windowUnit
-     * @param clock
-     * @param collisionBitwidth
+     * @param window            the window of time
+     * @param windowUnit        the unit of {@code window}
+     * @param clock             the {@link Clock} to use
+     * @param collisionBitwidth the bit size of the collision buffer (default is 8 which will yield 256 observations per nanosecond)
      */
     public SlidingTimeWindowReservoir(long window, TimeUnit windowUnit, Clock clock, int collisionBitwidth) {
         this.collisionBuffer = 1 << collisionBitwidth;
