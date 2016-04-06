@@ -53,9 +53,9 @@ public class SlidingTimeWindowReservoir implements Reservoir {
      * @param collisionBitwidth
      */
     public SlidingTimeWindowReservoir(long window, TimeUnit windowUnit, int collisionBitwidth) {
-        this(window, windowUnit, Clock.defaultClock());
+        this(window, windowUnit, Clock.defaultClock(), collisionBitwidth);
     }
-    
+
     /**
      * Creates a new {@link SlidingTimeWindowReservoir} with the given clock, window of time and collisionBitwidth.
      * 
