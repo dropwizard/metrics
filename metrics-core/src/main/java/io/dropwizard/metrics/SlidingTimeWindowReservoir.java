@@ -73,7 +73,7 @@ public class SlidingTimeWindowReservoir implements Reservoir {
         this.lastTick = new AtomicLong((clock.getTick() & collisionModulo) * collisionBuffer);
         this.count = new AtomicLong();
     }
-    
+
     @Override
     public int size() {
         trim();
