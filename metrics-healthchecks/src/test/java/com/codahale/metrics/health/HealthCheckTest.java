@@ -111,6 +111,66 @@ public class HealthCheckTest {
     }
 
     @Test
+    public void canHaveHealthyBuilderWithDetail() throws Exception {
+        final HealthCheck.Result result = HealthCheck.Result.healthyBuilder()
+            .withDetail("detail", "value")
+            .build();
+
+        assertThat(result.isHealthy())
+            .isTrue();
+
+        assertThat(result.getMessage())
+            .isNull();
+
+        assertThat(result.getError())
+            .isNull();
+
+        assertThat(result.getDetails())
+            .containsEntry("detail", "value");
+    }
+
+    @Test
+    public void canHaveUnHealthyBuilderWithDetail() throws Exception {
+        final HealthCheck.Result result = HealthCheck.Result.unHealthyBuilder()
+            .withDetail("detail", "value")
+            .build();
+
+        assertThat(result.isHealthy())
+            .isFalse();
+
+        assertThat(result.getMessage())
+            .isNull();
+
+        assertThat(result.getError())
+            .isNull();
+
+        assertThat(result.getDetails())
+            .containsEntry("detail", "value");
+    }
+
+    @Test
+    public void canHaveUnHealthyBuilderWithDetailAndError() throws Exception {
+        final RuntimeException e = mock(RuntimeException.class);
+        when(e.getMessage()).thenReturn("oh noes");
+
+        final HealthCheck.Result result = HealthCheck.Result.unHealthyBuilder(e)
+            .withDetail("detail", "value")
+            .build();
+
+        assertThat(result.isHealthy())
+            .isFalse();
+
+        assertThat(result.getMessage())
+            .isEqualTo("oh noes");
+
+        assertThat(result.getError())
+            .isEqualTo(e);
+
+        assertThat(result.getDetails())
+            .containsEntry("detail", "value");
+    }
+
+    @Test
     public void returnsResultsWhenExecuted() throws Exception {
         final HealthCheck.Result result = mock(HealthCheck.Result.class);
         when(underlying.execute()).thenReturn(result);

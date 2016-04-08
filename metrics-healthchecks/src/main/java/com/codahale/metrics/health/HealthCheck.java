@@ -1,15 +1,20 @@
 package com.codahale.metrics.health;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * A health check for a component of your application.
  */
 public abstract class HealthCheck {
     /**
-     * The result of a {@link HealthCheck} being run. It can be healthy (with an optional message)
-     * or unhealthy (with either an error message or a thrown exception).
+     * The result of a {@link HealthCheck} being run. It can be healthy (with an optional message and optional details)
+     * or unhealthy (with either an error message or a thrown exception and optional details).
      */
     public static class Result {
-        private static final Result HEALTHY = new Result(true, null, null);
+        private static final Result HEALTHY = new ResultBuilder(true).build();
         private static final int PRIME = 31;
 
         /**
@@ -28,7 +33,7 @@ public abstract class HealthCheck {
          * @return a healthy {@link Result} with an additional message
          */
         public static Result healthy(String message) {
-            return new Result(true, message, null);
+            return new ResultBuilder(true).withMessage(message).build();
         }
 
         /**
@@ -52,7 +57,7 @@ public abstract class HealthCheck {
          * @return an unhealthy {@link Result} with the given message
          */
         public static Result unhealthy(String message) {
-            return new Result(false, message, null);
+            return new ResultBuilder(false).withMessage(message).build();
         }
 
         /**
@@ -73,20 +78,50 @@ public abstract class HealthCheck {
          * Returns an unhealthy {@link Result} with the given error.
          *
          * @param error an exception thrown during the health check
-         * @return an unhealthy {@link Result} with the given error
+         * @return an unhealthy {@link Result} with the given {@code error}
          */
         public static Result unhealthy(Throwable error) {
-            return new Result(false, error.getMessage(), error);
+            return new ResultBuilder(error).build();
+        }
+
+		/**
+         * Returns an healthy {@link ResultBuilder}
+         *
+         * @return an healthy {@link ResultBuilder}
+         */
+        public static ResultBuilder healthyBuilder() {
+            return new ResultBuilder(true);
+        }
+
+        /**
+         * Returns an unhealthy {@link ResultBuilder}
+         *
+         * @return an unhealthy {@link ResultBuilder}
+         */
+        public static ResultBuilder unHealthyBuilder() {
+            return new ResultBuilder(false);
+        }
+
+        /**
+         * Returns an unhealthy {@link ResultBuilder} with the given {@code error}
+         *
+         * @param error an exception thrown during the health check
+         * @return an unhealthy {@link ResultBuilder}
+         */
+        public static ResultBuilder unHealthyBuilder(Throwable error) {
+            return new ResultBuilder(error);
         }
 
         private final boolean healthy;
         private final String message;
         private final Throwable error;
+        private final Map<String, Object> details;
 
-        private Result(boolean isHealthy, String message, Throwable error) {
-            this.healthy = isHealthy;
-            this.message = message;
-            this.error = error;
+        private Result(ResultBuilder builder) {
+            this.healthy = builder.healthy;
+            this.message = builder.message;
+            this.error = builder.error;
+            this.details = Collections.unmodifiableMap(builder.details);
         }
 
         /**
@@ -118,6 +153,10 @@ public abstract class HealthCheck {
             return error;
         }
 
+        public Map<String, Object> getDetails() {
+            return details;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) { return true; }
@@ -146,8 +185,80 @@ public abstract class HealthCheck {
             if (error != null) {
                 builder.append(", error=").append(error);
             }
+            if (details != null) {
+                Iterator<Map.Entry<String, Object>> it = details.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<String, Object> e = it.next();
+                    builder.append(e.getKey())
+                        .append("=")
+                        .append(e.getValue().toString());
+                }
+            }
             builder.append('}');
             return builder.toString();
+        }
+    }
+
+	/**
+     * This a convenient builder for an {@link HealthCheck.Result}. It can be health (with optional message and detail)
+     * or unhealthy (with optional message, error and detail)
+     */
+    public static class ResultBuilder {
+        private boolean healthy;
+        private String message;
+        private Throwable error;
+        private Map<String, Object> details;
+
+        protected ResultBuilder(boolean healthy) {
+            this.details = new LinkedHashMap<String, Object>();
+            this.healthy = healthy;
+        }
+
+        protected ResultBuilder(Throwable error) {
+            this(false);
+            this.error = error;
+            this.message = error.getMessage();
+        }
+
+		/**
+         * Set an optional message
+         *
+         * @param message an informative message
+         * @return this builder with the given {@code message}
+         */
+        public ResultBuilder withMessage(String message) {
+            this.message = message;
+            return this;
+        }
+
+		/**
+         * Set an optional formatted message
+         * <p/>
+         * Message formatting follows the same rules as {@link String#format(String, Object...)}.
+         *
+         * @param message a message format
+         * @param args    the arguments apply to the message format
+         * @return this builder with the given formatted {@code message}
+         * @see String#format(String, Object...)
+         */
+        public ResultBuilder withMessage(String message, Object... args) {
+            return withMessage(String.format(message, args));
+        }
+
+		/**
+         * Add an optional detail
+         *
+         * @param key a key for this detail
+         * @param data an object representing the detail data
+         * @return this builder with the given detail added
+         */
+        public ResultBuilder withDetail(String key, Object data) {
+            this.details.put(key, data);
+            return this;
+        }
+
+        public Result build() {
+            return new Result(this);
         }
     }
 
