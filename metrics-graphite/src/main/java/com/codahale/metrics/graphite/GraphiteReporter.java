@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
@@ -297,6 +299,10 @@ public class GraphiteReporter extends ScheduledReporter {
             return format(((Integer) o).longValue());
         } else if (o instanceof Long) {
             return format(((Long) o).longValue());
+        } else if (o instanceof BigInteger) {
+            return format(((BigInteger) o).longValue());
+        } else if (o instanceof BigDecimal) {
+            return format(((BigDecimal) o).longValue());
         }
         return null;
     }
