@@ -1,9 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Gauge;
-import io.dropwizard.metrics.Metric;
-import io.dropwizard.metrics.MetricSet;
-
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.Collections;

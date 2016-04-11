@@ -1,16 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Counter;
-import io.dropwizard.metrics.Gauge;
-import io.dropwizard.metrics.Histogram;
-import io.dropwizard.metrics.JmxReporter;
-import io.dropwizard.metrics.Meter;
-import io.dropwizard.metrics.Metered;
-import io.dropwizard.metrics.MetricFilter;
-import io.dropwizard.metrics.MetricRegistry;
-import io.dropwizard.metrics.MetricRegistryListener;
-import io.dropwizard.metrics.Timer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

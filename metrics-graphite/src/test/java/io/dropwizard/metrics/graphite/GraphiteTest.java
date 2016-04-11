@@ -5,8 +5,6 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import io.dropwizard.metrics.graphite.Graphite;
-
 import javax.net.SocketFactory;
 
 import java.io.ByteArrayOutputStream;

@@ -1,8 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Metric;
-
-
 /**
  * A gauge metric is an instantaneous reading of a particular value. To instrument a queue's depth,
  * for example:<br>

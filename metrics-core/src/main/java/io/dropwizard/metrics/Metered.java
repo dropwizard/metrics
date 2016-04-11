@@ -1,8 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Counting;
-import io.dropwizard.metrics.Metric;
-
 /**
  * An object which maintains mean and exponentially-weighted rate.
  */

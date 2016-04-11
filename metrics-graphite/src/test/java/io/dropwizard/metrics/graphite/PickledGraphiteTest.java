@@ -13,8 +13,6 @@ import org.mockito.stubbing.Answer;
 import org.python.core.PyList;
 import org.python.core.PyTuple;
 
-import io.dropwizard.metrics.graphite.PickledGraphite;
-
 import javax.net.SocketFactory;
 import javax.script.Bindings;
 import javax.script.Compilable;

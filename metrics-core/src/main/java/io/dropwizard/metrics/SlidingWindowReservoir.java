@@ -1,9 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Reservoir;
-import io.dropwizard.metrics.SlidingWindowReservoir;
-import io.dropwizard.metrics.Snapshot;
-
 import static java.lang.Math.min;
 
 /**

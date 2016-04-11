@@ -1,9 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Counter;
-import io.dropwizard.metrics.Meter;
-import io.dropwizard.metrics.MetricRegistry;
-
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 

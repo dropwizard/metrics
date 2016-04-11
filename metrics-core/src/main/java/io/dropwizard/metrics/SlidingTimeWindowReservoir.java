@@ -1,10 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Clock;
-import io.dropwizard.metrics.Reservoir;
-import io.dropwizard.metrics.SlidingTimeWindowReservoir;
-import io.dropwizard.metrics.Snapshot;
-
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;

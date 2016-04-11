@@ -1,15 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Clock;
-import io.dropwizard.metrics.ExponentiallyDecayingReservoir;
-import io.dropwizard.metrics.Histogram;
-import io.dropwizard.metrics.Meter;
-import io.dropwizard.metrics.Metered;
-import io.dropwizard.metrics.Reservoir;
-import io.dropwizard.metrics.Sampling;
-import io.dropwizard.metrics.Snapshot;
-import io.dropwizard.metrics.Timer;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 

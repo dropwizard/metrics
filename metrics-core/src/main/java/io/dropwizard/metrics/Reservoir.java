@@ -1,7 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Snapshot;
-
 /**
  * A statistically representative reservoir of a data stream.
  */

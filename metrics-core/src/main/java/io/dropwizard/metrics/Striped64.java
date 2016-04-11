@@ -8,7 +8,6 @@
 
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Striped64;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;

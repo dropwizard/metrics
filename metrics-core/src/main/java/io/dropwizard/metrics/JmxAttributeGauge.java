@@ -1,7 +1,5 @@
 package io.dropwizard.metrics;
 
-import io.dropwizard.metrics.Gauge;
-
 import java.io.IOException;
 
 import javax.management.JMException;
