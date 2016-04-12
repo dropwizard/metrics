@@ -20,6 +20,7 @@ public class AdminServlet extends HttpServlet {
     public static final String PING_URI_PARAM_KEY = "ping-uri";
     public static final String THREADS_URI_PARAM_KEY = "threads-uri";
     public static final String HEALTHCHECK_URI_PARAM_KEY = "healthcheck-uri";
+    public static final String HEALTHCHECK_PARAM_ATTRIBUTE_KEY = "healthcheck-param";
     public static final String SERVICE_NAME_PARAM_KEY= "service-name";
     public static final String CPU_PROFILE_URI_PARAM_KEY = "cpu-profile-uri";
 
@@ -107,7 +108,9 @@ public class AdminServlet extends HttpServlet {
         final String uri = req.getPathInfo();
         if (uri == null || uri.equals("/")) {
             super.service(req, resp);
-        } else if (uri.equals(healthcheckUri)) {
+        } else if (uri.startsWith(healthcheckUri)) {
+            String healthCheckParam = uri.substring(healthcheckUri.length());
+            req.setAttribute(HEALTHCHECK_PARAM_ATTRIBUTE_KEY, healthCheckParam);
             healthCheckServlet.service(req, resp);
         } else if (uri.startsWith(metricsUri)) {
             metricsServlet.service(req, resp);

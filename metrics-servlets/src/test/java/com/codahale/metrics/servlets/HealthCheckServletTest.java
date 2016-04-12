@@ -26,6 +26,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
     @Override
     protected void setUp(ServletTester tester) {
         tester.addServlet(HealthCheckServlet.class, "/healthchecks");
+        tester.addServlet(HealthCheckServlet.class, "/healthchecks/*");
         tester.setAttribute("com.codahale.metrics.servlets.HealthCheckServlet.registry", registry);
         tester.setAttribute("com.codahale.metrics.servlets.HealthCheckServlet.executor", threadPool);
     }
@@ -166,4 +167,47 @@ public class HealthCheckServletTest extends AbstractServletTest {
         final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
         healthCheckServlet.init(servletConfig);
     }
+
+    @Test
+    public void returns200ForOneCheckIfHealthy() throws Exception {
+        registry.register("fun", new HealthCheck() {
+            @Override
+            protected Result check() throws Exception {
+                return Result.healthy("whee");
+            }
+        });
+
+        request.setURI("/healthchecks/fun");
+
+        processRequest();
+
+        assertThat(response.getStatus())
+                .isEqualTo(200);
+        assertThat(response.getContent())
+                .isEqualTo("{\"fun\":{\"healthy\":true,\"message\":\"whee\"}}");
+        assertThat(response.get(HttpHeader.CONTENT_TYPE))
+                .isEqualTo("application/json");
+    }
+
+    @Test
+    public void returns500ForOneCheckIfUnhealthy() throws Exception {
+        registry.register("notFun", new HealthCheck() {
+            @Override
+            protected Result check() throws Exception {
+                return Result.unhealthy("whee");
+            }
+        });
+
+        request.setURI("/healthchecks/notFun");
+
+        processRequest();
+
+        assertThat(response.getStatus())
+                .isEqualTo(500);
+        assertThat(response.getContent())
+                .isEqualTo("{\"notFun\":{\"healthy\":false,\"message\":\"whee\"}}");
+        assertThat(response.get(HttpHeader.CONTENT_TYPE))
+                .isEqualTo("application/json");
+    }
+
 }
