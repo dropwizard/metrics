@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.concurrent.ExecutorService;
 
@@ -88,10 +89,14 @@ public class HealthCheckServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse resp) throws ServletException, IOException {
-        final Map<String, HealthCheck.Result> results;
+        Map<String, HealthCheck.Result> results;
         String name = getHealthCheckName(req);
         if (name != null) {
-            results = Collections.singletonMap(name, registry.runHealthCheck(name));
+            try {
+                results = Collections.singletonMap(name, registry.runHealthCheck(name));
+            } catch (NoSuchElementException e) {
+                results = Collections.emptyMap();
+            }
         } else {
             results = runHealthChecks();
         }

@@ -188,7 +188,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
-
+    
     @Test
     public void returns500ForOneCheckIfUnhealthy() throws Exception {
         registry.register("notFun", new HealthCheck() {
