@@ -112,7 +112,7 @@ public class MetricRegistry implements MetricSet {
      * @return a new or pre-existing {@link Counter}
      */
     public Counter counter(String name) {
-        return getOrAdd(name, MetricBuilder.COUNTERS);
+        return getOrAdd(name, getCounterMetricBuilder());
     }
 
     /**
@@ -123,7 +123,7 @@ public class MetricRegistry implements MetricSet {
      * @return a new or pre-existing {@link Histogram}
      */
     public Histogram histogram(String name) {
-        return getOrAdd(name, MetricBuilder.HISTOGRAMS);
+        return getOrAdd(name, getHistogramMetricBuilder());
     }
 
     /**
@@ -134,7 +134,7 @@ public class MetricRegistry implements MetricSet {
      * @return a new or pre-existing {@link Meter}
      */
     public Meter meter(String name) {
-        return getOrAdd(name, MetricBuilder.METERS);
+        return getOrAdd(name, getMeterMetricBuilder());
     }
 
     /**
@@ -145,7 +145,7 @@ public class MetricRegistry implements MetricSet {
      * @return a new or pre-existing {@link Timer}
      */
     public Timer timer(String name) {
-        return getOrAdd(name, MetricBuilder.TIMERS);
+        return getOrAdd(name, getTimerMetricBuilder());
     }
 
     /**
@@ -397,9 +397,46 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * A quick and easy way of capturing the notion of default metrics.
+     * Returns a {@link MetricBuilder} that captures the notion of default counters.
+     * This method is protected so that subclasses may override metric building.
+     * @return a builder that can construct a {@link Counter} 
      */
-    private interface MetricBuilder<T extends Metric> {
+    protected MetricBuilder<Counter> getCounterMetricBuilder() {
+    	return MetricBuilder.COUNTERS;
+    }
+
+    /**
+     * Returns a {@link MetricBuilder} that captures the notion of default histograms.
+     * This method is protected so that subclasses may override metric building.
+     * @return a builder that can construct a {@link Histogram} 
+     */
+    protected MetricBuilder<Histogram> getHistogramMetricBuilder() {
+    	return MetricBuilder.HISTOGRAMS;
+    }
+
+    /**
+     * Returns a {@link MetricBuilder} that captures the notion of default meters.
+     * This method is protected so that subclasses may override metric building.
+     * @return a builder that can construct a {@link Meter} 
+     */
+    protected MetricBuilder<Meter> getMeterMetricBuilder() {
+    	return MetricBuilder.METERS;
+    }
+
+    /**
+     * Returns a {@link MetricBuilder} that captures the notion of default timers.
+     * This method is protected so that subclasses may override metric building.
+     * @return a builder that can construct a {@link Timer} 
+     */
+    protected MetricBuilder<Timer> getTimerMetricBuilder() {
+    	return MetricBuilder.TIMERS;
+    }
+
+    /**
+     * A quick and easy way of capturing the notion of default metrics.
+     * @param <T> the type of {@link Metric} that is created by {@link newMetric}
+     */
+    protected interface MetricBuilder<T extends Metric> {
         MetricBuilder<Counter> COUNTERS = new MetricBuilder<Counter>() {
             @Override
             public Counter newMetric() {
