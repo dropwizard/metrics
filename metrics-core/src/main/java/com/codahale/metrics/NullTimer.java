@@ -49,7 +49,8 @@ public class NullTimer extends Timer {
      * @param duration not used
      * @param unit     not used
      */
-    public void update(long duration, TimeUnit unit) {
+    @Override
+	public void update(long duration, TimeUnit unit) {
     }
 
     /**
@@ -60,7 +61,8 @@ public class NullTimer extends Timer {
      * @return the value returned by {@code event}
      * @throws Exception if {@code event} throws an {@link Exception}
      */
-    public <T> T time(Callable<T> event) throws Exception {
+    @Override
+	public <T> T time(Callable<T> event) throws Exception {
         return event.call();
     }
 
