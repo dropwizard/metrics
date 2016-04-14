@@ -402,7 +402,7 @@ public class MetricRegistry implements MetricSet {
      * @return a builder that can construct a {@link Counter} 
      */
     protected MetricBuilder<Counter> getCounterMetricBuilder() {
-    	return MetricBuilder.COUNTERS;
+        return MetricBuilder.COUNTERS;
     }
 
     /**
@@ -411,7 +411,7 @@ public class MetricRegistry implements MetricSet {
      * @return a builder that can construct a {@link Histogram} 
      */
     protected MetricBuilder<Histogram> getHistogramMetricBuilder() {
-    	return MetricBuilder.HISTOGRAMS;
+        return MetricBuilder.HISTOGRAMS;
     }
 
     /**
@@ -420,7 +420,7 @@ public class MetricRegistry implements MetricSet {
      * @return a builder that can construct a {@link Meter} 
      */
     protected MetricBuilder<Meter> getMeterMetricBuilder() {
-    	return MetricBuilder.METERS;
+        return MetricBuilder.METERS;
     }
 
     /**
@@ -429,7 +429,7 @@ public class MetricRegistry implements MetricSet {
      * @return a builder that can construct a {@link Timer} 
      */
     protected MetricBuilder<Timer> getTimerMetricBuilder() {
-    	return MetricBuilder.TIMERS;
+        return MetricBuilder.TIMERS;
     }
 
     /**
