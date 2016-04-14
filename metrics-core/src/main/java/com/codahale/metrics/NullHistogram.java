@@ -4,40 +4,40 @@ package com.codahale.metrics;
  * A {@link Histogram} metric that cannot be changed from its initial value
  */
 public class NullHistogram extends Histogram {
-	private final Snapshot snapshot;
+    private final Snapshot snapshot;
 
-	/**
-	 * Initializes the histogram's value to contain a single 0.
-	 */
-	public NullHistogram() {
-		this(0);
-	}
+    /**
+     * Initializes the histogram's value to contain a single 0.
+     */
+    public NullHistogram() {
+        this(0);
+    }
 
-	/**
-	 * Initializes the histogram's value to contain a single initialValue.
-	 * 
-	 * @param initialValue will be the histogram's lone value
-	 */
-	public NullHistogram(long initialValue) {
-		this(new long[] { initialValue });
-	}
+    /**
+     * Initializes the histogram's value to contain a single initialValue.
+     * 
+     * @param initialValue will be the histogram's lone value
+     */
+    public NullHistogram(long initialValue) {
+        this(new long[] { initialValue });
+    }
 
-	/**
-	 * Initializes the histogram's values to initialValues.
-	 * 
-	 * @param initialValues will be the histogram's values
-	 */
-	public NullHistogram(long[] initialValues) {
-		super(null);
-		this.snapshot = new UniformSnapshot(initialValues);
-	}
+    /**
+     * Initializes the histogram's values to initialValues.
+     * 
+     * @param initialValues will be the histogram's values
+     */
+    public NullHistogram(long[] initialValues) {
+        super(null);
+        this.snapshot = new UniformSnapshot(initialValues);
+    }
 
     /**
      * Does nothing.
      *
      * @param value not used
      */
-	@Override
+    @Override
     public void update(int value) {
     }
 
@@ -46,7 +46,7 @@ public class NullHistogram extends Histogram {
      *
      * @param value not used
      */
-	@Override
+    @Override
     public void update(long value) {
     }
 
@@ -57,7 +57,7 @@ public class NullHistogram extends Histogram {
      */
     @Override
     public long getCount() {
-    	return snapshot.size();
+        return snapshot.size();
     }
 
     /**

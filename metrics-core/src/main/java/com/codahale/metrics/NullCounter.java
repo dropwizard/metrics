@@ -4,28 +4,28 @@ package com.codahale.metrics;
  * A {@link Counter} metric that cannot be changed from its initial value
  */
 public class NullCounter extends Counter {
-	private final long count;
+    private final long count;
 
-	/**
-	 * Initializes the counter's value to 0
-	 */
-	public NullCounter() {
-		this(0);
-	}
+    /**
+     * Initializes the counter's value to 0
+     */
+    public NullCounter() {
+        this(0);
+    }
 
-	/**
-	 * Initializes the counter's value to initialValue
-	 * 
-	 * @param initialValue will be the counter's value
-	 */
-	public NullCounter(long initialValue) {
-		this.count = initialValue;
-	}
+    /**
+     * Initializes the counter's value to initialValue
+     * 
+     * @param initialValue will be the counter's value
+     */
+    public NullCounter(long initialValue) {
+        this.count = initialValue;
+    }
 
-	/**
+    /**
      * Does nothing.
      */
-	@Override
+    @Override
     public void inc() {
     }
 
@@ -34,14 +34,14 @@ public class NullCounter extends Counter {
      *
      * @param n not used
      */
-	@Override
+    @Override
     public void inc(long n) {
     }
 
     /**
      * Does nothing.
      */
-	@Override
+    @Override
     public void dec() {
     }
 
@@ -50,7 +50,7 @@ public class NullCounter extends Counter {
      *
      * @param n not used
      */
-	@Override
+    @Override
     public void dec(long n) {
     }
 
