@@ -3,6 +3,9 @@ package com.codahale.metrics;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A {@link Timer} metric that cannot be changed from its initial value
+ */
 public class NullTimer extends Timer {
     private final Snapshot snapshot;
     private final double rate;
