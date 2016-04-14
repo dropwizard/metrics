@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.codahale.metrics;
 
 /**
