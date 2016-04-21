@@ -112,7 +112,8 @@ public class HealthCheckTest {
 
     @Test
     public void canHaveHealthyBuilderWithDetail() throws Exception {
-        final HealthCheck.Result result = HealthCheck.Result.healthyBuilder()
+        final HealthCheck.Result result = HealthCheck.Result.builder()
+            .healthy()
             .withDetail("detail", "value")
             .build();
 
@@ -131,7 +132,8 @@ public class HealthCheckTest {
 
     @Test
     public void canHaveUnHealthyBuilderWithDetail() throws Exception {
-        final HealthCheck.Result result = HealthCheck.Result.unHealthyBuilder()
+        final HealthCheck.Result result = HealthCheck.Result.builder()
+            .unhealthy()
             .withDetail("detail", "value")
             .build();
 
@@ -153,7 +155,9 @@ public class HealthCheckTest {
         final RuntimeException e = mock(RuntimeException.class);
         when(e.getMessage()).thenReturn("oh noes");
 
-        final HealthCheck.Result result = HealthCheck.Result.unHealthyBuilder(e)
+        final HealthCheck.Result result = HealthCheck.Result
+            .builder()
+            .unhealthy(e)
             .withDetail("detail", "value")
             .build();
 
