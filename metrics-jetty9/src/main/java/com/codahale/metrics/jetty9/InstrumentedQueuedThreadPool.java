@@ -12,6 +12,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
     private final MetricRegistry metricRegistry;
+    private String prefix;
 
     public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry) {
         this(registry, 200);
@@ -40,32 +41,53 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
                                         @Name("minThreads") int minThreads,
                                         @Name("idleTimeout") int idleTimeout,
                                         @Name("queue") BlockingQueue<Runnable> queue) {
+        this(registry, maxThreads, minThreads, idleTimeout, queue, null);
+    }
+
+    public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry,
+                                        @Name("maxThreads") int maxThreads,
+                                        @Name("minThreads") int minThreads,
+                                        @Name("idleTimeout") int idleTimeout,
+                                        @Name("queue") BlockingQueue<Runnable> queue,
+                                        @Name("prefix") String prefix) {
         super(maxThreads, minThreads, idleTimeout, queue);
         this.metricRegistry = registry;
+        this.prefix = prefix;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 
     @Override
     protected void doStart() throws Exception {
         super.doStart();
-        metricRegistry.register(name(QueuedThreadPool.class, getName(), "utilization"), new RatioGauge() {
+
+        final String prefix = this.prefix == null ? name(QueuedThreadPool.class, getName()) : name(this.prefix, getName());
+
+        metricRegistry.register(name(prefix, "utilization"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(getThreads() - getIdleThreads(), getThreads());
             }
         });
-        metricRegistry.register(name(QueuedThreadPool.class, getName(), "utilization-max"), new RatioGauge() {
+        metricRegistry.register(name(prefix, "utilization-max"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(getThreads() - getIdleThreads(), getMaxThreads());
             }
         });
-        metricRegistry.register(name(QueuedThreadPool.class, getName(), "size"), new Gauge<Integer>() {
+        metricRegistry.register(name(prefix, "size"), new Gauge<Integer>() {
             @Override
             public Integer getValue() {
                 return getThreads();
             }
         });
-        metricRegistry.register(name(QueuedThreadPool.class, getName(), "jobs"), new Gauge<Integer>() {
+        metricRegistry.register(name(prefix, "jobs"), new Gauge<Integer>() {
             @Override
             public Integer getValue() {
                 // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
