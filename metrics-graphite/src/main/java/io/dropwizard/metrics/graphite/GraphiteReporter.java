@@ -306,6 +306,8 @@ public class GraphiteReporter extends ScheduledReporter {
             return format(((Integer) o).longValue());
         } else if (o instanceof Long) {
             return format(((Long) o).longValue());
+        } else if (o instanceof Boolean) {
+            return format(((Boolean) o) ? 1 : 0);
         }
         return null;
     }
