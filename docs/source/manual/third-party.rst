@@ -30,3 +30,4 @@ the many third-party libraries which extend Metrics:
 * `jersey2-metrics <https://bitbucket.org/marshallpierce/jersey2-metrics>`_ provides integration with `Jersey 2 <https://jersey.java.net/>`_.
 * `jersey-metrics-filter <https://github.com/palominolabs/jersey-metrics-filter>`_ provides integration with Jersey 1.
 * `hdrhistogram-metrics-reservoir <https://bitbucket.org/marshallpierce/hdrhistogram-metrics-reservoir>`_ provides a Reservoir backed by `HdrHistogram <http://hdrhistogram.org/>`_.
+* `metrics-circonus <https://github.com/circonus-labs/metrics-circonus>`_ provides a registry and reporter for sending metrics (including full histograms) to `Circonus <https://www.circonus.com/>`_.
