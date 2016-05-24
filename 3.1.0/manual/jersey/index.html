@@ -71,7 +71,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../graphite/">Reporting to Graphite</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../httpclient/">Instrumenting Apache HttpClient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jdbi/">Instrumenting JDBI</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">Instrumenting Jersey 1.x</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Instrumenting Jersey 1.x</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#instrumenting-jersey-2-x">Instrumenting Jersey 2.x</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jetty/">Instrumenting Jetty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../log4j/">Instrumenting Log4j</a></li>
@@ -96,11 +96,11 @@
                 
   <div class="section" id="instrumenting-jersey-1-x">
 <span id="manual-jersey"></span><h1>Instrumenting Jersey 1.x</h1>
-<p>The <tt class="docutils literal"><span class="pre">metrics-jersey</span></tt> module provides <tt class="docutils literal"><span class="pre">InstrumentedResourceMethodDispatchAdapter</span></tt>, which allows
+<p>The <code class="docutils literal"><span class="pre">metrics-jersey</span></code> module provides <code class="docutils literal"><span class="pre">InstrumentedResourceMethodDispatchAdapter</span></code>, which allows
 you to instrument methods on your <a class="reference external" href="https://jersey.java.net/documentation/1.18/index.html">Jersey 1.x</a> resource classes:</p>
-<p>An instance of <tt class="docutils literal"><span class="pre">InstrumentedResourceMethodDispatchAdapter</span></tt> must be registered with your Jersey
-application&#8217;s <tt class="docutils literal"><span class="pre">ResourceConfig</span></tt> as a singleton provider for this to work.</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ExampleApplication</span> <span class="o">{</span>
+<p>An instance of <code class="docutils literal"><span class="pre">InstrumentedResourceMethodDispatchAdapter</span></code> must be registered with your Jersey
+application&#8217;s <code class="docutils literal"><span class="pre">ResourceConfig</span></code> as a singleton provider for this to work.</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ExampleApplication</span> <span class="o">{</span>
      <span class="kd">private</span> <span class="kd">final</span> <span class="n">DefaultResourceConfig</span> <span class="n">config</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DefaultResourceConfig</span><span class="o">();</span>
 
      <span class="kd">public</span> <span class="kt">void</span> <span class="nf">init</span><span class="o">()</span> <span class="o">{</span>
@@ -121,20 +121,20 @@ application&#8217;s <tt class="docutils literal"><span class="pre">ResourceConfi
  <span class="o">}</span>
 </pre></div>
 </div>
-<p>The <tt class="docutils literal"><span class="pre">show</span></tt> method in the above example will have a timer attached to it, measuring the time spent
+<p>The <code class="docutils literal"><span class="pre">show</span></code> method in the above example will have a timer attached to it, measuring the time spent
 in that method.</p>
-<p>Use of the <tt class="docutils literal"><span class="pre">&#64;Metered</span></tt> and <tt class="docutils literal"><span class="pre">&#64;ExceptionMetered</span></tt> annotations is also supported.</p>
+<p>Use of the <code class="docutils literal"><span class="pre">&#64;Metered</span></code> and <code class="docutils literal"><span class="pre">&#64;ExceptionMetered</span></code> annotations is also supported.</p>
 </div>
 <div class="section" id="instrumenting-jersey-2-x">
 <h1>Instrumenting Jersey 2.x</h1>
 <p>Jersey 2.x changed the API for how resource method monitoring works, so a new
-module <tt class="docutils literal"><span class="pre">metrics-jersey2</span></tt> provides <tt class="docutils literal"><span class="pre">InstrumentedResourceMethodApplicationListener</span></tt>,
+module <code class="docutils literal"><span class="pre">metrics-jersey2</span></code> provides <code class="docutils literal"><span class="pre">InstrumentedResourceMethodApplicationListener</span></code>,
 which allows you to instrument methods on your <a class="reference external" href="https://jersey.java.net/documentation/latest/index.html">Jersey 2.x</a> resource classes:</p>
-<p>The <tt class="docutils literal"><span class="pre">metrics-jersey2</span></tt> module provides <tt class="docutils literal"><span class="pre">InstrumentedResourceMethodApplicationListener</span></tt>, which allows
+<p>The <code class="docutils literal"><span class="pre">metrics-jersey2</span></code> module provides <code class="docutils literal"><span class="pre">InstrumentedResourceMethodApplicationListener</span></code>, which allows
 you to instrument methods on your <a class="reference external" href="https://jersey.java.net/documentation/latest/index.html">Jersey 2.x</a> resource classes:</p>
-<p>An instance of <tt class="docutils literal"><span class="pre">InstrumentedResourceMethodApplicationListener</span></tt> must be registered with your Jersey
-application&#8217;s <tt class="docutils literal"><span class="pre">ResourceConfig</span></tt> as a singleton provider for this to work.</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ExampleApplication</span> <span class="kd">extends</span> <span class="n">ResourceConfig</span> <span class="o">{</span>
+<p>An instance of <code class="docutils literal"><span class="pre">InstrumentedResourceMethodApplicationListener</span></code> must be registered with your Jersey
+application&#8217;s <code class="docutils literal"><span class="pre">ResourceConfig</span></code> as a singleton provider for this to work.</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ExampleApplication</span> <span class="kd">extends</span> <span class="n">ResourceConfig</span> <span class="o">{</span>
     <span class="o">.</span>
     <span class="o">.</span>
     <span class="o">.</span>
@@ -156,9 +156,9 @@ application&#8217;s <tt class="docutils literal"><span class="pre">ResourceConfi
 <span class="o">}</span>
 </pre></div>
 </div>
-<p>The <tt class="docutils literal"><span class="pre">show</span></tt> method in the above example will have a timer attached to it, measuring the time spent
+<p>The <code class="docutils literal"><span class="pre">show</span></code> method in the above example will have a timer attached to it, measuring the time spent
 in that method.</p>
-<p>Use of the <tt class="docutils literal"><span class="pre">&#64;Metered</span></tt> and <tt class="docutils literal"><span class="pre">&#64;ExceptionMetered</span></tt> annotations is also supported.</p>
+<p>Use of the <code class="docutils literal"><span class="pre">&#64;Metered</span></code> and <code class="docutils literal"><span class="pre">&#64;ExceptionMetered</span></code> annotations is also supported.</p>
 </div>
 
 
@@ -167,7 +167,7 @@ in that method.</p>
         <footer>
             &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
             Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
-            1.2.2.
+            1.4.1.
         </footer>
     </div>
 </body>

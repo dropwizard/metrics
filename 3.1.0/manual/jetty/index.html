@@ -73,7 +73,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../jdbi/">Instrumenting JDBI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jersey/">Instrumenting Jersey 1.x</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jersey/#instrumenting-jersey-2-x">Instrumenting Jersey 2.x</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">Instrumenting Jetty</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Instrumenting Jetty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../log4j/">Instrumenting Log4j</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../logback/">Instrumenting Logback</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jvm/">JVM Instrumentation</a></li>
@@ -96,21 +96,21 @@
                 
   <div class="section" id="instrumenting-jetty">
 <span id="manual-jetty"></span><h1>Instrumenting Jetty</h1>
-<p>The <tt class="docutils literal"><span class="pre">metrics-jetty8</span></tt> (Jetty 8.0), <tt class="docutils literal"><span class="pre">metrics-jetty9-legacy</span></tt> (Jetty 9.0), and <tt class="docutils literal"><span class="pre">metrics-jetty9</span></tt>
+<p>The <code class="docutils literal"><span class="pre">metrics-jetty8</span></code> (Jetty 8.0), <code class="docutils literal"><span class="pre">metrics-jetty9-legacy</span></code> (Jetty 9.0), and <code class="docutils literal"><span class="pre">metrics-jetty9</span></code>
 (Jetty 9.1 and higher) modules provides a set of instrumented equivalents of <a class="reference external" href="http://www.eclipse.org/jetty/">Jetty</a> classes:
-<tt class="docutils literal"><span class="pre">InstrumentedBlockingChannelConnector</span></tt>, <tt class="docutils literal"><span class="pre">InstrumentedHandler</span></tt>, <tt class="docutils literal"><span class="pre">InstrumentedQueuedThreadPool</span></tt>,
-<tt class="docutils literal"><span class="pre">InstrumentedSelectChannelConnector</span></tt>, and <tt class="docutils literal"><span class="pre">InstrumentedSocketConnector</span></tt>.</p>
-<p>The <tt class="docutils literal"><span class="pre">Connector</span></tt> implementations are simple, instrumented subclasses of the Jetty connector types
+<code class="docutils literal"><span class="pre">InstrumentedBlockingChannelConnector</span></code>, <code class="docutils literal"><span class="pre">InstrumentedHandler</span></code>, <code class="docutils literal"><span class="pre">InstrumentedQueuedThreadPool</span></code>,
+<code class="docutils literal"><span class="pre">InstrumentedSelectChannelConnector</span></code>, and <code class="docutils literal"><span class="pre">InstrumentedSocketConnector</span></code>.</p>
+<p>The <code class="docutils literal"><span class="pre">Connector</span></code> implementations are simple, instrumented subclasses of the Jetty connector types
 which measure connection duration, the rate of accepted connections, connections, disconnections,
 and the total number of active connections.</p>
-<p><tt class="docutils literal"><span class="pre">InstrumentedQueuedThreadPool</span></tt> is a <tt class="docutils literal"><span class="pre">QueuedThreadPool</span></tt> subclass which measures the ratio of idle
+<p><code class="docutils literal"><span class="pre">InstrumentedQueuedThreadPool</span></code> is a <code class="docutils literal"><span class="pre">QueuedThreadPool</span></code> subclass which measures the ratio of idle
 threads to working threads as well as the absolute number of threads (idle and otherwise).</p>
-<p><tt class="docutils literal"><span class="pre">InstrumentedHandler</span></tt> is a <tt class="docutils literal"><span class="pre">Handler</span></tt> decorator which measures a wide range of HTTP behavior:
+<p><code class="docutils literal"><span class="pre">InstrumentedHandler</span></code> is a <code class="docutils literal"><span class="pre">Handler</span></code> decorator which measures a wide range of HTTP behavior:
 dispatch times, requests, resumes, suspends, expires, the number of active, suspected, and
-dispatched requests, as well as meters of responses with <tt class="docutils literal"><span class="pre">1xx</span></tt>, <tt class="docutils literal"><span class="pre">2xx</span></tt>, <tt class="docutils literal"><span class="pre">3xx</span></tt>, <tt class="docutils literal"><span class="pre">4xx</span></tt>, and
-<tt class="docutils literal"><span class="pre">5xx</span></tt> status codes. It even has gauges for the ratios of <tt class="docutils literal"><span class="pre">4xx</span></tt> and <tt class="docutils literal"><span class="pre">5xx</span></tt> response rates to
-overall response rates. Finally, it includes meters for requests by the HTTP method: <tt class="docutils literal"><span class="pre">GET</span></tt>,
-<tt class="docutils literal"><span class="pre">POST</span></tt>, etc.</p>
+dispatched requests, as well as meters of responses with <code class="docutils literal"><span class="pre">1xx</span></code>, <code class="docutils literal"><span class="pre">2xx</span></code>, <code class="docutils literal"><span class="pre">3xx</span></code>, <code class="docutils literal"><span class="pre">4xx</span></code>, and
+<code class="docutils literal"><span class="pre">5xx</span></code> status codes. It even has gauges for the ratios of <code class="docutils literal"><span class="pre">4xx</span></code> and <code class="docutils literal"><span class="pre">5xx</span></code> response rates to
+overall response rates. Finally, it includes meters for requests by the HTTP method: <code class="docutils literal"><span class="pre">GET</span></code>,
+<code class="docutils literal"><span class="pre">POST</span></code>, etc.</p>
 </div>
 
 
@@ -119,7 +119,7 @@ overall response rates. Finally, it includes meters for requests by the HTTP met
         <footer>
             &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
             Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
-            1.2.2.
+            1.4.1.
         </footer>
     </div>
 </body>

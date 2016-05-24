@@ -79,7 +79,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../jvm/">JVM Instrumentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../json/">JSON Support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../servlets/">Metrics Servlets</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">Instrumenting Web Applications</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Instrumenting Web Applications</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../third-party/">Third Party Libraries</a></li>
 </ul>
 </li>
@@ -96,11 +96,11 @@
                 
   <div class="section" id="instrumenting-web-applications">
 <span id="manual-servlet"></span><h1>Instrumenting Web Applications</h1>
-<p>The <tt class="docutils literal"><span class="pre">metrics-servlet</span></tt> module provides a Servlet filter which has meters for status codes, a
+<p>The <code class="docutils literal"><span class="pre">metrics-servlet</span></code> module provides a Servlet filter which has meters for status codes, a
 counter for the number of active requests, and a timer for request duration. By default the filter
-will use <tt class="docutils literal"><span class="pre">com.codahale.metrics.servlet.InstrumentedFilter</span></tt> as the base name of the metrics.
-You can use the filter in your <tt class="docutils literal"><span class="pre">web.xml</span></tt> like this:</p>
-<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;filter&gt;</span>
+will use <code class="docutils literal"><span class="pre">com.codahale.metrics.servlet.InstrumentedFilter</span></code> as the base name of the metrics.
+You can use the filter in your <code class="docutils literal"><span class="pre">web.xml</span></code> like this:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;filter&gt;</span>
     <span class="nt">&lt;filter-name&gt;</span>instrumentedFilter<span class="nt">&lt;/filter-name&gt;</span>
     <span class="nt">&lt;filter-class&gt;</span>com.codahale.metrics.servlet.InstrumentedFilter<span class="nt">&lt;/filter-class&gt;</span>
 <span class="nt">&lt;/filter&gt;</span>
@@ -110,10 +110,10 @@ You can use the filter in your <tt class="docutils literal"><span class="pre">we
 <span class="nt">&lt;/filter-mapping&gt;</span>
 </pre></div>
 </div>
-<p>An optional filter init-param <tt class="docutils literal"><span class="pre">name-prefix</span></tt> can be specified to override the base name
+<p>An optional filter init-param <code class="docutils literal"><span class="pre">name-prefix</span></code> can be specified to override the base name
 of the metrics associated with the filter mapping. This can be helpful if you need to instrument
 multiple url patterns and give each a unique name.</p>
-<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;filter&gt;</span>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;filter&gt;</span>
     <span class="nt">&lt;filter-name&gt;</span>instrumentedFilter<span class="nt">&lt;/filter-name&gt;</span>
     <span class="nt">&lt;filter-class&gt;</span>com.codahale.metrics.servlet.InstrumentedFilter<span class="nt">&lt;/filter-class&gt;</span>
     <span class="nt">&lt;init-param&gt;</span>
@@ -127,10 +127,10 @@ multiple url patterns and give each a unique name.</p>
 <span class="nt">&lt;/filter-mapping&gt;</span>
 </pre></div>
 </div>
-<p>You will need to add your <tt class="docutils literal"><span class="pre">MetricRegistry</span></tt> to the servlet context as an attribute named
-<tt class="docutils literal"><span class="pre">com.codahale.metrics.servlet.InstrumentedFilter.registry</span></tt>. You can do this using the Servlet API
-by extending <tt class="docutils literal"><span class="pre">InstrumentedFilterContextListener</span></tt>:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyInstrumentedFilterContextListener</span> <span class="kd">extends</span> <span class="n">InstrumentedFilterContextListener</span> <span class="o">{</span>
+<p>You will need to add your <code class="docutils literal"><span class="pre">MetricRegistry</span></code> to the servlet context as an attribute named
+<code class="docutils literal"><span class="pre">com.codahale.metrics.servlet.InstrumentedFilter.registry</span></code>. You can do this using the Servlet API
+by extending <code class="docutils literal"><span class="pre">InstrumentedFilterContextListener</span></code>:</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyInstrumentedFilterContextListener</span> <span class="kd">extends</span> <span class="n">InstrumentedFilterContextListener</span> <span class="o">{</span>
     <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">MetricRegistry</span> <span class="n">REGISTRY</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MetricRegistry</span><span class="o">();</span>
 
     <span class="nd">@Override</span>
@@ -148,7 +148,7 @@ by extending <tt class="docutils literal"><span class="pre">InstrumentedFilterCo
         <footer>
             &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
             Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
-            1.2.2.
+            1.4.1.
         </footer>
     </div>
 </body>

@@ -67,7 +67,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../core/">Metrics Core</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../healthchecks/">Health Checks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ehcache/">Instrumenting Ehcache</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">Reporting to Ganglia</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Reporting to Ganglia</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../graphite/">Reporting to Graphite</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../httpclient/">Instrumenting Apache HttpClient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jdbi/">Instrumenting JDBI</a></li>
@@ -96,9 +96,9 @@
                 
   <div class="section" id="reporting-to-ganglia">
 <span id="manual-ganglia"></span><h1>Reporting to Ganglia</h1>
-<p>The <tt class="docutils literal"><span class="pre">metrics-ganglia</span></tt> module provides <tt class="docutils literal"><span class="pre">GangliaReporter</span></tt>, which allows your application to
+<p>The <code class="docutils literal"><span class="pre">metrics-ganglia</span></code> module provides <code class="docutils literal"><span class="pre">GangliaReporter</span></code>, which allows your application to
 constantly stream metric values to a <a class="reference external" href="http://ganglia.sourceforge.net/">Ganglia</a> server:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">GMetric</span> <span class="n">ganglia</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GMetric</span><span class="o">(</span><span class="s">&quot;ganglia.example.com&quot;</span><span class="o">,</span> <span class="mi">8649</span><span class="o">,</span> <span class="n">UDPAddressingMode</span><span class="o">.</span><span class="na">MULTICAST</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">final</span> <span class="n">GMetric</span> <span class="n">ganglia</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GMetric</span><span class="o">(</span><span class="s">&quot;ganglia.example.com&quot;</span><span class="o">,</span> <span class="mi">8649</span><span class="o">,</span> <span class="n">UDPAddressingMode</span><span class="o">.</span><span class="na">MULTICAST</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
 <span class="kd">final</span> <span class="n">GangliaReporter</span> <span class="n">reporter</span> <span class="o">=</span> <span class="n">GangliaReporter</span><span class="o">.</span><span class="na">forRegistry</span><span class="o">(</span><span class="n">registry</span><span class="o">)</span>
                                                 <span class="o">.</span><span class="na">convertRatesTo</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
                                                 <span class="o">.</span><span class="na">convertDurationsTo</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">MILLISECONDS</span><span class="o">)</span>
@@ -114,7 +114,7 @@ constantly stream metric values to a <a class="reference external" href="http://
         <footer>
             &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
             Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
-            1.2.2.
+            1.4.1.
         </footer>
     </div>
 </body>

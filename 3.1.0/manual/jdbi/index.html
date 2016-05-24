@@ -70,7 +70,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../ganglia/">Reporting to Ganglia</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../graphite/">Reporting to Graphite</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../httpclient/">Instrumenting Apache HttpClient</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">Instrumenting JDBI</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Instrumenting JDBI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jersey/">Instrumenting Jersey 1.x</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jersey/#instrumenting-jersey-2-x">Instrumenting Jersey 2.x</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jetty/">Instrumenting Jetty</a></li>
@@ -96,17 +96,17 @@
                 
   <div class="section" id="instrumenting-jdbi">
 <span id="manual-jdbi"></span><h1>Instrumenting JDBI</h1>
-<p>The <tt class="docutils literal"><span class="pre">metrics-jdbi</span></tt> module provides a <tt class="docutils literal"><span class="pre">TimingCollector</span></tt> implementation for <a class="reference external" href="http://jdbi.org/">JDBI</a>, an SQL
+<p>The <code class="docutils literal"><span class="pre">metrics-jdbi</span></code> module provides a <code class="docutils literal"><span class="pre">TimingCollector</span></code> implementation for <a class="reference external" href="http://jdbi.org/">JDBI</a>, an SQL
 convenience library.</p>
-<p>To use it, just add a <tt class="docutils literal"><span class="pre">InstrumentedTimingCollector</span></tt> instance to your <tt class="docutils literal"><span class="pre">DBI</span></tt>:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">DBI</span> <span class="n">dbi</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DBI</span><span class="o">(</span><span class="n">dataSource</span><span class="o">);</span>
+<p>To use it, just add a <code class="docutils literal"><span class="pre">InstrumentedTimingCollector</span></code> instance to your <code class="docutils literal"><span class="pre">DBI</span></code>:</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">final</span> <span class="n">DBI</span> <span class="n">dbi</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DBI</span><span class="o">(</span><span class="n">dataSource</span><span class="o">);</span>
 <span class="n">dbi</span><span class="o">.</span><span class="na">setTimingCollector</span><span class="o">(</span><span class="k">new</span> <span class="n">InstrumentedTimingCollector</span><span class="o">(</span><span class="n">registry</span><span class="o">));</span>
 </pre></div>
 </div>
-<p><tt class="docutils literal"><span class="pre">InstrumentedTimingCollector</span></tt> keeps per-SQL-object timing data, as well as general raw SQL timing
-data. The metric names for each query are constructed by an <tt class="docutils literal"><span class="pre">StatementNameStrategy</span></tt> instance, of
-which there are many implementations. By default, <tt class="docutils literal"><span class="pre">StatementNameStrategy</span></tt> uses
-<tt class="docutils literal"><span class="pre">SmartNameStrategy</span></tt>, which attempts to effectively handle both queries from bound objects and raw
+<p><code class="docutils literal"><span class="pre">InstrumentedTimingCollector</span></code> keeps per-SQL-object timing data, as well as general raw SQL timing
+data. The metric names for each query are constructed by an <code class="docutils literal"><span class="pre">StatementNameStrategy</span></code> instance, of
+which there are many implementations. By default, <code class="docutils literal"><span class="pre">StatementNameStrategy</span></code> uses
+<code class="docutils literal"><span class="pre">SmartNameStrategy</span></code>, which attempts to effectively handle both queries from bound objects and raw
 SQL.</p>
 </div>
 
@@ -116,7 +116,7 @@ SQL.</p>
         <footer>
             &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
             Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
-            1.2.2.
+            1.4.1.
         </footer>
     </div>
 </body>

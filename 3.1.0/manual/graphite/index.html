@@ -68,7 +68,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../healthchecks/">Health Checks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ehcache/">Instrumenting Ehcache</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ganglia/">Reporting to Ganglia</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">Reporting to Graphite</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Reporting to Graphite</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../httpclient/">Instrumenting Apache HttpClient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jdbi/">Instrumenting JDBI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jersey/">Instrumenting Jersey 1.x</a></li>
@@ -96,9 +96,9 @@
                 
   <div class="section" id="reporting-to-graphite">
 <span id="manual-graphite"></span><h1>Reporting to Graphite</h1>
-<p>The <tt class="docutils literal"><span class="pre">metrics-graphite</span></tt> module provides <tt class="docutils literal"><span class="pre">GraphiteReporter</span></tt>, which allows your application to
+<p>The <code class="docutils literal"><span class="pre">metrics-graphite</span></code> module provides <code class="docutils literal"><span class="pre">GraphiteReporter</span></code>, which allows your application to
 constantly stream metric values to a <a class="reference external" href="http://graphite.wikidot.com/">Graphite</a> server:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">Graphite</span> <span class="n">graphite</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Graphite</span><span class="o">(</span><span class="k">new</span> <span class="n">InetSocketAddress</span><span class="o">(</span><span class="s">&quot;graphite.example.com&quot;</span><span class="o">,</span> <span class="mi">2003</span><span class="o">));</span>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">final</span> <span class="n">Graphite</span> <span class="n">graphite</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Graphite</span><span class="o">(</span><span class="k">new</span> <span class="n">InetSocketAddress</span><span class="o">(</span><span class="s">&quot;graphite.example.com&quot;</span><span class="o">,</span> <span class="mi">2003</span><span class="o">));</span>
 <span class="kd">final</span> <span class="n">GraphiteReporter</span> <span class="n">reporter</span> <span class="o">=</span> <span class="n">GraphiteReporter</span><span class="o">.</span><span class="na">forRegistry</span><span class="o">(</span><span class="n">registry</span><span class="o">)</span>
                                                   <span class="o">.</span><span class="na">prefixedWith</span><span class="o">(</span><span class="s">&quot;web1.example.com&quot;</span><span class="o">)</span>
                                                   <span class="o">.</span><span class="na">convertRatesTo</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
@@ -108,8 +108,8 @@ constantly stream metric values to a <a class="reference external" href="http://
 <span class="n">reporter</span><span class="o">.</span><span class="na">start</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">MINUTES</span><span class="o">);</span>
 </pre></div>
 </div>
-<p>If you prefer to write metrics in batches using pickle, you can use the <tt class="docutils literal"><span class="pre">PickledGraphite</span></tt>:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="kd">final</span> <span class="n">Graphite</span> <span class="n">pickledGraphite</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PickledGraphite</span><span class="o">(</span><span class="k">new</span> <span class="n">InetSocketAddress</span><span class="o">(</span><span class="s">&quot;graphite.example.com&quot;</span><span class="o">,</span> <span class="mi">2004</span><span class="o">));</span>
+<p>If you prefer to write metrics in batches using pickle, you can use the <code class="docutils literal"><span class="pre">PickledGraphite</span></code>:</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">final</span> <span class="n">Graphite</span> <span class="n">pickledGraphite</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PickledGraphite</span><span class="o">(</span><span class="k">new</span> <span class="n">InetSocketAddress</span><span class="o">(</span><span class="s">&quot;graphite.example.com&quot;</span><span class="o">,</span> <span class="mi">2004</span><span class="o">));</span>
 <span class="kd">final</span> <span class="n">GraphiteReporter</span> <span class="n">reporter</span> <span class="o">=</span> <span class="n">GraphiteReporter</span><span class="o">.</span><span class="na">forRegistry</span><span class="o">(</span><span class="n">registry</span><span class="o">)</span>
                                                   <span class="o">.</span><span class="na">prefixedWith</span><span class="o">(</span><span class="s">&quot;web1.example.com&quot;</span><span class="o">)</span>
                                                   <span class="o">.</span><span class="na">convertRatesTo</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">)</span>
@@ -127,7 +127,7 @@ constantly stream metric values to a <a class="reference external" href="http://
         <footer>
             &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
             Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
-            1.2.2.
+            1.4.1.
         </footer>
     </div>
 </body>

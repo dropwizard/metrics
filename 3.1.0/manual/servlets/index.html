@@ -78,7 +78,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../logback/">Instrumenting Logback</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jvm/">JVM Instrumentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../json/">JSON Support</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">Metrics Servlets</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Metrics Servlets</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#healthcheckservlet">HealthCheckServlet</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#threaddumpservlet">ThreadDumpServlet</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#metricsservlet">MetricsServlet</a></li>
@@ -103,57 +103,57 @@
                 
   <div class="section" id="metrics-servlets">
 <span id="manual-servlets"></span><h1>Metrics Servlets</h1>
-<p>The <tt class="docutils literal"><span class="pre">metrics-servlets</span></tt> module provides a handful of useful servlets:</p>
+<p>The <code class="docutils literal"><span class="pre">metrics-servlets</span></code> module provides a handful of useful servlets:</p>
 <div class="section" id="healthcheckservlet">
 <span id="man-servlet-healthcheck"></span><h2>HealthCheckServlet</h2>
-<p><tt class="docutils literal"><span class="pre">HealthCheckServlet</span></tt> responds to <tt class="docutils literal"><span class="pre">GET</span></tt> requests by running all the [health checks](#health-checks)
-and returning <tt class="docutils literal"><span class="pre">501</span> <span class="pre">Not</span> <span class="pre">Implemented</span></tt> if no health checks are registered, <tt class="docutils literal"><span class="pre">200</span> <span class="pre">OK</span></tt> if all pass, or
-<tt class="docutils literal"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Service</span> <span class="pre">Error</span></tt> if one or more fail. The results are returned as a human-readable
-<tt class="docutils literal"><span class="pre">text/plain</span></tt> entity.</p>
-<p><tt class="docutils literal"><span class="pre">HealthCheckServlet</span></tt> requires that the servlet context has a <tt class="docutils literal"><span class="pre">HealthCheckRegistry</span></tt> named
-<tt class="docutils literal"><span class="pre">com.codahale.metrics.servlets.HealthCheckServlet.registry</span></tt>. You can subclass
-<tt class="docutils literal"><span class="pre">MetricsServletContextListener</span></tt>, which will add a specific <tt class="docutils literal"><span class="pre">HealthCheckRegistry</span></tt> to the servlet
+<p><code class="docutils literal"><span class="pre">HealthCheckServlet</span></code> responds to <code class="docutils literal"><span class="pre">GET</span></code> requests by running all the [health checks](#health-checks)
+and returning <code class="docutils literal"><span class="pre">501</span> <span class="pre">Not</span> <span class="pre">Implemented</span></code> if no health checks are registered, <code class="docutils literal"><span class="pre">200</span> <span class="pre">OK</span></code> if all pass, or
+<code class="docutils literal"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Service</span> <span class="pre">Error</span></code> if one or more fail. The results are returned as a human-readable
+<code class="docutils literal"><span class="pre">text/plain</span></code> entity.</p>
+<p><code class="docutils literal"><span class="pre">HealthCheckServlet</span></code> requires that the servlet context has a <code class="docutils literal"><span class="pre">HealthCheckRegistry</span></code> named
+<code class="docutils literal"><span class="pre">com.codahale.metrics.servlets.HealthCheckServlet.registry</span></code>. You can subclass
+<code class="docutils literal"><span class="pre">MetricsServletContextListener</span></code>, which will add a specific <code class="docutils literal"><span class="pre">HealthCheckRegistry</span></code> to the servlet
 context.</p>
 </div>
 <div class="section" id="threaddumpservlet">
 <span id="man-servlet-threaddump"></span><h2>ThreadDumpServlet</h2>
-<p><tt class="docutils literal"><span class="pre">ThreadDumpServlet</span></tt> responds to <tt class="docutils literal"><span class="pre">GET</span></tt> requests with a <tt class="docutils literal"><span class="pre">text/plain</span></tt> representation of all the live
+<p><code class="docutils literal"><span class="pre">ThreadDumpServlet</span></code> responds to <code class="docutils literal"><span class="pre">GET</span></code> requests with a <code class="docutils literal"><span class="pre">text/plain</span></code> representation of all the live
 threads in the JVM, their states, their stack traces, and the state of any locks they may be
 waiting for.</p>
 </div>
 <div class="section" id="metricsservlet">
 <span id="man-servlet-metrics"></span><h2>MetricsServlet</h2>
-<p><tt class="docutils literal"><span class="pre">MetricsServlet</span></tt> exposes the state of the metrics in a particular registry as a JSON object.</p>
-<p><tt class="docutils literal"><span class="pre">MetricsServlet</span></tt> requires that the servlet context has a <tt class="docutils literal"><span class="pre">MetricRegistry</span></tt> named
-<tt class="docutils literal"><span class="pre">com.codahale.metrics.servlets.MetricsServlet.registry</span></tt>. You can subclass
-<tt class="docutils literal"><span class="pre">MetricsServletContextListener</span></tt>, which will add a specific <tt class="docutils literal"><span class="pre">MetricRegistry</span></tt> to the servlet
+<p><code class="docutils literal"><span class="pre">MetricsServlet</span></code> exposes the state of the metrics in a particular registry as a JSON object.</p>
+<p><code class="docutils literal"><span class="pre">MetricsServlet</span></code> requires that the servlet context has a <code class="docutils literal"><span class="pre">MetricRegistry</span></code> named
+<code class="docutils literal"><span class="pre">com.codahale.metrics.servlets.MetricsServlet.registry</span></code>. You can subclass
+<code class="docutils literal"><span class="pre">MetricsServletContextListener</span></code>, which will add a specific <code class="docutils literal"><span class="pre">MetricRegistry</span></code> to the servlet
 context.</p>
-<p><tt class="docutils literal"><span class="pre">MetricsServlet</span></tt> also takes an initialization parameter, <tt class="docutils literal"><span class="pre">show-jvm-metrics</span></tt>, which if <tt class="docutils literal"><span class="pre">&quot;false&quot;</span></tt> will
+<p><code class="docutils literal"><span class="pre">MetricsServlet</span></code> also takes an initialization parameter, <code class="docutils literal"><span class="pre">show-jvm-metrics</span></code>, which if <code class="docutils literal"><span class="pre">&quot;false&quot;</span></code> will
 disable the outputting of JVM-level information in the JSON object.</p>
 </div>
 <div class="section" id="pingservlet">
 <span id="man-servlet-ping"></span><h2>PingServlet</h2>
-<p><tt class="docutils literal"><span class="pre">PingServlet</span></tt> responds to <tt class="docutils literal"><span class="pre">GET</span></tt> requests with a <tt class="docutils literal"><span class="pre">text/plain</span></tt>/<tt class="docutils literal"><span class="pre">200</span> <span class="pre">OK</span></tt> response of <tt class="docutils literal"><span class="pre">pong</span></tt>. This is
+<p><code class="docutils literal"><span class="pre">PingServlet</span></code> responds to <code class="docutils literal"><span class="pre">GET</span></code> requests with a <code class="docutils literal"><span class="pre">text/plain</span></code>/<code class="docutils literal"><span class="pre">200</span> <span class="pre">OK</span></code> response of <code class="docutils literal"><span class="pre">pong</span></code>. This is
 useful for determining liveness for load balancers, etc.</p>
 </div>
 <div class="section" id="adminservlet">
 <span id="man-servlet-admin"></span><h2>AdminServlet</h2>
-<p><tt class="docutils literal"><span class="pre">AdminServlet</span></tt> aggregates <tt class="docutils literal"><span class="pre">HealthCheckServlet</span></tt>, <tt class="docutils literal"><span class="pre">ThreadDumpServlet</span></tt>, <tt class="docutils literal"><span class="pre">MetricsServlet</span></tt>, and
-<tt class="docutils literal"><span class="pre">PingServlet</span></tt> into a single, easy-to-use servlet which provides a set of URIs:</p>
+<p><code class="docutils literal"><span class="pre">AdminServlet</span></code> aggregates <code class="docutils literal"><span class="pre">HealthCheckServlet</span></code>, <code class="docutils literal"><span class="pre">ThreadDumpServlet</span></code>, <code class="docutils literal"><span class="pre">MetricsServlet</span></code>, and
+<code class="docutils literal"><span class="pre">PingServlet</span></code> into a single, easy-to-use servlet which provides a set of URIs:</p>
 <ul class="simple">
-<li><tt class="docutils literal"><span class="pre">/</span></tt>: an HTML admin menu with links to the following:<ul>
-<li><tt class="docutils literal"><span class="pre">/healthcheck</span></tt>: <tt class="docutils literal"><span class="pre">HealthCheckServlet</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">/metrics</span></tt>: <tt class="docutils literal"><span class="pre">MetricsServlet</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">/ping</span></tt>: <tt class="docutils literal"><span class="pre">PingServlet</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">/threads</span></tt>: <tt class="docutils literal"><span class="pre">ThreadDumpServlet</span></tt></li>
+<li><code class="docutils literal"><span class="pre">/</span></code>: an HTML admin menu with links to the following:<ul>
+<li><code class="docutils literal"><span class="pre">/healthcheck</span></code>: <code class="docutils literal"><span class="pre">HealthCheckServlet</span></code></li>
+<li><code class="docutils literal"><span class="pre">/metrics</span></code>: <code class="docutils literal"><span class="pre">MetricsServlet</span></code></li>
+<li><code class="docutils literal"><span class="pre">/ping</span></code>: <code class="docutils literal"><span class="pre">PingServlet</span></code></li>
+<li><code class="docutils literal"><span class="pre">/threads</span></code>: <code class="docutils literal"><span class="pre">ThreadDumpServlet</span></code></li>
 </ul>
 </li>
 </ul>
-<p>You will need to add your <tt class="docutils literal"><span class="pre">MetricRegistry</span></tt> and <tt class="docutils literal"><span class="pre">HealthCheckRegistry</span></tt> instances to the servlet
-context as attributes named <tt class="docutils literal"><span class="pre">com.codahale.metrics.servlets.MetricsServlet.registry</span></tt> and
-<tt class="docutils literal"><span class="pre">com.codahale.metrics.servlets.HealthCheckServlet.registry</span></tt>, respectively. You can do this using
-the Servlet API by extending <tt class="docutils literal"><span class="pre">MetricsServlet.ContextListener</span></tt> for MetricRegistry:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyMetricsServletContextListener</span> <span class="kd">extends</span> <span class="n">MetricsServlet</span><span class="o">.</span><span class="na">ContextListener</span> <span class="o">{</span>
+<p>You will need to add your <code class="docutils literal"><span class="pre">MetricRegistry</span></code> and <code class="docutils literal"><span class="pre">HealthCheckRegistry</span></code> instances to the servlet
+context as attributes named <code class="docutils literal"><span class="pre">com.codahale.metrics.servlets.MetricsServlet.registry</span></code> and
+<code class="docutils literal"><span class="pre">com.codahale.metrics.servlets.HealthCheckServlet.registry</span></code>, respectively. You can do this using
+the Servlet API by extending <code class="docutils literal"><span class="pre">MetricsServlet.ContextListener</span></code> for MetricRegistry:</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyMetricsServletContextListener</span> <span class="kd">extends</span> <span class="n">MetricsServlet</span><span class="o">.</span><span class="na">ContextListener</span> <span class="o">{</span>
 
     <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">MetricRegistry</span> <span class="n">METRIC_REGISTRY</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MetricRegistry</span><span class="o">();</span>
 
@@ -165,8 +165,8 @@ the Servlet API by extending <tt class="docutils literal"><span class="pre">Metr
 <span class="o">}</span>
 </pre></div>
 </div>
-<p>And by extending <tt class="docutils literal"><span class="pre">HealthCheckServlet.ContextListener</span></tt> for HealthCheckRegistry:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyHealthCheckServletContextListener</span> <span class="kd">extends</span> <span class="n">HealthCheckServlet</span><span class="o">.</span><span class="na">ContextListener</span> <span class="o">{</span>
+<p>And by extending <code class="docutils literal"><span class="pre">HealthCheckServlet.ContextListener</span></code> for HealthCheckRegistry:</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyHealthCheckServletContextListener</span> <span class="kd">extends</span> <span class="n">HealthCheckServlet</span><span class="o">.</span><span class="na">ContextListener</span> <span class="o">{</span>
 
     <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">HealthCheckRegistry</span> <span class="n">HEALTH_CHECK_REGISTRY</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HealthCheckRegistry</span><span class="o">();</span>
 
@@ -178,8 +178,8 @@ the Servlet API by extending <tt class="docutils literal"><span class="pre">Metr
 <span class="o">}</span>
 </pre></div>
 </div>
-<p>Then you will need to register servlet context listeners either in you <tt class="docutils literal"><span class="pre">web.xml</span></tt> or annotating the class with <tt class="docutils literal"><span class="pre">&#64;WebListener</span></tt> if you are in servlet 3.0 environment. In <tt class="docutils literal"><span class="pre">web.xml</span></tt>:</p>
-<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;listener&gt;</span>
+<p>Then you will need to register servlet context listeners either in you <code class="docutils literal"><span class="pre">web.xml</span></code> or annotating the class with <code class="docutils literal"><span class="pre">&#64;WebListener</span></code> if you are in servlet 3.0 environment. In <code class="docutils literal"><span class="pre">web.xml</span></code>:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;listener&gt;</span>
         <span class="nt">&lt;listener-class&gt;</span>com.example.MyMetricsServletContextListener<span class="nt">&lt;/listener-class&gt;</span>
 <span class="nt">&lt;/listener&gt;</span>
 <span class="nt">&lt;listener&gt;</span>
@@ -187,8 +187,8 @@ the Servlet API by extending <tt class="docutils literal"><span class="pre">Metr
 <span class="nt">&lt;/listener&gt;</span>
 </pre></div>
 </div>
-<p>You will also need to register <tt class="docutils literal"><span class="pre">AdminServlet</span></tt> in <tt class="docutils literal"><span class="pre">web.xml</span></tt>:</p>
-<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;servlet&gt;</span>
+<p>You will also need to register <code class="docutils literal"><span class="pre">AdminServlet</span></code> in <code class="docutils literal"><span class="pre">web.xml</span></code>:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;servlet&gt;</span>
         <span class="nt">&lt;servlet-name&gt;</span>metrics<span class="nt">&lt;/servlet-name&gt;</span>
         <span class="nt">&lt;servlet-class&gt;</span>com.codahale.metrics.servlets.AdminServlet<span class="nt">&lt;/servlet-class&gt;</span>
 <span class="nt">&lt;/servlet&gt;</span>
@@ -207,7 +207,7 @@ the Servlet API by extending <tt class="docutils literal"><span class="pre">Metr
         <footer>
             &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
             Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
-            1.2.2.
+            1.4.1.
         </footer>
     </div>
 </body>

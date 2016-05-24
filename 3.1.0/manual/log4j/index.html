@@ -74,7 +74,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../jersey/">Instrumenting Jersey 1.x</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jersey/#instrumenting-jersey-2-x">Instrumenting Jersey 2.x</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jetty/">Instrumenting Jetty</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">Instrumenting Log4j</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Instrumenting Log4j</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../logback/">Instrumenting Logback</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jvm/">JVM Instrumentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../json/">JSON Support</a></li>
@@ -96,17 +96,17 @@
                 
   <div class="section" id="instrumenting-log4j">
 <span id="manual-log4j"></span><h1>Instrumenting Log4j</h1>
-<p>The <tt class="docutils literal"><span class="pre">metrics-log4j</span></tt> and <tt class="docutils literal"><span class="pre">metrics-log4j2</span></tt> modules provide <tt class="docutils literal"><span class="pre">InstrumentedAppender</span></tt>, a Log4j <tt class="docutils literal"><span class="pre">Appender</span></tt> implementation
+<p>The <code class="docutils literal"><span class="pre">metrics-log4j</span></code> and <code class="docutils literal"><span class="pre">metrics-log4j2</span></code> modules provide <code class="docutils literal"><span class="pre">InstrumentedAppender</span></code>, a Log4j <code class="docutils literal"><span class="pre">Appender</span></code> implementation
 (for log4j 1.x and log4j 2.x correspondingly) which records the rate of logged events by their logging level.</p>
 <p>You can add it to the root logger programmatically.</p>
 <p>For log4j 1.x:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="n">InstrumentedAppender</span> <span class="n">appender</span> <span class="o">=</span> <span class="k">new</span> <span class="n">InstrumentedAppender</span><span class="o">(</span><span class="n">registry</span><span class="o">);</span>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="n">InstrumentedAppender</span> <span class="n">appender</span> <span class="o">=</span> <span class="k">new</span> <span class="n">InstrumentedAppender</span><span class="o">(</span><span class="n">registry</span><span class="o">);</span>
 <span class="n">appender</span><span class="o">.</span><span class="na">activateOptions</span><span class="o">();</span>
 <span class="n">LogManager</span><span class="o">.</span><span class="na">getRootLogger</span><span class="o">().</span><span class="na">addAppender</span><span class="o">(</span><span class="n">appender</span><span class="o">);</span>
 </pre></div>
 </div>
 <p>For log4j 2.x:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="n">Filter</span> <span class="n">filter</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>        <span class="c1">// That&#39;s fine if we don&#39;t use filters; https://logging.apache.org/log4j/2.x/manual/filters.html</span>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="n">Filter</span> <span class="n">filter</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>        <span class="c1">// That&#39;s fine if we don&#39;t use filters; https://logging.apache.org/log4j/2.x/manual/filters.html</span>
 <span class="n">PatternLayout</span> <span class="n">layout</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span> <span class="c1">// The layout isn&#39;t used in InstrumentedAppender</span>
 
 <span class="n">InstrumentedAppender</span> <span class="n">appender</span> <span class="o">=</span> <span class="k">new</span> <span class="n">InstrumentedAppender</span><span class="o">(</span><span class="n">metrics</span><span class="o">,</span> <span class="n">filter</span><span class="o">,</span> <span class="n">layout</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
@@ -118,6 +118,20 @@
 <span class="n">context</span><span class="o">.</span><span class="na">updateLoggers</span><span class="o">(</span><span class="n">config</span><span class="o">);</span>
 </pre></div>
 </div>
+<p>You can also use standard log4j2 configuration, via plugin support:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;Configuration</span> <span class="na">status=</span><span class="s">&quot;INFO&quot;</span> <span class="na">name=</span><span class="s">&quot;log4j2-config&quot;</span> <span class="na">packages=</span><span class="s">&quot;com.codahale.metrics.log4j2&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;Appenders&gt;</span>
+    <span class="nt">&lt;MetricsAppender</span> <span class="na">name=</span><span class="s">&quot;metrics&quot;</span> <span class="na">registryName=</span><span class="s">&quot;shared-metrics-registry&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/Appenders&gt;</span>
+<span class="nt">&lt;Loggers&gt;</span>
+    <span class="nt">&lt;Root</span> <span class="na">level=</span><span class="s">&quot;INFO&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;AppenderRef</span> <span class="na">ref=</span><span class="s">&quot;metrics&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/Root&gt;</span>
+<span class="nt">&lt;/Loggers&gt;</span>
+<span class="nt">&lt;/Configuration&gt;</span>
+</pre></div>
+</div>
 </div>
 
 
@@ -126,7 +140,7 @@
         <footer>
             &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
             Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
-            1.2.2.
+            1.4.1.
         </footer>
     </div>
 </body>

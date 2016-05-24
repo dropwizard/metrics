@@ -69,7 +69,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../ehcache/">Instrumenting Ehcache</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ganglia/">Reporting to Ganglia</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../graphite/">Reporting to Graphite</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">Instrumenting Apache HttpClient</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Instrumenting Apache HttpClient</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#metric-naming-strategies">Metric naming strategies</a></li>
 </ul>
 </li>
@@ -99,19 +99,19 @@
                 
   <div class="section" id="instrumenting-apache-httpclient">
 <span id="manual-httpclient"></span><h1>Instrumenting Apache HttpClient</h1>
-<p>The <tt class="docutils literal"><span class="pre">metrics-httpclient</span></tt> module provides <tt class="docutils literal"><span class="pre">InstrumentedHttpClientConnManager</span></tt> and
-<tt class="docutils literal"><span class="pre">InstrumentedHttpClients</span></tt>, two instrumented versions of <a class="reference external" href="http://hc.apache.org/httpcomponents-client-ga/">Apache HttpClient 4.x</a> classes.</p>
-<p><tt class="docutils literal"><span class="pre">InstrumentedHttpClientConnManager</span></tt> is a thread-safe <tt class="docutils literal"><span class="pre">HttpClientConnectionManager</span></tt> implementation which
+<p>The <code class="docutils literal"><span class="pre">metrics-httpclient</span></code> module provides <code class="docutils literal"><span class="pre">InstrumentedHttpClientConnManager</span></code> and
+<code class="docutils literal"><span class="pre">InstrumentedHttpClients</span></code>, two instrumented versions of <a class="reference external" href="http://hc.apache.org/httpcomponents-client-ga/">Apache HttpClient 4.x</a> classes.</p>
+<p><code class="docutils literal"><span class="pre">InstrumentedHttpClientConnManager</span></code> is a thread-safe <code class="docutils literal"><span class="pre">HttpClientConnectionManager</span></code> implementation which
 measures the number of open connections in the pool and the rate at which new connections are
 opened.</p>
-<p><tt class="docutils literal"><span class="pre">InstrumentedHttpClients</span></tt> follows the <tt class="docutils literal"><span class="pre">HttpClients</span></tt> builder pattern and adds per-HTTP method timers for
+<p><code class="docutils literal"><span class="pre">InstrumentedHttpClients</span></code> follows the <code class="docutils literal"><span class="pre">HttpClients</span></code> builder pattern and adds per-HTTP method timers for
 HTTP requests.</p>
 <div class="section" id="metric-naming-strategies">
 <h2>Metric naming strategies</h2>
 <p>The default per-method metric naming and scoping strategy can be overridden by passing an
-implementation of <tt class="docutils literal"><span class="pre">HttpClientMetricNameStrategy</span></tt> to the <tt class="docutils literal"><span class="pre">InstrumentedHttpClients.createDefault</span></tt> method.</p>
+implementation of <code class="docutils literal"><span class="pre">HttpClientMetricNameStrategy</span></code> to the <code class="docutils literal"><span class="pre">InstrumentedHttpClients.createDefault</span></code> method.</p>
 <p>A number of pre-rolled strategies are available, e.g.:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="n">HttpClient</span> <span class="n">client</span> <span class="o">=</span> <span class="n">InstrumentedHttpClients</span><span class="o">.</span><span class="na">createDefault</span><span class="o">(</span><span class="n">registry</span><span class="o">,</span> <span class="n">HttpClientMetricNameStrategies</span><span class="o">.</span><span class="na">HOST_AND_METHOD</span><span class="o">);</span>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="n">HttpClient</span> <span class="n">client</span> <span class="o">=</span> <span class="n">InstrumentedHttpClients</span><span class="o">.</span><span class="na">createDefault</span><span class="o">(</span><span class="n">registry</span><span class="o">,</span> <span class="n">HttpClientMetricNameStrategies</span><span class="o">.</span><span class="na">HOST_AND_METHOD</span><span class="o">);</span>
 </pre></div>
 </div>
 </div>
@@ -123,7 +123,7 @@ implementation of <tt class="docutils literal"><span class="pre">HttpClientMetri
         <footer>
             &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
             Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
-            1.2.2.
+            1.4.1.
         </footer>
     </div>
 </body>
