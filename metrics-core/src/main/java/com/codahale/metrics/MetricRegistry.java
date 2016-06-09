@@ -149,6 +149,32 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
+     * Return the {@link Gauge} registered under this name; or create and register
+     * a new {@link Gauge} if none is registered.
+     *
+     * @param name the name of the metric
+     * @param gauge the gauge that needs to be registered
+     * @return a new/provided or pre-existing {@link Gauge}
+     */
+    public <T> Metric gauge(String name, Gauge<T> gauge ) {
+        final Metric metric = metrics.get(name);
+        if (Gauge.class.isInstance(metric)) {
+            return metric;
+        } else if (metric == null) {
+            try {
+                return register(name, gauge);
+            } catch (IllegalArgumentException e) {
+                final Metric added = metrics.get(name);
+                if (Gauge.class.isInstance(added)) {
+                    return added;
+                }
+            }
+        }
+        throw new IllegalArgumentException(name + " is already used for a different type of metric");
+    }
+
+
+    /**
      * Removes the metric with the given name.
      *
      * @param name the name of the metric
