@@ -330,14 +330,14 @@ public class GraphiteReporter extends ScheduledReporter {
         return Long.toString(n);
     }
 
+    private String prefix(MetricName name, String... components) {
+        return MetricName.join(MetricName.join(prefix, name), MetricName.build(components)).getKey();
+    }
+
     private String format(double v) {
         // the Carbon plaintext format is pretty underspecified, but it seems like it just wants
         // US-formatted digits
         return String.format(Locale.US, "%2.2f", v);
-    }
-
-    private String prefix(MetricName name, String... components) {
-        return MetricName.join(MetricName.join(prefix, name), MetricName.build(components)).getKey();
     }
 
     private String formatMetricNameForGraphite(String string) {
