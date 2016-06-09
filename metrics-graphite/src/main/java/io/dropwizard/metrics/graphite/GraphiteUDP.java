@@ -5,14 +5,11 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.charset.Charset;
-import java.util.regex.Pattern;
 
 /**
  * A client to a Carbon server using unconnected UDP
  */
 public class GraphiteUDP implements GraphiteSender {
-
-    private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
 
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
@@ -111,7 +108,7 @@ public class GraphiteUDP implements GraphiteSender {
     }
 
     protected String sanitize(String s) {
-        return WHITESPACE.matcher(s).replaceAll("-");
+        return GraphiteSanitize.sanitize(s, '-');
     }
 
 }

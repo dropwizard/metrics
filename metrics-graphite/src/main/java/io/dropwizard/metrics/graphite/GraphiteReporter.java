@@ -318,10 +318,26 @@ public class GraphiteReporter extends ScheduledReporter {
             } else {
                 value = Long.toString(n.longValue());
             }
+        } else if (o instanceof Boolean) {
+            return format(((Boolean) o) ? 1 : 0);
         } else {
             LOGGER.warn("Unable to format value for Graphite.", o);
         }
         return value;
+    }
+
+    private String prefix(MetricName name, String... components) {
+        return MetricName.join(MetricName.join(prefix, name), MetricName.build(components)).getKey();
+    }
+
+    private String format(long n) {
+        return Long.toString(n);
+    }
+
+    private String format(double v) {
+        // the Carbon plaintext format is pretty underspecified, but it seems like it just wants
+        // US-formatted digits
+        return String.format(Locale.US, "%2.2f", v);
     }
 
     private String prefix(MetricName name, String... components) {
