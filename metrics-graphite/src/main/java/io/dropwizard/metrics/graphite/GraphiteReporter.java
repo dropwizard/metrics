@@ -326,12 +326,12 @@ public class GraphiteReporter extends ScheduledReporter {
         return value;
     }
 
-    private String format(long n) {
-        return Long.toString(n);
-    }
-
     private String prefix(MetricName name, String... components) {
         return MetricName.join(MetricName.join(prefix, name), MetricName.build(components)).getKey();
+    }
+
+    private String format(long n) {
+        return Long.toString(n);
     }
 
     private String format(double v) {
