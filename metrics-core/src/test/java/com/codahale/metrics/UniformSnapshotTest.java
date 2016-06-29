@@ -93,38 +93,6 @@ public class UniformSnapshotTest {
     }
 
     @Test
-    public void worksWithUnderestimatedCollections() throws Exception {
-        final List<Long> longs = spy(new ArrayList<Long>());
-        longs.add(5L);
-        longs.add(1L);
-        longs.add(2L);
-        longs.add(3L);
-        longs.add(4L);
-        when(longs.size()).thenReturn(4, 5);
-
-        final Snapshot other = new UniformSnapshot(longs);
-
-        assertThat(other.getValues())
-                .containsOnly(1, 2, 3, 4, 5);
-    }
-
-    @Test
-    public void worksWithOverestimatedCollections() throws Exception {
-        final List<Long> longs = spy(new ArrayList<Long>());
-        longs.add(5L);
-        longs.add(1L);
-        longs.add(2L);
-        longs.add(3L);
-        longs.add(4L);
-        when(longs.size()).thenReturn(6, 5);
-
-        final Snapshot other = new UniformSnapshot(longs);
-
-        assertThat(other.getValues())
-                .containsOnly(1, 2, 3, 4, 5);
-    }
-
-    @Test
     public void dumpsToAStream() throws Exception {
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
 
