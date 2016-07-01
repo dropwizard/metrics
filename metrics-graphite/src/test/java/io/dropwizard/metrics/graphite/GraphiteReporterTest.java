@@ -161,6 +161,32 @@ public class GraphiteReporterTest {
     }
 
     @Test
+    public void reportsBooleanGaugeValues() throws Exception {
+        reporter.report(map("gauge", gauge(true)),
+                        this.<Counter>map(),
+                        this.<Histogram>map(),
+                        this.<Meter>map(),
+                        this.<Timer>map());
+
+        reporter.report(map("gauge", gauge(false)),
+                        this.<Counter>map(),
+                        this.<Histogram>map(),
+                        this.<Meter>map(),
+                        this.<Timer>map());
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).isConnected();
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send("prefix.gauge", "1", timestamp);
+        inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).isConnected();
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send("prefix.gauge", "0", timestamp);
+        inOrder.verify(graphite).flush();
+
+        verifyNoMoreInteractions(graphite);
+    }
+
+    @Test
     public void reportsCounters() throws Exception {
         final Counter counter = mock(Counter.class);
         when(counter.getCount()).thenReturn(100L);

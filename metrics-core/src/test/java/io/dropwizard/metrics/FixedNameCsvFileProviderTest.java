@@ -27,4 +27,12 @@ public class FixedNameCsvFileProviderTest {
         assertThat(file.getParentFile()).isEqualTo(dataDirectory);
         assertThat(file.getName()).isEqualTo("test.csv");
     }
+
+    @Test
+    public void testGetFileSanitize() {
+        FixedNameCsvFileProvider provider = new FixedNameCsvFileProvider();
+        File file = provider.getFile(dataDirectory, MetricName.build("/myfake/uri"));
+        assertThat(file.getParentFile()).isEqualTo(dataDirectory);
+        assertThat(file.getName()).isEqualTo("myfake.uri.csv");
+    }
 }
