@@ -84,6 +84,6 @@ public class UniformReservoir implements Reservoir {
         for (int i = 0; i < s; i++) {
             copy[i] = values.get(i);
         }
-        return new UniformSnapshot(copy);
+        return new UniformSnapshot(copy, false);
     }
 }

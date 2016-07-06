@@ -37,7 +37,22 @@ public class UniformSnapshot extends Snapshot {
      * @param values    an unordered set of values in the reservoir
      */
     public UniformSnapshot(long[] values) {
-        this.values = Arrays.copyOf(values, values.length);
+    	this(values, true);
+    }
+
+    /**
+     * Create a new {@link Snapshot} with the given values.
+     * Allows for trusted code to provide an array that won't be copied, for performance reasons.
+     *
+     * @param values    an unordered set of values in the reservoir
+     * @param copy      whether the array should be copied by the constructor
+     */
+    protected UniformSnapshot(long[] values, boolean copy) {
+    	if (copy) {
+    		this.values = Arrays.copyOf(values, values.length);
+    	} else {
+    		this.values = values;
+    	}
         Arrays.sort(this.values);
     }
 
