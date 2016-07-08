@@ -38,6 +38,6 @@ public class SlidingWindowReservoir implements Reservoir {
                 values[i] = measurements[i];
             }
         }
-        return new UniformSnapshot(values);
+        return new UniformSnapshot(values, false);
     }
 }
