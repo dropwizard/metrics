@@ -213,13 +213,16 @@ public class MetricRegistry implements MetricSet {
      * Removes all metrics which match the given filter.
      *
      * @param filter a filter
+     * @return whether or not a metric was removed
      */
-    public void removeMatching(MetricFilter filter) {
+    public boolean removeMatching(MetricFilter filter) {
+        boolean removed = false;
         for (Map.Entry<MetricName, Metric> entry : metrics.entrySet()) {
             if (filter.matches(entry.getKey(), entry.getValue())) {
-                remove(entry.getKey());
+                removed |= remove(entry.getKey());
             }
         }
+        return removed;
     }
 
     /**
