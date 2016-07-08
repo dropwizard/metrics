@@ -216,7 +216,7 @@ public class MetricRegistry implements MetricSet {
      * @return whether or not a metric was removed
      */
     public boolean removeMatching(MetricFilter filter) {
-    	boolean removed = false;
+        boolean removed = false;
         for (Map.Entry<MetricName, Metric> entry : metrics.entrySet()) {
             if (filter.matches(entry.getKey(), entry.getValue())) {
                 removed |= remove(entry.getKey());
