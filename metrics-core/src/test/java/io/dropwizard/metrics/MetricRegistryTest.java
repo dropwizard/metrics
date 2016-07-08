@@ -400,12 +400,12 @@ public class MetricRegistryTest {
         assertThat(registry.getNames())
                 .contains(timer1, timer2, histogram1);
 
-        registry.removeMatching(new MetricFilter() {
+        assertThat(registry.removeMatching(new MetricFilter() {
             @Override
             public boolean matches(MetricName name, Metric metric) {
                 return name.getKey().endsWith("1");
             }
-        });
+        })).isTrue();
 
         assertThat(registry.getNames())
                 .doesNotContain(timer1, histogram1);
