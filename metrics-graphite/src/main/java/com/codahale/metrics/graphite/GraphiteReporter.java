@@ -181,7 +181,7 @@ public class GraphiteReporter extends ScheduledReporter {
                 try {
                     reportCounter(entry.getKey(), entry.getValue(), timestamp);
                 } catch (Exception e) {
-                    LOGGER.warn("Unable to report to Graphite", graphite, e);
+                    LOGGER.warn("Unable to report to Graphite. key : " + entry.getKey(), graphite, e);
                 }
             }
 
@@ -189,7 +189,7 @@ public class GraphiteReporter extends ScheduledReporter {
                 try {
                     reportHistogram(entry.getKey(), entry.getValue(), timestamp);
                 } catch (Exception e) {
-                    LOGGER.warn("Unable to report to Graphite", graphite, e);
+                    LOGGER.warn("Unable to report to Graphite. key : " + entry.getKey(), graphite, e);
                 }
             }
 
@@ -197,7 +197,7 @@ public class GraphiteReporter extends ScheduledReporter {
                 try {
                     reportMetered(entry.getKey(), entry.getValue(), timestamp);
                 } catch (Exception e) {
-                    LOGGER.warn("Unable to report to Graphite", graphite, e);
+                    LOGGER.warn("Unable to report to Graphite. key : " + entry.getKey(), graphite, e);
                 }
             }
 
@@ -205,7 +205,7 @@ public class GraphiteReporter extends ScheduledReporter {
                 try {
                     reportTimer(entry.getKey(), entry.getValue(), timestamp);
                 } catch (Exception e) {
-                    LOGGER.warn("Unable to report to Graphite", graphite, e);
+                    LOGGER.warn("Unable to report to Graphite. key : " + entry.getKey(), graphite, e);
                 }
             }
 
