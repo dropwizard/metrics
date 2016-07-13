@@ -1,5 +1,6 @@
 package io.dropwizard.metrics;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -64,5 +65,10 @@ public abstract class CachedGauge<T> implements Gauge<T> {
                 return true;
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(this.getValue());
     }
 }

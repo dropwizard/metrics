@@ -51,4 +51,9 @@ public class Counter implements Metric, Counting {
     public long getCount() {
         return count.sum();
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(this.count);
+    }
 }

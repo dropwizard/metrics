@@ -23,6 +23,11 @@ public abstract class Clock {
         return System.currentTimeMillis();
     }
 
+    @Override
+    public String toString() {
+        return Long.toString(this.getTime());
+    }
+
     private static final Clock DEFAULT = new UserTimeClock();
 
     /**
