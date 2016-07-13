@@ -173,7 +173,7 @@ public class GraphiteReporter extends ScheduledReporter {
                 try {
                     reportGauge(entry.getKey(), entry.getValue(), timestamp);
                 } catch (Exception e) {
-                    LOGGER.warn("Unable to report to Graphite", graphite, e);
+                    LOGGER.warn("Unable to report to Graphite. key : " + entry.getKey(), graphite, e);
                 }
             }
 
