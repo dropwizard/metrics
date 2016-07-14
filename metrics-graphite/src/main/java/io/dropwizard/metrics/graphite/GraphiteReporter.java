@@ -288,10 +288,7 @@ public class GraphiteReporter extends ScheduledReporter {
 
     private void reportGauge(MetricName name, Gauge gauge, long timestamp) throws IOException {
 
-        String valueToReport;
-        Object value = gauge.getValue();
-
-        valueToReport = format(gauge.getValue());
+        String valueToReport = format(gauge.getValue());
         if (valueToReport != null) {
             graphite.send(prefix(name), valueToReport, timestamp);
         }
