@@ -288,21 +288,12 @@ public class GraphiteReporter extends ScheduledReporter {
 
     private void reportGauge(MetricName name, Gauge gauge, long timestamp) throws IOException {
 
-        String nameToReport;
         String valueToReport;
         Object value = gauge.getValue();
 
-        if (value instanceof Map) {
-            for (Object k : ((Map) value).keySet()) {
-                nameToReport = formatMetricNameForGraphite(k.toString());
-                valueToReport = format(((Map) value).get(k));
-                graphite.send(prefix(name)+"."+nameToReport, valueToReport, timestamp);
-            }
-        } else {
-            valueToReport = format(gauge.getValue());
-            if (valueToReport != null) {
-                graphite.send(prefix(name), valueToReport, timestamp);
-            }
+        valueToReport = format(gauge.getValue());
+        if (valueToReport != null) {
+            graphite.send(prefix(name), valueToReport, timestamp);
         }
 
     }
@@ -338,10 +329,6 @@ public class GraphiteReporter extends ScheduledReporter {
         // the Carbon plaintext format is pretty underspecified, but it seems like it just wants
         // US-formatted digits
         return String.format(Locale.US, "%2.2f", v);
-    }
-
-    private String formatMetricNameForGraphite(String string) {
-        return string.replaceAll("[^\\p{IsAlphabetic}^\\p{IsDigit}]", "_");
     }
 
 }
