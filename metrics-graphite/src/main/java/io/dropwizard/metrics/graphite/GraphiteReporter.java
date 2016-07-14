@@ -287,29 +287,31 @@ public class GraphiteReporter extends ScheduledReporter {
     }
 
     private void reportGauge(MetricName name, Gauge gauge, long timestamp) throws IOException {
-        final String value = format(gauge.getValue());
-        if (value != null) {
-            graphite.send(prefix(name), value, timestamp);
+
+        String valueToReport = format(gauge.getValue());
+        if (valueToReport != null) {
+            graphite.send(prefix(name), valueToReport, timestamp);
         }
+
     }
 
     private String format(Object o) {
-        if (o instanceof Float) {
-            return format(((Float) o).doubleValue());
-        } else if (o instanceof Double) {
-            return format(((Double) o).doubleValue());
-        } else if (o instanceof Byte) {
-            return format(((Byte) o).longValue());
-        } else if (o instanceof Short) {
-            return format(((Short) o).longValue());
-        } else if (o instanceof Integer) {
-            return format(((Integer) o).longValue());
-        } else if (o instanceof Long) {
-            return format(((Long) o).longValue());
+        String value = null;
+        if (o instanceof Number) {
+            Number n = (Number) o;
+            if (o instanceof Float || o instanceof Double) {
+                // the Carbon plaintext format is pretty underspecified, but it seems like it just wants
+                // US-formatted digits
+                value = String.format(Locale.US, "%2.2f", n.doubleValue());
+            } else {
+                value = Long.toString(n.longValue());
+            }
         } else if (o instanceof Boolean) {
             return format(((Boolean) o) ? 1 : 0);
+        } else {
+            LOGGER.warn("Unable to format value for Graphite.", o);
         }
-        return null;
+        return value;
     }
 
     private String prefix(MetricName name, String... components) {
@@ -325,4 +327,5 @@ public class GraphiteReporter extends ScheduledReporter {
         // US-formatted digits
         return String.format(Locale.US, "%2.2f", v);
     }
+
 }
