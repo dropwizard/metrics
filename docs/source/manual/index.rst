@@ -15,6 +15,7 @@ User Manual
     healthchecks
     ehcache
     graphite
+    collectd
     httpclient
     influxdb
     jdbi
