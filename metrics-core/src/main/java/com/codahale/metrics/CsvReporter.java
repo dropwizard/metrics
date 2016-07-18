@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
@@ -124,6 +125,7 @@ public class CsvReporter extends ScheduledReporter {
     private final File directory;
     private final Locale locale;
     private final Clock clock;
+    private final HashMap<File, PrintWriter> printWriterHashMap = new HashMap<File, PrintWriter>();
 
     private CsvReporter(MetricRegistry registry,
                         File directory,
@@ -239,19 +241,30 @@ public class CsvReporter extends ScheduledReporter {
             final File file = new File(directory, sanitize(name) + ".csv");
             final boolean fileAlreadyExists = file.exists();
             if (fileAlreadyExists || file.createNewFile()) {
-                final PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file,true), UTF_8));
-                try {
-                    if (!fileAlreadyExists) {
-                        out.println("t," + header);
-                    }
-                    out.printf(locale, String.format(locale, "%d,%s%n", timestamp, line), values);
-                } finally {
-                    out.close();
+                final PrintWriter out;
+                if (printWriterHashMap.containsKey(file)) {
+                    out = printWriterHashMap.get(file);
+                } else {
+                    out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file,true), UTF_8));
+                    printWriterHashMap.put(file, out);
                 }
+
+                if (!fileAlreadyExists) {
+                    out.println("t," + header);
+                }
+                out.printf(locale, String.format(locale, "%d,%s%n", timestamp, line), values);
             }
         } catch (IOException e) {
             LOGGER.warn("Error writing to {}", name, e);
         }
+    }
+
+    @Override
+    public void stop() {
+        for (final PrintWriter pw : printWriterHashMap.values()) {
+            pw.close();
+        }
+        super.stop();
     }
 
     protected String sanitize(String name) {
