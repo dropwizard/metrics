@@ -384,6 +384,12 @@ of ``.csv`` files in a given directory:
                                             .build(new File("~/projects/data/"));
     reporter.start(1, TimeUnit.SECONDS);
 
+and at the end of its usage,
+
+.. code-block:: java
+
+    reporter.stop();
+
 For each metric registered, a ``.csv`` file will be created, and every second its state will be
 written to it as a new row.
 
