@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
@@ -65,6 +66,25 @@ public class TimerTest {
 
         assertThat(value)
                 .isEqualTo("one");
+
+        verify(reservoir).update(50000000);
+    }
+
+    @Test
+    public void timesRunnableInstances() throws Exception {
+        final AtomicBoolean called = new AtomicBoolean();
+        timer.time(new Runnable() {
+            @Override
+            public void run() {
+                called.set(true);
+            }
+        });
+
+        assertThat(timer.getCount())
+                .isEqualTo(1);
+
+        assertThat(called.get())
+                .isTrue();
 
         verify(reservoir).update(50000000);
     }
