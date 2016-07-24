@@ -44,4 +44,20 @@ public class CounterTest {
         assertThat(counter.getCount())
                 .isEqualTo(-12);
     }
+
+    @Test
+    public void incrementByNegativeDelta() throws Exception {
+        counter.inc(-12);
+
+        assertThat(counter.getCount())
+                .isEqualTo(-12);
+    }
+
+    @Test
+    public void decrementByNegativeDelta() throws Exception {
+        counter.dec(-12);
+
+        assertThat(counter.getCount())
+                .isEqualTo(12);
+    }
 }
