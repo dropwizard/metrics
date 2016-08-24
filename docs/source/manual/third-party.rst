@@ -24,3 +24,4 @@ the many third-party libraries which extend Metrics:
 * `metrics-cdi <https://github.com/astefanutti/metrics-cdi>`_ provides integration with `CDI <http://www.cdi-spec.org/>`_ environments
 * `metrics-aspectj <https://github.com/astefanutti/metrics-aspectj>`_ provides integration with `AspectJ <http://eclipse.org/aspectj/>`_
 * `camel-metrics <https://github.com/InitiumIo/camel-metrics>`_ provides component for your `Apache Camel <https://camel.apache.org/>`_ route
+* `kafka-dropwizard-metrics <https://github.com/SimpleFinance/kafka-dropwizard-reporter>`_ allows Kafka producers, consumers, and streaming applications to register their built-in metrics with a Dropwizard Metrics registry.
