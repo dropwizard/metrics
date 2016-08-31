@@ -44,6 +44,7 @@ rate, meters also track 1-, 5-, and 15-minute moving averages.
 
 .. code-block:: java
 
+    private final MetricRegistry metrics = new MetricRegistry();
     private final Meter requests = metrics.meter("requests");
 
     public void handleRequest(Request request, Response response) {
