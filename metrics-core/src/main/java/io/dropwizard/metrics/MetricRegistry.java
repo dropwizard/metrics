@@ -60,6 +60,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     private final ConcurrentMap<MetricName, Metric> metrics;
+    private final MetricBuilders metricBuilders;
     private final List<MetricRegistryListener> listeners;
 
     /**
@@ -75,7 +76,12 @@ public class MetricRegistry implements MetricSet {
      * space- or time-bounded metric lifecycles, for example.
      */
     protected MetricRegistry(ConcurrentMap<MetricName, Metric> metricsMap) {
+        this(metricsMap, new DefaultMetricBuilders());
+    }
+
+    protected MetricRegistry(ConcurrentMap<MetricName, Metric> metricsMap, MetricBuilders metricBuilders) {
         this.metrics = metricsMap;
+        this.metricBuilders = metricBuilders;
         this.listeners = new CopyOnWriteArrayList<MetricRegistryListener>();
     }
 
@@ -137,7 +143,7 @@ public class MetricRegistry implements MetricSet {
      * @return a new or pre-existing {@link Counter}
      */
     public Counter counter(MetricName name) {
-        return getOrAdd(name, MetricBuilder.COUNTERS);
+        return getOrAdd(name, metricBuilders.getCounterMetricBuilder());
     }
 
     /**
@@ -155,7 +161,7 @@ public class MetricRegistry implements MetricSet {
      * @return a new or pre-existing {@link Histogram}
      */
     public Histogram histogram(MetricName name) {
-        return getOrAdd(name, MetricBuilder.HISTOGRAMS);
+        return getOrAdd(name, metricBuilders.getHistogramMetricBuilder());
     }
 
     /**
@@ -173,7 +179,7 @@ public class MetricRegistry implements MetricSet {
      * @return a new or pre-existing {@link Meter}
      */
     public Meter meter(MetricName name) {
-        return getOrAdd(name, MetricBuilder.METERS);
+        return getOrAdd(name, metricBuilders.getMeterMetricBuilder());
     }
 
     /**
@@ -191,7 +197,7 @@ public class MetricRegistry implements MetricSet {
      * @return a new or pre-existing {@link Timer}
      */
     public Timer timer(MetricName name) {
-        return getOrAdd(name, MetricBuilder.TIMERS);
+        return getOrAdd(name, metricBuilders.getTimerMetricBuilder());
     }
 
     /**
@@ -451,7 +457,7 @@ public class MetricRegistry implements MetricSet {
     /**
      * A quick and easy way of capturing the notion of default metrics.
      */
-    private interface MetricBuilder<T extends Metric> {
+    public interface MetricBuilder<T extends Metric> {
         MetricBuilder<Counter> COUNTERS = new MetricBuilder<Counter>() {
             @Override
             public Counter newMetric() {
@@ -503,5 +509,49 @@ public class MetricRegistry implements MetricSet {
         T newMetric();
 
         boolean isInstance(Metric metric);
+    }
+
+    public static class MetricBuilders {
+        private final MetricBuilder<Counter> counterMetricBuilder;
+        private final MetricBuilder<Histogram> histogramMetricBuilder;
+        private final MetricBuilder<Meter> meterMetricBuilder;
+        private final MetricBuilder<Timer> timerMetricBuilder;
+
+        public MetricBuilders(MetricBuilder<Counter> counterMetricBuilder,
+                              MetricBuilder<Histogram> histogramMetricBuilder,
+                              MetricBuilder<Meter> meterMetricBuilder,
+                              MetricBuilder<Timer> timerMetricBuilder) {
+            this.counterMetricBuilder = counterMetricBuilder;
+            this.histogramMetricBuilder = histogramMetricBuilder;
+            this.meterMetricBuilder = meterMetricBuilder;
+            this.timerMetricBuilder = timerMetricBuilder;
+        }
+
+        public MetricBuilder<Counter> getCounterMetricBuilder() {
+            return counterMetricBuilder;
+        }
+
+        public MetricBuilder<Histogram> getHistogramMetricBuilder() {
+            return histogramMetricBuilder;
+        }
+
+        public MetricBuilder<Meter> getMeterMetricBuilder() {
+            return meterMetricBuilder;
+        }
+
+        public MetricBuilder<Timer> getTimerMetricBuilder() {
+            return timerMetricBuilder;
+        }
+    }
+
+    public static class DefaultMetricBuilders extends MetricBuilders{
+        public DefaultMetricBuilders() {
+            super(
+                    MetricBuilder.COUNTERS,
+                    MetricBuilder.HISTOGRAMS,
+                    MetricBuilder.METERS,
+                    MetricBuilder.TIMERS
+            );
+        }
     }
 }
