@@ -1,8 +1,9 @@
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.jcache.JCacheGaugeSet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.jcache.JCacheGaugeSet;
 
 import javax.cache.Cache;
 import javax.cache.CacheManager;
@@ -24,14 +25,13 @@ public class JCacheGaugeSetTest {
         CachingProvider provider = Caching.getCachingProvider();
         cacheManager = provider.getCacheManager(
             getClass().getResource("ehcache.xml").toURI(),
-            this.getClass().getClassLoader());
+            getClass().getClassLoader());
 
         myCache = cacheManager.getCache("myCache");
         myOtherCache = cacheManager.getCache("myOtherCache");
 
         registry = new MetricRegistry();
         registry.register("jcache.statistics", new JCacheGaugeSet());
-
     }
 
     @Test
