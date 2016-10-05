@@ -118,7 +118,10 @@ This gauge returns the ratio of cache hits to misses using a meter and a timer.
 Cached Gauges
 -------------
 
-A cached gauge allows for a more efficient reporting of values which are expensive to calculate:
+A cached gauge allows for a more efficient reporting of values which are expensive
+to calculate. The value is cached for the period specified in the constructor. The "getValue()"
+method called by the client only returns the cached value. The protected "loadValue()" method
+is only called internally to reload the cache value.
 
 .. code-block:: java
 
