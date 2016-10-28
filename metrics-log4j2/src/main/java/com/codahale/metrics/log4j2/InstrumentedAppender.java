@@ -8,6 +8,9 @@ import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.plugins.Plugin;
+import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
+import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 
 import java.io.Serializable;
 
@@ -18,6 +21,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  * number of statements being logged. The meter names are the logging level names appended to the
  * name of the appender.
  */
+@Plugin(name = "MetricsAppender", category = "Core", elementType = "appender")
 public class InstrumentedAppender extends AbstractAppender {
     private final MetricRegistry registry;
 
@@ -73,6 +77,23 @@ public class InstrumentedAppender extends AbstractAppender {
     public InstrumentedAppender(MetricRegistry registry, Filter filter, Layout<? extends Serializable> layout, boolean ignoreExceptions) {
         super(name(Appender.class), filter, layout, ignoreExceptions);
         this.registry = registry;
+    }
+
+    /**
+     * Create a new instrumented appender using the given appender name and registry.
+     * @param appenderName The name of the appender.
+     * @param registry the metric registry
+     */
+    public InstrumentedAppender(String appenderName, MetricRegistry registry) {
+        super(appenderName, null, null, true);
+        this.registry = registry;
+    }
+
+    @PluginFactory
+    public static InstrumentedAppender createAppender(
+            @PluginAttribute("name") String name,
+            @PluginAttribute( value = "registryName", defaultString = "log4j2Metrics") String registry) {
+        return new InstrumentedAppender(name, SharedMetricRegistries.getOrCreate(registry));
     }
 
     @Override
