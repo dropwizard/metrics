@@ -3,10 +3,7 @@ package com.codahale.metrics;
 import java.io.Closeable;
 import java.util.Locale;
 import java.util.SortedMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -54,6 +51,8 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
 
     private final MetricRegistry registry;
     private final ScheduledExecutorService executor;
+    private final boolean shutdownExecutorOnStop;
+    private ScheduledFuture<?> scheduledFuture;
     private final MetricFilter filter;
     private final double durationFactor;
     private final String durationUnit;
@@ -75,10 +74,9 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 MetricFilter filter,
                                 TimeUnit rateUnit,
                                 TimeUnit durationUnit) {
-		this(registry, name, filter, rateUnit, durationUnit,
-                Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name + '-' + FACTORY_ID.incrementAndGet())));
+		this(registry, name, filter, rateUnit, durationUnit, createDefaultExecutor(name));
     }
-	
+
     /**
      * Creates a new {@link ScheduledReporter} instance.
      *
@@ -94,9 +92,30 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 TimeUnit rateUnit,
                                 TimeUnit durationUnit,
                                 ScheduledExecutorService executor) {
+        this(registry, name, filter, rateUnit, durationUnit, executor, true);
+    }
+
+    /**
+     * Creates a new {@link ScheduledReporter} instance.
+     *
+     * @param registry the {@link com.codahale.metrics.MetricRegistry} containing the metrics this
+     *                 reporter will report
+     * @param name     the reporter's name
+     * @param filter   the filter for which metrics to report
+     * @param executor the executor to use while scheduling reporting of metrics.
+     * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
+     */
+    protected ScheduledReporter(MetricRegistry registry,
+                                String name,
+                                MetricFilter filter,
+                                TimeUnit rateUnit,
+                                TimeUnit durationUnit,
+                                ScheduledExecutorService executor,
+                                boolean shutdownExecutorOnStop) {
         this.registry = registry;
         this.filter = filter;
-        this.executor = executor;
+        this.executor = executor == null? createDefaultExecutor(name) : executor;
+        this.shutdownExecutorOnStop = shutdownExecutorOnStop;
         this.rateFactor = rateUnit.toSeconds(1);
         this.rateUnit = calculateRateUnit(rateUnit);
         this.durationFactor = 1.0 / durationUnit.toNanos(1);
@@ -109,8 +128,11 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * @param period the amount of time between polls
      * @param unit   the unit for {@code period}
      */
-    public void start(long period, TimeUnit unit) {
-        executor.scheduleAtFixedRate(new Runnable() {
+    synchronized public void start(long period, TimeUnit unit) {
+        if (this.scheduledFuture != null) {
+            throw new IllegalArgumentException("Reporter already started");
+        }
+        this.scheduledFuture = executor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -123,26 +145,58 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
     }
 
     /**
-     * Stops the reporter and shuts down its thread of execution.
+     * Stops the reporter and if shutdownExecutorOnStop is true then shuts down its thread of execution.
      *
      * Uses the shutdown pattern from http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ExecutorService.html
      */
     public void stop() {
-        executor.shutdown(); // Disable new tasks from being submitted
-        try {
-            // Wait a while for existing tasks to terminate
-            if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-                executor.shutdownNow(); // Cancel currently executing tasks
-                // Wait a while for tasks to respond to being cancelled
+        if (shutdownExecutorOnStop) {
+            executor.shutdown(); // Disable new tasks from being submitted
+            try {
+                // Wait a while for existing tasks to terminate
                 if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-                    System.err.println(getClass().getSimpleName() + ": ScheduledExecutorService did not terminate");
+                    executor.shutdownNow(); // Cancel currently executing tasks
+                    // Wait a while for tasks to respond to being cancelled
+                    if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+                        System.err.println(getClass().getSimpleName() + ": ScheduledExecutorService did not terminate");
+                    }
+                }
+            } catch (InterruptedException ie) {
+                // (Re-)Cancel if current thread also interrupted
+                executor.shutdownNow();
+                // Preserve interrupt status
+                Thread.currentThread().interrupt();
+            }
+        } else {
+            // The external manager(like JEE container) responsible for lifecycle of executor
+            synchronized (this) {
+                if (this.scheduledFuture == null) {
+                    // was never started
+                    return;
+                }
+                if (this.scheduledFuture.isCancelled()) {
+                    // already cancelled
+                    return;
+                }
+                // just cancel the scheduledFuture and exit
+                this.scheduledFuture.cancel(false);
+                try {
+                    // Wait a while for existing tasks to terminate
+                    scheduledFuture.get(1, TimeUnit.SECONDS);
+                } catch (ExecutionException e) {
+                    // well, we should get this error when future is cancelled normally, just ignore it
+                } catch (InterruptedException e) {
+                    // The thread was interrupted while waiting future to complete
+                    // Preserve interrupt status
+                    Thread.currentThread().interrupt();
+                    if (!this.scheduledFuture.isDone()) {
+                        LOG.warn("The reporting schedulingFuture is not cancelled yet");
+                    }
+                } catch (TimeoutException e) {
+                    // The last reporting cycle is still in progress, nothing wrong, just add log record
+                    LOG.warn("The reporting schedulingFuture is not cancelled yet");
                 }
             }
-        } catch (InterruptedException ie) {
-            // (Re-)Cancel if current thread also interrupted
-            executor.shutdownNow();
-            // Preserve interrupt status
-            Thread.currentThread().interrupt();
         }
     }
 
@@ -198,8 +252,17 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
         return rate * rateFactor;
     }
 
+    protected boolean isShutdownExecutorOnStop() {
+        return shutdownExecutorOnStop;
+    }
+
     private String calculateRateUnit(TimeUnit unit) {
         final String s = unit.toString().toLowerCase(Locale.US);
         return s.substring(0, s.length() - 1);
     }
+
+    private static ScheduledExecutorService createDefaultExecutor(String name) {
+        return Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name + '-' + FACTORY_ID.incrementAndGet()));
+    }
+
 }

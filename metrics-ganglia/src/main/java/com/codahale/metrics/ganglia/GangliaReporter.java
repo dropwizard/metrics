@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -49,6 +50,8 @@ public class GangliaReporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
+        private ScheduledExecutorService executor;
+        private boolean shutdownExecutorOnStop;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -57,6 +60,34 @@ public class GangliaReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
+            this.executor = null;
+            this.shutdownExecutorOnStop = true;
+        }
+
+        /**
+         * Specifies whether or not, the executor (used for reporting) will be stopped with same time with reporter.
+         * Default value is true.
+         * Setting this parameter to false, has the sense in combining with providing external managed executor via {@link #scheduleOn(ScheduledExecutorService)}.
+         *
+         * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
+         * @return {@code this}
+         */
+        public Builder shutdownExecutorOnStop(boolean shutdownExecutorOnStop) {
+            this.shutdownExecutorOnStop = shutdownExecutorOnStop;
+            return this;
+        }
+
+        /**
+         * Specifies the executor to use while scheduling reporting of metrics.
+         * Default value is null.
+         * Null value leads to executor will be auto created on start.
+         *
+         * @param executor the executor to use while scheduling reporting of metrics.
+         * @return {@code this}
+         */
+        public Builder scheduleOn(ScheduledExecutorService executor) {
+            this.executor = executor;
+            return this;
         }
 
         /**
@@ -133,7 +164,7 @@ public class GangliaReporter extends ScheduledReporter {
          * @return a {@link GangliaReporter}
          */
         public GangliaReporter build(GMetric gmetric) {
-            return new GangliaReporter(registry, gmetric, null, prefix, tMax, dMax, rateUnit, durationUnit, filter);
+            return new GangliaReporter(registry, gmetric, null, prefix, tMax, dMax, rateUnit, durationUnit, filter, executor, shutdownExecutorOnStop);
         }
 
         /**
@@ -144,7 +175,7 @@ public class GangliaReporter extends ScheduledReporter {
          * @return a {@link GangliaReporter}
          */
         public GangliaReporter build(GMetric... gmetrics) {
-            return new GangliaReporter(registry, null, gmetrics, prefix, tMax, dMax, rateUnit, durationUnit, filter);
+            return new GangliaReporter(registry, null, gmetrics, prefix, tMax, dMax, rateUnit, durationUnit, filter, executor, shutdownExecutorOnStop);
         }
     }
 
@@ -164,8 +195,10 @@ public class GangliaReporter extends ScheduledReporter {
                             int dMax,
                             TimeUnit rateUnit,
                             TimeUnit durationUnit,
-                            MetricFilter filter) {
-        super(registry, "ganglia-reporter", filter, rateUnit, durationUnit);
+                            MetricFilter filter,
+                            ScheduledExecutorService executor,
+                            boolean shutdownExecutorOnStop) {
+        super(registry, "ganglia-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop);
         this.gmetric = gmetric;
         this.gmetrics = gmetrics;
         this.prefix = prefix;
