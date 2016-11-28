@@ -17,7 +17,7 @@ and returning ``501 Not Implemented`` if no health checks are registered, ``200 
 ``text/plain`` entity.
 
 ``HealthCheckServlet`` requires that the servlet context has a ``HealthCheckRegistry`` named
-``com.codahale.metrics.servlets.HealthCheckServlet.registry``. You can subclass
+``io.dropwizard.metrics.servlets.HealthCheckServlet.registry``. You can subclass
 ``MetricsServletContextListener``, which will add a specific ``HealthCheckRegistry`` to the servlet
 context.
 
@@ -38,7 +38,7 @@ MetricsServlet
 ``MetricsServlet`` exposes the state of the metrics in a particular registry as a JSON object.
 
 ``MetricsServlet`` requires that the servlet context has a ``MetricRegistry`` named
-``com.codahale.metrics.servlets.MetricsServlet.registry``. You can subclass
+``io.dropwizard.metrics.servlets.MetricsServlet.registry``. You can subclass
 ``MetricsServletContextListener``, which will add a specific ``MetricRegistry`` to the servlet
 context.
 
@@ -69,8 +69,8 @@ AdminServlet
   * ``/threads``: ``ThreadDumpServlet``
 
 You will need to add your ``MetricRegistry`` and ``HealthCheckRegistry`` instances to the servlet
-context as attributes named ``com.codahale.metrics.servlets.MetricsServlet.registry`` and
-``com.codahale.metrics.servlets.HealthCheckServlet.registry``, respectively. You can do this using
+context as attributes named ``io.dropwizard.metrics.servlets.MetricsServlet.registry`` and
+``io.dropwizard.metrics.servlets.HealthCheckServlet.registry``, respectively. You can do this using
 the Servlet API by extending ``MetricsServlet.ContextListener`` for MetricRegistry:
 
 .. code-block:: java
@@ -118,7 +118,7 @@ You will also need to register ``AdminServlet`` in ``web.xml``:
 
  	<servlet>
 		<servlet-name>metrics</servlet-name>
-		<servlet-class>com.codahale.metrics.servlets.AdminServlet</servlet-class>
+		<servlet-class>io.dropwizard.metrics.servlets.AdminServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>metrics</servlet-name>

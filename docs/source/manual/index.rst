@@ -14,9 +14,10 @@ User Manual
     core
     healthchecks
     ehcache
-    ganglia
     graphite
+    collectd
     httpclient
+    influxdb
     jdbi
     jersey
     jetty
