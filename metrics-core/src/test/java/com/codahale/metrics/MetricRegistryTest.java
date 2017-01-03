@@ -374,6 +374,10 @@ public class MetricRegistryTest {
             public boolean matches(String name, Metric metric) {
                 return name.endsWith("1");
             }
+            @Override
+            public boolean matches(String name, Metric metric, String measurement) {
+                return true;
+            }
         });
 
         assertThat(registry.getNames())
