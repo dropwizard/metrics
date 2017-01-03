@@ -139,6 +139,7 @@ public class GraphiteReporter extends ScheduledReporter {
     private final GraphiteSender graphite;
     private final Clock clock;
     private final MetricName prefix;
+    private final MetricFilter filter;
 
     private GraphiteReporter(MetricRegistry registry,
                              GraphiteSender graphite,
@@ -151,6 +152,7 @@ public class GraphiteReporter extends ScheduledReporter {
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = MetricName.build(prefix);
+        this.filter = filter;
     }
 
     @Override
@@ -223,63 +225,116 @@ public class GraphiteReporter extends ScheduledReporter {
     private void reportTimer(MetricName name, Timer timer, long timestamp) throws IOException {
         final Snapshot snapshot = timer.getSnapshot();
 
-        graphite.send(prefix(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
-        graphite.send(prefix(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
-        graphite.send(prefix(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);
-        graphite.send(prefix(name, "stddev"),
-                      format(convertDuration(snapshot.getStdDev())),
-                      timestamp);
-        graphite.send(prefix(name, "p50"),
-                      format(convertDuration(snapshot.getMedian())),
-                      timestamp);
-        graphite.send(prefix(name, "p75"),
-                      format(convertDuration(snapshot.get75thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p95"),
-                      format(convertDuration(snapshot.get95thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p98"),
-                      format(convertDuration(snapshot.get98thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p99"),
-                      format(convertDuration(snapshot.get99thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p999"),
-                      format(convertDuration(snapshot.get999thPercentile())),
-                      timestamp);
+        if (filter.matches(name, timer, "max")) {
+            graphite.send(prefix(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
+        }
+        if (filter.matches(name, timer, "mean")) {
+            graphite.send(prefix(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
+        }
+        if (filter.matches(name, timer, "min")) {
+            graphite.send(prefix(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);
+        }
+        if (filter.matches(name, timer, "stddev")) {
+            graphite.send(prefix(name, "stddev"),
+                    format(convertDuration(snapshot.getStdDev())),
+                    timestamp);
+        }
+        if (filter.matches(name, timer, "p50")) {
+            graphite.send(prefix(name, "p50"),
+                    format(convertDuration(snapshot.getMedian())),
+                    timestamp);
+        }
+        if (filter.matches(name, timer, "p75")) {
+            graphite.send(prefix(name, "p75"),
+                    format(convertDuration(snapshot.get75thPercentile())),
+                    timestamp);
+        }
+        if (filter.matches(name, timer, "p95")) {
+            graphite.send(prefix(name, "p95"),
+                    format(convertDuration(snapshot.get95thPercentile())),
+                    timestamp);
+        }
+        if (filter.matches(name, timer, "p98")) {
+            graphite.send(prefix(name, "p98"),
+                    format(convertDuration(snapshot.get98thPercentile())),
+                    timestamp);
+        }
+        if (filter.matches(name, timer, "p99")) {
+            graphite.send(prefix(name, "p99"),
+                    format(convertDuration(snapshot.get99thPercentile())),
+                    timestamp);
+        }
+        if (filter.matches(name, timer, "p999")) {
+            graphite.send(prefix(name, "p999"),
+                    format(convertDuration(snapshot.get999thPercentile())),
+                    timestamp);
+        }
 
         reportMetered(name, timer, timestamp);
     }
 
+
     private void reportMetered(MetricName name, Metered meter, long timestamp) throws IOException {
-        graphite.send(prefix(name, "count"), format(meter.getCount()), timestamp);
-        graphite.send(prefix(name, "m1_rate"),
-                      format(convertRate(meter.getOneMinuteRate())),
-                      timestamp);
-        graphite.send(prefix(name, "m5_rate"),
-                      format(convertRate(meter.getFiveMinuteRate())),
-                      timestamp);
-        graphite.send(prefix(name, "m15_rate"),
-                      format(convertRate(meter.getFifteenMinuteRate())),
-                      timestamp);
-        graphite.send(prefix(name, "mean_rate"),
-                      format(convertRate(meter.getMeanRate())),
-                      timestamp);
+        if (filter.matches(name, meter, "count")) {
+            graphite.send(prefix(name, "count"), format(meter.getCount()), timestamp);
+        }
+        if (filter.matches(name, meter, "m1_rate")) {
+            graphite.send(prefix(name, "m1_rate"),
+                    format(convertRate(meter.getOneMinuteRate())),
+                    timestamp);
+        }
+        if (filter.matches(name, meter, "m5_rate")) {
+            graphite.send(prefix(name, "m5_rate"),
+                    format(convertRate(meter.getFiveMinuteRate())),
+                    timestamp);
+        }
+        if (filter.matches(name, meter, "m15_rate")) {
+            graphite.send(prefix(name, "m15_rate"),
+                    format(convertRate(meter.getFifteenMinuteRate())),
+                    timestamp);
+        }
+        if (filter.matches(name, meter, "mean_rate")) {
+            graphite.send(prefix(name, "mean_rate"),
+                    format(convertRate(meter.getMeanRate())),
+                    timestamp);
+        }
     }
 
     private void reportHistogram(MetricName name, Histogram histogram, long timestamp) throws IOException {
         final Snapshot snapshot = histogram.getSnapshot();
-        graphite.send(prefix(name, "count"), format(histogram.getCount()), timestamp);
-        graphite.send(prefix(name, "max"), format(snapshot.getMax()), timestamp);
-        graphite.send(prefix(name, "mean"), format(snapshot.getMean()), timestamp);
-        graphite.send(prefix(name, "min"), format(snapshot.getMin()), timestamp);
-        graphite.send(prefix(name, "stddev"), format(snapshot.getStdDev()), timestamp);
-        graphite.send(prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
-        graphite.send(prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
-        graphite.send(prefix(name, "p95"), format(snapshot.get95thPercentile()), timestamp);
-        graphite.send(prefix(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
-        graphite.send(prefix(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
-        graphite.send(prefix(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
+        if (filter.matches(name, histogram, "count")) {
+            graphite.send(prefix(name, "count"), format(histogram.getCount()), timestamp);
+        }
+        if (filter.matches(name, histogram, "max")) {
+            graphite.send(prefix(name, "max"), format(snapshot.getMax()), timestamp);
+        }
+        if (filter.matches(name, histogram, "mean")) {
+            graphite.send(prefix(name, "mean"), format(snapshot.getMean()), timestamp);
+        }
+        if (filter.matches(name, histogram, "min")) {
+            graphite.send(prefix(name, "min"), format(snapshot.getMin()), timestamp);
+        }
+        if (filter.matches(name, histogram, "stddev")) {
+            graphite.send(prefix(name, "stddev"), format(snapshot.getStdDev()), timestamp);
+        }
+        if (filter.matches(name, histogram, "p50")) {
+            graphite.send(prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
+        }
+        if (filter.matches(name, histogram, "p75")) {
+            graphite.send(prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
+        }
+        if (filter.matches(name, histogram, "p95")) {
+            graphite.send(prefix(name, "p95"), format(snapshot.get95thPercentile()), timestamp);
+        }
+        if (filter.matches(name, histogram, "p98")) {
+            graphite.send(prefix(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
+        }
+        if (filter.matches(name, histogram, "p99")) {
+            graphite.send(prefix(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
+        }
+        if (filter.matches(name, histogram, "p999")) {
+            graphite.send(prefix(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
+        }
     }
 
     private void reportCounter(MetricName name, Counter counter, long timestamp) throws IOException {

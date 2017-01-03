@@ -22,4 +22,8 @@ public interface MetricFilter {
      * @return {@code true} if the metric matches the filter
      */
     boolean matches(MetricName name, Metric metric);
+
+    default public boolean matches(MetricName name, Metric metric, String measurement) {
+        return true;
+    }
 }
