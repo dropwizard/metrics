@@ -7,6 +7,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestExecutor;
 
+import io.dropwizard.metrics.Meter;
 import io.dropwizard.metrics.MetricRegistry;
 import io.dropwizard.metrics.Timer;
 
@@ -43,6 +44,9 @@ public class InstrumentedHttpRequestExecutor extends HttpRequestExecutor {
         final Timer.Context timerContext = timer(request).time();
         try {
             return super.execute(request, conn, context);
+        } catch (HttpException | IOException e) {
+            meter(e).mark();
+            throw e;
         } finally {
             timerContext.stop();
         }
@@ -50,5 +54,9 @@ public class InstrumentedHttpRequestExecutor extends HttpRequestExecutor {
 
     private Timer timer(HttpRequest request) {
         return registry.timer(metricNameStrategy.getNameFor(name, request));
+    }
+
+    private Meter meter(Exception e) {
+        return registry.meter(metricNameStrategy.getNameFor(name, e));
     }
 }
