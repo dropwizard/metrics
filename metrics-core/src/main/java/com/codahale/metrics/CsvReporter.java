@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -35,6 +36,8 @@ public class CsvReporter extends ScheduledReporter {
         private TimeUnit durationUnit;
         private Clock clock;
         private MetricFilter filter;
+        private ScheduledExecutorService executor;
+        private boolean shutdownExecutorOnStop;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -43,6 +46,34 @@ public class CsvReporter extends ScheduledReporter {
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.clock = Clock.defaultClock();
             this.filter = MetricFilter.ALL;
+            this.executor = null;
+            this.shutdownExecutorOnStop = true;
+        }
+
+        /**
+         * Specifies whether or not, the executor (used for reporting) will be stopped with same time with reporter.
+         * Default value is true.
+         * Setting this parameter to false, has the sense in combining with providing external managed executor via {@link #scheduleOn(ScheduledExecutorService)}.
+         *
+         * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
+         * @return {@code this}
+         */
+        public Builder shutdownExecutorOnStop(boolean shutdownExecutorOnStop) {
+            this.shutdownExecutorOnStop = shutdownExecutorOnStop;
+            return this;
+        }
+
+        /**
+         * Specifies the executor to use while scheduling reporting of metrics.
+         * Default value is null.
+         * Null value leads to executor will be auto created on start.
+         *
+         * @param executor the executor to use while scheduling reporting of metrics.
+         * @return {@code this}
+         */
+        public Builder scheduleOn(ScheduledExecutorService executor) {
+            this.executor = executor;
+            return this;
         }
 
         /**
@@ -114,7 +145,10 @@ public class CsvReporter extends ScheduledReporter {
                                    rateUnit,
                                    durationUnit,
                                    clock,
-                                   filter);
+                                   filter,
+                                   executor,
+                                   shutdownExecutorOnStop
+                                   );
         }
     }
 
@@ -131,8 +165,10 @@ public class CsvReporter extends ScheduledReporter {
                         TimeUnit rateUnit,
                         TimeUnit durationUnit,
                         Clock clock,
-                        MetricFilter filter) {
-        super(registry, "csv-reporter", filter, rateUnit, durationUnit);
+                        MetricFilter filter,
+                        ScheduledExecutorService executor,
+                        boolean shutdownExecutorOnStop) {
+        super(registry, "csv-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop);
         this.directory = directory;
         this.locale = locale;
         this.clock = clock;
