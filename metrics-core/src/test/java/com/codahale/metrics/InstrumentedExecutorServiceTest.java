@@ -2,6 +2,8 @@ package com.codahale.metrics;
 
 import org.junit.After;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,6 +13,9 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class InstrumentedExecutorServiceTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(InstrumentedExecutorServiceTest.class);
+
     private final ExecutorService executor = Executors.newCachedThreadPool();
     private final MetricRegistry registry = new MetricRegistry();
     private final InstrumentedExecutorService instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "xs");
@@ -49,7 +54,7 @@ public class InstrumentedExecutorServiceTest {
     public void tearDown() throws Exception {
         instrumentedExecutorService.shutdown();
         if (!instrumentedExecutorService.awaitTermination(2, TimeUnit.SECONDS)) {
-            System.err.println("InstrumentedExecutorService did not terminate.");
+            LOGGER.error("InstrumentedExecutorService did not terminate.");
         }
     }
 
