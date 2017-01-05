@@ -116,6 +116,27 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
+     * Return the {@link Counter} registered under this name; or create and register
+     * a new {@link Counter} using the provided MetricSupplier if none is registered.
+     *
+     * @param name the name of the metric
+     * @param supplier a MetricSupplier that can be used to manufacture a counter.
+     * @return a new or pre-existing {@link Counter}
+     */
+    public Counter counter(String name, final MetricSupplier<Counter> supplier) {
+        return getOrAdd(name, new MetricBuilder<Counter>() {
+            @Override
+            public Counter newMetric() {
+                return supplier.newMetric();
+            }
+            @Override
+            public boolean isInstance(Metric metric) {
+                return Counter.class.isInstance(metric);
+            }
+        });
+    }
+
+    /**
      * Return the {@link Histogram} registered under this name; or create and register 
      * a new {@link Histogram} if none is registered.
      *
@@ -127,7 +148,28 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * Return the {@link Meter} registered under this name; or create and register 
+     * Return the {@link Histogram} registered under this name; or create and register
+     * a new {@link Histogram} using the provided MetricSupplier if none is registered.
+     *
+     * @param name the name of the metric
+     * @param supplier a MetricSupplier that can be used to manufacture a histogram
+     * @return a new or pre-existing {@link Histogram}
+     */
+    public Histogram histogram(String name, final MetricSupplier<Histogram> supplier) {
+      return getOrAdd(name, new MetricBuilder<Histogram>() {
+        @Override
+        public Histogram newMetric() {
+          return supplier.newMetric();
+        }
+        @Override
+        public boolean isInstance(Metric metric) {
+          return Histogram.class.isInstance(metric);
+        }
+      });
+    }
+
+    /**
+     * Return the {@link Meter} registered under this name; or create and register
      * a new {@link Meter} if none is registered.
      *
      * @param name the name of the metric
@@ -138,7 +180,28 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * Return the {@link Timer} registered under this name; or create and register 
+     * Return the {@link Meter} registered under this name; or create and register
+     * a new {@link Meter} using the provided MetricSupplier if none is registered.
+     *
+     * @param name the name of the metric
+     * @param supplier a MetricSupplier that can be used to manufacture a Meter
+     * @return a new or pre-existing {@link Meter}
+     */
+    public Meter meter(String name, final MetricSupplier<Meter> supplier) {
+        return getOrAdd(name, new MetricBuilder<Meter>() {
+            @Override
+            public Meter newMetric() {
+                return supplier.newMetric();
+            }
+            @Override
+            public boolean isInstance(Metric metric) {
+                return Meter.class.isInstance(metric);
+            }
+        });
+    }
+
+    /**
+     * Return the {@link Timer} registered under this name; or create and register
      * a new {@link Timer} if none is registered.
      *
      * @param name the name of the metric
@@ -149,11 +212,54 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * Removes the metric with the given name.
+     * Return the {@link Timer} registered under this name; or create and register
+     * a new {@link Timer} using the provided MetricSupplier if none is registered.
      *
      * @param name the name of the metric
-     * @return whether or not the metric was removed
+     * @param supplier a MetricSupplier that can be used to manufacture a Timer
+     * @return a new or pre-existing {@link Timer}
      */
+    public Timer timer(String name, final MetricSupplier<Timer> supplier) {
+        return getOrAdd(name, new MetricBuilder<Timer>() {
+            @Override
+            public Timer newMetric() {
+                return supplier.newMetric();
+            }
+            @Override
+            public boolean isInstance(Metric metric) {
+                return Timer.class.isInstance(metric);
+            }
+        });
+    }
+
+    /**
+     * Return the {@link Gauge} registered under this name; or create and register
+     * a new {@link Gauge} using the provided MetricSupplier if none is registered.
+     *
+     * @param name the name of the metric
+     * @param supplier a MetricSupplier that can be used to manufacture a Gauge
+     * @return a new or pre-existing {@link Gauge}
+     */
+    public Gauge gauge(String name, final MetricSupplier<Gauge> supplier) {
+        return getOrAdd(name, new MetricBuilder<Gauge>() {
+            @Override
+            public Gauge newMetric() {
+                return supplier.newMetric();
+            }
+            @Override
+            public boolean isInstance(Metric metric) {
+                return Gauge.class.isInstance(metric);
+            }
+        });
+    }
+
+
+        /**
+         * Removes the metric with the given name.
+         *
+         * @param name the name of the metric
+         * @return whether or not the metric was removed
+         */
     public boolean remove(String name) {
         final Metric metric = metrics.remove(name);
         if (metric != null) {
@@ -394,6 +500,10 @@ public class MetricRegistry implements MetricSet {
     @Override
     public Map<String, Metric> getMetrics() {
         return Collections.unmodifiableMap(metrics);
+    }
+
+    public interface MetricSupplier<T extends Metric> {
+      T newMetric();
     }
 
     /**
