@@ -25,6 +25,7 @@
         <module>metrics-graphite</module>
         <module>metrics-httpclient</module>
         <module>metrics-httpasyncclient</module>
+        <module>metrics-jcache</module>
         <module>metrics-jdbi</module>
         <module>metrics-jersey</module>
         <module>metrics-jersey2</module>
