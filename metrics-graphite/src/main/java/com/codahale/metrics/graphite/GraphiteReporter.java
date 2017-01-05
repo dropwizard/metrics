@@ -7,10 +7,14 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
+
+import static com.codahale.metrics.graphite.MetricTypes.*;
 
 /**
  * A reporter which publishes metric values to a Graphite server.
@@ -40,6 +44,7 @@ public class GraphiteReporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
+        private Set<String> disabledMetricTypes;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -48,6 +53,7 @@ public class GraphiteReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
+            this.disabledMetricTypes = Collections.emptySet();
         }
 
         /**
@@ -106,6 +112,17 @@ public class GraphiteReporter extends ScheduledReporter {
         }
 
         /**
+         * Don't report the passed metrics types for all metrics (e.g. "p999", "stddev" or "m15"). See {@link MetricTypes}.
+         *
+         * @param disabledMetricTypes a {@link MetricFilter}
+         * @return {@code this}
+         */
+        public Builder disabledMetricTypes(Set<String> disabledMetricTypes) {
+            this.disabledMetricTypes = disabledMetricTypes;
+            return this;
+        }
+
+        /**
          * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
          * given {@link GraphiteSender}.
          *
@@ -127,12 +144,13 @@ public class GraphiteReporter extends ScheduledReporter {
          */
         public GraphiteReporter build(GraphiteSender graphite) {
             return new GraphiteReporter(registry,
-                                        graphite,
-                                        clock,
-                                        prefix,
-                                        rateUnit,
-                                        durationUnit,
-                                        filter);
+                    graphite,
+                    clock,
+                    prefix,
+                    rateUnit,
+                    durationUnit,
+                    filter,
+                    disabledMetricTypes);
         }
     }
 
@@ -141,6 +159,7 @@ public class GraphiteReporter extends ScheduledReporter {
     private final GraphiteSender graphite;
     private final Clock clock;
     private final String prefix;
+    private final Set<String> disabledMetricTypes;
 
     private GraphiteReporter(MetricRegistry registry,
                              GraphiteSender graphite,
@@ -148,11 +167,13 @@ public class GraphiteReporter extends ScheduledReporter {
                              String prefix,
                              TimeUnit rateUnit,
                              TimeUnit durationUnit,
-                             MetricFilter filter) {
+                             MetricFilter filter,
+                             Set<String> disabledMetricTypes) {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
+        this.disabledMetricTypes = disabledMetricTypes;
     }
 
     @Override
@@ -215,68 +236,58 @@ public class GraphiteReporter extends ScheduledReporter {
 
     private void reportTimer(String name, Timer timer, long timestamp) throws IOException {
         final Snapshot snapshot = timer.getSnapshot();
-
-        graphite.send(prefix(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
-        graphite.send(prefix(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
-        graphite.send(prefix(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);
-        graphite.send(prefix(name, "stddev"),
-                      format(convertDuration(snapshot.getStdDev())),
-                      timestamp);
-        graphite.send(prefix(name, "p50"),
-                      format(convertDuration(snapshot.getMedian())),
-                      timestamp);
-        graphite.send(prefix(name, "p75"),
-                      format(convertDuration(snapshot.get75thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p95"),
-                      format(convertDuration(snapshot.get95thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p98"),
-                      format(convertDuration(snapshot.get98thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p99"),
-                      format(convertDuration(snapshot.get99thPercentile())),
-                      timestamp);
-        graphite.send(prefix(name, "p999"),
-                      format(convertDuration(snapshot.get999thPercentile())),
-                      timestamp);
-
+        sendIfEnabled(MAX, name, convertDuration(snapshot.getMax()), timestamp);
+        sendIfEnabled(MEAN, name, convertDuration(snapshot.getMean()), timestamp);
+        sendIfEnabled(MIN, name, convertDuration(snapshot.getMin()), timestamp);
+        sendIfEnabled(STDDEV, name, convertDuration(snapshot.getStdDev()), timestamp);
+        sendIfEnabled(P50, name, convertDuration(snapshot.getMedian()), timestamp);
+        sendIfEnabled(P75, name, convertDuration(snapshot.get75thPercentile()), timestamp);
+        sendIfEnabled(P95, name, convertDuration(snapshot.get95thPercentile()), timestamp);
+        sendIfEnabled(P98, name, convertDuration(snapshot.get98thPercentile()), timestamp);
+        sendIfEnabled(P99, name, convertDuration(snapshot.get99thPercentile()), timestamp);
+        sendIfEnabled(P999, name, convertDuration(snapshot.get999thPercentile()), timestamp);
         reportMetered(name, timer, timestamp);
     }
 
     private void reportMetered(String name, Metered meter, long timestamp) throws IOException {
-        graphite.send(prefix(name, "count"), format(meter.getCount()), timestamp);
-        graphite.send(prefix(name, "m1_rate"),
-                      format(convertRate(meter.getOneMinuteRate())),
-                      timestamp);
-        graphite.send(prefix(name, "m5_rate"),
-                      format(convertRate(meter.getFiveMinuteRate())),
-                      timestamp);
-        graphite.send(prefix(name, "m15_rate"),
-                      format(convertRate(meter.getFifteenMinuteRate())),
-                      timestamp);
-        graphite.send(prefix(name, "mean_rate"),
-                      format(convertRate(meter.getMeanRate())),
-                      timestamp);
+        sendIfEnabled(COUNT, name, meter.getCount(), timestamp);
+        sendIfEnabled(M1_RATE, name, meter.getOneMinuteRate(), timestamp);
+        sendIfEnabled(M5_RATE, name, meter.getFiveMinuteRate(), timestamp);
+        sendIfEnabled(M15_RATE, name, meter.getFifteenMinuteRate(), timestamp);
+        sendIfEnabled(MEAN_RATE, name, meter.getMeanRate(), timestamp);
     }
 
     private void reportHistogram(String name, Histogram histogram, long timestamp) throws IOException {
         final Snapshot snapshot = histogram.getSnapshot();
-        graphite.send(prefix(name, "count"), format(histogram.getCount()), timestamp);
-        graphite.send(prefix(name, "max"), format(snapshot.getMax()), timestamp);
-        graphite.send(prefix(name, "mean"), format(snapshot.getMean()), timestamp);
-        graphite.send(prefix(name, "min"), format(snapshot.getMin()), timestamp);
-        graphite.send(prefix(name, "stddev"), format(snapshot.getStdDev()), timestamp);
-        graphite.send(prefix(name, "p50"), format(snapshot.getMedian()), timestamp);
-        graphite.send(prefix(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
-        graphite.send(prefix(name, "p95"), format(snapshot.get95thPercentile()), timestamp);
-        graphite.send(prefix(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
-        graphite.send(prefix(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
-        graphite.send(prefix(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
+        sendIfEnabled(COUNT, name, histogram.getCount(), timestamp);
+        sendIfEnabled(MAX, name, snapshot.getMax(), timestamp);
+        sendIfEnabled(MEAN, name, snapshot.getMean(), timestamp);
+        sendIfEnabled(MIN, name, snapshot.getMin(), timestamp);
+        sendIfEnabled(STDDEV, name, snapshot.getStdDev(), timestamp);
+        sendIfEnabled(P50, name, snapshot.getMedian(), timestamp);
+        sendIfEnabled(P75, name, snapshot.get75thPercentile(), timestamp);
+        sendIfEnabled(P95, name, snapshot.get95thPercentile(), timestamp);
+        sendIfEnabled(P98, name, snapshot.get98thPercentile(), timestamp);
+        sendIfEnabled(P99, name, snapshot.get99thPercentile(), timestamp);
+        sendIfEnabled(P999, name, snapshot.get999thPercentile(), timestamp);
+    }
+
+    private void sendIfEnabled(String type, String name, double value, long timestamp) throws IOException {
+        if (disabledMetricTypes.contains(type)){
+            return;
+        }
+        graphite.send(prefix(name, type), format(value), timestamp);
+    }
+
+    private void sendIfEnabled(String type, String name, long value, long timestamp) throws IOException {
+        if (disabledMetricTypes.contains(type)){
+            return;
+        }
+        graphite.send(prefix(name, type), format(value), timestamp);
     }
 
     private void reportCounter(String name, Counter counter, long timestamp) throws IOException {
-        graphite.send(prefix(name, "count"), format(counter.getCount()), timestamp);
+        sendIfEnabled(COUNT, name, counter.getCount(), timestamp);
     }
 
     private void reportGauge(String name, Gauge gauge, long timestamp) throws IOException {
