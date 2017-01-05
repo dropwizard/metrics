@@ -45,7 +45,7 @@ public class ThreadDumpTest {
         threadDump.dump(output);
 
         assertThat(output.toString())
-                .isEqualTo(String.format("runnable id=100 state=RUNNABLE%n" +
+                .isEqualTo(String.format("\"runnable\" id=100 state=RUNNABLE%n" +
                                                  "    at Blah.blee(Blah.java:100)%n" +
                                                  "%n" +
                                                  "%n"));
