@@ -37,7 +37,7 @@ public class PingServletTest extends AbstractServletTest {
     @Test
     public void returnsTextPlain() throws Exception {
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
-                .isEqualTo("text/plain; charset=ISO-8859-1");
+                .isEqualTo("text/plain;charset=ISO-8859-1");
     }
 
     @Test

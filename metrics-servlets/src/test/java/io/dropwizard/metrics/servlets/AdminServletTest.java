@@ -58,6 +58,6 @@ public class AdminServletTest extends AbstractServletTest {
                                 "</html>%n"
                 ));
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
-                .isEqualTo("text/html; charset=ISO-8859-1");
+                .isEqualTo("text/html;charset=UTF-8");
     }
 }
