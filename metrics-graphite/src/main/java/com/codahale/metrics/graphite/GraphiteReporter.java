@@ -1,20 +1,44 @@
 package com.codahale.metrics.graphite;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.Clock;
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.Metered;
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.MetricTypes;
+import com.codahale.metrics.ScheduledReporter;
+import com.codahale.metrics.Snapshot;
+import com.codahale.metrics.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
 
-import static com.codahale.metrics.graphite.MetricTypes.*;
+import static com.codahale.metrics.MetricTypes.COUNT;
+import static com.codahale.metrics.MetricTypes.M15_RATE;
+import static com.codahale.metrics.MetricTypes.M1_RATE;
+import static com.codahale.metrics.MetricTypes.M5_RATE;
+import static com.codahale.metrics.MetricTypes.MAX;
+import static com.codahale.metrics.MetricTypes.MEAN;
+import static com.codahale.metrics.MetricTypes.MEAN_RATE;
+import static com.codahale.metrics.MetricTypes.MIN;
+import static com.codahale.metrics.MetricTypes.P50;
+import static com.codahale.metrics.MetricTypes.P75;
+import static com.codahale.metrics.MetricTypes.P95;
+import static com.codahale.metrics.MetricTypes.P98;
+import static com.codahale.metrics.MetricTypes.P99;
+import static com.codahale.metrics.MetricTypes.P999;
+import static com.codahale.metrics.MetricTypes.STDDEV;
 
 /**
  * A reporter which publishes metric values to a Graphite server.
@@ -44,7 +68,7 @@ public class GraphiteReporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
-        private Set<String> disabledMetricTypes;
+        private EnumSet<MetricTypes> disabledMetricTypes;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -53,7 +77,7 @@ public class GraphiteReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
-            this.disabledMetricTypes = Collections.emptySet();
+            this.disabledMetricTypes = EnumSet.noneOf(MetricTypes.class);
         }
 
         /**
@@ -117,7 +141,7 @@ public class GraphiteReporter extends ScheduledReporter {
          * @param disabledMetricTypes a {@link MetricFilter}
          * @return {@code this}
          */
-        public Builder disabledMetricTypes(Set<String> disabledMetricTypes) {
+        public Builder disabledMetricTypes(EnumSet<MetricTypes> disabledMetricTypes) {
             this.disabledMetricTypes = disabledMetricTypes;
             return this;
         }
@@ -159,7 +183,7 @@ public class GraphiteReporter extends ScheduledReporter {
     private final GraphiteSender graphite;
     private final Clock clock;
     private final String prefix;
-    private final Set<String> disabledMetricTypes;
+    private final EnumSet<MetricTypes> disabledMetricTypes;
 
     private GraphiteReporter(MetricRegistry registry,
                              GraphiteSender graphite,
@@ -168,7 +192,7 @@ public class GraphiteReporter extends ScheduledReporter {
                              TimeUnit rateUnit,
                              TimeUnit durationUnit,
                              MetricFilter filter,
-                             Set<String> disabledMetricTypes) {
+                             EnumSet<MetricTypes> disabledMetricTypes) {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit);
         this.graphite = graphite;
         this.clock = clock;
@@ -272,18 +296,18 @@ public class GraphiteReporter extends ScheduledReporter {
         sendIfEnabled(P999, name, snapshot.get999thPercentile(), timestamp);
     }
 
-    private void sendIfEnabled(String type, String name, double value, long timestamp) throws IOException {
+    private void sendIfEnabled(MetricTypes type, String name, double value, long timestamp) throws IOException {
         if (disabledMetricTypes.contains(type)){
             return;
         }
-        graphite.send(prefix(name, type), format(value), timestamp);
+        graphite.send(prefix(name, type.toName()), format(value), timestamp);
     }
 
-    private void sendIfEnabled(String type, String name, long value, long timestamp) throws IOException {
+    private void sendIfEnabled(MetricTypes type, String name, long value, long timestamp) throws IOException {
         if (disabledMetricTypes.contains(type)){
             return;
         }
-        graphite.send(prefix(name, type), format(value), timestamp);
+        graphite.send(prefix(name, type.toName()), format(value), timestamp);
     }
 
     private void reportCounter(String name, Counter counter, long timestamp) throws IOException {

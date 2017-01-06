@@ -1,18 +1,32 @@
 package com.codahale.metrics.graphite;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.Clock;
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.MetricTypes;
+import com.codahale.metrics.Snapshot;
+import com.codahale.metrics.Timer;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 
 import java.net.UnknownHostException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.EnumSet;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 public class GraphiteReporterTest {
     private final long timestamp = 1000198;
@@ -25,7 +39,7 @@ public class GraphiteReporterTest {
                                                               .convertRatesTo(TimeUnit.SECONDS)
                                                               .convertDurationsTo(TimeUnit.MILLISECONDS)
                                                               .filter(MetricFilter.ALL)
-                                                              .disabledMetricTypes(new HashSet<String>())
+                                                              .disabledMetricTypes(EnumSet.noneOf(MetricTypes.class))
                                                               .build(graphite);
 
     @Before
@@ -328,13 +342,11 @@ public class GraphiteReporterTest {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
         when(meter.getOneMinuteRate()).thenReturn(2.0);
-        when(meter.getFiveMinuteRate()).thenReturn(3.0);
-        when(meter.getFifteenMinuteRate()).thenReturn(4.0);
+        when(meter.getFiveMinuteRate()).thenReturn(3.0); //should not be send
+        when(meter.getFifteenMinuteRate()).thenReturn(4.0); //should not be send
         when(meter.getMeanRate()).thenReturn(5.0);
 
-        Set<String> disabledMetricTypes = new HashSet<String>();
-        disabledMetricTypes.add(MetricTypes.M15_RATE);
-        disabledMetricTypes.add(MetricTypes.M5_RATE);
+        EnumSet<MetricTypes> disabledMetricTypes = EnumSet.of(MetricTypes.M15_RATE, MetricTypes.M5_RATE);
         GraphiteReporter reporterWithDisabledMetricTypes = GraphiteReporter.forRegistry(registry)
                 .withClock(clock)
                 .prefixedWith("prefix")
