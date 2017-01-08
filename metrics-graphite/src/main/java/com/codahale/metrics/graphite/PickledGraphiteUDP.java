@@ -162,8 +162,11 @@ public final class PickledGraphiteUDP implements GraphiteSender {
 
     @Override
     public void close() throws IOException {
-        datagramChannel.socket().close();
-        datagramChannel = null;
+        try {
+            datagramChannel.socket().close();
+        } finally {
+            datagramChannel = null;
+        }
     }
 
     @Override
@@ -186,7 +189,6 @@ public final class PickledGraphiteUDP implements GraphiteSender {
                 ByteBuffer byteBuffer = ByteBuffer.allocate(4 + payload.length).putInt(payload.length).put(payload);
 
                 datagramChannel.send(byteBuffer, address);
-                this.failures = 0;
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Wrote {} metrics", metrics.size());
                 }
