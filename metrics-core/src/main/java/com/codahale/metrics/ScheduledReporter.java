@@ -3,7 +3,13 @@ package com.codahale.metrics;
 import java.io.Closeable;
 import java.util.Locale;
 import java.util.SortedMap;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -66,7 +72,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      *                 reporter will report
      * @param name     the reporter's name
      * @param filter   the filter for which metrics to report
-     * @param rateUnit a unit of time 
+     * @param rateUnit a unit of time
      * @param durationUnit a unit of time
      */
     protected ScheduledReporter(MetricRegistry registry,
@@ -128,20 +134,32 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * @param period the amount of time between polls
      * @param unit   the unit for {@code period}
      */
-    synchronized public void start(long period, TimeUnit unit) {
-        if (this.scheduledFuture != null) {
-            throw new IllegalArgumentException("Reporter already started");
-        }
-        this.scheduledFuture = executor.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    report();
-                } catch (RuntimeException ex) {
-                    LOG.error("RuntimeException thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
-                }
-            }
-        }, period, period, unit);
+    public void start(long period, TimeUnit unit) {
+       start(period, period, unit);
+    }
+
+    /**
+     * Starts the reporter polling at the given period.
+     *
+     * @param initialDelay the time to delay the first execution
+     * @param period       the amount of time between polls
+     * @param unit         the unit for {@code period}
+     */
+    synchronized public void start(long initialDelay, long period, TimeUnit unit) {
+      if (this.scheduledFuture != null) {
+          throw new IllegalArgumentException("Reporter already started");
+      }
+
+      this.scheduledFuture = executor.scheduleAtFixedRate(new Runnable() {
+         @Override
+         public void run() {
+             try {
+                 report();
+             } catch (RuntimeException ex) {
+                 LOG.error("RuntimeException thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
+             }
+         }
+      }, initialDelay, period, unit);
     }
 
     /**

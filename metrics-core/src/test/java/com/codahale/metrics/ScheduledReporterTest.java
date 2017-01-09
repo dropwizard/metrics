@@ -39,7 +39,7 @@ public class ScheduledReporterTest {
         registry.register("meter", meter);
         registry.register("timer", timer);
 
-        when(executor.scheduleAtFixedRate(any(Runnable.class), eq(200L), eq(200L), eq(TimeUnit.MILLISECONDS)))
+        when(executor.scheduleAtFixedRate(any(Runnable.class), any(Long.class), any(Long.class), eq(TimeUnit.MILLISECONDS)))
                 .thenReturn(scheduledFuture);
     }
 
@@ -60,6 +60,24 @@ public class ScheduledReporterTest {
                 map("histogram", histogram),
                 map("meter", meter),
                 map("timer", timer)
+        );
+    }
+
+    @Test
+    public void shouldUsePeriodAsInitialDelayIfNotSpecifiedOtherwise() throws Exception {
+        reporterWithCustomExecutor.start(200, TimeUnit.MILLISECONDS);
+
+        verify(executor, times(1)).scheduleAtFixedRate(
+            any(Runnable.class), eq(200L), eq(200L), eq(TimeUnit.MILLISECONDS)
+        );
+    }
+
+    @Test
+    public void shouldStartWithSpecifiedInitialDelay() throws Exception {
+        reporterWithCustomExecutor.start(350, 100, TimeUnit.MILLISECONDS);
+
+        verify(executor).scheduleAtFixedRate(
+            any(Runnable.class), eq(350L), eq(100L), eq(TimeUnit.MILLISECONDS)
         );
     }
 
