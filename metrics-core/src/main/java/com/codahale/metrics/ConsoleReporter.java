@@ -3,6 +3,7 @@ package com.codahale.metrics;
 import java.io.PrintStream;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,6 +34,8 @@ public class ConsoleReporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
+        private ScheduledExecutorService executor;
+        private boolean shutdownExecutorOnStop;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -43,6 +46,34 @@ public class ConsoleReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
+            this.executor = null;
+            this.shutdownExecutorOnStop = true;
+        }
+
+        /**
+         * Specifies whether or not, the executor (used for reporting) will be stopped with same time with reporter.
+         * Default value is true.
+         * Setting this parameter to false, has the sense in combining with providing external managed executor via {@link #scheduleOn(ScheduledExecutorService)}.
+         *
+         * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
+         * @return {@code this}
+         */
+        public Builder shutdownExecutorOnStop(boolean shutdownExecutorOnStop) {
+            this.shutdownExecutorOnStop = shutdownExecutorOnStop;
+            return this;
+        }
+
+        /**
+         * Specifies the executor to use while scheduling reporting of metrics.
+         * Default value is null.
+         * Null value leads to executor will be auto created on start.
+         *
+         * @param executor the executor to use while scheduling reporting of metrics.
+         * @return {@code this}
+         */
+        public Builder scheduleOn(ScheduledExecutorService executor) {
+            this.executor = executor;
+            return this;
         }
 
         /**
@@ -135,7 +166,9 @@ public class ConsoleReporter extends ScheduledReporter {
                                        timeZone,
                                        rateUnit,
                                        durationUnit,
-                                       filter);
+                                       filter,
+                                       executor,
+                                       shutdownExecutorOnStop);
         }
     }
 
@@ -153,8 +186,10 @@ public class ConsoleReporter extends ScheduledReporter {
                             TimeZone timeZone,
                             TimeUnit rateUnit,
                             TimeUnit durationUnit,
-                            MetricFilter filter) {
-        super(registry, "console-reporter", filter, rateUnit, durationUnit);
+                            MetricFilter filter,
+                            ScheduledExecutorService executor,
+                            boolean shutdownExecutorOnStop) {
+        super(registry, "console-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop);
         this.output = output;
         this.locale = locale;
         this.clock = clock;

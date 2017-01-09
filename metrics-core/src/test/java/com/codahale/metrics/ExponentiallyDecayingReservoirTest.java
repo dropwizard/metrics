@@ -1,7 +1,10 @@
 package com.codahale.metrics;
 
 import org.junit.Test;
+
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -96,6 +99,101 @@ public class ExponentiallyDecayingReservoirTest {
         assertThat(reservoir.getSnapshot().size())
                 .isEqualTo(10);
         assertAllValuesBetween(reservoir, 3000, 4000);
+    }
+
+    @Test
+    public void multipleUpdatesAfterlongPeriodsOfInactivityShouldNotCorruptSamplingState () throws Exception {
+        // This test illustrates the potential race condition in rescale that
+        // can lead to a corrupt state.  Note that while this test uses updates
+        // exclusively to trigger the race condition, two concurrent updates
+        // may be made much more likely to trigger this behavior if executed
+        // while another thread is constructing a snapshot of the reservoir;
+        // that thread then holds the read lock when the two competing updates
+        // are executed and the race condition's window is substantially
+        // expanded.
+
+        // Run the test several times.
+        for (int attempt=0; attempt < 10; attempt++) {
+            final ManualClock clock = new ManualClock();
+            final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(10,
+                    0.015,
+                    clock);
+
+            // Various atomics used to communicate between this thread and the
+            // thread created below.
+            final AtomicBoolean running = new AtomicBoolean(true);
+            final AtomicInteger threadUpdates = new AtomicInteger(0);
+            final AtomicInteger testUpdates = new AtomicInteger(0);
+
+            final Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    int previous = 0;
+                    while (running.get()) {
+                        // Wait for the test thread to update it's counter
+                        // before updaing the reservoir.
+                        int next;
+                        while (previous >= (next = testUpdates.get()))
+                            ; // spin lock
+
+                        previous = next;
+
+                        // Update the reservoir.  This needs to occur at the
+                        // same time as the test thread's update.
+                        reservoir.update(1000);
+
+                        // Signal the main thread; allows the next update
+                        // attempt to begin.
+                        threadUpdates.incrementAndGet();
+                    }
+                }
+            });
+
+            thread.start();
+
+            int sum = 0;
+            int previous = -1;
+            for (int i = 0; i < 100; i++) {
+                // Wait for 24 hours before attempting the next concurrent
+                // update.  The delay here needs to be sufficiently long to
+                // overflow if an update attempt is allowed to add a value to
+                // the reservoir without rescaling.  Note that:
+                // e(alpha*(15*60*60)) =~ 10^351 >> Double.MAX_VALUE =~ 1.8*10^308.
+                clock.addHours(15);
+
+                // Signal the other thread; asynchronously updates the reservoir.
+                testUpdates.incrementAndGet();
+
+                // Delay a variable length of time.  Without a delay here this
+                // thread is heavily favored and the race condition is almost
+                // never observed.
+                for (int j = 0; j < i; j++)
+                    sum += j;
+
+                // Competing reservoir update.
+                reservoir.update(1000);
+
+                // Wait for the other thread to finish it's update.
+                int next;
+                while (previous >= (next = threadUpdates.get()))
+                    ; // spin lock
+
+                previous = next;
+            }
+
+            // Terminate the thread.
+            running.set(false);
+            testUpdates.incrementAndGet();
+            thread.join();
+
+            // Test failures will result in normWeights that are not finite;
+            // checking the mean value here is sufficient.
+            assertThat(reservoir.getSnapshot().getMean()).isBetween(0.0, Double.MAX_VALUE);
+
+            // Check the value of sum; should prevent the JVM from optimizing
+            // out the delay loop entirely.
+            assertThat(sum).isEqualTo(161700);
+        }
     }
 
     @Test
