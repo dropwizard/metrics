@@ -70,8 +70,6 @@ public class ScheduledReporterTest {
         verify(executor, times(1)).scheduleAtFixedRate(
             any(Runnable.class), eq(200L), eq(200L), eq(TimeUnit.MILLISECONDS)
         );
-
-        Thread.sleep(100);
     }
 
     @Test
@@ -81,8 +79,6 @@ public class ScheduledReporterTest {
         verify(executor).scheduleAtFixedRate(
             any(Runnable.class), eq(350L), eq(100L), eq(TimeUnit.MILLISECONDS)
         );
-
-        Thread.sleep(100);
     }
 
     @Test
