@@ -64,9 +64,6 @@ public class MetricsServlet extends HttpServlet {
 
         /**
          * Returns the name of the parameter used to specify the jsonp callback, if any.
-         * 
-         * @return the name of the parameter used to specify the jsonp callback, or <code>null</code>, if 
-         *         no such parameter exists.
          */
         protected String getJsonpCallbackParameter() {
             return null;
@@ -75,9 +72,6 @@ public class MetricsServlet extends HttpServlet {
         /**
          * Returns the {@link MetricFilter} that shall be used to filter metrics, or {@link MetricFilter#ALL} if
          * the default should be used.
-         * 
-         * @return the {@link MetricFilter} that shall be used to filter metrics, or {@link MetricFilter#ALL} if
-         *         the default should be used.
          */
         protected MetricFilter getMetricFilter() {
             // use the default
@@ -173,7 +167,7 @@ public class MetricsServlet extends HttpServlet {
         }
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
         resp.setStatus(HttpServletResponse.SC_OK);
-        
+
         final OutputStream output = resp.getOutputStream();
         try {
             if (jsonpParamName != null && req.getParameter(jsonpParamName) != null) {
