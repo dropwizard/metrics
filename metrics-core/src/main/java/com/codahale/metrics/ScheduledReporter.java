@@ -134,41 +134,33 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * @param period the amount of time between polls
      * @param unit   the unit for {@code period}
      */
-    synchronized public void start(long period, TimeUnit unit) {
-        if (this.scheduledFuture != null) {
-            throw new IllegalArgumentException("Reporter already started");
-        }
-        this.scheduledFuture = executor.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    report();
-                } catch (RuntimeException ex) {
-                    LOG.error("RuntimeException thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
-                }
-            }
-        }, period, period, unit);
+    public void start(long period, TimeUnit unit) {
+       start(period, period, unit);
     }
 
     /**
      * Starts the reporter polling at the given period.
      *
-     * @param period       the amount of time between polls
      * @param initialDelay the time to delay the first execution
+     * @param period       the amount of time between polls
      * @param unit         the unit for {@code period}
      */
-    public void start(long period, long initialDelay, TimeUnit unit) {
-       executor.scheduleAtFixedRate(new Runnable() {
-           @Override
-           public void run() {
-               try {
-                   report();
-               } catch (RuntimeException ex) {
-                   LOG.error("RuntimeException thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
-               }
-           }
-       }, initialDelay, period, unit);
-   }
+    synchronized public void start(long initialDelay, long period, TimeUnit unit) {
+      if (this.scheduledFuture != null) {
+          throw new IllegalArgumentException("Reporter already started");
+      }
+
+      this.scheduledFuture = executor.scheduleAtFixedRate(new Runnable() {
+         @Override
+         public void run() {
+             try {
+                 report();
+             } catch (RuntimeException ex) {
+                 LOG.error("RuntimeException thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
+             }
+         }
+      }, initialDelay, period, unit);
+    }
 
     /**
      * Stops the reporter and if shutdownExecutorOnStop is true then shuts down its thread of execution.
