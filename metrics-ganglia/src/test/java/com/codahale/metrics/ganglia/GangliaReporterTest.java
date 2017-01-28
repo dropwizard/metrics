@@ -5,7 +5,10 @@ import info.ganglia.gmetric4j.gmetric.GMetric;
 import info.ganglia.gmetric4j.gmetric.GMetricSlope;
 import info.ganglia.gmetric4j.gmetric.GMetricType;
 import org.junit.Test;
+import org.mockito.InOrder;
 
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -245,6 +248,38 @@ public class GangliaReporterTest {
         verify(ganglia).announce("m.test.another.timer.m15_rate", "5.0", GMetricType.DOUBLE, "calls/second", GMetricSlope.BOTH, 60, 0, "test.another");
 
         verifyNoMoreInteractions(ganglia);
+    }
+
+    @Test
+    public void disabledMetricsType() throws Exception {
+        final Meter meter = mock(Meter.class);
+        when(meter.getCount()).thenReturn(1L);
+        when(meter.getMeanRate()).thenReturn(2.0);
+        when(meter.getOneMinuteRate()).thenReturn(3.0);
+        when(meter.getFiveMinuteRate()).thenReturn(4.0);
+        when(meter.getFifteenMinuteRate()).thenReturn(5.0);
+
+        GangliaReporter reporter = GangliaReporter.forRegistry(registry)
+                .prefixedWith("m")
+                .withTMax(60)
+                .withDMax(0)
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .filter(MetricFilter.ALL)
+                .disabledMetricTypes(EnumSet.of(MetricType.COUNT, MetricType.MEAN_RATE, MetricType.M15_RATE))
+                .build(ganglia);
+
+        reporter.report(this.<Gauge>map(),
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                map("test.meter", meter),
+                this.<Timer>map());
+
+        verify(ganglia).announce("m.test.meter.m1_rate", "3.0", GMetricType.DOUBLE, "events/second", GMetricSlope.BOTH, 60, 0, "test");
+        verify(ganglia).announce("m.test.meter.m5_rate", "4.0", GMetricType.DOUBLE, "events/second", GMetricSlope.BOTH, 60, 0, "test");
+        verifyNoMoreInteractions(ganglia);
+
+        reporter.close();
     }
 
     private <T> SortedMap<String, T> map() {
