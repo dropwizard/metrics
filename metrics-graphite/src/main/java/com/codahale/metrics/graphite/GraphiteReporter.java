@@ -323,7 +323,7 @@ public class GraphiteReporter extends ScheduledReporter {
 
     private String format(Object o) {
         if (o instanceof Float) {
-            return format(((Float) o).doubleValue());
+            return format(((Float) o).floatValue());
         } else if (o instanceof Double) {
             return format(((Double) o).doubleValue());
         } else if (o instanceof Byte) {
@@ -350,8 +350,10 @@ public class GraphiteReporter extends ScheduledReporter {
     }
 
     private String format(double v) {
-        // the Carbon plaintext format is pretty underspecified, but it seems like it just wants
-        // US-formatted digits
-        return String.format(Locale.US, "%2.2f", v);
+        return Double.toString(v);
+    }
+
+    private String format(float v) {
+        return Float.toString(v);
     }
 }
