@@ -67,7 +67,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      *                 reporter will report
      * @param name     the reporter's name
      * @param filter   the filter for which metrics to report
-     * @param rateUnit a unit of time 
+     * @param rateUnit a unit of time
      * @param durationUnit a unit of time
      */
     protected ScheduledReporter(MetricRegistry registry,
@@ -78,7 +78,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
 		this(registry, name, filter, rateUnit, durationUnit,
                 Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name + '-' + FACTORY_ID.incrementAndGet())));
     }
-	
+
     /**
      * Creates a new {@link ScheduledReporter} instance.
      *
@@ -115,8 +115,8 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
             public void run() {
                 try {
                     report();
-                } catch (RuntimeException ex) {
-                    LOG.error("RuntimeException thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
+                } catch (Exception ex) {
+                    LOG.error("Exception thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
                 }
             }
         }, period, period, unit);
