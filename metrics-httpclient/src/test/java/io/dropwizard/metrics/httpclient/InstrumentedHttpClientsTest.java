@@ -6,7 +6,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import org.apache.http.HttpRequest;
-import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.junit.Before;
@@ -76,7 +75,7 @@ public class InstrumentedHttpClientsTest {
         try {
             client.execute(get);
             fail();
-        } catch (NoHttpResponseException expected) {
+        } catch (IOException expected) {
             assertThat(metricRegistry.getMeters()).containsKey(new MetricName("exception"));
         } finally {
             serverThread.interrupt();
