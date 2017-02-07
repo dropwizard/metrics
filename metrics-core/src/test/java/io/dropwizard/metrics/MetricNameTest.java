@@ -84,7 +84,6 @@ public class MetricNameTest {
 
         assertThat(a.compareTo(b)).isLessThan(0);
         assertThat(b.compareTo(a)).isGreaterThan(0);
-        assertThat(b.compareTo(b)).isEqualTo(0);
         assertThat(b.resolve("key").compareTo(b)).isLessThan(0);
         assertThat(b.compareTo(b.resolve("key"))).isGreaterThan(0);
     }
