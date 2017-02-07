@@ -23,15 +23,18 @@ import static com.codahale.metrics.MetricRegistry.name;
  */
 @Plugin(name = "MetricsAppender", category = "Core", elementType = "appender")
 public class InstrumentedAppender extends AbstractAppender {
-    private final MetricRegistry registry;
 
-    private Meter all;
-    private Meter trace;
-    private Meter debug;
-    private Meter info;
-    private Meter warn;
-    private Meter error;
-    private Meter fatal;
+    private static final long serialVersionUID = 1L;
+
+    private transient final MetricRegistry registry;
+
+    private transient Meter all;
+    private transient Meter trace;
+    private transient Meter debug;
+    private transient Meter info;
+    private transient Meter warn;
+    private transient Meter error;
+    private transient Meter fatal;
 
     /**
      * Create a new instrumented appender using the given registry name.
