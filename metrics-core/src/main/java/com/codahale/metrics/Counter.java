@@ -4,10 +4,10 @@ package com.codahale.metrics;
  * An incrementing and decrementing counter metric.
  */
 public class Counter implements Metric, Counting {
-    private final LongAdder count;
+    private final LongAdderAdapter count;
 
     public Counter() {
-        this.count = new LongAdder();
+        this.count = LongAdderProxy.create();
     }
 
     /**

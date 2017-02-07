@@ -26,7 +26,7 @@ public class EWMA {
     private volatile boolean initialized = false;
     private volatile double rate = 0.0;
 
-    private final LongAdder uncounted = new LongAdder();
+    private final LongAdderAdapter uncounted = LongAdderProxy.create();
     private final double alpha, interval;
 
     /**
