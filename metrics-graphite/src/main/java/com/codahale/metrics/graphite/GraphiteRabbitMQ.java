@@ -8,6 +8,7 @@ import com.rabbitmq.client.DefaultSocketConfigurator;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.util.concurrent.TimeoutException;
 
 /**
  * A rabbit-mq client to a Carbon server.
@@ -112,7 +113,11 @@ public class GraphiteRabbitMQ implements GraphiteSender {
             throw new IllegalStateException("Already connected");
         }
 
-        connection = connectionFactory.newConnection();
+        try {
+            connection = connectionFactory.newConnection();
+        } catch (TimeoutException e) {
+            throw new IllegalStateException(e);
+        }
         channel = connection.createChannel();
     }
 
