@@ -4,7 +4,7 @@ package com.codahale.metrics;
  * Proxy for creating long adders depending on the runtime. By default it tries to
  * the JDK's implementation and fallbacks to the internal one if the JDK doesn't provide
  * any. The JDK's LongAdder and the internal one don't have a common interface, therefore
- * we adapten them to {@link InternalLongAdderProvider}, which serves as a common interface for
+ * we adapten them to {@link LongAdderAdapter}, which serves as a common interface for
  * long adders.
  */
 class LongAdderProxy {
