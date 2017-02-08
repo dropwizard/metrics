@@ -159,9 +159,9 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
      * a linear pass over whatever data structure is being used."
      */
     private void rescale(long now, long next) {
-        if (nextScaleTime.compareAndSet(next, now + RESCALE_THRESHOLD)) {
-            lockForRescale();
-            try {
+        lockForRescale();
+        try {
+            if (nextScaleTime.compareAndSet(next, now + RESCALE_THRESHOLD)) {
                 final long oldStartTime = startTime;
                 this.startTime = currentTimeInSeconds();
                 final double scalingFactor = exp(-alpha * (startTime - oldStartTime));
@@ -175,9 +175,9 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
 
                 // make sure the counter is in sync with the number of stored samples.
                 count.set(values.size());
-            } finally {
-                unlockForRescale();
             }
+        } finally {
+            unlockForRescale();
         }
     }
 
