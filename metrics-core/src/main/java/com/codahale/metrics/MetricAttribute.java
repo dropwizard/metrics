@@ -1,9 +1,9 @@
 package com.codahale.metrics;
 
 /**
- * Represents types of metrics which can be reported.
+ * Represents attributes of metrics which can be reported.
  */
-public enum MetricType {
+public enum MetricAttribute {
 
     MAX("max"),
     MEAN("mean"),
@@ -23,7 +23,7 @@ public enum MetricType {
 
     private final String code;
 
-    MetricType(String code) {
+    MetricAttribute(String code) {
         this.code = code;
     }
 

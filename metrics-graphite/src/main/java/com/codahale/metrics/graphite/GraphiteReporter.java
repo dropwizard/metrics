@@ -16,7 +16,7 @@ import java.util.SortedMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.codahale.metrics.MetricType.*;
+import static com.codahale.metrics.MetricAttribute.*;
 
 /**
  * A reporter which publishes metric values to a Graphite server.
@@ -48,7 +48,7 @@ public class GraphiteReporter extends ScheduledReporter {
         private MetricFilter filter;
         private ScheduledExecutorService executor;
         private boolean shutdownExecutorOnStop;
-        private Set<MetricType> disabledMetricTypes;
+        private Set<MetricAttribute> disabledMetricAttributes;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -59,7 +59,7 @@ public class GraphiteReporter extends ScheduledReporter {
             this.filter = MetricFilter.ALL;
             this.executor = null;
             this.shutdownExecutorOnStop = true;
-            this.disabledMetricTypes = Collections.emptySet();
+            this.disabledMetricAttributes = Collections.emptySet();
         }
 
         /**
@@ -144,13 +144,14 @@ public class GraphiteReporter extends ScheduledReporter {
         }
 
         /**
-         * Don't report the passed metrics types for all metrics (e.g. "p999", "stddev" or "m15"). See {@link MetricType}.
+         * Don't report the passed metric attributes for all metrics (e.g. "p999", "stddev" or "m15").
+         * See {@link MetricAttribute}.
          *
-         * @param disabledMetricTypes a {@link MetricFilter}
+         * @param disabledMetricAttributes a {@link MetricFilter}
          * @return {@code this}
          */
-        public Builder disabledMetricTypes(Set<MetricType> disabledMetricTypes) {
-            this.disabledMetricTypes = disabledMetricTypes;
+        public Builder disabledMetricAttributes(Set<MetricAttribute> disabledMetricAttributes) {
+            this.disabledMetricAttributes = disabledMetricAttributes;
             return this;
         }
 
@@ -184,7 +185,7 @@ public class GraphiteReporter extends ScheduledReporter {
                                         filter,
                                         executor,
                                         shutdownExecutorOnStop,
-                                        disabledMetricTypes);
+                    disabledMetricAttributes);
         }
     }
 
@@ -203,9 +204,9 @@ public class GraphiteReporter extends ScheduledReporter {
                              MetricFilter filter,
                              ScheduledExecutorService executor,
                              boolean shutdownExecutorOnStop,
-                             Set<MetricType> disabledMetricTypes) {
+                             Set<MetricAttribute> disabledMetricAttributes) {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
-                disabledMetricTypes);
+                disabledMetricAttributes);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
@@ -305,15 +306,15 @@ public class GraphiteReporter extends ScheduledReporter {
         sendIfEnabled(P999, name, snapshot.get999thPercentile(), timestamp);
     }
 
-    private void sendIfEnabled(MetricType type, String name, double value, long timestamp) throws IOException {
-        if (getDisabledMetricTypes().contains(type)){
+    private void sendIfEnabled(MetricAttribute type, String name, double value, long timestamp) throws IOException {
+        if (getDisabledMetricAttributes().contains(type)){
             return;
         }
         graphite.send(prefix(name, type.getCode()), format(value), timestamp);
     }
 
-    private void sendIfEnabled(MetricType type, String name, long value, long timestamp) throws IOException {
-        if (getDisabledMetricTypes().contains(type)){
+    private void sendIfEnabled(MetricAttribute type, String name, long value, long timestamp) throws IOException {
+        if (getDisabledMetricAttributes().contains(type)){
             return;
         }
         graphite.send(prefix(name, type.getCode()), format(value), timestamp);

@@ -1,7 +1,7 @@
 package com.codahale.metrics.ganglia;
 
 import com.codahale.metrics.*;
-import com.codahale.metrics.MetricType;
+import com.codahale.metrics.MetricAttribute;
 import info.ganglia.gmetric4j.gmetric.GMetric;
 import info.ganglia.gmetric4j.gmetric.GMetricSlope;
 import info.ganglia.gmetric4j.gmetric.GMetricType;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static com.codahale.metrics.MetricType.*;
+import static com.codahale.metrics.MetricAttribute.*;
 
 /**
  * A reporter which announces metric values to a Ganglia cluster.
@@ -55,7 +55,7 @@ public class GangliaReporter extends ScheduledReporter {
         private MetricFilter filter;
         private ScheduledExecutorService executor;
         private boolean shutdownExecutorOnStop;
-        private Set<MetricType> disabledMetricTypes = Collections.emptySet();
+        private Set<MetricAttribute> disabledMetricAttributes = Collections.emptySet();
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -161,14 +161,14 @@ public class GangliaReporter extends ScheduledReporter {
         }
 
         /**
-         * Don't report the passed metrics types for all metrics (e.g. "p999", "stddev" or "m15").
-         * See {@link MetricType}.
+         * Don't report the passed metric attributes for all metrics (e.g. "p999", "stddev" or "m15").
+         * See {@link MetricAttribute}.
          *
-         * @param disabledMetricTypes a {@link MetricFilter}
+         * @param disabledMetricAttributes a {@link MetricFilter}
          * @return {@code this}
          */
-        public Builder disabledMetricTypes(Set<MetricType> disabledMetricTypes) {
-            this.disabledMetricTypes = disabledMetricTypes;
+        public Builder disabledMetricAttributes(Set<MetricAttribute> disabledMetricAttributes) {
+            this.disabledMetricAttributes = disabledMetricAttributes;
             return this;
         }
 
@@ -181,7 +181,7 @@ public class GangliaReporter extends ScheduledReporter {
          */
         public GangliaReporter build(GMetric gmetric) {
             return new GangliaReporter(registry, gmetric, null, prefix, tMax, dMax, rateUnit, durationUnit, filter,
-                    executor, shutdownExecutorOnStop, disabledMetricTypes);
+                    executor, shutdownExecutorOnStop, disabledMetricAttributes);
         }
 
         /**
@@ -193,7 +193,7 @@ public class GangliaReporter extends ScheduledReporter {
          */
         public GangliaReporter build(GMetric... gmetrics) {
             return new GangliaReporter(registry, null, gmetrics, prefix, tMax, dMax, rateUnit, durationUnit,
-                    filter, executor, shutdownExecutorOnStop ,disabledMetricTypes);
+                    filter, executor, shutdownExecutorOnStop , disabledMetricAttributes);
         }
     }
 
@@ -216,9 +216,9 @@ public class GangliaReporter extends ScheduledReporter {
                             MetricFilter filter,
                             ScheduledExecutorService executor,
                             boolean shutdownExecutorOnStop,
-                            Set<MetricType> disabledMetricTypes) {
+                            Set<MetricAttribute> disabledMetricAttributes) {
         super(registry, "ganglia-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
-                disabledMetricTypes);
+                disabledMetricAttributes);
         this.gmetric = gmetric;
         this.gmetrics = gmetrics;
         this.prefix = prefix;
@@ -358,21 +358,21 @@ public class GangliaReporter extends ScheduledReporter {
 
     private static final double MIN_VAL = 1E-300;
 
-    private void announceIfEnabled(MetricType metricType, String metricName, String group, double value, String units)
+    private void announceIfEnabled(MetricAttribute metricAttribute, String metricName, String group, double value, String units)
             throws GangliaException {
-        if (getDisabledMetricTypes().contains(metricType)) {
+        if (getDisabledMetricAttributes().contains(metricAttribute)) {
             return;
         }
         final String string = Math.abs(value) < MIN_VAL ? "0" : Double.toString(value);
-        announce(prefix(metricName, metricType.getCode()), group, string, GMetricType.DOUBLE, units);
+        announce(prefix(metricName, metricAttribute.getCode()), group, string, GMetricType.DOUBLE, units);
     }
 
-    private void announceIfEnabled(MetricType metricType, String metricName, String group, long value, String units)
+    private void announceIfEnabled(MetricAttribute metricAttribute, String metricName, String group, long value, String units)
             throws GangliaException {
-        if (getDisabledMetricTypes().contains(metricType)) {
+        if (getDisabledMetricAttributes().contains(metricAttribute)) {
             return;
         }
-        announce(prefix(metricName, metricType.getCode()), group, Long.toString(value), GMetricType.DOUBLE, units);
+        announce(prefix(metricName, metricAttribute.getCode()), group, Long.toString(value), GMetricType.DOUBLE, units);
     }
 
     private void announce(String name, String group, String value, GMetricType type, String units)

@@ -60,7 +60,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
     private final MetricRegistry registry;
     private final ScheduledExecutorService executor;
     private final boolean shutdownExecutorOnStop;
-    private final Set<MetricType> disabledMetricTypes;
+    private final Set<MetricAttribute> disabledMetricAttributes;
     private ScheduledFuture<?> scheduledFuture;
     private final MetricFilter filter;
     private final double durationFactor;
@@ -122,7 +122,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 ScheduledExecutorService executor,
                                 boolean shutdownExecutorOnStop) {
        this(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
-               Collections.<MetricType>emptySet());
+               Collections.<MetricAttribute>emptySet());
     }
 
     protected ScheduledReporter(MetricRegistry registry,
@@ -132,7 +132,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 TimeUnit durationUnit,
                                 ScheduledExecutorService executor,
                                 boolean shutdownExecutorOnStop,
-                                Set<MetricType> disabledMetricTypes) {
+                                Set<MetricAttribute> disabledMetricAttributes) {
         this.registry = registry;
         this.filter = filter;
         this.executor = executor == null? createDefaultExecutor(name) : executor;
@@ -141,8 +141,8 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
         this.rateUnit = calculateRateUnit(rateUnit);
         this.durationFactor = 1.0 / durationUnit.toNanos(1);
         this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
-        this.disabledMetricTypes = disabledMetricTypes != null ? disabledMetricTypes :
-                Collections.<MetricType>emptySet();
+        this.disabledMetricAttributes = disabledMetricAttributes != null ? disabledMetricAttributes :
+                Collections.<MetricAttribute>emptySet();
     }
 
     /**
@@ -291,8 +291,8 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
         return shutdownExecutorOnStop;
     }
 
-    protected Set<MetricType> getDisabledMetricTypes() {
-        return disabledMetricTypes;
+    protected Set<MetricAttribute> getDisabledMetricAttributes() {
+        return disabledMetricAttributes;
     }
 
     private String calculateRateUnit(TimeUnit unit) {

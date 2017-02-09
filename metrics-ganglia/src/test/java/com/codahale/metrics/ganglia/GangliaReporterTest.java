@@ -5,10 +5,8 @@ import info.ganglia.gmetric4j.gmetric.GMetric;
 import info.ganglia.gmetric4j.gmetric.GMetricSlope;
 import info.ganglia.gmetric4j.gmetric.GMetricType;
 import org.junit.Test;
-import org.mockito.InOrder;
 
 import java.util.EnumSet;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -251,7 +249,7 @@ public class GangliaReporterTest {
     }
 
     @Test
-    public void disabledMetricsType() throws Exception {
+    public void disabledMetricAttributes() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
         when(meter.getMeanRate()).thenReturn(2.0);
@@ -266,7 +264,7 @@ public class GangliaReporterTest {
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .filter(MetricFilter.ALL)
-                .disabledMetricTypes(EnumSet.of(MetricType.COUNT, MetricType.MEAN_RATE, MetricType.M15_RATE))
+                .disabledMetricAttributes(EnumSet.of(MetricAttribute.COUNT, MetricAttribute.MEAN_RATE, MetricAttribute.M15_RATE))
                 .build(ganglia);
 
         reporter.report(this.<Gauge>map(),

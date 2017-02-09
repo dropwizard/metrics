@@ -27,7 +27,7 @@ public class GraphiteReporterTest {
                                                               .convertRatesTo(TimeUnit.SECONDS)
                                                               .convertDurationsTo(TimeUnit.MILLISECONDS)
                                                               .filter(MetricFilter.ALL)
-                                                              .disabledMetricTypes(Collections.<MetricType>emptySet())
+                                                              .disabledMetricAttributes(Collections.<MetricAttribute>emptySet())
                                                               .build(graphite);
 
     @Before
@@ -328,7 +328,7 @@ public class GraphiteReporterTest {
     }
 
     @Test
-    public void disabledMetricsType() throws Exception {
+    public void disabledMetricsAttribute() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
         when(meter.getOneMinuteRate()).thenReturn(2.0);
@@ -336,16 +336,16 @@ public class GraphiteReporterTest {
         when(meter.getFifteenMinuteRate()).thenReturn(4.0);
         when(meter.getMeanRate()).thenReturn(5.0);
 
-        Set<MetricType> disabledMetricTypes = EnumSet.of(MetricType.M15_RATE, MetricType.M5_RATE);
-        GraphiteReporter reporterWithDisabledMetricTypes = GraphiteReporter.forRegistry(registry)
+        Set<MetricAttribute> disabledMetricAttributes = EnumSet.of(MetricAttribute.M15_RATE, MetricAttribute.M5_RATE);
+        GraphiteReporter reporterWithdisabledMetricAttributes = GraphiteReporter.forRegistry(registry)
                 .withClock(clock)
                 .prefixedWith("prefix")
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .filter(MetricFilter.ALL)
-                .disabledMetricTypes(disabledMetricTypes)
+                .disabledMetricAttributes(disabledMetricAttributes)
                 .build(graphite);
-        reporterWithDisabledMetricTypes.report(this.<Gauge>map(),
+        reporterWithdisabledMetricAttributes.report(this.<Gauge>map(),
                 this.<Counter>map(),
                 this.<Histogram>map(),
                 this.<Meter>map("meter", meter),
