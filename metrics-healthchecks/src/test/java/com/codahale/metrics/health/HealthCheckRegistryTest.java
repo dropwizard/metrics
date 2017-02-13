@@ -10,11 +10,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class HealthCheckRegistryTest {
     private final HealthCheckRegistry registry = new HealthCheckRegistry();
+    private final HealthCheckRegistryListener listener = mock(HealthCheckRegistryListener.class);
 
     private final HealthCheck hc1 = mock(HealthCheck.class);
     private final HealthCheck hc2 = mock(HealthCheck.class);
@@ -24,12 +24,53 @@ public class HealthCheckRegistryTest {
 
     @Before
     public void setUp() throws Exception {
+        registry.addListener(listener);
+
         when(hc1.execute()).thenReturn(r1);
 
         when(hc2.execute()).thenReturn(r2);
 
         registry.register("hc1", hc1);
         registry.register("hc2", hc2);
+    }
+
+    @Test
+    public void registeringHealthCheckTriggersNotification() {
+        verify(listener).onHealthCheckAdded("hc1", hc1);
+        verify(listener).onHealthCheckAdded("hc2", hc2);
+    }
+
+    @Test
+    public void removingHealthCheckTriggersNotification() {
+        registry.unregister("hc1");
+        registry.unregister("hc2");
+
+        verify(listener).onHealthCheckRemoved("hc1");
+        verify(listener).onHealthCheckRemoved("hc2");
+    }
+
+    @Test
+    public void addingListenerCatchesExistingHealthChecks() {
+        HealthCheckRegistryListener listener = mock(HealthCheckRegistryListener.class);
+        HealthCheckRegistry registry = new HealthCheckRegistry();
+        registry.register("hc1", hc1);
+        registry.register("hc2", hc2);
+        registry.addListener(listener);
+
+        verify(listener).onHealthCheckAdded("hc1", hc1);
+        verify(listener).onHealthCheckAdded("hc2", hc2);
+    }
+
+    @Test
+    public void removedListenerDoesNotReceiveUpdates() {
+        HealthCheckRegistryListener listener = mock(HealthCheckRegistryListener.class);
+        HealthCheckRegistry registry = new HealthCheckRegistry();
+        registry.addListener(listener);
+        registry.register("hc1", hc1);
+        registry.removeListener(listener);
+        registry.register("hc2", hc2);
+
+        verify(listener).onHealthCheckAdded("hc1", hc1);
     }
 
     @Test

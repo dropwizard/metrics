@@ -15,12 +15,39 @@ public class HealthCheckRegistry {
     private static final Logger LOGGER = LoggerFactory.getLogger(HealthCheckRegistry.class);
 
     private final ConcurrentMap<String, HealthCheck> healthChecks;
+    private final List<HealthCheckRegistryListener> listeners;
 
     /**
      * Creates a new {@link HealthCheckRegistry}.
      */
     public HealthCheckRegistry() {
         this.healthChecks = new ConcurrentHashMap<String, HealthCheck>();
+        this.listeners = new CopyOnWriteArrayList<HealthCheckRegistryListener>();
+    }
+
+    /**
+     * Adds a {@link HealthCheckRegistryListener} to a collection of listeners
+     * that will be notified on health check registration. Listeners will be
+     * notified in the order in which they are added.
+     * The listener will be notified of all existing health checks when it first registers.
+     * 
+     * @param listener listener to add
+     */
+    public void addListener(HealthCheckRegistryListener listener) {
+        listeners.add(listener);
+        for (Map.Entry<String, HealthCheck> entry : healthChecks.entrySet()) {
+            listener.onHealthCheckAdded(entry.getKey(), entry.getValue());
+        }
+    }
+
+    /**
+     * Removes a {@link HealthCheckRegistryListener} from this registry's
+     * collection of listeners.
+     * 
+     * @param listener listener to remove
+     */
+    public void removeListener(HealthCheckRegistryListener listener) {
+        listeners.remove(listener);
     }
 
     /**
@@ -30,7 +57,10 @@ public class HealthCheckRegistry {
      * @param healthCheck the {@link HealthCheck} instance
      */
     public void register(String name, HealthCheck healthCheck) {
-        healthChecks.putIfAbsent(name, healthCheck);
+        HealthCheck existing = healthChecks.putIfAbsent(name, healthCheck);
+        if (existing == null) {
+            onHealthCheckAdded(name, healthCheck);
+        }
     }
 
     /**
@@ -40,6 +70,7 @@ public class HealthCheckRegistry {
      */
     public void unregister(String name) {
         healthChecks.remove(name);
+        onHealthCheckRemoved(name);
     }
 
     /**
@@ -106,4 +137,17 @@ public class HealthCheckRegistry {
         }
         return Collections.unmodifiableSortedMap(results);
     }
+
+    private void onHealthCheckAdded(String name, HealthCheck healthCheck) {
+        for (HealthCheckRegistryListener listener : listeners) {
+            listener.onHealthCheckAdded(name, healthCheck);
+        }
+    }
+
+    private void onHealthCheckRemoved(String name) {
+        for (HealthCheckRegistryListener listener : listeners) {
+            listener.onHealthCheckRemoved(name);
+        }
+    }
+
 }
