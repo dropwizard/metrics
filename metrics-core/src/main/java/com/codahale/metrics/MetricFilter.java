@@ -12,6 +12,10 @@ public interface MetricFilter {
         public boolean matches(String name, Metric metric) {
             return true;
         }
+        @Override
+        public boolean matches(String name, Metric metric, String measurement) {
+            return true;
+        }
     };
 
     /**
@@ -22,4 +26,14 @@ public interface MetricFilter {
      * @return {@code true} if the metric matches the filter
      */
     boolean matches(String name, Metric metric);
+
+    /**
+     * Returns {@code true} if the metrics's measurement matches the filter; {@code false} otherwise.
+     *
+     * @param name the metrics's name
+     * @param metric the metric
+     * @param measurement the metric measurement's name
+     * @return {@code true} if the measurement matches the filter
+     */
+    boolean matches(String name, Metric metric, String measurement);
 }
