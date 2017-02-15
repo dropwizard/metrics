@@ -8,7 +8,7 @@ package com.codahale.metrics;
  */
 public class Histogram implements Metric, Sampling, Counting {
     private final Reservoir reservoir;
-    private final LongAdder count;
+    private final LongAdderAdapter count;
 
     /**
      * Creates a new {@link Histogram} with the given reservoir.
@@ -17,7 +17,7 @@ public class Histogram implements Metric, Sampling, Counting {
      */
     public Histogram(Reservoir reservoir) {
         this.reservoir = reservoir;
-        this.count = new LongAdder();
+        this.count = LongAdderProxy.create();
     }
 
     /**
