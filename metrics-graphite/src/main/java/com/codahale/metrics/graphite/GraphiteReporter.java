@@ -195,7 +195,22 @@ public class GraphiteReporter extends ScheduledReporter {
     private final Clock clock;
     private final String prefix;
 
-    private GraphiteReporter(MetricRegistry registry,
+    /**
+     * Creates a new {@link GraphiteReporter} instance.
+     *
+     * @param registry               the {@link MetricRegistry} containing the metrics this
+     *                               reporter will report
+     * @param graphite               the {@link GraphiteSender} which is responsible for sending metrics to a Carbon server
+     *                               via a transport protocol
+     * @param clock                  the instance of the time. Use {@link Clock#defaultClock()} for the default
+     * @param prefix                 the prefix of all metric names (may be null)
+     * @param rateUnit               the time unit of in which rates will be converted
+     * @param durationUnit           the time unit of in which durations will be converted
+     * @param filter                 the filter for which metrics to report
+     * @param executor               the executor to use while scheduling reporting of metrics (may be null).
+     * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
+     */
+    protected GraphiteReporter(MetricRegistry registry,
                              GraphiteSender graphite,
                              Clock clock,
                              String prefix,
@@ -359,7 +374,7 @@ public class GraphiteReporter extends ScheduledReporter {
         return Long.toString(n);
     }
 
-    private String format(double v) {
+    protected String format(double v) {
         // the Carbon plaintext format is pretty underspecified, but it seems like it just wants
         // US-formatted digits
         return String.format(Locale.US, "%2.2f", v);
