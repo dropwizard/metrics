@@ -6,6 +6,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -122,7 +124,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsFloatGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(1.1f)),
+        reporter.report(map("gauge", gauge(1.234f)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -130,7 +132,7 @@ public class GraphiteReporterTest {
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
-        inOrder.verify(graphite).send("prefix.gauge", "1.10", timestamp);
+        inOrder.verify(graphite).send("prefix.gauge", "1.234", timestamp);
         inOrder.verify(graphite).flush();
         inOrder.verify(graphite).close();
 
@@ -139,7 +141,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsDoubleGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(1.1)),
+        reporter.report(map("gauge", gauge(1.234567890123)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -147,7 +149,41 @@ public class GraphiteReporterTest {
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
-        inOrder.verify(graphite).send("prefix.gauge", "1.10", timestamp);
+        inOrder.verify(graphite).send("prefix.gauge", "1.234567890123", timestamp);
+        inOrder.verify(graphite).flush();
+
+        verifyNoMoreInteractions(graphite);
+    }
+
+    @Test
+    public void reportsBigIntegerGaugeValues() throws Exception {
+        reporter.report(map("gauge", gauge(new BigInteger("1234567890123456", 10))),
+                        this.<Counter>map(),
+                        this.<Histogram>map(),
+                        this.<Meter>map(),
+                        this.<Timer>map());
+
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).isConnected();
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send("prefix.gauge", "1.234567890123456E15", timestamp);
+        inOrder.verify(graphite).flush();
+
+        verifyNoMoreInteractions(graphite);
+    }
+
+    @Test
+    public void reportsBigDecimalGaugeValues() throws Exception {
+        reporter.report(map("gauge", gauge(new BigDecimal(new BigInteger("1234567890123456", 10)))),
+                        this.<Counter>map(),
+                        this.<Histogram>map(),
+                        this.<Meter>map(),
+                        this.<Timer>map());
+
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).isConnected();
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send("prefix.gauge", "1.234567890123456E15", timestamp);
         inOrder.verify(graphite).flush();
         inOrder.verify(graphite).close();
 
@@ -183,7 +219,7 @@ public class GraphiteReporterTest {
         when(snapshot.getMax()).thenReturn(2L);
         when(snapshot.getMean()).thenReturn(3.0);
         when(snapshot.getMin()).thenReturn(4L);
-        when(snapshot.getStdDev()).thenReturn(5.0);
+        when(snapshot.getStdDev()).thenReturn(5.6789);
         when(snapshot.getMedian()).thenReturn(6.0);
         when(snapshot.get75thPercentile()).thenReturn(7.0);
         when(snapshot.get95thPercentile()).thenReturn(8.0);
@@ -203,15 +239,15 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.histogram.count", "1", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.max", "2", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.mean", "3.00", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.mean", "3.0", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.min", "4", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.stddev", "5.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p50", "6.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p75", "7.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p95", "8.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p98", "9.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p99", "10.00", timestamp);
-        inOrder.verify(graphite).send("prefix.histogram.p999", "11.00", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.stddev", "5.6789", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p50", "6.0", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p75", "7.0", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p95", "8.0", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p98", "9.0", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p99", "10.0", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p999", "11.0", timestamp);
         inOrder.verify(graphite).flush();
         inOrder.verify(graphite).close();
 
@@ -236,10 +272,10 @@ public class GraphiteReporterTest {
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.meter.count", "1", timestamp);
-        inOrder.verify(graphite).send("prefix.meter.m1_rate", "2.00", timestamp);
-        inOrder.verify(graphite).send("prefix.meter.m5_rate", "3.00", timestamp);
-        inOrder.verify(graphite).send("prefix.meter.m15_rate", "4.00", timestamp);
-        inOrder.verify(graphite).send("prefix.meter.mean_rate", "5.00", timestamp);
+        inOrder.verify(graphite).send("prefix.meter.m1_rate", "2.0", timestamp);
+        inOrder.verify(graphite).send("prefix.meter.m5_rate", "3.0", timestamp);
+        inOrder.verify(graphite).send("prefix.meter.m15_rate", "4.0", timestamp);
+        inOrder.verify(graphite).send("prefix.meter.mean_rate", "5.0", timestamp);
         inOrder.verify(graphite).flush();
         inOrder.verify(graphite).close();
 
@@ -278,21 +314,21 @@ public class GraphiteReporterTest {
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
-        inOrder.verify(graphite).send("prefix.timer.max", "100.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.mean", "200.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.min", "300.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.stddev", "400.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p50", "500.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p75", "600.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p95", "700.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p98", "800.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p99", "900.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.p999", "1000.00", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.max", "100.0", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.mean", "200.0", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.min", "300.0", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.stddev", "400.0", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.p50", "500.0", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.p75", "600.0", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.p95", "700.0", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.p98", "800.0", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.p99", "900.0", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.p999", "1000.0", timestamp);
         inOrder.verify(graphite).send("prefix.timer.count", "1", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.m1_rate", "3.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.m5_rate", "4.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.m15_rate", "5.00", timestamp);
-        inOrder.verify(graphite).send("prefix.timer.mean_rate", "2.00", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.m1_rate", "3.0", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.m5_rate", "4.0", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.m15_rate", "5.0", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.mean_rate", "2.0", timestamp);
         inOrder.verify(graphite).flush();
         inOrder.verify(graphite).close();
 
