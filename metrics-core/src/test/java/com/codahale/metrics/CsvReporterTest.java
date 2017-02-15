@@ -51,6 +51,7 @@ public class CsvReporterTest {
                         this.<Histogram>map(),
                         this.<Meter>map(),
                         this.<Timer>map());
+        reporter.stop();
 
         assertThat(fileContents("gauge.csv"))
                 .isEqualTo(csv(
@@ -69,6 +70,7 @@ public class CsvReporterTest {
                         this.<Histogram>map(),
                         this.<Meter>map(),
                         this.<Timer>map());
+        reporter.stop();
 
         assertThat(fileContents("test.counter.csv"))
                 .isEqualTo(csv(
@@ -101,6 +103,7 @@ public class CsvReporterTest {
                         map("test.histogram", histogram),
                         this.<Meter>map(),
                         this.<Timer>map());
+        reporter.stop();
 
         assertThat(fileContents("test.histogram.csv"))
                 .isEqualTo(csv(
@@ -123,6 +126,7 @@ public class CsvReporterTest {
                         this.<Histogram>map(),
                         map("test.meter", meter),
                         this.<Timer>map());
+        reporter.stop();
 
         assertThat(fileContents("test.meter.csv"))
                 .isEqualTo(csv(
@@ -159,6 +163,7 @@ public class CsvReporterTest {
                         this.<Histogram>map(),
                         this.<Meter>map(),
                         map("test.another.timer", timer));
+        reporter.stop();
 
         assertThat(fileContents("test.another.timer.csv"))
                 .isEqualTo(csv(
