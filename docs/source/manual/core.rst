@@ -77,7 +77,7 @@ return the number of evictions from the cache.
 JMX Gauges
 ----------
 
-Given that many third-party library often expose metrics only via JMX, Metrics provides the
+Given that many third-party libraries often expose metrics only via JMX, Metrics provides the
 ``JmxAttributeGauge`` class, which takes the object name of a JMX MBean and the name of an attribute
 and produces a gauge implementation which returns the value of that attribute:
 
