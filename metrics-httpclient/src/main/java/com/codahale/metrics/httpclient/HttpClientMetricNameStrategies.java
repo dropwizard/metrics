@@ -1,8 +1,9 @@
 package com.codahale.metrics.httpclient;
 
 import org.apache.http.HttpRequest;
-import org.apache.http.RequestLine;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpRequestWrapper;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.net.URI;
@@ -26,11 +27,9 @@ public class HttpClientMetricNameStrategies {
             new HttpClientMetricNameStrategy() {
                 @Override
                 public String getNameFor(String name, HttpRequest request) {
-                    final RequestLine requestLine = request.getRequestLine();
-                    final URI uri = URI.create(requestLine.getUri());
                     return name(HttpClient.class,
                                 name,
-                                uri.getHost(),
+                                requestURI(request).getHost(),
                                 methodNameString(request));
                 }
             };
@@ -40,8 +39,7 @@ public class HttpClientMetricNameStrategies {
                 @Override
                 public String getNameFor(String name, HttpRequest request) {
                     try {
-                        final RequestLine requestLine = request.getRequestLine();
-                        final URIBuilder url = new URIBuilder(requestLine.getUri());
+                        final URIBuilder url = new URIBuilder(requestURI(request));
                         return name(HttpClient.class,
                                     name,
                                     url.removeQuery().build().toString(),
@@ -54,5 +52,14 @@ public class HttpClientMetricNameStrategies {
 
     private static String methodNameString(HttpRequest request) {
         return request.getRequestLine().getMethod().toLowerCase() + "-requests";
+    }
+
+    private static URI requestURI(HttpRequest request) {
+        if (request instanceof HttpRequestWrapper)
+            return requestURI(((HttpRequestWrapper) request).getOriginal());
+
+        return (request instanceof HttpUriRequest) ?
+            ((HttpUriRequest) request).getURI() :
+                URI.create(request.getRequestLine().getUri());
     }
 }
