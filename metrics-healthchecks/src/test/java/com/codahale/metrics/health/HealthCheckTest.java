@@ -1,10 +1,10 @@
 package com.codahale.metrics.health;
 
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import org.junit.Test;
 
 public class HealthCheckTest {
     private static class ExampleHealthCheck extends HealthCheck {
@@ -189,8 +189,15 @@ public class HealthCheckTest {
         when(e.getMessage()).thenReturn("oh noes");
 
         when(underlying.execute()).thenThrow(e);
+        HealthCheck.Result actual = healthCheck.execute();
 
-        assertThat(healthCheck.execute())
-                .isEqualTo(HealthCheck.Result.unhealthy(e));
+        assertThat(actual.isHealthy())
+                .isFalse();
+        assertThat(actual.getMessage())
+                .isEqualTo("oh noes");
+        assertThat(actual.getError())
+                .isEqualTo(e);
+        assertThat(actual.getDetails())
+                .isNull();
     }
 }

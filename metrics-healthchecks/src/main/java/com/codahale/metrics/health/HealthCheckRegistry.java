@@ -1,12 +1,33 @@
 package com.codahale.metrics.health;
 
+import static com.codahale.metrics.health.HealthCheck.Result;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.concurrent.*;
-
-import static com.codahale.metrics.health.HealthCheck.Result;
+import com.codahale.metrics.health.annotation.Async;
 
 /**
  * A registry for health checks.
@@ -16,21 +37,41 @@ public class HealthCheckRegistry {
 
     private final ConcurrentMap<String, HealthCheck> healthChecks;
     private final List<HealthCheckRegistryListener> listeners;
+    private final ScheduledExecutorService asyncExecutorService;
+    private final Object lock = new Object();
 
     /**
      * Creates a new {@link HealthCheckRegistry}.
      */
     public HealthCheckRegistry() {
-        this.healthChecks = new ConcurrentHashMap<String, HealthCheck>();
-        this.listeners = new CopyOnWriteArrayList<HealthCheckRegistryListener>();
+        this(Runtime.getRuntime().availableProcessors());
     }
 
     /**
-     * Adds a {@link HealthCheckRegistryListener} to a collection of listeners
-     * that will be notified on health check registration. Listeners will be
-     * notified in the order in which they are added.
-     * The listener will be notified of all existing health checks when it first registers.
-     * 
+     * Creates a new {@link HealthCheckRegistry}.
+     *
+     * @param asyncExecutorPoolSize core pool size for async health check executions
+     */
+    public HealthCheckRegistry(int asyncExecutorPoolSize) {
+        this(createExecutorService(asyncExecutorPoolSize));
+    }
+
+    /**
+     * Creates a new {@link HealthCheckRegistry}.
+     *
+     * @param asyncExecutorService executor service for async health check executions
+     */
+    public HealthCheckRegistry(ScheduledExecutorService asyncExecutorService) {
+        this.healthChecks = new ConcurrentHashMap<String, HealthCheck>();
+        this.listeners = new CopyOnWriteArrayList<HealthCheckRegistryListener>();
+        this.asyncExecutorService = asyncExecutorService;
+    }
+
+    /**
+     * Adds a {@link HealthCheckRegistryListener} to a collection of listeners that will be notified on health check
+     * registration. Listeners will be notified in the order in which they are added. The listener will be notified of all
+     * existing health checks when it first registers.
+     *
      * @param listener listener to add
      */
     public void addListener(HealthCheckRegistryListener listener) {
@@ -41,9 +82,8 @@ public class HealthCheckRegistry {
     }
 
     /**
-     * Removes a {@link HealthCheckRegistryListener} from this registry's
-     * collection of listeners.
-     * 
+     * Removes a {@link HealthCheckRegistryListener} from this registry's collection of listeners.
+     *
      * @param listener listener to remove
      */
     public void removeListener(HealthCheckRegistryListener listener) {
@@ -57,9 +97,18 @@ public class HealthCheckRegistry {
      * @param healthCheck the {@link HealthCheck} instance
      */
     public void register(String name, HealthCheck healthCheck) {
-        HealthCheck existing = healthChecks.putIfAbsent(name, healthCheck);
-        if (existing == null) {
-            onHealthCheckAdded(name, healthCheck);
+        HealthCheck registered = null;
+        synchronized (lock) {
+            if (!healthChecks.containsKey(name)) {
+                registered = healthCheck;
+                if (healthCheck.getClass().isAnnotationPresent(Async.class)) {
+                    registered = new AsyncHealthCheckDecorator(healthCheck, asyncExecutorService);
+                }
+                healthChecks.put(name, registered);
+            }
+        }
+        if (registered != null) {
+            onHealthCheckAdded(name, registered);
         }
     }
 
@@ -69,8 +118,16 @@ public class HealthCheckRegistry {
      * @param name the name of the {@link HealthCheck} instance
      */
     public void unregister(String name) {
-        healthChecks.remove(name);
-        onHealthCheckRemoved(name);
+        HealthCheck healthCheck = null;
+        synchronized (lock) {
+            healthCheck = healthChecks.remove(name);
+            if (healthCheck instanceof AsyncHealthCheckDecorator) {
+                ((AsyncHealthCheckDecorator) healthCheck).tearDown();
+            }
+        }
+        if (healthCheck != null) {
+            onHealthCheckRemoved(name, healthCheck);
+        }
     }
 
     /**
@@ -85,7 +142,7 @@ public class HealthCheckRegistry {
     /**
      * Runs the health check with the given name.
      *
-     * @param name    the health check's name
+     * @param name the health check's name
      * @return the result of the health check
      * @throws NoSuchElementException if there is no health check with the given name
      */
@@ -113,7 +170,8 @@ public class HealthCheckRegistry {
 
     /**
      * Runs the registered health checks in parallel and returns a map of the results.
-     * @param   executor object to launch and track health checks progress
+     *
+     * @param executor object to launch and track health checks progress
      * @return a map of the health check results
      */
     public SortedMap<String, HealthCheck.Result> runHealthChecks(ExecutorService executor) {
@@ -136,8 +194,10 @@ public class HealthCheckRegistry {
                 results.put(entry.getKey(), HealthCheck.Result.unhealthy(e));
             }
         }
+
         return Collections.unmodifiableSortedMap(results);
     }
+
 
     private void onHealthCheckAdded(String name, HealthCheck healthCheck) {
         for (HealthCheckRegistryListener listener : listeners) {
@@ -145,10 +205,54 @@ public class HealthCheckRegistry {
         }
     }
 
-    private void onHealthCheckRemoved(String name) {
+    private void onHealthCheckRemoved(String name, HealthCheck healthCheck) {
         for (HealthCheckRegistryListener listener : listeners) {
-            listener.onHealthCheckRemoved(name);
+            listener.onHealthCheckRemoved(name, healthCheck);
         }
     }
 
+    private static ScheduledExecutorService createExecutorService(int corePoolSize) {
+        ScheduledExecutorService asyncExecutorService = Executors.newScheduledThreadPool(corePoolSize,
+                new NamedThreadFactory("healthcheck-async-executor-"));
+        try {
+            Method method = asyncExecutorService.getClass().getMethod("setRemoveOnCancelPolicy", Boolean.TYPE);
+            method.invoke(asyncExecutorService, true);
+        } catch (NoSuchMethodException e) {
+            logSetExecutorCancellationPolicyFailure(e);
+        } catch (IllegalAccessException e) {
+            logSetExecutorCancellationPolicyFailure(e);
+        } catch (InvocationTargetException e) {
+            logSetExecutorCancellationPolicyFailure(e);
+        }
+        return asyncExecutorService;
+    }
+
+    private static void logSetExecutorCancellationPolicyFailure(Exception e) {
+        LOGGER.warn("Tried but failed to set executor cancellation policy to remove on cancel which has been introduced " +
+                "in Java 7. This could result in a memory leak if many asynchronous health checks are registered and " +
+                "removed because cancellation does not actually remove them from the executor.", e);
+    }
+
+    private static class NamedThreadFactory implements ThreadFactory {
+        private static final AtomicInteger poolNumber = new AtomicInteger(1);
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        NamedThreadFactory(String namePrefix) {
+            SecurityManager s = System.getSecurityManager();
+            group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+            this.namePrefix = namePrefix;
+        }
+
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
+            if (t.isDaemon())
+                t.setDaemon(false);
+            if (t.getPriority() != Thread.NORM_PRIORITY)
+                t.setPriority(Thread.NORM_PRIORITY);
+            return t;
+        }
+    }
 }
