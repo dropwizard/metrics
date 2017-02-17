@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 
 import java.net.UnknownHostException;
+import java.util.Locale;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -148,6 +149,31 @@ public class GraphiteReporterTest {
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1.10", timestamp);
+        inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
+
+        verifyNoMoreInteractions(graphite);
+    }
+
+    @Test
+    public void reportsDoubleGaugeValuesWithCustomFormat() throws Exception {
+        final GraphiteReporter graphiteReporter = new GraphiteReporter(registry, graphite, clock, "prefix",
+                TimeUnit.SECONDS, TimeUnit.MICROSECONDS, MetricFilter.ALL, null, false,
+                Collections.<MetricAttribute>emptySet()){
+            @Override
+            protected String format(double v) {
+                return String.format(Locale.US, "%4.4f", v);
+            }
+        };
+        graphiteReporter.report(map("gauge", gauge(1.13574)),
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                this.<Meter>map(),
+                this.<Timer>map());
+
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send("prefix.gauge", "1.1357", timestamp);
         inOrder.verify(graphite).flush();
         inOrder.verify(graphite).close();
 
