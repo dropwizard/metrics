@@ -33,6 +33,7 @@ public class ConsoleReporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
+        private MetricNameFormatter nameFormatter;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -43,6 +44,7 @@ public class ConsoleReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
+            this.nameFormatter = name -> name.toString();
         }
 
         /**
@@ -121,6 +123,16 @@ public class ConsoleReporter extends ScheduledReporter {
             this.filter = filter;
             return this;
         }
+        
+        /**
+         * Use given {@link MetricNameFormatter} when creating the metric name string
+         * @param nameformatter the formatter to use
+         * @return {@code this}
+         */
+        public Builder withNameFormatter(MetricNameFormatter nameformatter) {
+            this.nameFormatter = nameformatter;
+            return this;
+        }
 
         /**
          * Builds a {@link ConsoleReporter} with the given properties.
@@ -135,7 +147,8 @@ public class ConsoleReporter extends ScheduledReporter {
                                        timeZone,
                                        rateUnit,
                                        durationUnit,
-                                       filter);
+                                       filter,
+                                       nameFormatter);
         }
     }
 
@@ -145,6 +158,7 @@ public class ConsoleReporter extends ScheduledReporter {
     private final Locale locale;
     private final Clock clock;
     private final DateFormat dateFormat;
+    private final MetricNameFormatter nameFormatter;
 
     private ConsoleReporter(MetricRegistry registry,
                             PrintStream output,
@@ -153,7 +167,8 @@ public class ConsoleReporter extends ScheduledReporter {
                             TimeZone timeZone,
                             TimeUnit rateUnit,
                             TimeUnit durationUnit,
-                            MetricFilter filter) {
+                            MetricFilter filter,
+                            MetricNameFormatter nameFormatter) {
         super(registry, "console-reporter", filter, rateUnit, durationUnit);
         this.output = output;
         this.locale = locale;
@@ -162,6 +177,7 @@ public class ConsoleReporter extends ScheduledReporter {
                                                          DateFormat.MEDIUM,
                                                          locale);
         dateFormat.setTimeZone(timeZone);
+        this.nameFormatter = nameFormatter;
     }
 
     @Override
@@ -177,7 +193,7 @@ public class ConsoleReporter extends ScheduledReporter {
         if (!gauges.isEmpty()) {
             printWithBanner("-- Gauges", '-');
             for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
-                output.println(entry.getKey());
+                output.println(nameFormatter.formatMetricName(entry.getKey()));
                 printGauge(entry);
             }
             output.println();
@@ -186,7 +202,7 @@ public class ConsoleReporter extends ScheduledReporter {
         if (!counters.isEmpty()) {
             printWithBanner("-- Counters", '-');
             for (Map.Entry<MetricName, Counter> entry : counters.entrySet()) {
-                output.println(entry.getKey());
+                output.println(nameFormatter.formatMetricName(entry.getKey()));
                 printCounter(entry);
             }
             output.println();
@@ -195,7 +211,7 @@ public class ConsoleReporter extends ScheduledReporter {
         if (!histograms.isEmpty()) {
             printWithBanner("-- Histograms", '-');
             for (Map.Entry<MetricName, Histogram> entry : histograms.entrySet()) {
-                output.println(entry.getKey());
+                output.println(nameFormatter.formatMetricName(entry.getKey()));
                 printHistogram(entry.getValue());
             }
             output.println();
@@ -204,7 +220,7 @@ public class ConsoleReporter extends ScheduledReporter {
         if (!meters.isEmpty()) {
             printWithBanner("-- Meters", '-');
             for (Map.Entry<MetricName, Meter> entry : meters.entrySet()) {
-                output.println(entry.getKey());
+                output.println(nameFormatter.formatMetricName(entry.getKey()));
                 printMeter(entry.getValue());
             }
             output.println();
@@ -213,7 +229,7 @@ public class ConsoleReporter extends ScheduledReporter {
         if (!timers.isEmpty()) {
             printWithBanner("-- Timers", '-');
             for (Map.Entry<MetricName, Timer> entry : timers.entrySet()) {
-                output.println(entry.getKey());
+                output.println(nameFormatter.formatMetricName(entry.getKey()));
                 printTimer(entry.getValue());
             }
             output.println();
@@ -281,5 +297,5 @@ public class ConsoleReporter extends ScheduledReporter {
             output.print(c);
         }
         output.println();
-    }
+    } 
 }

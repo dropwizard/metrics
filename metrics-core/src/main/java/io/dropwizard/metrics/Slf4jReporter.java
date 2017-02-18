@@ -41,6 +41,7 @@ public class Slf4jReporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
+        private MetricNameFormatter nameFormatter;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -51,6 +52,7 @@ public class Slf4jReporter extends ScheduledReporter {
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
             this.loggingLevel = LoggingLevel.INFO;
+            this.nameFormatter = name -> name.toString();
         }
 
         /**
@@ -129,6 +131,16 @@ public class Slf4jReporter extends ScheduledReporter {
             this.loggingLevel = loggingLevel;
             return this;
         }
+        
+        /**
+         * Use given {@link MetricNameFormatter} when creating the metric name string
+         * @param nameformatter the formatter to use
+         * @return {@code this}
+         */
+        public Builder withNameFormatter(MetricNameFormatter nameformatter) {
+            this.nameFormatter = nameformatter;
+            return this;
+        }
 
         /**
          * Builds a {@link Slf4jReporter} with the given properties.
@@ -155,13 +167,14 @@ public class Slf4jReporter extends ScheduledReporter {
                     loggerProxy = new DebugLoggerProxy(logger);
                     break;
             }
-            return new Slf4jReporter(registry, loggerProxy, marker, prefix, rateUnit, durationUnit, filter);
+            return new Slf4jReporter(registry, loggerProxy, marker, prefix, rateUnit, durationUnit, filter,nameFormatter);
         }
     }
 
     private final LoggerProxy loggerProxy;
     private final Marker marker;
     private final MetricName prefix;
+    private final MetricNameFormatter nameFormatter;
 
     private Slf4jReporter(MetricRegistry registry,
                           LoggerProxy loggerProxy,
@@ -169,11 +182,13 @@ public class Slf4jReporter extends ScheduledReporter {
                           String prefix,
                           TimeUnit rateUnit,
                           TimeUnit durationUnit,
-                          MetricFilter filter) {
+                          MetricFilter filter,
+                          MetricNameFormatter nameFormatter) {
         super(registry, "logger-reporter", filter, rateUnit, durationUnit);
         this.loggerProxy = loggerProxy;
         this.marker = marker;
         this.prefix = MetricName.build(prefix);
+        this.nameFormatter = nameFormatter;
     }
 
     @Override
@@ -212,7 +227,7 @@ public class Slf4jReporter extends ScheduledReporter {
                         "p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, " +
                         "m15={}, rate_unit={}, duration_unit={}",
                 "TIMER",
-                prefix(name),
+                formatName(name),
                 timer.getCount(),
                 convertDuration(snapshot.getMin()),
                 convertDuration(snapshot.getMax()),
@@ -236,7 +251,7 @@ public class Slf4jReporter extends ScheduledReporter {
         loggerProxy.log(marker,
                 "type={}, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
                 "METER",
-                prefix(name),
+                formatName(name),
                 meter.getCount(),
                 convertRate(meter.getMeanRate()),
                 convertRate(meter.getOneMinuteRate()),
@@ -251,7 +266,7 @@ public class Slf4jReporter extends ScheduledReporter {
                 "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, " +
                         "median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
                 "HISTOGRAM",
-                prefix(name),
+                formatName(name),
                 histogram.getCount(),
                 snapshot.getMin(),
                 snapshot.getMax(),
@@ -266,11 +281,11 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     private void logCounter(MetricName name, Counter counter) {
-        loggerProxy.log(marker, "type={}, name={}, count={}", "COUNTER", prefix(name), counter.getCount());
+        loggerProxy.log(marker, "type={}, name={}, count={}", "COUNTER", formatName(name), counter.getCount());
     }
 
     private void logGauge(MetricName name, Gauge gauge) {
-        loggerProxy.log(marker, "type={}, name={}, value={}", "GAUGE", prefix(name), gauge.getValue());
+        loggerProxy.log(marker, "type={}, name={}, value={}", "GAUGE", formatName(name), gauge.getValue());
     }
 
     @Override
@@ -278,8 +293,9 @@ public class Slf4jReporter extends ScheduledReporter {
         return "events/" + super.getRateUnit();
     }
 
-    private String prefix(MetricName name, String... components) {
-        return MetricName.join(MetricName.join(prefix, name), MetricName.build(components)).getKey();
+    private String formatName(MetricName name) {
+        name = MetricName.join(prefix,name);
+        return nameFormatter.formatMetricName(name);
     }
 
     /* private class to allow logger configuration */

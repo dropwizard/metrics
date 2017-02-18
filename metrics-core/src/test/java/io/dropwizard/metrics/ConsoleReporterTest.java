@@ -1,34 +1,25 @@
 package io.dropwizard.metrics;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import io.dropwizard.metrics.Clock;
-import io.dropwizard.metrics.ConsoleReporter;
-import io.dropwizard.metrics.Counter;
-import io.dropwizard.metrics.Gauge;
-import io.dropwizard.metrics.Histogram;
-import io.dropwizard.metrics.Meter;
-import io.dropwizard.metrics.MetricFilter;
-import io.dropwizard.metrics.MetricName;
-import io.dropwizard.metrics.MetricRegistry;
-import io.dropwizard.metrics.Snapshot;
-import io.dropwizard.metrics.Timer;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ConsoleReporterTest {
+	private final Map<String,String> testTags = Collections.singletonMap("key1", "value1");
     private final MetricRegistry registry = mock(MetricRegistry.class);
     private final Clock clock = mock(Clock.class);
     private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -41,11 +32,13 @@ public class ConsoleReporterTest {
                                                             .convertRatesTo(TimeUnit.SECONDS)
                                                             .convertDurationsTo(TimeUnit.MILLISECONDS)
                                                             .filter(MetricFilter.ALL)
+                                                            .withNameFormatter(name -> name.toString())
                                                             .build();
 
     @Before
     public void setUp() throws Exception {
         when(clock.getTime()).thenReturn(1363568676000L);
+        
     }
 
     @Test
@@ -53,7 +46,7 @@ public class ConsoleReporterTest {
         final Gauge gauge = mock(Gauge.class);
         when(gauge.getValue()).thenReturn(1);
 
-        reporter.report(map("gauge", gauge),
+        reporter.report(map("gauge", testTags, gauge),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -64,7 +57,7 @@ public class ConsoleReporterTest {
                         "3/17/13 6:04:36 PM =============================================================",
                         "",
                         "-- Gauges ----------------------------------------------------------------------",
-                        "gauge",
+                        "gauge{key1=value1}",
                         "             value = 1",
                         "",
                         ""
@@ -77,7 +70,7 @@ public class ConsoleReporterTest {
         when(counter.getCount()).thenReturn(100L);
 
         reporter.report(this.<Gauge>map(),
-                        map("test.counter", counter),
+                        map("test.counter", testTags, counter),
                         this.<Histogram>map(),
                         this.<Meter>map(),
                         this.<Timer>map());
@@ -87,7 +80,7 @@ public class ConsoleReporterTest {
                         "3/17/13 6:04:36 PM =============================================================",
                         "",
                         "-- Counters --------------------------------------------------------------------",
-                        "test.counter",
+                        "test.counter{key1=value1}",
                         "             count = 100",
                         "",
                         ""
@@ -115,7 +108,7 @@ public class ConsoleReporterTest {
 
         reporter.report(this.<Gauge>map(),
                         this.<Counter>map(),
-                        map("test.histogram", histogram),
+                        map("test.histogram", testTags, histogram),
                         this.<Meter>map(),
                         this.<Timer>map());
 
@@ -124,7 +117,7 @@ public class ConsoleReporterTest {
                         "3/17/13 6:04:36 PM =============================================================",
                         "",
                         "-- Histograms ------------------------------------------------------------------",
-                        "test.histogram",
+                        "test.histogram{key1=value1}",
                         "             count = 1",
                         "               min = 4",
                         "               max = 2",
@@ -153,7 +146,7 @@ public class ConsoleReporterTest {
         reporter.report(this.<Gauge>map(),
                         this.<Counter>map(),
                         this.<Histogram>map(),
-                        map("test.meter", meter),
+                        map("test.meter", testTags, meter),
                         this.<Timer>map());
 
         assertThat(consoleOutput())
@@ -161,7 +154,7 @@ public class ConsoleReporterTest {
                         "3/17/13 6:04:36 PM =============================================================",
                         "",
                         "-- Meters ----------------------------------------------------------------------",
-                        "test.meter",
+                        "test.meter{key1=value1}",
                         "             count = 1",
                         "         mean rate = 2.00 events/second",
                         "     1-minute rate = 3.00 events/second",
@@ -200,14 +193,14 @@ public class ConsoleReporterTest {
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
-                        map("test.another.timer", timer));
+                        map("test.another.timer",testTags, timer));
 
         assertThat(consoleOutput())
                 .isEqualTo(lines(
                         "3/17/13 6:04:36 PM =============================================================",
                         "",
                         "-- Timers ----------------------------------------------------------------------",
-                        "test.another.timer",
+                        "test.another.timer{key1=value1}",
                         "             count = 1",
                         "         mean rate = 2.00 calls/second",
                         "     1-minute rate = 3.00 calls/second",
@@ -223,6 +216,40 @@ public class ConsoleReporterTest {
                         "              98% <= 800.00 milliseconds",
                         "              99% <= 900.00 milliseconds",
                         "            99.9% <= 1000.00 milliseconds",
+                        "",
+                        ""
+                ));
+    }
+    
+    @Test
+    public void testNameFormatterIsUsed() throws UnsupportedEncodingException {
+    	ConsoleReporter formatReporter = ConsoleReporter.forRegistry(registry)
+                .outputTo(output)
+                .formattedFor(Locale.US)
+                .withClock(clock)
+                .formattedFor(TimeZone.getTimeZone("PST"))
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .filter(MetricFilter.ALL)
+                .withNameFormatter(MetricNameFormatter.APPEND_TAG_VALUES)
+                .build();
+    	
+    	final Counter counter = mock(Counter.class);
+        when(counter.getCount()).thenReturn(100L);
+
+        formatReporter.report(this.<Gauge>map(),
+                        map("test.counter", testTags, counter),
+                        this.<Histogram>map(),
+                        this.<Meter>map(),
+                        this.<Timer>map());
+
+        assertThat(consoleOutput())
+                .isEqualTo(lines(
+                        "3/17/13 6:04:36 PM =============================================================",
+                        "",
+                        "-- Counters --------------------------------------------------------------------",
+                        "test.counter.value1",
+                        "             count = 100",
                         "",
                         ""
                 ));
@@ -244,9 +271,9 @@ public class ConsoleReporterTest {
         return new TreeMap<MetricName, T>();
     }
 
-    private <T> SortedMap<MetricName, T> map(String name, T metric) {
+    private <T> SortedMap<MetricName, T> map(String name, Map<String,String> tags, T metric) {
         final TreeMap<MetricName, T> map = new TreeMap<MetricName, T>();
-        map.put(MetricName.build(name), metric);
+        map.put(new MetricName(name,tags), metric);
         return map;
     }
 }
