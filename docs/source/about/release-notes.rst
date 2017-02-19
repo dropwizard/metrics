@@ -4,6 +4,19 @@
 Release Notes
 #############
 
+.. _rel-3.1.3
+
+v3.1.3:
+===================
+
+* `GraphiteReporter` opens a new TCP connection when sending metrics instead of maintaining a persisted connection. `#1036 <https://github.com/dropwizard/metrics/pull/1036>`_
+* `GraphiteReporter` retries DNS lookups in case of a lookup failure. `#1064 <https://github.com/dropwizard/metrics/pull/1064>`_
+* `ScheduledReporter` suppresses all kind of exceptions raised by the `report` method. `#1040 <https://github.com/dropwizard/metrics/pull/1040>`_
+* JDK's `ThreadLocalRandom` is now used by default. `#1052 <https://github.com/dropwizard/metrics/pull/1052>`_
+* JDK's `LongAdder` is now used by default. `#1055 <https://github.com/dropwizard/metrics/pull/1055>`_
+* Fixed a race condition bug in `ExponentiallyDecayingReservoir`. `#1046 <https://github.com/dropwizard/metrics/pull/1046>`_
+* Fixed a long overflow bug in `SlidingTimeWindowReservoir`. `#1072 <https://github.com/dropwizard/metrics/pull/1072>`_
+
 .. _rel-3.0.1:
 
 v3.0.1: Jul 23 2013
