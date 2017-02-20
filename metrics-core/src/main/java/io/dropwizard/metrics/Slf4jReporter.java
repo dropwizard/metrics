@@ -52,7 +52,7 @@ public class Slf4jReporter extends ScheduledReporter {
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
             this.loggingLevel = LoggingLevel.INFO;
-            this.nameFormatter = name -> name.toString();
+            this.nameFormatter = MetricNameFormatter.METRIC_NAME_TOSTRING;
         }
 
         /**

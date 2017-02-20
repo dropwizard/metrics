@@ -47,6 +47,18 @@ public class MetricNameFormatterTest {
 		Assert.assertEquals("this.is.a.test.b.kv1.value1", formatter.formatMetricName(name));
 	}
 	
+	@Test
+	public void toStringFormatterTest() {
+		Map<String,String> tags = new HashMap<>();
+		tags.put("tag1", "value1");
+		tags.put("key1", "kv1");
+		tags.put("a", "b");
+		MetricName name = new MetricName("this.is.a.test",tags);
+		
+		Assert.assertEquals(name.toString(), MetricNameFormatter.METRIC_NAME_TOSTRING.formatMetricName(name));
+		
+	}
+	
 	
 
 }

@@ -21,14 +21,19 @@ public interface MetricNameFormatter {
      * A {@link MetricNameFormatter} that will only use the name part of the {@link MetricName} and
      * ignore all tags
      */
-    public static MetricNameFormatter NAME_ONLY = name -> name.getKey();
+    public static final MetricNameFormatter NAME_ONLY = name -> name.getKey();
+    
+    /**
+     * A {@link MetricNameFormatter} that will invoke {@link MetricName#toString()}
+     */
+    public static final MetricNameFormatter METRIC_NAME_TOSTRING =name -> name.toString();
     
     /**
      * A {@link MetricNameFormatter} that will append tag names and values to the metric string.
      * The tags are sorted by tag key and then appended in sorted order to the name.
      * For example: <code>foo.bar.time[m=b,d=e]</code> will result in <code>foo.bar.time.d.e.m.b</code>
      */
-    public static MetricNameFormatter APPEND_TAGS = name -> {
+    public static final MetricNameFormatter APPEND_TAGS = name -> {
         StringBuilder sb = new StringBuilder(name.getKey());
         Map<String,String> tags = name.getTags();
         List<String> tagNames = new ArrayList<>(tags.keySet());
@@ -48,7 +53,7 @@ public interface MetricNameFormatter {
      * tag values are sorted and then appended in sorted order.
      * For example: <code>foo.bar.time[m=b,d=e,f=a]</code> will result in <code>foo.bar.time.a.b.e</code>
      */
-    public static MetricNameFormatter APPEND_TAG_VALUES = name -> {
+    public static final MetricNameFormatter APPEND_TAG_VALUES = name -> {
         StringBuilder sb = new StringBuilder(name.getKey());
         List<String> tagValues = new ArrayList<>(name.getTags().values());
         Collections.sort(tagValues);

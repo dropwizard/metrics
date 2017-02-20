@@ -44,7 +44,7 @@ public class ConsoleReporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
-            this.nameFormatter = name -> name.toString();
+            this.nameFormatter = MetricNameFormatter.METRIC_NAME_TOSTRING;
         }
 
         /**
