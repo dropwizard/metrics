@@ -4,6 +4,65 @@
 Release Notes
 #############
 
+.. _rel-3.2.0
+
+v3.2.0:
+===================
+
+* `GraphiteReporter` opens a new TCP connection when sending metrics instead of maintaining a persisted connection. `#1047 <https://github.com/dropwizard/metrics/pull/1047>`_
+* `GraphiteReporter` retries DNS lookups in case of a lookup failure. `#1064 <https://github.com/dropwizard/metrics/pull/1064>`_
+* `ScheduledReporter` suppresses all kind of exceptions raised by the `report` method. `#1049 <https://github.com/dropwizard/metrics/pull/1049>`_
+* JDK's `ThreadLocalRandom` is now used by default. `#1052 <https://github.com/dropwizard/metrics/pull/1052>`_
+* JDK's `LongAdder` is now used by default. `#1055 <https://github.com/dropwizard/metrics/pull/1055>`_
+* Fixed a race condition bug in `ExponentiallyDecayingReservoir`. `#1033 <https://github.com/dropwizard/metrics/pull/1033>`_
+* Fixed a long overflow bug in `SlidingTimeWindowReservoir`. `#1063 <https://github.com/dropwizard/metrics/pull/1063>`_
+* `AdminServlet` supports CPU profiling. `#927 <https://github.com/dropwizard/metrics/pull/927>`_
+* `GraphiteReporter` sanitizes metrics. `#938 <https://github.com/dropwizard/metrics/pull/938>`_
+* Support for publishing `BigInteger` and `BigDecimal` metrics in `GraphiteReporter`. `#933 <https://github.com/dropwizard/metrics/pull/933>`_
+* Support for publishing boolean metrics in `GraphiteReporter`. `#905 <https://github.com/dropwizard/metrics/pull/905>`_
+* Added support for overriding the format of floating numbers in `GraphiteReporter`. `#1073 <https://github.com/dropwizard/metrics/pull/1073>`_
+* Added support for disabling reporting of metric attributes. `#1048 <https://github.com/dropwizard/metrics/pull/1048>`_
+* Reporters are more user friendly for managed environments like GAE or JEE. `#1018 <https://github.com/dropwizard/metrics/pull/1018>`_
+* Support for setting a custom initial delay for reporters. `#999 <https://github.com/dropwizard/metrics/pull/999>`_
+* Support for custom details in a result of a health check. `#663 <https://github.com/dropwizard/metrics/pull/663>`_
+* Added a listener for health checks. `#1068 <https://github.com/dropwizard/metrics/pull/1068>`_
+* Health checks are reported as unhealthy on exceptions. `#783 <https://github.com/dropwizard/metrics/pull/783>`_
+* Allow setting a custom prefix for Jetty's `InstrumentedQueuedThreadPool`. `#947 <https://github.com/dropwizard/metrics/pull/947>`_
+* Allow setting custom prefix for Jetty's `QueuedThreadPool`. `#908 <https://github.com/dropwizard/metrics/pull/908>`_
+* Added support for Jetty 9.3 and higher. `#1038 <https://github.com/dropwizard/metrics/pull/1038>`_
+* Fixed instrumentation of Jetty9 async servlets. `#1074 <https://github.com/dropwizard/metrics/pull/1074>`_
+* Added support for JCache/JSR 107 metrics. `#1010 <https://github.com/dropwizard/metrics/pull/1010>`_
+* Added thread-safe getters for metrics with custom instantiations. `#1023 <https://github.com/dropwizard/metrics/pull/1023>`_
+* Added an overload of `Timer#time` that takes a `Runnable`. `#989 <https://github.com/dropwizard/metrics/pull/989>`_
+* Support extracting the request URI from wrapped requests in `HttpClientMetricNameStrategies`. `#947 <https://github.com/dropwizard/metrics/pull/947>`_
+* Support for the log4j2 xml-based config. `#900 <https://github.com/dropwizard/metrics/pull/900>`_
+* Internal `Striped64` doesn't depend on `sun.misc.Unsafe` anymore. `#966 <https://github.com/dropwizard/metrics/pull/966>`_
+* Optimized creation of `UniformSnapshot`. `#970 <https://github.com/dropwizard/metrics/pull/970>`_
+* Added a memory pool gauge to the JVM memory usage metrics. `#786 <https://github.com/dropwizard/metrics/pull/786>`_
+* Added support for async servlets for `metric-servlet`. `#796 <https://github.com/dropwizard/metrics/pull/796>`_
+* Opt-in default shared metric registry. `#801 <https://github.com/dropwizard/metrics/pull/801>`_
+* Added support for patterns in MBean object names `#809 <https://github.com/dropwizard/metrics/pull/809>`_
+* Allow a pluggable strategy for the name of the CSV files for `CsvReporter`. `#882 <https://github.com/dropwizard/metrics/pull/882>`_
+* Upgraded to slf4j 1.22
+* Upgraded to Jackson 2.6.6
+* Upgraded to amqp-client 3.6.6
+* Upgraded to httpclient 4.5.2
+* Upgraded to log4j2 2.3
+* Upgraded to logback 1.1.10
+
+.. _rel-3.1.3
+
+v3.1.3:
+===================
+
+* `GraphiteReporter` opens a new TCP connection when sending metrics instead of maintaining a persisted connection. `#1036 <https://github.com/dropwizard/metrics/pull/1036>`_
+* `GraphiteReporter` retries DNS lookups in case of a lookup failure. `#1064 <https://github.com/dropwizard/metrics/pull/1064>`_
+* `ScheduledReporter` suppresses all kind of exceptions raised by the `report` method. `#1040 <https://github.com/dropwizard/metrics/pull/1040>`_
+* JDK's `ThreadLocalRandom` is now used by default. `#1052 <https://github.com/dropwizard/metrics/pull/1052>`_
+* JDK's `LongAdder` is now used by default. `#1055 <https://github.com/dropwizard/metrics/pull/1055>`_
+* Fixed a race condition bug in `ExponentiallyDecayingReservoir`. `#1046 <https://github.com/dropwizard/metrics/pull/1046>`_
+* Fixed a long overflow bug in `SlidingTimeWindowReservoir`. `#1072 <https://github.com/dropwizard/metrics/pull/1072>`_
+
 .. _rel-3.0.1:
 
 v3.0.1: Jul 23 2013
