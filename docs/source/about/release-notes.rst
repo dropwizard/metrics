@@ -6,7 +6,7 @@ Release Notes
 
 .. _rel-3.2.0
 
-v3.2.0:
+v3.2.0: Feb 24 2017
 ===================
 
 * `GraphiteReporter` opens a new TCP connection when sending metrics instead of maintaining a persisted connection. `#1047 <https://github.com/dropwizard/metrics/pull/1047>`_
@@ -52,7 +52,7 @@ v3.2.0:
 
 .. _rel-3.1.3
 
-v3.1.3:
+v3.1.3: Feb 24 2017
 ===================
 
 * `GraphiteReporter` opens a new TCP connection when sending metrics instead of maintaining a persisted connection. `#1036 <https://github.com/dropwizard/metrics/pull/1036>`_
