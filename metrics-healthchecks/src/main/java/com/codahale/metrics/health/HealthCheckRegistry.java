@@ -35,6 +35,7 @@ import com.codahale.metrics.health.annotation.Async;
  */
 public class HealthCheckRegistry {
     private static final Logger LOGGER = LoggerFactory.getLogger(HealthCheckRegistry.class);
+    private static final int ASYNC_EXECUTOR_POOL_SIZE = 2;
 
     private final ConcurrentMap<String, HealthCheck> healthChecks;
     private final List<HealthCheckRegistryListener> listeners;
@@ -45,7 +46,7 @@ public class HealthCheckRegistry {
      * Creates a new {@link HealthCheckRegistry}.
      */
     public HealthCheckRegistry() {
-        this(Runtime.getRuntime().availableProcessors());
+        this(ASYNC_EXECUTOR_POOL_SIZE);
     }
 
     /**
