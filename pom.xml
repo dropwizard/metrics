@@ -190,9 +190,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                        <configuration>
-                            <keyname>4D13335B</keyname>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
