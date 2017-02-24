@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -208,6 +209,22 @@ public class HealthCheckRegistry {
     private void onHealthCheckRemoved(String name, HealthCheck healthCheck) {
         for (HealthCheckRegistryListener listener : listeners) {
             listener.onHealthCheckRemoved(name, healthCheck);
+        }
+    }
+
+    /**
+     * Shuts down the scheduled executor for async health checks
+     */
+    public void shutdown() {
+        asyncExecutorService.shutdown(); // Disable new health checks from being submitted
+        try {
+            // Give some time to the current healtch checks to finish gracefully
+            if (!asyncExecutorService.awaitTermination(1, TimeUnit.SECONDS)) {
+                asyncExecutorService.shutdownNow();
+            }
+        } catch (InterruptedException ie) {
+            asyncExecutorService.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 

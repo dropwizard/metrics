@@ -84,6 +84,12 @@ public class HealthCheckServlet extends HttpServlet {
     }
 
     @Override
+    public void destroy() {
+        super.destroy();
+        registry.shutdown();
+    }
+
+    @Override
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse resp) throws ServletException, IOException {
         final SortedMap<String, HealthCheck.Result> results = runHealthChecks();
