@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,6 +35,7 @@ import com.codahale.metrics.health.annotation.Async;
  */
 public class HealthCheckRegistry {
     private static final Logger LOGGER = LoggerFactory.getLogger(HealthCheckRegistry.class);
+    private static final int ASYNC_EXECUTOR_POOL_SIZE = 2;
 
     private final ConcurrentMap<String, HealthCheck> healthChecks;
     private final List<HealthCheckRegistryListener> listeners;
@@ -44,7 +46,7 @@ public class HealthCheckRegistry {
      * Creates a new {@link HealthCheckRegistry}.
      */
     public HealthCheckRegistry() {
-        this(Runtime.getRuntime().availableProcessors());
+        this(ASYNC_EXECUTOR_POOL_SIZE);
     }
 
     /**
@@ -211,6 +213,22 @@ public class HealthCheckRegistry {
         }
     }
 
+    /**
+     * Shuts down the scheduled executor for async health checks
+     */
+    public void shutdown() {
+        asyncExecutorService.shutdown(); // Disable new health checks from being submitted
+        try {
+            // Give some time to the current healtch checks to finish gracefully
+            if (!asyncExecutorService.awaitTermination(1, TimeUnit.SECONDS)) {
+                asyncExecutorService.shutdownNow();
+            }
+        } catch (InterruptedException ie) {
+            asyncExecutorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+    }
+
     private static ScheduledExecutorService createExecutorService(int corePoolSize) {
         ScheduledExecutorService asyncExecutorService = Executors.newScheduledThreadPool(corePoolSize,
                 new NamedThreadFactory("healthcheck-async-executor-"));
@@ -234,7 +252,7 @@ public class HealthCheckRegistry {
     }
 
     private static class NamedThreadFactory implements ThreadFactory {
-        private static final AtomicInteger poolNumber = new AtomicInteger(1);
+
         private final ThreadGroup group;
         private final AtomicInteger threadNumber = new AtomicInteger(1);
         private final String namePrefix;
@@ -248,8 +266,7 @@ public class HealthCheckRegistry {
         @Override
         public Thread newThread(Runnable r) {
             Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
-            if (t.isDaemon())
-                t.setDaemon(false);
+            t.setDaemon(true);
             if (t.getPriority() != Thread.NORM_PRIORITY)
                 t.setPriority(Thread.NORM_PRIORITY);
             return t;
