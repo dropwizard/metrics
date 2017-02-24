@@ -16,6 +16,7 @@
     <url>http://metrics.codahale.com/</url>
 
     <modules>
+        <module>docs</module>
         <module>metrics-annotation</module>
         <module>metrics-benchmarks</module>
         <module>metrics-core</module>
