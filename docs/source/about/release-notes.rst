@@ -4,7 +4,7 @@
 Release Notes
 #############
 
-.. _rel-3.2.0
+.. _rel-3.2.0:
 
 v3.2.0: Feb 24 2017
 ===================
@@ -26,6 +26,7 @@ v3.2.0: Feb 24 2017
 * Support for setting a custom initial delay for reporters. `#999 <https://github.com/dropwizard/metrics/pull/999>`_
 * Support for custom details in a result of a health check. `#663 <https://github.com/dropwizard/metrics/pull/663>`_
 * Added a listener for health checks. `#1068 <https://github.com/dropwizard/metrics/pull/1068>`_
+* Support for asynchronous health checks `#1077 <https://github.com/dropwizard/metrics/pull/1077>`_
 * Health checks are reported as unhealthy on exceptions. `#783 <https://github.com/dropwizard/metrics/pull/783>`_
 * Allow setting a custom prefix for Jetty's `InstrumentedQueuedThreadPool`. `#947 <https://github.com/dropwizard/metrics/pull/947>`_
 * Allow setting custom prefix for Jetty's `QueuedThreadPool`. `#908 <https://github.com/dropwizard/metrics/pull/908>`_
@@ -50,7 +51,7 @@ v3.2.0: Feb 24 2017
 * Upgraded to log4j2 2.3
 * Upgraded to logback 1.1.10
 
-.. _rel-3.1.3
+.. _rel-3.1.3:
 
 v3.1.3: Feb 24 2017
 ===================
