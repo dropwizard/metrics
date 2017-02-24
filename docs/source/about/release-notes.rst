@@ -63,6 +63,79 @@ v3.1.3: Feb 24 2017
 * Fixed a race condition bug in `ExponentiallyDecayingReservoir`. `#1046 <https://github.com/dropwizard/metrics/pull/1046>`_
 * Fixed a long overflow bug in `SlidingTimeWindowReservoir`. `#1072 <https://github.com/dropwizard/metrics/pull/1072>`_
 
+
+.. _rel-3.1.0:
+
+v3.1.0: Sen 10 2014
+===================
+
+https://groups.google.com/forum/#!topic/metrics-user/zwzHnMBcAX4
+
+* Upgrade to Jetty 9.1 (metrics-jetty9, Jetty 9.0 module renamed to metrics-jetty9-legacy)
+* Add log4j2 support (metrics-log4j2)
+* Upgrade to Jersey2 (metrics-jersey2)
+* Add httpasyncclient support (metrics-httpasyncclient)
+* Changed maven groupId to io.dropwizard.metrics
+* Enable Java8 builds on Travis, fix javadocs and disable some doclinting
+* Fixing some compilation warnings about missing generics and varargs invocation
+* Instrumentation for java.util.concurrent classes
+* ExponentiallyDecayingReservoir: quantiles weighting
+* Loosen type requirements for JmxAttributeGauge constructor
+* SlidingWindowReservoir - ArrayOutOfBoundsException thrown if # of Reservoir examples exceeds Integer max value
+* Classloader metrics
+* Add an instrumented ScheduledExecutorService
+* Fix race condition in InstrumentedThreadFactoryTest
+* Correct comparison of System.nanoTime in SlidingTimeWindowReservoir
+* Add SharedHealthCheckRegistries class
+* Migrate benchmarks from Caliper to JMH
+* New annotations: @CachedGauge, @Counted, @Metric
+* Support for annotations on classes and constructors
+* Allow @Metric on methods and parameters
+* Add @Inherited and @Documented on all type annotations
+* Adapted ehcache integration to latest ehcache version 2.8.3
+* Upgrade to HttpClient 4.3
+* InstrumentedHandler: Remove duplicate calls to requests.update(...)
+* New metric 'utilization-max' to track thread usage out of max pool size in jetty
+* Replaced Jetty-specific Request with Servlet API interfaces
+* Jetty 8: Avoid NPE if InstrumentedQueuedThreadPool gauges are read too early
+* Jetty 8: Call updateResponses onComplete of ContinuationListener
+* Allow specifying a custom prefix Jetty 9 InstrumentedHandler
+* MetricsModule is serializing wrong minute rates for timers
+* MeterSerializer.serialize had m1_rate and m15_rate transposed
+* Add CachedThreadStatesGaugeSet
+* Monitor count of deadlock threads
+* Prevent exceptions from ThreadDumpServlet on Google AppEngine
+* Upgrade to logback 1.1.1
+* Allow InstrumentedAppender use in logback.xml
+* Use getClass() in place of AbstractInstrumentedFilter.class in generated metric names
+* Update MetricsServlet with support for JSONP as alternative to CORS
+* Specify the base name of the metrics as a filter init-param for the metrics captured in the AbstractInstrumentedFilter
+* Add option to provide MetricFilter to MetricsServlet
+* AdminServlet generates link to pretty printed healthchecks
+* MetricsServlet.ContextListener doesn't initialize the context correctly
+* Every reporter implements Reporter interface to indicate that is a Reporter
+* Added support for passing a ScheduledExecutorService to ScheduledReporters
+* Improve the ScheduledReporter#stop method
+* Ensure ScheduledReporters get unique thread pools.
+* Suppress runtime exceptions thrown from ScheduledReporter#report
+* Ability to inject a factory of ObjectName
+* Lazy fetch of PlatformMBeanServer
+* JMX Reporter throws exception when metric name contains an asterisk
+* onTimerRemoved in JmxListener calls registered.add
+* Support for mBean servers that rewrite the supplied ObjectName upon registration
+* Graphite reporter does not notify when Graphite/Carbon server is unreachable
+* Persistent connections to Graphite
+* Graphite constructor accepts host/port
+* Graphtie Pickle sender
+* Graphite UDP sender
+* Graphite AMQP sender
+* Add a threshold/minimum value to report before converting results to 0
+* Report to multiple gmetric instances
+* Escape slahes on ganglia metric names
+* Upgrade slf4j to 1.7.6
+* Enhancement for logging level option on Slf4jReporter
+
+
 .. _rel-3.0.1:
 
 v3.0.1: Jul 23 2013
