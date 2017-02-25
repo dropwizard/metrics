@@ -360,7 +360,7 @@ public class GangliaReporter extends ScheduledReporter {
 
     private void announceIfEnabled(MetricAttribute metricAttribute, String metricName, String group, double value, String units)
             throws GangliaException {
-        if (getDisabledMetricAttributes().contains(metricAttribute)) {
+        if (isMetricAttributeDisabled(metricAttribute)) {
             return;
         }
         final String string = Math.abs(value) < MIN_VAL ? "0" : Double.toString(value);
@@ -369,7 +369,7 @@ public class GangliaReporter extends ScheduledReporter {
 
     private void announceIfEnabled(MetricAttribute metricAttribute, String metricName, String group, long value, String units)
             throws GangliaException {
-        if (getDisabledMetricAttributes().contains(metricAttribute)) {
+        if (isMetricAttributeDisabled(metricAttribute)) {
             return;
         }
         announce(prefix(metricName, metricAttribute.getCode()), group, Long.toString(value), GMetricType.DOUBLE, units);
