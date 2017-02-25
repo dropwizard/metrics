@@ -4,11 +4,16 @@ import java.io.Closeable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import static com.codahale.metrics.MeasurementPublisher.DO_NOT_PUBLISH;
+
 /**
  * A timer metric which aggregates timing durations and provides duration statistics, plus
  * throughput statistics via {@link Meter}.
  */
 public class Timer implements Metered, Sampling {
+
+    private static final TimeUnit TIMER_TIME_UNIT = TimeUnit.NANOSECONDS;
+
     /**
      * A timing context.
      *
@@ -43,6 +48,8 @@ public class Timer implements Metered, Sampling {
         }
     }
 
+    private final String name;
+    private final MeasurementPublisher measurementPublisher;
     private final Meter meter;
     private final Histogram histogram;
     private final Clock clock;
@@ -50,30 +57,38 @@ public class Timer implements Metered, Sampling {
     /**
      * Creates a new {@link Timer} using an {@link ExponentiallyDecayingReservoir} and the default
      * {@link Clock}.
+     * @param name The name of the metric
+     * @param measurementPublisher a publisher which the metric should notify of any measurements
      */
-    public Timer() {
-        this(new ExponentiallyDecayingReservoir());
+    public Timer(String name, MeasurementPublisher measurementPublisher) {
+        this(name, measurementPublisher, new ExponentiallyDecayingReservoir());
     }
 
     /**
      * Creates a new {@link Timer} that uses the given {@link Reservoir}.
      *
+     * @param name The name of the metric
+     * @param measurementPublisher a publisher which the metric should notify of any measurements
      * @param reservoir the {@link Reservoir} implementation the timer should use
      */
-    public Timer(Reservoir reservoir) {
-        this(reservoir, Clock.defaultClock());
+    public Timer(String name, MeasurementPublisher measurementPublisher, Reservoir reservoir) {
+        this(name, measurementPublisher, reservoir, Clock.defaultClock());
     }
 
     /**
      * Creates a new {@link Timer} that uses the given {@link Reservoir} and {@link Clock}.
      *
+     * @param name The name of the metric
+     * @param measurementPublisher a publisher which the metric should notify of any measurements
      * @param reservoir the {@link Reservoir} implementation the timer should use
      * @param clock  the {@link Clock} implementation the timer should use
      */
-    public Timer(Reservoir reservoir, Clock clock) {
-        this.meter = new Meter(clock);
+    public Timer(String name, MeasurementPublisher measurementPublisher, Reservoir reservoir, Clock clock) {
+        this.name = name;
+        this.measurementPublisher = measurementPublisher;
+        this.meter = new Meter(name, DO_NOT_PUBLISH, clock);
         this.clock = clock;
-        this.histogram = new Histogram(reservoir);
+        this.histogram = new Histogram(name, DO_NOT_PUBLISH, reservoir);
     }
 
     /**
@@ -83,7 +98,7 @@ public class Timer implements Metered, Sampling {
      * @param unit     the scale unit of {@code duration}
      */
     public void update(long duration, TimeUnit unit) {
-        update(unit.toNanos(duration));
+        update(TIMER_TIME_UNIT.convert(duration, unit));
     }
 
     /**
@@ -164,5 +179,6 @@ public class Timer implements Metered, Sampling {
             histogram.update(duration);
             meter.mark();
         }
+        measurementPublisher.timerUpdated(name, duration, TIMER_TIME_UNIT);
     }
 }

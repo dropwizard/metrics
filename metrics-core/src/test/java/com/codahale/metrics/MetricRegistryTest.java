@@ -5,7 +5,9 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import static com.codahale.metrics.MeasurementPublisher.DEFAULT_MEASUREMENT_PUBLISHER;
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
@@ -13,17 +15,20 @@ import static org.mockito.Mockito.*;
 
 public class MetricRegistryTest {
     private final MetricRegistryListener listener = mock(MetricRegistryListener.class);
-    private final MetricRegistry registry = new MetricRegistry();
+    private final MeasurementPublisher measurementPublisher = DEFAULT_MEASUREMENT_PUBLISHER;
+    private final MetricRegistry registry = new MetricRegistry(measurementPublisher);
     @SuppressWarnings("unchecked")
     private final Gauge<String> gauge = mock(Gauge.class);
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
+    private final MeasurementListener measurementListener = mock(MeasurementListener.class);
 
     @Before
     public void setUp() throws Exception {
         registry.addListener(listener);
+        registry.addMeasurementListener(measurementListener);
     }
 
     @Test
@@ -67,7 +72,7 @@ public class MetricRegistryTest {
     public void accessingACustomCounterRegistersAndReusesTheCounter() throws Exception {
         final MetricRegistry.MetricSupplier<Counter> supplier = new MetricRegistry.MetricSupplier<Counter>() {
             @Override
-            public Counter newMetric() {
+            public Counter newMetric(String name, MeasurementPublisher measurementPublisher) {
                 return counter;
             }
         };
@@ -114,7 +119,7 @@ public class MetricRegistryTest {
     public void accessingACustomHistogramRegistersAndReusesIt() throws Exception {
         final MetricRegistry.MetricSupplier<Histogram> supplier = new MetricRegistry.MetricSupplier<Histogram>() {
             @Override
-            public Histogram newMetric() {
+            public Histogram newMetric(String name, MeasurementPublisher measurementPublisher) {
                 return histogram;
             }
         };
@@ -160,7 +165,7 @@ public class MetricRegistryTest {
     public void accessingACustomMeterRegistersAndReusesIt() throws Exception {
         final MetricRegistry.MetricSupplier<Meter> supplier = new MetricRegistry.MetricSupplier<Meter>() {
             @Override
-            public Meter newMetric() {
+            public Meter newMetric(String name, MeasurementPublisher measurementPublisher) {
                 return meter;
             }
         };
@@ -206,7 +211,7 @@ public class MetricRegistryTest {
     public void accessingACustomTimerRegistersAndReusesIt() throws Exception {
         final MetricRegistry.MetricSupplier<Timer> supplier = new MetricRegistry.MetricSupplier<Timer>() {
             @Override
-            public Timer newMetric() {
+            public Timer newMetric(String name, MeasurementPublisher measurementPublisher) {
                 return timer;
             }
         };
@@ -234,7 +239,7 @@ public class MetricRegistryTest {
     public void accessingACustomGaugeRegistersAndReusesIt() throws Exception {
         final MetricRegistry.MetricSupplier<Gauge> supplier = new MetricRegistry.MetricSupplier<Gauge>() {
             @Override
-            public Gauge newMetric() {
+            public Gauge newMetric(String name, MeasurementPublisher measurementPublisher) {
                 return gauge;
             }
         };
@@ -471,5 +476,78 @@ public class MetricRegistryTest {
 
         verify(listener).onTimerRemoved("timer-1");
         verify(listener).onHistogramRemoved("histogram-1");
+    }
+
+    @Test
+    public void measurementListenersNotified() {
+        registry.counter("counter").inc();
+        verify(measurementListener).counterIncremented("counter", 1);
+
+        registry.counter("counter").dec();
+        verify(measurementListener).counterDecremented("counter", 1);
+
+        registry.timer("timer").update(1, TimeUnit.NANOSECONDS);
+        verify(measurementListener).timerUpdated("timer", 1, TimeUnit.NANOSECONDS);
+
+        registry.histogram("histogram").update(1);
+        verify(measurementListener).histogramUpdated("histogram", 1);
+
+        registry.meter("meter").mark();
+        verify(measurementListener).meterMarked("meter", 1);
+
+        verifyNoMoreInteractions(measurementListener);
+    }
+
+    @Test
+    public void measurementListenersNotifiedWithCustomSuppliers() {
+        MetricRegistry.MetricSupplier<Counter> counterSupplier = new MetricRegistry.MetricSupplier<Counter>() {
+            @Override
+            public Counter newMetric(String name, MeasurementPublisher measurementPublisher) {
+                return new Counter(name, measurementPublisher);
+            }
+        };
+        MetricRegistry.MetricSupplier<Timer> timerSupplier = new MetricRegistry.MetricSupplier<Timer>() {
+            @Override
+            public Timer newMetric(String name, MeasurementPublisher measurementPublisher) {
+                return new Timer(name, measurementPublisher);
+            }
+        };
+        MetricRegistry.MetricSupplier<Histogram> histogramSupplier = new MetricRegistry.MetricSupplier<Histogram>() {
+            @Override
+            public Histogram newMetric(String name, MeasurementPublisher measurementPublisher) {
+                return new Histogram(name, measurementPublisher, new ExponentiallyDecayingReservoir());
+            }
+        };
+        MetricRegistry.MetricSupplier<Meter> meterSupplier = new MetricRegistry.MetricSupplier<Meter>() {
+            @Override
+            public Meter newMetric(String name, MeasurementPublisher measurementPublisher) {
+                return new Meter(name, measurementPublisher);
+            }
+        };
+
+        registry.counter("counter", counterSupplier).inc();
+        verify(measurementListener).counterIncremented("counter", 1);
+
+        registry.counter("counter", counterSupplier).dec();
+        verify(measurementListener).counterDecremented("counter", 1);
+
+        registry.timer("timer", timerSupplier).update(1, TimeUnit.NANOSECONDS);
+        verify(measurementListener).timerUpdated("timer", 1, TimeUnit.NANOSECONDS);
+
+        registry.histogram("histogram", histogramSupplier).update(1);
+        verify(measurementListener).histogramUpdated("histogram", 1);
+
+        registry.meter("meter", meterSupplier).mark();
+        verify(measurementListener).meterMarked("meter", 1);
+
+        verifyNoMoreInteractions(measurementListener);
+    }
+
+    @Test
+    public void aRemovedMeasurementListenerDoesNotReceiveMeasurements() throws Exception {
+        registry.removeMeasurementListener(measurementListener);
+
+        registry.counter("counter").inc();
+        verifyZeroInteractions(measurementListener);
     }
 }

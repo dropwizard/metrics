@@ -21,7 +21,8 @@ public class TimerTest {
             return val += 50000000;
         }
     };
-    private final Timer timer = new Timer(reservoir, clock);
+    private final MeasurementPublisher measurementPublisher = mock(MeasurementPublisher.class);
+    private final Timer timer = new Timer("timer", measurementPublisher, reservoir, clock);
 
     @Test
     public void hasRates() throws Exception {
@@ -116,5 +117,16 @@ public class TimerTest {
                 .isZero();
 
         verifyZeroInteractions(reservoir);
+    }
+
+    @Test
+    public void notifiesMeasurementListeners() {
+        timer.update(1, TimeUnit.NANOSECONDS);
+        verify(measurementPublisher)
+                .timerUpdated("timer", 1, TimeUnit.NANOSECONDS);
+        verify(measurementPublisher, never())
+                .histogramUpdated(anyString(), anyLong());
+        verify(measurementPublisher, never())
+                .meterMarked(anyString(), anyLong());
     }
 }

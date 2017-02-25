@@ -4,11 +4,11 @@ import com.codahale.metrics.*;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.codahale.metrics.MeasurementPublisher.DO_NOT_PUBLISH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -57,8 +57,8 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
         });
         registry.counter("c").inc();
         registry.histogram("h").update(1);
-        registry.register("m", new Meter(clock)).mark();
-        registry.register("t", new Timer(new ExponentiallyDecayingReservoir(), clock))
+        registry.register("m", new Meter("m", DO_NOT_PUBLISH, clock)).mark();
+        registry.register("t", new Timer("t", DO_NOT_PUBLISH, new ExponentiallyDecayingReservoir(), clock))
                 .update(1, TimeUnit.SECONDS);
 
         request.setMethod("GET");

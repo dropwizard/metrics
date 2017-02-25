@@ -3,9 +3,12 @@ package com.codahale.metrics;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class CounterTest {
-    private final Counter counter = new Counter();
+    private MeasurementPublisher measurementPublisher = mock(MeasurementPublisher.class);
+    private final Counter counter = new Counter("counter", measurementPublisher);
 
     @Test
     public void startsAtZero() throws Exception {
@@ -59,5 +62,12 @@ public class CounterTest {
 
         assertThat(counter.getCount())
                 .isEqualTo(12);
+    }
+
+    @Test
+    public void notifiesMeasurementPublisher() {
+        counter.inc(1);
+        verify(measurementPublisher)
+                .counterIncremented("counter", 1);
     }
 }

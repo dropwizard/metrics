@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
+import static com.codahale.metrics.MeasurementPublisher.DO_NOT_PUBLISH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
 
@@ -64,7 +65,7 @@ public class MeterApproximationTest {
             long duration, TimeUnit durationUnit) {
         
         final ManualClock clock = new ManualClock();
-        final Meter meter = new Meter(clock);
+        final Meter meter = new Meter("metronome", DO_NOT_PUBLISH, clock);
         
         clock.addNanos(introDelayUnit.toNanos(introDelay));
         

@@ -8,11 +8,13 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class MeterTest {
     private final Clock clock = mock(Clock.class);
-    private final Meter meter = new Meter(clock);
+    private final MeasurementPublisher measurementPublisher = mock(MeasurementPublisher.class);
+    private final Meter meter = new Meter("meter", measurementPublisher, clock);
 
     @Before
     public void setUp() throws Exception {
@@ -54,5 +56,12 @@ public class MeterTest {
 
         assertThat(meter.getFifteenMinuteRate())
                 .isEqualTo(0.1988, offset(0.001));
+    }
+
+    @Test
+    public void notifiesMeasurementPublisher() {
+        meter.mark();
+        verify(measurementPublisher)
+                .meterMarked("meter", 1);
     }
 }

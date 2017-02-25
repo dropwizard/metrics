@@ -7,7 +7,8 @@ import static org.mockito.Mockito.*;
 
 public class HistogramTest {
     private final Reservoir reservoir = mock(Reservoir.class);
-    private final Histogram histogram = new Histogram(reservoir);
+    private final MeasurementPublisher measurementPublisher = mock(MeasurementPublisher.class);
+    private final Histogram histogram = new Histogram("histogram", measurementPublisher, reservoir);
 
     @Test
     public void updatesTheCountOnUpdates() throws Exception {
@@ -34,5 +35,13 @@ public class HistogramTest {
         histogram.update(1);
 
         verify(reservoir).update(1);
+    }
+
+    @Test
+    public void notifiesMeasurementListeners() {
+        histogram.update(1);
+        verify(measurementPublisher)
+                .histogramUpdated("histogram", 1);
+        verifyNoMoreInteractions(measurementPublisher);
     }
 }

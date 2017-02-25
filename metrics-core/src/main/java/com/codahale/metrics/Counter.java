@@ -5,8 +5,12 @@ package com.codahale.metrics;
  */
 public class Counter implements Metric, Counting {
     private final LongAdderAdapter count;
+    private final String name;
+    private final MeasurementPublisher measurementPublisher;
 
-    public Counter() {
+    public Counter(String name, MeasurementPublisher measurementPublisher) {
+        this.name = name;
+        this.measurementPublisher = measurementPublisher;
         this.count = LongAdderProxy.create();
     }
 
@@ -24,6 +28,7 @@ public class Counter implements Metric, Counting {
      */
     public void inc(long n) {
         count.add(n);
+        measurementPublisher.counterIncremented(name, n);
     }
 
     /**
@@ -40,6 +45,7 @@ public class Counter implements Metric, Counting {
      */
     public void dec(long n) {
         count.add(-n);
+        measurementPublisher.counterDecremented(name, n);
     }
 
     /**

@@ -19,21 +19,29 @@ public class Meter implements Metered {
     private final LongAdderAdapter count = LongAdderProxy.create();
     private final long startTime;
     private final AtomicLong lastTick;
+    private final String name;
+    private final MeasurementPublisher measurementPublisher;
     private final Clock clock;
 
     /**
      * Creates a new {@link Meter}.
+     * @param name The name of the metric
+     * @param measurementPublisher a publisher which the metric should notify of any measurements
      */
-    public Meter() {
-        this(Clock.defaultClock());
+    public Meter(String name, MeasurementPublisher measurementPublisher) {
+        this(name, measurementPublisher, Clock.defaultClock());
     }
 
     /**
      * Creates a new {@link Meter}.
      *
+     * @param name The name of the metric
+     * @param measurementPublisher a publisher which the metric should notify of any measurements
      * @param clock      the clock to use for the meter ticks
      */
-    public Meter(Clock clock) {
+    public Meter(String name, MeasurementPublisher measurementPublisher, Clock clock) {
+        this.name = name;
+        this.measurementPublisher = measurementPublisher;
         this.clock = clock;
         this.startTime = this.clock.getTick();
         this.lastTick = new AtomicLong(startTime);
@@ -57,6 +65,7 @@ public class Meter implements Metered {
         m1Rate.update(n);
         m5Rate.update(n);
         m15Rate.update(n);
+        measurementPublisher.meterMarked(name, n);
     }
 
     private void tickIfNecessary() {

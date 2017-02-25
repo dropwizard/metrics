@@ -9,10 +9,12 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import static com.codahale.metrics.MeasurementPublisher.DO_NOT_PUBLISH;
+
 @State(Scope.Benchmark)
 public class MeterBenchmark {
 
-    private final Meter meter = new Meter();
+    private final Meter meter = new Meter("meter", DO_NOT_PUBLISH);
 
     // It's intentionally not declared as final to avoid constant folding
     private long nextValue = 0xFBFBABBA;

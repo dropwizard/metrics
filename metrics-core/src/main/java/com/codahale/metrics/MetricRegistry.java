@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * A registry of metric instances.
  */
 public class MetricRegistry implements MetricSet {
+
     /**
      * Concatenates elements to form a dotted name, eliding any null values or empty strings.
      *
@@ -50,13 +51,25 @@ public class MetricRegistry implements MetricSet {
 
     private final ConcurrentMap<String, Metric> metrics;
     private final List<MetricRegistryListener> listeners;
+    private final MeasurementPublisher measurementPublisher;
 
     /**
      * Creates a new {@link MetricRegistry}.
      */
     public MetricRegistry() {
+        this(MeasurementPublisher.DEFAULT_MEASUREMENT_PUBLISHER);
+    }
+
+    /**
+     * Creates a new {@link MetricRegistry}. Visible for testing.
+     *
+     * @param measurementPublisher the publisher which will be notified of all measurements, and which is responsible
+     *                             for notifying each {@link MeasurementListener}.
+     */
+    MetricRegistry(MeasurementPublisher measurementPublisher) {
         this.metrics = buildMap();
         this.listeners = new CopyOnWriteArrayList<MetricRegistryListener>();
+        this.measurementPublisher = measurementPublisher;
     }
 
     /**
@@ -123,11 +136,11 @@ public class MetricRegistry implements MetricSet {
      * @param supplier a MetricSupplier that can be used to manufacture a counter.
      * @return a new or pre-existing {@link Counter}
      */
-    public Counter counter(String name, final MetricSupplier<Counter> supplier) {
+    public Counter counter(final String name, final MetricSupplier<Counter> supplier) {
         return getOrAdd(name, new MetricBuilder<Counter>() {
             @Override
-            public Counter newMetric() {
-                return supplier.newMetric();
+            public Counter newMetric(String name, MeasurementPublisher measurementPublisher) {
+                return supplier.newMetric(name, measurementPublisher);
             }
             @Override
             public boolean isInstance(Metric metric) {
@@ -155,11 +168,11 @@ public class MetricRegistry implements MetricSet {
      * @param supplier a MetricSupplier that can be used to manufacture a histogram
      * @return a new or pre-existing {@link Histogram}
      */
-    public Histogram histogram(String name, final MetricSupplier<Histogram> supplier) {
+    public Histogram histogram(final String name, final MetricSupplier<Histogram> supplier) {
       return getOrAdd(name, new MetricBuilder<Histogram>() {
         @Override
-        public Histogram newMetric() {
-          return supplier.newMetric();
+        public Histogram newMetric(String name, MeasurementPublisher measurementPublisher) {
+          return supplier.newMetric(name, measurementPublisher);
         }
         @Override
         public boolean isInstance(Metric metric) {
@@ -187,11 +200,11 @@ public class MetricRegistry implements MetricSet {
      * @param supplier a MetricSupplier that can be used to manufacture a Meter
      * @return a new or pre-existing {@link Meter}
      */
-    public Meter meter(String name, final MetricSupplier<Meter> supplier) {
+    public Meter meter(final String name, final MetricSupplier<Meter> supplier) {
         return getOrAdd(name, new MetricBuilder<Meter>() {
             @Override
-            public Meter newMetric() {
-                return supplier.newMetric();
+            public Meter newMetric(String name, MeasurementPublisher measurementPublisher) {
+                return supplier.newMetric(name, measurementPublisher);
             }
             @Override
             public boolean isInstance(Metric metric) {
@@ -219,11 +232,11 @@ public class MetricRegistry implements MetricSet {
      * @param supplier a MetricSupplier that can be used to manufacture a Timer
      * @return a new or pre-existing {@link Timer}
      */
-    public Timer timer(String name, final MetricSupplier<Timer> supplier) {
+    public Timer timer(final String name, final MetricSupplier<Timer> supplier) {
         return getOrAdd(name, new MetricBuilder<Timer>() {
             @Override
-            public Timer newMetric() {
-                return supplier.newMetric();
+            public Timer newMetric(String name, MeasurementPublisher measurementPublisher) {
+                return supplier.newMetric(name, measurementPublisher);
             }
             @Override
             public boolean isInstance(Metric metric) {
@@ -240,11 +253,11 @@ public class MetricRegistry implements MetricSet {
      * @param supplier a MetricSupplier that can be used to manufacture a Gauge
      * @return a new or pre-existing {@link Gauge}
      */
-    public Gauge gauge(String name, final MetricSupplier<Gauge> supplier) {
+    public Gauge gauge(final String name, final MetricSupplier<Gauge> supplier) {
         return getOrAdd(name, new MetricBuilder<Gauge>() {
             @Override
-            public Gauge newMetric() {
-                return supplier.newMetric();
+            public Gauge newMetric(String name, MeasurementPublisher measurementPublisher) {
+                return supplier.newMetric(name, measurementPublisher);
             }
             @Override
             public boolean isInstance(Metric metric) {
@@ -305,6 +318,25 @@ public class MetricRegistry implements MetricSet {
      */
     public void removeListener(MetricRegistryListener listener) {
         listeners.remove(listener);
+    }
+
+    /**
+     * Adds a {@link MeasurementListener} to a collection of listeners that will be notified of
+     * metric measurements. Listeners will be notified in the order in which they are added.
+     *
+     * @param listener the listener that will be notified of measurements
+     */
+    public void addMeasurementListener(MeasurementListener listener) {
+        measurementPublisher.addListener(listener);
+    }
+
+    /**
+     * Removes a {@link MeasurementListener} from the listeners that will be notified of metric measurements
+     *
+     * @param listener the {@link MeasurementListener} that will be removed
+     */
+    public void removeMeasurementListener(MeasurementListener listener) {
+        measurementPublisher.removeListener(listener);
     }
 
     /**
@@ -420,7 +452,7 @@ public class MetricRegistry implements MetricSet {
             return (T) metric;
         } else if (metric == null) {
             try {
-                return register(name, builder.newMetric());
+                return register(name, builder.newMetric(name, measurementPublisher));
             } catch (IllegalArgumentException e) {
                 final Metric added = metrics.get(name);
                 if (builder.isInstance(added)) {
@@ -503,7 +535,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     public interface MetricSupplier<T extends Metric> {
-      T newMetric();
+      T newMetric(String name, MeasurementPublisher measurementPublisher);
     }
 
     /**
@@ -512,8 +544,8 @@ public class MetricRegistry implements MetricSet {
     private interface MetricBuilder<T extends Metric> {
         MetricBuilder<Counter> COUNTERS = new MetricBuilder<Counter>() {
             @Override
-            public Counter newMetric() {
-                return new Counter();
+            public Counter newMetric(String name, MeasurementPublisher measurementPublisher) {
+                return new Counter(name, measurementPublisher);
             }
 
             @Override
@@ -524,8 +556,8 @@ public class MetricRegistry implements MetricSet {
 
         MetricBuilder<Histogram> HISTOGRAMS = new MetricBuilder<Histogram>() {
             @Override
-            public Histogram newMetric() {
-                return new Histogram(new ExponentiallyDecayingReservoir());
+            public Histogram newMetric(String name, MeasurementPublisher measurementPublisher) {
+                return new Histogram(name, measurementPublisher, new ExponentiallyDecayingReservoir());
             }
 
             @Override
@@ -536,8 +568,8 @@ public class MetricRegistry implements MetricSet {
 
         MetricBuilder<Meter> METERS = new MetricBuilder<Meter>() {
             @Override
-            public Meter newMetric() {
-                return new Meter();
+            public Meter newMetric(String name, MeasurementPublisher measurementPublisher) {
+                return new Meter(name, measurementPublisher);
             }
 
             @Override
@@ -548,8 +580,8 @@ public class MetricRegistry implements MetricSet {
 
         MetricBuilder<Timer> TIMERS = new MetricBuilder<Timer>() {
             @Override
-            public Timer newMetric() {
-                return new Timer();
+            public Timer newMetric(String name, MeasurementPublisher measurementPublisher) {
+                return new Timer(name, measurementPublisher);
             }
 
             @Override
@@ -558,7 +590,7 @@ public class MetricRegistry implements MetricSet {
             }
         };
 
-        T newMetric();
+        T newMetric(String name, MeasurementPublisher measurementPublisher);
 
         boolean isInstance(Metric metric);
     }

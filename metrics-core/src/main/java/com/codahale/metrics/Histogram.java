@@ -7,15 +7,21 @@ package com.codahale.metrics;
  *      variance</a>
  */
 public class Histogram implements Metric, Sampling, Counting {
+    private final String name;
+    private final MeasurementPublisher measurementPublisher;
     private final Reservoir reservoir;
     private final LongAdderAdapter count;
 
     /**
      * Creates a new {@link Histogram} with the given reservoir.
      *
+     * @param name The name of the metric
+     * @param measurementPublisher a publisher which the metric should notify of any measurements
      * @param reservoir the reservoir to create a histogram from
      */
-    public Histogram(Reservoir reservoir) {
+    public Histogram(String name, MeasurementPublisher measurementPublisher, Reservoir reservoir) {
+        this.name = name;
+        this.measurementPublisher = measurementPublisher;
         this.reservoir = reservoir;
         this.count = LongAdderProxy.create();
     }
@@ -37,6 +43,7 @@ public class Histogram implements Metric, Sampling, Counting {
     public void update(long value) {
         count.increment();
         reservoir.update(value);
+        measurementPublisher.histogramUpdated(name, value);
     }
 
     /**
