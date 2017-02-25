@@ -388,6 +388,9 @@ public class GraphiteReporterTest {
         when(meter.getFifteenMinuteRate()).thenReturn(4.0);
         when(meter.getMeanRate()).thenReturn(5.0);
 
+        final Counter counter = mock(Counter.class);
+        when(counter.getCount()).thenReturn(11L);
+
         Set<MetricAttribute> disabledMetricAttributes = EnumSet.of(MetricAttribute.M15_RATE, MetricAttribute.M5_RATE);
         GraphiteReporter reporterWithdisabledMetricAttributes = GraphiteReporter.forRegistry(registry)
                 .withClock(clock)
@@ -398,13 +401,14 @@ public class GraphiteReporterTest {
                 .disabledMetricAttributes(disabledMetricAttributes)
                 .build(graphite);
         reporterWithdisabledMetricAttributes.report(this.<Gauge>map(),
-                this.<Counter>map(),
+                this.<Counter>map("counter", counter),
                 this.<Histogram>map(),
                 this.<Meter>map("meter", meter),
                 this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send("prefix.counter.count", "11", timestamp);
         inOrder.verify(graphite).send("prefix.meter.count", "1", timestamp);
         inOrder.verify(graphite).send("prefix.meter.m1_rate", "2.00", timestamp);
         inOrder.verify(graphite).send("prefix.meter.mean_rate", "5.00", timestamp);

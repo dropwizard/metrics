@@ -336,7 +336,7 @@ public class GraphiteReporter extends ScheduledReporter {
     }
 
     private void reportCounter(String name, Counter counter, long timestamp) throws IOException {
-        sendIfEnabled(COUNT, name, counter.getCount(), timestamp);
+        graphite.send(prefix(name, COUNT.getCode()), format(counter.getCount()), timestamp);
     }
 
     private void reportGauge(String name, Gauge gauge, long timestamp) throws IOException {
