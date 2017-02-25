@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.codahale.metrics.MeasurementPublisher.DEFAULT_MEASUREMENT_PUBLISHER;
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
@@ -15,7 +14,7 @@ import static org.mockito.Mockito.*;
 
 public class MetricRegistryTest {
     private final MetricRegistryListener listener = mock(MetricRegistryListener.class);
-    private final MeasurementPublisher measurementPublisher = DEFAULT_MEASUREMENT_PUBLISHER;
+    private final MeasurementPublisher measurementPublisher = new MeasurementPublisher.DefaultMeasurementPublisher();
     private final MetricRegistry registry = new MetricRegistry(measurementPublisher);
     @SuppressWarnings("unchecked")
     private final Gauge<String> gauge = mock(Gauge.class);

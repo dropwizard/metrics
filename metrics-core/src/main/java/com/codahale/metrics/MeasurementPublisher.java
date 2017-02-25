@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 public interface MeasurementPublisher {
     MeasurementPublisher DO_NOT_PUBLISH = new DoNothingMeasurementPublisher();
-    MeasurementPublisher DEFAULT_MEASUREMENT_PUBLISHER = new DefaultMeasurementPublisher();
 
     void addListener(MeasurementListener listener);
 
@@ -66,7 +65,7 @@ public interface MeasurementPublisher {
     class DefaultMeasurementPublisher implements MeasurementPublisher {
         private Set<MeasurementListener> listeners = new HashSet<MeasurementListener>();
 
-        private DefaultMeasurementPublisher() {
+        DefaultMeasurementPublisher() {
         }
 
         @Override

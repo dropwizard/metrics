@@ -57,7 +57,7 @@ public class MetricRegistry implements MetricSet {
      * Creates a new {@link MetricRegistry}.
      */
     public MetricRegistry() {
-        this(MeasurementPublisher.DEFAULT_MEASUREMENT_PUBLISHER);
+        this(new MeasurementPublisher.DefaultMeasurementPublisher());
     }
 
     /**
