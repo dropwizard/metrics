@@ -543,7 +543,7 @@ public class JmxReporter implements Reporter, Closeable {
                 unregisterMBean(objectName);
             } catch (InstanceNotFoundException e) {
                 LOGGER.debug("Unable to unregister gauge", e);
-            } catch (MBeanRegistrationException e) {
+            } catch (JMException e) {
                 LOGGER.warn("Unable to unregister gauge", e);
             }
         }
@@ -569,7 +569,7 @@ public class JmxReporter implements Reporter, Closeable {
                 unregisterMBean(objectName);
             } catch (InstanceNotFoundException e) {
                 LOGGER.debug("Unable to unregister counter", e);
-            } catch (MBeanRegistrationException e) {
+            } catch (JMException e) {
                 LOGGER.warn("Unable to unregister counter", e);
             }
         }
@@ -595,7 +595,7 @@ public class JmxReporter implements Reporter, Closeable {
                 unregisterMBean(objectName);
             } catch (InstanceNotFoundException e) {
                 LOGGER.debug("Unable to unregister histogram", e);
-            } catch (MBeanRegistrationException e) {
+            } catch (JMException e) {
                 LOGGER.warn("Unable to unregister histogram", e);
             }
         }
@@ -621,7 +621,7 @@ public class JmxReporter implements Reporter, Closeable {
                 unregisterMBean(objectName);
             } catch (InstanceNotFoundException e) {
                 LOGGER.debug("Unable to unregister meter", e);
-            } catch (MBeanRegistrationException e) {
+            } catch (JMException e) {
                 LOGGER.warn("Unable to unregister meter", e);
             }
         }
@@ -647,12 +647,12 @@ public class JmxReporter implements Reporter, Closeable {
                 unregisterMBean(objectName);
             } catch (InstanceNotFoundException e) {
                 LOGGER.debug("Unable to unregister timer", e);
-            } catch (MBeanRegistrationException e) {
+            } catch (JMException e) {
                 LOGGER.warn("Unable to unregister timer", e);
             }
         }
 
-        private ObjectName createName(String type, MetricName name) {
+        private ObjectName createName(String type, MetricName name) throws MalformedObjectNameException {
             return objectNameFactory.createName(type, this.name, name);
         }
 
