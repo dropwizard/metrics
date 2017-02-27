@@ -251,11 +251,15 @@ public class GangliaReporterTest {
     @Test
     public void disabledMetricAttributes() throws Exception {
         final Meter meter = mock(Meter.class);
+        final Counter counter = mock(Counter.class);
+
         when(meter.getCount()).thenReturn(1L);
         when(meter.getMeanRate()).thenReturn(2.0);
         when(meter.getOneMinuteRate()).thenReturn(3.0);
         when(meter.getFiveMinuteRate()).thenReturn(4.0);
         when(meter.getFifteenMinuteRate()).thenReturn(5.0);
+
+        when(counter.getCount()).thenReturn(1L);
 
         GangliaReporter reporter = GangliaReporter.forRegistry(registry)
                 .prefixedWith("m")
@@ -268,11 +272,12 @@ public class GangliaReporterTest {
                 .build(ganglia);
 
         reporter.report(this.<Gauge>map(),
-                this.<Counter>map(),
+                map("test.counter", counter),
                 this.<Histogram>map(),
                 map("test.meter", meter),
                 this.<Timer>map());
 
+        verify(ganglia).announce("m.test.counter.count", "1", GMetricType.DOUBLE, "", GMetricSlope.BOTH, 60, 0,  "test");
         verify(ganglia).announce("m.test.meter.m1_rate", "3.0", GMetricType.DOUBLE, "events/second", GMetricSlope.BOTH, 60, 0, "test");
         verify(ganglia).announce("m.test.meter.m5_rate", "4.0", GMetricType.DOUBLE, "events/second", GMetricSlope.BOTH, 60, 0, "test");
         verifyNoMoreInteractions(ganglia);
