@@ -1,10 +1,9 @@
 package com.codahale.metrics.health;
 
-import com.codahale.metrics.MetricRegistry;
-
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A map of shared, named health registries.
@@ -12,6 +11,13 @@ import java.util.concurrent.ConcurrentMap;
 public class SharedHealthCheckRegistries {
     private static final ConcurrentMap<String, HealthCheckRegistry> REGISTRIES =
             new ConcurrentHashMap<String, HealthCheckRegistry>();
+
+    private static AtomicReference<String> defaultRegistryName = new AtomicReference<String>();
+
+    /* Visible for testing */
+    static void setDefaultRegistryName(AtomicReference<String> defaultRegistryName) {
+        SharedHealthCheckRegistries.defaultRegistryName = defaultRegistryName;
+    }
 
     private SharedHealthCheckRegistries() { /* singleton */ }
 
@@ -42,5 +48,46 @@ public class SharedHealthCheckRegistries {
             return raced;
         }
         return existing;
+    }
+
+    /**
+     * Creates a new registry and sets it as the default one under the provided name.
+     *
+     * @param name the registry name
+     * @return the default registry
+     * @throws IllegalStateException if the name has already been set
+     */
+    public synchronized static HealthCheckRegistry setDefault(String name) {
+        final HealthCheckRegistry registry = getOrCreate(name);
+        return setDefault(name, registry);
+    }
+
+    /**
+     * Sets the provided registry as the default one under the provided name
+     *
+     * @param name                the default registry name
+     * @param healthCheckRegistry the default registry
+     * @throws IllegalStateException if the default registry has already been set
+     */
+    public static HealthCheckRegistry setDefault(String name, HealthCheckRegistry healthCheckRegistry) {
+        if (defaultRegistryName.compareAndSet(null, name)) {
+            add(name, healthCheckRegistry);
+            return healthCheckRegistry;
+        }
+        throw new IllegalStateException("Default health check registry is already set.");
+    }
+
+    /**
+     * Gets the name of the default registry, if it has been set
+     *
+     * @return the default registry
+     * @throws IllegalStateException if the default has not been set
+     */
+    public static HealthCheckRegistry getDefault() {
+        final String name = defaultRegistryName.get();
+        if (name != null) {
+            return getOrCreate(name);
+        }
+        throw new IllegalStateException("Default registry name has not been set.");
     }
 }
