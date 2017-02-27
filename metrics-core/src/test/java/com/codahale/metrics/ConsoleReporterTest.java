@@ -6,7 +6,12 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,15 +19,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ConsoleReporterTest {
+    private final Locale locale = Locale.US;
+    private final TimeZone timeZone = TimeZone.getTimeZone("PST");
+
     private final MetricRegistry registry = mock(MetricRegistry.class);
     private final Clock clock = mock(Clock.class);
     private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     private final PrintStream output = new PrintStream(bytes);
     private final ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)
                                                             .outputTo(output)
-                                                            .formattedFor(Locale.US)
+                                                            .formattedFor(locale)
                                                             .withClock(clock)
-                                                            .formattedFor(TimeZone.getTimeZone("PST"))
+                                                            .formattedFor(timeZone)
                                                             .convertRatesTo(TimeUnit.SECONDS)
                                                             .convertDurationsTo(TimeUnit.MILLISECONDS)
                                                             .filter(MetricFilter.ALL)
@@ -219,9 +227,9 @@ public class ConsoleReporterTest {
 
         final ConsoleReporter customReporter = ConsoleReporter.forRegistry(registry)
                 .outputTo(output)
-                .formattedFor(Locale.US)
+                .formattedFor(locale)
                 .withClock(clock)
-                .formattedFor(TimeZone.getTimeZone("PST"))
+                .formattedFor(timeZone)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .filter(MetricFilter.ALL)
@@ -260,9 +268,9 @@ public class ConsoleReporterTest {
 
         final ConsoleReporter customReporter = ConsoleReporter.forRegistry(registry)
                 .outputTo(output)
-                .formattedFor(Locale.US)
+                .formattedFor(locale)
                 .withClock(clock)
-                .formattedFor(TimeZone.getTimeZone("PST"))
+                .formattedFor(timeZone)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .filter(MetricFilter.ALL)
@@ -325,9 +333,9 @@ public class ConsoleReporterTest {
 
         final ConsoleReporter customReporter = ConsoleReporter.forRegistry(registry)
                 .outputTo(output)
-                .formattedFor(Locale.US)
+                .formattedFor(locale)
                 .withClock(clock)
-                .formattedFor(TimeZone.getTimeZone("PST"))
+                .formattedFor(timeZone)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .filter(MetricFilter.ALL)

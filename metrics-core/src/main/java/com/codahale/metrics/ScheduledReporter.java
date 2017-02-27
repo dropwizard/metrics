@@ -291,17 +291,8 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
         return shutdownExecutorOnStop;
     }
 
-    /**
-     * Check if Attribute disabled to be logged
-     * @param attribute metric attribute
-     * @return True if attribute is configured to be disabled
-     */
-    protected boolean isMetricAttributeDisabled(MetricAttribute attribute) {
-        if(disabledMetricAttributes != null && disabledMetricAttributes.contains(attribute)) {
-            return true;
-        }
-
-        return false;
+    protected Set<MetricAttribute> getDisabledMetricAttributes() {
+        return disabledMetricAttributes;
     }
 
     private String calculateRateUnit(TimeUnit unit) {

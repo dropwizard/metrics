@@ -340,7 +340,7 @@ public class ConsoleReporter extends ScheduledReporter {
      * @param status Status to be logged
      */
     private void printIfEnabled(MetricAttribute type, String status) {
-        if(isMetricAttributeDisabled(type)) {
+        if(getDisabledMetricAttributes().contains(type)) {
             return;
         }
 

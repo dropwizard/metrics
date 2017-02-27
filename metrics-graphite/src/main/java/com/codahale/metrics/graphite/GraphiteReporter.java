@@ -322,14 +322,14 @@ public class GraphiteReporter extends ScheduledReporter {
     }
 
     private void sendIfEnabled(MetricAttribute type, String name, double value, long timestamp) throws IOException {
-        if (isMetricAttributeDisabled(type)){
+        if (getDisabledMetricAttributes().contains(type)){
             return;
         }
         graphite.send(prefix(name, type.getCode()), format(value), timestamp);
     }
 
     private void sendIfEnabled(MetricAttribute type, String name, long value, long timestamp) throws IOException {
-        if (isMetricAttributeDisabled(type)){
+        if (getDisabledMetricAttributes().contains(type)){
             return;
         }
         graphite.send(prefix(name, type.getCode()), format(value), timestamp);
