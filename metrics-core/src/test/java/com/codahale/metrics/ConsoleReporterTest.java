@@ -7,9 +7,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
-import java.util.SortedMap;
 import java.util.TimeZone;
+import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,15 +19,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ConsoleReporterTest {
+    private final Locale locale = Locale.US;
+    private final TimeZone timeZone = TimeZone.getTimeZone("PST");
+
     private final MetricRegistry registry = mock(MetricRegistry.class);
     private final Clock clock = mock(Clock.class);
     private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     private final PrintStream output = new PrintStream(bytes);
     private final ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)
                                                             .outputTo(output)
-                                                            .formattedFor(Locale.US)
+                                                            .formattedFor(locale)
                                                             .withClock(clock)
-                                                            .formattedFor(TimeZone.getTimeZone("PST"))
+                                                            .formattedFor(timeZone)
                                                             .convertRatesTo(TimeUnit.SECONDS)
                                                             .convertDurationsTo(TimeUnit.MILLISECONDS)
                                                             .filter(MetricFilter.ALL)
@@ -211,6 +216,168 @@ public class ConsoleReporterTest {
                         "              98% <= 800.00 milliseconds",
                         "              99% <= 900.00 milliseconds",
                         "            99.9% <= 1000.00 milliseconds",
+                        "",
+                        ""
+                ));
+    }
+
+    @Test
+    public void reportMeterWithDisabledAttributes() throws Exception {
+        Set<MetricAttribute> disabledMetricAttributes = EnumSet.of(MetricAttribute.M15_RATE, MetricAttribute.M5_RATE, MetricAttribute.COUNT);
+
+        final ConsoleReporter customReporter = ConsoleReporter.forRegistry(registry)
+                .outputTo(output)
+                .formattedFor(locale)
+                .withClock(clock)
+                .formattedFor(timeZone)
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .filter(MetricFilter.ALL)
+                .disabledMetricAttributes(disabledMetricAttributes)
+            .build();
+
+        final Meter meter = mock(Meter.class);
+        when(meter.getCount()).thenReturn(1L);
+        when(meter.getMeanRate()).thenReturn(2.0);
+        when(meter.getOneMinuteRate()).thenReturn(3.0);
+        when(meter.getFiveMinuteRate()).thenReturn(4.0);
+        when(meter.getFifteenMinuteRate()).thenReturn(5.0);
+
+        customReporter.report(this.<Gauge>map(),
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                map("test.meter", meter),
+                this.<Timer>map());
+
+        assertThat(consoleOutput())
+                .isEqualTo(lines(
+                        "3/17/13 6:04:36 PM =============================================================",
+                        "",
+                        "-- Meters ----------------------------------------------------------------------",
+                        "test.meter",
+                        "         mean rate = 2.00 events/second",
+                        "     1-minute rate = 3.00 events/second",
+                        "",
+                        ""
+                ));
+    }
+
+    @Test
+    public void reportTimerWithDisabledAttributes() throws Exception {
+        Set<MetricAttribute> disabledMetricAttributes = EnumSet.of(MetricAttribute.P50, MetricAttribute.P999, MetricAttribute.M5_RATE, MetricAttribute.MAX);
+
+        final ConsoleReporter customReporter = ConsoleReporter.forRegistry(registry)
+                .outputTo(output)
+                .formattedFor(locale)
+                .withClock(clock)
+                .formattedFor(timeZone)
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .filter(MetricFilter.ALL)
+                .disabledMetricAttributes(disabledMetricAttributes)
+                .build();
+
+        final Timer timer = mock(Timer.class);
+        when(timer.getCount()).thenReturn(1L);
+        when(timer.getMeanRate()).thenReturn(2.0);
+        when(timer.getOneMinuteRate()).thenReturn(3.0);
+        when(timer.getFiveMinuteRate()).thenReturn(4.0);
+        when(timer.getFifteenMinuteRate()).thenReturn(5.0);
+
+        final Snapshot snapshot = mock(Snapshot.class);
+        when(snapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));
+        when(snapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));
+        when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
+        when(snapshot.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));
+        when(snapshot.getMedian()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(500));
+        when(snapshot.get75thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(600));
+        when(snapshot.get95thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(700));
+        when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
+        when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
+        when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS
+                .toNanos(1000));
+
+        when(timer.getSnapshot()).thenReturn(snapshot);
+
+        customReporter.report(this.<Gauge>map(),
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                this.<Meter>map(),
+                map("test.another.timer", timer));
+
+        assertThat(consoleOutput())
+                .isEqualTo(lines(
+                        "3/17/13 6:04:36 PM =============================================================",
+                        "",
+                        "-- Timers ----------------------------------------------------------------------",
+                        "test.another.timer",
+                        "             count = 1",
+                        "         mean rate = 2.00 calls/second",
+                        "     1-minute rate = 3.00 calls/second",
+                        "    15-minute rate = 5.00 calls/second",
+                        "               min = 300.00 milliseconds",
+                        "              mean = 200.00 milliseconds",
+                        "            stddev = 400.00 milliseconds",
+                        "              75% <= 600.00 milliseconds",
+                        "              95% <= 700.00 milliseconds",
+                        "              98% <= 800.00 milliseconds",
+                        "              99% <= 900.00 milliseconds",
+                        "",
+                        ""
+                ));
+    }
+
+    @Test
+    public void reportHistogramWithDisabledAttributes() throws Exception {
+        Set<MetricAttribute> disabledMetricAttributes = EnumSet.of(MetricAttribute.MIN, MetricAttribute.MAX, MetricAttribute.STDDEV, MetricAttribute.P95);
+
+        final ConsoleReporter customReporter = ConsoleReporter.forRegistry(registry)
+                .outputTo(output)
+                .formattedFor(locale)
+                .withClock(clock)
+                .formattedFor(timeZone)
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .filter(MetricFilter.ALL)
+                .disabledMetricAttributes(disabledMetricAttributes)
+                .build();
+
+        final Histogram histogram = mock(Histogram.class);
+        when(histogram.getCount()).thenReturn(1L);
+
+        final Snapshot snapshot = mock(Snapshot.class);
+        when(snapshot.getMax()).thenReturn(2L);
+        when(snapshot.getMean()).thenReturn(3.0);
+        when(snapshot.getMin()).thenReturn(4L);
+        when(snapshot.getStdDev()).thenReturn(5.0);
+        when(snapshot.getMedian()).thenReturn(6.0);
+        when(snapshot.get75thPercentile()).thenReturn(7.0);
+        when(snapshot.get95thPercentile()).thenReturn(8.0);
+        when(snapshot.get98thPercentile()).thenReturn(9.0);
+        when(snapshot.get99thPercentile()).thenReturn(10.0);
+        when(snapshot.get999thPercentile()).thenReturn(11.0);
+
+        when(histogram.getSnapshot()).thenReturn(snapshot);
+
+        customReporter.report(this.<Gauge>map(),
+                this.<Counter>map(),
+                map("test.histogram", histogram),
+                this.<Meter>map(),
+                this.<Timer>map());
+
+        assertThat(consoleOutput())
+                .isEqualTo(lines(
+                        "3/17/13 6:04:36 PM =============================================================",
+                        "",
+                        "-- Histograms ------------------------------------------------------------------",
+                        "test.histogram",
+                        "             count = 1",
+                        "              mean = 3.00",
+                        "            median = 6.00",
+                        "              75% <= 7.00",
+                        "              98% <= 9.00",
+                        "              99% <= 10.00",
+                        "            99.9% <= 11.00",
                         "",
                         ""
                 ));
