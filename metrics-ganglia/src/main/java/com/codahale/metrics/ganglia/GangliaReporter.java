@@ -337,7 +337,7 @@ public class GangliaReporter extends ScheduledReporter {
         final String sanitizedName = escapeSlashes(name);
         final String group = group(name);
         try {
-            announceIfEnabled(COUNT, sanitizedName, group, counter.getCount(), "");
+            announce(prefix(sanitizedName, COUNT.getCode()), group, Long.toString(counter.getCount()), GMetricType.DOUBLE, "");
         } catch (GangliaException e) {
             LOGGER.warn("Unable to report counter {}", name, e);
         }
