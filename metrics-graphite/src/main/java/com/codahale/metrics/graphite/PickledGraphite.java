@@ -40,7 +40,6 @@ public class PickledGraphite implements GraphiteSender {
     private final Charset charset;
 
     private Socket socket;
-    private Writer writer;
     private int failures;
 
     /**
@@ -181,12 +180,30 @@ public class PickledGraphite implements GraphiteSender {
         }
 
         this.socket = socketFactory.createSocket(address.getAddress(), address.getPort());
-        this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), charset));
     }
 
     @Override
     public boolean isConnected() {
-        return socket != null && socket.isConnected() && !socket.isClosed();
+      if (socket != null && socket.isConnected() && !socket.isClosed()) {
+        // the above checks isn't enough to identify semi open connections
+        // See RFC793 figure 11 for the scenario which this is trying to address
+        // if socket is open, it should be fine to send a byte right?
+
+        try {
+          OutputStream os = socket.getOutputStream();
+          os.write(0);
+          return true;
+        } catch (IOException ioe) {
+          try {
+            socket.close();
+          } catch (IOException ioe2) {
+          }
+          finally {
+            this.socket = null;
+          }
+        }
+      }
+      return false;
     }
 
     /**
@@ -217,25 +234,20 @@ public class PickledGraphite implements GraphiteSender {
     @Override
     public void flush() throws IOException {
         writeMetrics();
-        if (writer != null) {
-            writer.flush();
-        }
     }
 
     @Override
     public void close() throws IOException {
         try {
             flush();
-            if (writer != null) {
-                writer.close();
-            }
+            socket.close();
         } catch (IOException ex) {
-            if (socket != null) {
-                socket.close();
-            }
+            // if flush() is tried over a semi closed socket then
+            // IOException will be thrown. We want to explicitly
+            // release the resource too.
+            socket.close();
         } finally {
             this.socket = null;
-            this.writer = null;
         }
     }
 
