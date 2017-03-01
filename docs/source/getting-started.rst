@@ -21,7 +21,7 @@ You need the ``metrics-core`` library as a dependency:
 
     <dependencies>
         <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
+           <groupId>io.dropwizard.metrics4</groupId>
             <artifactId>metrics-core</artifactId>
             <version>${metrics.version}</version>
         </dependency>
@@ -121,7 +121,7 @@ So the complete Getting Started is
 
     <dependencies>
       <dependency>
-        <groupId>io.dropwizard.metrics</groupId>
+       <groupId>io.dropwizard.metrics4</groupId>
         <artifactId>metrics-core</artifactId>
         <version>${metrics.version}</version>
       </dependency>
@@ -376,7 +376,7 @@ To use this servlet, include the ``metrics-servlets`` module as a dependency:
 .. code-block:: xml
 
     <dependency>
-        <groupId>io.dropwizard.metrics</groupId>
+       <groupId>io.dropwizard.metrics4</groupId>
         <artifactId>metrics-servlets</artifactId>
         <version>${metrics.version}</version>
     </dependency>
