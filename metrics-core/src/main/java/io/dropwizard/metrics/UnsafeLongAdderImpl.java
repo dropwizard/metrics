@@ -52,6 +52,17 @@ class UnsafeLongAdderImpl extends UnsafeStriped64 implements LongAdder, Serializ
     }
 
     /**
+     * Sets the given value
+     *
+     * @param x the value to set
+     */
+    @Override
+    public void set(long x) {
+        long diff = x - sum();
+        add(x);
+    }
+
+    /**
      * Adds the given value.
      *
      * @param x the value to add

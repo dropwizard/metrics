@@ -167,6 +167,7 @@ public class ConsoleReporter extends ScheduledReporter {
     @Override
     public void report(SortedMap<MetricName, Gauge> gauges,
                        SortedMap<MetricName, Counter> counters,
+                       SortedMap<MetricName, Statistic> statistics,
                        SortedMap<MetricName, Histogram> histograms,
                        SortedMap<MetricName, Meter> meters,
                        SortedMap<MetricName, Timer> timers) {
@@ -188,6 +189,15 @@ public class ConsoleReporter extends ScheduledReporter {
             for (Map.Entry<MetricName, Counter> entry : counters.entrySet()) {
                 output.println(entry.getKey());
                 printCounter(entry);
+            }
+            output.println();
+        }
+
+        if (!statistics.isEmpty()) {
+            printWithBanner("-- Statistics", '-');
+            for (Map.Entry<MetricName, Statistic> entry : statistics.entrySet()) {
+                output.println(entry.getKey());
+                printStatistic(entry);
             }
             output.println();
         }
@@ -232,6 +242,10 @@ public class ConsoleReporter extends ScheduledReporter {
     }
 
     private void printCounter(Map.Entry<MetricName, Counter> entry) {
+        output.printf(locale, "             count = %d%n", entry.getValue().getCount());
+    }
+
+    private void printStatistic(Map.Entry<MetricName, Statistic> entry) {
         output.printf(locale, "             count = %d%n", entry.getValue().getCount());
     }
 

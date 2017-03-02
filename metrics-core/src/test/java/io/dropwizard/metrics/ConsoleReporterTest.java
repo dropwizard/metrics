@@ -55,6 +55,7 @@ public class ConsoleReporterTest {
 
         reporter.report(map("gauge", gauge),
                         this.<Counter>map(),
+                        this.<Statistic>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
                         this.<Timer>map());
@@ -78,6 +79,7 @@ public class ConsoleReporterTest {
 
         reporter.report(this.<Gauge>map(),
                         map("test.counter", counter),
+                        this.<Statistic>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
                         this.<Timer>map());
@@ -88,6 +90,30 @@ public class ConsoleReporterTest {
                         "",
                         "-- Counters --------------------------------------------------------------------",
                         "test.counter",
+                        "             count = 100",
+                        "",
+                        ""
+                ));
+    }
+
+    @Test
+    public void reportsStatisticValues() throws Exception {
+        final Statistic statistic = mock(Statistic.class);
+        when(statistic.getCount()).thenReturn(100L);
+
+        reporter.report(this.<Gauge>map(),
+                this.<Counter>map(),
+                map("test.statistic", statistic),
+                this.<Histogram>map(),
+                this.<Meter>map(),
+                this.<Timer>map());
+
+        assertThat(consoleOutput())
+                .isEqualTo(lines(
+                        "3/17/13 6:04:36 PM =============================================================",
+                        "",
+                        "-- Statistics ------------------------------------------------------------------",
+                        "test.statistic",
                         "             count = 100",
                         "",
                         ""
@@ -115,6 +141,7 @@ public class ConsoleReporterTest {
 
         reporter.report(this.<Gauge>map(),
                         this.<Counter>map(),
+                        this.<Statistic>map(),
                         map("test.histogram", histogram),
                         this.<Meter>map(),
                         this.<Timer>map());
@@ -152,6 +179,7 @@ public class ConsoleReporterTest {
 
         reporter.report(this.<Gauge>map(),
                         this.<Counter>map(),
+                        this.<Statistic>map(),
                         this.<Histogram>map(),
                         map("test.meter", meter),
                         this.<Timer>map());
@@ -198,6 +226,7 @@ public class ConsoleReporterTest {
 
         reporter.report(this.<Gauge>map(),
                         this.<Counter>map(),
+                        this.<Statistic>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
                         map("test.another.timer", timer));

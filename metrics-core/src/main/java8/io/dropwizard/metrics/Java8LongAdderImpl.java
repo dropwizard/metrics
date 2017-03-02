@@ -11,6 +11,12 @@ class Java8LongAdderImpl implements io.dropwizard.metrics.LongAdder {
     }
 
 	@Override
+	public void set(long x) {
+		long diff = x - delegate.sum();
+		delegate.add(diff);
+	}
+
+	@Override
 	public void add(long x) {
 		delegate.add(x);
 	}

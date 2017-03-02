@@ -152,6 +152,7 @@ public class CsvReporter extends ScheduledReporter {
     @Override
     public void report(SortedMap<MetricName, Gauge> gauges,
                        SortedMap<MetricName, Counter> counters,
+                       SortedMap<MetricName, Statistic> statistics,
                        SortedMap<MetricName, Histogram> histograms,
                        SortedMap<MetricName, Meter> meters,
                        SortedMap<MetricName, Timer> timers) {
@@ -163,6 +164,10 @@ public class CsvReporter extends ScheduledReporter {
 
         for (Map.Entry<MetricName, Counter> entry : counters.entrySet()) {
             reportCounter(timestamp, entry.getKey(), entry.getValue());
+        }
+
+        for (Map.Entry<MetricName, Statistic> entry : statistics.entrySet()) {
+            reportStatistic(timestamp, entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<MetricName, Histogram> entry : histograms.entrySet()) {
@@ -239,6 +244,15 @@ public class CsvReporter extends ScheduledReporter {
 
     private void reportCounter(long timestamp, MetricName name, Counter counter) {
         report(timestamp, name, "count", "%d", counter.getCount());
+    }
+
+    private void reportStatistic(long timestamp, MetricName name, Statistic statistic) {
+
+        report(timestamp,
+                name,
+                "count",
+                "%d",
+                statistic.getCount());
     }
 
     private void reportGauge(long timestamp, MetricName name, Gauge gauge) {

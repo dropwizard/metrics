@@ -159,6 +159,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
         synchronized (this) {
             report(registry.getGauges(filter),
                     registry.getCounters(filter),
+                    registry.getStatistic(filter),
                     registry.getHistograms(filter),
                     registry.getMeters(filter),
                     registry.getTimers(filter));
@@ -170,12 +171,14 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      *
      * @param gauges     all of the gauges in the registry
      * @param counters   all of the counters in the registry
+     * @param statistic  all of the statistics in the registry
      * @param histograms all of the histograms in the registry
      * @param meters     all of the meters in the registry
      * @param timers     all of the timers in the registry
      */
     public abstract void report(SortedMap<MetricName, Gauge> gauges,
                                 SortedMap<MetricName, Counter> counters,
+                                SortedMap<MetricName, Statistic> statistic,
                                 SortedMap<MetricName, Histogram> histograms,
                                 SortedMap<MetricName, Meter> meters,
                                 SortedMap<MetricName, Timer> timers);

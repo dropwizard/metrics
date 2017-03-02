@@ -5,6 +5,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import javax.xml.transform.sax.SAXTransformerFactory;
 import java.io.*;
 import java.nio.CharBuffer;
 import java.util.Locale;
@@ -46,6 +47,7 @@ public class CsvReporterTest {
 
         reporter.report(map("gauge", gauge),
                         this.<Counter>map(),
+                        this.<Statistic>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
                         this.<Timer>map());
@@ -64,11 +66,31 @@ public class CsvReporterTest {
 
         reporter.report(this.<Gauge>map(),
                         map("test.counter", counter),
+                        this.<Statistic>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
                         this.<Timer>map());
 
         assertThat(fileContents("test.counter.csv"))
+                .isEqualTo(csv(
+                        "t,count",
+                        "19910191,100"
+                ));
+    }
+
+    @Test
+    public void reportsStatisticValues() throws Exception {
+        final Statistic statistic = mock(Statistic.class);
+        when(statistic.getCount()).thenReturn(100L);
+
+        reporter.report(this.<Gauge>map(),
+                this.<Counter>map(),
+                map("test.statistic", statistic),
+                this.<Histogram>map(),
+                this.<Meter>map(),
+                this.<Timer>map());
+
+        assertThat(fileContents("test.statistic.csv"))
                 .isEqualTo(csv(
                         "t,count",
                         "19910191,100"
@@ -96,6 +118,7 @@ public class CsvReporterTest {
 
         reporter.report(this.<Gauge>map(),
                         this.<Counter>map(),
+                        this.<Statistic>map(),
                         map("test.histogram", histogram),
                         this.<Meter>map(),
                         this.<Timer>map());
@@ -118,6 +141,7 @@ public class CsvReporterTest {
 
         reporter.report(this.<Gauge>map(),
                         this.<Counter>map(),
+                        this.<Statistic>map(),
                         this.<Histogram>map(),
                         map("test.meter", meter),
                         this.<Timer>map());
@@ -154,6 +178,7 @@ public class CsvReporterTest {
 
         reporter.report(this.<Gauge>map(),
                         this.<Counter>map(),
+                        this.<Statistic>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
                         map("test.another.timer", timer));
@@ -179,6 +204,7 @@ public class CsvReporterTest {
 
         reporter.report(map("gauge", gauge),
                 this.<Counter>map(),
+                this.<Statistic>map(),
                 this.<Histogram>map(),
                 this.<Meter>map(),
                 this.<Timer>map());
