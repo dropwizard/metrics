@@ -34,7 +34,7 @@ public class Slf4jReporterTest {
             .withLoggingLevel(Slf4jReporter.LoggingLevel.INFO)
             .filter(MetricFilter.ALL)
             .build();
-
+   
     private final Slf4jReporter errorReporter = Slf4jReporter.forRegistry(registry)
             .outputTo(logger)
             .markWith(marker)

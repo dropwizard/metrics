@@ -15,7 +15,9 @@ import java.util.concurrent.TimeUnit;
  * for the bound logging toolkit to further process metrics reports.
  */
 public class Slf4jReporter extends ScheduledReporter {
-    /**
+
+
+	/**
      * Returns a new {@link Builder} for {@link Slf4jReporter}.
      *
      * @param registry the registry to report
@@ -41,7 +43,67 @@ public class Slf4jReporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
+        private String logTimerFormat = "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, " +
+    	        "p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, " +
+    	        "m15={}, rate_unit={}, duration_unit={}";
+    	private String logMeterFormat = "type={}, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}";
+    	private String logHistogramFormat = "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, " +
+    	        "median={}, p75={}, p95={}, p98={}, p99={}, p999={}";
+    	private String logGaugeFormat = "type={}, name={}, value={}";
+    	private String logCountFormat = "type={}, name={}, count={}";
 
+    	
+
+        /**
+         * Log format for Timer.
+         * Default: 
+         * "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, 
+         *  median={},p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={},
+         *  m1={}, m5={},m15={}, rate_unit={}, duration_unit={}"
+         */ 
+        public Builder timerFormat(String format) {
+            this.logTimerFormat = format;
+            return this;
+        }
+        /**
+         * Log format for Meter.
+         * Default: 
+         * "type={}, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}"
+         */ 
+        public Builder meterFormat(String format) {
+            this.logMeterFormat = format;
+            return this;
+        }
+        /**
+         * Log format for Timer.
+         * Default: 
+         * "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}"
+         */ 
+        public Builder histogramFormat(String format) {
+            this.logHistogramFormat = format;
+            return this;
+        }
+        /**
+         * Log format for Timer.
+         * Default: 
+         * "type={}, name={}, value={}"
+         */ 
+        public Builder gaugeFormat(String format) {
+            this.logGaugeFormat = format;
+            return this;
+        }
+        /**
+         * Log format for Timer.
+         * Default: 
+         * "type={}, name={}, count={}"
+         */ 
+        public Builder countFormat(String format) {
+            this.logCountFormat = format;
+            return this;
+        }
+        
+        
+    	
         private Builder(MetricRegistry registry) {
             this.registry = registry;
             this.logger = LoggerFactory.getLogger("metrics");
@@ -155,25 +217,37 @@ public class Slf4jReporter extends ScheduledReporter {
                     loggerProxy = new DebugLoggerProxy(logger);
                     break;
             }
-            return new Slf4jReporter(registry, loggerProxy, marker, prefix, rateUnit, durationUnit, filter);
+            return new Slf4jReporter(registry, loggerProxy, marker, prefix, rateUnit, durationUnit, filter,logTimerFormat,logMeterFormat,logHistogramFormat,logGaugeFormat,logCountFormat);
         }
     }
 
     private final LoggerProxy loggerProxy;
     private final Marker marker;
     private final MetricName prefix;
-
+    private final String logTimerFormat ;
+	private final String logMeterFormat ;
+	private final String logGaugeFormat ;
+	private final String logCountFormat ;
+	private final String logHistogramFormat ;
+    
+    
     private Slf4jReporter(MetricRegistry registry,
                           LoggerProxy loggerProxy,
                           Marker marker,
                           String prefix,
                           TimeUnit rateUnit,
                           TimeUnit durationUnit,
-                          MetricFilter filter) {
+                          MetricFilter filter, String logTimerFormat, String logMeterFormat,String logHistogramFormat, String logGaugeFormat, String logCountFormat) {
         super(registry, "logger-reporter", filter, rateUnit, durationUnit);
         this.loggerProxy = loggerProxy;
         this.marker = marker;
         this.prefix = MetricName.build(prefix);
+        this.logTimerFormat=logTimerFormat;
+        this.logMeterFormat=logMeterFormat;
+        this.logHistogramFormat=logHistogramFormat;
+        this.logGaugeFormat=logGaugeFormat;
+        this.logCountFormat=logCountFormat;
+        
     }
 
     @Override
@@ -208,9 +282,7 @@ public class Slf4jReporter extends ScheduledReporter {
     private void logTimer(MetricName name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
         loggerProxy.log(marker,
-                "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, " +
-                        "p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, " +
-                        "m15={}, rate_unit={}, duration_unit={}",
+                logTimerFormat,
                 "TIMER",
                 prefix(name),
                 timer.getCount(),
@@ -234,7 +306,7 @@ public class Slf4jReporter extends ScheduledReporter {
 
     private void logMeter(MetricName name, Meter meter) {
         loggerProxy.log(marker,
-                "type={}, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
+                logMeterFormat,
                 "METER",
                 prefix(name),
                 meter.getCount(),
@@ -248,8 +320,7 @@ public class Slf4jReporter extends ScheduledReporter {
     private void logHistogram(MetricName name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
         loggerProxy.log(marker,
-                "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, " +
-                        "median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
+                logHistogramFormat,
                 "HISTOGRAM",
                 prefix(name),
                 histogram.getCount(),
@@ -266,11 +337,11 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     private void logCounter(MetricName name, Counter counter) {
-        loggerProxy.log(marker, "type={}, name={}, count={}", "COUNTER", prefix(name), counter.getCount());
+        loggerProxy.log(marker, logCountFormat, "COUNTER", prefix(name), counter.getCount());
     }
 
     private void logGauge(MetricName name, Gauge gauge) {
-        loggerProxy.log(marker, "type={}, name={}, value={}", "GAUGE", prefix(name), gauge.getValue());
+        loggerProxy.log(marker, logGaugeFormat, "GAUGE", prefix(name), gauge.getValue());
     }
 
     @Override
