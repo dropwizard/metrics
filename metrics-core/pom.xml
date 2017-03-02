@@ -8,7 +8,7 @@
         <version>4.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>metrics-core</artifactId>
+    <artifactId>core</artifactId>
     <name>Metrics Core</name>
     <packaging>bundle</packaging>
     <description>
