@@ -1,26 +1,32 @@
 package com.codahale.metrics.graphite;
 
 class GraphiteSanitize {
+
+    private static final String ACCEPTED_CHARS = ".-_";
+
     /** Replaces all characters from a given string that are not ascii and not alphanumeric
      *  with a dash */
-    static String sanitize(String string, char replacement) {
-        String replaced = replaceFrom(string, replacement);
+    static String sanitize(String string, char replacementCh) {
+        String replaced = replaceFrom(string, replacementCh);
+
+        final String replacementStr = String.valueOf(replacementCh);
+        final String duplicateChars = (replacementStr+replacementStr);
 
         // Consolidate multiple dashes into a single one
-        String result = replaced.replace("--", "-");
+        String result = replaced.replace(duplicateChars, replacementStr);
         while (!result.equals(replaced)) {
             replaced = result;
-            result = replaced.replace("--", "-");
+            result = replaced.replace(duplicateChars, replacementStr);
         }
 
         // Remove any leading or trailing dashes
-        return strip(result, replacement);
+        return strip(result, replacementCh);
     }
 
     /** A char matches when it is a letter or digit and it is ASCII, in Guava terminology,
      *  this would be CharMatcher.ASCII.and(CharMatcher.JAVA_LETTER_OR_DIGIT).negate() */
     private static boolean matches(char c) {
-        return !(Character.isLetterOrDigit(c) && c <= '\u007f');
+        return !((Character.isLetterOrDigit(c) || ACCEPTED_CHARS.contains(String.valueOf(c))) && c <= '\u007f');
     }
 
     /** Replace all characters that we're interested in with a replacement character,
