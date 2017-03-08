@@ -54,6 +54,7 @@ public class JmxReporterTest {
         when(hSnapshot.get98thPercentile()).thenReturn(9.0);
         when(hSnapshot.get99thPercentile()).thenReturn(10.0);
         when(hSnapshot.get999thPercentile()).thenReturn(11.0);
+        when(hSnapshot.size()).thenReturn(1);
 
         when(histogram.getSnapshot()).thenReturn(hSnapshot);
 
@@ -80,6 +81,7 @@ public class JmxReporterTest {
         when(tSnapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
         when(tSnapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
         when(tSnapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(1000));
+        when(tSnapshot.size()).thenReturn(1);
 
         when(timer.getSnapshot()).thenReturn(tSnapshot);
 
@@ -152,7 +154,8 @@ public class JmxReporterTest {
                                                        "95thPercentile",
                                                        "98thPercentile",
                                                        "99thPercentile",
-                                                       "999thPercentile");
+                                                       "999thPercentile",
+                                                       "SnapshotSize");
 
         assertThat(values(attributes))
                 .contains(entry("Count", 1L))
@@ -165,7 +168,9 @@ public class JmxReporterTest {
                 .contains(entry("95thPercentile", 8.0))
                 .contains(entry("98thPercentile", 9.0))
                 .contains(entry("99thPercentile", 10.0))
-                .contains(entry("999thPercentile", 11.0));
+                .contains(entry("999thPercentile", 11.0))
+                .contains(entry("SnapshotSize", 1L))
+        ;
     }
 
     @Test
