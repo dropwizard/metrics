@@ -163,7 +163,7 @@ public class GraphiteRabbitMQ implements GraphiteSender {
     }
 
     public String sanitize(String s) {
-        return GraphiteSanitize.sanitize(s, '-');
+        return GraphiteSanitize.sanitize(s);
     }
 
 }

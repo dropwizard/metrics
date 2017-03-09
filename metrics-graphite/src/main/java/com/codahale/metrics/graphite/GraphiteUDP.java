@@ -104,7 +104,7 @@ public class GraphiteUDP implements GraphiteSender {
     }
 
     protected String sanitize(String s) {
-        return GraphiteSanitize.sanitize(s, '-');
+        return GraphiteSanitize.sanitize(s);
     }
 
     DatagramChannel getDatagramChannel() {
