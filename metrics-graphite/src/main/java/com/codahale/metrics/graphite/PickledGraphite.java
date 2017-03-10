@@ -358,7 +358,7 @@ public class PickledGraphite implements GraphiteSender {
     }
 
     protected String sanitize(String s) {
-        return GraphiteSanitize.sanitize(s, '-');
+        return GraphiteSanitize.sanitize(s);
     }
 
 }
