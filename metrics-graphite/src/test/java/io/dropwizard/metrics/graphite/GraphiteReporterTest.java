@@ -13,10 +13,14 @@ import io.dropwizard.metrics.Timer;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.python.antlr.PythonParser.test_return;
 
 import io.dropwizard.metrics.*;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +32,7 @@ public class GraphiteReporterTest {
     private final Clock clock = mock(Clock.class);
     private final Graphite graphite = mock(Graphite.class);
     private final MetricRegistry registry = mock(MetricRegistry.class);
+    private final Map<String,String> testTags = Collections.singletonMap("t1", "t2");
     private final GraphiteReporter reporter = GraphiteReporter.forRegistry(registry)
                                                               .withClock(clock)
                                                               .prefixedWith("prefix")
@@ -43,7 +48,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void doesNotReportStringGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge("value")),
+        reporter.report(map("gauge", testTags, gauge("value")),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -60,7 +65,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsByteGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge((byte) 1)),
+        reporter.report(map("gauge", testTags, gauge((byte) 1)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -77,7 +82,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsShortGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge((short) 1)),
+        reporter.report(map("gauge", testTags, gauge((short) 1)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -94,7 +99,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsIntegerGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(1)),
+        reporter.report(map("gauge", testTags, gauge(1)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -111,7 +116,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsLongGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(1L)),
+        reporter.report(map("gauge", testTags, gauge(1L)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -128,7 +133,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsFloatGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(1.1f)),
+        reporter.report(map("gauge", testTags, gauge(1.1f)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -145,7 +150,7 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsDoubleGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(1.1)),
+        reporter.report(map("gauge", testTags, gauge(1.1)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -162,13 +167,13 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsBooleanGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge(true)),
+        reporter.report(map("gauge", testTags, gauge(true)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
                         this.<Timer>map());
 
-        reporter.report(map("gauge", gauge(false)),
+        reporter.report(map("gauge", testTags, gauge(false)),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -192,7 +197,7 @@ public class GraphiteReporterTest {
         when(counter.getCount()).thenReturn(100L);
 
         reporter.report(this.<Gauge>map(),
-                        this.<Counter>map("counter", counter),
+                        this.<Counter>map("counter", testTags, counter),
                         this.<Histogram>map(),
                         this.<Meter>map(),
                         this.<Timer>map());
@@ -227,7 +232,7 @@ public class GraphiteReporterTest {
 
         reporter.report(this.<Gauge>map(),
                         this.<Counter>map(),
-                        this.<Histogram>map("histogram", histogram),
+                        this.<Histogram>map("histogram", testTags, histogram),
                         this.<Meter>map(),
                         this.<Timer>map());
 
@@ -262,7 +267,7 @@ public class GraphiteReporterTest {
         reporter.report(this.<Gauge>map(),
                         this.<Counter>map(),
                         this.<Histogram>map(),
-                        this.<Meter>map("meter", meter),
+                        this.<Meter>map("meter", testTags, meter),
                         this.<Timer>map());
 
         final InOrder inOrder = inOrder(graphite);
@@ -306,7 +311,7 @@ public class GraphiteReporterTest {
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
-                        map("timer", timer));
+                        map("timer", testTags, timer));
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).isConnected();
@@ -334,7 +339,7 @@ public class GraphiteReporterTest {
     @Test
     public void closesConnectionIfGraphiteIsUnavailable() throws Exception {
         doThrow(new UnknownHostException("UNKNOWN-HOST")).when(graphite).connect();
-        reporter.report(map("gauge", gauge(1)),
+        reporter.report(map("gauge", testTags, gauge(1)),
             this.<Counter>map(),
             this.<Histogram>map(),
             this.<Meter>map(),
@@ -353,7 +358,7 @@ public class GraphiteReporterTest {
         final Gauge gauge = mock(Gauge.class);
         when(gauge.getValue()).thenThrow(new RuntimeException("kaboom"));
 
-        reporter.report(map("gauge", gauge),
+        reporter.report(map("gauge", testTags, gauge),
                         this.<Counter>map(),
                         this.<Histogram>map(),
                         this.<Meter>map(),
@@ -375,14 +380,44 @@ public class GraphiteReporterTest {
 
         verifyNoMoreInteractions(graphite);
     }
+    
+    @Test
+    public void testNameFormatterIsUsed() throws IllegalStateException, IOException {
+    	GraphiteReporter formatReporter = GraphiteReporter.forRegistry(registry)
+                .withClock(clock)
+                .prefixedWith("prefix")
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .withMetricNameFormatter(MetricNameFormatter.APPEND_TAG_VALUES)
+                .filter(MetricFilter.ALL)                
+                .build(graphite);
+    	
+    	final Counter counter = mock(Counter.class);
+        when(counter.getCount()).thenReturn(100L);
+
+        formatReporter.report(this.<Gauge>map(),
+                        this.<Counter>map("counter", testTags, counter),
+                        this.<Histogram>map(),
+                        this.<Meter>map(),
+                        this.<Timer>map());
+
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).isConnected();
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send("prefix.counter.t2.count", "100", timestamp);
+        inOrder.verify(graphite).flush();
+
+        verifyNoMoreInteractions(graphite);
+    	
+    }
 
     private <T> SortedMap<MetricName, T> map() {
         return new TreeMap<MetricName, T>();
     }
 
-    private <T> SortedMap<MetricName, T> map(String name, T metric) {
+    private <T> SortedMap<MetricName, T> map(String name, Map<String,String> tags, T metric) {
         final TreeMap<MetricName, T> map = new TreeMap<MetricName, T>();
-        map.put(MetricName.build(name), metric);
+        map.put(new MetricName(name,tags), metric);
         return map;
     }
 
