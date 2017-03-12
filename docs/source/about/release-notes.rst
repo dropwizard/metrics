@@ -4,6 +4,26 @@
 Release Notes
 #############
 
+.. _rel-3.2.1:
+
+v3.2.1: Mar 10 2017
+===================
+
+* Suppot for shutting down the health check registry. `#1084 <https://github.com/dropwizard/metrics/pull/1084>`_
+* Added support for the default shared health check registry name #1095 `#1095 <https://github.com/dropwizard/metrics/pull/1095>`_
+* SharedMetricRegistries are now thread-safe. `#1094 <https://github.com/dropwizard/metrics/pull/1095>`_
+* The size of the snapshot of a histogram is reported via JMX. `#1102 <https://github.com/dropwizard/metrics/pull/1102>`_
+* Don't ignore the counter attribute for reporters. `#1090 <https://github.com/dropwizard/metrics/pull/1090>`_
+* Added support for disabling attributes in ConsoleReporter. `#1092 <https://github.com/dropwizard/metrics/pull/1092>`_
+* Rollbacked GraphiteSanitize to replacing whitespaces. `#1099 <https://github.com/dropwizard/metrics/pull/1099>`_
+
+.. _rel-3.1.4:
+
+v3.1.4: Mar 10 2017
+===================
+
+* Fix accidentally broken Graphite UDP reporter `#1100 <https://github.com/dropwizard/metrics/pull/1100>`_
+
 .. _rel-3.2.0:
 
 v3.2.0: Feb 24 2017
