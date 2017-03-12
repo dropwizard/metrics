@@ -381,7 +381,7 @@ public class MetricRegistry implements MetricSet {
         }
     }
 
-    private void registerAll(String prefix, MetricSet metrics) throws IllegalArgumentException {
+    public void registerAll(String prefix, MetricSet metrics) throws IllegalArgumentException {
         for (Map.Entry<String, Metric> entry : metrics.getMetrics().entrySet()) {
             if (entry.getValue() instanceof MetricSet) {
                 registerAll(name(prefix, entry.getKey()), (MetricSet) entry.getValue());
