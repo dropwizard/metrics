@@ -154,7 +154,7 @@
 
             <build>
                 <plugins>
-                    <!-- java 8 doclint html verification is excluded to suppress strict HTML 4.0 compliance errors 
+                    <!-- java 8 doclint html verification is excluded to suppress strict HTML 4.0 compliance errors
                          like "error: self-closing element not allowed <p />"   -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

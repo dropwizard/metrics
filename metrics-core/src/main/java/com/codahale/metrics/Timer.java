@@ -130,6 +130,16 @@ public class Timer implements Metered, Sampling {
     }
 
     @Override
+    public double getHourlyRate() {
+        return meter.getHourlyRate();
+    }
+
+    @Override
+    public double getDailyRate() {
+        return meter.getDailyRate();
+    }
+
+    @Override
     public double getMeanRate() {
         return meter.getMeanRate();
     }

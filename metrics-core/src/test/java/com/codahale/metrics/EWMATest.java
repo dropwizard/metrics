@@ -215,6 +215,143 @@ public class EWMATest {
         assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.22072766, offset(0.000001));
     }
 
+    @Test
+    public void aHourlyEWMAWithAValueOfThree() throws Exception {
+        final EWMA ewma = EWMA.hourlyMinuteEWMA();
+        ewma.update(3);
+        ewma.tick();
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.6, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59008287, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.58032966, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.57073765, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.56130419, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.55202664, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.54290245, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.53392906, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.52510399, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.51642478, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.50788903, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.49949436, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.49123845, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.48311899, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.47513373, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.46728046, offset(0.000001));
+    }
+
+    @Test
+    public void aDailyEWMAWithAValueOfThree() throws Exception {
+        final EWMA ewma = EWMA.dailyEWMA();
+        ewma.update(3);
+        ewma.tick();
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.6, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59958347, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59916724, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59875130, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59833564, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59792027, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59750520, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59709041, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59667590, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59626169, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59584776, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59543412, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59502077, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59460771, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59419493, offset(0.000001));
+
+        elapseMinute(ewma);
+
+        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.59378243, offset(0.000001));
+    }
 
     private void elapseMinute(EWMA ewma) {
         for (int i = 1; i <= 12; i++) {

@@ -53,4 +53,28 @@ public interface Metered extends Metric, Counting {
      *         occurred since the meter was created
      */
     double getOneMinuteRate();
+
+    /**
+     * Returns the hourly exponentially-weighted moving average rate at which events have
+     * occurred since the meter was created.
+     * <p/>
+     * This rate has the same exponential decay factor as the hourly load average in the {@code
+     * top} Unix command.
+     *
+     * @return the hourly exponentially-weighted moving average rate at which events have
+     *         occurred since the meter was created
+     */
+    double getHourlyRate();
+
+    /**
+     * Returns the daily exponentially-weighted moving average rate at which events have
+     * occurred since the meter was created.
+     * <p/>
+     * This rate has the same exponential decay factor as the daily load average in the {@code
+     * top} Unix command.
+     *
+     * @return the daily exponentially-weighted moving average rate at which events have
+     *         occurred since the meter was created
+     */
+    double getDailyRate();
 }
