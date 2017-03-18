@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.management.*;
-
 import java.io.Closeable;
 import java.lang.management.ManagementFactory;
 import java.util.Collections;
@@ -237,6 +236,8 @@ public class JmxReporter implements Reporter, Closeable {
         double get999thPercentile();
 
         long[] values();
+
+        long getSnapshotSize();
     }
     // CHECKSTYLE:ON
 
@@ -312,6 +313,10 @@ public class JmxReporter implements Reporter, Closeable {
         @Override
         public long[] values() {
             return metric.getSnapshot().getValues();
+        }
+
+        public long getSnapshotSize() {
+            return metric.getSnapshot().size();
         }
     }
 

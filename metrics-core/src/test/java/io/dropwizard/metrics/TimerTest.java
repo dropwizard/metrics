@@ -9,6 +9,7 @@ import io.dropwizard.metrics.Timer;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
@@ -76,18 +77,18 @@ public class TimerTest {
 
     @Test
     public void timesRunnableInstances() throws Exception {
-        final boolean[] called = {false};
+        final AtomicBoolean called = new AtomicBoolean();
         timer.time(new Runnable() {
             @Override
             public void run() {
-                called[0] = true;
+                called.set(true);
             }
         });
 
         assertThat(timer.getCount())
                 .isEqualTo(1);
 
-        assertThat(called[0])
+        assertThat(called.get())
                 .isTrue();
 
         verify(reservoir).update(50000000);

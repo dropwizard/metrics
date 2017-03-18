@@ -110,17 +110,17 @@ public class Timer implements Metered, Sampling {
     }
 
     /**
-     * Times and records the duration of an event.
+     * Times and records the duration of event.
      *
      * @param event a {@link Runnable} whose {@link Runnable#run()} method implements a process
      *              whose duration should be timed
      */
     public void time(Runnable event) {
-        long startTime = this.clock.getTick();
+        final long startTime = clock.getTick();
         try {
             event.run();
         } finally {
-            update(this.clock.getTick() - startTime);
+            update(clock.getTick() - startTime);
         }
     }
 

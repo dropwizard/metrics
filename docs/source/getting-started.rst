@@ -77,7 +77,7 @@ Complete getting started
 So the complete Getting Started is
 
 .. code-block:: java
-    
+
     package sample;
     import io.dropwizard.metrics.*;
     import java.util.concurrent.TimeUnit;

@@ -37,15 +37,15 @@ public class Slf4jReporterTest {
             .withLoggingLevel(Slf4jReporter.LoggingLevel.ERROR)
             .filter(MetricFilter.ALL)
             .build();
-    
+
     private Map<String,String> testTags;
-    
+
     @Before
     public void setup() {
     	testTags = new HashMap<>();
     	testTags.put("t1", "v1");
     	testTags.put("k2", "v2");
-    	
+
     }
 
     @Test
@@ -354,7 +354,7 @@ public class Slf4jReporterTest {
                 "events/second",
                 "milliseconds");
     }
-    
+
     @Test
     public void testNameFormatterIsUsed() {
     	Slf4jReporter reporter = Slf4jReporter.forRegistry(registry)
@@ -367,7 +367,7 @@ public class Slf4jReporterTest {
                 .filter(MetricFilter.ALL)
     			.withNameFormatter(MetricNameFormatter.APPEND_TAG_VALUES)
     			.build();
-    	
+
     	when(logger.isInfoEnabled(marker)).thenReturn(true);
     	reporter.report(map("gauge", testTags, gauge("value")),
                 this.<Counter>map(),

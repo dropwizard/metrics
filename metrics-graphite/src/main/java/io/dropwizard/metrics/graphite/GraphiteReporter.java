@@ -6,22 +6,25 @@ import io.dropwizard.metrics.Gauge;
 import io.dropwizard.metrics.Histogram;
 import io.dropwizard.metrics.Meter;
 import io.dropwizard.metrics.Metered;
+import io.dropwizard.metrics.MetricAttribute;
+import io.dropwizard.metrics.MetricName;
+import io.dropwizard.metrics.MetricNameFormatter;
 import io.dropwizard.metrics.MetricFilter;
 import io.dropwizard.metrics.MetricRegistry;
 import io.dropwizard.metrics.ScheduledReporter;
 import io.dropwizard.metrics.Snapshot;
 import io.dropwizard.metrics.Timer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.dropwizard.metrics.*;
-
 import java.io.IOException;
-import java.util.Locale;
-import java.util.Map;
-import java.util.SortedMap;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static io.dropwizard.metrics.MetricAttribute.*;
 
 /**
  * A reporter which publishes metric values to a Graphite server.
@@ -51,6 +54,9 @@ public class GraphiteReporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
+        private ScheduledExecutorService executor;
+        private boolean shutdownExecutorOnStop;
+        private Set<MetricAttribute> disabledMetricAttributes;
         private MetricNameFormatter nameFormatter;
 
         private Builder(MetricRegistry registry) {
@@ -61,6 +67,35 @@ public class GraphiteReporter extends ScheduledReporter {
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
             this.nameFormatter = MetricNameFormatter.NAME_ONLY;
+            this.executor = null;
+            this.shutdownExecutorOnStop = true;
+            this.disabledMetricAttributes = Collections.emptySet();
+        }
+
+        /**
+         * Specifies whether or not, the executor (used for reporting) will be stopped with same time with reporter.
+         * Default value is true.
+         * Setting this parameter to false, has the sense in combining with providing external managed executor via {@link #scheduleOn(ScheduledExecutorService)}.
+         *
+         * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
+         * @return {@code this}
+         */
+        public Builder shutdownExecutorOnStop(boolean shutdownExecutorOnStop) {
+            this.shutdownExecutorOnStop = shutdownExecutorOnStop;
+            return this;
+        }
+
+        /**
+         * Specifies the executor to use while scheduling reporting of metrics.
+         * Default value is null.
+         * Null value leads to executor will be auto created on start.
+         *
+         * @param executor the executor to use while scheduling reporting of metrics.
+         * @return {@code this}
+         */
+        public Builder scheduleOn(ScheduledExecutorService executor) {
+            this.executor = executor;
+            return this;
         }
 
         /**
@@ -117,15 +152,41 @@ public class GraphiteReporter extends ScheduledReporter {
             this.filter = filter;
             return this;
         }
-        
+
         /**
          * Format {@link MetricName MetricNames} with the given {@link MetricNameFormatter}
+         *
          * @param nameFormatter the nameFormatter
          * @return {@code this}
          */
         public Builder withMetricNameFormatter(MetricNameFormatter nameFormatter) {
-        	this.nameFormatter = nameFormatter;
-        	return this;
+            this.nameFormatter = nameFormatter;
+            return this;
+        }
+
+        /**
+         * Don't report the passed metric attributes for all metrics (e.g. "p999", "stddev" or "m15").
+         * See {@link MetricAttribute}.
+         *
+         * @param disabledMetricAttributes a {@link MetricFilter}
+         * @return {@code this}
+         */
+        public Builder disabledMetricAttributes(Set<MetricAttribute> disabledMetricAttributes) {
+            this.disabledMetricAttributes = disabledMetricAttributes;
+            return this;
+        }
+
+        /**
+         * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
+         * given {@link GraphiteSender}.
+         * <p>
+         * Present for binary compatibility
+         *
+         * @param graphite a {@link Graphite}
+         * @return a {@link GraphiteReporter}
+         */
+        public GraphiteReporter build(Graphite graphite) {
+            return build((GraphiteSender) graphite);
         }
 
         /**
@@ -137,13 +198,16 @@ public class GraphiteReporter extends ScheduledReporter {
          */
         public GraphiteReporter build(GraphiteSender graphite) {
             return new GraphiteReporter(registry,
-                                        graphite,
-                                        clock,
-                                        prefix,
-                                        rateUnit,
-                                        durationUnit,
-                                        filter,
-                                        nameFormatter);
+                    graphite,
+                    clock,
+                    prefix,
+                    rateUnit,
+                    durationUnit,
+                    filter,
+                    executor,
+                    shutdownExecutorOnStop,
+                    disabledMetricAttributes,
+                    nameFormatter);
         }
     }
 
@@ -154,15 +218,34 @@ public class GraphiteReporter extends ScheduledReporter {
     private final MetricName prefix;
     private final MetricNameFormatter nameFormatter;
 
-    private GraphiteReporter(MetricRegistry registry,
-                             GraphiteSender graphite,
-                             Clock clock,
-                             String prefix,
-                             TimeUnit rateUnit,
-                             TimeUnit durationUnit,
-                             MetricFilter filter,
-                             MetricNameFormatter nameFormatter) {
-        super(registry, "graphite-reporter", filter, rateUnit, durationUnit);
+    /**
+     * Creates a new {@link GraphiteReporter} instance.
+     *
+     * @param registry               the {@link MetricRegistry} containing the metrics this
+     *                               reporter will report
+     * @param graphite               the {@link GraphiteSender} which is responsible for sending metrics to a Carbon server
+     *                               via a transport protocol
+     * @param clock                  the instance of the time. Use {@link Clock#defaultClock()} for the default
+     * @param prefix                 the prefix of all metric names (may be null)
+     * @param rateUnit               the time unit of in which rates will be converted
+     * @param durationUnit           the time unit of in which durations will be converted
+     * @param filter                 the filter for which metrics to report
+     * @param executor               the executor to use while scheduling reporting of metrics (may be null).
+     * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
+     */
+    protected GraphiteReporter(MetricRegistry registry,
+                               GraphiteSender graphite,
+                               Clock clock,
+                               String prefix,
+                               TimeUnit rateUnit,
+                               TimeUnit durationUnit,
+                               MetricFilter filter,
+                               ScheduledExecutorService executor,
+                               boolean shutdownExecutorOnStop,
+                               Set<MetricAttribute> disabledMetricAttributes,
+                               MetricNameFormatter nameFormatter) {
+        super(registry, "graphite-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
+                disabledMetricAttributes);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = MetricName.build(prefix);
@@ -179,9 +262,7 @@ public class GraphiteReporter extends ScheduledReporter {
 
         // oh it'd be lovely to use Java 7 here
         try {
-            if (!graphite.isConnected()) {
-    	          graphite.connect();
-            }
+            graphite.connect();
 
             for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
                 reportGauge(entry.getKey(), entry.getValue(), timestamp);
@@ -202,10 +283,10 @@ public class GraphiteReporter extends ScheduledReporter {
             for (Map.Entry<MetricName, Timer> entry : timers.entrySet()) {
                 reportTimer(entry.getKey(), entry.getValue(), timestamp);
             }
-
             graphite.flush();
         } catch (Throwable t) {
             LOGGER.warn("Unable to report to Graphite", graphite, t);
+        } finally {
             closeGraphiteConnection();
         }
     }
@@ -214,12 +295,7 @@ public class GraphiteReporter extends ScheduledReporter {
         try {
             graphite.close();
         } catch (IOException e) {
-            LOGGER.warn("Unable to report to Graphite", graphite, e);
-            try {
-                graphite.close();
-            } catch (IOException e1) {
-                LOGGER.warn("Error closing Graphite", graphite, e1);
-            }
+            LOGGER.warn("Error closing Graphite", graphite, e);
         }
     }
 
@@ -238,101 +314,94 @@ public class GraphiteReporter extends ScheduledReporter {
 
     private void reportTimer(MetricName name, Timer timer, long timestamp) throws IOException {
         final Snapshot snapshot = timer.getSnapshot();
-
-        graphite.send(formatName(name, "max"), format(convertDuration(snapshot.getMax())), timestamp);
-        graphite.send(formatName(name, "mean"), format(convertDuration(snapshot.getMean())), timestamp);
-        graphite.send(formatName(name, "min"), format(convertDuration(snapshot.getMin())), timestamp);
-        graphite.send(formatName(name, "stddev"),
-                      format(convertDuration(snapshot.getStdDev())),
-                      timestamp);
-        graphite.send(formatName(name, "p50"),
-                      format(convertDuration(snapshot.getMedian())),
-                      timestamp);
-        graphite.send(formatName(name, "p75"),
-                      format(convertDuration(snapshot.get75thPercentile())),
-                      timestamp);
-        graphite.send(formatName(name, "p95"),
-                      format(convertDuration(snapshot.get95thPercentile())),
-                      timestamp);
-        graphite.send(formatName(name, "p98"),
-                      format(convertDuration(snapshot.get98thPercentile())),
-                      timestamp);
-        graphite.send(formatName(name, "p99"),
-                      format(convertDuration(snapshot.get99thPercentile())),
-                      timestamp);
-        graphite.send(formatName(name, "p999"),
-                      format(convertDuration(snapshot.get999thPercentile())),
-                      timestamp);
-
+        sendIfEnabled(MAX, name, convertDuration(snapshot.getMax()), timestamp);
+        sendIfEnabled(MEAN, name, convertDuration(snapshot.getMean()), timestamp);
+        sendIfEnabled(MIN, name, convertDuration(snapshot.getMin()), timestamp);
+        sendIfEnabled(STDDEV, name, convertDuration(snapshot.getStdDev()), timestamp);
+        sendIfEnabled(P50, name, convertDuration(snapshot.getMedian()), timestamp);
+        sendIfEnabled(P75, name, convertDuration(snapshot.get75thPercentile()), timestamp);
+        sendIfEnabled(P95, name, convertDuration(snapshot.get95thPercentile()), timestamp);
+        sendIfEnabled(P98, name, convertDuration(snapshot.get98thPercentile()), timestamp);
+        sendIfEnabled(P99, name, convertDuration(snapshot.get99thPercentile()), timestamp);
+        sendIfEnabled(P999, name, convertDuration(snapshot.get999thPercentile()), timestamp);
         reportMetered(name, timer, timestamp);
     }
 
     private void reportMetered(MetricName name, Metered meter, long timestamp) throws IOException {
-        graphite.send(formatName(name, "count"), format(meter.getCount()), timestamp);
-        graphite.send(formatName(name, "m1_rate"),
-                      format(convertRate(meter.getOneMinuteRate())),
-                      timestamp);
-        graphite.send(formatName(name, "m5_rate"),
-                      format(convertRate(meter.getFiveMinuteRate())),
-                      timestamp);
-        graphite.send(formatName(name, "m15_rate"),
-                      format(convertRate(meter.getFifteenMinuteRate())),
-                      timestamp);
-        graphite.send(formatName(name, "mean_rate"),
-                      format(convertRate(meter.getMeanRate())),
-                      timestamp);
+        sendIfEnabled(COUNT, name, meter.getCount(), timestamp);
+        sendIfEnabled(M1_RATE, name, meter.getOneMinuteRate(), timestamp);
+        sendIfEnabled(M5_RATE, name, meter.getFiveMinuteRate(), timestamp);
+        sendIfEnabled(M15_RATE, name, meter.getFifteenMinuteRate(), timestamp);
+        sendIfEnabled(MEAN_RATE, name, meter.getMeanRate(), timestamp);
     }
 
     private void reportHistogram(MetricName name, Histogram histogram, long timestamp) throws IOException {
         final Snapshot snapshot = histogram.getSnapshot();
-        graphite.send(formatName(name, "count"), format(histogram.getCount()), timestamp);
-        graphite.send(formatName(name, "max"), format(snapshot.getMax()), timestamp);
-        graphite.send(formatName(name, "mean"), format(snapshot.getMean()), timestamp);
-        graphite.send(formatName(name, "min"), format(snapshot.getMin()), timestamp);
-        graphite.send(formatName(name, "stddev"), format(snapshot.getStdDev()), timestamp);
-        graphite.send(formatName(name, "p50"), format(snapshot.getMedian()), timestamp);
-        graphite.send(formatName(name, "p75"), format(snapshot.get75thPercentile()), timestamp);
-        graphite.send(formatName(name, "p95"), format(snapshot.get95thPercentile()), timestamp);
-        graphite.send(formatName(name, "p98"), format(snapshot.get98thPercentile()), timestamp);
-        graphite.send(formatName(name, "p99"), format(snapshot.get99thPercentile()), timestamp);
-        graphite.send(formatName(name, "p999"), format(snapshot.get999thPercentile()), timestamp);
+        sendIfEnabled(COUNT, name, histogram.getCount(), timestamp);
+        sendIfEnabled(MAX, name, snapshot.getMax(), timestamp);
+        sendIfEnabled(MEAN, name, snapshot.getMean(), timestamp);
+        sendIfEnabled(MIN, name, snapshot.getMin(), timestamp);
+        sendIfEnabled(STDDEV, name, snapshot.getStdDev(), timestamp);
+        sendIfEnabled(P50, name, snapshot.getMedian(), timestamp);
+        sendIfEnabled(P75, name, snapshot.get75thPercentile(), timestamp);
+        sendIfEnabled(P95, name, snapshot.get95thPercentile(), timestamp);
+        sendIfEnabled(P98, name, snapshot.get98thPercentile(), timestamp);
+        sendIfEnabled(P99, name, snapshot.get99thPercentile(), timestamp);
+        sendIfEnabled(P999, name, snapshot.get999thPercentile(), timestamp);
+    }
+
+    private void sendIfEnabled(MetricAttribute type, MetricName name, double value, long timestamp) throws IOException {
+        if (getDisabledMetricAttributes().contains(type)) {
+            return;
+        }
+        graphite.send(prefix(name, type.getCode()), format(value), timestamp);
+    }
+
+    private void sendIfEnabled(MetricAttribute type, MetricName name, long value, long timestamp) throws IOException {
+        if (getDisabledMetricAttributes().contains(type)) {
+            return;
+        }
+        graphite.send(prefix(name, type.getCode()), format(value), timestamp);
     }
 
     private void reportCounter(MetricName name, Counter counter, long timestamp) throws IOException {
-        graphite.send(formatName(name, "count"), format(counter.getCount()), timestamp);
+        graphite.send(prefix(name, COUNT.getCode()), format(counter.getCount()), timestamp);
     }
 
     private void reportGauge(MetricName name, Gauge gauge, long timestamp) throws IOException {
-
         String valueToReport = format(gauge.getValue());
         if (valueToReport != null) {
-            graphite.send(formatName(name), valueToReport, timestamp);
+            graphite.send(prefix(name), valueToReport, timestamp);
         }
 
     }
 
     private String format(Object o) {
-        String value = null;
-        if (o instanceof Number) {
-            Number n = (Number) o;
-            if (o instanceof Float || o instanceof Double) {
-                // the Carbon plaintext format is pretty underspecified, but it seems like it just wants
-                // US-formatted digits
-                value = String.format(Locale.US, "%2.2f", n.doubleValue());
-            } else {
-                value = Long.toString(n.longValue());
-            }
+        if (o instanceof Float) {
+            return format(((Float) o).doubleValue());
+        } else if (o instanceof Double) {
+            return format(((Double) o).doubleValue());
+        } else if (o instanceof Byte) {
+            return format(((Byte) o).longValue());
+        } else if (o instanceof Short) {
+            return format(((Short) o).longValue());
+        } else if (o instanceof Integer) {
+            return format(((Integer) o).longValue());
+        } else if (o instanceof Long) {
+            return format(((Long) o).longValue());
+        } else if (o instanceof BigInteger) {
+            return format(((BigInteger) o).doubleValue());
+        } else if (o instanceof BigDecimal) {
+            return format(((BigDecimal) o).doubleValue());
         } else if (o instanceof Boolean) {
             return format(((Boolean) o) ? 1 : 0);
-        } else {
-            LOGGER.warn("Unable to format value for Graphite.", o);
         }
-        return value;
+        return null;
     }
 
-    private String formatName(MetricName name, String... components) {
-    	String formattedNameStr = this.nameFormatter.formatMetricName(name);
-    	MetricName formattedName = new MetricName(formattedNameStr);
+    private String prefix(MetricName name, String... components) {
+        String formattedNameStr = this.nameFormatter.formatMetricName(name);
+        MetricName formattedName = new MetricName(formattedNameStr);
         return MetricName.join(MetricName.join(prefix, formattedName), MetricName.build(components)).getKey();
     }
 
@@ -340,10 +409,9 @@ public class GraphiteReporter extends ScheduledReporter {
         return Long.toString(n);
     }
 
-    private String format(double v) {
+    protected String format(double v) {
         // the Carbon plaintext format is pretty underspecified, but it seems like it just wants
         // US-formatted digits
         return String.format(Locale.US, "%2.2f", v);
     }
-
 }

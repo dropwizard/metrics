@@ -5,6 +5,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.nio.client.HttpAsyncClient;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import io.dropwizard.metrics.httpclient.HttpClientMetricNameStrategy;
