@@ -18,22 +18,22 @@
 
     <dependencies>
         <dependency>
-           <groupId>io.dropwizard.metrics4</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>metrics-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-           <groupId>io.dropwizard.metrics4</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>metrics-healthchecks</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-           <groupId>io.dropwizard.metrics4</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>metrics-json</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-           <groupId>io.dropwizard.metrics4</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>metrics-jvm</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -74,7 +74,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-           <groupId>io.dropwizard.metrics4</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>metrics-jetty9</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
