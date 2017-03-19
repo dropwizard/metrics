@@ -43,7 +43,7 @@
         <servlet.version>3.1.0</servlet.version>
         <slf4j.version>1.7.22</slf4j.version>
         <jackson.version>2.6.6</jackson.version>
-        <jetty9.version>9.2.2.v20140723</jetty9.version>
+        <jetty9.version>9.4.2.v20170220</jetty9.version>
         <rabbitmq.version>3.6.6</rabbitmq.version>
         <javadoc.doclint.none>-Xdoclint:none</javadoc.doclint.none>
     </properties>
