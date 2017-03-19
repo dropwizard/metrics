@@ -7,13 +7,13 @@
 
     <groupId>io.dropwizard.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>3.2.4-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
         The Metrics library.
     </description>
-    <url>http://metrics.dropwizard.io/</url>
+    <url>http://metrics.codahale.com/</url>
 
     <modules>
         <module>docs</module>
