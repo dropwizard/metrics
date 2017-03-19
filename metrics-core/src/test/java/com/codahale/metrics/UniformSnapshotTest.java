@@ -3,8 +3,10 @@ package com.codahale.metrics;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -90,6 +92,39 @@ public class UniformSnapshotTest {
 
         assertThat(other.getValues())
                 .containsOnly(1, 2, 3, 4, 5);
+    }
+
+    @Test
+    public void correctlyCreatedFromCollectionWithWeakIterator() throws Exception {
+        final ConcurrentSkipListSet<Long> values = new ConcurrentSkipListSet<Long>();
+
+        // Create a latch to make sure that the background thread has started and
+        // pushed some data to the collection.
+        final CountDownLatch latch = new CountDownLatch(10);
+        final Thread backgroundThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final Random random = new Random();
+                // Update the collection in the loop to trigger a potential `ArrayOutOfBoundException`
+                // and verify that the snapshot doesn't make assumptions about the size of the iterator.
+                while (!Thread.currentThread().isInterrupted()) {
+                    values.add(random.nextLong());
+                    latch.countDown();
+                }
+            }
+        });
+        backgroundThread.start();
+
+        try {
+            latch.await(5, TimeUnit.SECONDS);
+            assertThat(latch.getCount()).isEqualTo(0);
+
+            // Create a snapshot while the  collection is being updated.
+            final Snapshot snapshot = new UniformSnapshot(values);
+            assertThat(snapshot.getValues().length).isGreaterThanOrEqualTo(10);
+        } finally {
+            backgroundThread.interrupt();
+        }
     }
 
     @Test

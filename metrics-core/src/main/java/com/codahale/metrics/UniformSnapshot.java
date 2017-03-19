@@ -23,14 +23,14 @@ public class UniformSnapshot extends Snapshot {
      * @param values    an unordered set of values in the reservoir
      */
     public UniformSnapshot(Collection<Long> values) {
-        this.values = new long[values.size()];
-        int i = 0;
-        for (Long value : values) {
-            this.values[i++] = value;
+        final Object[] copy = values.toArray();
+        this.values = new long[copy.length];
+        for (int i = 0; i < copy.length; i++) {
+            this.values[i] = (Long) copy[i];
         }
         Arrays.sort(this.values);
     }
-    
+
     /**
      * Create a new {@link Snapshot} with the given values.
      *
