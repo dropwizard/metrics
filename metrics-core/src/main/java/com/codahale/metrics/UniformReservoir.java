@@ -2,6 +2,7 @@ package com.codahale.metrics;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicLongArray;
 
@@ -70,7 +71,7 @@ public class UniformReservoir implements Reservoir {
     private static long nextLong(long n) {
         long bits, val;
         do {
-            bits = ThreadLocalRandomProxy.current().nextLong() & (~(1L << BITS_PER_LONG));
+            bits = ThreadLocalRandom.current().nextLong() & (~(1L << BITS_PER_LONG));
             val = bits % n;
         } while (bits - val + (n - 1) < 0L);
         return val;
