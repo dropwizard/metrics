@@ -41,7 +41,7 @@ public class GraphiteRabbitMQTest
         when(bogusConnection.createChannel()).thenReturn(bogusChannel);
         doThrow(new IOException())
                 .when(bogusChannel)
-                .basicPublish(anyString(), anyString(), any(AMQP.BasicProperties.class), any(byte[].class));
+                .basicPublish(anyString(), anyString(), any(), any(byte[].class));
     }
 
     @Test
