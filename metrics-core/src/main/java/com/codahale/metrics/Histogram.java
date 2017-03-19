@@ -1,5 +1,7 @@
 package com.codahale.metrics;
 
+import java.util.concurrent.atomic.LongAdder;
+
 /**
  * A metric which calculates the distribution of a value.
  *
@@ -8,7 +10,7 @@ package com.codahale.metrics;
  */
 public class Histogram implements Metric, Sampling, Counting {
     private final Reservoir reservoir;
-    private final LongAdderAdapter count;
+    private final LongAdder count;
 
     /**
      * Creates a new {@link Histogram} with the given reservoir.
@@ -17,7 +19,7 @@ public class Histogram implements Metric, Sampling, Counting {
      */
     public Histogram(Reservoir reservoir) {
         this.reservoir = reservoir;
-        this.count = LongAdderProxy.create();
+        this.count = new LongAdder();
     }
 
     /**
