@@ -32,7 +32,6 @@
         <module>metrics-jersey2</module>
         <module>metrics-jetty8</module>
         <module>metrics-jetty9</module>
-        <module>metrics-jetty9-legacy</module>
         <module>metrics-json</module>
         <module>metrics-jvm</module>
         <module>metrics-log4j2</module>
