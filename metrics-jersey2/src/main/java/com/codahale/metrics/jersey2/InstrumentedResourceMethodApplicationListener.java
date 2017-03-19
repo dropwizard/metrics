@@ -17,6 +17,7 @@ import org.glassfish.jersey.server.monitoring.RequestEventListener;
 
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.ext.Provider;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -176,17 +177,27 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
 
     private void registerMetricsForModel(ResourceModel resourceModel) {
         for (final Resource resource : resourceModel.getResources()) {
+
+            final Timed classLevelTimed = getClassLevelAnnotation(resource, Timed.class);
+            final Metered classLevelMetered = getClassLevelAnnotation(resource, Metered.class);
+            final ExceptionMetered classLevelExceptionMetered = getClassLevelAnnotation(resource, ExceptionMetered.class);
+
             for (final ResourceMethod method : resource.getAllMethods()) {
-                registerTimedAnnotations(method);
-                registerMeteredAnnotations(method);
-                registerExceptionMeteredAnnotations(method);
+                registerTimedAnnotations(method, classLevelTimed);
+                registerMeteredAnnotations(method, classLevelMetered);
+                registerExceptionMeteredAnnotations(method, classLevelExceptionMetered);
             }
 
             for (final Resource childResource : resource.getChildResources()) {
+
+                final Timed classLevelTimedChild = getClassLevelAnnotation(childResource, Timed.class);
+                final Metered classLevelMeteredChild = getClassLevelAnnotation(childResource, Metered.class);
+                final ExceptionMetered classLevelExceptionMeteredChild = getClassLevelAnnotation(childResource, ExceptionMetered.class);
+
                 for (final ResourceMethod method : childResource.getAllMethods()) {
-                    registerTimedAnnotations(method);
-                    registerMeteredAnnotations(method);
-                    registerExceptionMeteredAnnotations(method);
+                    registerTimedAnnotations(method, classLevelTimedChild);
+                    registerMeteredAnnotations(method, classLevelMeteredChild);
+                    registerExceptionMeteredAnnotations(method, classLevelExceptionMeteredChild);
                 }
             }
         }
@@ -203,29 +214,57 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         return listener;
     }
 
-    private void registerTimedAnnotations(final ResourceMethod method) {
+    private <T extends Annotation> T getClassLevelAnnotation(final Resource resource, final Class<T> annotationClazz) {
+        T annotation = null;
+
+        for (final Class<?> clazz : resource.getHandlerClasses()) {
+            annotation = clazz.getAnnotation(annotationClazz);
+
+            if (annotation != null) {
+                break;
+            }
+        }
+        return annotation;
+    }
+
+    private void registerTimedAnnotations(final ResourceMethod method, final Timed classLevelTimed) {
         final Method definitionMethod = method.getInvocable().getDefinitionMethod();
+        if (classLevelTimed != null) {
+            timers.putIfAbsent(definitionMethod, timerMetric(this.metrics, method, classLevelTimed));
+            return;
+        }
+
         final Timed annotation = definitionMethod.getAnnotation(Timed.class);
 
-        if (annotation != null) { 
+        if (annotation != null) {
             timers.putIfAbsent(definitionMethod, timerMetric(this.metrics, method, annotation));
         }
     }
 
-    private void registerMeteredAnnotations(final ResourceMethod method) {
+    private void registerMeteredAnnotations(final ResourceMethod method, final Metered classLevelMetered) {
         final Method definitionMethod = method.getInvocable().getDefinitionMethod();
+
+        if (classLevelMetered != null) {
+            meters.putIfAbsent(definitionMethod, meterMetric(metrics, method, classLevelMetered));
+            return;
+        }
         final Metered annotation = definitionMethod.getAnnotation(Metered.class);
 
-        if (annotation != null) { 
+        if (annotation != null) {
             meters.putIfAbsent(definitionMethod, meterMetric(metrics, method, annotation));
         }
     }
 
-    private void registerExceptionMeteredAnnotations(final ResourceMethod method) {
+    private void registerExceptionMeteredAnnotations(final ResourceMethod method, final ExceptionMetered classLevelExceptionMetered) {
         final Method definitionMethod = method.getInvocable().getDefinitionMethod();
+
+        if (classLevelExceptionMetered != null) {
+            exceptionMeters.putIfAbsent(definitionMethod, new ExceptionMeterMetric(metrics, method, classLevelExceptionMetered));
+            return;
+        }
         final ExceptionMetered annotation = definitionMethod.getAnnotation(ExceptionMetered.class);
 
-        if (annotation != null) { 
+        if (annotation != null) {
             exceptionMeters.putIfAbsent(definitionMethod, new ExceptionMeterMetric(metrics, method, annotation));
         }
     }
