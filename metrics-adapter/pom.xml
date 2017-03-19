@@ -11,12 +11,12 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>io.dropwizard.metrics4</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>metrics-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>io.dropwizard.metrics4</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>metrics-healthchecks</artifactId>
 			<version>${project.version}</version>
 			<optional>true</optional>
