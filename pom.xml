@@ -30,7 +30,6 @@
         <module>metrics-jdbi</module>
         <module>metrics-jersey</module>
         <module>metrics-jersey2</module>
-        <module>metrics-jetty8</module>
         <module>metrics-jetty9</module>
         <module>metrics-json</module>
         <module>metrics-jvm</module>
