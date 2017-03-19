@@ -2,6 +2,7 @@ package com.codahale.metrics;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * A meter metric which measures mean throughput and one-, five-, and fifteen-minute
@@ -16,7 +17,7 @@ public class Meter implements Metered {
     private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
     private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
 
-    private final LongAdderAdapter count = LongAdderProxy.create();
+    private final LongAdder count = new LongAdder();
     private final long startTime;
     private final AtomicLong lastTick;
     private final Clock clock;
