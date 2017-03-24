@@ -4,18 +4,158 @@
 Release Notes
 #############
 
-.. _rel-4.0.0:
+.. _rel-3.2.1:
 
-v4.0.0: TBD
+v3.2.1: Mar 10 2017
 ===================
 
-* Package name is now ``io.dropwizard.metrics``
-* Tagged metrics
+* Suppot for shutting down the health check registry. `#1084 <https://github.com/dropwizard/metrics/pull/1084>`_
+* Added support for the default shared health check registry name #1095 `#1095 <https://github.com/dropwizard/metrics/pull/1095>`_
+* SharedMetricRegistries are now thread-safe. `#1094 <https://github.com/dropwizard/metrics/pull/1095>`_
+* The size of the snapshot of a histogram is reported via JMX. `#1102 <https://github.com/dropwizard/metrics/pull/1102>`_
+* Don't ignore the counter attribute for reporters. `#1090 <https://github.com/dropwizard/metrics/pull/1090>`_
+* Added support for disabling attributes in ConsoleReporter. `#1092 <https://github.com/dropwizard/metrics/pull/1092>`_
+* Rollbacked GraphiteSanitize to replacing whitespaces. `#1099 <https://github.com/dropwizard/metrics/pull/1099>`_
 
-.. _missing-releases:
+.. _rel-3.1.4:
 
-Missing v3.0.2 - v3.1.2
-=======================
+v3.1.4: Mar 10 2017
+===================
+
+* Fix accidentally broken Graphite UDP reporter `#1100 <https://github.com/dropwizard/metrics/pull/1100>`_
+
+.. _rel-3.2.0:
+
+v3.2.0: Feb 24 2017
+===================
+
+* `GraphiteReporter` opens a new TCP connection when sending metrics instead of maintaining a persisted connection. `#1047 <https://github.com/dropwizard/metrics/pull/1047>`_
+* `GraphiteReporter` retries DNS lookups in case of a lookup failure. `#1064 <https://github.com/dropwizard/metrics/pull/1064>`_
+* `ScheduledReporter` suppresses all kind of exceptions raised by the `report` method. `#1049 <https://github.com/dropwizard/metrics/pull/1049>`_
+* JDK's `ThreadLocalRandom` is now used by default. `#1052 <https://github.com/dropwizard/metrics/pull/1052>`_
+* JDK's `LongAdder` is now used by default. `#1055 <https://github.com/dropwizard/metrics/pull/1055>`_
+* Fixed a race condition bug in `ExponentiallyDecayingReservoir`. `#1033 <https://github.com/dropwizard/metrics/pull/1033>`_
+* Fixed a long overflow bug in `SlidingTimeWindowReservoir`. `#1063 <https://github.com/dropwizard/metrics/pull/1063>`_
+* `AdminServlet` supports CPU profiling. `#927 <https://github.com/dropwizard/metrics/pull/927>`_
+* `GraphiteReporter` sanitizes metrics. `#938 <https://github.com/dropwizard/metrics/pull/938>`_
+* Support for publishing `BigInteger` and `BigDecimal` metrics in `GraphiteReporter`. `#933 <https://github.com/dropwizard/metrics/pull/933>`_
+* Support for publishing boolean metrics in `GraphiteReporter`. `#905 <https://github.com/dropwizard/metrics/pull/905>`_
+* Added support for overriding the format of floating numbers in `GraphiteReporter`. `#1073 <https://github.com/dropwizard/metrics/pull/1073>`_
+* Added support for disabling reporting of metric attributes. `#1048 <https://github.com/dropwizard/metrics/pull/1048>`_
+* Reporters are more user friendly for managed environments like GAE or JEE. `#1018 <https://github.com/dropwizard/metrics/pull/1018>`_
+* Support for setting a custom initial delay for reporters. `#999 <https://github.com/dropwizard/metrics/pull/999>`_
+* Support for custom details in a result of a health check. `#663 <https://github.com/dropwizard/metrics/pull/663>`_
+* Added a listener for health checks. `#1068 <https://github.com/dropwizard/metrics/pull/1068>`_
+* Support for asynchronous health checks `#1077 <https://github.com/dropwizard/metrics/pull/1077>`_
+* Health checks are reported as unhealthy on exceptions. `#783 <https://github.com/dropwizard/metrics/pull/783>`_
+* Allow setting a custom prefix for Jetty's `InstrumentedQueuedThreadPool`. `#947 <https://github.com/dropwizard/metrics/pull/947>`_
+* Allow setting custom prefix for Jetty's `QueuedThreadPool`. `#908 <https://github.com/dropwizard/metrics/pull/908>`_
+* Added support for Jetty 9.3 and higher. `#1038 <https://github.com/dropwizard/metrics/pull/1038>`_
+* Fixed instrumentation of Jetty9 async servlets. `#1074 <https://github.com/dropwizard/metrics/pull/1074>`_
+* Added support for JCache/JSR 107 metrics. `#1010 <https://github.com/dropwizard/metrics/pull/1010>`_
+* Added thread-safe getters for metrics with custom instantiations. `#1023 <https://github.com/dropwizard/metrics/pull/1023>`_
+* Added an overload of `Timer#time` that takes a `Runnable`. `#989 <https://github.com/dropwizard/metrics/pull/989>`_
+* Support extracting the request URI from wrapped requests in `HttpClientMetricNameStrategies`. `#947 <https://github.com/dropwizard/metrics/pull/947>`_
+* Support for the log4j2 xml-based config. `#900 <https://github.com/dropwizard/metrics/pull/900>`_
+* Internal `Striped64` doesn't depend on `sun.misc.Unsafe` anymore. `#966 <https://github.com/dropwizard/metrics/pull/966>`_
+* Optimized creation of `UniformSnapshot`. `#970 <https://github.com/dropwizard/metrics/pull/970>`_
+* Added a memory pool gauge to the JVM memory usage metrics. `#786 <https://github.com/dropwizard/metrics/pull/786>`_
+* Added support for async servlets for `metric-servlet`. `#796 <https://github.com/dropwizard/metrics/pull/796>`_
+* Opt-in default shared metric registry. `#801 <https://github.com/dropwizard/metrics/pull/801>`_
+* Added support for patterns in MBean object names `#809 <https://github.com/dropwizard/metrics/pull/809>`_
+* Allow a pluggable strategy for the name of the CSV files for `CsvReporter`. `#882 <https://github.com/dropwizard/metrics/pull/882>`_
+* Upgraded to slf4j 1.22
+* Upgraded to Jackson 2.6.6
+* Upgraded to amqp-client 3.6.6
+* Upgraded to httpclient 4.5.2
+* Upgraded to log4j2 2.3
+* Upgraded to logback 1.1.10
+
+.. _rel-3.1.3:
+
+v3.1.3: Feb 24 2017
+===================
+
+* `GraphiteReporter` opens a new TCP connection when sending metrics instead of maintaining a persisted connection. `#1036 <https://github.com/dropwizard/metrics/pull/1036>`_
+* `GraphiteReporter` retries DNS lookups in case of a lookup failure. `#1064 <https://github.com/dropwizard/metrics/pull/1064>`_
+* `ScheduledReporter` suppresses all kind of exceptions raised by the `report` method. `#1040 <https://github.com/dropwizard/metrics/pull/1040>`_
+* JDK's `ThreadLocalRandom` is now used by default. `#1052 <https://github.com/dropwizard/metrics/pull/1052>`_
+* JDK's `LongAdder` is now used by default. `#1055 <https://github.com/dropwizard/metrics/pull/1055>`_
+* Fixed a race condition bug in `ExponentiallyDecayingReservoir`. `#1046 <https://github.com/dropwizard/metrics/pull/1046>`_
+* Fixed a long overflow bug in `SlidingTimeWindowReservoir`. `#1072 <https://github.com/dropwizard/metrics/pull/1072>`_
+
+
+.. _rel-3.1.0:
+
+v3.1.0: Sen 10 2014
+===================
+
+https://groups.google.com/forum/#!topic/metrics-user/zwzHnMBcAX4
+
+* Upgrade to Jetty 9.1 (metrics-jetty9, Jetty 9.0 module renamed to metrics-jetty9-legacy)
+* Add log4j2 support (metrics-log4j2)
+* Upgrade to Jersey2 (metrics-jersey2)
+* Add httpasyncclient support (metrics-httpasyncclient)
+* Changed maven groupId to io.dropwizard.metrics
+* Enable Java8 builds on Travis, fix javadocs and disable some doclinting
+* Fixing some compilation warnings about missing generics and varargs invocation
+* Instrumentation for java.util.concurrent classes
+* ExponentiallyDecayingReservoir: quantiles weighting
+* Loosen type requirements for JmxAttributeGauge constructor
+* SlidingWindowReservoir - ArrayOutOfBoundsException thrown if # of Reservoir examples exceeds Integer max value
+* Classloader metrics
+* Add an instrumented ScheduledExecutorService
+* Fix race condition in InstrumentedThreadFactoryTest
+* Correct comparison of System.nanoTime in SlidingTimeWindowReservoir
+* Add SharedHealthCheckRegistries class
+* Migrate benchmarks from Caliper to JMH
+* New annotations: @CachedGauge, @Counted, @Metric
+* Support for annotations on classes and constructors
+* Allow @Metric on methods and parameters
+* Add @Inherited and @Documented on all type annotations
+* Adapted ehcache integration to latest ehcache version 2.8.3
+* Upgrade to HttpClient 4.3
+* InstrumentedHandler: Remove duplicate calls to requests.update(...)
+* New metric 'utilization-max' to track thread usage out of max pool size in jetty
+* Replaced Jetty-specific Request with Servlet API interfaces
+* Jetty 8: Avoid NPE if InstrumentedQueuedThreadPool gauges are read too early
+* Jetty 8: Call updateResponses onComplete of ContinuationListener
+* Allow specifying a custom prefix Jetty 9 InstrumentedHandler
+* MetricsModule is serializing wrong minute rates for timers
+* MeterSerializer.serialize had m1_rate and m15_rate transposed
+* Add CachedThreadStatesGaugeSet
+* Monitor count of deadlock threads
+* Prevent exceptions from ThreadDumpServlet on Google AppEngine
+* Upgrade to logback 1.1.1
+* Allow InstrumentedAppender use in logback.xml
+* Use getClass() in place of AbstractInstrumentedFilter.class in generated metric names
+* Update MetricsServlet with support for JSONP as alternative to CORS
+* Specify the base name of the metrics as a filter init-param for the metrics captured in the AbstractInstrumentedFilter
+* Add option to provide MetricFilter to MetricsServlet
+* AdminServlet generates link to pretty printed healthchecks
+* MetricsServlet.ContextListener doesn't initialize the context correctly
+* Every reporter implements Reporter interface to indicate that is a Reporter
+* Added support for passing a ScheduledExecutorService to ScheduledReporters
+* Improve the ScheduledReporter#stop method
+* Ensure ScheduledReporters get unique thread pools.
+* Suppress runtime exceptions thrown from ScheduledReporter#report
+* Ability to inject a factory of ObjectName
+* Lazy fetch of PlatformMBeanServer
+* JMX Reporter throws exception when metric name contains an asterisk
+* onTimerRemoved in JmxListener calls registered.add
+* Support for mBean servers that rewrite the supplied ObjectName upon registration
+* Graphite reporter does not notify when Graphite/Carbon server is unreachable
+* Persistent connections to Graphite
+* Graphite constructor accepts host/port
+* Graphtie Pickle sender
+* Graphite UDP sender
+* Graphite AMQP sender
+* Add a threshold/minimum value to report before converting results to 0
+* Report to multiple gmetric instances
+* Escape slahes on ganglia metric names
+* Upgrade slf4j to 1.7.6
+* Enhancement for logging level option on Slf4jReporter
+
 
 .. _rel-3.0.1:
 

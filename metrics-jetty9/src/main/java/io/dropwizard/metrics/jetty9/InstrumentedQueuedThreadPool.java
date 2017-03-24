@@ -1,18 +1,18 @@
 package io.dropwizard.metrics.jetty9;
 
-import static io.dropwizard.metrics.MetricRegistry.name;
-
-import org.eclipse.jetty.util.annotation.Name;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
-
 import io.dropwizard.metrics.Gauge;
 import io.dropwizard.metrics.MetricRegistry;
 import io.dropwizard.metrics.RatioGauge;
+import org.eclipse.jetty.util.annotation.Name;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import java.util.concurrent.BlockingQueue;
 
+import static io.dropwizard.metrics.MetricRegistry.name;
+
 public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
     private final MetricRegistry metricRegistry;
+    private String prefix;
 
     public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry) {
         this(registry, 200);
@@ -41,32 +41,56 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
                                         @Name("minThreads") int minThreads,
                                         @Name("idleTimeout") int idleTimeout,
                                         @Name("queue") BlockingQueue<Runnable> queue) {
+        this(registry, maxThreads, minThreads, idleTimeout, queue, null);
+    }
+
+    public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry,
+                                        @Name("maxThreads") int maxThreads,
+                                        @Name("minThreads") int minThreads,
+                                        @Name("idleTimeout") int idleTimeout,
+                                        @Name("queue") BlockingQueue<Runnable> queue,
+                                        @Name("metricPrefix") String prefix) {
         super(maxThreads, minThreads, idleTimeout, queue);
         this.metricRegistry = registry;
+        this.prefix = prefix;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    private String metricPrefix() {
+        return prefix != null ? prefix : QueuedThreadPool.class.getName();
     }
 
     @Override
     protected void doStart() throws Exception {
         super.doStart();
-        metricRegistry.register(name(QueuedThreadPool.class, getName(), "utilization"), new RatioGauge() {
+
+
+        metricRegistry.register(name(metricPrefix(), "utilization"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(getThreads() - getIdleThreads(), getThreads());
             }
         });
-        metricRegistry.register(name(QueuedThreadPool.class, getName(), "utilization-max"), new RatioGauge() {
+        metricRegistry.register(name(metricPrefix(), "utilization-max"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(getThreads() - getIdleThreads(), getMaxThreads());
             }
         });
-        metricRegistry.register(name(QueuedThreadPool.class, getName(), "size"), new Gauge<Integer>() {
+        metricRegistry.register(name(metricPrefix(), "size"), new Gauge<Integer>() {
             @Override
             public Integer getValue() {
                 return getThreads();
             }
         });
-        metricRegistry.register(name(QueuedThreadPool.class, getName(), "jobs"), new Gauge<Integer>() {
+        metricRegistry.register(name(metricPrefix(), "jobs"), new Gauge<Integer>() {
             @Override
             public Integer getValue() {
                 // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
@@ -75,4 +99,5 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
             }
         });
     }
+
 }

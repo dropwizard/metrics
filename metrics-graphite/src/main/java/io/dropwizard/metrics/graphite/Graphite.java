@@ -1,5 +1,8 @@
 package io.dropwizard.metrics.graphite;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.net.SocketFactory;
 
 import java.io.*;
@@ -7,13 +10,11 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
-import java.util.regex.Pattern;
 
 /**
  * A client to a Carbon server via TCP.
  */
 public class Graphite implements GraphiteSender {
-    private static final Pattern WHITESPACE = Pattern.compile("[\\s]+");
     // this may be optimistic about Carbon/Graphite
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
@@ -26,6 +27,8 @@ public class Graphite implements GraphiteSender {
     private Socket socket;
     private Writer writer;
     private int failures;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Graphite.class);
 
     /**
      * Creates a new client which connects to the given address using the default
@@ -164,16 +167,23 @@ public class Graphite implements GraphiteSender {
                 writer.close();
             }
         } catch (IOException ex) {
+            LOGGER.debug("Error closing writer", ex);
+        } finally {
+            this.writer = null;
+        }
+
+        try {
             if (socket != null) {
                 socket.close();
             }
+        } catch (IOException ex) {
+            LOGGER.debug("Error closing socket", ex);
         } finally {
             this.socket = null;
-            this.writer = null;
         }
     }
 
     protected String sanitize(String s) {
-        return WHITESPACE.matcher(s).replaceAll("-");
+        return GraphiteSanitize.sanitize(s);
     }
 }

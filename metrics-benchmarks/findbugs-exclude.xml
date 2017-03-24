@@ -5,4 +5,7 @@
     <Match>
         <Package name="org.openjdk.jmh.infra.generated" />
     </Match>
+    <Match>
+        <Package name="org.openjdk.jmh.infra.generated" />
+    </Match>
 </FindBugsFilter>

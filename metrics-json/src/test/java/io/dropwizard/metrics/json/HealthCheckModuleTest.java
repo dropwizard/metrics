@@ -8,6 +8,12 @@ import io.dropwizard.metrics.json.HealthCheckModule;
 
 import io.dropwizard.metrics.health.HealthCheck;
 import static org.assertj.core.api.Assertions.assertThat;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -83,5 +89,40 @@ public class HealthCheckModuleTest {
                                        "}" +
                                    "}" +
                                    "}");
+    }
+
+    @Test
+    public void serializeResultWithDetail() throws Exception {
+        Map<String, Object> complex = new LinkedHashMap<String, Object>();
+        complex.put("field", "value");
+
+        HealthCheck.Result result = HealthCheck.Result.builder()
+            .healthy()
+            .withDetail("boolean", true)
+            .withDetail("integer", 1)
+            .withDetail("long", 2L)
+            .withDetail("float", 3.546F)
+            .withDetail("double", 4.567D)
+            .withDetail("BigInteger", new BigInteger("12345"))
+            .withDetail("BigDecimal", new BigDecimal("12345.56789"))
+            .withDetail("String", "string")
+            .withDetail("complex", complex)
+            .build();
+
+        assertThat(mapper.writeValueAsString(result))
+            .isEqualTo("{" +
+                "\"healthy\":true," +
+                "\"boolean\":true," +
+                "\"integer\":1," +
+                "\"long\":2," +
+                "\"float\":3.546," +
+                "\"double\":4.567," +
+                "\"BigInteger\":12345," +
+                "\"BigDecimal\":12345.56789," +
+                "\"String\":\"string\"," +
+                "\"complex\":{" +
+                    "\"field\":\"value\"" +
+                "}" +
+            "}");
     }
 }

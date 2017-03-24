@@ -5,12 +5,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.CharBuffer;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -49,7 +46,7 @@ public class CsvReporterTest {
         this.testTags = new HashMap<>();
         this.testTags.put("t1", "tv1");
         this.testTags.put("k2", "k3");
-        
+
     }
 
     @Test
@@ -208,21 +205,7 @@ public class CsvReporterTest {
     }
 
     private String fileContents(String filename) throws IOException {
-        final StringBuilder builder = new StringBuilder();
-        final FileInputStream input = new FileInputStream(new File(dataDirectory, filename));
-        try {
-            final InputStreamReader reader = new InputStreamReader(input);
-            final BufferedReader bufferedReader = new BufferedReader(reader);
-            final CharBuffer buf = CharBuffer.allocate(1024);
-            while (bufferedReader.read(buf) != -1) {
-                buf.flip();
-                builder.append(buf);
-                buf.clear();
-            }
-        } finally {
-            input.close();
-        }
-        return builder.toString();
+        return new String(Files.readAllBytes(new File(dataDirectory, filename).toPath()));
     }
 
     private <T> SortedMap<MetricName, T> map() {

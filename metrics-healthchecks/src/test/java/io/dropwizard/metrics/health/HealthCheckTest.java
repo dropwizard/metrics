@@ -5,8 +5,11 @@ import org.junit.Test;
 import io.dropwizard.metrics.health.HealthCheck;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import org.junit.Test;
 
 public class HealthCheckTest {
     private static class ExampleHealthCheck extends HealthCheck {
@@ -113,6 +116,70 @@ public class HealthCheckTest {
     }
 
     @Test
+    public void canHaveHealthyBuilderWithDetail() throws Exception {
+        final HealthCheck.Result result = HealthCheck.Result.builder()
+            .healthy()
+            .withDetail("detail", "value")
+            .build();
+
+        assertThat(result.isHealthy())
+            .isTrue();
+
+        assertThat(result.getMessage())
+            .isNull();
+
+        assertThat(result.getError())
+            .isNull();
+
+        assertThat(result.getDetails())
+            .containsEntry("detail", "value");
+    }
+
+    @Test
+    public void canHaveUnHealthyBuilderWithDetail() throws Exception {
+        final HealthCheck.Result result = HealthCheck.Result.builder()
+            .unhealthy()
+            .withDetail("detail", "value")
+            .build();
+
+        assertThat(result.isHealthy())
+            .isFalse();
+
+        assertThat(result.getMessage())
+            .isNull();
+
+        assertThat(result.getError())
+            .isNull();
+
+        assertThat(result.getDetails())
+            .containsEntry("detail", "value");
+    }
+
+    @Test
+    public void canHaveUnHealthyBuilderWithDetailAndError() throws Exception {
+        final RuntimeException e = mock(RuntimeException.class);
+        when(e.getMessage()).thenReturn("oh noes");
+
+        final HealthCheck.Result result = HealthCheck.Result
+            .builder()
+            .unhealthy(e)
+            .withDetail("detail", "value")
+            .build();
+
+        assertThat(result.isHealthy())
+            .isFalse();
+
+        assertThat(result.getMessage())
+            .isEqualTo("oh noes");
+
+        assertThat(result.getError())
+            .isEqualTo(e);
+
+        assertThat(result.getDetails())
+            .containsEntry("detail", "value");
+    }
+
+    @Test
     public void returnsResultsWhenExecuted() throws Exception {
         final HealthCheck.Result result = mock(HealthCheck.Result.class);
         when(underlying.execute()).thenReturn(result);
@@ -127,8 +194,15 @@ public class HealthCheckTest {
         when(e.getMessage()).thenReturn("oh noes");
 
         when(underlying.execute()).thenThrow(e);
+        HealthCheck.Result actual = healthCheck.execute();
 
-        assertThat(healthCheck.execute())
-                .isEqualTo(HealthCheck.Result.unhealthy(e));
+        assertThat(actual.isHealthy())
+                .isFalse();
+        assertThat(actual.getMessage())
+                .isEqualTo("oh noes");
+        assertThat(actual.getError())
+                .isEqualTo(e);
+        assertThat(actual.getDetails())
+                .isNull();
     }
 }

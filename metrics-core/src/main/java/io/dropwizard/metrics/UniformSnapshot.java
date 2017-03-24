@@ -30,11 +30,11 @@ public class UniformSnapshot extends Snapshot {
         }
         Arrays.sort(this.values);
     }
-
+    
     /**
      * Create a new {@link Snapshot} with the given values.
      *
-     * @param values    an unordered set of values in the reservoir
+     * @param values    an unordered set of values in the reservoir that can be used by this class directly
      */
     public UniformSnapshot(long[] values) {
     	this(values, true);

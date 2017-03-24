@@ -9,6 +9,7 @@ import org.apache.http.HttpRequest;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import io.dropwizard.metrics.MetricName;

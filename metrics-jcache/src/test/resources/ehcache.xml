@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://www.ehcache.org/v3" xmlns:jsr107="http://www.ehcache.org/v3/jsr107">
+  <service>
+    <jsr107:defaults enable-management="true" enable-statistics="true"/>
+  </service>
+  <cache-template name="simple">
+    <expiry>
+      <ttl unit="seconds">3600</ttl>
+    </expiry>
+    <heap>1</heap>
+  </cache-template>
+
+  <cache alias="myCache" uses-template="simple"/>
+  <cache alias="myOtherCache" uses-template="simple"/>
+
+</config>

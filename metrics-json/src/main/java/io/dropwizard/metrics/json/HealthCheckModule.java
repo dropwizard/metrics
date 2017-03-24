@@ -12,6 +12,8 @@ import io.dropwizard.metrics.health.HealthCheck;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
 
 public class HealthCheckModule extends Module {
     private static class HealthCheckResultSerializer extends StdSerializer<HealthCheck.Result> {
@@ -33,6 +35,15 @@ public class HealthCheckModule extends Module {
             }
 
             serializeThrowable(json, result.getError(), "error");
+
+            Map<String, Object> details = result.getDetails();
+            if (details != null && !details.isEmpty()) {
+                Iterator<Map.Entry<String, Object>> it = details.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<String, Object> e = it.next();
+                    json.writeObjectField(e.getKey(), e.getValue());
+                }
+            }
 
             json.writeEndObject();
         }
