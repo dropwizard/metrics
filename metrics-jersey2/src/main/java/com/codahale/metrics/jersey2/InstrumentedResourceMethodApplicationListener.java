@@ -41,6 +41,9 @@ import static com.codahale.metrics.MetricRegistry.name;
 @Provider
 public class InstrumentedResourceMethodApplicationListener implements ApplicationEventListener, ModelProcessor {
 
+    private static final String[] REQUEST_FILTERING = {"request", "filtering"};
+    private static final String[] RESPONSE_FILTERING = {"response", "filtering"};
+    private static final String TOTAL = "total";
     private final MetricRegistry metrics;
     private ConcurrentMap<EventTypeAndMethod, Timer> timers = new ConcurrentHashMap<>();
     private ConcurrentMap<Method, Meter> meters = new ConcurrentHashMap<>();
@@ -104,36 +107,56 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         );
     }
 
-    private static class TimerRequestEventListener implements RequestEventListener {
+    private class TimerRequestEventListener implements RequestEventListener {
         private final ConcurrentMap<EventTypeAndMethod, Timer> timers;
         private Timer.Context context = null;
+        private final long start;
 
         public TimerRequestEventListener(final ConcurrentMap<EventTypeAndMethod, Timer> timers) {
             this.timers = timers;
+            start = clockProvider.get().getTick();
         }
 
         @Override
         public void onEvent(RequestEvent event) {
             switch (event.getType()) {
             case RESOURCE_METHOD_START:
-                final EventTypeAndMethod key = key(event);
-                if (key == null) {
-                    return;
-                }
-                final Timer timer = this.timers.get(key);
+            case REQUEST_MATCHED:
+            case RESP_FILTERS_START:
+                final Timer timer = timer(event);
                 if (timer == null) {
                     return;
                 }
                 this.context = timer.time();
                 break;
             case RESOURCE_METHOD_FINISHED:
+            case REQUEST_FILTERED:
+            case RESP_FILTERS_FINISHED:
+            case FINISHED:
                 if (this.context != null) {
                     this.context.close();
+                    this.context = null;
                 }
                 break;
             default:
                 break;
             }
+            if (event.getType() == RequestEvent.Type.FINISHED) {
+                final Timer timer = timer(event);
+                if (timer == null) {
+                    return;
+                }
+                long end = clockProvider.get().getTick();
+                timer.update(end - start, TimeUnit.NANOSECONDS);
+            }
+        }
+
+        private Timer timer(RequestEvent event) {
+            final EventTypeAndMethod key = key(event);
+            if (key == null) {
+                return null;
+            }
+            return timers.get(key);
         }
     }
 
@@ -269,6 +292,14 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         final Method definitionMethod = method.getInvocable().getDefinitionMethod();
         if (classLevelTimed != null) {
             timers.putIfAbsent(EventTypeAndMethod.requestMethodStart(definitionMethod), timerMetric(this.metrics, method, classLevelTimed));
+            if (classLevelTimed.name().isEmpty()) {
+                timers.putIfAbsent(EventTypeAndMethod.requestMatched(definitionMethod),
+                    timerMetric(this.metrics, method, classLevelTimed, REQUEST_FILTERING));
+                timers.putIfAbsent(EventTypeAndMethod.respFiltersStart(definitionMethod),
+                    timerMetric(this.metrics, method, classLevelTimed, RESPONSE_FILTERING));
+                timers.putIfAbsent(EventTypeAndMethod.finished(definitionMethod),
+                    timerMetric(this.metrics, method, classLevelTimed, TOTAL));
+            }
             return;
         }
 
@@ -276,6 +307,14 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
 
         if (annotation != null) {
             timers.putIfAbsent(EventTypeAndMethod.requestMethodStart(definitionMethod), timerMetric(this.metrics, method, annotation));
+            if (annotation.name().isEmpty()) {
+                timers.putIfAbsent(EventTypeAndMethod.requestMatched(definitionMethod),
+                    timerMetric(this.metrics, method, annotation, REQUEST_FILTERING));
+                timers.putIfAbsent(EventTypeAndMethod.respFiltersStart(definitionMethod),
+                    timerMetric(this.metrics, method, annotation, RESPONSE_FILTERING));
+                timers.putIfAbsent(EventTypeAndMethod.finished(definitionMethod),
+                    timerMetric(this.metrics, method, annotation, TOTAL));
+            }
         }
     }
 
@@ -309,8 +348,9 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
 
     private Timer timerMetric(final MetricRegistry registry,
                                      final ResourceMethod method,
-                                     final Timed timed) {
-        final String name = chooseName(timed.name(), timed.absolute(), method);
+                                     final Timed timed,
+                                     final String... suffixes) {
+        final String name = chooseName(timed.name(), timed.absolute(), method, suffixes);
         return registry.timer(name, new MetricRegistry.MetricSupplier<Timer>() {
             @Override
             public Timer newMetric() {
@@ -352,6 +392,18 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
 
         public static EventTypeAndMethod requestMethodStart(Method method) {
             return new EventTypeAndMethod(RequestEvent.Type.RESOURCE_METHOD_START, method);
+        }
+
+        public static EventTypeAndMethod requestMatched(Method method) {
+            return new EventTypeAndMethod(RequestEvent.Type.REQUEST_MATCHED, method);
+        }
+
+        public static EventTypeAndMethod respFiltersStart(Method method) {
+            return new EventTypeAndMethod(RequestEvent.Type.RESP_FILTERS_START, method);
+        }
+
+        public static EventTypeAndMethod finished(Method method) {
+            return new EventTypeAndMethod(RequestEvent.Type.FINISHED, method);
         }
 
         @Override
