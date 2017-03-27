@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class SharedMetricRegistries {
     private static final ConcurrentMap<String, MetricRegistry> REGISTRIES =
-            new ConcurrentHashMap<String, MetricRegistry>();
+            new ConcurrentHashMap<>();
 
     private static volatile String defaultRegistryName = null;
 

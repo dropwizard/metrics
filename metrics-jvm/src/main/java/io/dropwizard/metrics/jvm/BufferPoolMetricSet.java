@@ -37,7 +37,7 @@ public class BufferPoolMetricSet implements MetricSet {
 
     @Override
     public Map<MetricName, Metric> getMetrics() {
-        final Map<MetricName, Metric> gauges = new HashMap<MetricName, Metric>();
+        final Map<MetricName, Metric> gauges = new HashMap<>();
         for (String pool : POOLS) {
             for (int i = 0; i < ATTRIBUTES.length; i++) {
                 final String attribute = ATTRIBUTES[i];

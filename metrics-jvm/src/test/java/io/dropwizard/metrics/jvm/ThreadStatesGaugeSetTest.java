@@ -31,7 +31,7 @@ public class ThreadStatesGaugeSetTest {
     private final ThreadInfo timedWaitingThread = mock(ThreadInfo.class);
     private final ThreadInfo terminatedThread = mock(ThreadInfo.class);
 
-    private final Set<String> deadlocks = new HashSet<String>();
+    private final Set<String> deadlocks = new HashSet<>();
 
     private static final MetricName TERMINATED_COUNT = MetricName.build("terminated.count");
     private static final MetricName NEW_COUNT = MetricName.build("new.count");

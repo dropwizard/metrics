@@ -47,7 +47,7 @@ public class ThreadStatesGaugeSet implements MetricSet {
 
     @Override
     public Map<MetricName, Metric> getMetrics() {
-        final Map<MetricName, Metric> gauges = new HashMap<MetricName, Metric>();
+        final Map<MetricName, Metric> gauges = new HashMap<>();
 
         for (final Thread.State state : Thread.State.values()) {
             gauges.put(name(state.toString().toLowerCase(), "count"),

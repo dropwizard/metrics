@@ -30,7 +30,7 @@ public class JvmAttributeGaugeSet implements MetricSet {
 
     @Override
     public Map<MetricName, Metric> getMetrics() {
-        final Map<MetricName, Metric> gauges = new HashMap<MetricName, Metric>();
+        final Map<MetricName, Metric> gauges = new HashMap<>();
 
         gauges.put(MetricName.build("name"), new Gauge<String>() {
             @Override

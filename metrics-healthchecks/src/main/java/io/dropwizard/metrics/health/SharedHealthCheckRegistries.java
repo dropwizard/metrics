@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class SharedHealthCheckRegistries {
     private static final ConcurrentMap<String, HealthCheckRegistry> REGISTRIES =
-            new ConcurrentHashMap<String, HealthCheckRegistry>();
+            new ConcurrentHashMap<>();
 
     private SharedHealthCheckRegistries() { /* singleton */ }
 

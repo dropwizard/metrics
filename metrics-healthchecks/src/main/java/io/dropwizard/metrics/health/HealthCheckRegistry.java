@@ -20,7 +20,7 @@ public class HealthCheckRegistry {
      * Creates a new {@link HealthCheckRegistry}.
      */
     public HealthCheckRegistry() {
-        this.healthChecks = new ConcurrentHashMap<String, HealthCheck>();
+        this.healthChecks = new ConcurrentHashMap<>();
     }
 
     /**
@@ -48,7 +48,7 @@ public class HealthCheckRegistry {
      * @return the names of all registered health checks
      */
     public SortedSet<String> getNames() {
-        return Collections.unmodifiableSortedSet(new TreeSet<String>(healthChecks.keySet()));
+        return Collections.unmodifiableSortedSet(new TreeSet<>(healthChecks.keySet()));
     }
 
     /**
@@ -72,7 +72,7 @@ public class HealthCheckRegistry {
      * @return a map of the health check results
      */
     public SortedMap<String, HealthCheck.Result> runHealthChecks() {
-        final SortedMap<String, HealthCheck.Result> results = new TreeMap<String, HealthCheck.Result>();
+        final SortedMap<String, HealthCheck.Result> results = new TreeMap<>();
         for (Map.Entry<String, HealthCheck> entry : healthChecks.entrySet()) {
             final Result result = entry.getValue().execute();
             results.put(entry.getKey(), result);
@@ -86,7 +86,7 @@ public class HealthCheckRegistry {
      * @return a map of the health check results
      */
     public SortedMap<String, HealthCheck.Result> runHealthChecks(ExecutorService executor) {
-        final Map<String, Future<HealthCheck.Result>> futures = new HashMap<String, Future<Result>>();
+        final Map<String, Future<HealthCheck.Result>> futures = new HashMap<>();
         for (final Map.Entry<String, HealthCheck> entry : healthChecks.entrySet()) {
             futures.put(entry.getKey(), executor.submit(new Callable<Result>() {
                 @Override
@@ -96,7 +96,7 @@ public class HealthCheckRegistry {
             }));
         }
 
-        final SortedMap<String, HealthCheck.Result> results = new TreeMap<String, HealthCheck.Result>();
+        final SortedMap<String, HealthCheck.Result> results = new TreeMap<>();
         for (Map.Entry<String, Future<Result>> entry : futures.entrySet()) {
             try {
                 results.put(entry.getKey(), entry.getValue().get());

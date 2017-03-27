@@ -38,12 +38,12 @@ public class MemoryUsageGaugeSet implements MetricSet {
     public MemoryUsageGaugeSet(MemoryMXBean mxBean,
                                Collection<MemoryPoolMXBean> memoryPools) {
         this.mxBean = mxBean;
-        this.memoryPools = new ArrayList<MemoryPoolMXBean>(memoryPools);
+        this.memoryPools = new ArrayList<>(memoryPools);
     }
 
     @Override
     public Map<MetricName, Metric> getMetrics() {
-        final Map<MetricName, Metric> gauges = new HashMap<MetricName, Metric>();
+        final Map<MetricName, Metric> gauges = new HashMap<>();
 
         gauges.put(MetricName.build("total.init"), new Gauge<Long>() {
             @Override
