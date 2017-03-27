@@ -16,6 +16,7 @@ import org.glassfish.jersey.server.monitoring.RequestEvent;
 import org.glassfish.jersey.server.monitoring.RequestEventListener;
 
 import javax.ws.rs.core.Configuration;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.ext.Provider;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -38,7 +39,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class InstrumentedResourceMethodApplicationListener implements ApplicationEventListener, ModelProcessor {
 
     private final MetricRegistry metrics;
-    private ConcurrentMap<Method, Timer> timers = new ConcurrentHashMap<>();
+    private ConcurrentMap<EventTypeAndMethod, Timer> timers = new ConcurrentHashMap<>();
     private ConcurrentMap<Method, Meter> meters = new ConcurrentHashMap<>();
     private ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters = new ConcurrentHashMap<>();
 
@@ -74,26 +75,45 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         }
     }
 
+    private static EventTypeAndMethod key(RequestEvent event) {
+        final ResourceMethod resourceMethod = event.getUriInfo().getMatchedResourceMethod();
+        if (resourceMethod == null) {
+            return null;
+        }
+        return new EventTypeAndMethod(
+            event.getType(), resourceMethod.getInvocable().getDefinitionMethod()
+        );
+    }
+
     private static class TimerRequestEventListener implements RequestEventListener {
-        private final ConcurrentMap<Method, Timer> timers;
+        private final ConcurrentMap<EventTypeAndMethod, Timer> timers;
         private Timer.Context context = null;
 
-        public TimerRequestEventListener(final ConcurrentMap<Method, Timer> timers) {
+        public TimerRequestEventListener(final ConcurrentMap<EventTypeAndMethod, Timer> timers) {
             this.timers = timers;
         }
 
         @Override
         public void onEvent(RequestEvent event) {
-            if (event.getType() == RequestEvent.Type.RESOURCE_METHOD_START) {
-                final Timer timer = this.timers.get(event.getUriInfo()
-                        .getMatchedResourceMethod().getInvocable().getDefinitionMethod());
-                if (timer != null) {
-                    this.context = timer.time();
+            switch (event.getType()) {
+            case RESOURCE_METHOD_START:
+                final EventTypeAndMethod key = key(event);
+                if (key == null) {
+                    return;
                 }
-            } else if (event.getType() == RequestEvent.Type.RESOURCE_METHOD_FINISHED) {
+                final Timer timer = this.timers.get(key);
+                if (timer == null) {
+                    return;
+                }
+                this.context = timer.time();
+                break;
+            case RESOURCE_METHOD_FINISHED:
                 if (this.context != null) {
                     this.context.close();
                 }
+                break;
+            default:
+                break;
             }
         }
     }
@@ -108,8 +128,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         @Override
         public void onEvent(RequestEvent event) {
             if (event.getType() == RequestEvent.Type.RESOURCE_METHOD_START) {
-                final Meter meter = this.meters.get(event.getUriInfo()
-                        .getMatchedResourceMethod().getInvocable().getDefinitionMethod());
+                final Meter meter = this.meters.get(event.getUriInfo().getMatchedResourceMethod().getInvocable().getDefinitionMethod());
                 if (meter != null) {
                     meter.mark();
                 }
@@ -230,14 +249,14 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     private void registerTimedAnnotations(final ResourceMethod method, final Timed classLevelTimed) {
         final Method definitionMethod = method.getInvocable().getDefinitionMethod();
         if (classLevelTimed != null) {
-            timers.putIfAbsent(definitionMethod, timerMetric(this.metrics, method, classLevelTimed));
+            timers.putIfAbsent(EventTypeAndMethod.requestMethodStart(definitionMethod), timerMetric(this.metrics, method, classLevelTimed));
             return;
         }
 
         final Timed annotation = definitionMethod.getAnnotation(Timed.class);
 
         if (annotation != null) {
-            timers.putIfAbsent(definitionMethod, timerMetric(this.metrics, method, annotation));
+            timers.putIfAbsent(EventTypeAndMethod.requestMethodStart(definitionMethod), timerMetric(this.metrics, method, annotation));
         }
     }
 
@@ -294,5 +313,45 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         return name(name(method.getInvocable().getDefinitionMethod().getDeclaringClass(),
                         method.getInvocable().getDefinitionMethod().getName()),
                 suffixes);
+    }
+
+    static final class EventTypeAndMethod {
+        @NotNull
+        private final RequestEvent.Type type;
+        @NotNull
+        private final Method method;
+
+        public EventTypeAndMethod(RequestEvent.Type type, Method method) {
+            this.type = type;
+            this.method = method;
+        }
+
+        public static EventTypeAndMethod requestMethodStart(Method method) {
+            return new EventTypeAndMethod(RequestEvent.Type.RESOURCE_METHOD_START, method);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            EventTypeAndMethod that = (EventTypeAndMethod) o;
+
+            if (type != that.type) {
+                return false;
+            }
+            return method.equals(that.method);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = type.hashCode();
+            result = 31 * result + method.hashCode();
+            return result;
+        }
     }
 }
