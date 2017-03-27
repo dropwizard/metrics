@@ -57,8 +57,10 @@ public abstract class HealthCheck extends io.dropwizard.metrics.health.HealthChe
 		}
 	}
 
+	@Override
 	protected abstract Result check() throws Exception;
 
+	@Override
 	public Result execute() {
 		try {
 			return check();

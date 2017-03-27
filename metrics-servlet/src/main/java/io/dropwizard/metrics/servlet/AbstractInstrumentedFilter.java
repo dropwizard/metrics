@@ -175,6 +175,7 @@ public abstract class AbstractInstrumentedFilter implements Filter {
             super.setStatus(sc, sm);
         }
 
+        @Override
         public int getStatus() {
             return httpStatus;
         }
