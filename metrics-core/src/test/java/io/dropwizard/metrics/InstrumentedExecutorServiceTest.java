@@ -58,7 +58,7 @@ public class InstrumentedExecutorServiceTest {
 
     @Test
     public void reportsRejected() throws Exception {
-        final BlockingQueue<Runnable> queueCapacityOne = new LinkedBlockingQueue<Runnable>(1);
+        final BlockingQueue<Runnable> queueCapacityOne = new LinkedBlockingQueue<>(1);
         this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS, queueCapacityOne);
         final InstrumentedExecutorService instrumented = new InstrumentedExecutorService(executor, registry, "r");
         final CountDownLatch finish = new CountDownLatch(1);
@@ -75,7 +75,7 @@ public class InstrumentedExecutorServiceTest {
         assertThat(duration.getCount()).isEqualTo(0);
         assertThat(rejected.getCount()).isEqualTo(0);
 
-        final List<Future<Object>> futures = new ArrayList<Future<Object>>();
+        final List<Future<Object>> futures = new ArrayList<>();
         // Start two callables - one to run on thread and one to be added to queue
         for (int i = 0; i < 2; i++) {
             futures.add(instrumented.submit(new Callable<Object>() {

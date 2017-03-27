@@ -22,7 +22,7 @@ public class WeightedSnapshotTest {
             throw new IllegalArgumentException("Mismatched lengths: " + values.length + " vs " + weights.length);
         }
         
-        final ArrayList<WeightedSample> samples = new ArrayList<WeightedSnapshot.WeightedSample>();
+        final ArrayList<WeightedSample> samples = new ArrayList<>();
         for (int i = 0; i < values.length; i++) {
             samples.add(new WeightedSnapshot.WeightedSample(values[i], weights[i]));
         }

@@ -74,7 +74,7 @@ public class ScheduledReporterTest {
     }
 
     private <T> SortedMap<MetricName, T> map(String name, T value) {
-        final SortedMap<MetricName, T> map = new TreeMap<MetricName, T>();
+        final SortedMap<MetricName, T> map = new TreeMap<>();
         map.put(MetricName.build(name), value);
         return map;
     }

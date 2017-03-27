@@ -265,7 +265,7 @@ public class MetricRegistryTest {
         final MetricSet metrics = new MetricSet() {
             @Override
             public Map<MetricName, Metric> getMetrics() {
-                final Map<MetricName, Metric> metrics = new HashMap<MetricName, Metric>();
+                final Map<MetricName, Metric> metrics = new HashMap<>();
                 metrics.put(GAUGE2, gauge);
                 metrics.put(COUNTER2, counter);
                 return metrics;
@@ -286,7 +286,7 @@ public class MetricRegistryTest {
         final MetricSet metrics = new MetricSet() {
             @Override
             public Map<MetricName, Metric> getMetrics() {
-                final Map<MetricName, Metric> metrics = new HashMap<MetricName, Metric>();
+                final Map<MetricName, Metric> metrics = new HashMap<>();
                 metrics.put(GAUGE, gauge);
                 metrics.put(COUNTER, counter);
                 return metrics;
@@ -304,7 +304,7 @@ public class MetricRegistryTest {
         final MetricSet inner = new MetricSet() {
             @Override
             public Map<MetricName, Metric> getMetrics() {
-                final Map<MetricName, Metric> metrics = new HashMap<MetricName, Metric>();
+                final Map<MetricName, Metric> metrics = new HashMap<>();
                 metrics.put(GAUGE, gauge);
                 return metrics;
             }
@@ -313,7 +313,7 @@ public class MetricRegistryTest {
         final MetricSet outer = new MetricSet() {
             @Override
             public Map<MetricName, Metric> getMetrics() {
-                final Map<MetricName, Metric> metrics = new HashMap<MetricName, Metric>();
+                final Map<MetricName, Metric> metrics = new HashMap<>();
                 metrics.put(MetricName.build("inner"), inner);
                 metrics.put(COUNTER, counter);
                 return metrics;

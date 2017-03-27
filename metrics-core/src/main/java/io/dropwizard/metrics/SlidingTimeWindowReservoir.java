@@ -39,7 +39,7 @@ public class SlidingTimeWindowReservoir implements Reservoir {
      */
     public SlidingTimeWindowReservoir(long window, TimeUnit windowUnit, Clock clock) {
         this.clock = clock;
-        this.measurements = new ConcurrentSkipListMap<Long, Long>();
+        this.measurements = new ConcurrentSkipListMap<>();
         this.window = windowUnit.toNanos(window) * COLLISION_BUFFER;
         this.lastTick = new AtomicLong(clock.getTick() * COLLISION_BUFFER);
         this.count = new AtomicLong();
