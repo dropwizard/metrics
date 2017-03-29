@@ -1,5 +1,7 @@
 package com.codahale.metrics.jersey2;
 
+import com.codahale.metrics.Clock;
+import com.codahale.metrics.ExponentiallyDecayingReservoir;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
@@ -22,6 +24,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -43,6 +46,12 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     private ConcurrentMap<Method, Meter> meters = new ConcurrentHashMap<>();
     private ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters = new ConcurrentHashMap<>();
 
+    public interface ClockProvider {
+        Clock get();
+    }
+
+    private final ClockProvider clockProvider;
+
     /**
      * Construct an application event listener using the given metrics registry.
      * <p/>
@@ -53,7 +62,17 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
      * @param metrics a {@link MetricRegistry}
      */
     public InstrumentedResourceMethodApplicationListener(final MetricRegistry metrics) {
+        this(metrics, null);
+    }
+
+    public InstrumentedResourceMethodApplicationListener(final MetricRegistry metrics, ClockProvider clockProvider) {
         this.metrics = metrics;
+        this.clockProvider = clockProvider != null ? clockProvider : new ClockProvider() {
+            @Override
+            public Clock get() {
+                return Clock.defaultClock();
+            }
+        };
     }
 
     /**
@@ -288,11 +307,16 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         }
     }
 
-    private static Timer timerMetric(final MetricRegistry registry,
+    private Timer timerMetric(final MetricRegistry registry,
                                      final ResourceMethod method,
                                      final Timed timed) {
         final String name = chooseName(timed.name(), timed.absolute(), method);
-        return registry.timer(name);
+        return registry.timer(name, new MetricRegistry.MetricSupplier<Timer>() {
+            @Override
+            public Timer newMetric() {
+                return new Timer(new ExponentiallyDecayingReservoir(), clockProvider.get());
+            }
+        });
     }
 
     private static Meter meterMetric(final MetricRegistry registry,
