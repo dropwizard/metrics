@@ -1,7 +1,6 @@
 package io.dropwizard.metrics.jersey2;
 
 import static io.dropwizard.metrics.MetricRegistry.name;
-
 import org.glassfish.jersey.server.model.ModelProcessor;
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceMethod;
@@ -11,6 +10,8 @@ import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
 import org.glassfish.jersey.server.monitoring.RequestEventListener;
 
+import io.dropwizard.metrics.Clock;
+import io.dropwizard.metrics.ExponentiallyDecayingReservoir;
 import io.dropwizard.metrics.annotation.ExceptionMetered;
 import io.dropwizard.metrics.annotation.Metered;
 import io.dropwizard.metrics.annotation.Timed;
@@ -45,6 +46,12 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     private ConcurrentMap<Method, Meter> meters = new ConcurrentHashMap<>();
     private ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters = new ConcurrentHashMap<>();
 
+    public interface ClockProvider {
+        Clock get();
+    }
+
+    private final ClockProvider clockProvider;
+
     /**
      * Construct an application event listener using the given metrics registry.
      * <p/>
@@ -55,7 +62,17 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
      * @param metrics a {@link MetricRegistry}
      */
     public InstrumentedResourceMethodApplicationListener(final MetricRegistry metrics) {
+        this(metrics, null);
+    }
+
+    public InstrumentedResourceMethodApplicationListener(final MetricRegistry metrics, ClockProvider clockProvider) {
         this.metrics = metrics;
+        this.clockProvider = clockProvider != null ? clockProvider : new ClockProvider() {
+            @Override
+            public Clock get() {
+                return Clock.defaultClock();
+            }
+        };
     }
 
     /**
@@ -290,11 +307,16 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         }
     }
 
-    private static Timer timerMetric(final MetricRegistry registry,
+    private Timer timerMetric(final MetricRegistry registry,
                                      final ResourceMethod method,
                                      final Timed timed) {
         final MetricName name = chooseName(timed.name(), timed.absolute(), method);
-        return registry.timer(name);
+        return registry.timer(name, new MetricRegistry.MetricSupplier<Timer>() {
+            @Override
+            public Timer newMetric() {
+                return new Timer(new ExponentiallyDecayingReservoir(), clockProvider.get());
+            }
+        });
     }
 
     private static Meter meterMetric(final MetricRegistry registry,
