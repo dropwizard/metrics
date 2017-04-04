@@ -179,7 +179,7 @@ public class MetricsServlet extends HttpServlet {
             output.close();
         }
     }
-    
+
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // Send Response

@@ -260,14 +260,14 @@ public class MetricsServletTest extends AbstractServletTest {
         final MetricsServlet metricsServlet = new MetricsServlet(null);
         metricsServlet.init(servletConfig);
     }
-    
+
     @Test
-    public void optionsHasAccessControlAllowedOrigin() throws Exception{
-    	request.setMethod("OPTIONS");
+    public void optionsHasAccessControlAllowedOrigin() throws Exception {
+        request.setMethod("OPTIONS");
         request.setURI("/metrics");
         request.setVersion("HTTP/1.0");
         request.setHeader("Origin", "http://localhost");
-        
+
         processRequest();
 
         assertThat(response.getStatus())
