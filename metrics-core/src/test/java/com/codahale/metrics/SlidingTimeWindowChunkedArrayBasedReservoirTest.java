@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +17,7 @@ public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
     @Test
     public void storesMeasurementsWithDuplicateTicks() throws Exception {
         final Clock clock = mock(Clock.class);
-        final SlidingTimeWindowChankedArrayBasedReservoir reservoir = new SlidingTimeWindowChankedArrayBasedReservoir(10, NANOSECONDS, clock);
+        final SlidingTimeWindowArrayReservoir reservoir = new SlidingTimeWindowArrayReservoir(10, NANOSECONDS, clock);
 
         when(clock.getTick()).thenReturn(20L);
 
@@ -32,7 +31,7 @@ public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
     @Test
     public void boundsMeasurementsToATimeWindow() throws Exception {
         final Clock clock = mock(Clock.class);
-        final SlidingTimeWindowChankedArrayBasedReservoir reservoir = new SlidingTimeWindowChankedArrayBasedReservoir(10, NANOSECONDS, clock);
+        final SlidingTimeWindowArrayReservoir reservoir = new SlidingTimeWindowArrayReservoir(10, NANOSECONDS, clock);
 
         when(clock.getTick()).thenReturn(0L);
         reservoir.update(1);
@@ -53,6 +52,23 @@ public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
                 .containsOnly(4, 5);
     }
 
+//    @Test
+//    public void profilingTest() {
+//        long time = TimeUnit.HOURS.toNanos(1) * 256 - 1000;
+//        AtomicLong counter = new AtomicLong(Long.MAX_VALUE - time);
+//        ManualClock manualClock = new ManualClock();
+//        int window = 3;
+////        Random random = new Random(ThreadLocalRandom.current().nextInt());
+//
+//        SlidingTimeWindowArrayReservoir arrayReservoir = new SlidingTimeWindowArrayReservoir(window, NANOSECONDS, manualClock);
+//
+//        for (int i = 0; i < 100000000; i++) {
+//            long l = counter.incrementAndGet();
+//            manualClock.addNanos(l);
+//            arrayReservoir.update(l);
+//        }
+//    }
+
     @Test
     public void comparisonResultsTest() {
         long time = TimeUnit.HOURS.toNanos(1) * 256 - 1000;
@@ -62,7 +78,7 @@ public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
         Random random = new Random(ThreadLocalRandom.current().nextInt());
 
         SlidingTimeWindowReservoir treeReservoir = new SlidingTimeWindowReservoir(window, NANOSECONDS, manualClock);
-        SlidingTimeWindowChankedArrayBasedReservoir arrayReservoir = new SlidingTimeWindowChankedArrayBasedReservoir(window, NANOSECONDS, manualClock);
+        SlidingTimeWindowArrayReservoir arrayReservoir = new SlidingTimeWindowArrayReservoir(window, NANOSECONDS, manualClock);
 
         for (int i = 0; i < 100000000; i++) {
             long l = counter.incrementAndGet();
@@ -101,8 +117,8 @@ public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
                 assertThat(clock.getTick() * 256).isGreaterThan(0);
 
                 // Create the reservoir
-                final SlidingTimeWindowChankedArrayBasedReservoir reservoir = new SlidingTimeWindowChankedArrayBasedReservoir(window, NANOSECONDS, clock);
-               int updatesAfterThreshold = 0;
+                final SlidingTimeWindowArrayReservoir reservoir = new SlidingTimeWindowArrayReservoir(window, NANOSECONDS, clock);
+                int updatesAfterThreshold = 0;
                 while (true) {
                     // Update the reservoir
                     for (int i = 0; i < updatesPerTick; i++) {

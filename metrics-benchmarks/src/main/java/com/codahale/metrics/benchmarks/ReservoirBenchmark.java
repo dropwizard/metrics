@@ -1,7 +1,7 @@
 package com.codahale.metrics.benchmarks;
 
 import com.codahale.metrics.ExponentiallyDecayingReservoir;
-import com.codahale.metrics.SlidingTimeWindowChankedArrayBasedReservoir;
+import com.codahale.metrics.SlidingTimeWindowArrayReservoir;
 import com.codahale.metrics.SlidingTimeWindowReservoir;
 import com.codahale.metrics.SlidingWindowReservoir;
 import com.codahale.metrics.UniformReservoir;
@@ -25,7 +25,7 @@ public class ReservoirBenchmark {
     private final ExponentiallyDecayingReservoir exponential = new ExponentiallyDecayingReservoir();
     private final SlidingWindowReservoir sliding = new SlidingWindowReservoir(1000);
     private final SlidingTimeWindowReservoir slidingTime = new SlidingTimeWindowReservoir(200, TimeUnit.MILLISECONDS);
-    private final SlidingTimeWindowChankedArrayBasedReservoir arrTime = new SlidingTimeWindowChankedArrayBasedReservoir(200, TimeUnit.MILLISECONDS);
+    private final SlidingTimeWindowArrayReservoir arrTime = new SlidingTimeWindowArrayReservoir(200, TimeUnit.MILLISECONDS);
 
     // It's intentionally not declared as final to avoid constant folding
     private long nextValue = 0xFBFBABBA;

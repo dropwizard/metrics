@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * A {@link Reservoir} implementation backed by a sliding window that stores only the measurements made
  * in the last {@code N} seconds (or other time unit).
  */
-public class SlidingTimeWindowChankedArrayBasedReservoir implements Reservoir {
+public class SlidingTimeWindowArrayReservoir implements Reservoir {
     // allow for this many duplicate ticks before overwriting measurements
     private static final int COLLISION_BUFFER = 256;
     // only trim on updating once every N
@@ -15,29 +15,29 @@ public class SlidingTimeWindowChankedArrayBasedReservoir implements Reservoir {
     private static final long CLEAR_BUFFER = TimeUnit.HOURS.toNanos(1) * COLLISION_BUFFER;
 
     private final Clock clock;
-    final ChunkedAssociativeLongArray measurements;
+    private final ChunkedAssociativeLongArray measurements;
     private final long window;
-    final AtomicLong lastTick;
+    private final AtomicLong lastTick;
     private final AtomicLong count;
 
     /**
-     * Creates a new {@link SlidingTimeWindowChankedArrayBasedReservoir} with the given window of time.
+     * Creates a new {@link SlidingTimeWindowArrayReservoir} with the given window of time.
      *
      * @param window     the window of time
      * @param windowUnit the unit of {@code window}
      */
-    public SlidingTimeWindowChankedArrayBasedReservoir(long window, TimeUnit windowUnit) {
+    public SlidingTimeWindowArrayReservoir(long window, TimeUnit windowUnit) {
         this(window, windowUnit, Clock.defaultClock());
     }
 
     /**
-     * Creates a new {@link SlidingTimeWindowChankedArrayBasedReservoir} with the given clock and window of time.
+     * Creates a new {@link SlidingTimeWindowArrayReservoir} with the given clock and window of time.
      *
      * @param window     the window of time
      * @param windowUnit the unit of {@code window}
      * @param clock      the {@link Clock} to use
      */
-    public SlidingTimeWindowChankedArrayBasedReservoir(long window, TimeUnit windowUnit, Clock clock) {
+    public SlidingTimeWindowArrayReservoir(long window, TimeUnit windowUnit, Clock clock) {
         this.clock = clock;
         this.measurements = new ChunkedAssociativeLongArray(512);
         this.window = windowUnit.toNanos(window) * COLLISION_BUFFER;
