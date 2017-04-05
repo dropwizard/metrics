@@ -1,0 +1,32 @@
+# Run complete. Total time: 00:03:51
+
+Benchmark                                                                           Mode  Samples      Score  Score error   Units
+c.c.m.b.ReservoirBenchmark.arrReservoir                                             avgt       10      0.570        0.048   us/op
+c.c.m.b.ReservoirBenchmark.arrReservoir:@gc.count.profiled                          avgt       10     21.000          NaN  counts
+c.c.m.b.ReservoirBenchmark.arrReservoir:@gc.count.total                             avgt       10     28.000          NaN  counts
+c.c.m.b.ReservoirBenchmark.arrReservoir:@gc.time.profiled                           avgt       10    116.000          NaN      ms
+c.c.m.b.ReservoirBenchmark.arrReservoir:@gc.time.total                              avgt       10    203.000          NaN      ms
+
+c.c.m.b.ReservoirBenchmark.perfExponentiallyDecayingReservoir                       avgt       10      0.630        0.005   us/op
+c.c.m.b.ReservoirBenchmark.perfExponentiallyDecayingReservoir:@gc.count.profiled    avgt       10    518.000          NaN  counts
+c.c.m.b.ReservoirBenchmark.perfExponentiallyDecayingReservoir:@gc.count.total       avgt       10    606.000          NaN  counts
+c.c.m.b.ReservoirBenchmark.perfExponentiallyDecayingReservoir:@gc.time.profiled     avgt       10    246.000          NaN      ms
+c.c.m.b.ReservoirBenchmark.perfExponentiallyDecayingReservoir:@gc.time.total        avgt       10    306.000          NaN      ms
+
+c.c.m.b.ReservoirBenchmark.perfSlidingTimeWindowReservoir                           avgt       10      3.111        1.741   us/op
+c.c.m.b.ReservoirBenchmark.perfSlidingTimeWindowReservoir:@gc.count.profiled        avgt       10     18.000          NaN  counts
+c.c.m.b.ReservoirBenchmark.perfSlidingTimeWindowReservoir:@gc.count.total           avgt       10     34.000          NaN  counts
+c.c.m.b.ReservoirBenchmark.perfSlidingTimeWindowReservoir:@gc.time.profiled         avgt       10  11568.000          NaN      ms
+c.c.m.b.ReservoirBenchmark.perfSlidingTimeWindowReservoir:@gc.time.total            avgt       10  17099.000          NaN      ms
+
+c.c.m.b.ReservoirBenchmark.perfSlidingWindowReservoir                               avgt       10      0.220        0.012   us/op
+c.c.m.b.ReservoirBenchmark.perfSlidingWindowReservoir:@gc.count.profiled            avgt       10      0.000          NaN  counts
+c.c.m.b.ReservoirBenchmark.perfSlidingWindowReservoir:@gc.count.total               avgt       10      0.000          NaN  counts
+c.c.m.b.ReservoirBenchmark.perfSlidingWindowReservoir:@gc.time.profiled             avgt       10      0.000          NaN      ms
+c.c.m.b.ReservoirBenchmark.perfSlidingWindowReservoir:@gc.time.total                avgt       10      0.000          NaN      ms
+
+c.c.m.b.ReservoirBenchmark.perfUniformReservoir                                     avgt       10      0.091        0.002   us/op
+c.c.m.b.ReservoirBenchmark.perfUniformReservoir:@gc.count.profiled                  avgt       10      0.000          NaN  counts
+c.c.m.b.ReservoirBenchmark.perfUniformReservoir:@gc.count.total                     avgt       10      0.000          NaN  counts
+c.c.m.b.ReservoirBenchmark.perfUniformReservoir:@gc.time.profiled                   avgt       10      0.000          NaN      ms
+c.c.m.b.ReservoirBenchmark.perfUniformReservoir:@gc.time.total                      avgt       10      0.000          NaN      ms

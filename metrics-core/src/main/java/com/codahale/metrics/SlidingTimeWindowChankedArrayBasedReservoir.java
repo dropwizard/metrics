@@ -1,6 +1,5 @@
 package com.codahale.metrics;
 
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -8,40 +7,39 @@ import java.util.concurrent.atomic.AtomicLong;
  * A {@link Reservoir} implementation backed by a sliding window that stores only the measurements made
  * in the last {@code N} seconds (or other time unit).
  */
-public class SlidingTimeWindowReservoir implements Reservoir {
+public class SlidingTimeWindowChankedArrayBasedReservoir implements Reservoir {
     // allow for this many duplicate ticks before overwriting measurements
     private static final int COLLISION_BUFFER = 256;
     // only trim on updating once every N
     private static final int TRIM_THRESHOLD = 256;
-    // offsets the front of the time window for the purposes of clearing the buffer in trim
     private static final long CLEAR_BUFFER = TimeUnit.HOURS.toNanos(1) * COLLISION_BUFFER;
 
     private final Clock clock;
-    private final ConcurrentSkipListMap<Long, Long> measurements;
+    final ChunkedAssociativeLongArray measurements;
     private final long window;
-    private final AtomicLong lastTick;
+    final AtomicLong lastTick;
     private final AtomicLong count;
 
     /**
-     * Creates a new {@link SlidingTimeWindowReservoir} with the given window of time.
+     * Creates a new {@link SlidingTimeWindowChankedArrayBasedReservoir} with the given window of time.
      *
      * @param window     the window of time
      * @param windowUnit the unit of {@code window}
      */
-    public SlidingTimeWindowReservoir(long window, TimeUnit windowUnit) {
+    public SlidingTimeWindowChankedArrayBasedReservoir(long window, TimeUnit windowUnit) {
         this(window, windowUnit, Clock.defaultClock());
     }
 
     /**
-     * Creates a new {@link SlidingTimeWindowReservoir} with the given clock and window of time.
+     * Creates a new {@link SlidingTimeWindowChankedArrayBasedReservoir} with the given clock and window of time.
      *
      * @param window     the window of time
      * @param windowUnit the unit of {@code window}
      * @param clock      the {@link Clock} to use
      */
-    public SlidingTimeWindowReservoir(long window, TimeUnit windowUnit, Clock clock) {
+    public SlidingTimeWindowChankedArrayBasedReservoir(long window, TimeUnit windowUnit, Clock clock) {
         this.clock = clock;
-        this.measurements = new ConcurrentSkipListMap<Long, Long>();
+        this.measurements = new ChunkedAssociativeLongArray(512);
         this.window = windowUnit.toNanos(window) * COLLISION_BUFFER;
         this.lastTick = new AtomicLong(clock.getTick() * COLLISION_BUFFER);
         this.count = new AtomicLong();
@@ -50,7 +48,9 @@ public class SlidingTimeWindowReservoir implements Reservoir {
     @Override
     public int size() {
         trim();
-        return measurements.size();
+        final long now = lastTick.get();
+        final long windowStart = now - window;
+        return measurements.size(windowStart);
     }
 
     @Override
@@ -58,13 +58,21 @@ public class SlidingTimeWindowReservoir implements Reservoir {
         if (count.incrementAndGet() % TRIM_THRESHOLD == 0) {
             trim();
         }
-        measurements.put(getTick(), value);
+        long lastTick = this.lastTick.get();
+        long newTick = getTick();
+        boolean longOverflow = newTick < lastTick;
+        if (longOverflow) {
+            measurements.clear();
+        }
+        measurements.put(newTick, value);
     }
 
     @Override
     public Snapshot getSnapshot() {
         trim();
-        return new UniformSnapshot(measurements.values());
+        final long now = lastTick.get();
+        final long windowStart = now - window;
+        return new UniformSnapshot(measurements.values(windowStart));
     }
 
     private long getTick() {
@@ -74,7 +82,7 @@ public class SlidingTimeWindowReservoir implements Reservoir {
             // ensure the tick is strictly incrementing even if there are duplicate ticks
             final long newTick = tick - oldTick > 0 ? tick : oldTick + 1;
             if (lastTick.compareAndSet(oldTick, newTick)) {
-//                System.out.println("tree tick: " + newTick);
+//                System.out.println("arr tick: " + newTick);
                 return newTick;
             }
         }
@@ -84,15 +92,13 @@ public class SlidingTimeWindowReservoir implements Reservoir {
         final long now = getTick();
         final long windowStart = now - window;
         final long windowEnd = now + CLEAR_BUFFER;
-//        System.out.println("tree");
+//        System.out.println("arr");
 //        System.out.println(windowStart);
 //        System.out.println(windowEnd);
-
         if (windowStart < windowEnd) {
-            measurements.headMap(windowStart).clear();
-            measurements.tailMap(windowEnd).clear();
+            measurements.trim(windowStart, windowEnd);
         } else {
-            measurements.subMap(windowEnd, windowStart).clear();
+            measurements.clear(windowEnd, windowStart);
         }
     }
 }
