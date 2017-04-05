@@ -52,6 +52,7 @@ public class FileDescriptorRatioGaugeTest {
         }
 
         // overridden on Java 1.7; random crap on Java 1.6
+        @Override
         public ObjectName getObjectName() {
             return null;
         }

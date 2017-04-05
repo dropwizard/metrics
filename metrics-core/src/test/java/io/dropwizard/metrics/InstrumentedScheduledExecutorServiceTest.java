@@ -44,6 +44,7 @@ public class InstrumentedScheduledExecutorServiceTest {
         assertThat(percentOfPeriod.getCount()).isZero();
 
         Future<?> theFuture = instrumentedScheduledExecutor.submit(new Runnable() {
+            @Override
             public void run() {
                 assertThat(submitted.getCount()).isEqualTo(1);
 
@@ -87,6 +88,7 @@ public class InstrumentedScheduledExecutorServiceTest {
         assertThat(percentOfPeriod.getCount()).isZero();
 
         ScheduledFuture<?> theFuture = instrumentedScheduledExecutor.schedule(new Runnable() {
+            @Override
             public void run() {
                 assertThat(submitted.getCount()).isZero();
 
@@ -132,6 +134,7 @@ public class InstrumentedScheduledExecutorServiceTest {
         final Object obj = new Object();
 
         Future<Object> theFuture = instrumentedScheduledExecutor.submit(new Callable<Object>() {
+            @Override
             public Object call() {
                 assertThat(submitted.getCount()).isEqualTo(1);
 
@@ -179,6 +182,7 @@ public class InstrumentedScheduledExecutorServiceTest {
         final Object obj = new Object();
 
         ScheduledFuture<Object> theFuture = instrumentedScheduledExecutor.schedule(new Callable<Object>() {
+            @Override
             public Object call() {
                 assertThat(submitted.getCount()).isZero();
 
@@ -224,6 +228,7 @@ public class InstrumentedScheduledExecutorServiceTest {
         assertThat(percentOfPeriod.getCount()).isZero();
 
         ScheduledFuture<?> theFuture = instrumentedScheduledExecutor.scheduleAtFixedRate(new Runnable() {
+            @Override
             public void run() {
                 assertThat(submitted.getCount()).isZero();
 

@@ -37,6 +37,7 @@ public class InstrumentedExecutorServiceTest {
         assertThat(rejected.getCount()).isEqualTo(0);
 
         Future<?> theFuture = instrumentedExecutorService.submit(new Runnable() {
+            @Override
             public void run() {
                 assertThat(submitted.getCount()).isEqualTo(1);
                 assertThat(running.getCount()).isEqualTo(1);
