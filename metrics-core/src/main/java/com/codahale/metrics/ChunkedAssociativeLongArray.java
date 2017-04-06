@@ -1,6 +1,5 @@
 package com.codahale.metrics;
 
-import static java.lang.Math.min;
 import static java.util.Arrays.binarySearch;
 
 import java.util.ArrayDeque;
@@ -12,9 +11,9 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ChunkedAssociativeLongArray {
     private static final long[] EMPTY = new long[0];
-    private static final int DEFAULT_CHUNK_SIZE = 100;
-    private final ReentrantLock activeChunkLock = new ReentrantLock();
+    private static final int DEFAULT_CHUNK_SIZE = 512;
 
+    private final ReentrantLock activeChunkLock = new ReentrantLock();
     private final int chunkSize;
     private Chunk activeChunk;
 
@@ -40,114 +39,72 @@ public class ChunkedAssociativeLongArray {
         }
     }
 
-    public int traverse(long minKey, Deque<Chunk> traversedChunksDeque) {
+    public int traverse(Deque<Chunk> traversedChunksDeque) {
         Chunk currentChunk;
-        int currentChunkCursor;
-        int currentChunkStartIndex;
         activeChunkLock.lock();
         try {
             currentChunk = activeChunk;
-            currentChunkStartIndex = activeChunk.startIndex;
-            currentChunkCursor = activeChunk.cursor;
         } finally {
             activeChunkLock.unlock();
         }
 
-        if (!isFirstElementIsGreaterEqualThanKey(currentChunk, minKey)) {
-            return 0;
-        }
-
         int valuesSize = 0;
         while (true) {
-            int realIndex = findFirstIndexOfGreaterEqualElements(
-                currentChunk.keys, currentChunkStartIndex, currentChunkCursor, minKey
-            );
-            int actualElementsCount = currentChunkCursor - realIndex;
-            valuesSize += actualElementsCount;
+            valuesSize += currentChunk.cursor - currentChunk.startIndex;
             if (traversedChunksDeque != null) {
                 traversedChunksDeque.addLast(currentChunk);
             }
-            if (realIndex != currentChunkStartIndex || currentChunk.tailChunk == null) {
+            if (currentChunk.tailChunk == null) {
                 break;
             }
-
             currentChunk = currentChunk.tailChunk;
-            currentChunkCursor = currentChunk.cursor;
-            currentChunkStartIndex = currentChunk.startIndex;
         }
 
         return valuesSize;
     }
 
-    public long[] values(long minKey) {
+    public long[] values() {
         Deque<Chunk> chunksDeque = new ArrayDeque<Chunk>();
-        int valuesSize = traverse(minKey, chunksDeque);
+        int valuesSize = traverse(chunksDeque);
         if (valuesSize == 0) {
             return EMPTY;
         }
 
         long[] values = new long[valuesSize];
         int valuesIndex = 0;
-        Chunk copySourceChunk = chunksDeque.removeLast();
-        int copyStartIndex = findFirstIndexOfGreaterEqualElements(
-            copySourceChunk.keys, copySourceChunk.startIndex, copySourceChunk.cursor, minKey
-        );
-
-        while (valuesIndex < valuesSize) {
-            int canBeCopiedFromChunk = copySourceChunk.cursor - copyStartIndex;
-            int leftToCopy = valuesSize - valuesIndex;
-            int length = min(canBeCopiedFromChunk, leftToCopy);
-            if (copyStartIndex + length != 0) {
-                System.arraycopy(copySourceChunk.values, copyStartIndex, values, valuesIndex, length);
-            }
+        while (!chunksDeque.isEmpty()) {
+            Chunk copySourceChunk = chunksDeque.removeLast();
+            int length = copySourceChunk.cursor - copySourceChunk.startIndex;
+            System.arraycopy(copySourceChunk.values, copySourceChunk.startIndex, values, valuesIndex, length);
             valuesIndex += length;
-
-            if (!chunksDeque.isEmpty()) {
-                copySourceChunk = chunksDeque.removeLast();
-                copyStartIndex = copySourceChunk.startIndex;
-            }
         }
 
         return values;
     }
 
-    public int size(long minKey) {
-        int valueSize = traverse(minKey, null);
+    public int size() {
+        int valueSize = traverse(null);
         return valueSize;
     }
 
-    String out(long minKey) {
+    String out() {
         ArrayDeque<Chunk> chunksDeque = new ArrayDeque<Chunk>();
-        int valuesSize = traverse(minKey, chunksDeque);
+        int valuesSize = traverse(chunksDeque);
         if (valuesSize == 0) {
             return "[]";
         }
 
         StringBuilder builder = new StringBuilder();
-        int valuesIndex = 0;
-        Chunk copySourceChunk = chunksDeque.removeLast();
-        int copyStartIndex = findFirstIndexOfGreaterEqualElements(
-            copySourceChunk.keys, copySourceChunk.startIndex, copySourceChunk.cursor, minKey
-        );
-
-        while (valuesIndex < valuesSize) {
-            int canBeCopiedFromChunk = copySourceChunk.cursor - copyStartIndex;
-            int leftToCopy = valuesSize - valuesIndex;
-            int length = min(canBeCopiedFromChunk, leftToCopy);
-            if (copyStartIndex + length != 0) {
-                builder.append('[');
-                for (int i = copyStartIndex; i < copyStartIndex + length; i++) {
-                    long key = copySourceChunk.keys[i];
-                    long value = copySourceChunk.values[i];
-                    builder.append('(').append(key).append(": ").append(value).append(')').append(' ');
-                }
-                builder.append(']');
+        while (!chunksDeque.isEmpty()) {
+            Chunk copySourceChunk = chunksDeque.removeLast();
+            builder.append('[');
+            for (int i = copySourceChunk.startIndex; i < copySourceChunk.cursor; i++) {
+                long key = copySourceChunk.keys[i];
+                long value = copySourceChunk.values[i];
+                builder.append('(').append(key).append(": ").append(value).append(')').append(' ');
             }
-            valuesIndex += length;
-
+            builder.append(']');
             if (!chunksDeque.isEmpty()) {
-                copySourceChunk = chunksDeque.removeLast();
-                copyStartIndex = copySourceChunk.startIndex;
                 builder.append("->");
             }
         }
@@ -167,25 +124,27 @@ public class ChunkedAssociativeLongArray {
          *       |5______________________________23|                    :: trim(5, 23)
          *       [5, 9] -> [10, 13, 14, 15] -> [21]                     :: result layout
          */
+        Chunk head;
         activeChunkLock.lock();
         try {
-            Chunk head = findChunkWhereKeyShouldBe(activeChunk, endKey);
+            head = findChunkWhereKeyShouldBe(activeChunk, endKey);
             activeChunk = head;
             int newEndIndex = findFirstIndexOfGreaterEqualElements(
                 activeChunk.keys, activeChunk.startIndex, activeChunk.cursor, endKey
             );
             activeChunk.cursor = newEndIndex;
 
-            Chunk tail = findChunkWhereKeyShouldBe(head, startKey);
-            int newStartIndex = findFirstIndexOfGreaterEqualElements(
-                tail.keys, tail.startIndex, tail.cursor, startKey
-            );
-            tail.startIndex = newStartIndex;
-            tail.chunkSize = tail.cursor - tail.startIndex;
-            tail.tailChunk = null; // get rid of all forward chunks
         } finally {
             activeChunkLock.unlock();
         }
+
+        Chunk tail = findChunkWhereKeyShouldBe(head, startKey);
+        int newStartIndex = findFirstIndexOfGreaterEqualElements(
+            tail.keys, tail.startIndex, tail.cursor, startKey
+        );
+        tail.startIndex = newStartIndex;
+        tail.chunkSize = tail.cursor - tail.startIndex;
+        tail.tailChunk = null; // get rid of all forward chunks
     }
 
     /**
@@ -201,25 +160,26 @@ public class ChunkedAssociativeLongArray {
          *       |5______________________________23|                    :: clear(5, 23)
          * [3, 4]               ->                 [24, 29, 30] -> [31] :: result layout
          */
+        Chunk tail;
         activeChunkLock.lock();
         try {
-            Chunk tail = findChunkWhereKeyShouldBe(activeChunk, endKey);
-            Chunk gapStartChunk = splitChunkOnTwoSeparateChunks(tail, endKey);
-
-            // now we should skip specified gap [startKey, endKey]
-            // and concatenate our tail with new head four after gap
-            Chunk afterGapHead = findChunkWhereKeyShouldBe(gapStartChunk, startKey);
-            if (afterGapHead != null) {
-                int newEndIndex = findFirstIndexOfGreaterEqualElements(
-                    afterGapHead.keys, afterGapHead.startIndex, afterGapHead.cursor, startKey
-                );
-                afterGapHead.cursor = newEndIndex;
-                afterGapHead.chunkSize = afterGapHead.cursor - afterGapHead.startIndex;
-            }
-            tail.tailChunk = afterGapHead; // concat
+            tail = findChunkWhereKeyShouldBe(activeChunk, endKey);
         } finally {
             activeChunkLock.unlock();
         }
+
+        Chunk gapStartChunk = splitChunkOnTwoSeparateChunks(tail, endKey);
+        // now we should skip specified gap [startKey, endKey]
+        // and concatenate our tail with new head four after gap
+        Chunk afterGapHead = findChunkWhereKeyShouldBe(gapStartChunk, startKey);
+        if (afterGapHead != null) {
+            int newEndIndex = findFirstIndexOfGreaterEqualElements(
+                afterGapHead.keys, afterGapHead.startIndex, afterGapHead.cursor, startKey
+            );
+            afterGapHead.cursor = newEndIndex;
+            afterGapHead.chunkSize = afterGapHead.cursor - afterGapHead.startIndex;
+        }
+        tail.tailChunk = afterGapHead; // concat
     }
 
     private Chunk splitChunkOnTwoSeparateChunks(Chunk chunk, long key) {
@@ -265,7 +225,7 @@ public class ChunkedAssociativeLongArray {
         try {
             activeChunk.tailChunk = null;
             activeChunk.startIndex = 0;
-            activeChunk.chunkSize = this.chunkSize;
+            activeChunk.chunkSize = activeChunk.keys.length;
             activeChunk.cursor = 0;
         } finally {
             activeChunkLock.unlock();

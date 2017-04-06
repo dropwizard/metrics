@@ -87,13 +87,16 @@ public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
             }
             treeReservoir.update(l);
             arrayReservoir.update(l);
-            if (random.nextDouble() < 0.01) {
+            if (random.nextDouble() < 0.001) {
 //                System.out.println(arrayReservoir.measurements.out(arrayReservoir.lastTick.get() - window * 256));
                 long[] treeValues = treeReservoir.getSnapshot().getValues();
                 long[] arrValues = arrayReservoir.getSnapshot().getValues();
 //                System.out.println(arrayReservoir.measurements.out(arrayReservoir.lastTick.get() - window * 256));
                 assertThat(arrValues).isEqualTo(treeValues);
 //                System.out.println(" ");
+            }
+            if (random.nextDouble() < 0.005) {
+                assertThat(arrayReservoir.size()).isEqualTo(treeReservoir.size());
             }
         }
     }

@@ -30,22 +30,6 @@ public class ReservoirBenchmark {
     // It's intentionally not declared as final to avoid constant folding
     private long nextValue = 0xFBFBABBA;
 
-    public static void main(String[] args) throws RunnerException {
-        Options opt = new OptionsBuilder()
-            .include(".*" + ReservoirBenchmark.class.getSimpleName() + ".*")
-            .warmupIterations(10)
-            .measurementIterations(10)
-            .addProfiler(GCProfiler.class)
-            .measurementTime(TimeValue.seconds(3))
-            .timeUnit(TimeUnit.MICROSECONDS)
-            .mode(Mode.AverageTime)
-            .threads(4)
-            .forks(1)
-            .build();
-
-        new Runner(opt).run();
-    }
-
     @Benchmark
     public Object perfUniformReservoir() {
         uniform.update(nextValue);
@@ -74,6 +58,22 @@ public class ReservoirBenchmark {
     public Object perfSlidingTimeWindowReservoir() {
         slidingTime.update(nextValue);
         return slidingTime;
+    }
+
+    public static void main(String[] args) throws RunnerException {
+        Options opt = new OptionsBuilder()
+            .include(".*" + ReservoirBenchmark.class.getSimpleName() + ".*")
+            .warmupIterations(10)
+            .measurementIterations(10)
+            .addProfiler(GCProfiler.class)
+            .measurementTime(TimeValue.seconds(3))
+            .timeUnit(TimeUnit.MICROSECONDS)
+            .mode(Mode.AverageTime)
+            .threads(4)
+            .forks(1)
+            .build();
+
+        new Runner(opt).run();
     }
 
 }

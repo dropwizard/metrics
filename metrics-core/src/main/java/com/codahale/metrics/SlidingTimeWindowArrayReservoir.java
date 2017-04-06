@@ -39,7 +39,7 @@ public class SlidingTimeWindowArrayReservoir implements Reservoir {
      */
     public SlidingTimeWindowArrayReservoir(long window, TimeUnit windowUnit, Clock clock) {
         this.clock = clock;
-        this.measurements = new ChunkedAssociativeLongArray(512);
+        this.measurements = new ChunkedAssociativeLongArray();
         this.window = windowUnit.toNanos(window) * COLLISION_BUFFER;
         this.lastTick = new AtomicLong(clock.getTick() * COLLISION_BUFFER);
         this.count = new AtomicLong();
@@ -48,9 +48,7 @@ public class SlidingTimeWindowArrayReservoir implements Reservoir {
     @Override
     public int size() {
         trim();
-        final long now = lastTick.get();
-        final long windowStart = now - window;
-        return measurements.size(windowStart);
+        return measurements.size();
     }
 
     @Override
@@ -70,9 +68,7 @@ public class SlidingTimeWindowArrayReservoir implements Reservoir {
     @Override
     public Snapshot getSnapshot() {
         trim();
-        final long now = lastTick.get();
-        final long windowStart = now - window;
-        return new UniformSnapshot(measurements.values(windowStart));
+        return new UniformSnapshot(measurements.values());
     }
 
     private long getTick() {
@@ -82,7 +78,6 @@ public class SlidingTimeWindowArrayReservoir implements Reservoir {
             // ensure the tick is strictly incrementing even if there are duplicate ticks
             final long newTick = tick - oldTick > 0 ? tick : oldTick + 1;
             if (lastTick.compareAndSet(oldTick, newTick)) {
-//                System.out.println("arr tick: " + newTick);
                 return newTick;
             }
         }
@@ -92,9 +87,6 @@ public class SlidingTimeWindowArrayReservoir implements Reservoir {
         final long now = getTick();
         final long windowStart = now - window;
         final long windowEnd = now + CLEAR_BUFFER;
-//        System.out.println("arr");
-//        System.out.println(windowStart);
-//        System.out.println(windowEnd);
         if (windowStart < windowEnd) {
             measurements.trim(windowStart, windowEnd);
         } else {
