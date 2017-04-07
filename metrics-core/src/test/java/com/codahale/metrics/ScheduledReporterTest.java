@@ -8,6 +8,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.*;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -176,6 +177,11 @@ public class ScheduledReporterTest {
         when(scheduledFuture.get(1, TimeUnit.SECONDS)).thenThrow(new TimeoutException());
         reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
         reporterWithExternallyManagedExecutor.stop(); // TimeoutException should be ignored
+    }
+
+    @Test
+    public void shouldConvertDurationToMillisecondsPrecisely() {
+        assertEquals(2.0E-5, reporter.convertDuration(20), 0.0);
     }
 
     private <T> SortedMap<String, T> map(String name, T value) {

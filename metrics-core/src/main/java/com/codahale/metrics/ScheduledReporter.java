@@ -63,9 +63,9 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
     private final Set<MetricAttribute> disabledMetricAttributes;
     private ScheduledFuture<?> scheduledFuture;
     private final MetricFilter filter;
-    private final double durationFactor;
+    private final long durationFactor;
     private final String durationUnit;
-    private final double rateFactor;
+    private final long rateFactor;
     private final String rateUnit;
 
     /**
@@ -139,7 +139,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
         this.shutdownExecutorOnStop = shutdownExecutorOnStop;
         this.rateFactor = rateUnit.toSeconds(1);
         this.rateUnit = calculateRateUnit(rateUnit);
-        this.durationFactor = 1.0 / durationUnit.toNanos(1);
+        this.durationFactor = durationUnit.toNanos(1);
         this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
         this.disabledMetricAttributes = disabledMetricAttributes != null ? disabledMetricAttributes :
                 Collections.<MetricAttribute>emptySet();
@@ -280,7 +280,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
     }
 
     protected double convertDuration(double duration) {
-        return duration * durationFactor;
+        return duration / durationFactor;
     }
 
     protected double convertRate(double rate) {
