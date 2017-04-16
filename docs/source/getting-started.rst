@@ -118,6 +118,10 @@ So the complete Getting Started is
     <artifactId>sample</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Example project for Metrics</name>
+    
+    </properties>
+        <metrics.version>|release|</metrics.version>
+    </properties>
 
     <dependencies>
       <dependency>
@@ -192,9 +196,11 @@ for constructing these names:
 
 This will return a string with something like ``"com.example.QueueManager.jobs.size"``.
 
-For most queue and queue-like structures, you won't want to simply return ``queue.size()``. Most of
-``java.util`` and ``java.util.concurrent`` have implementations of ``#size()`` which are **O(n)**,
-which means your gauge will be slow (potentially while holding a lock).
+.. note::
+
+   For most queue and queue-like structures, you won't want to simply return ``queue.size()``. Most of
+   ``java.util`` and ``java.util.concurrent`` have implementations of ``#size()`` which are **O(n)**,
+   which means your gauge will be slow (potentially while holding a lock).
 
 .. _gs-counters:
 
