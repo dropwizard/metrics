@@ -60,6 +60,7 @@ public class ConsoleReporterTest {
                         "gauge",
                         "             value = 1",
                         "",
+                        "",
                         ""
                 ));
     }
@@ -82,6 +83,7 @@ public class ConsoleReporterTest {
                         "-- Counters --------------------------------------------------------------------",
                         "test.counter",
                         "             count = 100",
+                        "",
                         "",
                         ""
                 ));

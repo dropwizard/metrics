@@ -36,7 +36,6 @@ public class ConsoleReporter extends ScheduledReporter {
         private MetricFilter filter;
         private ScheduledExecutorService executor;
         private boolean shutdownExecutorOnStop;
-        private Set<MetricAttribute> disabledMetricAttributes;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -49,7 +48,6 @@ public class ConsoleReporter extends ScheduledReporter {
             this.filter = MetricFilter.ALL;
             this.executor = null;
             this.shutdownExecutorOnStop = true;
-            disabledMetricAttributes = Collections.emptySet();
         }
 
         /**
@@ -162,8 +160,9 @@ public class ConsoleReporter extends ScheduledReporter {
          * @param disabledMetricAttributes a {@link MetricFilter}
          * @return {@code this}
          */
+        @Deprecated
         public Builder disabledMetricAttributes(Set<MetricAttribute> disabledMetricAttributes) {
-            this.disabledMetricAttributes = disabledMetricAttributes;
+            this.filter = this.filter.and(MetricFilter.disableMetricAttributes(disabledMetricAttributes));
             return this;
         }
 
@@ -174,16 +173,15 @@ public class ConsoleReporter extends ScheduledReporter {
          */
         public ConsoleReporter build() {
             return new ConsoleReporter(registry,
-                                       output,
-                                       locale,
-                                       clock,
-                                       timeZone,
-                                       rateUnit,
-                                       durationUnit,
-                                       filter,
-                                       executor,
-                                       shutdownExecutorOnStop,
-                                       disabledMetricAttributes);
+                    output,
+                    locale,
+                    clock,
+                    timeZone,
+                    rateUnit,
+                    durationUnit,
+                    filter,
+                    executor,
+                    shutdownExecutorOnStop);
         }
     }
 
@@ -195,23 +193,22 @@ public class ConsoleReporter extends ScheduledReporter {
     private final DateFormat dateFormat;
 
     private ConsoleReporter(MetricRegistry registry,
-                            PrintStream output,
-                            Locale locale,
-                            Clock clock,
-                            TimeZone timeZone,
-                            TimeUnit rateUnit,
-                            TimeUnit durationUnit,
-                            MetricFilter filter,
-                            ScheduledExecutorService executor,
-                            boolean shutdownExecutorOnStop,
-                            Set<MetricAttribute> disabledMetricAttributes) {
-        super(registry, "console-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, disabledMetricAttributes);
+                             PrintStream output,
+                             Locale locale,
+                             Clock clock,
+                             TimeZone timeZone,
+                             TimeUnit rateUnit,
+                             TimeUnit durationUnit,
+                             MetricFilter filter,
+                             ScheduledExecutorService executor,
+                             boolean shutdownExecutorOnStop) {
+        super(registry, "console-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop);
         this.output = output;
         this.locale = locale;
         this.clock = clock;
         this.dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT,
-                                                         DateFormat.MEDIUM,
-                                                         locale);
+                DateFormat.MEDIUM,
+                locale);
         dateFormat.setTimeZone(timeZone);
     }
 
@@ -228,8 +225,9 @@ public class ConsoleReporter extends ScheduledReporter {
         if (!gauges.isEmpty()) {
             printWithBanner("-- Gauges", '-');
             for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
-                output.println(entry.getKey());
-                printGauge(entry);
+                String name = entry.getKey();
+                output.println(name);
+                printGauge(name, entry.getValue());
             }
             output.println();
         }
@@ -237,8 +235,9 @@ public class ConsoleReporter extends ScheduledReporter {
         if (!counters.isEmpty()) {
             printWithBanner("-- Counters", '-');
             for (Map.Entry<String, Counter> entry : counters.entrySet()) {
-                output.println(entry.getKey());
-                printCounter(entry);
+                String name = entry.getKey();
+                output.println(name);
+                printCounter(name, entry.getValue());
             }
             output.println();
         }
@@ -246,8 +245,9 @@ public class ConsoleReporter extends ScheduledReporter {
         if (!histograms.isEmpty()) {
             printWithBanner("-- Histograms", '-');
             for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
-                output.println(entry.getKey());
-                printHistogram(entry.getValue());
+                String name = entry.getKey();
+                output.println(name);
+                printHistogram(name, entry.getValue());
             }
             output.println();
         }
@@ -255,8 +255,9 @@ public class ConsoleReporter extends ScheduledReporter {
         if (!meters.isEmpty()) {
             printWithBanner("-- Meters", '-');
             for (Map.Entry<String, Meter> entry : meters.entrySet()) {
-                output.println(entry.getKey());
-                printMeter(entry.getValue());
+                String name = entry.getKey();
+                output.println(name);
+                printMeter(name, entry.getValue());
             }
             output.println();
         }
@@ -264,8 +265,9 @@ public class ConsoleReporter extends ScheduledReporter {
         if (!timers.isEmpty()) {
             printWithBanner("-- Timers", '-');
             for (Map.Entry<String, Timer> entry : timers.entrySet()) {
-                output.println(entry.getKey());
-                printTimer(entry.getValue());
+                String name = entry.getKey();
+                output.println(name);
+                printTimer(name, entry.getValue());
             }
             output.println();
         }
@@ -274,55 +276,58 @@ public class ConsoleReporter extends ScheduledReporter {
         output.flush();
     }
 
-    private void printMeter(Meter meter) {
-        printIfEnabled(MetricAttribute.COUNT, String.format(locale, "             count = %d", meter.getCount()));
-        printIfEnabled(MetricAttribute.MEAN_RATE, String.format(locale, "         mean rate = %2.2f events/%s", convertRate(meter.getMeanRate()), getRateUnit()));
-        printIfEnabled(MetricAttribute.M1_RATE, String.format(locale, "     1-minute rate = %2.2f events/%s", convertRate(meter.getOneMinuteRate()), getRateUnit()));
-        printIfEnabled(MetricAttribute.M5_RATE, String.format(locale, "     5-minute rate = %2.2f events/%s", convertRate(meter.getFiveMinuteRate()), getRateUnit()));
-        printIfEnabled(MetricAttribute.M15_RATE, String.format(locale, "    15-minute rate = %2.2f events/%s", convertRate(meter.getFifteenMinuteRate()), getRateUnit()));
+    private void printMeter(String name, Meter meter) {
+        printIfEnabled(name, meter, MetricAttribute.COUNT, String.format(locale, "             count = %d", meter.getCount()));
+        printIfEnabled(name, meter, MetricAttribute.MEAN_RATE, String.format(locale, "         mean rate = %2.2f events/%s", convertRate(meter.getMeanRate()), getRateUnit()));
+        printIfEnabled(name, meter, MetricAttribute.M1_RATE, String.format(locale, "     1-minute rate = %2.2f events/%s", convertRate(meter.getOneMinuteRate()), getRateUnit()));
+        printIfEnabled(name, meter, MetricAttribute.M5_RATE, String.format(locale, "     5-minute rate = %2.2f events/%s", convertRate(meter.getFiveMinuteRate()), getRateUnit()));
+        printIfEnabled(name, meter, MetricAttribute.M15_RATE, String.format(locale, "    15-minute rate = %2.2f events/%s", convertRate(meter.getFifteenMinuteRate()), getRateUnit()));
     }
 
-    private void printCounter(Map.Entry<String, Counter> entry) {
-        output.printf(locale, "             count = %d%n", entry.getValue().getCount());
+    private void printCounter(String name, Counter counter) {
+        printIfEnabled(name, counter, MetricAttribute.COUNT, String.format(locale, "             count = %d%n", counter.getCount()));
     }
 
-    private void printGauge(Map.Entry<String, Gauge> entry) {
-        output.printf(locale, "             value = %s%n", entry.getValue().getValue());
+    private void printGauge(String name, Gauge gauge) {
+        Object value = gauge.getValue();
+        if(value != null) {
+            printIfEnabled(name, gauge, MetricAttribute.GAUGE, String.format(locale, "             value = %s%n", value));
+        }
     }
 
-    private void printHistogram(Histogram histogram) {
-        printIfEnabled(MetricAttribute.COUNT, String.format(locale, "             count = %d", histogram.getCount()));
+    private void printHistogram(String name, Histogram histogram) {
+        printIfEnabled(name, histogram, MetricAttribute.COUNT, String.format(locale, "             count = %d", histogram.getCount()));
         Snapshot snapshot = histogram.getSnapshot();
-        printIfEnabled(MetricAttribute.MIN, String.format(locale, "               min = %d", snapshot.getMin()));
-        printIfEnabled(MetricAttribute.MAX, String.format(locale, "               max = %d", snapshot.getMax()));
-        printIfEnabled(MetricAttribute.MEAN, String.format(locale, "              mean = %2.2f", snapshot.getMean()));
-        printIfEnabled(MetricAttribute.STDDEV, String.format(locale, "            stddev = %2.2f", snapshot.getStdDev()));
-        printIfEnabled(MetricAttribute.P50, String.format(locale, "            median = %2.2f", snapshot.getMedian()));
-        printIfEnabled(MetricAttribute.P75, String.format(locale, "              75%% <= %2.2f", snapshot.get75thPercentile()));
-        printIfEnabled(MetricAttribute.P95, String.format(locale, "              95%% <= %2.2f", snapshot.get95thPercentile()));
-        printIfEnabled(MetricAttribute.P98, String.format(locale, "              98%% <= %2.2f", snapshot.get98thPercentile()));
-        printIfEnabled(MetricAttribute.P99, String.format(locale, "              99%% <= %2.2f", snapshot.get99thPercentile()));
-        printIfEnabled(MetricAttribute.P999, String.format(locale, "            99.9%% <= %2.2f", snapshot.get999thPercentile()));
+        printIfEnabled(name, histogram, MetricAttribute.MIN, String.format(locale, "               min = %d", snapshot.getMin()));
+        printIfEnabled(name, histogram, MetricAttribute.MAX, String.format(locale, "               max = %d", snapshot.getMax()));
+        printIfEnabled(name, histogram, MetricAttribute.MEAN, String.format(locale, "              mean = %2.2f", snapshot.getMean()));
+        printIfEnabled(name, histogram, MetricAttribute.STDDEV, String.format(locale, "            stddev = %2.2f", snapshot.getStdDev()));
+        printIfEnabled(name, histogram, MetricAttribute.P50, String.format(locale, "            median = %2.2f", snapshot.getMedian()));
+        printIfEnabled(name, histogram, MetricAttribute.P75, String.format(locale, "              75%% <= %2.2f", snapshot.get75thPercentile()));
+        printIfEnabled(name, histogram, MetricAttribute.P95, String.format(locale, "              95%% <= %2.2f", snapshot.get95thPercentile()));
+        printIfEnabled(name, histogram, MetricAttribute.P98, String.format(locale, "              98%% <= %2.2f", snapshot.get98thPercentile()));
+        printIfEnabled(name, histogram, MetricAttribute.P99, String.format(locale, "              99%% <= %2.2f", snapshot.get99thPercentile()));
+        printIfEnabled(name, histogram, MetricAttribute.P999, String.format(locale, "            99.9%% <= %2.2f", snapshot.get999thPercentile()));
     }
 
-    private void printTimer(Timer timer) {
+    private void printTimer(String name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
-        printIfEnabled(MetricAttribute.COUNT, String.format(locale, "             count = %d", timer.getCount()));
-        printIfEnabled(MetricAttribute.MEAN_RATE, String.format(locale, "         mean rate = %2.2f calls/%s", convertRate(timer.getMeanRate()), getRateUnit()));
-        printIfEnabled(MetricAttribute.M1_RATE, String.format(locale, "     1-minute rate = %2.2f calls/%s", convertRate(timer.getOneMinuteRate()), getRateUnit()));
-        printIfEnabled(MetricAttribute.M5_RATE, String.format(locale, "     5-minute rate = %2.2f calls/%s", convertRate(timer.getFiveMinuteRate()), getRateUnit()));
-        printIfEnabled(MetricAttribute.M15_RATE, String.format(locale, "    15-minute rate = %2.2f calls/%s", convertRate(timer.getFifteenMinuteRate()), getRateUnit()));
+        printIfEnabled(name, timer, MetricAttribute.COUNT, String.format(locale, "             count = %d", timer.getCount()));
+        printIfEnabled(name, timer, MetricAttribute.MEAN_RATE, String.format(locale, "         mean rate = %2.2f calls/%s", convertRate(timer.getMeanRate()), getRateUnit()));
+        printIfEnabled(name, timer, MetricAttribute.M1_RATE, String.format(locale, "     1-minute rate = %2.2f calls/%s", convertRate(timer.getOneMinuteRate()), getRateUnit()));
+        printIfEnabled(name, timer, MetricAttribute.M5_RATE, String.format(locale, "     5-minute rate = %2.2f calls/%s", convertRate(timer.getFiveMinuteRate()), getRateUnit()));
+        printIfEnabled(name, timer, MetricAttribute.M15_RATE, String.format(locale, "    15-minute rate = %2.2f calls/%s", convertRate(timer.getFifteenMinuteRate()), getRateUnit()));
 
-        printIfEnabled(MetricAttribute.MIN, String.format(locale, "               min = %2.2f %s", convertDuration(snapshot.getMin()), getDurationUnit()));
-        printIfEnabled(MetricAttribute.MAX, String.format(locale, "               max = %2.2f %s", convertDuration(snapshot.getMax()), getDurationUnit()));
-        printIfEnabled(MetricAttribute.MEAN, String.format(locale, "              mean = %2.2f %s", convertDuration(snapshot.getMean()), getDurationUnit()));
-        printIfEnabled(MetricAttribute.STDDEV, String.format(locale, "            stddev = %2.2f %s", convertDuration(snapshot.getStdDev()), getDurationUnit()));
-        printIfEnabled(MetricAttribute.P50, String.format(locale, "            median = %2.2f %s", convertDuration(snapshot.getMedian()), getDurationUnit()));
-        printIfEnabled(MetricAttribute.P75, String.format(locale, "              75%% <= %2.2f %s", convertDuration(snapshot.get75thPercentile()), getDurationUnit()));
-        printIfEnabled(MetricAttribute.P95, String.format(locale, "              95%% <= %2.2f %s", convertDuration(snapshot.get95thPercentile()), getDurationUnit()));
-        printIfEnabled(MetricAttribute.P98, String.format(locale, "              98%% <= %2.2f %s", convertDuration(snapshot.get98thPercentile()), getDurationUnit()));
-        printIfEnabled(MetricAttribute.P99, String.format(locale, "              99%% <= %2.2f %s", convertDuration(snapshot.get99thPercentile()), getDurationUnit()));
-        printIfEnabled(MetricAttribute.P999, String.format(locale, "            99.9%% <= %2.2f %s", convertDuration(snapshot.get999thPercentile()), getDurationUnit()));
+        printIfEnabled(name, timer, MetricAttribute.MIN, String.format(locale, "               min = %2.2f %s", convertDuration(snapshot.getMin()), getDurationUnit()));
+        printIfEnabled(name, timer, MetricAttribute.MAX, String.format(locale, "               max = %2.2f %s", convertDuration(snapshot.getMax()), getDurationUnit()));
+        printIfEnabled(name, timer, MetricAttribute.MEAN, String.format(locale, "              mean = %2.2f %s", convertDuration(snapshot.getMean()), getDurationUnit()));
+        printIfEnabled(name, timer, MetricAttribute.STDDEV, String.format(locale, "            stddev = %2.2f %s", convertDuration(snapshot.getStdDev()), getDurationUnit()));
+        printIfEnabled(name, timer, MetricAttribute.P50, String.format(locale, "            median = %2.2f %s", convertDuration(snapshot.getMedian()), getDurationUnit()));
+        printIfEnabled(name, timer, MetricAttribute.P75, String.format(locale, "              75%% <= %2.2f %s", convertDuration(snapshot.get75thPercentile()), getDurationUnit()));
+        printIfEnabled(name, timer, MetricAttribute.P95, String.format(locale, "              95%% <= %2.2f %s", convertDuration(snapshot.get95thPercentile()), getDurationUnit()));
+        printIfEnabled(name, timer, MetricAttribute.P98, String.format(locale, "              98%% <= %2.2f %s", convertDuration(snapshot.get98thPercentile()), getDurationUnit()));
+        printIfEnabled(name, timer, MetricAttribute.P99, String.format(locale, "              99%% <= %2.2f %s", convertDuration(snapshot.get99thPercentile()), getDurationUnit()));
+        printIfEnabled(name, timer, MetricAttribute.P999, String.format(locale, "            99.9%% <= %2.2f %s", convertDuration(snapshot.get999thPercentile()), getDurationUnit()));
     }
 
     private void printWithBanner(String s, char c) {
@@ -336,14 +341,14 @@ public class ConsoleReporter extends ScheduledReporter {
 
     /**
      * Print only if the attribute is enabled
+     * @param name Metric name
+     * @param metric
      * @param type Metric attribute
      * @param status Status to be logged
      */
-    private void printIfEnabled(MetricAttribute type, String status) {
-        if(getDisabledMetricAttributes().contains(type)) {
-            return;
+    private void printIfEnabled(String name, Metric metric, MetricAttribute type, String status) {
+        if(shallSendFilter(name, metric, type)) {
+            output.println(status);
         }
-
-        output.println(status);
     }
 }

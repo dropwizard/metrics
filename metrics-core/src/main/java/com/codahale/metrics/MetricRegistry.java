@@ -436,7 +436,7 @@ public class MetricRegistry implements MetricSet {
         final TreeMap<String, T> timers = new TreeMap<String, T>();
         for (Map.Entry<String, Metric> entry : metrics.entrySet()) {
             if (klass.isInstance(entry.getValue()) && filter.matches(entry.getKey(),
-                                                                     entry.getValue())) {
+                                                                     entry.getValue(), MetricAttribute.ALL)) {
                 timers.put(entry.getKey(), (T) entry.getValue());
             }
         }

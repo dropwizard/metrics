@@ -5,6 +5,14 @@ package com.codahale.metrics;
  */
 public enum MetricAttribute {
 
+    ALL("") {
+        @Override
+        public String getCode() {
+            throw new IllegalStateException();
+        }
+    }, // complete metric itself
+
+    GAUGE(""),
     MAX("max"),
     MEAN("mean"),
     MIN("min"),

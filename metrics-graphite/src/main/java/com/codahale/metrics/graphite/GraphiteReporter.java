@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +47,6 @@ public class GraphiteReporter extends ScheduledReporter {
         private MetricFilter filter;
         private ScheduledExecutorService executor;
         private boolean shutdownExecutorOnStop;
-        private Set<MetricAttribute> disabledMetricAttributes;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -59,7 +57,6 @@ public class GraphiteReporter extends ScheduledReporter {
             this.filter = MetricFilter.ALL;
             this.executor = null;
             this.shutdownExecutorOnStop = true;
-            this.disabledMetricAttributes = Collections.emptySet();
         }
 
         /**
@@ -150,8 +147,9 @@ public class GraphiteReporter extends ScheduledReporter {
          * @param disabledMetricAttributes a {@link MetricFilter}
          * @return {@code this}
          */
+        @Deprecated
         public Builder disabledMetricAttributes(Set<MetricAttribute> disabledMetricAttributes) {
-            this.disabledMetricAttributes = disabledMetricAttributes;
+            this.filter = filter.and(MetricFilter.disableMetricAttributes(disabledMetricAttributes));
             return this;
         }
 
@@ -184,8 +182,7 @@ public class GraphiteReporter extends ScheduledReporter {
                                         durationUnit,
                                         filter,
                                         executor,
-                                        shutdownExecutorOnStop,
-                    disabledMetricAttributes);
+                                        shutdownExecutorOnStop);
         }
     }
 
@@ -218,10 +215,8 @@ public class GraphiteReporter extends ScheduledReporter {
                              TimeUnit durationUnit,
                              MetricFilter filter,
                              ScheduledExecutorService executor,
-                             boolean shutdownExecutorOnStop,
-                             Set<MetricAttribute> disabledMetricAttributes) {
-        super(registry, "graphite-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
-                disabledMetricAttributes);
+                             boolean shutdownExecutorOnStop) {
+        super(registry, "graphite-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
@@ -285,64 +280,64 @@ public class GraphiteReporter extends ScheduledReporter {
 
     private void reportTimer(String name, Timer timer, long timestamp) throws IOException {
         final Snapshot snapshot = timer.getSnapshot();
-        sendIfEnabled(MAX, name, convertDuration(snapshot.getMax()), timestamp);
-        sendIfEnabled(MEAN, name, convertDuration(snapshot.getMean()), timestamp);
-        sendIfEnabled(MIN, name, convertDuration(snapshot.getMin()), timestamp);
-        sendIfEnabled(STDDEV, name, convertDuration(snapshot.getStdDev()), timestamp);
-        sendIfEnabled(P50, name, convertDuration(snapshot.getMedian()), timestamp);
-        sendIfEnabled(P75, name, convertDuration(snapshot.get75thPercentile()), timestamp);
-        sendIfEnabled(P95, name, convertDuration(snapshot.get95thPercentile()), timestamp);
-        sendIfEnabled(P98, name, convertDuration(snapshot.get98thPercentile()), timestamp);
-        sendIfEnabled(P99, name, convertDuration(snapshot.get99thPercentile()), timestamp);
-        sendIfEnabled(P999, name, convertDuration(snapshot.get999thPercentile()), timestamp);
+        sendIfEnabled(name, timer, MAX, convertDuration(snapshot.getMax()), timestamp);
+        sendIfEnabled(name, timer, MEAN, convertDuration(snapshot.getMean()), timestamp);
+        sendIfEnabled(name, timer, MIN, convertDuration(snapshot.getMin()), timestamp);
+        sendIfEnabled(name, timer, STDDEV, convertDuration(snapshot.getStdDev()), timestamp);
+        sendIfEnabled(name, timer, P50, convertDuration(snapshot.getMedian()), timestamp);
+        sendIfEnabled(name, timer, P75, convertDuration(snapshot.get75thPercentile()), timestamp);
+        sendIfEnabled(name, timer, P95, convertDuration(snapshot.get95thPercentile()), timestamp);
+        sendIfEnabled(name, timer, P98, convertDuration(snapshot.get98thPercentile()), timestamp);
+        sendIfEnabled(name, timer, P99, convertDuration(snapshot.get99thPercentile()), timestamp);
+        sendIfEnabled(name, timer, P999, convertDuration(snapshot.get999thPercentile()), timestamp);
         reportMetered(name, timer, timestamp);
     }
 
     private void reportMetered(String name, Metered meter, long timestamp) throws IOException {
-        sendIfEnabled(COUNT, name, meter.getCount(), timestamp);
-        sendIfEnabled(M1_RATE, name, meter.getOneMinuteRate(), timestamp);
-        sendIfEnabled(M5_RATE, name, meter.getFiveMinuteRate(), timestamp);
-        sendIfEnabled(M15_RATE, name, meter.getFifteenMinuteRate(), timestamp);
-        sendIfEnabled(MEAN_RATE, name, meter.getMeanRate(), timestamp);
+        sendIfEnabled(name, meter, COUNT, meter.getCount(), timestamp);
+        sendIfEnabled(name, meter, M1_RATE, meter.getOneMinuteRate(), timestamp);
+        sendIfEnabled(name, meter, M5_RATE, meter.getFiveMinuteRate(), timestamp);
+        sendIfEnabled(name, meter, M15_RATE, meter.getFifteenMinuteRate(), timestamp);
+        sendIfEnabled(name, meter, MEAN_RATE, meter.getMeanRate(), timestamp);
     }
 
     private void reportHistogram(String name, Histogram histogram, long timestamp) throws IOException {
         final Snapshot snapshot = histogram.getSnapshot();
-        sendIfEnabled(COUNT, name, histogram.getCount(), timestamp);
-        sendIfEnabled(MAX, name, snapshot.getMax(), timestamp);
-        sendIfEnabled(MEAN, name, snapshot.getMean(), timestamp);
-        sendIfEnabled(MIN, name, snapshot.getMin(), timestamp);
-        sendIfEnabled(STDDEV, name, snapshot.getStdDev(), timestamp);
-        sendIfEnabled(P50, name, snapshot.getMedian(), timestamp);
-        sendIfEnabled(P75, name, snapshot.get75thPercentile(), timestamp);
-        sendIfEnabled(P95, name, snapshot.get95thPercentile(), timestamp);
-        sendIfEnabled(P98, name, snapshot.get98thPercentile(), timestamp);
-        sendIfEnabled(P99, name, snapshot.get99thPercentile(), timestamp);
-        sendIfEnabled(P999, name, snapshot.get999thPercentile(), timestamp);
+        sendIfEnabled(name, histogram, COUNT, histogram.getCount(), timestamp);
+        sendIfEnabled(name, histogram, MAX, snapshot.getMax(), timestamp);
+        sendIfEnabled(name, histogram, MEAN, snapshot.getMean(), timestamp);
+        sendIfEnabled(name, histogram, MIN, snapshot.getMin(), timestamp);
+        sendIfEnabled(name, histogram, STDDEV, snapshot.getStdDev(), timestamp);
+        sendIfEnabled(name, histogram, P50, snapshot.getMedian(), timestamp);
+        sendIfEnabled(name, histogram, P75, snapshot.get75thPercentile(), timestamp);
+        sendIfEnabled(name, histogram, P95, snapshot.get95thPercentile(), timestamp);
+        sendIfEnabled(name, histogram, P98, snapshot.get98thPercentile(), timestamp);
+        sendIfEnabled(name, histogram, P99, snapshot.get99thPercentile(), timestamp);
+        sendIfEnabled(name, histogram, P999, snapshot.get999thPercentile(), timestamp);
     }
 
-    private void sendIfEnabled(MetricAttribute type, String name, double value, long timestamp) throws IOException {
-        if (getDisabledMetricAttributes().contains(type)){
-            return;
-        }
-        graphite.send(prefix(name, type.getCode()), format(value), timestamp);
+    private void sendIfEnabled(String name, Metric metric, MetricAttribute type, double value, long timestamp) throws IOException {
+        sendIfEnabled(name, metric, type, format(value), timestamp);
     }
 
-    private void sendIfEnabled(MetricAttribute type, String name, long value, long timestamp) throws IOException {
-        if (getDisabledMetricAttributes().contains(type)){
-            return;
+    private void sendIfEnabled(String name, Metric metric, MetricAttribute type, long value, long timestamp) throws IOException {
+        sendIfEnabled(name, metric, type, format(value), timestamp);
+    }
+
+    private void sendIfEnabled(String name, Metric metric, MetricAttribute type, String value, long timestamp) throws IOException {
+        if(shallSendFilter(name, metric, type)) {
+            graphite.send(prefix(name, type.getCode()), value, timestamp);
         }
-        graphite.send(prefix(name, type.getCode()), format(value), timestamp);
     }
 
     private void reportCounter(String name, Counter counter, long timestamp) throws IOException {
-        graphite.send(prefix(name, COUNT.getCode()), format(counter.getCount()), timestamp);
+        sendIfEnabled(name, counter, COUNT, counter.getCount(), timestamp);
     }
 
     private void reportGauge(String name, Gauge gauge, long timestamp) throws IOException {
         final String value = format(gauge.getValue());
         if (value != null) {
-            graphite.send(prefix(name), value, timestamp);
+            sendIfEnabled(name, gauge, GAUGE, value, timestamp);
         }
     }
 

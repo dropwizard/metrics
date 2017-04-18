@@ -158,8 +158,7 @@ public class GraphiteReporterTest {
     @Test
     public void reportsDoubleGaugeValuesWithCustomFormat() throws Exception {
         final GraphiteReporter graphiteReporter = new GraphiteReporter(registry, graphite, clock, "prefix",
-                TimeUnit.SECONDS, TimeUnit.MICROSECONDS, MetricFilter.ALL, null, false,
-                Collections.<MetricAttribute>emptySet()){
+                TimeUnit.SECONDS, TimeUnit.MICROSECONDS, MetricFilter.ALL, null, false) {
             @Override
             protected String format(double v) {
                 return String.format(Locale.US, "%4.4f", v);

@@ -459,7 +459,7 @@ public class MetricRegistryTest {
 
         registry.removeMatching(new MetricFilter() {
             @Override
-            public boolean matches(String name, Metric metric) {
+            public boolean matches(String name, Metric metric, MetricAttribute attribute) {
                 return name.endsWith("1");
             }
         });

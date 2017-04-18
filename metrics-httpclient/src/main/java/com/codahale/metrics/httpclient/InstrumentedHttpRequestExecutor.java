@@ -18,7 +18,7 @@ public class InstrumentedHttpRequestExecutor extends HttpRequestExecutor {
 
     public InstrumentedHttpRequestExecutor(MetricRegistry registry,
                                            HttpClientMetricNameStrategy metricNameStrategy) {
-        this(registry, metricNameStrategy, null);
+        this(registry, metricNameStrategy, "name");
     }
 
     public InstrumentedHttpRequestExecutor(MetricRegistry registry,

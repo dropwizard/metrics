@@ -4,9 +4,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricRegistryListener;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.httpclient.HttpClientMetricNameStrategy;
-import com.codahale.metrics.httpclient.InstrumentedHttpClients;
 import org.apache.http.HttpRequest;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.nio.client.HttpAsyncClient;
@@ -29,7 +27,7 @@ public class InstrumentedHttpClientsTest {
 
     @Before
     public void setUp() throws Exception {
-        CloseableHttpAsyncClient chac = new InstrumentedNHttpClientBuilder(metricRegistry, metricNameStrategy).build();
+        CloseableHttpAsyncClient chac = new InstrumentedNHttpClientBuilder(metricRegistry, metricNameStrategy, "name").build();
         chac.start();
         hac = chac;
         metricRegistry.addListener(registryListener);
