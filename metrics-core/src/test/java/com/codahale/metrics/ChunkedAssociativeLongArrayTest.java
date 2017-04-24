@@ -215,9 +215,5 @@ public class ChunkedAssociativeLongArrayTest {
         array.clear(-9223134837387994768L, 9222687636321556080L);
         System.out.println(" ");
         System.out.println(array.out());
-
-//        tree
-//        9222687636321556080
-//            - 9223134837387994768
     }
 }

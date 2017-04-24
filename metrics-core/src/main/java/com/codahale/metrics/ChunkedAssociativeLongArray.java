@@ -14,7 +14,7 @@ public class ChunkedAssociativeLongArray {
     private static final int DEFAULT_CHUNK_SIZE = 512;
 
     private final ReentrantLock activeChunkLock = new ReentrantLock();
-    private final int chunkSize;
+    private final int defaultChunkSize;
     private Chunk activeChunk;
 
     public ChunkedAssociativeLongArray() {
@@ -22,7 +22,7 @@ public class ChunkedAssociativeLongArray {
     }
 
     public ChunkedAssociativeLongArray(int chunkSize) {
-        this.chunkSize = chunkSize;
+        this.defaultChunkSize = chunkSize;
         this.activeChunk = new Chunk(chunkSize);
     }
 
@@ -31,7 +31,7 @@ public class ChunkedAssociativeLongArray {
         try {
             boolean isFull = activeChunk.cursor - activeChunk.startIndex == activeChunk.chunkSize;
             if (isFull) {
-                activeChunk = new Chunk(activeChunk, this.chunkSize);
+                activeChunk = new Chunk(activeChunk, this.defaultChunkSize);
             }
             activeChunk.append(key, value);
         } finally {
@@ -70,16 +70,21 @@ public class ChunkedAssociativeLongArray {
             return EMPTY;
         }
 
-        long[] values = new long[valuesSize];
-        int valuesIndex = 0;
-        while (!chunksDeque.isEmpty()) {
-            Chunk copySourceChunk = chunksDeque.removeLast();
-            int length = copySourceChunk.cursor - copySourceChunk.startIndex;
-            System.arraycopy(copySourceChunk.values, copySourceChunk.startIndex, values, valuesIndex, length);
-            valuesIndex += length;
+        activeChunkLock.lock();
+        try {
+            long[] values = new long[valuesSize];
+            int valuesIndex = 0;
+            while (!chunksDeque.isEmpty()) {
+                Chunk copySourceChunk = chunksDeque.removeLast();
+                int length = copySourceChunk.cursor - copySourceChunk.startIndex;
+                int itemsToCopy = Math.min(valuesSize - valuesIndex, length);
+                System.arraycopy(copySourceChunk.values, copySourceChunk.startIndex, values, valuesIndex, itemsToCopy);
+                valuesIndex += length;
+            }
+            return values;
+        } finally {
+            activeChunkLock.unlock();
         }
-
-        return values;
     }
 
     public int size() {
@@ -88,7 +93,7 @@ public class ChunkedAssociativeLongArray {
     }
 
     String out() {
-        ArrayDeque<Chunk> chunksDeque = new ArrayDeque<Chunk>();
+        Deque<Chunk> chunksDeque = new ArrayDeque<Chunk>();
         int valuesSize = traverse(chunksDeque);
         if (valuesSize == 0) {
             return "[]";
@@ -142,9 +147,11 @@ public class ChunkedAssociativeLongArray {
         int newStartIndex = findFirstIndexOfGreaterEqualElements(
             tail.keys, tail.startIndex, tail.cursor, startKey
         );
-        tail.startIndex = newStartIndex;
-        tail.chunkSize = tail.cursor - tail.startIndex;
-        tail.tailChunk = null; // get rid of all forward chunks
+        if (tail.startIndex != newStartIndex) {
+            tail.startIndex = newStartIndex;
+            tail.chunkSize = tail.cursor - tail.startIndex;
+            tail.tailChunk = null;
+        }
     }
 
     /**
@@ -169,13 +176,24 @@ public class ChunkedAssociativeLongArray {
         }
 
         Chunk gapStartChunk = splitChunkOnTwoSeparateChunks(tail, endKey);
+        if (gapStartChunk == null) {
+            return;
+        }
         // now we should skip specified gap [startKey, endKey]
         // and concatenate our tail with new head four after gap
         Chunk afterGapHead = findChunkWhereKeyShouldBe(gapStartChunk, startKey);
-        if (afterGapHead != null) {
-            int newEndIndex = findFirstIndexOfGreaterEqualElements(
-                afterGapHead.keys, afterGapHead.startIndex, afterGapHead.cursor, startKey
-            );
+        if (afterGapHead == null) {
+            return;
+        }
+
+        int newEndIndex = findFirstIndexOfGreaterEqualElements(
+            afterGapHead.keys, afterGapHead.startIndex, afterGapHead.cursor, startKey
+        );
+        if (newEndIndex == afterGapHead.startIndex) {
+            tail.tailChunk = null;
+            return;
+        }
+        if (afterGapHead.cursor != newEndIndex) {
             afterGapHead.cursor = newEndIndex;
             afterGapHead.chunkSize = afterGapHead.cursor - afterGapHead.startIndex;
         }
@@ -195,17 +213,20 @@ public class ChunkedAssociativeLongArray {
         int splitIndex = findFirstIndexOfGreaterEqualElements(
             chunk.keys, chunk.startIndex, chunk.cursor, key
         );
+        if (splitIndex == chunk.startIndex || splitIndex == chunk.cursor) {
+            return chunk.tailChunk;
+        }
         int newTailSize = splitIndex - chunk.startIndex;
         Chunk newTail = new Chunk(chunk.keys, chunk.values, chunk.startIndex, splitIndex, newTailSize, chunk.tailChunk);
         chunk.startIndex = splitIndex;
-        chunk.chunkSize = chunk.cursor - chunk.startIndex;
+        chunk.chunkSize = chunk.chunkSize - newTailSize;
         chunk.tailChunk = newTail;
         return newTail;
     }
 
     private Chunk findChunkWhereKeyShouldBe(Chunk currentChunk, long key) {
         while (true) {
-            if (isFirstElementIsGreaterEqualThanKey(currentChunk, key) && currentChunk.tailChunk != null) {
+            if (isFirstElementIsEmptyOrGreaterEqualThanKey(currentChunk, key) && currentChunk.tailChunk != null) {
                 currentChunk = currentChunk.tailChunk;
                 continue;
             }
@@ -214,9 +235,9 @@ public class ChunkedAssociativeLongArray {
         return currentChunk;
     }
 
-    private boolean isFirstElementIsGreaterEqualThanKey(Chunk chunk, long key) {
-        return chunk.cursor != chunk.startIndex
-            && chunk.keys[chunk.startIndex] >= key;
+    private boolean isFirstElementIsEmptyOrGreaterEqualThanKey(Chunk chunk, long key) {
+        return chunk.cursor == chunk.startIndex
+            || chunk.keys[chunk.startIndex] >= key;
     }
 
 
@@ -246,7 +267,7 @@ public class ChunkedAssociativeLongArray {
         return realIndex;
     }
 
-    private class Chunk {
+    private static class Chunk {
         private final long[] keys;
         private final long[] values;
 

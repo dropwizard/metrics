@@ -1,6 +1,7 @@
 package com.codahale.metrics;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -9,11 +10,104 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings("Duplicates")
-public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
+public class SlidingTimeWindowArrayReservoirTest {
+
+    public static final int CYCLES = 100000;
+
+    @Test
+    public void allocTest() {
+        SlidingTimeWindowArrayReservoir reservoir = new SlidingTimeWindowArrayReservoir(500, TimeUnit.SECONDS);
+        for (int i = 0; i < 1024; i++) {
+            reservoir.update(i);
+        }
+        reservoir.update(31L);
+        reservoir.update(15L);
+        long[] values = reservoir.getSnapshot().getValues();
+        String stringValues = Arrays.toString(Arrays.copyOfRange(values, values.length - 2, values.length));
+
+        System.out.println(stringValues);
+    }
+
+    @Test
+    public void t() throws InterruptedException {
+        final AtomicReference<SlidingTimeWindowArrayReservoir> reservoir = new AtomicReference<SlidingTimeWindowArrayReservoir>(
+            new SlidingTimeWindowArrayReservoir(1, SECONDS)
+        );
+        ExecutorService actor1 = Executors.newSingleThreadExecutor();
+        ExecutorService actor2 = Executors.newSingleThreadExecutor();
+        ExecutorService actor3 = Executors.newSingleThreadExecutor();
+
+        final CyclicBarrier cyclicBarrier = new CyclicBarrier(3, new Runnable() {
+            @Override public void run() {
+                reservoir.set(new SlidingTimeWindowArrayReservoir(1, SECONDS));
+            }
+        });
+        final Random random = new Random();
+
+        actor1.execute(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < CYCLES; i++) {
+                    reservoir.get().update(51L);
+                    try {
+                        cyclicBarrier.await();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (BrokenBarrierException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        actor2.execute(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < CYCLES; i++) {
+                    reservoir.get().update(31L);
+                    try {
+                        cyclicBarrier.await();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (BrokenBarrierException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        actor3.execute(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < CYCLES; i++) {
+                    try {
+                        Snapshot snapshot = reservoir.get().getSnapshot();
+                        if (random.nextDouble() < 1D / CYCLES) {
+                            System.out.println(snapshot);
+                        }
+                        cyclicBarrier.await();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        actor1.shutdown();
+        actor2.shutdown();
+        actor3.shutdown();
+        actor1.awaitTermination(1, TimeUnit.HOURS);
+        actor2.awaitTermination(1, TimeUnit.HOURS);
+        actor3.awaitTermination(1, TimeUnit.HOURS);
+    }
+
     @Test
     public void storesMeasurementsWithDuplicateTicks() throws Exception {
         final Clock clock = mock(Clock.class);
@@ -25,7 +119,7 @@ public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
         reservoir.update(2);
 
         assertThat(reservoir.getSnapshot().getValues())
-                .containsOnly(1, 2);
+            .containsOnly(1, 2);
     }
 
     @Test
@@ -49,25 +143,8 @@ public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
         reservoir.update(5);
 
         assertThat(reservoir.getSnapshot().getValues())
-                .containsOnly(4, 5);
+            .containsOnly(4, 5);
     }
-
-//    @Test
-//    public void profilingTest() {
-//        long time = TimeUnit.HOURS.toNanos(1) * 256 - 1000;
-//        AtomicLong counter = new AtomicLong(Long.MAX_VALUE - time);
-//        ManualClock manualClock = new ManualClock();
-//        int window = 3;
-////        Random random = new Random(ThreadLocalRandom.current().nextInt());
-//
-//        SlidingTimeWindowArrayReservoir arrayReservoir = new SlidingTimeWindowArrayReservoir(window, NANOSECONDS, manualClock);
-//
-//        for (int i = 0; i < 100000000; i++) {
-//            long l = counter.incrementAndGet();
-//            manualClock.addNanos(l);
-//            arrayReservoir.update(l);
-//        }
-//    }
 
     @Test
     public void comparisonResultsTest() {
@@ -80,7 +157,7 @@ public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
         SlidingTimeWindowReservoir treeReservoir = new SlidingTimeWindowReservoir(window, NANOSECONDS, manualClock);
         SlidingTimeWindowArrayReservoir arrayReservoir = new SlidingTimeWindowArrayReservoir(window, NANOSECONDS, manualClock);
 
-        for (int i = 0; i < 100000000; i++) {
+        for (int i = 0; i < 10000000; i++) {
             long l = counter.incrementAndGet();
             if (random.nextDouble() < 0.2) {
                 manualClock.addNanos(l);
@@ -102,7 +179,7 @@ public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
     }
 
     @Test
-    public void testGetTickOverflow () {
+    public void testGetTickOverflow() {
         final Random random = new Random(0);
         final int window = 128;
         AtomicLong counter = new AtomicLong(0L);
@@ -116,7 +193,7 @@ public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
 
                 // Set the clock to overflow in (2*window+1)ns
                 final ManualClock clock = new ManualClock();
-                clock.addNanos(Long.MAX_VALUE/256 - 2*window - clock.getTick());
+                clock.addNanos(Long.MAX_VALUE / 256 - 2 * window - clock.getTick());
                 assertThat(clock.getTick() * 256).isGreaterThan(0);
 
                 // Create the reservoir
@@ -132,8 +209,8 @@ public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
                     // Randomly check the reservoir size
                     if (random.nextDouble() < 0.1) {
                         assertThat(reservoir.size())
-                                .as("Bad reservoir size with: threshold=%d, updatesPerTick=%d", threshold, updatesPerTick)
-                                .isLessThanOrEqualTo(window * 256);
+                            .as("Bad reservoir size with: threshold=%d, updatesPerTick=%d", threshold, updatesPerTick)
+                            .isLessThanOrEqualTo(window * 256);
                     }
 
                     // Update the clock
@@ -141,15 +218,16 @@ public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
 
                     // If the clock has overflowed start counting updates
                     if ((clock.getTick() * 256) < 0) {
-                        if (updatesAfterThreshold++ >= threshold)
+                        if (updatesAfterThreshold++ >= threshold) {
                             break;
+                        }
                     }
                 }
 
                 // Check the final reservoir size
                 assertThat(reservoir.size())
-                        .as("Bad final reservoir size with: threshold=%d, updatesPerTick=%d", threshold, updatesPerTick)
-                        .isLessThanOrEqualTo(window * 256);
+                    .as("Bad final reservoir size with: threshold=%d, updatesPerTick=%d", threshold, updatesPerTick)
+                    .isLessThanOrEqualTo(window * 256);
 
                 // Advance the clock far enough to clear the reservoir.  Note that here the window only loosely defines
                 // the reservoir window; when updatesPerTick is greater than 128 the sliding window will always be well
@@ -162,8 +240,8 @@ public class SlidingTimeWindowChunkedArrayBasedReservoirTest {
 
                 // The reservoir should now be empty
                 assertThat(reservoir.size())
-                        .as("Bad reservoir size after delay with: threshold=%d, updatesPerTick=%d", threshold, updatesPerTick)
-                        .isEqualTo(0);
+                    .as("Bad reservoir size after delay with: threshold=%d, updatesPerTick=%d", threshold, updatesPerTick)
+                    .isEqualTo(0);
             }
         }
     }

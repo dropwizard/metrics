@@ -9,9 +9,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class SlidingTimeWindowArrayReservoir implements Reservoir {
     // allow for this many duplicate ticks before overwriting measurements
-    private static final int COLLISION_BUFFER = 256;
+    private static final long COLLISION_BUFFER = 256L;
     // only trim on updating once every N
-    private static final int TRIM_THRESHOLD = 256;
+    private static final long TRIM_THRESHOLD = 256L;
     private static final long CLEAR_BUFFER = TimeUnit.HOURS.toNanos(1) * COLLISION_BUFFER;
 
     private final Clock clock;
@@ -53,7 +53,7 @@ public class SlidingTimeWindowArrayReservoir implements Reservoir {
 
     @Override
     public void update(long value) {
-        if (count.incrementAndGet() % TRIM_THRESHOLD == 0) {
+        if (count.incrementAndGet() % TRIM_THRESHOLD == 0L) {
             trim();
         }
         long lastTick = this.lastTick.get();
@@ -76,7 +76,7 @@ public class SlidingTimeWindowArrayReservoir implements Reservoir {
             final long oldTick = lastTick.get();
             final long tick = clock.getTick() * COLLISION_BUFFER;
             // ensure the tick is strictly incrementing even if there are duplicate ticks
-            final long newTick = tick - oldTick > 0 ? tick : oldTick + 1;
+            final long newTick = tick - oldTick > 0L ? tick : oldTick + 1L;
             if (lastTick.compareAndSet(oldTick, newTick)) {
                 return newTick;
             }
