@@ -35,8 +35,9 @@ class ThreadLocalRandomProxy {
     private static final Provider INSTANCE = getThreadLocalProvider();
     private static Provider getThreadLocalProvider() {
         try {
+            Class.forName("java.util.concurrent.ThreadLocalRandom");
             return new JdkProvider();
-        } catch (NoClassDefFoundError e) {
+        } catch (ClassNotFoundException e) {
             return new InternalProvider();
         }
     }
