@@ -13,7 +13,6 @@ import io.dropwizard.metrics.Timer;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
-import org.python.antlr.PythonParser.test_return;
 
 import io.dropwizard.metrics.*;
 
