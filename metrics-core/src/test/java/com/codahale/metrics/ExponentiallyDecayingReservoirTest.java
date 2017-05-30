@@ -102,6 +102,35 @@ public class ExponentiallyDecayingReservoirTest {
     }
 
     @Test
+    public void longPeriodsOfInactivity_fetchShouldResample() {
+        final ManualClock clock = new ManualClock();
+        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(10,
+                0.015,
+                clock);
+
+        // add 1000 values at a rate of 10 values/second
+        for (int i = 0; i < 1000; i++) {
+            reservoir.update(1000 + i);
+            clock.addMillis(100);
+        }
+        assertThat(reservoir.getSnapshot().size())
+                .isEqualTo(10);
+        assertAllValuesBetween(reservoir, 1000, 2000);
+
+        // wait for 15 hours and add another value.
+        // this should trigger a rescale. Note that the number of samples will be reduced to 2
+        // because of the very small scaling factor that will make all existing priorities equal to
+        // zero after rescale.
+        clock.addHours(20);
+
+        Snapshot snapshot = reservoir.getSnapshot();
+        assertThat(snapshot.getMax()).isEqualTo(0);
+        assertThat(snapshot.getMean()).isEqualTo(0);
+        assertThat(snapshot.getMedian()).isEqualTo(0);
+        assertThat(snapshot.size()).isEqualTo(1);
+    }
+
+    @Test
     public void multipleUpdatesAfterlongPeriodsOfInactivityShouldNotCorruptSamplingState () throws Exception {
         // This test illustrates the potential race condition in rescale that
         // can lead to a corrupt state.  Note that while this test uses updates
@@ -210,13 +239,13 @@ public class ExponentiallyDecayingReservoirTest {
             reservoir.update(177);
             clock.addMillis(valuesIntervalMillis);
         }
-        
+
         // switching to mode 2: 10 minutes more with the same rate, but larger value
         for (int i = 0; i < 10*valuesRatePerMinute; i++) {
             reservoir.update(9999);
             clock.addMillis(valuesIntervalMillis);
         }
-        
+
         // expect that quantiles should be more about mode 2 after 10 minutes
         assertThat(reservoir.getSnapshot().getMedian())
                 .isEqualTo(9999);
@@ -228,7 +257,7 @@ public class ExponentiallyDecayingReservoirTest {
         final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(1000,
                                                                                             0.015,
                                                                                             clock);
-        
+
         final int valuesRatePerMinute = 10;
         final int valuesIntervalMillis = (int) (TimeUnit.MINUTES.toMillis(1) / valuesRatePerMinute);
         // mode 1: steady regime for 120 minutes
@@ -236,18 +265,18 @@ public class ExponentiallyDecayingReservoirTest {
             reservoir.update(9998);
             clock.addMillis(valuesIntervalMillis);
         }
-        
+
         // switching to mode 2: 10 minutes more with the same rate, but smaller value
         for (int i = 0; i < 10*valuesRatePerMinute; i++) {
             reservoir.update(178);
             clock.addMillis(valuesIntervalMillis);
         }
-        
+
         // expect that quantiles should be more about mode 2 after 10 minutes
         assertThat(reservoir.getSnapshot().get95thPercentile())
                 .isEqualTo(178);
     }
-    
+
     @Test
     public void quantiliesShouldBeBasedOnWeights() {
         final ManualClock clock = new ManualClock();
@@ -259,7 +288,7 @@ public class ExponentiallyDecayingReservoirTest {
         }
 
         clock.addSeconds(120);
-        
+
         for (int i = 0; i < 10; i++) {
             reservoir.update(9999);
         }
@@ -275,7 +304,7 @@ public class ExponentiallyDecayingReservoirTest {
         assertThat(reservoir.getSnapshot().get75thPercentile())
                 .isEqualTo(9999);
     }
-    
+
     private static void assertAllValuesBetween(ExponentiallyDecayingReservoir reservoir,
                                                double min,
                                                double max) {

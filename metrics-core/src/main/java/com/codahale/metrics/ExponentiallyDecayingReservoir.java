@@ -96,7 +96,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
             final double itemWeight = weight(timestamp - startTime);
             final WeightedSample sample = new WeightedSample(value, itemWeight);
             final double priority = itemWeight / ThreadLocalRandomProxy.current().nextDouble();
-            
+
             final long newCount = count.incrementAndGet();
             if (newCount <= size) {
                 values.put(priority, sample);
@@ -124,6 +124,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
 
     @Override
     public Snapshot getSnapshot() {
+        rescaleIfNeeded();
         lockForRegularUsage();
         try {
             return new WeightedSnapshot(values.values());
