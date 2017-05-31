@@ -38,14 +38,13 @@ public class WeightedSnapshot extends Snapshot {
      * @param values    an unordered set of values in the reservoir
      */
     public WeightedSnapshot(Collection<WeightedSample> values) {
-        final WeightedSample[] copy = values.toArray( new WeightedSample[]{} );
-
         if (values.size()==1 && Double.compare(values.iterator().next().weight,0D)==0) {
             this.values = new long[0];
             this.normWeights = new double[0];
             this.quantiles = new double[0];
             return;
         }
+        final WeightedSample[] copy = values.toArray( new WeightedSample[]{} );
 
         Arrays.sort(copy, new Comparator<WeightedSample>() {
             @Override
