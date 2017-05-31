@@ -127,7 +127,19 @@ public class ExponentiallyDecayingReservoirTest {
         assertThat(snapshot.getMax()).isEqualTo(0);
         assertThat(snapshot.getMean()).isEqualTo(0);
         assertThat(snapshot.getMedian()).isEqualTo(0);
-        assertThat(snapshot.size()).isEqualTo(1);
+        assertThat(snapshot.size()).isEqualTo(0);
+    }
+
+    @Test
+    public void emptyReservoirSnapshot_shouldReturnZeroForAllValues() {
+        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(100, 0.015,
+                new ManualClock());
+
+        Snapshot snapshot = reservoir.getSnapshot();
+        assertThat(snapshot.getMax()).isEqualTo(0);
+        assertThat(snapshot.getMean()).isEqualTo(0);
+        assertThat(snapshot.getMedian()).isEqualTo(0);
+        assertThat(snapshot.size()).isEqualTo(0);
     }
 
     @Test

@@ -12,7 +12,7 @@ import java.util.Comparator;
  * A statistical snapshot of a {@link WeightedSnapshot}.
  */
 public class WeightedSnapshot extends Snapshot {
-    
+
     /**
      * A single sample item with value and its weights for {@link WeightedSnapshot}.
      */
@@ -25,7 +25,7 @@ public class WeightedSnapshot extends Snapshot {
             this.weight = weight;
         }
     }
-    
+
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private final long[] values;
@@ -39,7 +39,14 @@ public class WeightedSnapshot extends Snapshot {
      */
     public WeightedSnapshot(Collection<WeightedSample> values) {
         final WeightedSample[] copy = values.toArray( new WeightedSample[]{} );
-    
+
+        if (values.size()==1 && Double.compare(values.iterator().next().weight,0D)==0) {
+            this.values = new long[0];
+            this.normWeights = new double[0];
+            this.quantiles = new double[0];
+            return;
+        }
+
         Arrays.sort(copy, new Comparator<WeightedSample>() {
             @Override
             public int compare(WeightedSample o1, WeightedSample o2) {
@@ -55,7 +62,7 @@ public class WeightedSnapshot extends Snapshot {
         this.values = new long[copy.length];
         this.normWeights = new double[copy.length];
         this.quantiles = new double[copy.length];
-        
+
         double sumWeight = 0;
         for (WeightedSample sample : copy) {
             sumWeight += sample.weight;
