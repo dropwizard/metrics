@@ -45,7 +45,7 @@ public class WeightedSnapshot extends Snapshot {
             return;
         }
         final WeightedSample[] copy = values.toArray( new WeightedSample[]{} );
-        
+    
         Arrays.sort(copy, new Comparator<WeightedSample>() {
             @Override
             public int compare(WeightedSample o1, WeightedSample o2) {
