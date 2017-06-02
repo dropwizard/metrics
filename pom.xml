@@ -192,6 +192,7 @@
                     <compilerId>javac-with-errorprone</compilerId>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <showWarnings>true</showWarnings>
+                    <compilerArgument>-Xlint:all</compilerArgument>
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
