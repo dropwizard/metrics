@@ -97,7 +97,7 @@ class LongAdderProxy {
             final JdkProvider jdkProvider = new JdkProvider();
             jdkProvider.get(); // To trigger a possible `NoClassDefFoundError` exception
             return jdkProvider;
-        } catch (NoClassDefFoundError e) {
+        } catch (Throwable e) {
             return new InternalLongAdderProvider();
         }
     }
