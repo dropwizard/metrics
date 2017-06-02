@@ -265,6 +265,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * @param meters     all of the meters in the registry
      * @param timers     all of the timers in the registry
      */
+    @SuppressWarnings("rawtypes")
     public abstract void report(SortedMap<String, Gauge> gauges,
                                 SortedMap<String, Counter> counters,
                                 SortedMap<String, Histogram> histograms,

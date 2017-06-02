@@ -216,6 +216,7 @@ public class ConsoleReporter extends ScheduledReporter {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public void report(SortedMap<String, Gauge> gauges,
                        SortedMap<String, Counter> counters,
                        SortedMap<String, Histogram> histograms,
@@ -229,7 +230,7 @@ public class ConsoleReporter extends ScheduledReporter {
             printWithBanner("-- Gauges", '-');
             for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
                 output.println(entry.getKey());
-                printGauge(entry);
+                printGauge(entry.getValue());
             }
             output.println();
         }
@@ -286,8 +287,8 @@ public class ConsoleReporter extends ScheduledReporter {
         output.printf(locale, "             count = %d%n", entry.getValue().getCount());
     }
 
-    private void printGauge(Map.Entry<String, Gauge> entry) {
-        output.printf(locale, "             value = %s%n", entry.getValue().getValue());
+    private void printGauge(Gauge<?> gauge) {
+        output.printf(locale, "             value = %s%n", gauge.getValue());
     }
 
     private void printHistogram(Histogram histogram) {
