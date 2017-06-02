@@ -9,6 +9,7 @@ public interface Metered extends Metric, Counting {
      *
      * @return the number of events which have been marked
      */
+    @Override
     long getCount();
 
     /**

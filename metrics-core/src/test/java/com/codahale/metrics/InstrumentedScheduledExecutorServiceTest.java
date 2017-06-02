@@ -40,19 +40,17 @@ public class InstrumentedScheduledExecutorServiceTest {
         assertThat(scheduledOverrun.getCount()).isZero();
         assertThat(percentOfPeriod.getCount()).isZero();
 
-        Future<?> theFuture = instrumentedScheduledExecutor.submit(new Runnable() {
-            public void run() {
-                assertThat(submitted.getCount()).isEqualTo(1);
+        Future<?> theFuture = instrumentedScheduledExecutor.submit(() -> {
+            assertThat(submitted.getCount()).isEqualTo(1);
 
-                assertThat(running.getCount()).isEqualTo(1);
-                assertThat(completed.getCount()).isZero();
-                assertThat(duration.getCount()).isZero();
+            assertThat(running.getCount()).isEqualTo(1);
+            assertThat(completed.getCount()).isZero();
+            assertThat(duration.getCount()).isZero();
 
-                assertThat(scheduledOnce.getCount()).isZero();
-                assertThat(scheduledRepetitively.getCount()).isZero();
-                assertThat(scheduledOverrun.getCount()).isZero();
-                assertThat(percentOfPeriod.getCount()).isZero();
-            }
+            assertThat(scheduledOnce.getCount()).isZero();
+            assertThat(scheduledRepetitively.getCount()).isZero();
+            assertThat(scheduledOverrun.getCount()).isZero();
+            assertThat(percentOfPeriod.getCount()).isZero();
         });
 
         theFuture.get();
@@ -83,19 +81,17 @@ public class InstrumentedScheduledExecutorServiceTest {
         assertThat(scheduledOverrun.getCount()).isZero();
         assertThat(percentOfPeriod.getCount()).isZero();
 
-        ScheduledFuture<?> theFuture = instrumentedScheduledExecutor.schedule(new Runnable() {
-            public void run() {
-                assertThat(submitted.getCount()).isZero();
+        ScheduledFuture<?> theFuture = instrumentedScheduledExecutor.schedule(() -> {
+            assertThat(submitted.getCount()).isZero();
 
-                assertThat(running.getCount()).isEqualTo(1);
-                assertThat(completed.getCount()).isZero();
-                assertThat(duration.getCount()).isZero();
+            assertThat(running.getCount()).isEqualTo(1);
+            assertThat(completed.getCount()).isZero();
+            assertThat(duration.getCount()).isZero();
 
-                assertThat(scheduledOnce.getCount()).isEqualTo(1);
-                assertThat(scheduledRepetitively.getCount()).isZero();
-                assertThat(scheduledOverrun.getCount()).isZero();
-                assertThat(percentOfPeriod.getCount()).isZero();
-            }
+            assertThat(scheduledOnce.getCount()).isEqualTo(1);
+            assertThat(scheduledRepetitively.getCount()).isZero();
+            assertThat(scheduledOverrun.getCount()).isZero();
+            assertThat(percentOfPeriod.getCount()).isZero();
         }, 10L, TimeUnit.MILLISECONDS);
 
         theFuture.get();
@@ -128,21 +124,19 @@ public class InstrumentedScheduledExecutorServiceTest {
 
         final Object obj = new Object();
 
-        Future<Object> theFuture = instrumentedScheduledExecutor.submit(new Callable<Object>() {
-            public Object call() {
-                assertThat(submitted.getCount()).isEqualTo(1);
+        Future<Object> theFuture = instrumentedScheduledExecutor.submit(() -> {
+            assertThat(submitted.getCount()).isEqualTo(1);
 
-                assertThat(running.getCount()).isEqualTo(1);
-                assertThat(completed.getCount()).isZero();
-                assertThat(duration.getCount()).isZero();
+            assertThat(running.getCount()).isEqualTo(1);
+            assertThat(completed.getCount()).isZero();
+            assertThat(duration.getCount()).isZero();
 
-                assertThat(scheduledOnce.getCount()).isZero();
-                assertThat(scheduledRepetitively.getCount()).isZero();
-                assertThat(scheduledOverrun.getCount()).isZero();
-                assertThat(percentOfPeriod.getCount()).isZero();
+            assertThat(scheduledOnce.getCount()).isZero();
+            assertThat(scheduledRepetitively.getCount()).isZero();
+            assertThat(scheduledOverrun.getCount()).isZero();
+            assertThat(percentOfPeriod.getCount()).isZero();
 
-                return obj;
-            }
+            return obj;
         });
 
         assertThat(theFuture.get()).isEqualTo(obj);
@@ -175,21 +169,19 @@ public class InstrumentedScheduledExecutorServiceTest {
 
         final Object obj = new Object();
 
-        ScheduledFuture<Object> theFuture = instrumentedScheduledExecutor.schedule(new Callable<Object>() {
-            public Object call() {
-                assertThat(submitted.getCount()).isZero();
+        ScheduledFuture<Object> theFuture = instrumentedScheduledExecutor.schedule(() -> {
+            assertThat(submitted.getCount()).isZero();
 
-                assertThat(running.getCount()).isEqualTo(1);
-                assertThat(completed.getCount()).isZero();
-                assertThat(duration.getCount()).isZero();
+            assertThat(running.getCount()).isEqualTo(1);
+            assertThat(completed.getCount()).isZero();
+            assertThat(duration.getCount()).isZero();
 
-                assertThat(scheduledOnce.getCount()).isEqualTo(1);
-                assertThat(scheduledRepetitively.getCount()).isZero();
-                assertThat(scheduledOverrun.getCount()).isZero();
-                assertThat(percentOfPeriod.getCount()).isZero();
+            assertThat(scheduledOnce.getCount()).isEqualTo(1);
+            assertThat(scheduledRepetitively.getCount()).isZero();
+            assertThat(scheduledOverrun.getCount()).isZero();
+            assertThat(percentOfPeriod.getCount()).isZero();
 
-                return obj;
-            }
+            return obj;
         }, 10L, TimeUnit.MILLISECONDS);
 
         assertThat(theFuture.get()).isEqualTo(obj);
@@ -220,22 +212,18 @@ public class InstrumentedScheduledExecutorServiceTest {
         assertThat(scheduledOverrun.getCount()).isZero();
         assertThat(percentOfPeriod.getCount()).isZero();
 
-        ScheduledFuture<?> theFuture = instrumentedScheduledExecutor.scheduleAtFixedRate(new Runnable() {
-            public void run() {
-                assertThat(submitted.getCount()).isZero();
+        ScheduledFuture<?> theFuture = instrumentedScheduledExecutor.scheduleAtFixedRate(() -> {
+            assertThat(submitted.getCount()).isZero();
 
-                assertThat(running.getCount()).isEqualTo(1);
+            assertThat(running.getCount()).isEqualTo(1);
 
-                assertThat(scheduledOnce.getCount()).isEqualTo(0);
-                assertThat(scheduledRepetitively.getCount()).isEqualTo(1);
+            assertThat(scheduledOnce.getCount()).isEqualTo(0);
+            assertThat(scheduledRepetitively.getCount()).isEqualTo(1);
 
-                try {
-                    TimeUnit.MILLISECONDS.sleep(50);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-
-                return;
+            try {
+                TimeUnit.MILLISECONDS.sleep(50);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
             }
         }, 10L, 10L, TimeUnit.MILLISECONDS);
 
