@@ -33,6 +33,7 @@ public class ScheduledReporterTest {
     private final ScheduledReporter[] reporters = new ScheduledReporter[] {reporter, reporterWithCustomExecutor, reporterWithExternallyManagedExecutor};
 
     @Before
+    @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
         registry.register("gauge", gauge);
         registry.register("counter", counter);
