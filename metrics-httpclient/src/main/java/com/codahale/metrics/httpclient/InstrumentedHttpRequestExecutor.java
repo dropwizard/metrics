@@ -9,6 +9,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestExecutor;
 
+import com.codahale.metrics.Meter;
+
 import java.io.IOException;
 
 public class InstrumentedHttpRequestExecutor extends HttpRequestExecutor {
@@ -42,6 +44,9 @@ public class InstrumentedHttpRequestExecutor extends HttpRequestExecutor {
         final Timer.Context timerContext = timer(request).time();
         try {
             return super.execute(request, conn, context);
+        } catch (HttpException | IOException e) {
+            meter(e).mark();
+            throw e;
         } finally {
             timerContext.stop();
         }
@@ -49,5 +54,9 @@ public class InstrumentedHttpRequestExecutor extends HttpRequestExecutor {
 
     private Timer timer(HttpRequest request) {
         return registry.timer(metricNameStrategy.getNameFor(name, request));
+    }
+
+    private Meter meter(Exception e) {
+        return registry.meter(metricNameStrategy.getNameFor(name, e));
     }
 }
