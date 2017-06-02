@@ -172,7 +172,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
          public void run() {
              try {
                  report();
-             } catch (Exception ex) {
+             } catch (Throwable ex) {
                  LOG.error("Exception thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
              }
          }
