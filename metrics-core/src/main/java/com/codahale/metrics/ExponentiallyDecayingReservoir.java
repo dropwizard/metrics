@@ -124,6 +124,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
 
     @Override
     public Snapshot getSnapshot() {
+        rescaleIfNeeded();
         lockForRegularUsage();
         try {
             return new WeightedSnapshot(values.values());
