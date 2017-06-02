@@ -15,6 +15,8 @@ import org.apache.http.nio.protocol.HttpAsyncRequestProducer;
 import org.apache.http.nio.protocol.HttpAsyncResponseConsumer;
 import org.apache.http.protocol.HttpContext;
 
+import static java.util.Objects.requireNonNull;
+
 public class InstrumentedNHttpClientBuilder extends HttpAsyncClientBuilder {
     private final MetricRegistry metricRegistry;
     private final String name;
@@ -63,16 +65,11 @@ public class InstrumentedNHttpClientBuilder extends HttpAsyncClientBuilder {
                 final Timer.Context timerContext;
                 try {
                     timerContext = timer(requestProducer.generateRequest()).time();
-                } catch (IOException ex) {
-                    throw new AssertionError(ex);
-                } catch (HttpException ex) {
-                    throw new AssertionError(ex);
+                } catch (IOException | HttpException ex) {
+                    throw new RuntimeException(ex);
                 }
-                try {
-                    return ac.execute(requestProducer, responseConsumer, context, callback);
-                } finally {
-                    timerContext.stop();
-                }
+                return ac.execute(requestProducer, responseConsumer, context,
+                        new TimingFutureCallback<>(callback, timerContext));
             }
 
             @Override
@@ -80,6 +77,41 @@ public class InstrumentedNHttpClientBuilder extends HttpAsyncClientBuilder {
                 ac.close();
             }
         };
+    }
+
+    private static class TimingFutureCallback<T> implements FutureCallback<T> {
+        private final FutureCallback<T> callback;
+        private final Timer.Context timerContext;
+
+        private TimingFutureCallback(FutureCallback<T> callback,
+                                     Timer.Context timerContext) {
+            this.callback = callback;
+            this.timerContext = requireNonNull(timerContext, "timerContext");
+        }
+
+        @Override
+        public void completed(T result) {
+            timerContext.stop();
+            if(callback != null) {
+                callback.completed(result);
+            }
+        }
+
+        @Override
+        public void failed(Exception ex) {
+            timerContext.stop();
+            if(callback != null) {
+                callback.failed(ex);
+            }
+        }
+
+        @Override
+        public void cancelled() {
+            timerContext.stop();
+            if(callback != null) {
+                callback.cancelled();
+            }
+        }
     }
 
 }
