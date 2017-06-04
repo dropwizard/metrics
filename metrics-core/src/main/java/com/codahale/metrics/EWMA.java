@@ -88,7 +88,8 @@ public class EWMA {
         final long count = uncounted.sumThenReset();
         final double instantRate = count / interval;
         if (initialized) {
-            rate += (alpha * (instantRate - rate));
+            final double oldRate = this.rate;
+            rate = oldRate + (alpha * (instantRate - oldRate));
         } else {
             rate = instantRate;
             initialized = true;
