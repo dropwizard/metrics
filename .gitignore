@@ -9,3 +9,5 @@ bin
 *.iws
 .metadata
 jcstress.*
+metrics-jcstress/results/
+TODO.md

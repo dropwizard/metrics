@@ -15,7 +15,7 @@ public class SlidingTimeWindowArrayReservoir implements Reservoir {
     private static final long CLEAR_BUFFER = TimeUnit.HOURS.toNanos(1) * COLLISION_BUFFER;
 
     private final Clock clock;
-    private final ChunkedAssociativeLongArray measurements;
+    final ChunkedAssociativeLongArray measurements;
     private final long window;
     private final AtomicLong lastTick;
     private final AtomicLong count;
@@ -53,16 +53,18 @@ public class SlidingTimeWindowArrayReservoir implements Reservoir {
 
     @Override
     public void update(long value) {
-        if (count.incrementAndGet() % TRIM_THRESHOLD == 0L) {
-            trim();
-        }
-        long lastTick = this.lastTick.get();
-        long newTick = getTick();
-        boolean longOverflow = newTick < lastTick;
-        if (longOverflow) {
-            measurements.clear();
-        }
-        measurements.put(newTick, value);
+        long newTick;
+        do {
+            if (count.incrementAndGet() % TRIM_THRESHOLD == 0L) {
+                trim();
+            }
+            long lastTick = this.lastTick.get();
+            newTick = getTick();
+            boolean longOverflow = newTick < lastTick;
+            if (longOverflow) {
+                measurements.clear();
+            }
+        } while (!measurements.put(newTick, value));
     }
 
     @Override
@@ -83,7 +85,7 @@ public class SlidingTimeWindowArrayReservoir implements Reservoir {
         }
     }
 
-    private void trim() {
+    void trim() {
         final long now = getTick();
         final long windowStart = now - window;
         final long windowEnd = now + CLEAR_BUFFER;

@@ -1,7 +1,5 @@
-package com.codahale.metrics.jcstress;
+package com.codahale.metrics;
 
-import com.codahale.metrics.SlidingTimeWindowArrayReservoir;
-import com.codahale.metrics.Snapshot;
 import org.openjdk.jcstress.annotations.Actor;
 import org.openjdk.jcstress.annotations.Expect;
 import org.openjdk.jcstress.annotations.JCStressTest;
@@ -12,7 +10,7 @@ import org.openjdk.jcstress.infra.results.StringResult1;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-//@JCStressTest
+@JCStressTest
 @Outcome(id = "\\[\\]", expect = Expect.ACCEPTABLE)
 @Outcome(id = "\\[31\\]", expect = Expect.ACCEPTABLE)
 @Outcome(id = "\\[15\\]", expect = Expect.ACCEPTABLE)

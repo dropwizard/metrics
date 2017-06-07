@@ -3,6 +3,7 @@ package com.codahale.metrics;
 import static java.util.Arrays.binarySearch;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -26,9 +27,12 @@ public class ChunkedAssociativeLongArray {
         this.activeChunk = new Chunk(chunkSize);
     }
 
-    public void put(long key, long value) {
+    public boolean put(long key, long value) {
         activeChunkLock.lock();
         try {
+            if (activeChunk.cursor != 0 && activeChunk.keys[activeChunk.cursor-1] > key) {
+                return false; // key should be the same as last inserted or bigger
+            }
             boolean isFull = activeChunk.cursor - activeChunk.startIndex == activeChunk.chunkSize;
             if (isFull) {
                 activeChunk = new Chunk(activeChunk, this.defaultChunkSize);
@@ -37,9 +41,10 @@ public class ChunkedAssociativeLongArray {
         } finally {
             activeChunkLock.unlock();
         }
+        return true;
     }
 
-    public int traverse(Deque<Chunk> traversedChunksDeque) {
+    private int traverse(Deque<Chunk> traversedChunksDeque) {
         Chunk currentChunk;
         activeChunkLock.lock();
         try {
@@ -59,7 +64,6 @@ public class ChunkedAssociativeLongArray {
             }
             currentChunk = currentChunk.tailChunk;
         }
-
         return valuesSize;
     }
 
@@ -76,10 +80,18 @@ public class ChunkedAssociativeLongArray {
             int valuesIndex = 0;
             while (!chunksDeque.isEmpty()) {
                 Chunk copySourceChunk = chunksDeque.removeLast();
-                int length = copySourceChunk.cursor - copySourceChunk.startIndex;
+                int startIndex = copySourceChunk.startIndex;
+                int cursor = copySourceChunk.cursor;
+                // it is important to calculate length and copy array with local indexes
+                // it guaranties that startIndex won't change between length calculation and copying
+                int length = cursor - startIndex;
                 int itemsToCopy = Math.min(valuesSize - valuesIndex, length);
-                System.arraycopy(copySourceChunk.values, copySourceChunk.startIndex, values, valuesIndex, itemsToCopy);
+                System.arraycopy(copySourceChunk.values, startIndex, values, valuesIndex, itemsToCopy);
                 valuesIndex += length;
+            }
+            if (valuesIndex < valuesSize) {
+                // chunk was trimmed during copying (very rare case found with jcstress)
+                values = Arrays.copyOf(values, valuesIndex);
             }
             return values;
         } finally {
@@ -123,7 +135,7 @@ public class ChunkedAssociativeLongArray {
      * @param startKey
      * @param endKey
      */
-    public void trim(long startKey, long endKey) {
+    void trim(long startKey, long endKey) {
         /*
          * [3, 4, 5, 9] -> [10, 13, 14, 15] -> [21, 24, 29, 30] -> [31] :: start layout
          *       |5______________________________23|                    :: trim(5, 23)
@@ -268,6 +280,7 @@ public class ChunkedAssociativeLongArray {
     }
 
     private static class Chunk {
+
         private final long[] keys;
         private final long[] values;
 

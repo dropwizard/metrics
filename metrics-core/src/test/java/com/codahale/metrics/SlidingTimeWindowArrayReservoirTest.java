@@ -23,19 +23,38 @@ public class SlidingTimeWindowArrayReservoirTest {
 
     public static final int CYCLES = 100000;
 
-    @Test
-    public void allocTest() {
-        SlidingTimeWindowArrayReservoir reservoir = new SlidingTimeWindowArrayReservoir(500, TimeUnit.SECONDS);
-        for (int i = 0; i < 1024; i++) {
-            reservoir.update(i);
-        }
-        reservoir.update(31L);
-        reservoir.update(15L);
-        long[] values = reservoir.getSnapshot().getValues();
-        String stringValues = Arrays.toString(Arrays.copyOfRange(values, values.length - 2, values.length));
-
-        System.out.println(stringValues);
-    }
+//    @Test
+//    public void simultaneousReadAndTrim() throws InterruptedException {
+//        for (int j = 0; j < 1000; j++) {
+//            final AtomicLong ticks = new AtomicLong(0);
+//            final SlidingTimeWindowArrayReservoir reservoir = new SlidingTimeWindowArrayReservoir(10, TimeUnit.NANOSECONDS, new Clock() {
+//                @Override
+//                public long getTick() {
+//                    return ticks.get();
+//                }
+//            });
+//
+//            for (int i = 0; i < 250; i++) {
+//                ticks.set(i);
+//                reservoir.update(i);
+//            }
+//            Thread trimer = new Thread(new Runnable() {
+//                @Override public void run() {
+//                    ticks.set(253);
+//                    reservoir.trim();
+//                }
+//            });
+//            Thread dumper = new Thread(new Runnable() {
+//                @Override public void run() {
+//                    System.out.println(Arrays.toString(reservoir.getSnapshot().getValues()));
+//                }
+//            });
+//            trimer.start();
+//            dumper.start();
+//            trimer.join();
+//            dumper.join();
+//        }
+//    }
 
     @Test
     public void t() throws InterruptedException {
