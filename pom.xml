@@ -7,13 +7,13 @@
 
     <groupId>io.dropwizard.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>3.2.3-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
         The Metrics library.
     </description>
-    <url>http://metrics.codahale.com/</url>
+    <url>http://metrics.dropwizard.io</url>
 
     <modules>
         <module>docs</module>
@@ -22,20 +22,15 @@
         <module>metrics-core</module>
         <module>metrics-healthchecks</module>
         <module>metrics-ehcache</module>
-        <module>metrics-ganglia</module>
         <module>metrics-graphite</module>
         <module>metrics-httpclient</module>
         <module>metrics-httpasyncclient</module>
         <module>metrics-jcache</module>
         <module>metrics-jdbi</module>
-        <module>metrics-jersey</module>
         <module>metrics-jersey2</module>
-        <module>metrics-jetty8</module>
         <module>metrics-jetty9</module>
-        <module>metrics-jetty9-legacy</module>
         <module>metrics-json</module>
         <module>metrics-jvm</module>
-        <module>metrics-log4j</module>
         <module>metrics-log4j2</module>
         <module>metrics-logback</module>
         <module>metrics-servlet</module>
@@ -47,11 +42,10 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <servlet.version>3.1.0</servlet.version>
         <slf4j.version>1.7.22</slf4j.version>
-        <jackson.version>2.6.6</jackson.version>
-        <jetty8.version>8.1.11.v20130520</jetty8.version>
-        <jetty9.legacy.version>9.0.4.v20130625</jetty9.legacy.version>
-        <jetty9.version>9.2.2.v20140723</jetty9.version>
+        <jackson.version>2.8.7</jackson.version>
+        <jetty9.version>9.4.2.v20170220</jetty9.version>
         <rabbitmq.version>3.6.6</rabbitmq.version>
+        <javadoc.doclint.none>-Xdoclint:none</javadoc.doclint.none>
     </properties>
 
     <developers>
@@ -124,19 +118,19 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>1.6.1</version>
+            <version>3.6.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
+            <artifactId>mockito-core</artifactId>
+            <version>2.7.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -148,26 +142,6 @@
     </dependencies>
 
     <profiles>
-        <profile>
-            <id>doclint-java8-disable</id>
-            <activation>
-                <jdk>[1.8,)</jdk>
-            </activation>
-
-            <build>
-                <plugins>
-                    <!-- java 8 doclint html verification is excluded to suppress strict HTML 4.0 compliance errors 
-                         like "error: self-closing element not allowed <p />"   -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <additionalparam>-Xdoclint:all -Xdoclint:-html</additionalparam>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>release-sign-artifacts</id>
             <activation>
@@ -207,11 +181,27 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.6.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <compilerId>javac-with-errorprone</compilerId>
+                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.plexus</groupId>
+                        <artifactId>plexus-compiler-javac-errorprone</artifactId>
+                        <version>2.8.1</version>
+                    </dependency>
+                    <!-- override plexus-compiler-javac-errorprone's dependency on
+                         Error Prone with the latest version -->
+                    <dependency>
+                        <groupId>com.google.errorprone</groupId>
+                        <artifactId>error_prone_core</artifactId>
+                        <version>2.0.19</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
@@ -273,6 +263,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.9</version>
+                <configuration>
+                    <additionalparam>${javadoc.doclint.none}</additionalparam>
+                    <quiet>true</quiet>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>

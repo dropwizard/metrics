@@ -121,7 +121,7 @@ public class InstrumentedAppenderTest {
       when(event.getLevel()).thenReturn(Level.INFO);
       shared.doAppend(event);
 
-      assertThat(SharedMetricRegistries.names().contains(InstrumentedAppender.DEFAULT_REGISTRY));
+      assertThat(SharedMetricRegistries.names()).contains(InstrumentedAppender.DEFAULT_REGISTRY);
       assertThat(registry.meter(METRIC_NAME_PREFIX + ".info").getCount())
               .isEqualTo(1);
     }
@@ -135,7 +135,7 @@ public class InstrumentedAppenderTest {
       when(event.getLevel()).thenReturn(Level.INFO);
       shared.doAppend(event);
 
-      assertThat(SharedMetricRegistries.names().contains("something_else"));
+      assertThat(SharedMetricRegistries.names()).contains("something_else");
       assertThat(registry.meter(METRIC_NAME_PREFIX + ".info").getCount())
               .isEqualTo(1);
     }
