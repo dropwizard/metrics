@@ -1,98 +1,19 @@
 package com.codahale.metrics;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Random;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings("Duplicates")
 public class SlidingTimeWindowArrayReservoirTest {
-
-    public static final int CYCLES = 100000;
-
-    @Test
-    public void t() throws InterruptedException {
-        final AtomicReference<SlidingTimeWindowArrayReservoir> reservoir = new AtomicReference<SlidingTimeWindowArrayReservoir>(
-            new SlidingTimeWindowArrayReservoir(1, SECONDS)
-        );
-        ExecutorService actor1 = Executors.newSingleThreadExecutor();
-        ExecutorService actor2 = Executors.newSingleThreadExecutor();
-        ExecutorService actor3 = Executors.newSingleThreadExecutor();
-
-        final CyclicBarrier cyclicBarrier = new CyclicBarrier(3, new Runnable() {
-            @Override public void run() {
-                reservoir.set(new SlidingTimeWindowArrayReservoir(1, SECONDS));
-            }
-        });
-        final Random random = new Random();
-
-        actor1.execute(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < CYCLES; i++) {
-                    reservoir.get().update(51L);
-                    try {
-                        cyclicBarrier.await();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (BrokenBarrierException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        actor2.execute(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < CYCLES; i++) {
-                    reservoir.get().update(31L);
-                    try {
-                        cyclicBarrier.await();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (BrokenBarrierException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        actor3.execute(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < CYCLES; i++) {
-                    try {
-                        Snapshot snapshot = reservoir.get().getSnapshot();
-                        if (random.nextDouble() < 1D / CYCLES) {
-                            System.out.println(snapshot);
-                        }
-                        cyclicBarrier.await();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-
-        actor1.shutdown();
-        actor2.shutdown();
-        actor3.shutdown();
-        actor1.awaitTermination(1, TimeUnit.HOURS);
-        actor2.awaitTermination(1, TimeUnit.HOURS);
-        actor3.awaitTermination(1, TimeUnit.HOURS);
-    }
 
     @Test
     public void storesMeasurementsWithDuplicateTicks() throws Exception {
@@ -151,12 +72,9 @@ public class SlidingTimeWindowArrayReservoirTest {
             treeReservoir.update(l);
             arrayReservoir.update(l);
             if (random.nextDouble() < 0.001) {
-//                System.out.println(arrayReservoir.measurements.out(arrayReservoir.lastTick.get() - window * 256));
                 long[] treeValues = treeReservoir.getSnapshot().getValues();
                 long[] arrValues = arrayReservoir.getSnapshot().getValues();
-//                System.out.println(arrayReservoir.measurements.out(arrayReservoir.lastTick.get() - window * 256));
                 assertThat(arrValues).isEqualTo(treeValues);
-//                System.out.println(" ");
             }
             if (random.nextDouble() < 0.005) {
                 assertThat(arrayReservoir.size()).isEqualTo(treeReservoir.size());

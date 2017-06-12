@@ -15,7 +15,7 @@ public class SlidingTimeWindowArrayReservoir implements Reservoir {
     private static final long CLEAR_BUFFER = TimeUnit.HOURS.toNanos(1) * COLLISION_BUFFER;
 
     private final Clock clock;
-    final ChunkedAssociativeLongArray measurements;
+    private final ChunkedAssociativeLongArray measurements;
     private final long window;
     private final AtomicLong lastTick;
     private final AtomicLong count;

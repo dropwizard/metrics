@@ -7,10 +7,7 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * @author bstorozhuk
- */
-public class ChunkedAssociativeLongArray {
+class ChunkedAssociativeLongArray {
     private static final long[] EMPTY = new long[0];
     private static final int DEFAULT_CHUNK_SIZE = 512;
 
@@ -18,16 +15,16 @@ public class ChunkedAssociativeLongArray {
     private final int defaultChunkSize;
     private Chunk activeChunk;
 
-    public ChunkedAssociativeLongArray() {
+    ChunkedAssociativeLongArray() {
         this(DEFAULT_CHUNK_SIZE);
     }
 
-    public ChunkedAssociativeLongArray(int chunkSize) {
+    ChunkedAssociativeLongArray(int chunkSize) {
         this.defaultChunkSize = chunkSize;
         this.activeChunk = new Chunk(chunkSize);
     }
 
-    public boolean put(long key, long value) {
+    boolean put(long key, long value) {
         activeChunkLock.lock();
         try {
             if (activeChunk.cursor != 0 && activeChunk.keys[activeChunk.cursor-1] > key) {
@@ -67,7 +64,7 @@ public class ChunkedAssociativeLongArray {
         return valuesSize;
     }
 
-    public long[] values() {
+    long[] values() {
         Deque<Chunk> chunksDeque = new ArrayDeque<Chunk>();
         int valuesSize = traverse(chunksDeque);
         if (valuesSize == 0) {
@@ -99,7 +96,7 @@ public class ChunkedAssociativeLongArray {
         }
     }
 
-    public int size() {
+    int size() {
         int valueSize = traverse(null);
         return valueSize;
     }
@@ -173,7 +170,7 @@ public class ChunkedAssociativeLongArray {
      * @param startKey
      * @param endKey
      */
-    public void clear(long startKey, long endKey) {
+    void clear(long startKey, long endKey) {
         /*
          * [3, 4, 5, 9] -> [10, 13, 14, 15] -> [21, 24, 29, 30] -> [31] :: start layout
          *       |5______________________________23|                    :: clear(5, 23)
@@ -253,7 +250,7 @@ public class ChunkedAssociativeLongArray {
     }
 
 
-    public void clear() {
+    void clear() {
         activeChunkLock.lock();
         try {
             activeChunk.tailChunk = null;
@@ -313,7 +310,7 @@ public class ChunkedAssociativeLongArray {
             this.tailChunk = tailChunk;
         }
 
-        public void append(long key, long value) {
+        private void append(long key, long value) {
             keys[cursor] = key;
             values[cursor] = value;
             cursor++;
