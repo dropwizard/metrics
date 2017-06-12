@@ -74,7 +74,6 @@ public class SlidingTimeWindowReservoir implements Reservoir {
             // ensure the tick is strictly incrementing even if there are duplicate ticks
             final long newTick = tick - oldTick > 0 ? tick : oldTick + 1;
             if (lastTick.compareAndSet(oldTick, newTick)) {
-//                System.out.println("tree tick: " + newTick);
                 return newTick;
             }
         }
@@ -84,10 +83,6 @@ public class SlidingTimeWindowReservoir implements Reservoir {
         final long now = getTick();
         final long windowStart = now - window;
         final long windowEnd = now + CLEAR_BUFFER;
-//        System.out.println("tree");
-//        System.out.println(windowStart);
-//        System.out.println(windowEnd);
-
         if (windowStart < windowEnd) {
             measurements.headMap(windowStart).clear();
             measurements.tailMap(windowEnd).clear();

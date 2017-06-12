@@ -37,7 +37,7 @@ public class ReservoirBenchmark {
     }
 
     @Benchmark
-    public Object arrReservoir() {
+    public Object perfSlidingTimeWindowArrayReservoir() {
         arrTime.update(nextValue);
         return arrTime;
     }
