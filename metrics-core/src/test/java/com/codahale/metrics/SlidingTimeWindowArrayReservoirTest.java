@@ -23,39 +23,6 @@ public class SlidingTimeWindowArrayReservoirTest {
 
     public static final int CYCLES = 100000;
 
-//    @Test
-//    public void simultaneousReadAndTrim() throws InterruptedException {
-//        for (int j = 0; j < 1000; j++) {
-//            final AtomicLong ticks = new AtomicLong(0);
-//            final SlidingTimeWindowArrayReservoir reservoir = new SlidingTimeWindowArrayReservoir(10, TimeUnit.NANOSECONDS, new Clock() {
-//                @Override
-//                public long getTick() {
-//                    return ticks.get();
-//                }
-//            });
-//
-//            for (int i = 0; i < 250; i++) {
-//                ticks.set(i);
-//                reservoir.update(i);
-//            }
-//            Thread trimer = new Thread(new Runnable() {
-//                @Override public void run() {
-//                    ticks.set(253);
-//                    reservoir.trim();
-//                }
-//            });
-//            Thread dumper = new Thread(new Runnable() {
-//                @Override public void run() {
-//                    System.out.println(Arrays.toString(reservoir.getSnapshot().getValues()));
-//                }
-//            });
-//            trimer.start();
-//            dumper.start();
-//            trimer.join();
-//            dumper.join();
-//        }
-//    }
-
     @Test
     public void t() throws InterruptedException {
         final AtomicReference<SlidingTimeWindowArrayReservoir> reservoir = new AtomicReference<SlidingTimeWindowArrayReservoir>(
@@ -176,7 +143,7 @@ public class SlidingTimeWindowArrayReservoirTest {
         SlidingTimeWindowReservoir treeReservoir = new SlidingTimeWindowReservoir(window, NANOSECONDS, manualClock);
         SlidingTimeWindowArrayReservoir arrayReservoir = new SlidingTimeWindowArrayReservoir(window, NANOSECONDS, manualClock);
 
-        for (int i = 0; i < 10000000; i++) {
+        for (int i = 0; i < 100000; i++) {
             long l = counter.incrementAndGet();
             if (random.nextDouble() < 0.2) {
                 manualClock.addNanos(l);
