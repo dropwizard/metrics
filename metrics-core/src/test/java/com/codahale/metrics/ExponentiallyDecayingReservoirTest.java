@@ -87,7 +87,7 @@ public class ExponentiallyDecayingReservoirTest {
         clock.addHours(15);
         reservoir.update(2000);
         assertThat(reservoir.getSnapshot().size())
-                .isEqualTo(2);
+                .isEqualTo(1);
         assertAllValuesBetween(reservoir, 1000, 3000);
 
 
