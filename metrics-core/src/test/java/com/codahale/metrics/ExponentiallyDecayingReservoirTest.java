@@ -87,7 +87,7 @@ public class ExponentiallyDecayingReservoirTest {
         clock.addHours(15);
         reservoir.update(2000);
         assertThat(reservoir.getSnapshot().size())
-                .isEqualTo(2);
+                .isEqualTo(1);
         assertAllValuesBetween(reservoir, 1000, 3000);
 
 
@@ -99,6 +99,47 @@ public class ExponentiallyDecayingReservoirTest {
         assertThat(reservoir.getSnapshot().size())
                 .isEqualTo(10);
         assertAllValuesBetween(reservoir, 3000, 4000);
+    }
+
+    @Test
+    public void longPeriodsOfInactivity_fetchShouldResample() {
+        final ManualClock clock = new ManualClock();
+        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(10,
+                0.015,
+                clock);
+
+        // add 1000 values at a rate of 10 values/second
+        for (int i = 0; i < 1000; i++) {
+            reservoir.update(1000 + i);
+            clock.addMillis(100);
+        }
+        assertThat(reservoir.getSnapshot().size())
+                .isEqualTo(10);
+        assertAllValuesBetween(reservoir, 1000, 2000);
+
+        // wait for 15 hours and add another value.
+        // this should trigger a rescale. Note that the number of samples will be reduced to 2
+        // because of the very small scaling factor that will make all existing priorities equal to
+        // zero after rescale.
+        clock.addHours(20);
+
+        Snapshot snapshot = reservoir.getSnapshot();
+        assertThat(snapshot.getMax()).isEqualTo(0);
+        assertThat(snapshot.getMean()).isEqualTo(0);
+        assertThat(snapshot.getMedian()).isEqualTo(0);
+        assertThat(snapshot.size()).isEqualTo(0);
+    }
+
+    @Test
+    public void emptyReservoirSnapshot_shouldReturnZeroForAllValues() {
+        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(100, 0.015,
+                new ManualClock());
+
+        Snapshot snapshot = reservoir.getSnapshot();
+        assertThat(snapshot.getMax()).isEqualTo(0);
+        assertThat(snapshot.getMean()).isEqualTo(0);
+        assertThat(snapshot.getMedian()).isEqualTo(0);
+        assertThat(snapshot.size()).isEqualTo(0);
     }
 
     @Test

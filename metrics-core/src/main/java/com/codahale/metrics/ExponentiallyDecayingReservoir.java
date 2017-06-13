@@ -124,6 +124,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
 
     @Override
     public Snapshot getSnapshot() {
+        rescaleIfNeeded();
         lockForRegularUsage();
         try {
             return new WeightedSnapshot(values.values());
@@ -165,12 +166,15 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
                 final long oldStartTime = startTime;
                 this.startTime = currentTimeInSeconds();
                 final double scalingFactor = exp(-alpha * (startTime - oldStartTime));
-
-                final ArrayList<Double> keys = new ArrayList<Double>(values.keySet());
-                for (Double key : keys) {
-                    final WeightedSample sample = values.remove(key);
-                    final WeightedSample newSample = new WeightedSample(sample.value, sample.weight * scalingFactor);
-                    values.put(key * scalingFactor, newSample);
+                if (Double.compare(scalingFactor, 0) == 0) {
+                    values.clear();
+                } else {
+                    final ArrayList<Double> keys = new ArrayList<Double>(values.keySet());
+                    for (Double key : keys) {
+                        final WeightedSample sample = values.remove(key);
+                        final WeightedSample newSample = new WeightedSample(sample.value, sample.weight * scalingFactor);
+                        values.put(key * scalingFactor, newSample);
+                    }
                 }
 
                 // make sure the counter is in sync with the number of stored samples.
