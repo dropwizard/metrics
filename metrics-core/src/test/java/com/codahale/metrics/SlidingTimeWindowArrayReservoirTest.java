@@ -55,28 +55,26 @@ public class SlidingTimeWindowArrayReservoirTest {
 
     @Test
     public void comparisonResultsTest() {
-        long time = TimeUnit.HOURS.toNanos(1) * 256 - 1000;
-        AtomicLong counter = new AtomicLong(Long.MAX_VALUE - time);
+        int cycles = 1000000;
+        long time = (Long.MAX_VALUE / 256) - (long) (cycles * 0.5);
         ManualClock manualClock = new ManualClock();
-        int window = 3;
+        manualClock.addNanos(time);
+        int window = 300;
         Random random = new Random(ThreadLocalRandom.current().nextInt());
 
         SlidingTimeWindowReservoir treeReservoir = new SlidingTimeWindowReservoir(window, NANOSECONDS, manualClock);
         SlidingTimeWindowArrayReservoir arrayReservoir = new SlidingTimeWindowArrayReservoir(window, NANOSECONDS, manualClock);
 
-        for (int i = 0; i < 100000; i++) {
-            long l = counter.incrementAndGet();
-            if (random.nextDouble() < 0.2) {
-                manualClock.addNanos(l);
-            }
-            treeReservoir.update(l);
-            arrayReservoir.update(l);
-            if (random.nextDouble() < 0.001) {
+        for (int i = 0; i < cycles; i++) {
+            manualClock.addNanos(1);
+            treeReservoir.update(i);
+            arrayReservoir.update(i);
+            if (random.nextDouble() < 0.01) {
                 long[] treeValues = treeReservoir.getSnapshot().getValues();
                 long[] arrValues = arrayReservoir.getSnapshot().getValues();
                 assertThat(arrValues).isEqualTo(treeValues);
             }
-            if (random.nextDouble() < 0.005) {
+            if (random.nextDouble() < 0.05) {
                 assertThat(arrayReservoir.size()).isEqualTo(treeReservoir.size());
             }
         }
