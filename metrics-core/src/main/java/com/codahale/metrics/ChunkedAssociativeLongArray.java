@@ -3,15 +3,12 @@ package com.codahale.metrics;
 import static java.util.Arrays.binarySearch;
 
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Deque;
-import java.util.concurrent.locks.ReentrantLock;
 
 class ChunkedAssociativeLongArray {
     private static final long[] EMPTY = new long[0];
     private static final int DEFAULT_CHUNK_SIZE = 512;
 
-    private final ReentrantLock activeChunkLock = new ReentrantLock();
     private final int defaultChunkSize;
     private Chunk activeChunk;
 
@@ -24,32 +21,20 @@ class ChunkedAssociativeLongArray {
         this.activeChunk = new Chunk(chunkSize);
     }
 
-    boolean put(long key, long value) {
-        activeChunkLock.lock();
-        try {
-            if (activeChunk.cursor != 0 && activeChunk.keys[activeChunk.cursor-1] > key) {
-                return false; // key should be the same as last inserted or bigger
-            }
-            boolean isFull = activeChunk.cursor - activeChunk.startIndex == activeChunk.chunkSize;
-            if (isFull) {
-                activeChunk = new Chunk(activeChunk, this.defaultChunkSize);
-            }
-            activeChunk.append(key, value);
-        } finally {
-            activeChunkLock.unlock();
+    synchronized boolean put(long key, long value) {
+        if (activeChunk.cursor != 0 && activeChunk.keys[activeChunk.cursor - 1] > key) {
+            return false; // key should be the same as last inserted or bigger
         }
+        boolean isFull = activeChunk.cursor - activeChunk.startIndex == activeChunk.chunkSize;
+        if (isFull) {
+            activeChunk = new Chunk(activeChunk, this.defaultChunkSize);
+        }
+        activeChunk.append(key, value);
         return true;
     }
 
     private int traverse(Deque<Chunk> traversedChunksDeque) {
-        Chunk currentChunk;
-        activeChunkLock.lock();
-        try {
-            currentChunk = activeChunk;
-        } finally {
-            activeChunkLock.unlock();
-        }
-
+        Chunk currentChunk = activeChunk;
         int valuesSize = 0;
         while (true) {
             valuesSize += currentChunk.cursor - currentChunk.startIndex;
@@ -64,44 +49,30 @@ class ChunkedAssociativeLongArray {
         return valuesSize;
     }
 
-    long[] values() {
+    synchronized long[] values() {
         Deque<Chunk> chunksDeque = new ArrayDeque<Chunk>();
         int valuesSize = traverse(chunksDeque);
         if (valuesSize == 0) {
             return EMPTY;
         }
-
-        activeChunkLock.lock();
-        try {
-            long[] values = new long[valuesSize];
-            int valuesIndex = 0;
-            while (!chunksDeque.isEmpty()) {
-                Chunk copySourceChunk = chunksDeque.removeLast();
-                int startIndex = copySourceChunk.startIndex;
-                int cursor = copySourceChunk.cursor;
-                // it is important to calculate length and copy array with local indexes
-                // it guaranties that startIndex won't change between length calculation and copying
-                int length = cursor - startIndex;
-                int itemsToCopy = Math.min(valuesSize - valuesIndex, length);
-                System.arraycopy(copySourceChunk.values, startIndex, values, valuesIndex, itemsToCopy);
-                valuesIndex += length;
-            }
-            if (valuesIndex < valuesSize) {
-                // chunk was trimmed during copying (very rare case found with jcstress)
-                values = Arrays.copyOf(values, valuesIndex);
-            }
-            return values;
-        } finally {
-            activeChunkLock.unlock();
+        long[] values = new long[valuesSize];
+        int valuesIndex = 0;
+        while (!chunksDeque.isEmpty()) {
+            Chunk copySourceChunk = chunksDeque.removeLast();
+            int length = copySourceChunk.cursor - copySourceChunk.startIndex;
+            int itemsToCopy = Math.min(valuesSize - valuesIndex, length);
+            System.arraycopy(copySourceChunk.values, copySourceChunk.startIndex, values, valuesIndex, itemsToCopy);
+            valuesIndex += length;
         }
+        return values;
     }
 
-    int size() {
+    synchronized int size() {
         int valueSize = traverse(null);
         return valueSize;
     }
 
-    String out() {
+    synchronized String out() {
         Deque<Chunk> chunksDeque = new ArrayDeque<Chunk>();
         int valuesSize = traverse(chunksDeque);
         if (valuesSize == 0) {
@@ -132,25 +103,18 @@ class ChunkedAssociativeLongArray {
      * @param startKey
      * @param endKey
      */
-    void trim(long startKey, long endKey) {
+    synchronized void trim(long startKey, long endKey) {
         /*
          * [3, 4, 5, 9] -> [10, 13, 14, 15] -> [21, 24, 29, 30] -> [31] :: start layout
          *       |5______________________________23|                    :: trim(5, 23)
          *       [5, 9] -> [10, 13, 14, 15] -> [21]                     :: result layout
          */
-        Chunk head;
-        activeChunkLock.lock();
-        try {
-            head = findChunkWhereKeyShouldBe(activeChunk, endKey);
-            activeChunk = head;
-            int newEndIndex = findFirstIndexOfGreaterEqualElements(
-                activeChunk.keys, activeChunk.startIndex, activeChunk.cursor, endKey
-            );
-            activeChunk.cursor = newEndIndex;
-
-        } finally {
-            activeChunkLock.unlock();
-        }
+        Chunk head = findChunkWhereKeyShouldBe(activeChunk, endKey);
+        activeChunk = head;
+        int newEndIndex = findFirstIndexOfGreaterEqualElements(
+            activeChunk.keys, activeChunk.startIndex, activeChunk.cursor, endKey
+        );
+        activeChunk.cursor = newEndIndex;
 
         Chunk tail = findChunkWhereKeyShouldBe(head, startKey);
         int newStartIndex = findFirstIndexOfGreaterEqualElements(
@@ -170,20 +134,13 @@ class ChunkedAssociativeLongArray {
      * @param startKey
      * @param endKey
      */
-    void clear(long startKey, long endKey) {
+    synchronized void clear(long startKey, long endKey) {
         /*
          * [3, 4, 5, 9] -> [10, 13, 14, 15] -> [21, 24, 29, 30] -> [31] :: start layout
          *       |5______________________________23|                    :: clear(5, 23)
          * [3, 4]               ->                 [24, 29, 30] -> [31] :: result layout
          */
-        Chunk tail;
-        activeChunkLock.lock();
-        try {
-            tail = findChunkWhereKeyShouldBe(activeChunk, endKey);
-        } finally {
-            activeChunkLock.unlock();
-        }
-
+        Chunk tail = findChunkWhereKeyShouldBe(activeChunk, endKey);
         Chunk gapStartChunk = splitChunkOnTwoSeparateChunks(tail, endKey);
         if (gapStartChunk == null) {
             return;
@@ -207,6 +164,13 @@ class ChunkedAssociativeLongArray {
             afterGapHead.chunkSize = afterGapHead.cursor - afterGapHead.startIndex;
         }
         tail.tailChunk = afterGapHead; // concat
+    }
+
+    synchronized void clear() {
+        activeChunk.tailChunk = null;
+        activeChunk.startIndex = 0;
+        activeChunk.chunkSize = activeChunk.keys.length;
+        activeChunk.cursor = 0;
     }
 
     private Chunk splitChunkOnTwoSeparateChunks(Chunk chunk, long key) {
@@ -249,18 +213,6 @@ class ChunkedAssociativeLongArray {
             || chunk.keys[chunk.startIndex] >= key;
     }
 
-
-    void clear() {
-        activeChunkLock.lock();
-        try {
-            activeChunk.tailChunk = null;
-            activeChunk.startIndex = 0;
-            activeChunk.chunkSize = activeChunk.keys.length;
-            activeChunk.cursor = 0;
-        } finally {
-            activeChunkLock.unlock();
-        }
-    }
 
     private int findFirstIndexOfGreaterEqualElements(long[] array, int startIndex, int endIndex, long minKey) {
         if (endIndex == startIndex || array[startIndex] >= minKey) {
