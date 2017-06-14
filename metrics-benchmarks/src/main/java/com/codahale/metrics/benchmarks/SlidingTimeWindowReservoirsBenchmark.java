@@ -1,11 +1,12 @@
 package com.codahale.metrics.benchmarks;
 
-import com.codahale.metrics.ExponentiallyDecayingReservoir;
 import com.codahale.metrics.SlidingTimeWindowArrayReservoir;
 import com.codahale.metrics.SlidingTimeWindowReservoir;
-import com.codahale.metrics.SlidingWindowReservoir;
-import com.codahale.metrics.UniformReservoir;
+import com.codahale.metrics.Snapshot;
+
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Group;
+import org.openjdk.jmh.annotations.GroupThreads;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
@@ -18,12 +19,11 @@ import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author bstorozhuk
+ */
 @State(Scope.Benchmark)
-public class ReservoirBenchmark {
-
-    private final UniformReservoir uniform = new UniformReservoir();
-    private final ExponentiallyDecayingReservoir exponential = new ExponentiallyDecayingReservoir();
-    private final SlidingWindowReservoir sliding = new SlidingWindowReservoir(1000);
+public class SlidingTimeWindowReservoirsBenchmark {
     private final SlidingTimeWindowReservoir slidingTime = new SlidingTimeWindowReservoir(200, TimeUnit.MILLISECONDS);
     private final SlidingTimeWindowArrayReservoir arrTime = new SlidingTimeWindowArrayReservoir(200, TimeUnit.MILLISECONDS);
 
@@ -31,49 +31,50 @@ public class ReservoirBenchmark {
     private long nextValue = 0xFBFBABBA;
 
     @Benchmark
-    public Object perfUniformReservoir() {
-        uniform.update(nextValue);
-        return uniform;
-    }
-
-    @Benchmark
-    public Object perfSlidingTimeWindowArrayReservoir() {
-        arrTime.update(nextValue);
-        return arrTime;
-    }
-
-    @Benchmark
-    public Object perfExponentiallyDecayingReservoir() {
-        exponential.update(nextValue);
-        return exponential;
-    }
-
-    @Benchmark
-    public Object perfSlidingWindowReservoir() {
-        sliding.update(nextValue);
-        return sliding;
-    }
-
-    @Benchmark
-    public Object perfSlidingTimeWindowReservoir() {
+    @Group("slidingTime")
+    @GroupThreads(3)
+    public Object slidingTimeAddMeasurement() {
         slidingTime.update(nextValue);
         return slidingTime;
     }
 
+    @Benchmark
+    @Group("slidingTime")
+    @GroupThreads(1)
+    public Object slidingTimeRead() {
+        Snapshot snapshot = slidingTime.getSnapshot();
+        return snapshot;
+    }
+
+    @Benchmark
+    @Group("arrTime")
+    @GroupThreads(3)
+    public Object arrTimeAddMeasurement() {
+        arrTime.update(nextValue);
+        return slidingTime;
+    }
+
+    @Benchmark
+    @Group("arrTime")
+    @GroupThreads(1)
+    public Object arrTimeRead() {
+        Snapshot snapshot = arrTime.getSnapshot();
+        return snapshot;
+    }
+
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-            .include(".*" + ReservoirBenchmark.class.getSimpleName() + ".*")
+            .include(".*" + SlidingTimeWindowReservoirsBenchmark.class.getSimpleName() + ".*")
             .warmupIterations(10)
             .measurementIterations(10)
             .addProfiler(GCProfiler.class)
             .measurementTime(TimeValue.seconds(3))
             .timeUnit(TimeUnit.MICROSECONDS)
             .mode(Mode.AverageTime)
-            .threads(4)
             .forks(1)
             .build();
 
         new Runner(opt).run();
     }
-
 }
+
