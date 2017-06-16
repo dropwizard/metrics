@@ -1,6 +1,5 @@
 package io.dropwizard.metrics;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 

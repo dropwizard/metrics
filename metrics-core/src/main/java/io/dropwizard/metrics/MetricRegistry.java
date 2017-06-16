@@ -82,7 +82,6 @@ public class MetricRegistry implements MetricSet {
     /**
      * @see #register(MetricName, Metric)
      */
-    @SuppressWarnings("unchecked")
     public <T extends Metric> T register(String name, T metric) throws IllegalArgumentException {
         return register(MetricName.build(name), metric);
     }
@@ -96,7 +95,6 @@ public class MetricRegistry implements MetricSet {
      * @return {@code metric}
      * @throws IllegalArgumentException if the name is already registered
      */
-    @SuppressWarnings("unchecked")
     public <T extends Metric> T register(MetricName name, T metric) throws IllegalArgumentException {
         if (metric instanceof MetricSet) {
             registerAll(name, (MetricSet) metric);
