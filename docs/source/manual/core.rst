@@ -257,10 +257,14 @@ representative of the past ``N`` seconds (or other time period).
 .. hint::
 
     Try to use our new optimised version of ``SlidingTimeWindowReservoir`` called ``SlidingTimeWindowArrayReservoir``.
-    It brings much lower memory overhead, only 2 longs per measurement. Also it's allocation/free
-    patterns are different, so GC overhead is 60x-80x lower then ``SlidingTimeWindowReservoir`` and it's now comparable with
-    ``ExponentiallyDecayingReservoir`` in terms GC overhead. In general all operations became ~3x faster,
-    so it is still slower then ``ExponentiallyDecayingReservoir`` but not as much (updates are only 1.8x slower).
+    It brings much lower memory overhead. Also it's allocation/free patterns are different,
+    so GC overhead is 60x-80x lower then ``SlidingTimeWindowReservoir``. Now ``SlidingTimeWindowArrayReservoir`` is
+    comparable with ``ExponentiallyDecayingReservoir`` in terms GC overhead and performance.
+    As for required memory, ``SlidingTimeWindowArrayReservoir`` takes ~128 bits per stored measurement and you can simply
+    calculate required amount of heap.
+
+    Example: 10K measurements / sec with reservoir storing time of 1 minute will take
+    10000 * 60 * 128 / 8 = 9600000 bytes ~ 9 megabytes
 
 .. _man-core-meters:
 
