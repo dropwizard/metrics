@@ -200,4 +200,16 @@ public class HealthCheckTest {
         assertThat(actual.getDetails())
                 .isNull();
     }
+
+    @Test
+    public void toStringWorksEvenForNullAttributes() throws Exception {
+        final HealthCheck.Result resultWithNullDetailValue = HealthCheck.Result.builder()
+           .unhealthy()
+           .withDetail("aNullDetail", null)
+           .build();
+        assertThat(resultWithNullDetailValue.toString())
+           .contains(
+              "Result{isHealthy=false, timestamp=", // Skip the timestamp part of the String.
+              ", aNullDetail=null}");
+    }
 }
