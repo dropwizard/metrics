@@ -181,6 +181,8 @@ public class Graphite implements GraphiteSender {
         } finally {
             this.socket = null;
         }
+        
+        // if hostname is used, re-resolve DNS in connect() by clearing the address
         if (this.hostname != null) {
             this.address = null;
         }
