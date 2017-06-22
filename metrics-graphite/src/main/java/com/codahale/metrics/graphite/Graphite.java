@@ -181,6 +181,9 @@ public class Graphite implements GraphiteSender {
         } finally {
             this.socket = null;
         }
+        if (this.hostname != null) {
+            this.address = null;
+        }
     }
 
     protected String sanitize(String s) {
