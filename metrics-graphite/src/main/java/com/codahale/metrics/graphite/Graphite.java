@@ -20,7 +20,7 @@ public class Graphite implements GraphiteSender {
 
     private final String hostname;
     private final int port;
-    private final InetSocketAddress address;
+    private InetSocketAddress address;
     private final SocketFactory socketFactory;
     private final Charset charset;
 
