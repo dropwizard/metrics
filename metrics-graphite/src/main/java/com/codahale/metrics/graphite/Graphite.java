@@ -20,7 +20,7 @@ public class Graphite implements GraphiteSender {
 
     private final String hostname;
     private final int port;
-    private final InetSocketAddress address;
+    private InetSocketAddress address;
     private final SocketFactory socketFactory;
     private final Charset charset;
 
@@ -180,6 +180,11 @@ public class Graphite implements GraphiteSender {
             LOGGER.debug("Error closing socket", ex);
         } finally {
             this.socket = null;
+        }
+        
+        // if hostname is used, re-resolve DNS in connect() by clearing the address
+        if (this.hostname != null) {
+            this.address = null;
         }
     }
 
