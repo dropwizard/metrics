@@ -16,22 +16,22 @@ class ChunkedAssociativeLongArray {
 
     private final int defaultChunkSize;
     /*
-    We use this ArrayDeque as cache to store chunks that are expired and removed from main data structure.
-    Then instead of allocating new Chunk immediately we are trying to poll one from this deque.
-    So if you have constant or slowly changing load ChunkedAssociativeLongArray will never
-    throw away old chunks or allocate new ones which makes this data structure almost garbage free.
+     * We use this ArrayDeque as cache to store chunks that are expired and removed from main data structure.
+     * Then instead of allocating new Chunk immediately we are trying to poll one from this deque.
+     * So if you have constant or slowly changing load ChunkedAssociativeLongArray will never
+     * throw away old chunks or allocate new ones which makes this data structure almost garbage free.
      */
     private final ArrayDeque<SoftReference<Chunk>> chunksCache = new ArrayDeque<SoftReference<Chunk>>();
 
     /*
-    Why LinkedList if we are creating fast data structure with low GC overhead?
-
-    First of all LinkedList here has relatively small size countOfStoredMeasurements / DEFAULT_CHUNK_SIZE.
-    And we are heavily rely on LinkedList implementation because:
-    1. Now we deleting chunks from both sides of the list  in trim(long startKey, long endKey)
-    2. Deleting from and inserting chunks into the middle in clear(long startKey, long endKey)
-
-    LinkedList gives us O(1) complexity for all this operations and that is not the case with ArrayList.
+     * Why LinkedList if we are creating fast data structure with low GC overhead?
+     *
+     * First of all LinkedList here has relatively small size countOfStoredMeasurements / DEFAULT_CHUNK_SIZE.
+     * And we are heavily rely on LinkedList implementation because:
+     * 1. Now we deleting chunks from both sides of the list  in trim(long startKey, long endKey)
+     * 2. Deleting from and inserting chunks into the middle in clear(long startKey, long endKey)
+     *
+     * LinkedList gives us O(1) complexity for all this operations and that is not the case with ArrayList.
      */
     private final LinkedList<Chunk> chunks = new LinkedList<Chunk>();
 
@@ -44,20 +44,19 @@ class ChunkedAssociativeLongArray {
     }
 
     private Chunk allocateChunk() {
-        SoftReference<Chunk> chunkRef = chunksCache.pollLast();
-        while (chunkRef != null && chunkRef.get() == null) {
-            chunkRef = chunksCache.pollLast();
+        while (true) {
+            final SoftReference<Chunk> chunkRef = chunksCache.pollLast();
+            if (chunkRef == null) {
+                return new Chunk(defaultChunkSize);
+            }
+            final Chunk chunk = chunkRef.get();
+            if (chunk != null) {
+                chunk.cursor = 0;
+                chunk.startIndex = 0;
+                chunk.chunkSize = chunk.keys.length;
+                return chunk;
+            }
         }
-
-        Chunk chunk = chunkRef == null ? null : chunkRef.get();
-        if (chunk == null) {
-            chunk = new Chunk(this.defaultChunkSize);
-        } else {
-            chunk.cursor = 0;
-            chunk.startIndex = 0;
-            chunk.chunkSize = chunk.keys.length;
-        }
-        return chunk;
     }
 
     private void freeChunk(Chunk chunk) {
