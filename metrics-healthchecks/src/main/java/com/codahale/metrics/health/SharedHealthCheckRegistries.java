@@ -84,10 +84,23 @@ public class SharedHealthCheckRegistries {
      * @throws IllegalStateException if the default has not been set
      */
     public static HealthCheckRegistry getDefault() {
+        final HealthCheckRegistry healthCheckRegistry = tryGetDefault();
+        if (healthCheckRegistry != null) {
+            return healthCheckRegistry;
+        }
+        throw new IllegalStateException("Default registry name has not been set.");
+    }
+
+    /**
+     * Same as {@link #getDefault()} except returns null when the default registry has not been set.
+     *
+     * @return the default registry or null
+     */
+    public static HealthCheckRegistry tryGetDefault() {
         final String name = defaultRegistryName.get();
         if (name != null) {
             return getOrCreate(name);
         }
-        throw new IllegalStateException("Default registry name has not been set.");
+        return null;
     }
 }
