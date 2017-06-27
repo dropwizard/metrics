@@ -48,7 +48,7 @@ Reporters
 * `metrics-mongodb-reporter <https://github.com/aparnachaudhary/mongodb-metrics-reporter>`_ provides a reporter for `MongoDB <https://www.mongodb.org/>`_.
 * `metrics-munin-reporter <https://github.com/slashidea/metrics-munin-reporter>`_ provides a reporter for `Munin <http://munin-monitoring.org/>`_
 * `metrics-new-relic <https://github.com/palominolabs/metrics-new-relic>`_ provides a reporter which sends data to `New Relic <http://newrelic.com/>`_.
-* `metrics-reporter-config <https://github.com/addthis/metrics-reporter-config>`_ DropWizard-eqsue YAML configuration of reporters.
+* `metrics-reporter-config <https://github.com/addthis/metrics-reporter-config>`_ DropWizard-esque YAML configuration of reporters.
 * `metrics-signalfx <https://github.com/signalfx/signalfx-java>`_ provides a reporter to send data to `SignalFx <http://www.signalfx.com/>`_.
 * `metrics-spark-reporter <https://github.com/ippontech/metrics-spark-reporter>`_ provides a reporter for `Apache Spark Streaming <https://spark.apache.org/streaming/>`_.
 * `metrics-splunk <https://github.com/zenmoto/metrics-splunk>`_ provides a reporter for `Splunk <http://www.splunk.com/>`_.
