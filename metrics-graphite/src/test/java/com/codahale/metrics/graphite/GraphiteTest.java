@@ -154,7 +154,7 @@ public class GraphiteTest {
 
     @Test
     public void notifiesIfGraphiteIsUnavailable() throws Exception {
-        final String unavailableHost = "unknown-host-10el6m7yg56ge7dm.com";
+        final String unavailableHost = "unknown-host-10el6m7yg56ge7dmcom";
         InetSocketAddress unavailableAddress = new InetSocketAddress(unavailableHost, 1234);
         Graphite unavailableGraphite = new Graphite(unavailableAddress, socketFactory);
 
