@@ -16,8 +16,9 @@ Many, many thanks to:
 * `Bartosz Krasiński <https://github.com/krasinski>`_
 * `Bart Prokop <https://github.com/bartprokop>`_
 * `Basil James Whitehouse III <https://github.com/basil3whitehouse>`_
+* `Benjamin Gehrels <https://github.com/BGehrels>`_
 * `Ben Tatham <https://github.com/bentatham>`_
-* `BGehrels <https://github.com/BGehrels>`_
+* `Bogdan Storozhuk <https://github.com/storozhukBM>`_
 * `Brenden Matthews <https://github.com/brndnmtthws>`_
 * `Brian  <https://github.com/codelotus>`_
 * `Brian Roberts <https://github.com/flicken>`_
@@ -51,6 +52,7 @@ Many, many thanks to:
 * `Fabrizio Cannizzo <https://github.com/smartrics>`_
 * `François Beausoleil <https://github.com/francois>`_
 * `Gabor Arki <https://github.com/arkigabor>`_
+* `George Spalding <https://github.com/georgespalding>`_
 * `Gerolf Seitz <https://github.com/gseitz>`_
 * `gilbode <https://github.com/gilbode>`_
 * `Greg Bowyer <https://github.com/GregBowyer>`_
@@ -59,6 +61,7 @@ Many, many thanks to:
 * `ho3rexqj <https://github.com/ho3rexqj>`_
 * `Hussein Elsayed <https://github.com/husseincoder>`_
 * `Ian Strachan <https://github.com/ianestrachan>`_
+* `Istvan Meszaros <https://github.com/IstvanM>`_
 * `Ivan Dyedov <https://github.com/idyedov>`_
 * `Jackson Davis <https://github.com/jcdavis>`_
 * `James Burkhart <https://github.com/fourk>`_
@@ -75,6 +78,7 @@ Many, many thanks to:
 * `Jesper Blomquist <https://github.com/jebl01>`_
 * `Jesse Eichar <https://github.com/jesseeichar>`_
 * `Jochen Schalanda <https://github.com/joschi>`_
+* `Joe Ellis <https://github.com/ellisjoe>`_
 * `Joel Takvorian <https://github.com/jotak>`_
 * `John-John Tedro <https://github.com/udoprog>`_
 * `John Wang <https://github.com/javasoze>`_
@@ -84,6 +88,7 @@ Many, many thanks to:
 * `Justin Plock <https://github.com/jplock>`_
 * `Kevin Clark <https://github.com/kevinclark>`_
 * `Kevin Menard <https://github.com/nirvdrum>`_
+* `Kevin Yeh <https://github.com/kyeah>`_
 * `konnik <https://github.com/konnik>`_
 * `Larry Shatzer, Jr. <https://github.com/larrys>`_
 * `Luke Amdor <https://github.com/rubbish>`_
@@ -105,6 +110,7 @@ Many, many thanks to:
 * `Nick Telford <https://github.com/nicktelford>`_
 * `Norbert Potocki <https://github.com/norbertpotocki>`_
 * `Pablo Fernandez <https://github.com/fernandezpablo85>`_
+* `Patryk Najda <https://github.com/patrox>`_
 * `Paul Brown <https://github.com/prb>`_
 * `Paul Doran <https://github.com/dorzey>`_
 * `Paul Sanwald <https://github.com/pcsanwald>`_
@@ -112,6 +118,7 @@ Many, many thanks to:
 * `Raman Gupta <https://github.com/rocketraman>`_
 * `Realbot <https://github.com/realbot>`_
 * `Robby Walker <https://github.com/robbywalker>`_
+* `Ron Klein <https://github.com/kleinron>`_
 * `Ryan Campbell <https://github.com/recampbell>`_
 * `Ryan McCrone <https://github.com/rwmccro>`_
 * `Ryan Tenney <https://github.com/ryantenney>`_
