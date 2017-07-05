@@ -5,18 +5,6 @@ import static io.dropwizard.metrics.MetricRegistry.name;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.dropwizard.metrics.Counter;
-import io.dropwizard.metrics.Gauge;
-import io.dropwizard.metrics.Histogram;
-import io.dropwizard.metrics.Meter;
-import io.dropwizard.metrics.Metric;
-import io.dropwizard.metrics.MetricFilter;
-import io.dropwizard.metrics.MetricName;
-import io.dropwizard.metrics.MetricRegistry;
-import io.dropwizard.metrics.MetricRegistryListener;
-import io.dropwizard.metrics.MetricSet;
-import io.dropwizard.metrics.Timer;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -85,6 +73,23 @@ public class MetricRegistryTest {
     }
 
     @Test
+    public void accessingACustomCounterRegistersAndReusesTheCounter() throws Exception {
+        final MetricRegistry.MetricSupplier<Counter> supplier = new MetricRegistry.MetricSupplier<Counter>() {
+            @Override
+            public Counter newMetric() {
+                return counter;
+            }
+        };
+        final Counter counter1 = registry.counter("thing", supplier);
+        final Counter counter2 = registry.counter("thing", supplier);
+
+        assertThat(counter1)
+                .isSameAs(counter2);
+
+        verify(listener).onCounterAdded(THING, counter1);
+    }
+
+    @Test
     public void removingACounterTriggersANotification() throws Exception {
         registry.register(THING, counter);
 
@@ -114,6 +119,23 @@ public class MetricRegistryTest {
     }
 
     @Test
+    public void accessingACustomHistogramRegistersAndReusesIt() throws Exception {
+        final MetricRegistry.MetricSupplier<Histogram> supplier = new MetricRegistry.MetricSupplier<Histogram>() {
+            @Override
+            public Histogram newMetric() {
+                return histogram;
+            }
+        };
+        final Histogram histogram1 = registry.histogram("thing", supplier);
+        final Histogram histogram2 = registry.histogram("thing", supplier);
+
+        assertThat(histogram1)
+            .isSameAs(histogram2);
+
+        verify(listener).onHistogramAdded(THING, histogram1);
+    }
+
+    @Test
     public void removingAHistogramTriggersANotification() throws Exception {
         registry.register(THING, histogram);
 
@@ -135,6 +157,23 @@ public class MetricRegistryTest {
     public void accessingAMeterRegistersAndReusesIt() throws Exception {
         final Meter meter1 = registry.meter(THING);
         final Meter meter2 = registry.meter(THING);
+
+        assertThat(meter1)
+                .isSameAs(meter2);
+
+        verify(listener).onMeterAdded(THING, meter1);
+    }
+
+    @Test
+    public void accessingACustomMeterRegistersAndReusesIt() throws Exception {
+        final MetricRegistry.MetricSupplier<Meter> supplier = new MetricRegistry.MetricSupplier<Meter>() {
+            @Override
+            public Meter newMetric() {
+                return meter;
+            }
+        };
+        final Meter meter1 = registry.meter("thing", supplier);
+        final Meter meter2 = registry.meter("thing", supplier);
 
         assertThat(meter1)
                 .isSameAs(meter2);
@@ -171,6 +210,23 @@ public class MetricRegistryTest {
         verify(listener).onTimerAdded(THING, timer1);
     }
 
+     @Test
+    public void accessingACustomTimerRegistersAndReusesIt() throws Exception {
+        final MetricRegistry.MetricSupplier<Timer> supplier = new MetricRegistry.MetricSupplier<Timer>() {
+            @Override
+            public Timer newMetric() {
+                return timer;
+            }
+        };
+        final Timer timer1 = registry.timer("thing", supplier);
+        final Timer timer2 = registry.timer("thing", supplier);
+
+        assertThat(timer1)
+                .isSameAs(timer2);
+
+        verify(listener).onTimerAdded(THING, timer1);
+    }
+
     @Test
     public void removingATimerTriggersANotification() throws Exception {
         registry.register(THING, timer);
@@ -179,6 +235,23 @@ public class MetricRegistryTest {
                 .isTrue();
 
         verify(listener).onTimerRemoved(THING);
+    }
+
+     @Test
+    public void accessingACustomGaugeRegistersAndReusesIt() throws Exception {
+        final MetricRegistry.MetricSupplier<Gauge> supplier = new MetricRegistry.MetricSupplier<Gauge>() {
+            @Override
+            public Gauge newMetric() {
+                return gauge;
+            }
+        };
+        final Gauge gauge1 = registry.gauge("thing", supplier);
+        final Gauge gauge2 = registry.gauge("thing", supplier);
+
+        assertThat(gauge1)
+                .isSameAs(gauge2);
+
+        verify(listener).onGaugeAdded(THING, gauge1);
     }
 
     @Test

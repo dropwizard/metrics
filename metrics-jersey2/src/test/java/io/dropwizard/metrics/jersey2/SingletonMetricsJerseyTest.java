@@ -1,10 +1,13 @@
 package io.dropwizard.metrics.jersey2;
 
+import io.dropwizard.metrics.Clock;
 import io.dropwizard.metrics.Meter;
 import io.dropwizard.metrics.MetricRegistry;
 import io.dropwizard.metrics.Timer;
 import io.dropwizard.metrics.jersey2.resources.InstrumentedResource;
 import io.dropwizard.metrics.jersey2.resources.InstrumentedSubResource;
+import io.dropwizard.metrics.jersey2.resources.TestRequestFilter;
+
 import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
@@ -34,13 +37,24 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
 
     private MetricRegistry registry;
 
+    private TestClock testClock;
+
+    public class TestClockProvider implements InstrumentedResourceMethodApplicationListener.ClockProvider {
+        @Override
+        public Clock get() {
+            return testClock;
+        }
+    }
+
     @Override
     protected Application configure() {
         this.registry = new MetricRegistry();
 
+        testClock = new TestClock();
         ResourceConfig config = new ResourceConfig();
-        config = config.register(new MetricsFeature(this.registry));
-        config = config.register(InstrumentedResource.class);
+        config = config.register(new MetricsFeature(this.registry, new TestClockProvider()));
+        config = config.register(new TestRequestFilter(testClock));
+        config = config.register(new InstrumentedResource(testClock));
 
         return config;
     }
@@ -55,7 +69,96 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
         final Timer timer = registry.timer(name(InstrumentedResource.class, "timed"));
 
         assertThat(timer.getCount()).isEqualTo(1);
+        assertThat(timer.getSnapshot().getValues()[0]).isEqualTo(1);
     }
+
+    @Test
+    public void explicitNamesAreUsed() {
+        assertThat(target("named")
+            .request()
+            .get(String.class))
+            .isEqualTo("fancy");
+
+        final Timer timer = registry.timer(name(InstrumentedResource.class, "fancyName"));
+
+        assertThat(timer.getCount()).isEqualTo(1);
+        assertThat(timer.getSnapshot().getValues()[0]).isEqualTo(1);
+    }
+
+    @Test
+    public void absoluteNamesAreNotPrefixed() {
+        assertThat(target("absolute")
+            .request()
+            .get(String.class))
+            .isEqualTo("absolute");
+
+        final Timer timer = registry.timer("absolutelyFancy");
+
+        assertThat(timer.getCount()).isEqualTo(1);
+        assertThat(timer.getSnapshot().getValues()[0]).isEqualTo(1);
+    }
+
+    @Test
+    public void requestFiltersOfTimedMethodsAreTimed() {
+        assertThat(target("timed")
+            .request()
+            .get(String.class))
+            .isEqualTo("yay");
+
+        final Timer timer = registry.timer(name(InstrumentedResource.class, "timed", "request", "filtering"));
+
+        assertThat(timer.getCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void requestTimedMethodsGetTotalTimer() {
+        assertThat(target("timed")
+            .request()
+            .get(String.class))
+            .isEqualTo("yay");
+
+        final Timer timer = registry.timer(name(InstrumentedResource.class, "timed", "total"));
+
+        assertThat(timer.getCount()).isEqualTo(1);
+        assertThat(timer.getSnapshot().getValues()[0]).isEqualTo(5);
+    }
+
+    @Test
+    public void implicitlyNamedMethodsDoGetFilterMetrics() {
+        assertThat(target("timed")
+            .request()
+            .get(String.class))
+            .isEqualTo("yay");
+
+        assertThat(registry.getMeters()).doesNotContainKey(
+            name(InstrumentedResource.class, "timed", "request", "filtering")
+        );
+    }
+
+    @Test
+    public void explicitlyNamedMethodsDontGetFilterMetrics() {
+        assertThat(target("named")
+            .request()
+            .get(String.class))
+            .isEqualTo("fancy");
+
+        assertThat(registry.getMeters()).doesNotContainKey(
+            name(InstrumentedResource.class, "fancyName", "request", "filtering")
+        );
+    }
+
+    @Test
+    public void responseFiltersOfTimedMethodsAreTimed() {
+        assertThat(target("timed")
+            .request()
+            .get(String.class))
+            .isEqualTo("yay");
+
+        final Timer timer = registry.timer(name(InstrumentedResource.class, "timed", "response", "filtering"));
+
+        assertThat(timer.getCount()).isEqualTo(1);
+    }
+
 
     @Test
     public void meteredMethodsAreMetered() {
