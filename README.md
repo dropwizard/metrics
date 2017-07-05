@@ -1,4 +1,5 @@
 Metrics [![Build Status](https://secure.travis-ci.org/dropwizard/metrics.png)](http://travis-ci.org/dropwizard/metrics)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.dropwizard.metrics/metrics-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.dropwizard.metrics/metrics-core/)
 =======
 
 *Capturing JVM- and application-level metrics. So you know what's going on.*
