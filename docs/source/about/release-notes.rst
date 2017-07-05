@@ -17,6 +17,13 @@ v3.2.3: Jun 28 2017
 * ``SlidingTimeWindowArrayReservoir`` as a fast alternative of ``SlidingTimeWindowReservoir`` `#1139 <https://github.com/dropwizard/metrics/pull/1139>`_
 * Avoid a NPE in toString of ``HealthCheck.Result`` `#1141 <https://github.com/dropwizard/metrics/pull/1141>`_
 
+.. _rel-3.1.5:
+
+v3.1.5: Jun 2 2017
+===================
+
+* More robust lookup of ``ThreadLocal`` and ``LongAdder`` on JDK6 (e.g. WebLogic) `#1136 <https://github.com/dropwizard/metrics/pull/1136>`_
+
 .. _rel-3.2.2:
 
 v3.2.2: Mar 20 2017
