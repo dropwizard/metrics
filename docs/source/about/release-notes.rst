@@ -4,6 +4,19 @@
 Release Notes
 #############
 
+.. _rel-3.2.3:
+
+v3.2.3: Jun 28 2017
+===================
+
+* Improve ``ScheduledReporter`` ``convertDurations`` precision `#1115 <https://github.com/dropwizard/metrics/pull/1115>`_
+* Suppress all kinds of Throwables raised by ``report()`` `#1128 <https://github.com/dropwizard/metrics/pull/1128>`_
+* ``ExponentiallyDecayingReservoir`` was giving incorrect values in the snapshot if the inactive period was too long `#1135 <https://github.com/dropwizard/metrics/pull/1135>`_
+* Ability to get default metrics registry without an exception `#1140 <https://github.com/dropwizard/metrics/pull/1140>`_
+* Ability to get default health check registry without an exception `#1152 <https://github.com/dropwizard/metrics/pull/1152>`_
+* ``SlidingTimeWindowArrayReservoir`` as a fast alternative of ``SlidingTimeWindowReservoir`` `#1139 <https://github.com/dropwizard/metrics/pull/1139>`_
+* Avoid a NPE in toString of ``HealthCheck.Result`` `#1141 <https://github.com/dropwizard/metrics/pull/1141>`_
+
 .. _rel-3.2.2:
 
 v3.2.2: Mar 20 2017
