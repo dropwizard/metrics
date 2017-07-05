@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Third Party Libraries | Metrics</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="../_static/metrics.css" type="text/css"/>
+    <link rel="top" title="Metrics" href="../index.html"/>
+    <link rel="up" title="User Manual" href="index.html"/>
+    <link rel="next" title="About Metrics" href="../about/index.html"/>
+    <link rel="prev" title="Instrumenting Web Applications" href="servlet.html"/>
+    <style lang="text/css">
+        #top-bar, #top-bar small, #top-bar a {
+            text-shadow: 0px -1px 0px #cf2c0f;
+            color: #fff;
+        }
+        
+        #top-bar {
+            background-color: #ED4A2D;
+            background-image: -moz-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -ms-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ff684b), to(#cf2c0f));
+            background-image: -webkit-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -o-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: linear-gradient(top, #ff684b, #cf2c0f);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ff684b', endColorstr = '#cf2c0f', GradientType = 0);
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0;
+        }
+
+
+        .hero-unit {
+            background-image: url("../_static/metrics-hat.png") !important;
+            background-repeat: no-repeat !important;
+            background-position: 30px 50px;
+        }
+
+        .hero-unit div.section {
+            padding-left: 200px !important;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://github.com/dropwizard/metrics">
+        <img style="position: absolute; top: 0; right: 0; border: 0;"
+             src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"
+             alt="Fork me on GitHub"></a>
+    <div class="navbar">
+        <div class="navbar-inner container-fluid" id="top-bar">
+            <header class="row-fluid">
+                <h1 class="span12" id="title"><img class="logo" src="../_static/metrics-logo.png" alt="Logo"/>
+                    <a href="../index.html">Metrics</a>
+                    <small>Mind the gap.</small>
+                </h1>
+            </header>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span3" id="sidebar">
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">User Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="core.html">Metrics Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="healthchecks.html">Health Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ehcache.html">Instrumenting Ehcache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ganglia.html">Reporting to Ganglia</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graphite.html">Reporting to Graphite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="httpclient.html">Instrumenting Apache HttpClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jdbi.html">Instrumenting JDBI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jersey.html">Instrumenting Jersey 1.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jersey.html#instrumenting-jersey-2-x">Instrumenting Jersey 2.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jetty.html">Instrumenting Jetty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="log4j.html">Instrumenting Log4j</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logback.html">Instrumenting Logback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jvm.html">JVM Instrumentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="json.html">JSON Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="servlets.html">Metrics Servlets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="servlet.html">Instrumenting Web Applications</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Third Party Libraries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#instrumented-libraries">Instrumented Libraries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#language-wrappers">Language Wrappers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reporters">Reporters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#advansed-metrics-implementations">Advansed metrics implementations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About Metrics</a></li>
+</ul>
+
+                <hr/>
+                <ul>
+                    <li><a href="https://dropwizard.github.io/metrics/3.2.3/apidocs/">Javadoc</a></li>
+                    <li><a href="https://groups.google.com/forum/#!forum/metrics-user">Mailing List</a></li>
+                </ul>
+            </div>
+            <div class="span9" id="body">
+                
+  <div class="section" id="third-party-libraries">
+<span id="manual-third-party"></span><h1>Third Party Libraries</h1>
+<p>If you&#8217;re looking to integrate with something not provided by the main Metrics libraries, check out
+the many third-party libraries which extend Metrics:</p>
+<div class="section" id="instrumented-libraries">
+<h2>Instrumented Libraries</h2>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/InitiumIo/camel-metrics">camel-metrics</a> provides component for your <a class="reference external" href="https://camel.apache.org/">Apache Camel</a> route.</li>
+<li><a class="reference external" href="https://bitbucket.org/marshallpierce/hdrhistogram-metrics-reservoir">hdrhistogram-metrics-reservoir</a> provides a Histogram reservoir backed by <a class="reference external" href="http://hdrhistogram.org/">HdrHistogram</a>.</li>
+<li><a class="reference external" href="https://bitbucket.org/marshallpierce/jersey2-metrics">jersey2-metrics</a> provides integration with <a class="reference external" href="https://jersey.java.net/">Jersey 2</a>.</li>
+<li><a class="reference external" href="https://github.com/palominolabs/jersey-metrics-filter">jersey-metrics-filter</a> provides integration with Jersey 1.</li>
+<li><a class="reference external" href="https://github.com/astefanutti/metrics-aspectj">metrics-aspectj</a> provides integration with <a class="reference external" href="http://eclipse.org/aspectj/">AspectJ</a>.</li>
+<li><a class="reference external" href="https://github.com/astefanutti/metrics-cdi">metrics-cdi</a> provides integration with <a class="reference external" href="http://www.cdi-spec.org/">CDI</a> environments,</li>
+<li><a class="reference external" href="https://github.com/palominolabs/metrics-guice">metrics-guice</a> provides integration with <a class="reference external" href="https://code.google.com/p/google-guice/">Guice</a>.</li>
+<li><a class="reference external" href="https://github.com/palominolabs/metrics-guice-servlet">metrics-guice-servlet</a> provides <a class="reference external" href="https://github.com/google/guice/wiki/Servlets">Guice Servlet</a> integration with AdminServlet.</li>
+<li><a class="reference external" href="https://github.com/raskasa/metrics-okhttp">metrics-okhttp</a> provides integration with <a class="reference external" href="http://square.github.io/okhttp">OkHttp</a>.</li>
+<li><a class="reference external" href="https://github.com/kenshoo/metrics-play">metrics-play</a> provides an integration with the <a class="reference external" href="https://www.playframework.com/">Play Framework</a>.</li>
+<li><a class="reference external" href="https://github.com/ryantenney/metrics-spring">metrics-spring</a> provides integration with <a class="reference external" href="http://spring.io/">Spring</a>.</li>
+<li><a class="reference external" href="https://github.com/NitorCreations/wicket-metrics">wicket-metrics</a> provides easy integration for your <a class="reference external" href="http://wicket.apache.org/">Wicket</a> application.</li>
+</ul>
+</div>
+<div class="section" id="language-wrappers">
+<h2>Language Wrappers</h2>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/sjl/metrics-clojure">metrics-clojure</a> provides an API optimized for Clojure.</li>
+<li><a class="reference external" href="https://github.com/erikvanoosten/metrics-scala">metrics-scala</a> provides an API optimized for Scala.</li>
+</ul>
+</div>
+<div class="section" id="reporters">
+<h2>Reporters</h2>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/rlazoti/finagle-metrics">finagle-metrics</a> provides a reporter for a <a class="reference external" href="https://twitter.github.io/finagle/">Finagle</a> service.</li>
+<li><a class="reference external" href="https://github.com/SimpleFinance/kafka-dropwizard-reporter">kafka-dropwizard-metrics</a> allows Kafka producers, consumers, and streaming applications to register their built-in metrics with a Dropwizard Metrics registry.</li>
+<li><a class="reference external" href="https://github.com/addthis/MetricCatcher">MetricCatcher</a> Turns JSON over UDP into Metrics so that non-jvm languages can know what&#8217;s going on too.</li>
+<li><a class="reference external" href="https://github.com/brndnmtthws/metrics-cassandra">metrics-cassandra</a> provides a reporter for <a class="reference external" href="https://cassandra.apache.org/">Apache Cassandra</a>.</li>
+<li><a class="reference external" href="https://github.com/circonus-labs/metrics-circonus">metrics-circonus</a> provides a registry and reporter for sending metrics (including full histograms) to <a class="reference external" href="https://www.circonus.com/">Circonus</a>.</li>
+<li><a class="reference external" href="https://github.com/coursera/metrics-datadog">metrics-datadog</a> provides a reporter to send data to <a class="reference external" href="http://www.datadoghq.com/">Datadog</a>.</li>
+<li><a class="reference external" href="https://github.com/elasticsearch/elasticsearch-metrics-reporter-java">metrics-elasticsearch-reporter</a> provides a reporter for <a class="reference external" href="http://www.elasticsearch.org/">elasticsearch</a></li>
+<li><a class="reference external" href="https://github.com/joshelser/dropwizard-hadoop-metrics2">metrics-hadoop-metrics2-reporter</a> provides a reporter for <a class="reference external" href="https://hadoop.apache.org/docs/r2.7.2/api/org/apache/hadoop/metrics2/package-summary.html">Hadoop Metrics2</a>.</li>
+<li><a class="reference external" href="https://github.com/hawkular/hawkular-dropwizard-reporter">metrics-hawkular</a> provides a reporter for <a class="reference external" href="http://www.hawkular.org/">Hawkular Metrics</a>.</li>
+<li><a class="reference external" href="https://github.com/novaquark/metrics-influxdb">metrics-influxdb</a> provides a reporter which announces measurements to <a class="reference external" href="http://influxdb.org/">InfluxDB</a></li>
+<li><a class="reference external" href="https://github.com/egineering-llc/metrics-instrumental">metrics-instrumental</a> provides a reporter to send data to <a class="reference external" href="http://instrumentalapp.com/">Instrumental</a>.</li>
+<li><a class="reference external" href="https://github.com/hengyunabc/metrics-kafka">metrics-kafka</a> provides a reporter for <a class="reference external" href="http://kafka.apache.org/">Kafka</a>.</li>
+<li><a class="reference external" href="https://github.com/librato/metrics-librato">metrics-librato</a> provides a reporter for <a class="reference external" href="https://metrics.librato.com/">Librato Metrics</a>, a scalable metric collection, aggregation, monitoring, and alerting service.</li>
+<li><a class="reference external" href="https://github.com/aparnachaudhary/mongodb-metrics-reporter">metrics-mongodb-reporter</a> provides a reporter for <a class="reference external" href="https://www.mongodb.org/">MongoDB</a>.</li>
+<li><a class="reference external" href="https://github.com/slashidea/metrics-munin-reporter">metrics-munin-reporter</a> provides a reporter for <a class="reference external" href="http://munin-monitoring.org/">Munin</a></li>
+<li><a class="reference external" href="https://github.com/palominolabs/metrics-new-relic">metrics-new-relic</a> provides a reporter which sends data to <a class="reference external" href="http://newrelic.com/">New Relic</a>.</li>
+<li><a class="reference external" href="https://github.com/addthis/metrics-reporter-config">metrics-reporter-config</a> DropWizard-esque YAML configuration of reporters.</li>
+<li><a class="reference external" href="https://github.com/signalfx/signalfx-java">metrics-signalfx</a> provides a reporter to send data to <a class="reference external" href="http://www.signalfx.com/">SignalFx</a>.</li>
+<li><a class="reference external" href="https://github.com/ippontech/metrics-spark-reporter">metrics-spark-reporter</a> provides a reporter for <a class="reference external" href="https://spark.apache.org/streaming/">Apache Spark Streaming</a>.</li>
+<li><a class="reference external" href="https://github.com/zenmoto/metrics-splunk">metrics-splunk</a> provides a reporter for <a class="reference external" href="http://www.splunk.com/">Splunk</a>.</li>
+<li><a class="reference external" href="https://github.com/ReadyTalk/metrics-statsd">metrics-statsd</a> provides a Metrics 2.x and 3.x reporter for <a class="reference external" href="https://github.com/etsy/statsd/">StatsD</a></li>
+<li><a class="reference external" href="https://github.com/hengyunabc/metrics-zabbix">metrics-zabbiz</a> provides a reporter for <a class="reference external" href="http://www.zabbix.com/">Zabbix</a>.</li>
+<li><a class="reference external" href="https://github.com/sematext/sematext-metrics-reporter">sematext-metrics-reporter</a> provides a reporter for <a class="reference external" href="http://sematext.com/spm/index.html">SPM</a>.</li>
+</ul>
+</div>
+<div class="section" id="advansed-metrics-implementations">
+<h2>Advansed metrics implementations</h2>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/vladimir-bukhtoyarov/rolling-metrics">rolling-metrics</a> provides a collection of advanced metrics with rolling time window semantic, such as Rolling-Counter, Hit-Ratio, Top and Reservoir backed by HdrHistogram.</li>
+</ul>
+</div>
+</div>
+
+
+            </div></div>
+        <hr/>
+        <footer>
+            <p style="float: left">
+            &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
+            Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
+            1.5.2.
+            </p>
+            <p style="float: right">Dropwizard Metrics v3.2.3</p>
+        </footer>
+    </div>
+</body>
+</html>
+
+
