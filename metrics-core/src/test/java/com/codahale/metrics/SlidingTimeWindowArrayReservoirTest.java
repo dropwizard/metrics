@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 
 @SuppressWarnings("Duplicates")
