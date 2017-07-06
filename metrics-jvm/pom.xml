@@ -22,5 +22,10 @@
             <artifactId>metrics-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jmx</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>
