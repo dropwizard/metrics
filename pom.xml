@@ -105,6 +105,11 @@
             <name>Nexus Release Repository</name>
             <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
+        <site>
+            <id>metrics-site</id>
+            <name>Metrics Web site</name>
+            <url>http://metrics.dropwizard.io</url>
+        </site>
     </distributionManagement>
 
     <dependencyManagement>
