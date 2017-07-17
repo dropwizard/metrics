@@ -105,11 +105,8 @@ public class HealthCheckServlet extends HttpServlet {
             }
         }
 
-        final OutputStream output = resp.getOutputStream();
-        try {
+        try (OutputStream output = resp.getOutputStream()) {
             getWriter(req).writeValue(output, results);
-        } finally {
-            output.close();
         }
     }
 

@@ -92,13 +92,10 @@ public class AdminServlet extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
         resp.setContentType(CONTENT_TYPE);
-        final PrintWriter writer = resp.getWriter();
-        try {
+        try (PrintWriter writer = resp.getWriter()) {
             writer.println(MessageFormat.format(TEMPLATE, path, metricsUri, path, pingUri, path,
-                                                threadsUri, path, healthcheckUri, path, cpuprofileUri,
-                                                serviceName == null ? "" : " (" + serviceName + ")"));
-        } finally {
-            writer.close();
+                    threadsUri, path, healthcheckUri, path, cpuprofileUri,
+                    serviceName == null ? "" : " (" + serviceName + ")"));
         }
     }
 

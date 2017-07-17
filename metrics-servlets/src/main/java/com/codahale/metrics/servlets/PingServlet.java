@@ -23,11 +23,8 @@ public class PingServlet extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setHeader(CACHE_CONTROL, NO_CACHE);
         resp.setContentType(CONTENT_TYPE);
-        final PrintWriter writer = resp.getWriter();
-        try {
+        try (PrintWriter writer = resp.getWriter()) {
             writer.println(CONTENT);
-        } finally {
-            writer.close();
         }
     }
 }
