@@ -15,12 +15,12 @@ import static org.mockito.Mockito.when;
 
 public class WeightedSnapshotTest {
     
-    static public ArrayList<WeightedSample> WeightedArray(long[] values, double[] weights) {
+    private static List<WeightedSample> weightedArray(long[] values, double[] weights) {
         if (values.length != weights.length) {
             throw new IllegalArgumentException("Mismatched lengths: " + values.length + " vs " + weights.length);
         }
         
-        final ArrayList<WeightedSample> samples = new ArrayList<WeightedSnapshot.WeightedSample>();
+        final List<WeightedSample> samples = new ArrayList<WeightedSnapshot.WeightedSample>();
         for (int i = 0; i < values.length; i++) {
             samples.add(new WeightedSnapshot.WeightedSample(values[i], weights[i]));
         }
@@ -29,7 +29,7 @@ public class WeightedSnapshotTest {
     }
     
     private final Snapshot snapshot = new WeightedSnapshot(
-            WeightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2}) );
+            weightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2}) );
 
     @Test
     public void smallQuantilesAreTheFirstValue() throws Exception {
@@ -102,7 +102,7 @@ public class WeightedSnapshotTest {
 
     @Test
     public void worksWithUnderestimatedCollections() throws Exception {
-        final List<WeightedSample> items = spy(WeightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2}));
+        final List<WeightedSample> items = spy(weightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2}));
         when(items.size()).thenReturn(4, 5);
 
         final Snapshot other = new WeightedSnapshot(items);
@@ -113,7 +113,7 @@ public class WeightedSnapshotTest {
 
     @Test
     public void worksWithOverestimatedCollections() throws Exception {
-        final List<WeightedSample> items = spy(WeightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2}));
+        final List<WeightedSample> items = spy(weightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2}));
         when(items.size()).thenReturn(6, 5);
 
         final Snapshot other = new WeightedSnapshot(items);
@@ -159,7 +159,7 @@ public class WeightedSnapshotTest {
     @Test
     public void calculatesAMinOfZeroForAnEmptySnapshot() throws Exception {
         final Snapshot emptySnapshot = new WeightedSnapshot(
-            WeightedArray(new long[]{}, new double[]{}) );
+            weightedArray(new long[]{}, new double[]{}) );
 
         assertThat(emptySnapshot.getMin())
                 .isZero();
@@ -168,7 +168,7 @@ public class WeightedSnapshotTest {
     @Test
     public void calculatesAMaxOfZeroForAnEmptySnapshot() throws Exception {
         final Snapshot emptySnapshot = new WeightedSnapshot(
-            WeightedArray(new long[]{}, new double[]{}) );
+            weightedArray(new long[]{}, new double[]{}) );
 
         assertThat(emptySnapshot.getMax())
                 .isZero();
@@ -177,7 +177,7 @@ public class WeightedSnapshotTest {
     @Test
     public void calculatesAMeanOfZeroForAnEmptySnapshot() throws Exception {
         final Snapshot emptySnapshot = new WeightedSnapshot(
-            WeightedArray(new long[]{}, new double[]{}) );
+            weightedArray(new long[]{}, new double[]{}) );
 
         assertThat(emptySnapshot.getMean())
                 .isZero();
@@ -186,7 +186,7 @@ public class WeightedSnapshotTest {
     @Test
     public void calculatesAStdDevOfZeroForAnEmptySnapshot() throws Exception {
         final Snapshot emptySnapshot = new WeightedSnapshot(
-            WeightedArray(new long[]{}, new double[]{}) );
+            weightedArray(new long[]{}, new double[]{}) );
 
         assertThat(emptySnapshot.getStdDev())
                 .isZero();
@@ -195,7 +195,7 @@ public class WeightedSnapshotTest {
     @Test
     public void calculatesAStdDevOfZeroForASingletonSnapshot() throws Exception {
         final Snapshot singleItemSnapshot = new WeightedSnapshot(
-            WeightedArray(new long[]{ 1 }, new double[]{ 1.0 }) );
+            weightedArray(new long[]{ 1 }, new double[]{ 1.0 }) );
 
         assertThat(singleItemSnapshot.getStdDev())
                 .isZero();
@@ -204,7 +204,7 @@ public class WeightedSnapshotTest {
     @Test
     public void expectNoOverflowForLowWeights() throws Exception {
         final Snapshot scatteredSnapshot = new WeightedSnapshot(
-            WeightedArray(
+            weightedArray(
                     new long[]{ 1, 2, 3 }, 
                     new double[]{ Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE }
             ) 
