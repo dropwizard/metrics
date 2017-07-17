@@ -51,7 +51,7 @@ class AsyncHealthCheckDecorator extends HealthCheck implements Runnable {
         return healthCheck;
     }
 
-    private void check(boolean expression, String message) {
+    private static void check(boolean expression, String message) {
         if (!expression) {
             throw new IllegalArgumentException(message);
         }
