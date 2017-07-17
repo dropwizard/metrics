@@ -61,37 +61,25 @@ public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientCo
         this.metricsRegistry = metricsRegistry;
         this.name = name;
         metricsRegistry.register(name(HttpClientConnectionManager.class, name, "available-connections"),
-                                 new Gauge<Integer>() {
-                                     @Override
-                                     public Integer getValue() {
-                                         // this acquires a lock on the connection pool; remove if contention sucks
-                                         return getTotalStats().getAvailable();
-                                     }
-                                 });
+                (Gauge<Integer>) () -> {
+                    // this acquires a lock on the connection pool; remove if contention sucks
+                    return getTotalStats().getAvailable();
+                });
         metricsRegistry.register(name(HttpClientConnectionManager.class, name, "leased-connections"),
-                                 new Gauge<Integer>() {
-                                     @Override
-                                     public Integer getValue() {
-                                         // this acquires a lock on the connection pool; remove if contention sucks
-                                         return getTotalStats().getLeased();
-                                     }
-                                 });
+                (Gauge<Integer>) () -> {
+                    // this acquires a lock on the connection pool; remove if contention sucks
+                    return getTotalStats().getLeased();
+                });
         metricsRegistry.register(name(HttpClientConnectionManager.class, name, "max-connections"),
-                                 new Gauge<Integer>() {
-                                     @Override
-                                     public Integer getValue() {
-                                         // this acquires a lock on the connection pool; remove if contention sucks
-                                         return getTotalStats().getMax();
-                                     }
-                                 });
+                (Gauge<Integer>) () -> {
+                    // this acquires a lock on the connection pool; remove if contention sucks
+                    return getTotalStats().getMax();
+                });
         metricsRegistry.register(name(HttpClientConnectionManager.class, name, "pending-connections"),
-                                 new Gauge<Integer>() {
-                                     @Override
-                                     public Integer getValue() {
-                                         // this acquires a lock on the connection pool; remove if contention sucks
-                                         return getTotalStats().getPending();
-                                     }
-                                 });
+                (Gauge<Integer>) () -> {
+                    // this acquires a lock on the connection pool; remove if contention sucks
+                    return getTotalStats().getPending();
+                });
     }
 
     @Override
