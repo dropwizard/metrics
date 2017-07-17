@@ -1,4 +1,6 @@
-package com.codahale.metrics;
+package com.codahale.metrics.jvm;
+
+import com.codahale.metrics.Clock;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
