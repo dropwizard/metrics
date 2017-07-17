@@ -101,14 +101,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <!-- exclude jmh generated classes designed to trick jvm like "unused fields" padding -->
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <configuration>
-                    <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
