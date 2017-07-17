@@ -1,6 +1,12 @@
 package com.codahale.metrics;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -12,8 +18,8 @@ public class MetricRegistry implements MetricSet {
     /**
      * Concatenates elements to form a dotted name, eliding any null values or empty strings.
      *
-     * @param name     the first element of the name
-     * @param names    the remaining elements of the name
+     * @param name  the first element of the name
+     * @param names the remaining elements of the name
      * @return {@code name} and {@code names} concatenated by periods
      */
     public static String name(String name, String... names) {
@@ -31,8 +37,8 @@ public class MetricRegistry implements MetricSet {
      * Concatenates a class name and elements to form a dotted name, eliding any null values or
      * empty strings.
      *
-     * @param klass    the first element of the name
-     * @param names    the remaining elements of the name
+     * @param klass the first element of the name
+     * @param names the remaining elements of the name
      * @return {@code klass} and {@code names} concatenated by periods
      */
     public static String name(Class<?> klass, String... names) {
@@ -97,7 +103,7 @@ public class MetricRegistry implements MetricSet {
     /**
      * Given a metric set, registers them.
      *
-     * @param metrics    a set of metrics
+     * @param metrics a set of metrics
      * @throws IllegalArgumentException if any of the names are already registered
      */
     public void registerAll(MetricSet metrics) throws IllegalArgumentException {
@@ -105,7 +111,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * Return the {@link Counter} registered under this name; or create and register 
+     * Return the {@link Counter} registered under this name; or create and register
      * a new {@link Counter} if none is registered.
      *
      * @param name the name of the metric
@@ -119,7 +125,7 @@ public class MetricRegistry implements MetricSet {
      * Return the {@link Counter} registered under this name; or create and register
      * a new {@link Counter} using the provided MetricSupplier if none is registered.
      *
-     * @param name the name of the metric
+     * @param name     the name of the metric
      * @param supplier a MetricSupplier that can be used to manufacture a counter.
      * @return a new or pre-existing {@link Counter}
      */
@@ -129,6 +135,7 @@ public class MetricRegistry implements MetricSet {
             public Counter newMetric() {
                 return supplier.newMetric();
             }
+
             @Override
             public boolean isInstance(Metric metric) {
                 return Counter.class.isInstance(metric);
@@ -137,7 +144,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * Return the {@link Histogram} registered under this name; or create and register 
+     * Return the {@link Histogram} registered under this name; or create and register
      * a new {@link Histogram} if none is registered.
      *
      * @param name the name of the metric
@@ -151,21 +158,22 @@ public class MetricRegistry implements MetricSet {
      * Return the {@link Histogram} registered under this name; or create and register
      * a new {@link Histogram} using the provided MetricSupplier if none is registered.
      *
-     * @param name the name of the metric
+     * @param name     the name of the metric
      * @param supplier a MetricSupplier that can be used to manufacture a histogram
      * @return a new or pre-existing {@link Histogram}
      */
     public Histogram histogram(String name, final MetricSupplier<Histogram> supplier) {
-      return getOrAdd(name, new MetricBuilder<Histogram>() {
-        @Override
-        public Histogram newMetric() {
-          return supplier.newMetric();
-        }
-        @Override
-        public boolean isInstance(Metric metric) {
-          return Histogram.class.isInstance(metric);
-        }
-      });
+        return getOrAdd(name, new MetricBuilder<Histogram>() {
+            @Override
+            public Histogram newMetric() {
+                return supplier.newMetric();
+            }
+
+            @Override
+            public boolean isInstance(Metric metric) {
+                return Histogram.class.isInstance(metric);
+            }
+        });
     }
 
     /**
@@ -183,7 +191,7 @@ public class MetricRegistry implements MetricSet {
      * Return the {@link Meter} registered under this name; or create and register
      * a new {@link Meter} using the provided MetricSupplier if none is registered.
      *
-     * @param name the name of the metric
+     * @param name     the name of the metric
      * @param supplier a MetricSupplier that can be used to manufacture a Meter
      * @return a new or pre-existing {@link Meter}
      */
@@ -193,6 +201,7 @@ public class MetricRegistry implements MetricSet {
             public Meter newMetric() {
                 return supplier.newMetric();
             }
+
             @Override
             public boolean isInstance(Metric metric) {
                 return Meter.class.isInstance(metric);
@@ -215,7 +224,7 @@ public class MetricRegistry implements MetricSet {
      * Return the {@link Timer} registered under this name; or create and register
      * a new {@link Timer} using the provided MetricSupplier if none is registered.
      *
-     * @param name the name of the metric
+     * @param name     the name of the metric
      * @param supplier a MetricSupplier that can be used to manufacture a Timer
      * @return a new or pre-existing {@link Timer}
      */
@@ -225,6 +234,7 @@ public class MetricRegistry implements MetricSet {
             public Timer newMetric() {
                 return supplier.newMetric();
             }
+
             @Override
             public boolean isInstance(Metric metric) {
                 return Timer.class.isInstance(metric);
@@ -236,7 +246,7 @@ public class MetricRegistry implements MetricSet {
      * Return the {@link Gauge} registered under this name; or create and register
      * a new {@link Gauge} using the provided MetricSupplier if none is registered.
      *
-     * @param name the name of the metric
+     * @param name     the name of the metric
      * @param supplier a MetricSupplier that can be used to manufacture a Gauge
      * @return a new or pre-existing {@link Gauge}
      */
@@ -247,6 +257,7 @@ public class MetricRegistry implements MetricSet {
             public Gauge newMetric() {
                 return supplier.newMetric();
             }
+
             @Override
             public boolean isInstance(Metric metric) {
                 return Gauge.class.isInstance(metric);
@@ -255,12 +266,12 @@ public class MetricRegistry implements MetricSet {
     }
 
 
-        /**
-         * Removes the metric with the given name.
-         *
-         * @param name the name of the metric
-         * @return whether or not the metric was removed
-         */
+    /**
+     * Removes the metric with the given name.
+     *
+     * @param name the name of the metric
+     * @return whether or not the metric was removed
+     */
     public boolean remove(String name) {
         final Metric metric = metrics.remove(name);
         if (metric != null) {
@@ -330,7 +341,7 @@ public class MetricRegistry implements MetricSet {
     /**
      * Returns a map of all the gauges in the registry and their names which match the given filter.
      *
-     * @param filter    the metric filter to match
+     * @param filter the metric filter to match
      * @return all the gauges in the registry
      */
     @SuppressWarnings("rawtypes")
@@ -351,7 +362,7 @@ public class MetricRegistry implements MetricSet {
      * Returns a map of all the counters in the registry and their names which match the given
      * filter.
      *
-     * @param filter    the metric filter to match
+     * @param filter the metric filter to match
      * @return all the counters in the registry
      */
     public SortedMap<String, Counter> getCounters(MetricFilter filter) {
@@ -371,7 +382,7 @@ public class MetricRegistry implements MetricSet {
      * Returns a map of all the histograms in the registry and their names which match the given
      * filter.
      *
-     * @param filter    the metric filter to match
+     * @param filter the metric filter to match
      * @return all the histograms in the registry
      */
     public SortedMap<String, Histogram> getHistograms(MetricFilter filter) {
@@ -390,7 +401,7 @@ public class MetricRegistry implements MetricSet {
     /**
      * Returns a map of all the meters in the registry and their names which match the given filter.
      *
-     * @param filter    the metric filter to match
+     * @param filter the metric filter to match
      * @return all the meters in the registry
      */
     public SortedMap<String, Meter> getMeters(MetricFilter filter) {
@@ -409,7 +420,7 @@ public class MetricRegistry implements MetricSet {
     /**
      * Returns a map of all the timers in the registry and their names which match the given filter.
      *
-     * @param filter    the metric filter to match
+     * @param filter the metric filter to match
      * @return all the timers in the registry
      */
     public SortedMap<String, Timer> getTimers(MetricFilter filter) {
@@ -439,7 +450,7 @@ public class MetricRegistry implements MetricSet {
         final TreeMap<String, T> timers = new TreeMap<String, T>();
         for (Map.Entry<String, Metric> entry : metrics.entrySet()) {
             if (klass.isInstance(entry.getValue()) && filter.matches(entry.getKey(),
-                                                                     entry.getValue())) {
+                    entry.getValue())) {
                 timers.put(entry.getKey(), (T) entry.getValue());
             }
         }
@@ -506,7 +517,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     public interface MetricSupplier<T extends Metric> {
-      T newMetric();
+        T newMetric();
     }
 
     /**
