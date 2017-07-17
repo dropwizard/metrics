@@ -1,8 +1,8 @@
 package com.codahale.metrics.health;
 
-import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -16,7 +16,8 @@ public abstract class HealthCheck {
      * or unhealthy (with either an error message or a thrown exception and optional details).
      */
     public static class Result {
-        private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+        private static final DateTimeFormatter DATE_FORMAT_PATTERN =
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         private static final int PRIME = 31;
 
         /**
@@ -115,7 +116,7 @@ public abstract class HealthCheck {
             this.message = message;
             this.error = error;
             this.details = details == null ? null : Collections.unmodifiableMap(details);
-            timestamp = new SimpleDateFormat(DATE_FORMAT_PATTERN).format(new Date());
+            timestamp = DATE_FORMAT_PATTERN.format(ZonedDateTime.now());
         }
 
         /**
