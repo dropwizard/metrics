@@ -26,6 +26,32 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class PickledGraphite implements GraphiteSender {
 
+    static class MetricTuple {
+        String name;
+        long timestamp;
+        String value;
+
+        MetricTuple(String name, long timestamp, String value) {
+            this.name = name;
+            this.timestamp = timestamp;
+            this.value = value;
+        }
+    }
+
+    /**
+     * Minimally necessary pickle opcodes.
+     */
+    private static final char
+            MARK = '(',
+            STOP = '.',
+            LONG = 'L',
+            STRING = 'S',
+            APPEND = 'a',
+            LIST = 'l',
+            TUPLE = 't',
+            QUOTE = '\'',
+            LF = '\n';
+
     private static final Logger LOGGER = LoggerFactory.getLogger(PickledGraphite.class);
     private final static int DEFAULT_BATCH_SIZE = 100;
 
@@ -277,20 +303,6 @@ public class PickledGraphite implements GraphiteSender {
     }
 
     /**
-     * Minimally necessary pickle opcodes.
-     */
-    private final char
-            MARK = '(',
-            STOP = '.',
-            LONG = 'L',
-            STRING = 'S',
-            APPEND = 'a',
-            LIST = 'l',
-            TUPLE = 't',
-            QUOTE = '\'',
-            LF = '\n';
-
-    /**
      * See: http://readthedocs.org/docs/graphite/en/1.0/feeding-carbon.html
      *
      * @throws IOException
@@ -343,18 +355,6 @@ public class PickledGraphite implements GraphiteSender {
         pickled.flush();
 
         return out.toByteArray();
-    }
-
-    static class MetricTuple {
-        String name;
-        long timestamp;
-        String value;
-
-        MetricTuple(String name, long timestamp, String value) {
-            this.name = name;
-            this.timestamp = timestamp;
-            this.value = value;
-        }
     }
 
     protected String sanitize(String s) {
