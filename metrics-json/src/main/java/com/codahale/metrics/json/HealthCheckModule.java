@@ -16,6 +16,9 @@ import java.util.Map;
 
 public class HealthCheckModule extends Module {
     private static class HealthCheckResultSerializer extends StdSerializer<HealthCheck.Result> {
+
+        private static final long serialVersionUID = 1L;
+
         private HealthCheckResultSerializer() {
             super(HealthCheck.Result.class);
         }
