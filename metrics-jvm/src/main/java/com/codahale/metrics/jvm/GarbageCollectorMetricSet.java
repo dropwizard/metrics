@@ -32,27 +32,16 @@ public class GarbageCollectorMetricSet implements MetricSet {
      * @param garbageCollectors    the garbage collectors
      */
     public GarbageCollectorMetricSet(Collection<GarbageCollectorMXBean> garbageCollectors) {
-        this.garbageCollectors = new ArrayList<GarbageCollectorMXBean>(garbageCollectors);
+        this.garbageCollectors = new ArrayList<>(garbageCollectors);
     }
 
     @Override
     public Map<String, Metric> getMetrics() {
-        final Map<String, Metric> gauges = new HashMap<String, Metric>();
+        final Map<String, Metric> gauges = new HashMap<>();
         for (final GarbageCollectorMXBean gc : garbageCollectors) {
             final String name = WHITESPACE.matcher(gc.getName()).replaceAll("-");
-            gauges.put(name(name, "count"), new Gauge<Long>() {
-                @Override
-                public Long getValue() {
-                    return gc.getCollectionCount();
-                }
-            });
-
-            gauges.put(name(name, "time"), new Gauge<Long>() {
-                @Override
-                public Long getValue() {
-                    return gc.getCollectionTime();
-                }
-            });
+            gauges.put(name(name, "count"), (Gauge<Long>) gc::getCollectionCount);
+            gauges.put(name(name, "time"), (Gauge<Long>) gc::getCollectionTime);
         }
         return Collections.unmodifiableMap(gauges);
     }

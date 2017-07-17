@@ -32,14 +32,14 @@ public class GarbageCollectorMetricSetTest {
 
     @Test
     public void hasAGaugeForGcCounts() throws Exception {
-        final Gauge<String> gauge = (Gauge<String>) metrics.getMetrics().get("PS-OldGen.count");
+        final Gauge<Long> gauge = (Gauge<Long>) metrics.getMetrics().get("PS-OldGen.count");
         assertThat(gauge.getValue())
                 .isEqualTo(1L);
     }
 
     @Test
     public void hasAGaugeForGcTimes() throws Exception {
-        final Gauge<String> gauge = (Gauge<String>) metrics.getMetrics().get("PS-OldGen.time");
+        final Gauge<Long> gauge = (Gauge<Long>) metrics.getMetrics().get("PS-OldGen.time");
         assertThat(gauge.getValue())
                 .isEqualTo(2L);
     }

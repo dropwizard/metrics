@@ -175,7 +175,7 @@ public class InstrumentedHandler extends HandlerWrapper {
 
         metricRegistry.register(name(prefix, "percent-5xx-15m"), new RatioGauge() {
             @Override
-            protected Ratio getRatio() {
+            public Ratio getRatio() {
                 return Ratio.of(responses[4].getFifteenMinuteRate(),
                         requests.getFifteenMinuteRate());
             }

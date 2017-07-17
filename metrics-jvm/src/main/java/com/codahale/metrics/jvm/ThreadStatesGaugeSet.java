@@ -50,41 +50,13 @@ public class ThreadStatesGaugeSet implements MetricSet {
 
         for (final Thread.State state : Thread.State.values()) {
             gauges.put(name(state.toString().toLowerCase(), "count"),
-                       new Gauge<Object>() {
-                           @Override
-                           public Object getValue() {
-                               return getThreadCount(state);
-                           }
-                       });
+                    (Gauge<Object>) () -> getThreadCount(state));
         }
 
-        gauges.put("count", new Gauge<Integer>() {
-            @Override
-            public Integer getValue() {
-                return threads.getThreadCount();
-            }
-        });
-
-        gauges.put("daemon.count", new Gauge<Integer>() {
-            @Override
-            public Integer getValue() {
-                return threads.getDaemonThreadCount();
-            }
-        });
-
-        gauges.put("deadlock.count", new Gauge<Integer>() {
-            @Override
-            public Integer getValue() {
-                return deadlockDetector.getDeadlockedThreads().size();
-            }
-        });
-
-        gauges.put("deadlocks", new Gauge<Set<String>>() {
-            @Override
-            public Set<String> getValue() {
-                return deadlockDetector.getDeadlockedThreads();
-            }
-        });
+        gauges.put("count", (Gauge<Integer>) threads::getThreadCount);
+        gauges.put("daemon.count", (Gauge<Integer>) threads::getDaemonThreadCount);
+        gauges.put("deadlock.count", (Gauge<Integer>) () -> deadlockDetector.getDeadlockedThreads().size());
+        gauges.put("deadlocks", (Gauge<Set<String>>) deadlockDetector::getDeadlockedThreads);
 
         return Collections.unmodifiableMap(gauges);
     }
