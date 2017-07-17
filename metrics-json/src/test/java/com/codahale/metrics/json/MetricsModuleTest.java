@@ -201,7 +201,7 @@ public class MetricsModuleTest {
 
         assertThat(mapper.writeValueAsString(registry))
                 .isEqualTo("{" +
-                                   "\"version\":\"3.1.3\"," +
+                                   "\"version\":\"4.0.0\"," +
                                    "\"gauges\":{}," +
                                    "\"counters\":{}," +
                                    "\"histograms\":{}," +
