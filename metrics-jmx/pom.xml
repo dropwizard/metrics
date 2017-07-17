@@ -13,7 +13,7 @@
     <name>Metrics Integration with JMX</name>
     <packaging>bundle</packaging>
     <description>
-        A set of classes which allow you to collect and report metrics via JMX
+        A set of classes which allow you to report metrics via JMX.
     </description>
 
     <dependencies>

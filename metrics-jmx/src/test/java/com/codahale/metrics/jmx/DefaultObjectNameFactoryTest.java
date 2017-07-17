@@ -1,9 +1,10 @@
-package com.codahale.metrics;
+package com.codahale.metrics.jmx;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.management.ObjectName;
 
+import com.codahale.metrics.jmx.DefaultObjectNameFactory;
 import org.junit.Test;
 
 public class DefaultObjectNameFactoryTest {
