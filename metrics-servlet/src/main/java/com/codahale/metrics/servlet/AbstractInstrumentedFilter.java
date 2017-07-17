@@ -169,6 +169,7 @@ public abstract class AbstractInstrumentedFilter implements Filter {
         }
 
         @Override
+        @SuppressWarnings("deprecation")
         public void setStatus(int sc, String sm) {
             httpStatus = sc;
             super.setStatus(sc, sm);
