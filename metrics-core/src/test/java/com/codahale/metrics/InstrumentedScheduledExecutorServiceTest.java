@@ -16,16 +16,16 @@ public class InstrumentedScheduledExecutorServiceTest {
     private final MetricRegistry registry = new MetricRegistry();
     private final InstrumentedScheduledExecutorService instrumentedScheduledExecutor = new InstrumentedScheduledExecutorService(scheduledExecutor, registry, "xs");
 
-    final Meter submitted = registry.meter("xs.submitted");
+    private final Meter submitted = registry.meter("xs.submitted");
 
-    final Counter running = registry.counter("xs.running");
-    final Meter completed = registry.meter("xs.completed");
-    final Timer duration = registry.timer("xs.duration");
+    private final Counter running = registry.counter("xs.running");
+    private final Meter completed = registry.meter("xs.completed");
+    private final Timer duration = registry.timer("xs.duration");
 
-    final Meter scheduledOnce = registry.meter("xs.scheduled.once");
-    final Meter scheduledRepetitively = registry.meter("xs.scheduled.repetitively");
-    final Counter scheduledOverrun = registry.counter("xs.scheduled.overrun");
-    final Histogram percentOfPeriod = registry.histogram("xs.scheduled.percent-of-period");
+    private final Meter scheduledOnce = registry.meter("xs.scheduled.once");
+    private final Meter scheduledRepetitively = registry.meter("xs.scheduled.repetitively");
+    private final Counter scheduledOverrun = registry.counter("xs.scheduled.overrun");
+    private final Histogram percentOfPeriod = registry.histogram("xs.scheduled.percent-of-period");
 
     @Test
     public void testSubmitRunnable() throws Exception {
