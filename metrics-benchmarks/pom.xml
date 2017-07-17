@@ -66,6 +66,17 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.1</version>
+                <configuration>
+                    <compilerVersion>1.8</compilerVersion>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <compilerArgument>-XepDisableWarningsInGeneratedCode</compilerArgument>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
