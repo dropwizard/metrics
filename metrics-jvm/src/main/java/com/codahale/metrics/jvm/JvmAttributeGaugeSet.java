@@ -1,4 +1,8 @@
-package com.codahale.metrics;
+package com.codahale.metrics.jvm;
+
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricSet;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
