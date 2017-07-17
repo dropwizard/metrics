@@ -340,7 +340,7 @@ public class GraphiteReporter extends ScheduledReporter {
         graphite.send(prefix(name, COUNT.getCode()), format(counter.getCount()), timestamp);
     }
 
-    private void reportGauge(String name, Gauge gauge, long timestamp) throws IOException {
+    private void reportGauge(String name, Gauge<?> gauge, long timestamp) throws IOException {
         final String value = format(gauge.getValue());
         if (value != null) {
             graphite.send(prefix(name), value, timestamp);
