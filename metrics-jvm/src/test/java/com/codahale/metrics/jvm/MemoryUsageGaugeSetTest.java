@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("rawtypes")
 public class MemoryUsageGaugeSetTest {
     private final MemoryUsage heap = mock(MemoryUsage.class);
     private final MemoryUsage nonHeap = mock(MemoryUsage.class);

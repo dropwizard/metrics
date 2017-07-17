@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("rawtypes")
 public class JmxReporterTest {
     private final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
     private final String name = UUID.randomUUID().toString().replaceAll("[{\\-}]", "");

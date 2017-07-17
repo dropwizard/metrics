@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("rawtypes")
 public class BufferPoolMetricSetTest {
     private final MBeanServer mBeanServer = mock(MBeanServer.class);
     private final BufferPoolMetricSet buffers = new BufferPoolMetricSet(mBeanServer);
