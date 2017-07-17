@@ -1,4 +1,4 @@
-package com.codahale.metrics;
+package com.codahale.metrics.jvm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

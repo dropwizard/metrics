@@ -3,7 +3,7 @@ package com.codahale.metrics.jcache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.codahale.metrics.JmxAttributeGauge;
+import com.codahale.metrics.jvm.JmxAttributeGauge;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricSet;
 

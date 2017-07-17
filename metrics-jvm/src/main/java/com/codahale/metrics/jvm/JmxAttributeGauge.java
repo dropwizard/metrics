@@ -1,4 +1,6 @@
-package com.codahale.metrics;
+package com.codahale.metrics.jvm;
+
+import com.codahale.metrics.Gauge;
 
 import java.io.IOException;
 import javax.management.JMException;
