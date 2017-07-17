@@ -6,18 +6,31 @@ import org.junit.Test;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ScheduledReporterTest {
-    private final Gauge gauge = mock(Gauge.class);
+    private final Gauge<String> gauge = () -> "";
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
+
+    @SuppressWarnings("rawtypes")
     private final ScheduledFuture scheduledFuture = mock(ScheduledFuture.class);
     private final ScheduledExecutorService executor = mock(ScheduledExecutorService.class);
 
@@ -186,22 +199,22 @@ public class ScheduledReporterTest {
     }
 
     private <T> SortedMap<String, T> map(String name, T value) {
-        final SortedMap<String, T> map = new TreeMap<String, T>();
+        final SortedMap<String, T> map = new TreeMap<>();
         map.put(name, value);
         return map;
     }
 
     private static class DummyReporter extends ScheduledReporter {
 
-        public DummyReporter(MetricRegistry registry, String name, MetricFilter filter, TimeUnit rateUnit, TimeUnit durationUnit) {
+        DummyReporter(MetricRegistry registry, String name, MetricFilter filter, TimeUnit rateUnit, TimeUnit durationUnit) {
             super(registry, name, filter, rateUnit, durationUnit);
         }
 
-        public DummyReporter(MetricRegistry registry, String name, MetricFilter filter, TimeUnit rateUnit, TimeUnit durationUnit, ScheduledExecutorService executor) {
+        DummyReporter(MetricRegistry registry, String name, MetricFilter filter, TimeUnit rateUnit, TimeUnit durationUnit, ScheduledExecutorService executor) {
             super(registry, name, filter, rateUnit, durationUnit, executor);
         }
 
-        public DummyReporter(MetricRegistry registry, String name, MetricFilter filter, TimeUnit rateUnit, TimeUnit durationUnit, ScheduledExecutorService executor, boolean shutdownExecutorOnStop) {
+        DummyReporter(MetricRegistry registry, String name, MetricFilter filter, TimeUnit rateUnit, TimeUnit durationUnit, ScheduledExecutorService executor, boolean shutdownExecutorOnStop) {
             super(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop);
         }
 

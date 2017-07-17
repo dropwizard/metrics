@@ -2,8 +2,8 @@ package com.codahale.metrics.health;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,6 +24,8 @@ import com.codahale.metrics.health.annotation.Async;
 public class AsyncHealthCheckDecoratorTest {
     private final HealthCheck mockHealthCheck = mock(HealthCheck.class);
     private final ScheduledExecutorService mockExecutorService = mock(ScheduledExecutorService.class);
+
+    @SuppressWarnings("rawtypes")
     private final ScheduledFuture mockFuture = mock(ScheduledFuture.class);
 
     @Test(expected = IllegalArgumentException.class)
@@ -86,6 +88,7 @@ public class AsyncHealthCheckDecoratorTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void tearDownTriggersCancellation() throws Exception {
         when(mockExecutorService.scheduleAtFixedRate(any(Runnable.class), eq(0L), eq(1L), eq(TimeUnit.SECONDS))).
                 thenReturn(mockFuture);
@@ -100,6 +103,7 @@ public class AsyncHealthCheckDecoratorTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void afterFirstExecutionDecoratedHealthCheckResultIsProvided() throws Exception {
         HealthCheck.Result expectedResult = HealthCheck.Result.healthy("AsyncHealthCheckTest");
         when(mockExecutorService.scheduleAtFixedRate(any(Runnable.class), eq(0L), eq(1L), eq(TimeUnit.SECONDS)))
@@ -121,6 +125,7 @@ public class AsyncHealthCheckDecoratorTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void exceptionInDecoratedHealthCheckWontAffectAsyncDecorator() throws Exception {
         Exception exception = new Exception("TestException");
         when(mockExecutorService.scheduleAtFixedRate(any(Runnable.class), eq(0L), eq(1L), eq(TimeUnit.SECONDS)))

@@ -26,6 +26,7 @@ public class InstrumentedThreadFactoryTest {
      * TODO: Try not using real threads in a unit test?
      */
     @Test
+    @SuppressWarnings("unused")
     public void reportsThreadInformation() throws Exception {
         final CountDownLatch allTasksAreCreated = new CountDownLatch(THREAD_COUNT);
         final CountDownLatch allTasksAreCounted = new CountDownLatch(1);

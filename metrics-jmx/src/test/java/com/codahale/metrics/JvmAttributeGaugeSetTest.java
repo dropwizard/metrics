@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("unchecked")
 public class JvmAttributeGaugeSetTest {
     private final RuntimeMXBean runtime = mock(RuntimeMXBean.class);
     private final JvmAttributeGaugeSet gauges = new JvmAttributeGaugeSet(runtime);
@@ -32,7 +33,7 @@ public class JvmAttributeGaugeSetTest {
 
     @Test
     public void hasAGaugeForTheJVMName() throws Exception {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("name");
+        final Gauge<String> gauge = (Gauge<String>) gauges.getMetrics().get("name");
 
         assertThat(gauge.getValue())
                 .isEqualTo("9928@example.com");
@@ -40,7 +41,7 @@ public class JvmAttributeGaugeSetTest {
 
     @Test
     public void hasAGaugeForTheJVMVendor() throws Exception {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("vendor");
+        final Gauge<String> gauge = (Gauge<String>) gauges.getMetrics().get("vendor");
 
         assertThat(gauge.getValue())
                 .isEqualTo("Oracle Corporation Java HotSpot(TM) 64-Bit Server VM 23.7-b01 (1.7)");
@@ -48,7 +49,7 @@ public class JvmAttributeGaugeSetTest {
 
     @Test
     public void hasAGaugeForTheJVMUptime() throws Exception {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("uptime");
+        final Gauge<Long> gauge = (Gauge<Long>) gauges.getMetrics().get("uptime");
 
         assertThat(gauge.getValue())
                 .isEqualTo(100L);
@@ -56,9 +57,8 @@ public class JvmAttributeGaugeSetTest {
 
     @Test
     public void autoDiscoversTheRuntimeBean() throws Exception {
-        final Gauge gauge = (Gauge) new JvmAttributeGaugeSet().getMetrics().get("uptime");
+        final Gauge<Long> gauge = (Gauge<Long>) new JvmAttributeGaugeSet().getMetrics().get("uptime");
 
-        assertThat((Long) gauge.getValue())
-                .isPositive();
+        assertThat(gauge.getValue()).isPositive();
     }
 }

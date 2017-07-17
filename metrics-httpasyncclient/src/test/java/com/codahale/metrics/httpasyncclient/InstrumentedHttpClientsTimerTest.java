@@ -12,16 +12,20 @@ import org.apache.http.nio.client.HttpAsyncClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
@@ -87,11 +91,11 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
         responseFuture.get(20, TimeUnit.SECONDS);
 
         // Callback must have been called
-        assertTrue(responseFuture.isDone());
+        assertThat(responseFuture.isDone()).isTrue();
         // After the computation is complete timer must be stopped
         // Materialzing the future and calling the future callback is not an atomic operation so
         // we need to wait for callback to succeed
-        verify(futureCallback, timeout(100).times(1)).completed(Matchers.<HttpResponse>anyObject());
+        verify(futureCallback, timeout(100).times(1)).completed(any(HttpResponse.class));
         verify(context, timeout(100).times(1)).stop();
     }
 
@@ -121,7 +125,7 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
         // After the computation is complete timer must be stopped
         // Materialzing the future and calling the future callback is not an atomic operation so
         // we need to wait for callback to succeed
-        verify(futureCallback, timeout(100).times(1)).failed(Matchers.<Exception>anyObject());
+        verify(futureCallback, timeout(100).times(1)).failed(any(Exception.class));
         verify(context, timeout(100).times(1)).stop();
     }
 

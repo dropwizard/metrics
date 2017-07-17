@@ -15,7 +15,9 @@ import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class CsvReporterTest {
     @Rule public final TemporaryFolder folder = new TemporaryFolder();
@@ -43,14 +45,13 @@ public class CsvReporterTest {
 
     @Test
     public void reportsGaugeValues() throws Exception {
-        final Gauge gauge = mock(Gauge.class);
-        when(gauge.getValue()).thenReturn(1);
+        final Gauge<Integer> gauge = () -> 1;
 
         reporter.report(map("gauge", gauge),
-                        this.<Counter>map(),
-                        this.<Histogram>map(),
-                        this.<Meter>map(),
-                        this.<Timer>map());
+                        map(),
+                        map(),
+                        map(),
+                        map());
 
         assertThat(fileContents("gauge.csv"))
                 .isEqualTo(csv(
@@ -64,11 +65,11 @@ public class CsvReporterTest {
         final Counter counter = mock(Counter.class);
         when(counter.getCount()).thenReturn(100L);
 
-        reporter.report(this.<Gauge>map(),
+        reporter.report(map(),
                         map("test.counter", counter),
-                        this.<Histogram>map(),
-                        this.<Meter>map(),
-                        this.<Timer>map());
+                        map(),
+                        map(),
+                        map());
 
         assertThat(fileContents("test.counter.csv"))
                 .isEqualTo(csv(
@@ -96,11 +97,11 @@ public class CsvReporterTest {
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
-        reporter.report(this.<Gauge>map(),
-                        this.<Counter>map(),
+        reporter.report(map(),
+                        map(),
                         map("test.histogram", histogram),
-                        this.<Meter>map(),
-                        this.<Timer>map());
+                        map(),
+                        map());
 
         assertThat(fileContents("test.histogram.csv"))
                 .isEqualTo(csv(
@@ -118,11 +119,11 @@ public class CsvReporterTest {
         when(meter.getFiveMinuteRate()).thenReturn(4.0);
         when(meter.getFifteenMinuteRate()).thenReturn(5.0);
 
-        reporter.report(this.<Gauge>map(),
-                        this.<Counter>map(),
-                        this.<Histogram>map(),
+        reporter.report(map(),
+                        map(),
+                        map(),
                         map("test.meter", meter),
-                        this.<Timer>map());
+                        map());
 
         assertThat(fileContents("test.meter.csv"))
                 .isEqualTo(csv(
@@ -154,10 +155,10 @@ public class CsvReporterTest {
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
-        reporter.report(this.<Gauge>map(),
-                        this.<Counter>map(),
-                        this.<Histogram>map(),
-                        this.<Meter>map(),
+        reporter.report(map(),
+                        map(),
+                        map(),
+                        map(),
                         map("test.another.timer", timer));
 
         assertThat(fileContents("test.another.timer.csv"))
@@ -176,14 +177,13 @@ public class CsvReporterTest {
                 .withCsvFileProvider(fileProvider)
                 .build(dataDirectory);
 
-        final Gauge gauge = mock(Gauge.class);
-        when(gauge.getValue()).thenReturn(1);
+        final Gauge<Integer> gauge = () -> 1;
 
         reporter.report(map("gauge", gauge),
-                this.<Counter>map(),
-                this.<Histogram>map(),
-                this.<Meter>map(),
-                this.<Timer>map());
+                map(),
+                map(),
+                map(),
+                map());
 
         verify(fileProvider).getFile(dataDirectory, "gauge");
     }
@@ -201,11 +201,11 @@ public class CsvReporterTest {
     }
 
     private <T> SortedMap<String, T> map() {
-        return new TreeMap<String, T>();
+        return new TreeMap<>();
     }
 
     private <T> SortedMap<String, T> map(String name, T metric) {
-        final TreeMap<String, T> map = new TreeMap<String, T>();
+        final TreeMap<String, T> map = new TreeMap<>();
         map.put(name, metric);
         return map;
     }

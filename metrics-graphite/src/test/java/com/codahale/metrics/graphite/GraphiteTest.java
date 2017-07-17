@@ -16,9 +16,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.failBecauseExceptionWasNotThrown;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class GraphiteTest {
     private final String host = "example.com";
@@ -36,39 +41,23 @@ public class GraphiteTest {
         final AtomicBoolean connected = new AtomicBoolean(true);
         final AtomicBoolean closed = new AtomicBoolean(false);
 
-        when(socket.isConnected()).thenAnswer(new Answer<Boolean>() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                return connected.get();
-            }
-        });
+        when(socket.isConnected()).thenAnswer(invocation -> connected.get());
 
-        when(socket.isClosed()).thenAnswer(new Answer<Boolean>() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                return closed.get();
-            }
-        });
+        when(socket.isClosed()).thenAnswer(invocation -> closed.get());
 
-        doAnswer(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                connected.set(false);
-                closed.set(true);
-                return null;
-            }
+        doAnswer(invocation -> {
+            connected.set(false);
+            closed.set(true);
+            return null;
         }).when(socket).close();
 
         when(socket.getOutputStream()).thenReturn(output);
 
         // Mock behavior of socket.getOutputStream().close() calling socket.close();
-        doAnswer(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                invocation.callRealMethod();
-                socket.close();
-                return null;
-            }
+        doAnswer(invocation -> {
+            invocation.callRealMethod();
+            socket.close();
+            return null;
         }).when(output).close();
 
         when(socketFactory.createSocket(any(InetAddress.class), anyInt())).thenReturn(socket);

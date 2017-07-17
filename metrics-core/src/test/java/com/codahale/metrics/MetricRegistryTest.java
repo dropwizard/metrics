@@ -9,13 +9,14 @@ import java.util.Map;
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 public class MetricRegistryTest {
     private final MetricRegistryListener listener = mock(MetricRegistryListener.class);
     private final MetricRegistry registry = new MetricRegistry();
-    @SuppressWarnings("unchecked")
-    private final Gauge<String> gauge = mock(Gauge.class);
+    private final Gauge<String> gauge = () -> "";
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
     private final Meter meter = mock(Meter.class);
@@ -65,12 +66,7 @@ public class MetricRegistryTest {
 
     @Test
     public void accessingACustomCounterRegistersAndReusesTheCounter() throws Exception {
-        final MetricRegistry.MetricSupplier<Counter> supplier = new MetricRegistry.MetricSupplier<Counter>() {
-            @Override
-            public Counter newMetric() {
-                return counter;
-            }
-        };
+        final MetricRegistry.MetricSupplier<Counter> supplier = () -> counter;
         final Counter counter1 = registry.counter("thing", supplier);
         final Counter counter2 = registry.counter("thing", supplier);
 
@@ -112,12 +108,7 @@ public class MetricRegistryTest {
 
     @Test
     public void accessingACustomHistogramRegistersAndReusesIt() throws Exception {
-        final MetricRegistry.MetricSupplier<Histogram> supplier = new MetricRegistry.MetricSupplier<Histogram>() {
-            @Override
-            public Histogram newMetric() {
-                return histogram;
-            }
-        };
+        final MetricRegistry.MetricSupplier<Histogram> supplier = () -> histogram;
         final Histogram histogram1 = registry.histogram("thing", supplier);
         final Histogram histogram2 = registry.histogram("thing", supplier);
 
@@ -158,12 +149,7 @@ public class MetricRegistryTest {
 
     @Test
     public void accessingACustomMeterRegistersAndReusesIt() throws Exception {
-        final MetricRegistry.MetricSupplier<Meter> supplier = new MetricRegistry.MetricSupplier<Meter>() {
-            @Override
-            public Meter newMetric() {
-                return meter;
-            }
-        };
+        final MetricRegistry.MetricSupplier<Meter> supplier = () -> meter;
         final Meter meter1 = registry.meter("thing", supplier);
         final Meter meter2 = registry.meter("thing", supplier);
 
@@ -204,12 +190,7 @@ public class MetricRegistryTest {
 
     @Test
     public void accessingACustomTimerRegistersAndReusesIt() throws Exception {
-        final MetricRegistry.MetricSupplier<Timer> supplier = new MetricRegistry.MetricSupplier<Timer>() {
-            @Override
-            public Timer newMetric() {
-                return timer;
-            }
-        };
+        final MetricRegistry.MetricSupplier<Timer> supplier = () -> timer;
         final Timer timer1 = registry.timer("thing", supplier);
         final Timer timer2 = registry.timer("thing", supplier);
 
@@ -231,13 +212,9 @@ public class MetricRegistryTest {
     }
 
     @Test
+    @SuppressWarnings("rawtypes")
     public void accessingACustomGaugeRegistersAndReusesIt() throws Exception {
-        final MetricRegistry.MetricSupplier<Gauge> supplier = new MetricRegistry.MetricSupplier<Gauge>() {
-            @Override
-            public Gauge newMetric() {
-                return gauge;
-            }
-        };
+        final MetricRegistry.MetricSupplier<Gauge> supplier = () -> gauge;
         final Gauge gauge1 = registry.gauge("thing", supplier);
         final Gauge gauge2 = registry.gauge("thing", supplier);
 
@@ -329,14 +306,11 @@ public class MetricRegistryTest {
 
     @Test
     public void registersMultipleMetrics() throws Exception {
-        final MetricSet metrics = new MetricSet() {
-            @Override
-            public Map<String, Metric> getMetrics() {
-                final Map<String, Metric> metrics = new HashMap<String, Metric>();
-                metrics.put("gauge", gauge);
-                metrics.put("counter", counter);
-                return metrics;
-            }
+        final MetricSet metrics = () -> {
+            final Map<String, Metric> m = new HashMap<>();
+            m.put("gauge", gauge);
+            m.put("counter", counter);
+            return m;
         };
 
         registry.registerAll(metrics);
@@ -347,14 +321,11 @@ public class MetricRegistryTest {
 
     @Test
     public void registersMultipleMetricsWithAPrefix() throws Exception {
-        final MetricSet metrics = new MetricSet() {
-            @Override
-            public Map<String, Metric> getMetrics() {
-                final Map<String, Metric> metrics = new HashMap<String, Metric>();
-                metrics.put("gauge", gauge);
-                metrics.put("counter", counter);
-                return metrics;
-            }
+        final MetricSet metrics = () -> {
+            final Map<String, Metric> m = new HashMap<>();
+            m.put("gauge", gauge);
+            m.put("counter", counter);
+            return m;
         };
 
         registry.register("my", metrics);
@@ -365,23 +336,17 @@ public class MetricRegistryTest {
 
     @Test
     public void registersRecursiveMetricSets() throws Exception {
-        final MetricSet inner = new MetricSet() {
-            @Override
-            public Map<String, Metric> getMetrics() {
-                final Map<String, Metric> metrics = new HashMap<String, Metric>();
-                metrics.put("gauge", gauge);
-                return metrics;
-            }
+        final MetricSet inner = () -> {
+            final Map<String, Metric> m = new HashMap<>();
+            m.put("gauge", gauge);
+            return m;
         };
 
-        final MetricSet outer = new MetricSet() {
-            @Override
-            public Map<String, Metric> getMetrics() {
-                final Map<String, Metric> metrics = new HashMap<String, Metric>();
-                metrics.put("inner", inner);
-                metrics.put("counter", counter);
-                return metrics;
-            }
+        final MetricSet outer = () -> {
+            final Map<String, Metric> m = new HashMap<>();
+            m.put("inner", inner);
+            m.put("counter", counter);
+            return m;
         };
 
         registry.register("my", outer);
@@ -437,15 +402,10 @@ public class MetricRegistryTest {
 
     @Test
     public void concatenatesClassesWithoutCanonicalNamesWithStrings() throws Exception {
-        final Gauge<String> g = new Gauge<String>() {
-            @Override
-            public String getValue() {
-                return null;
-            }
-        };
+        final Gauge<String> g = () -> null;
 
         assertThat(name(g.getClass(), "one", "two"))
-                .isEqualTo("com.codahale.metrics.MetricRegistryTest$10.one.two");
+                .matches("com\\.codahale\\.metrics\\.MetricRegistryTest.+?\\.one\\.two");
     }
 
     @Test
@@ -457,12 +417,7 @@ public class MetricRegistryTest {
         assertThat(registry.getNames())
                 .contains("timer-1", "timer-2", "histogram-1");
 
-        registry.removeMatching(new MetricFilter() {
-            @Override
-            public boolean matches(String name, Metric metric) {
-                return name.endsWith("1");
-            }
-        });
+        registry.removeMatching((name, metric) -> name.endsWith("1"));
 
         assertThat(registry.getNames())
                 .doesNotContain("timer-1", "histogram-1");

@@ -6,14 +6,16 @@ import org.junit.Test;
 
 import java.lang.management.GarbageCollectorMXBean;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("unchecked")
 public class GarbageCollectorMetricSetTest {
     private final GarbageCollectorMXBean gc = mock(GarbageCollectorMXBean.class);
-    private final GarbageCollectorMetricSet metrics = new GarbageCollectorMetricSet(Arrays.asList(gc));
+    private final GarbageCollectorMetricSet metrics = new GarbageCollectorMetricSet(Collections.singletonList(gc));
 
     @Before
     public void setUp() throws Exception {
@@ -30,14 +32,14 @@ public class GarbageCollectorMetricSetTest {
 
     @Test
     public void hasAGaugeForGcCounts() throws Exception {
-        final Gauge gauge = (Gauge) metrics.getMetrics().get("PS-OldGen.count");
+        final Gauge<String> gauge = (Gauge<String>) metrics.getMetrics().get("PS-OldGen.count");
         assertThat(gauge.getValue())
                 .isEqualTo(1L);
     }
 
     @Test
     public void hasAGaugeForGcTimes() throws Exception {
-        final Gauge gauge = (Gauge) metrics.getMetrics().get("PS-OldGen.time");
+        final Gauge<String> gauge = (Gauge<String>) metrics.getMetrics().get("PS-OldGen.time");
         assertThat(gauge.getValue())
                 .isEqualTo(2L);
     }

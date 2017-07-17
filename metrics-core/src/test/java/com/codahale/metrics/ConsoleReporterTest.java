@@ -6,12 +6,12 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.EnumSet;
+import java.util.Locale;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TimeZone;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,14 +43,13 @@ public class ConsoleReporterTest {
 
     @Test
     public void reportsGaugeValues() throws Exception {
-        final Gauge gauge = mock(Gauge.class);
-        when(gauge.getValue()).thenReturn(1);
+        final Gauge<Integer> gauge = () -> 1;
 
         reporter.report(map("gauge", gauge),
-                        this.<Counter>map(),
-                        this.<Histogram>map(),
-                        this.<Meter>map(),
-                        this.<Timer>map());
+                        map(),
+                        map(),
+                        map(),
+                        map());
 
         assertThat(consoleOutput())
                 .isEqualTo(lines(
@@ -69,11 +68,11 @@ public class ConsoleReporterTest {
         final Counter counter = mock(Counter.class);
         when(counter.getCount()).thenReturn(100L);
 
-        reporter.report(this.<Gauge>map(),
+        reporter.report(map(),
                         map("test.counter", counter),
-                        this.<Histogram>map(),
-                        this.<Meter>map(),
-                        this.<Timer>map());
+                        map(),
+                        map(),
+                        map());
 
         assertThat(consoleOutput())
                 .isEqualTo(lines(
@@ -106,11 +105,11 @@ public class ConsoleReporterTest {
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
-        reporter.report(this.<Gauge>map(),
-                        this.<Counter>map(),
+        reporter.report(map(),
+                        map(),
                         map("test.histogram", histogram),
-                        this.<Meter>map(),
-                        this.<Timer>map());
+                        map(),
+                        map());
 
         assertThat(consoleOutput())
                 .isEqualTo(lines(
@@ -143,11 +142,11 @@ public class ConsoleReporterTest {
         when(meter.getFiveMinuteRate()).thenReturn(4.0);
         when(meter.getFifteenMinuteRate()).thenReturn(5.0);
 
-        reporter.report(this.<Gauge>map(),
-                        this.<Counter>map(),
-                        this.<Histogram>map(),
+        reporter.report(map(),
+                        map(),
+                        map(),
                         map("test.meter", meter),
-                        this.<Timer>map());
+                        map());
 
         assertThat(consoleOutput())
                 .isEqualTo(lines(
@@ -189,10 +188,10 @@ public class ConsoleReporterTest {
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
-        reporter.report(this.<Gauge>map(),
-                        this.<Counter>map(),
-                        this.<Histogram>map(),
-                        this.<Meter>map(),
+        reporter.report(map(),
+                        map(),
+                        map(),
+                        map(),
                         map("test.another.timer", timer));
 
         assertThat(consoleOutput())
@@ -243,11 +242,11 @@ public class ConsoleReporterTest {
         when(meter.getFiveMinuteRate()).thenReturn(4.0);
         when(meter.getFifteenMinuteRate()).thenReturn(5.0);
 
-        customReporter.report(this.<Gauge>map(),
-                this.<Counter>map(),
-                this.<Histogram>map(),
+        customReporter.report(map(),
+                map(),
+                map(),
                 map("test.meter", meter),
-                this.<Timer>map());
+                map());
 
         assertThat(consoleOutput())
                 .isEqualTo(lines(
@@ -299,10 +298,10 @@ public class ConsoleReporterTest {
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
-        customReporter.report(this.<Gauge>map(),
-                this.<Counter>map(),
-                this.<Histogram>map(),
-                this.<Meter>map(),
+        customReporter.report(map(),
+                map(),
+                map(),
+                map(),
                 map("test.another.timer", timer));
 
         assertThat(consoleOutput())
@@ -359,11 +358,11 @@ public class ConsoleReporterTest {
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
-        customReporter.report(this.<Gauge>map(),
-                this.<Counter>map(),
+        customReporter.report(map(),
+                map(),
                 map("test.histogram", histogram),
-                this.<Meter>map(),
-                this.<Timer>map());
+                map(),
+                map());
 
         assertThat(consoleOutput())
                 .isEqualTo(lines(
@@ -396,11 +395,11 @@ public class ConsoleReporterTest {
     }
 
     private <T> SortedMap<String, T> map() {
-        return new TreeMap<String, T>();
+        return new TreeMap<>();
     }
 
     private <T> SortedMap<String, T> map(String name, T metric) {
-        final TreeMap<String, T> map = new TreeMap<String, T>();
+        final TreeMap<String, T> map = new TreeMap<>();
         map.put(name, metric);
         return map;
     }

@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
@@ -155,15 +156,16 @@ public class InstrumentedHandlerTest {
                 final HttpServletResponse httpServletResponse
         ) throws IOException, ServletException {
             request.setHandled(true);
-            if (path.equals("/blocking")) {
-                LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(1));
-                httpServletResponse.setStatus(200);
-                httpServletResponse.setContentType("text/plain");
-                httpServletResponse.getWriter().write("some content from the blocking request\n");
-            } else if (path.equals("/async")) {
-                final AsyncContext context = request.startAsync();
-                Thread t = new Thread() {
-                    public void run() {
+            switch (path) {
+                case "/blocking":
+                    LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(1));
+                    httpServletResponse.setStatus(200);
+                    httpServletResponse.setContentType("text/plain");
+                    httpServletResponse.getWriter().write("some content from the blocking request\n");
+                    break;
+                case "/async":
+                    final AsyncContext context = request.startAsync();
+                    Thread t = new Thread(() -> {
                         LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(1));
                         httpServletResponse.setStatus(200);
                         httpServletResponse.setContentType("text/plain");
@@ -174,7 +176,8 @@ public class InstrumentedHandlerTest {
                                     new WriteListener() {
                                         @Override
                                         public void onWritePossible() throws IOException {
-                                            servletOutputStream.write("some content from the async\n".getBytes());
+                                            servletOutputStream.write("some content from the async\n"
+                                                    .getBytes(StandardCharsets.UTF_8));
                                             context.complete();
                                         }
 
@@ -187,13 +190,14 @@ public class InstrumentedHandlerTest {
                         } catch (IOException e) {
                             context.complete();
                         }
-                    }
-                };
-                t.start();
-            } else {
-                httpServletResponse.setStatus(404);
-                httpServletResponse.setContentType("text/plain");
-                httpServletResponse.getWriter().write("Not Found\n");
+                    });
+                    t.start();
+                    break;
+                default:
+                    httpServletResponse.setStatus(404);
+                    httpServletResponse.setContentType("text/plain");
+                    httpServletResponse.getWriter().write("Not Found\n");
+                    break;
             }
         }
     }

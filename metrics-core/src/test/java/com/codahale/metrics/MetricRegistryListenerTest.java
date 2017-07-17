@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 public class MetricRegistryListenerTest {
-    private final Gauge gauge = mock(Gauge.class);
+    private final Gauge<String> gauge = () -> "";
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
     private final Meter meter = mock(Meter.class);

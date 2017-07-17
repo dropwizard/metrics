@@ -32,14 +32,12 @@ public class InstrumentedExecutorServiceTest {
         assertThat(completed.getCount()).isEqualTo(0);
         assertThat(duration.getCount()).isEqualTo(0);
 
-        Future<?> theFuture = instrumentedExecutorService.submit(new Runnable() {
-            public void run() {
-                assertThat(submitted.getCount()).isEqualTo(1);
-                assertThat(running.getCount()).isEqualTo(1);
-                assertThat(completed.getCount()).isEqualTo(0);
-                assertThat(duration.getCount()).isEqualTo(0);
-	    }
-	});
+        Future<?> theFuture = instrumentedExecutorService.submit(() -> {
+            assertThat(submitted.getCount()).isEqualTo(1);
+            assertThat(running.getCount()).isEqualTo(1);
+            assertThat(completed.getCount()).isEqualTo(0);
+            assertThat(duration.getCount()).isEqualTo(0);
+        });
 
         theFuture.get();
 
