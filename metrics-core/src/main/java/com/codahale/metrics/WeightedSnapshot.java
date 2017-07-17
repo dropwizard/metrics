@@ -3,10 +3,11 @@ package com.codahale.metrics;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * A statistical snapshot of a {@link WeightedSnapshot}.
@@ -25,8 +26,6 @@ public class WeightedSnapshot extends Snapshot {
             this.weight = weight;
         }
     }
-    
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private final long[] values;
     private final double[] normWeights;

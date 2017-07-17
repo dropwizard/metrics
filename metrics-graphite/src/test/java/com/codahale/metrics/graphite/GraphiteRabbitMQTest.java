@@ -1,6 +1,5 @@
 package com.codahale.metrics.graphite;
 
-import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -9,11 +8,10 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.failBecauseExceptionWasNotThrown;
-
 
 import static org.mockito.Mockito.*;
 
@@ -28,8 +26,6 @@ public class GraphiteRabbitMQTest
     private final Channel bogusChannel = mock(Channel.class);
 
     private final GraphiteRabbitMQ graphite = new GraphiteRabbitMQ(connectionFactory, "graphite");
-
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     @Before
     public void setUp() throws Exception {
@@ -92,7 +88,8 @@ public class GraphiteRabbitMQTest
 
         String expectedMessage = "name value 100\n";
 
-        verify(channel, times(1)).basicPublish("graphite", "name", null, expectedMessage.getBytes(UTF_8));
+        verify(channel, times(1)).basicPublish("graphite", "name", null,
+                expectedMessage.getBytes(UTF_8));
 
         assertThat(graphite.getFailures()).isZero();
     }
@@ -104,7 +101,8 @@ public class GraphiteRabbitMQTest
 
         String expectedMessage = "name-to-sanitize value-to-sanitize 100\n";
 
-        verify(channel, times(1)).basicPublish("graphite", "name-to-sanitize", null, expectedMessage.getBytes(UTF_8));
+        verify(channel, times(1)).basicPublish("graphite", "name-to-sanitize", null,
+                expectedMessage.getBytes(UTF_8));
 
         assertThat(graphite.getFailures()).isZero();
     }

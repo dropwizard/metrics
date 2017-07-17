@@ -19,12 +19,12 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * A client to a Carbon server that sends all metrics after they have been pickled in configurable sized batches
  */
 public class PickledGraphite implements GraphiteSender {
-
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PickledGraphite.class);
     private final static int DEFAULT_BATCH_SIZE = 100;

@@ -3,17 +3,16 @@ package com.codahale.metrics;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 
 import static java.lang.Math.floor;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * A statistical snapshot of a {@link UniformSnapshot}.
  */
 public class UniformSnapshot extends Snapshot {
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private final long[] values;
 

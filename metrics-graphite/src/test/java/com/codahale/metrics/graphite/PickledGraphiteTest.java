@@ -1,5 +1,6 @@
 package com.codahale.metrics.graphite;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.failBecauseExceptionWasNotThrown;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,13 +30,12 @@ import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PickledGraphiteTest {
     private final SocketFactory socketFactory = mock(SocketFactory.class);
     private final InetSocketAddress address = new InetSocketAddress("example.com", 1234);
-    private final PickledGraphite graphite = new PickledGraphite(address, socketFactory, Charset.forName("UTF-8"), 2);
+    private final PickledGraphite graphite = new PickledGraphite(address, socketFactory, UTF_8, 2);
 
     private final Socket socket = mock(Socket.class);
     private final ByteArrayOutputStream output = spy(new ByteArrayOutputStream());

@@ -7,15 +7,14 @@ import com.rabbitmq.client.DefaultSocketConfigurator;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.nio.charset.Charset;
 import java.util.concurrent.TimeoutException;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * A rabbit-mq client to a Carbon server.
  */
 public class GraphiteRabbitMQ implements GraphiteSender {
-
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private static final Integer DEFAULT_RABBIT_CONNECTION_TIMEOUT_MS = 500;
     private static final Integer DEFAULT_RABBIT_SOCKET_TIMEOUT_MS = 5000;

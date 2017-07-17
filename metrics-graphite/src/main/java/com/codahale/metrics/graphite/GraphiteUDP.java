@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
-import java.nio.charset.Charset;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * A client to a Carbon server using unconnected UDP
  */
 public class GraphiteUDP implements GraphiteSender {
-
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private final String hostname;
     private final int port;

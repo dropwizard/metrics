@@ -11,12 +11,13 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * A client to a Carbon server via TCP.
  */
 public class Graphite implements GraphiteSender {
     // this may be optimistic about Carbon/Graphite
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private final String hostname;
     private final int port;
