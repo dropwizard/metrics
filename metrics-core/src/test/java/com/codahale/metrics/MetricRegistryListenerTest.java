@@ -6,7 +6,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 public class MetricRegistryListenerTest {
-    private final Gauge<String> gauge = () -> "";
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
     private final Meter meter = mock(Meter.class);
@@ -17,9 +16,9 @@ public class MetricRegistryListenerTest {
 
     @Test
     public void noOpsOnGaugeAdded() throws Exception {
-        listener.onGaugeAdded("blah", gauge);
-
-        verifyZeroInteractions(gauge);
+        listener.onGaugeAdded("blah", () -> {
+            throw new RuntimeException("Should not be called");
+        });
     }
 
     @Test
