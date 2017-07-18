@@ -32,8 +32,9 @@ public class InstrumentedQueuedThreadPoolTest {
 
         verify(metricRegistry, atLeastOnce()).register(metricNameCaptor.capture(), any(Metric.class));
         String metricName = metricNameCaptor.getValue();
-        assertThat(metricName).startsWith(PREFIX)
-                .withFailMessage("Custom metric's prefix doesn't match");
+        assertThat(metricName)
+                .overridingErrorMessage("Custom metric's prefix doesn't match")
+                .startsWith(PREFIX);
 
     }
 
@@ -43,8 +44,9 @@ public class InstrumentedQueuedThreadPoolTest {
 
         verify(metricRegistry, atLeastOnce()).register(metricNameCaptor.capture(), any(Metric.class));
         String metricName = metricNameCaptor.getValue();
-        assertThat(metricName).startsWith(QueuedThreadPool.class.getName())
-                .withFailMessage("The default metrics prefix was changed");
+        assertThat(metricName)
+                .overridingErrorMessage("The default metrics prefix was changed")
+                .startsWith(QueuedThreadPool.class.getName());
     }
 
 }
