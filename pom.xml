@@ -94,7 +94,7 @@
 
     <issueManagement>
         <system>github</system>
-        <url>http://github.com/dropwizard/metrics/issues#issue/</url>
+        <url>https://github.com/dropwizard/metrics/issues/</url>
     </issueManagement>
 
     <distributionManagement>
