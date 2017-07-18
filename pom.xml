@@ -67,6 +67,14 @@
                 <role>committer</role>
             </roles>
         </developer>
+        <developer>
+            <name>Artem Prigoda</name>
+            <email>prigoda.artem@ya.ru</email>
+            <timezone>Europe/Berlin</timezone>
+            <roles>
+                <role>committer</role>
+            </roles>
+        </developer>
     </developers>
 
     <licenses>
