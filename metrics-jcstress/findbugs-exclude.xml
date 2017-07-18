@@ -1,8 +1,0 @@
-<FindBugsFilter>
-    <Match>
-        <Package name="com.codahale.metrics" />
-    </Match>
-    <Match>
-        <Package name="org.openjdk.jcstress.infra.results" />
-    </Match>
-</FindBugsFilter>
