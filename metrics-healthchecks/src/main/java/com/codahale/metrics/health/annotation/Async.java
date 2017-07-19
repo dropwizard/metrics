@@ -15,15 +15,15 @@ public @interface Async {
     /**
      * Enum representing the initial health states.
      */
-    public enum InitialState {
-        HEALTHY, UNHEALTHY;
+    enum InitialState {
+        HEALTHY, UNHEALTHY
     }
 
     /**
      * Enum representing the possible schedule types.
      */
-    public enum ScheduleType {
-        FIXED_RATE, FIXED_DELAY;
+    enum ScheduleType {
+        FIXED_RATE, FIXED_DELAY
     }
 
     /**
