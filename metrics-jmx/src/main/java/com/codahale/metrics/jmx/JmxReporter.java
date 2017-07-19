@@ -691,11 +691,11 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         public TimeUnit durationFor(String name) {
-            return durationOverrides.containsKey(name) ? durationOverrides.get(name) : defaultDuration;
+            return durationOverrides.getOrDefault(name, defaultDuration);
         }
 
         public TimeUnit rateFor(String name) {
-            return rateOverrides.containsKey(name) ? rateOverrides.get(name) : defaultRate;
+            return rateOverrides.getOrDefault(name, defaultRate);
         }
     }
 
