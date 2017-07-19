@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
 public class HealthCheckModule extends Module {
@@ -77,8 +78,6 @@ public class HealthCheckModule extends Module {
 
     @Override
     public void setupModule(SetupContext context) {
-        context.addSerializers(new SimpleSerializers(Arrays.<JsonSerializer<?>>asList(
-                new HealthCheckResultSerializer()
-        )));
+        context.addSerializers(new SimpleSerializers(Collections.singletonList(new HealthCheckResultSerializer())));
     }
 }
