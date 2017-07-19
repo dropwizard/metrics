@@ -1,14 +1,12 @@
 package com.codahale.metrics.servlets;
 
-import com.codahale.metrics.health.HealthCheck;
-import com.codahale.metrics.health.HealthCheckRegistry;
-import org.eclipse.jetty.http.HttpHeader;
-import org.eclipse.jetty.servlet.ServletTester;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,7 +15,15 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.servlet.ServletTester;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.codahale.metrics.health.HealthCheck;
+import com.codahale.metrics.health.HealthCheckFilter;
+import com.codahale.metrics.health.HealthCheckRegistry;
 
 public class HealthCheckServletTest extends AbstractServletTest {
     private final HealthCheckRegistry registry = new HealthCheckRegistry();
@@ -28,6 +34,8 @@ public class HealthCheckServletTest extends AbstractServletTest {
         tester.addServlet(HealthCheckServlet.class, "/healthchecks");
         tester.setAttribute("com.codahale.metrics.servlets.HealthCheckServlet.registry", registry);
         tester.setAttribute("com.codahale.metrics.servlets.HealthCheckServlet.executor", threadPool);
+        tester.setAttribute("com.codahale.metrics.servlets.HealthCheckServlet.healthCheckFilter",
+                (HealthCheckFilter) (name, healthCheck) -> !"filtered".equals(name));
     }
 
     @Before
@@ -60,6 +68,32 @@ public class HealthCheckServletTest extends AbstractServletTest {
             @Override
             protected Result check() throws Exception {
                 return Result.healthy("whee");
+            }
+        });
+
+        processRequest();
+
+        assertThat(response.getStatus())
+                .isEqualTo(200);
+        assertThat(response.getContent())
+                .isEqualTo("{\"fun\":{\"healthy\":true,\"message\":\"whee\"}}");
+        assertThat(response.get(HttpHeader.CONTENT_TYPE))
+                .isEqualTo("application/json");
+    }
+
+    @Test
+    public void returnsASubsetOfHealthChecksIfFiltered() throws Exception {
+        registry.register("fun", new HealthCheck() {
+            @Override
+            protected Result check() throws Exception {
+                return Result.healthy("whee");
+            }
+        });
+
+        registry.register("filtered", new HealthCheck() {
+            @Override
+            protected Result check() throws Exception {
+                return Result.unhealthy("whee");
             }
         });
 
@@ -151,7 +185,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
         final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
         healthCheckServlet.init(servletConfig);
 
-        verify(servletConfig, times(2)).getServletContext();
+        verify(servletConfig, times(1)).getServletContext();
         verify(servletContext, times(1)).getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY));
     }
 
