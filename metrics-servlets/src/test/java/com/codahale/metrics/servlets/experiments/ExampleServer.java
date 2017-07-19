@@ -22,16 +22,12 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public class ExampleServer {
     private static final MetricRegistry REGISTRY = new MetricRegistry();
-    private static final Counter COUNTER_1 = REGISTRY.counter(name(ExampleServer.class,
-                                                                   "wah",
-                                                                   "doody"));
+    private static final Counter COUNTER_1 = REGISTRY.counter(name(ExampleServer.class, "wah", "doody"));
     private static final Counter COUNTER_2 = REGISTRY.counter(name(ExampleServer.class, "woo"));
+
     static {
-        REGISTRY.register(name(ExampleServer.class, "boo"), new Gauge<Integer>() {
-            @Override
-            public Integer getValue() {
-                throw new RuntimeException("asplode!");
-            }
+        REGISTRY.register(name(ExampleServer.class, "boo"), (Gauge<Integer>) () -> {
+            throw new RuntimeException("asplode!");
         });
     }
 
@@ -42,9 +38,8 @@ public class ExampleServer {
         final ThreadPool threadPool = new InstrumentedQueuedThreadPool(REGISTRY);
         final Server server = new Server(threadPool);
 
-        final Connector connector = new ServerConnector(server,
-                                                        new InstrumentedConnectionFactory(new HttpConnectionFactory(),
-                                                                                          REGISTRY.timer("http.connection")));
+        final Connector connector = new ServerConnector(server, new InstrumentedConnectionFactory(
+                new HttpConnectionFactory(), REGISTRY.timer("http.connection")));
         server.addConnector(connector);
 
         final ServletContextHandler context = new ServletContextHandler();
@@ -58,7 +53,7 @@ public class ExampleServer {
         final InstrumentedHandler handler = new InstrumentedHandler(REGISTRY);
         handler.setHandler(context);
         server.setHandler(handler);
-        
+
         server.start();
         server.join();
     }

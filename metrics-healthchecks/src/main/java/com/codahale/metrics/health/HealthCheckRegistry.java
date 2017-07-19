@@ -179,12 +179,7 @@ public class HealthCheckRegistry {
     public SortedMap<String, HealthCheck.Result> runHealthChecks(ExecutorService executor) {
         final Map<String, Future<HealthCheck.Result>> futures = new HashMap<String, Future<Result>>();
         for (final Map.Entry<String, HealthCheck> entry : healthChecks.entrySet()) {
-            futures.put(entry.getKey(), executor.submit(new Callable<Result>() {
-                @Override
-                public Result call() throws Exception {
-                    return entry.getValue().execute();
-                }
-            }));
+            futures.put(entry.getKey(), executor.submit(() -> entry.getValue().execute()));
         }
 
         final SortedMap<String, HealthCheck.Result> results = new TreeMap<String, HealthCheck.Result>();

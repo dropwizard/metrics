@@ -101,16 +101,13 @@ public class UniformSnapshotTest {
         // Create a latch to make sure that the background thread has started and
         // pushed some data to the collection.
         final CountDownLatch latch = new CountDownLatch(10);
-        final Thread backgroundThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final Random random = new Random();
-                // Update the collection in the loop to trigger a potential `ArrayOutOfBoundException`
-                // and verify that the snapshot doesn't make assumptions about the size of the iterator.
-                while (!Thread.currentThread().isInterrupted()) {
-                    values.add(random.nextLong());
-                    latch.countDown();
-                }
+        final Thread backgroundThread = new Thread(() -> {
+            final Random random = new Random();
+            // Update the collection in the loop to trigger a potential `ArrayOutOfBoundException`
+            // and verify that the snapshot doesn't make assumptions about the size of the iterator.
+            while (!Thread.currentThread().isInterrupted()) {
+                values.add(random.nextLong());
+                latch.countDown();
             }
         });
         backgroundThread.start();

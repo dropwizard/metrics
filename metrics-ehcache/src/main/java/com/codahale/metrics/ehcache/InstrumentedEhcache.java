@@ -119,140 +119,55 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
 
         final String prefix = name(cache.getClass(), cache.getName());
         registry.register(name(prefix, "hits"),
-                          new Gauge<Long>() {
-                              @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().cacheHitCount();
-                              }
-                          });
+                (Gauge<Long>) () -> cache.getStatistics().cacheHitCount());
 
         registry.register(name(prefix, "in-memory-hits"),
-                          new Gauge<Long>() {
-                              @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().localHeapHitCount();
-                              }
-                          });
+                (Gauge<Long>) () -> cache.getStatistics().localHeapHitCount());
 
         registry.register(name(prefix, "off-heap-hits"),
-                          new Gauge<Long>() {
-                              @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().localOffHeapHitCount();
-                              }
-                          });
+                (Gauge<Long>) () -> cache.getStatistics().localOffHeapHitCount());
 
         registry.register(name(prefix, "on-disk-hits"),
-                          new Gauge<Long>() {
-                              @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().localDiskHitCount();
-                              }
-                          });
+                (Gauge<Long>) () -> cache.getStatistics().localDiskHitCount());
 
         registry.register(name(prefix, "misses"),
-                          new Gauge<Long>() {
-                              @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().cacheMissCount();
-                              }
-                          });
+                (Gauge<Long>) () -> cache.getStatistics().cacheMissCount());
 
         registry.register(name(prefix, "in-memory-misses"),
-                          new Gauge<Long>() {
-                              @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().localHeapMissCount();
-                              }
-                          });
+                (Gauge<Long>) () -> cache.getStatistics().localHeapMissCount());
 
         registry.register(name(prefix, "off-heap-misses"),
-                          new Gauge<Long>() {
-                              @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().localOffHeapMissCount();
-                              }
-                          });
+                (Gauge<Long>) () -> cache.getStatistics().localOffHeapMissCount());
 
         registry.register(name(prefix, "on-disk-misses"),
-                          new Gauge<Long>() {
-                              @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().localDiskMissCount();
-                              }
-                          });
+                (Gauge<Long>) () -> cache.getStatistics().localDiskMissCount());
 
         registry.register(name(prefix, "objects"),
-                          new Gauge<Long>() {
-                              @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().getSize();
-                              }
-                          });
+                (Gauge<Long>) () -> cache.getStatistics().getSize());
 
         registry.register(name(prefix, "in-memory-objects"),
-                          new Gauge<Long>() {
-                              @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().getLocalHeapSize();
-                              }
-                          });
+                (Gauge<Long>) () -> cache.getStatistics().getLocalHeapSize());
 
         registry.register(name(prefix, "off-heap-objects"),
-                          new Gauge<Long>() {
-                              @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().getLocalOffHeapSize();
-                              }
-                          });
+                (Gauge<Long>) () -> cache.getStatistics().getLocalOffHeapSize());
 
         registry.register(name(prefix, "on-disk-objects"),
-                          new Gauge<Long>() {
-                              @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().getLocalDiskSize();
-                              }
-                          });
+                (Gauge<Long>) () -> cache.getStatistics().getLocalDiskSize());
 
         registry.register(name(prefix, "mean-get-time"),
-                          new Gauge<Double>() {
-                              @Override
-                              public Double getValue() {
-                                  return cache.getStatistics().cacheGetOperation().latency().average().value();
-                              }
-                          });
+                (Gauge<Double>) () -> cache.getStatistics().cacheGetOperation().latency().average().value());
 
         registry.register(name(prefix, "mean-search-time"),
-                          new Gauge<Double>() {
-                              @Override
-                              public Double getValue() {
-                                  return cache.getStatistics().cacheSearchOperation().latency().average().value();
-                              }
-                          });
+                (Gauge<Double>) () -> cache.getStatistics().cacheSearchOperation().latency().average().value());
 
         registry.register(name(prefix, "eviction-count"),
-                          new Gauge<Long>() {
-                              @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().cacheEvictionOperation().count().value();
-                              }
-                          });
+                (Gauge<Long>) () -> cache.getStatistics().cacheEvictionOperation().count().value());
 
         registry.register(name(prefix, "searches-per-second"),
-                          new Gauge<Double>() {
-                              @Override
-                              public Double getValue() {
-                                  return cache.getStatistics().cacheSearchOperation().rate().value();
-                              }
-                          });
+                (Gauge<Double>) () -> cache.getStatistics().cacheSearchOperation().rate().value());
 
         registry.register(name(prefix, "writer-queue-size"),
-                          new Gauge<Long>() {
-                              @Override
-                              public Long getValue() {
-                                  return cache.getStatistics().getWriterQueueLength();
-                              }
-                          });
+                (Gauge<Long>) () -> cache.getStatistics().getWriterQueueLength());
 
         return new InstrumentedEhcache(registry, cache);
     }

@@ -81,19 +81,11 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
                 return Ratio.of(getThreads() - getIdleThreads(), getMaxThreads());
             }
         });
-        metricRegistry.register(name(prefix, "size"), new Gauge<Integer>() {
-            @Override
-            public Integer getValue() {
-                return getThreads();
-            }
-        });
-        metricRegistry.register(name(prefix, "jobs"), new Gauge<Integer>() {
-            @Override
-            public Integer getValue() {
-                // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
-                // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.
-                return getQueue().size();
-            }
+        metricRegistry.register(name(prefix, "size"), (Gauge<Integer>) this::getThreads);
+        metricRegistry.register(name(prefix, "jobs"), (Gauge<Integer>) () -> {
+            // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
+            // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.
+            return getQueue().size();
         });
     }
 }

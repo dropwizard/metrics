@@ -166,27 +166,24 @@ public class ExponentiallyDecayingReservoirTest {
             final AtomicInteger threadUpdates = new AtomicInteger(0);
             final AtomicInteger testUpdates = new AtomicInteger(0);
 
-            final Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    int previous = 0;
-                    while (running.get()) {
-                        // Wait for the test thread to update it's counter
-                        // before updaing the reservoir.
-                        int next;
-                        while (previous >= (next = testUpdates.get()))
-                            ; // spin lock
+            final Thread thread = new Thread(() -> {
+                int previous = 0;
+                while (running.get()) {
+                    // Wait for the test thread to update it's counter
+                    // before updaing the reservoir.
+                    int next;
+                    while (previous >= (next = testUpdates.get()))
+                        ; // spin lock
 
-                        previous = next;
+                    previous = next;
 
-                        // Update the reservoir.  This needs to occur at the
-                        // same time as the test thread's update.
-                        reservoir.update(1000);
+                    // Update the reservoir.  This needs to occur at the
+                    // same time as the test thread's update.
+                    reservoir.update(1000);
 
-                        // Signal the main thread; allows the next update
-                        // attempt to begin.
-                        threadUpdates.incrementAndGet();
-                    }
+                    // Signal the main thread; allows the next update
+                    // attempt to begin.
+                    threadUpdates.incrementAndGet();
                 }
             });
 

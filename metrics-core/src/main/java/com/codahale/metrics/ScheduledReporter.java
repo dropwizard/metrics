@@ -167,15 +167,12 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
           throw new IllegalArgumentException("Reporter already started");
       }
 
-      this.scheduledFuture = executor.scheduleAtFixedRate(new Runnable() {
-         @Override
-         public void run() {
-             try {
-                 report();
-             } catch (Throwable ex) {
-                 LOG.error("Exception thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
-             }
-         }
+      this.scheduledFuture = executor.scheduleAtFixedRate(() -> {
+          try {
+              report();
+          } catch (Throwable ex) {
+              LOG.error("Exception thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
+          }
       }, initialDelay, period, unit);
     }
 

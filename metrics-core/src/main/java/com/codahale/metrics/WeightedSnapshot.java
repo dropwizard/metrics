@@ -38,18 +38,8 @@ public class WeightedSnapshot extends Snapshot {
      */
     public WeightedSnapshot(Collection<WeightedSample> values) {
         final WeightedSample[] copy = values.toArray( new WeightedSample[]{} );
-    
-        Arrays.sort(copy, new Comparator<WeightedSample>() {
-            @Override
-            public int compare(WeightedSample o1, WeightedSample o2) {
-                if (o1.value > o2.value)
-                    return 1;
-                if (o1.value < o2.value)
-                    return -1;
-                return 0;
-            }
-        }
-        );
+
+        Arrays.sort(copy, Comparator.comparing(w -> w.value));
 
         this.values = new long[copy.length];
         this.normWeights = new double[copy.length];

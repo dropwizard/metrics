@@ -7,12 +7,7 @@ public interface MetricFilter {
     /**
      * Matches all metrics, regardless of type or name.
      */
-    MetricFilter ALL = new MetricFilter() {
-        @Override
-        public boolean matches(String name, Metric metric) {
-            return true;
-        }
-    };
+    MetricFilter ALL = (name, metric) -> true;
 
     /**
      * Returns {@code true} if the metric matches the filter; {@code false} otherwise.
