@@ -157,13 +157,10 @@ public class JmxReporter implements Reporter, Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JmxReporter.class);
 
-    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface MetricMBean {
         ObjectName objectName();
     }
-    // CHECKSTYLE:ON
-
 
     private abstract static class AbstractBean implements MetricMBean {
         private final ObjectName objectName;
@@ -178,12 +175,10 @@ public class JmxReporter implements Reporter, Closeable {
         }
     }
 
-    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface JmxGaugeMBean extends MetricMBean {
         Object getValue();
     }
-    // CHECKSTYLE:ON
 
     private static class JmxGauge extends AbstractBean implements JmxGaugeMBean {
         private final Gauge<?> metric;
@@ -199,12 +194,10 @@ public class JmxReporter implements Reporter, Closeable {
         }
     }
 
-    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface JmxCounterMBean extends MetricMBean {
         long getCount();
     }
-    // CHECKSTYLE:ON
 
     private static class JmxCounter extends AbstractBean implements JmxCounterMBean {
         private final Counter metric;
@@ -220,7 +213,6 @@ public class JmxReporter implements Reporter, Closeable {
         }
     }
 
-    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface JmxHistogramMBean extends MetricMBean {
         long getCount();
@@ -249,7 +241,6 @@ public class JmxReporter implements Reporter, Closeable {
 
         long getSnapshotSize();
     }
-    // CHECKSTYLE:ON
 
     private static class JmxHistogram implements JmxHistogramMBean {
         private final ObjectName objectName;
@@ -331,7 +322,6 @@ public class JmxReporter implements Reporter, Closeable {
         }
     }
 
-    //CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface JmxMeterMBean extends MetricMBean {
         long getCount();
@@ -346,7 +336,6 @@ public class JmxReporter implements Reporter, Closeable {
 
         String getRateUnit();
     }
-    //CHECKSTYLE:ON
 
     private static class JmxMeter extends AbstractBean implements JmxMeterMBean {
         private final Metered metric;
@@ -396,7 +385,6 @@ public class JmxReporter implements Reporter, Closeable {
         }
     }
 
-    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface JmxTimerMBean extends JmxMeterMBean {
         double getMin();
@@ -420,9 +408,9 @@ public class JmxReporter implements Reporter, Closeable {
         double get999thPercentile();
 
         long[] values();
+
         String getDurationUnit();
     }
-    // CHECKSTYLE:ON
 
     static class JmxTimer extends JmxMeter implements JmxTimerMBean {
         private final Timer metric;
@@ -538,7 +526,7 @@ public class JmxReporter implements Reporter, Closeable {
             }
         }
 
-        @Override
+            @Override
         public void onGaugeAdded(String name, Gauge<?> gauge) {
             try {
                 if (filter.matches(name, gauge)) {
