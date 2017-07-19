@@ -34,11 +34,7 @@ public class FileDescriptorRatioGauge extends RatioGauge {
         try {
             return Ratio.of(invoke("getOpenFileDescriptorCount"),
                             invoke("getMaxFileDescriptorCount"));
-        } catch (NoSuchMethodException e) {
-            return Ratio.of(Double.NaN, Double.NaN);
-        } catch (IllegalAccessException e) {
-            return Ratio.of(Double.NaN, Double.NaN);
-        } catch (InvocationTargetException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             return Ratio.of(Double.NaN, Double.NaN);
         }
     }

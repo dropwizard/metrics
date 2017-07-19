@@ -109,13 +109,7 @@ public abstract class AbstractInstrumentedFilter implements Filter {
         boolean error = false;
         try {
             chain.doFilter(request, wrappedResponse);
-        } catch (IOException e) {
-            error = true;
-            throw e;
-        } catch (ServletException e) {
-            error = true;
-            throw e;
-        } catch (RuntimeException e) {
+        } catch (IOException | RuntimeException | ServletException e) {
             error = true;
             throw e;
         } finally {

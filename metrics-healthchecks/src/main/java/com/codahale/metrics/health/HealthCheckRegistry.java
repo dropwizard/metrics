@@ -229,11 +229,7 @@ public class HealthCheckRegistry {
         try {
             Method method = asyncExecutorService.getClass().getMethod("setRemoveOnCancelPolicy", Boolean.TYPE);
             method.invoke(asyncExecutorService, true);
-        } catch (NoSuchMethodException e) {
-            logSetExecutorCancellationPolicyFailure(e);
-        } catch (IllegalAccessException e) {
-            logSetExecutorCancellationPolicyFailure(e);
-        } catch (InvocationTargetException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             logSetExecutorCancellationPolicyFailure(e);
         }
         return asyncExecutorService;

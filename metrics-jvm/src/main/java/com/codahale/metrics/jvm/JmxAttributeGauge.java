@@ -44,9 +44,7 @@ public class JmxAttributeGauge implements Gauge<Object> {
     public Object getValue() {
         try {
             return mBeanServerConn.getAttribute(getObjectName(), attributeName);
-        } catch (IOException e) {
-            return null;
-        } catch (JMException e) {
+        } catch (IOException | JMException e) {
             return null;
         }
     }
