@@ -26,7 +26,7 @@ public interface GraphiteSender extends Closeable{
 	/**
 	 * Flushes buffer, if applicable
 	 *
-	 * @throws IOException
+	 * @throws IOException if there was an error during flushing metrics to the socket
 	 */
 	void flush() throws IOException;
 

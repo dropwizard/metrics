@@ -305,10 +305,11 @@ public class PickledGraphite implements GraphiteSender {
     /**
      * See: http://readthedocs.org/docs/graphite/en/1.0/feeding-carbon.html
      *
-     * @throws IOException
+     * @throws IOException shouldn't happen because we write to memory.
      */
     byte[] pickleMetrics(List<MetricTuple> metrics) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream(metrics.size() * 75); // Extremely rough estimate of 75 bytes per message
+        // Extremely rough estimate of 75 bytes per message
+        ByteArrayOutputStream out = new ByteArrayOutputStream(metrics.size() * 75);
         Writer pickled = new OutputStreamWriter(out, charset);
 
         pickled.append(MARK);

@@ -40,8 +40,8 @@ public abstract class HttpClientTestBase {
      *
      * @param handler The request handler that will be used to respond to every request.
      * @return The {@link HttpHost} of the server
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException          in case it's not possible to start the server
+     * @throws InterruptedException in case the server's main thread was interrupted
      */
     public HttpHost startServerWithGlobalRequestHandler(HttpRequestHandler handler)
             throws IOException, InterruptedException {
