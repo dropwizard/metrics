@@ -188,7 +188,7 @@ public class MetricsModule extends Module {
         private static final long serialVersionUID = 1L;
 
         private final MetricFilter filter;
-        
+
         private MetricRegistrySerializer(MetricFilter filter) {
             super(MetricRegistry.class);
             this.filter = filter;
@@ -213,7 +213,7 @@ public class MetricsModule extends Module {
     private final TimeUnit durationUnit;
     private final boolean showSamples;
     private final MetricFilter filter;
-    
+
     public MetricsModule(TimeUnit rateUnit, TimeUnit durationUnit, boolean showSamples) {
         this(rateUnit, durationUnit, showSamples, MetricFilter.ALL);
     }

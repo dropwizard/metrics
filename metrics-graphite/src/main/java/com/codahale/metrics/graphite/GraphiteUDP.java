@@ -23,7 +23,7 @@ public class GraphiteUDP implements GraphiteSender {
      * Creates a new client which sends data to given address using UDP
      *
      * @param hostname The hostname of the Carbon server
-     * @param port The port of the Carbon server
+     * @param port     The port of the Carbon server
      */
     public GraphiteUDP(String hostname, int port) {
         this.hostname = hostname;
@@ -58,7 +58,7 @@ public class GraphiteUDP implements GraphiteSender {
 
     @Override
     public boolean isConnected() {
-    		return datagramChannel != null && !datagramChannel.socket().isClosed();
+        return datagramChannel != null && !datagramChannel.socket().isClosed();
     }
 
     @Override
@@ -81,7 +81,7 @@ public class GraphiteUDP implements GraphiteSender {
 
     @Override
     public void flush() throws IOException {
-    	  // Nothing to do
+        // Nothing to do
     }
 
     @Override

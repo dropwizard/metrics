@@ -23,7 +23,7 @@ public class FileDescriptorRatioGauge extends RatioGauge {
     /**
      * Creates a new gauge using the given OS bean.
      *
-     * @param os    an {@link OperatingSystemMXBean}
+     * @param os an {@link OperatingSystemMXBean}
      */
     public FileDescriptorRatioGauge(OperatingSystemMXBean os) {
         this.os = os;
@@ -33,7 +33,7 @@ public class FileDescriptorRatioGauge extends RatioGauge {
     protected Ratio getRatio() {
         try {
             return Ratio.of(invoke("getOpenFileDescriptorCount"),
-                            invoke("getMaxFileDescriptorCount"));
+                    invoke("getMaxFileDescriptorCount"));
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             return Ratio.of(Double.NaN, Double.NaN);
         }

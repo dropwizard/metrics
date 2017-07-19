@@ -5,7 +5,7 @@
     </Appenders>
     <Loggers>
         <Root level="INFO">
-            <AppenderRef ref="metrics" />
+            <AppenderRef ref="metrics"/>
         </Root>
     </Loggers>
 </Configuration>

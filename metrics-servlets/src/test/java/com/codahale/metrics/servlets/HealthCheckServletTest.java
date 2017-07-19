@@ -116,11 +116,11 @@ public class HealthCheckServletTest extends AbstractServletTest {
                 .isEqualTo(200);
         assertThat(response.getContent())
                 .isEqualTo(String.format("{%n" +
-                                                 "  \"fun\" : {%n" +
-                                                 "    \"healthy\" : true,%n" +
-                                                 "    \"message\" : \"whee\"%n" +
-                                                 "  }%n" +
-                                                 "}"));
+                        "  \"fun\" : {%n" +
+                        "    \"healthy\" : true,%n" +
+                        "    \"message\" : \"whee\"%n" +
+                        "  }%n" +
+                        "}"));
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
@@ -131,10 +131,10 @@ public class HealthCheckServletTest extends AbstractServletTest {
         final ServletContext servletContext = mock(ServletContext.class);
         final ServletConfig servletConfig = mock(ServletConfig.class);
         when(servletConfig.getServletContext()).thenReturn(servletContext);
- 
+
         final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(healthCheckRegistry);
         healthCheckServlet.init(servletConfig);
- 
+
         verify(servletConfig, times(1)).getServletContext();
         verify(servletContext, never()).getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY));
     }
@@ -146,11 +146,11 @@ public class HealthCheckServletTest extends AbstractServletTest {
         final ServletConfig servletConfig = mock(ServletConfig.class);
         when(servletConfig.getServletContext()).thenReturn(servletContext);
         when(servletContext.getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY)))
-       	    .thenReturn(healthCheckRegistry);
- 
+                .thenReturn(healthCheckRegistry);
+
         final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
         healthCheckServlet.init(servletConfig);
- 
+
         verify(servletConfig, times(2)).getServletContext();
         verify(servletContext, times(1)).getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY));
     }
@@ -161,8 +161,8 @@ public class HealthCheckServletTest extends AbstractServletTest {
         final ServletConfig servletConfig = mock(ServletConfig.class);
         when(servletConfig.getServletContext()).thenReturn(servletContext);
         when(servletContext.getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY)))
-            .thenReturn("IRELLEVANT_STRING");
- 
+                .thenReturn("IRELLEVANT_STRING");
+
         final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
         healthCheckServlet.init(servletConfig);
     }

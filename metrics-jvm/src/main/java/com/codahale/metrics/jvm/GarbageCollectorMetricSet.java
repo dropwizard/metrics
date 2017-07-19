@@ -29,7 +29,7 @@ public class GarbageCollectorMetricSet implements MetricSet {
     /**
      * Creates a new set of gauges for the given collection of garbage collectors.
      *
-     * @param garbageCollectors    the garbage collectors
+     * @param garbageCollectors the garbage collectors
      */
     public GarbageCollectorMetricSet(Collection<GarbageCollectorMXBean> garbageCollectors) {
         this.garbageCollectors = new ArrayList<>(garbageCollectors);

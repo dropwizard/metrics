@@ -18,8 +18,7 @@ public abstract class InstrumentedFilterContextListener implements ServletContex
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        sce.getServletContext().setAttribute(InstrumentedFilter.REGISTRY_ATTRIBUTE,
-                                             getMetricRegistry());
+        sce.getServletContext().setAttribute(InstrumentedFilter.REGISTRY_ATTRIBUTE, getMetricRegistry());
     }
 
     @Override

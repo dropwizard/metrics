@@ -28,9 +28,9 @@ public class ThreadDumpTest {
         when(runnable.getThreadName()).thenReturn("runnable");
         when(runnable.getThreadId()).thenReturn(100L);
         when(runnable.getThreadState()).thenReturn(Thread.State.RUNNABLE);
-        when(runnable.getStackTrace()).thenReturn(new StackTraceElement[]{ rLine1 });
-        when(runnable.getLockedMonitors()).thenReturn(new MonitorInfo[]{ });
-        when(runnable.getLockedSynchronizers()).thenReturn(new LockInfo[]{ });
+        when(runnable.getStackTrace()).thenReturn(new StackTraceElement[]{rLine1});
+        when(runnable.getLockedMonitors()).thenReturn(new MonitorInfo[]{});
+        when(runnable.getLockedSynchronizers()).thenReturn(new LockInfo[]{});
 
         when(threadMXBean.dumpAllThreads(true, true)).thenReturn(new ThreadInfo[]{
                 runnable
@@ -44,8 +44,8 @@ public class ThreadDumpTest {
 
         assertThat(output.toString())
                 .isEqualTo(String.format("\"runnable\" id=100 state=RUNNABLE%n" +
-                                                 "    at Blah.blee(Blah.java:100)%n" +
-                                                 "%n" +
-                                                 "%n"));
+                        "    at Blah.blee(Blah.java:100)%n" +
+                        "%n" +
+                        "%n"));
     }
 }

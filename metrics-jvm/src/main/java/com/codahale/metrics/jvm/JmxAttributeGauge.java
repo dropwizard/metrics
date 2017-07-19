@@ -30,9 +30,9 @@ public class JmxAttributeGauge implements Gauge<Object> {
     /**
      * Creates a new JmxAttributeGauge.
      *
-     * @param mBeanServerConn  the {@link MBeanServerConnection}
-     * @param objectName       the name of the object
-     * @param attributeName    the name of the object's attribute
+     * @param mBeanServerConn the {@link MBeanServerConnection}
+     * @param objectName      the name of the object
+     * @param attributeName   the name of the object's attribute
      */
     public JmxAttributeGauge(MBeanServerConnection mBeanServerConn, ObjectName objectName, String attributeName) {
         this.mBeanServerConn = mBeanServerConn;

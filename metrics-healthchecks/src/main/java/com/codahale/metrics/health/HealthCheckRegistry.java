@@ -223,7 +223,7 @@ public class HealthCheckRegistry {
 
     private static ScheduledExecutorService createExecutorService(int corePoolSize) {
         final ScheduledThreadPoolExecutor asyncExecutorService = new ScheduledThreadPoolExecutor(corePoolSize,
-                        new NamedThreadFactory("healthcheck-async-executor-"));
+                new NamedThreadFactory("healthcheck-async-executor-"));
         asyncExecutorService.setRemoveOnCancelPolicy(true);
         return asyncExecutorService;
     }

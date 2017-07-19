@@ -26,6 +26,7 @@ public class JvmAttributeGaugeSet implements MetricSet {
 
     /**
      * Creates a new set of gauges with the given {@link RuntimeMXBean}.
+     *
      * @param runtime JVM management interface with access to system properties
      */
     public JvmAttributeGaugeSet(RuntimeMXBean runtime) {
@@ -38,11 +39,11 @@ public class JvmAttributeGaugeSet implements MetricSet {
 
         gauges.put("name", (Gauge<String>) runtime::getName);
         gauges.put("vendor", (Gauge<String>) () -> String.format(Locale.US,
-                             "%s %s %s (%s)",
-                             runtime.getVmVendor(),
-                             runtime.getVmName(),
-                             runtime.getVmVersion(),
-                             runtime.getSpecVersion()));
+                "%s %s %s (%s)",
+                runtime.getVmVendor(),
+                runtime.getVmName(),
+                runtime.getVmVersion(),
+                runtime.getSpecVersion()));
         gauges.put("uptime", (Gauge<Long>) runtime::getUptime);
 
         return Collections.unmodifiableMap(gauges);

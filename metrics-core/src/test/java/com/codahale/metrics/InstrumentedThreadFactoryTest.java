@@ -22,7 +22,6 @@ public class InstrumentedThreadFactoryTest {
     /**
      * Tests all parts of the InstrumentedThreadFactory except for termination since that
      * is currently difficult to do without race conditions.
-     *
      * TODO: Try not using real threads in a unit test?
      */
     @Test

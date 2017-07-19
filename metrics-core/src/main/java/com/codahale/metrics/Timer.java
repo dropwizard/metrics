@@ -27,6 +27,7 @@ public class Timer implements Metered, Sampling {
         /**
          * Updates the timer with the difference between current and start time. Call to this method will
          * not reset the start time. Multiple calls result in multiple updates.
+         *
          * @return the elapsed time in nanoseconds
          */
         public long stop() {
@@ -35,7 +36,9 @@ public class Timer implements Metered, Sampling {
             return elapsed;
         }
 
-        /** Equivalent to calling {@link #stop()}. */
+        /**
+         * Equivalent to calling {@link #stop()}.
+         */
         @Override
         public void close() {
             stop();
@@ -67,7 +70,7 @@ public class Timer implements Metered, Sampling {
      * Creates a new {@link Timer} that uses the given {@link Reservoir} and {@link Clock}.
      *
      * @param reservoir the {@link Reservoir} implementation the timer should use
-     * @param clock  the {@link Clock} implementation the timer should use
+     * @param clock     the {@link Clock} implementation the timer should use
      */
     public Timer(Reservoir reservoir, Clock clock) {
         this.meter = new Meter(clock);

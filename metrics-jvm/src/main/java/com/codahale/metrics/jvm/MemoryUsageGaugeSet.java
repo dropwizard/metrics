@@ -25,8 +25,7 @@ public class MemoryUsageGaugeSet implements MetricSet {
     private final List<MemoryPoolMXBean> memoryPools;
 
     public MemoryUsageGaugeSet() {
-        this(ManagementFactory.getMemoryMXBean(),
-             ManagementFactory.getMemoryPoolMXBeans());
+        this(ManagementFactory.getMemoryMXBean(), ManagementFactory.getMemoryPoolMXBeans());
     }
 
     public MemoryUsageGaugeSet(MemoryMXBean mxBean,
@@ -75,15 +74,14 @@ public class MemoryUsageGaugeSet implements MetricSet {
         for (final MemoryPoolMXBean pool : memoryPools) {
             final String poolName = name("pools", WHITESPACE.matcher(pool.getName()).replaceAll("-"));
 
-            gauges.put(name(poolName, "usage"),
-                    new RatioGauge() {
-                           @Override
-                           protected Ratio getRatio() {
-                               MemoryUsage usage = pool.getUsage();
-                               return Ratio.of(usage.getUsed(),
-                                       usage.getMax() == -1 ? usage.getCommitted() : usage.getMax());
-                           }
-                    });
+            gauges.put(name(poolName, "usage"), new RatioGauge() {
+                @Override
+                protected Ratio getRatio() {
+                    MemoryUsage usage = pool.getUsage();
+                    return Ratio.of(usage.getUsed(),
+                            usage.getMax() == -1 ? usage.getCommitted() : usage.getMax());
+                }
+            });
 
             gauges.put(name(poolName, "max"), (Gauge<Long>) () -> pool.getUsage().getMax());
             gauges.put(name(poolName, "used"), (Gauge<Long>) () -> pool.getUsage().getUsed());
@@ -91,7 +89,8 @@ public class MemoryUsageGaugeSet implements MetricSet {
 
             // Only register GC usage metrics if the memory pool supports usage statistics.
             if (pool.getCollectionUsage() != null) {
-            	gauges.put(name(poolName, "used-after-gc"), (Gauge<Long>) () -> pool.getCollectionUsage().getUsed());
+                gauges.put(name(poolName, "used-after-gc"), (Gauge<Long>) () ->
+                        pool.getCollectionUsage().getUsed());
             }
 
             gauges.put(name(poolName, "init"), (Gauge<Long>) () -> pool.getUsage().getInit());

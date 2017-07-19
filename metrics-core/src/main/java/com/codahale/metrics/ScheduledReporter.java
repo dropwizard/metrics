@@ -71,11 +71,11 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
     /**
      * Creates a new {@link ScheduledReporter} instance.
      *
-     * @param registry the {@link com.codahale.metrics.MetricRegistry} containing the metrics this
-     *                 reporter will report
-     * @param name     the reporter's name
-     * @param filter   the filter for which metrics to report
-     * @param rateUnit a unit of time
+     * @param registry     the {@link com.codahale.metrics.MetricRegistry} containing the metrics this
+     *                     reporter will report
+     * @param name         the reporter's name
+     * @param filter       the filter for which metrics to report
+     * @param rateUnit     a unit of time
      * @param durationUnit a unit of time
      */
     protected ScheduledReporter(MetricRegistry registry,
@@ -83,7 +83,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 MetricFilter filter,
                                 TimeUnit rateUnit,
                                 TimeUnit durationUnit) {
-		this(registry, name, filter, rateUnit, durationUnit, createDefaultExecutor(name));
+        this(registry, name, filter, rateUnit, durationUnit, createDefaultExecutor(name));
     }
 
     /**
@@ -107,11 +107,11 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
     /**
      * Creates a new {@link ScheduledReporter} instance.
      *
-     * @param registry the {@link com.codahale.metrics.MetricRegistry} containing the metrics this
-     *                 reporter will report
-     * @param name     the reporter's name
-     * @param filter   the filter for which metrics to report
-     * @param executor the executor to use while scheduling reporting of metrics.
+     * @param registry               the {@link com.codahale.metrics.MetricRegistry} containing the metrics this
+     *                               reporter will report
+     * @param name                   the reporter's name
+     * @param filter                 the filter for which metrics to report
+     * @param executor               the executor to use while scheduling reporting of metrics.
      * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
      */
     protected ScheduledReporter(MetricRegistry registry,
@@ -121,7 +121,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 TimeUnit durationUnit,
                                 ScheduledExecutorService executor,
                                 boolean shutdownExecutorOnStop) {
-       this(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, Collections.emptySet());
+        this(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, Collections.emptySet());
     }
 
     protected ScheduledReporter(MetricRegistry registry,
@@ -134,7 +134,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 Set<MetricAttribute> disabledMetricAttributes) {
         this.registry = registry;
         this.filter = filter;
-        this.executor = executor == null? createDefaultExecutor(name) : executor;
+        this.executor = executor == null ? createDefaultExecutor(name) : executor;
         this.shutdownExecutorOnStop = shutdownExecutorOnStop;
         this.rateFactor = rateUnit.toSeconds(1);
         this.rateUnit = calculateRateUnit(rateUnit);
@@ -151,7 +151,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * @param unit   the unit for {@code period}
      */
     public void start(long period, TimeUnit unit) {
-       start(period, period, unit);
+        start(period, period, unit);
     }
 
     /**
@@ -162,22 +162,22 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * @param unit         the unit for {@code period}
      */
     synchronized public void start(long initialDelay, long period, TimeUnit unit) {
-      if (this.scheduledFuture != null) {
-          throw new IllegalArgumentException("Reporter already started");
-      }
+        if (this.scheduledFuture != null) {
+            throw new IllegalArgumentException("Reporter already started");
+        }
 
-      this.scheduledFuture = executor.scheduleAtFixedRate(() -> {
-          try {
-              report();
-          } catch (Throwable ex) {
-              LOG.error("Exception thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
-          }
-      }, initialDelay, period, unit);
+        this.scheduledFuture = executor.scheduleAtFixedRate(() -> {
+            try {
+                report();
+            } catch (Throwable ex) {
+                LOG.error("Exception thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
+            }
+        }, initialDelay, period, unit);
     }
 
     /**
      * Stops the reporter and if shutdownExecutorOnStop is true then shuts down its thread of execution.
-     *
+     * <p>
      * Uses the shutdown pattern from http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ExecutorService.html
      */
     public void stop() {

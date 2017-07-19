@@ -59,8 +59,7 @@ public class JCacheGaugeSet implements MetricSet {
     private Set<ObjectInstance> getCacheBeans() {
         try {
             return ManagementFactory.getPlatformMBeanServer().queryMBeans(ObjectName.getInstance(M_BEAN_COORDINATES), null);
-        }
-        catch(MalformedObjectNameException e) {
+        } catch (MalformedObjectNameException e) {
             LOGGER.error("Unable to retrieve {}. Are JCache statistics enabled?", M_BEAN_COORDINATES);
             throw new RuntimeException(e);
         }
@@ -72,7 +71,7 @@ public class JCacheGaugeSet implements MetricSet {
 
         for (Method method : methods) {
             String methodName = method.getName();
-            if(methodName.startsWith("get")) {
+            if (methodName.startsWith("get")) {
                 availableStatsNames.add(methodName.substring(3));
             }
         }

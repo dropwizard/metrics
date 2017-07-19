@@ -151,7 +151,7 @@ class ChunkedAssociativeLongArray {
                 fromHeadIterator.remove();
             } else {
                 int newEndIndex = findFirstIndexOfGreaterEqualElements(
-                    currentHead.keys, currentHead.startIndex, currentHead.cursor, endKey
+                        currentHead.keys, currentHead.startIndex, currentHead.cursor, endKey
                 );
                 currentHead.cursor = newEndIndex;
                 break;
@@ -166,7 +166,7 @@ class ChunkedAssociativeLongArray {
                 fromTailIterator.remove();
             } else {
                 int newStartIndex = findFirstIndexOfGreaterEqualElements(
-                    currentTail.keys, currentTail.startIndex, currentTail.cursor, startKey
+                        currentTail.keys, currentTail.startIndex, currentTail.cursor, startKey
                 );
                 if (currentTail.startIndex != newStartIndex) {
                     currentTail.startIndex = newStartIndex;
@@ -209,7 +209,7 @@ class ChunkedAssociativeLongArray {
                 fromHeadIterator.remove();
             } else {
                 int newEndIndex = findFirstIndexOfGreaterEqualElements(
-                    afterGapHead.keys, afterGapHead.startIndex, afterGapHead.cursor, startKey
+                        afterGapHead.keys, afterGapHead.startIndex, afterGapHead.cursor, startKey
                 );
                 if (newEndIndex == afterGapHead.startIndex) {
                     break;
@@ -238,7 +238,7 @@ class ChunkedAssociativeLongArray {
          * |s--tail--e||s--head--e|
          */
         int splitIndex = findFirstIndexOfGreaterEqualElements(
-            chunk.keys, chunk.startIndex, chunk.cursor, key
+                chunk.keys, chunk.startIndex, chunk.cursor, key
         );
         if (splitIndex == chunk.startIndex || splitIndex == chunk.cursor) {
             return null;
@@ -251,13 +251,11 @@ class ChunkedAssociativeLongArray {
     }
 
     private boolean isFirstElementIsEmptyOrGreaterEqualThanKey(Chunk chunk, long key) {
-        return chunk.cursor == chunk.startIndex
-            || chunk.keys[chunk.startIndex] >= key;
+        return chunk.cursor == chunk.startIndex || chunk.keys[chunk.startIndex] >= key;
     }
 
     private boolean isLastElementIsLessThanKey(Chunk chunk, long key) {
-        return chunk.cursor == chunk.startIndex
-            || chunk.keys[chunk.cursor - 1] < key;
+        return chunk.cursor == chunk.startIndex || chunk.keys[chunk.cursor - 1] < key;
     }
 
 

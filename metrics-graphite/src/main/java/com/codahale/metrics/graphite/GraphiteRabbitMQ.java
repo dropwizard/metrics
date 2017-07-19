@@ -90,7 +90,7 @@ public class GraphiteRabbitMQ implements GraphiteSender {
 
         this.connectionFactory = new ConnectionFactory();
 
-	connectionFactory.setSocketConfigurator(new DefaultSocketConfigurator() {
+        connectionFactory.setSocketConfigurator(new DefaultSocketConfigurator() {
             @Override
             public void configure(Socket socket) throws IOException {
                 super.configure(socket);
@@ -141,7 +141,7 @@ public class GraphiteRabbitMQ implements GraphiteSender {
 
     @Override
     public void flush() throws IOException {
-    	  // Nothing to do
+        // Nothing to do
     }
 
     @Override

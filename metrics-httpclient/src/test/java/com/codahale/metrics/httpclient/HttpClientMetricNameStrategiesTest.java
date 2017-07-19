@@ -20,7 +20,7 @@ public class HttpClientMetricNameStrategiesTest {
     @Test
     public void methodOnlyWithName() {
         assertThat(METHOD_ONLY.getNameFor("some-service", new HttpGet("/whatever")),
-                   is("org.apache.http.client.HttpClient.some-service.get-requests"));
+                is("org.apache.http.client.HttpClient.some-service.get-requests"));
     }
 
     @Test
@@ -32,7 +32,7 @@ public class HttpClientMetricNameStrategiesTest {
     @Test
     public void hostAndMethodWithName() {
         assertThat(HOST_AND_METHOD.getNameFor("some-service", new HttpPost("http://my.host.com/whatever")),
-                   is("org.apache.http.client.HttpClient.some-service.my.host.com.post-requests"));
+                is("org.apache.http.client.HttpClient.some-service.my.host.com.post-requests"));
     }
 
     @Test

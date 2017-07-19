@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * A {@link Gauge} implementation which caches its value for a period of time.
  *
- * @param <T>    the type of the gauge's value
+ * @param <T> the type of the gauge's value
  */
 public abstract class CachedGauge<T> implements Gauge<T> {
     private final Clock clock;
@@ -18,8 +18,8 @@ public abstract class CachedGauge<T> implements Gauge<T> {
     /**
      * Creates a new cached gauge with the given timeout period.
      *
-     * @param timeout        the timeout
-     * @param timeoutUnit    the unit of {@code timeout}
+     * @param timeout     the timeout
+     * @param timeoutUnit the unit of {@code timeout}
      */
     protected CachedGauge(long timeout, TimeUnit timeoutUnit) {
         this(Clock.defaultClock(), timeout, timeoutUnit);
@@ -28,9 +28,9 @@ public abstract class CachedGauge<T> implements Gauge<T> {
     /**
      * Creates a new cached gauge with the given clock and timeout period.
      *
-     * @param clock          the clock used to calculate the timeout
-     * @param timeout        the timeout
-     * @param timeoutUnit    the unit of {@code timeout}
+     * @param clock       the clock used to calculate the timeout
+     * @param timeout     the timeout
+     * @param timeoutUnit the unit of {@code timeout}
      */
     protected CachedGauge(Clock clock, long timeout, TimeUnit timeoutUnit) {
         this.clock = clock;

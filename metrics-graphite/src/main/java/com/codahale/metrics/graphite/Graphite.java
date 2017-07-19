@@ -36,7 +36,7 @@ public class Graphite implements GraphiteSender {
      * {@link SocketFactory}.
      *
      * @param hostname The hostname of the Carbon server
-     * @param port The port of the Carbon server
+     * @param port     The port of the Carbon server
      */
     public Graphite(String hostname, int port) {
         this(hostname, port, SocketFactory.getDefault());
@@ -45,8 +45,8 @@ public class Graphite implements GraphiteSender {
     /**
      * Creates a new client which connects to the given address and socket factory.
      *
-     * @param hostname The hostname of the Carbon server
-     * @param port The port of the Carbon server
+     * @param hostname      The hostname of the Carbon server
+     * @param port          The port of the Carbon server
      * @param socketFactory the socket factory
      */
     public Graphite(String hostname, int port, SocketFactory socketFactory) {
@@ -57,8 +57,8 @@ public class Graphite implements GraphiteSender {
      * Creates a new client which connects to the given address and socket factory using the given
      * character set.
      *
-     * @param hostname The hostname of the Carbon server
-     * @param port The port of the Carbon server
+     * @param hostname      The hostname of the Carbon server
+     * @param port          The port of the Carbon server
      * @param socketFactory the socket factory
      * @param charset       the character set used by the server
      */
@@ -117,7 +117,7 @@ public class Graphite implements GraphiteSender {
         }
         if (address.getAddress() == null) {
             // retry lookup, just in case the DNS changed
-            address = new InetSocketAddress(address.getHostName(),address.getPort());
+            address = new InetSocketAddress(address.getHostName(), address.getPort());
 
             if (address.getAddress() == null) {
                 throw new UnknownHostException(address.getHostName());
@@ -130,7 +130,7 @@ public class Graphite implements GraphiteSender {
 
     @Override
     public boolean isConnected() {
-    		return socket != null && socket.isConnected() && !socket.isClosed();
+        return socket != null && socket.isConnected() && !socket.isClosed();
     }
 
     @Override

@@ -51,7 +51,7 @@ public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientCo
 
     public InstrumentedHttpClientConnectionManager(MetricRegistry metricsRegistry,
                                                    Registry<ConnectionSocketFactory> socketFactoryRegistry,
-                                                   HttpConnectionFactory<HttpRoute,ManagedHttpClientConnection> connFactory,
+                                                   HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection> connFactory,
                                                    SchemePortResolver schemePortResolver,
                                                    DnsResolver dnsResolver,
                                                    long connTTL,

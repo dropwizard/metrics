@@ -32,7 +32,7 @@ public class Meter implements Metered {
     /**
      * Creates a new {@link Meter}.
      *
-     * @param clock      the clock to use for the meter ticks
+     * @param clock the clock to use for the meter ticks
      */
     public Meter(Clock clock) {
         this.clock = clock;

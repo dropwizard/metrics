@@ -67,7 +67,7 @@ public class FileDescriptorRatioGaugeTest {
     public void validateFileDescriptorRatioPresenceOnNixPlatforms() throws Exception {
         OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
         assumeTrue(osBean instanceof com.sun.management.UnixOperatingSystemMXBean);
-        
+
         assertThat(new FileDescriptorRatioGauge().getValue())
                 .isGreaterThanOrEqualTo(0.0)
                 .isLessThanOrEqualTo(1.0);

@@ -21,9 +21,9 @@ import static com.codahale.metrics.MetricRegistry.name;
  */
 public class BufferPoolMetricSet implements MetricSet {
     private static final Logger LOGGER = LoggerFactory.getLogger(BufferPoolMetricSet.class);
-    private static final String[] ATTRIBUTES = { "Count", "MemoryUsed", "TotalCapacity" };
-    private static final String[] NAMES = { "count", "used", "capacity" };
-    private static final String[] POOLS = { "direct", "mapped" };
+    private static final String[] ATTRIBUTES = {"Count", "MemoryUsed", "TotalCapacity"};
+    private static final String[] NAMES = {"count", "used", "capacity"};
+    private static final String[] POOLS = {"direct", "mapped"};
 
     private final MBeanServer mBeanServer;
 
@@ -41,8 +41,7 @@ public class BufferPoolMetricSet implements MetricSet {
                 try {
                     final ObjectName on = new ObjectName("java.nio:type=BufferPool,name=" + pool);
                     mBeanServer.getMBeanInfo(on);
-                    gauges.put(name(pool, name),
-                               new JmxAttributeGauge(mBeanServer, on, attribute));
+                    gauges.put(name(pool, name), new JmxAttributeGauge(mBeanServer, on, attribute));
                 } catch (JMException ignored) {
                     LOGGER.debug("Unable to load buffer pool MBeans, possibly running on Java 6");
                 }

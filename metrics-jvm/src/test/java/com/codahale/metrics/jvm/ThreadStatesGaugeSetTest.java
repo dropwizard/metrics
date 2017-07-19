@@ -17,7 +17,7 @@ public class ThreadStatesGaugeSetTest {
     private final ThreadMXBean threads = mock(ThreadMXBean.class);
     private final ThreadDeadlockDetector detector = mock(ThreadDeadlockDetector.class);
     private final ThreadStatesGaugeSet gauges = new ThreadStatesGaugeSet(threads, detector);
-    private final long[] ids = new long[]{ 1, 2, 3 };
+    private final long[] ids = new long[]{1, 2, 3};
 
     private final ThreadInfo newThread = mock(ThreadInfo.class);
     private final ThreadInfo runnableThread = mock(ThreadInfo.class);
@@ -55,15 +55,15 @@ public class ThreadStatesGaugeSetTest {
     public void hasASetOfGauges() throws Exception {
         assertThat(gauges.getMetrics().keySet())
                 .containsOnly("terminated.count",
-                              "new.count",
-                              "count",
-                              "timed_waiting.count",
-                              "deadlocks",
-                              "blocked.count",
-                              "waiting.count",
-                              "daemon.count",
-                              "runnable.count",
-                              "deadlock.count");
+                        "new.count",
+                        "count",
+                        "timed_waiting.count",
+                        "deadlocks",
+                        "blocked.count",
+                        "waiting.count",
+                        "daemon.count",
+                        "runnable.count",
+                        "deadlock.count");
     }
 
     @Test

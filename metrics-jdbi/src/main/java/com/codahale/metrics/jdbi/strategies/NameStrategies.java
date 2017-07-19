@@ -145,8 +145,8 @@ public final class NameStrategies {
             }
 
             return name(className.substring(0, dotPos),
-                        className.substring(dotPos + 1),
-                        statementName);
+                    className.substring(dotPos + 1),
+                    statementName);
         }
     }
 

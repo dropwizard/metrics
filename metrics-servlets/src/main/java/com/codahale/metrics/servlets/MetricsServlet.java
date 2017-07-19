@@ -141,18 +141,18 @@ public class MetricsServlet extends HttpServlet {
         }
 
         final TimeUnit rateUnit = parseTimeUnit(context.getInitParameter(RATE_UNIT),
-                                                TimeUnit.SECONDS);
+                TimeUnit.SECONDS);
         final TimeUnit durationUnit = parseTimeUnit(context.getInitParameter(DURATION_UNIT),
-                                                    TimeUnit.SECONDS);
+                TimeUnit.SECONDS);
         final boolean showSamples = Boolean.parseBoolean(context.getInitParameter(SHOW_SAMPLES));
         MetricFilter filter = (MetricFilter) context.getAttribute(METRIC_FILTER);
         if (filter == null) {
-          filter = MetricFilter.ALL;
+            filter = MetricFilter.ALL;
         }
         this.mapper = new ObjectMapper().registerModule(new MetricsModule(rateUnit,
-                                                                          durationUnit,
-                                                                          showSamples,
-                                                                          filter));
+                durationUnit,
+                showSamples,
+                filter));
 
         this.allowedOrigin = context.getInitParameter(ALLOWED_ORIGIN);
         this.jsonpParamName = context.getInitParameter(CALLBACK_PARAM);

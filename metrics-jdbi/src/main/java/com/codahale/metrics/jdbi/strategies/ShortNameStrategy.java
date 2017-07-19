@@ -23,10 +23,10 @@ public final class ShortNameStrategy extends DelegatingStatementNameStrategy {
         // Java does not allow super (..., new ShortContextClassStrategy(), new ShortSqlObjectStrategy(), ...);
         // ==> No enclosing instance of type <xxx> is available due to some intermediate constructor invocation. Lame.
         registerStrategies(NameStrategies.CHECK_EMPTY,
-                           new ShortContextClassStrategy(),
-                           new ShortSqlObjectStrategy(),
-                           NameStrategies.CHECK_RAW,
-                           NameStrategies.NAIVE_NAME);
+                new ShortContextClassStrategy(),
+                new ShortSqlObjectStrategy(),
+                NameStrategies.CHECK_RAW,
+                NameStrategies.NAIVE_NAME);
     }
 
     private final class ShortContextClassStrategy implements StatementNameStrategy {

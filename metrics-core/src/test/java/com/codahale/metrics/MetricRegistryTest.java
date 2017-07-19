@@ -159,7 +159,7 @@ public class MetricRegistryTest {
         verify(listener).onMeterAdded("thing", meter1);
     }
 
-        @Test
+    @Test
     public void removingAMeterTriggersANotification() throws Exception {
         registry.register("thing", meter);
 
@@ -372,7 +372,7 @@ public class MetricRegistryTest {
     @Test
     @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void elidesNullValuesFromNamesWhenOnlyOneNullPassedIn() throws Exception {
-        assertThat(name("one", (String)null))
+        assertThat(name("one", (String) null))
                 .isEqualTo("one");
     }
 

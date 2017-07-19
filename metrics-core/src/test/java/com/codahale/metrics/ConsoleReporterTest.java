@@ -27,14 +27,14 @@ public class ConsoleReporterTest {
     private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     private final PrintStream output = new PrintStream(bytes);
     private final ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)
-                                                            .outputTo(output)
-                                                            .formattedFor(locale)
-                                                            .withClock(clock)
-                                                            .formattedFor(timeZone)
-                                                            .convertRatesTo(TimeUnit.SECONDS)
-                                                            .convertDurationsTo(TimeUnit.MILLISECONDS)
-                                                            .filter(MetricFilter.ALL)
-                                                            .build();
+            .outputTo(output)
+            .formattedFor(locale)
+            .withClock(clock)
+            .formattedFor(timeZone)
+            .convertRatesTo(TimeUnit.SECONDS)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .filter(MetricFilter.ALL)
+            .build();
 
     @Before
     public void setUp() throws Exception {
@@ -46,10 +46,10 @@ public class ConsoleReporterTest {
         final Gauge<Integer> gauge = () -> 1;
 
         reporter.report(map("gauge", gauge),
-                        map(),
-                        map(),
-                        map(),
-                        map());
+                map(),
+                map(),
+                map(),
+                map());
 
         assertThat(consoleOutput())
                 .isEqualTo(lines(
@@ -69,10 +69,10 @@ public class ConsoleReporterTest {
         when(counter.getCount()).thenReturn(100L);
 
         reporter.report(map(),
-                        map("test.counter", counter),
-                        map(),
-                        map(),
-                        map());
+                map("test.counter", counter),
+                map(),
+                map(),
+                map());
 
         assertThat(consoleOutput())
                 .isEqualTo(lines(
@@ -106,10 +106,10 @@ public class ConsoleReporterTest {
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
         reporter.report(map(),
-                        map(),
-                        map("test.histogram", histogram),
-                        map(),
-                        map());
+                map(),
+                map("test.histogram", histogram),
+                map(),
+                map());
 
         assertThat(consoleOutput())
                 .isEqualTo(lines(
@@ -143,10 +143,10 @@ public class ConsoleReporterTest {
         when(meter.getFifteenMinuteRate()).thenReturn(5.0);
 
         reporter.report(map(),
-                        map(),
-                        map(),
-                        map("test.meter", meter),
-                        map());
+                map(),
+                map(),
+                map("test.meter", meter),
+                map());
 
         assertThat(consoleOutput())
                 .isEqualTo(lines(
@@ -184,15 +184,15 @@ public class ConsoleReporterTest {
         when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
         when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
         when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS
-                                                                        .toNanos(1000));
+                .toNanos(1000));
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
         reporter.report(map(),
-                        map(),
-                        map(),
-                        map(),
-                        map("test.another.timer", timer));
+                map(),
+                map(),
+                map(),
+                map("test.another.timer", timer));
 
         assertThat(consoleOutput())
                 .isEqualTo(lines(
@@ -233,7 +233,7 @@ public class ConsoleReporterTest {
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .filter(MetricFilter.ALL)
                 .disabledMetricAttributes(disabledMetricAttributes)
-            .build();
+                .build();
 
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);

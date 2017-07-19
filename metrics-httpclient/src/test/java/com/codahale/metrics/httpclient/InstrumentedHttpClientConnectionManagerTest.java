@@ -10,7 +10,7 @@ public class InstrumentedHttpClientConnectionManagerTest {
 
     @Test
     public void shouldRemoveGauges() {
-       final InstrumentedHttpClientConnectionManager instrumentedHttpClientConnectionManager = new InstrumentedHttpClientConnectionManager(metricRegistry);
+        final InstrumentedHttpClientConnectionManager instrumentedHttpClientConnectionManager = new InstrumentedHttpClientConnectionManager(metricRegistry);
         Assert.assertEquals(4, metricRegistry.getGauges().size());
 
         instrumentedHttpClientConnectionManager.close();

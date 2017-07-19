@@ -57,41 +57,41 @@ public class MetricsModuleTest {
         when(snapshot.get98thPercentile()).thenReturn(9.0);
         when(snapshot.get99thPercentile()).thenReturn(10.0);
         when(snapshot.get999thPercentile()).thenReturn(11.0);
-        when(snapshot.getValues()).thenReturn(new long[]{ 1, 2, 3 });
+        when(snapshot.getValues()).thenReturn(new long[]{1, 2, 3});
 
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
         assertThat(mapper.writeValueAsString(histogram))
                 .isEqualTo("{" +
-                                   "\"count\":1," +
-                                   "\"max\":2," +
-                                   "\"mean\":3.0," +
-                                   "\"min\":4," +
-                                   "\"p50\":6.0," +
-                                   "\"p75\":7.0," +
-                                   "\"p95\":8.0," +
-                                   "\"p98\":9.0," +
-                                   "\"p99\":10.0," +
-                                   "\"p999\":11.0," +
-                                   "\"stddev\":5.0}");
+                        "\"count\":1," +
+                        "\"max\":2," +
+                        "\"mean\":3.0," +
+                        "\"min\":4," +
+                        "\"p50\":6.0," +
+                        "\"p75\":7.0," +
+                        "\"p95\":8.0," +
+                        "\"p98\":9.0," +
+                        "\"p99\":10.0," +
+                        "\"p999\":11.0," +
+                        "\"stddev\":5.0}");
 
         final ObjectMapper fullMapper = new ObjectMapper().registerModule(
                 new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, true, MetricFilter.ALL));
 
         assertThat(fullMapper.writeValueAsString(histogram))
                 .isEqualTo("{" +
-                                   "\"count\":1," +
-                                   "\"max\":2," +
-                                   "\"mean\":3.0," +
-                                   "\"min\":4," +
-                                   "\"p50\":6.0," +
-                                   "\"p75\":7.0," +
-                                   "\"p95\":8.0," +
-                                   "\"p98\":9.0," +
-                                   "\"p99\":10.0," +
-                                   "\"p999\":11.0," +
-                                   "\"values\":[1,2,3]," +
-                                   "\"stddev\":5.0}");
+                        "\"count\":1," +
+                        "\"max\":2," +
+                        "\"mean\":3.0," +
+                        "\"min\":4," +
+                        "\"p50\":6.0," +
+                        "\"p75\":7.0," +
+                        "\"p95\":8.0," +
+                        "\"p98\":9.0," +
+                        "\"p99\":10.0," +
+                        "\"p999\":11.0," +
+                        "\"values\":[1,2,3]," +
+                        "\"stddev\":5.0}");
     }
 
     @Test
@@ -105,12 +105,12 @@ public class MetricsModuleTest {
 
         assertThat(mapper.writeValueAsString(meter))
                 .isEqualTo("{" +
-                                   "\"count\":1," +
-                                   "\"m15_rate\":3.0," +
-                                   "\"m1_rate\":5.0," +
-                                   "\"m5_rate\":4.0," +
-                                   "\"mean_rate\":2.0," +
-                                   "\"units\":\"events/second\"}");
+                        "\"count\":1," +
+                        "\"m15_rate\":3.0," +
+                        "\"m1_rate\":5.0," +
+                        "\"m5_rate\":4.0," +
+                        "\"mean_rate\":2.0," +
+                        "\"units\":\"events/second\"}");
     }
 
     @Test
@@ -144,47 +144,47 @@ public class MetricsModuleTest {
 
         assertThat(mapper.writeValueAsString(timer))
                 .isEqualTo("{" +
-                                   "\"count\":1," +
-                                   "\"max\":100.0," +
-                                   "\"mean\":200.0," +
-                                   "\"min\":300.0," +
-                                   "\"p50\":500.0," +
-                                   "\"p75\":600.0," +
-                                   "\"p95\":700.0," +
-                                   "\"p98\":800.0," +
-                                   "\"p99\":900.0," +
-                                   "\"p999\":1000.0," +
-                                   "\"stddev\":400.0," +
-                                   "\"m15_rate\":5.0," +
-                                   "\"m1_rate\":3.0," +
-                                   "\"m5_rate\":4.0," +
-                                   "\"mean_rate\":2.0," +
-                                   "\"duration_units\":\"milliseconds\"," +
-                                   "\"rate_units\":\"calls/second\"}");
+                        "\"count\":1," +
+                        "\"max\":100.0," +
+                        "\"mean\":200.0," +
+                        "\"min\":300.0," +
+                        "\"p50\":500.0," +
+                        "\"p75\":600.0," +
+                        "\"p95\":700.0," +
+                        "\"p98\":800.0," +
+                        "\"p99\":900.0," +
+                        "\"p999\":1000.0," +
+                        "\"stddev\":400.0," +
+                        "\"m15_rate\":5.0," +
+                        "\"m1_rate\":3.0," +
+                        "\"m5_rate\":4.0," +
+                        "\"mean_rate\":2.0," +
+                        "\"duration_units\":\"milliseconds\"," +
+                        "\"rate_units\":\"calls/second\"}");
 
         final ObjectMapper fullMapper = new ObjectMapper().registerModule(
                 new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, true, MetricFilter.ALL));
 
         assertThat(fullMapper.writeValueAsString(timer))
                 .isEqualTo("{" +
-                                   "\"count\":1," +
-                                   "\"max\":100.0," +
-                                   "\"mean\":200.0," +
-                                   "\"min\":300.0," +
-                                   "\"p50\":500.0," +
-                                   "\"p75\":600.0," +
-                                   "\"p95\":700.0," +
-                                   "\"p98\":800.0," +
-                                   "\"p99\":900.0," +
-                                   "\"p999\":1000.0," +
-                                   "\"values\":[1.0,2.0,3.0]," +
-                                   "\"stddev\":400.0," +
-                                   "\"m15_rate\":5.0," +
-                                   "\"m1_rate\":3.0," +
-                                   "\"m5_rate\":4.0," +
-                                   "\"mean_rate\":2.0," +
-                                   "\"duration_units\":\"milliseconds\"," +
-                                   "\"rate_units\":\"calls/second\"}");
+                        "\"count\":1," +
+                        "\"max\":100.0," +
+                        "\"mean\":200.0," +
+                        "\"min\":300.0," +
+                        "\"p50\":500.0," +
+                        "\"p75\":600.0," +
+                        "\"p95\":700.0," +
+                        "\"p98\":800.0," +
+                        "\"p99\":900.0," +
+                        "\"p999\":1000.0," +
+                        "\"values\":[1.0,2.0,3.0]," +
+                        "\"stddev\":400.0," +
+                        "\"m15_rate\":5.0," +
+                        "\"m1_rate\":3.0," +
+                        "\"m5_rate\":4.0," +
+                        "\"mean_rate\":2.0," +
+                        "\"duration_units\":\"milliseconds\"," +
+                        "\"rate_units\":\"calls/second\"}");
     }
 
     @Test
@@ -193,11 +193,11 @@ public class MetricsModuleTest {
 
         assertThat(mapper.writeValueAsString(registry))
                 .isEqualTo("{" +
-                                   "\"version\":\"4.0.0\"," +
-                                   "\"gauges\":{}," +
-                                   "\"counters\":{}," +
-                                   "\"histograms\":{}," +
-                                   "\"meters\":{}," +
-                                   "\"timers\":{}}");
+                        "\"version\":\"4.0.0\"," +
+                        "\"gauges\":{}," +
+                        "\"counters\":{}," +
+                        "\"histograms\":{}," +
+                        "\"meters\":{}," +
+                        "\"timers\":{}}");
     }
 }

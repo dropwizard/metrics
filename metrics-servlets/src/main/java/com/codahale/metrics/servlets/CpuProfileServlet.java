@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.joda.time.Duration;
 import com.papertrail.profiler.CpuProfile;
 
@@ -46,8 +47,7 @@ public class CpuProfileServlet extends HttpServlet {
         final Thread.State state;
         if ("blocked".equalsIgnoreCase(req.getParameter("state"))) {
             state = Thread.State.BLOCKED;
-        }
-        else {
+        } else {
             state = Thread.State.RUNNABLE;
         }
 

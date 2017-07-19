@@ -13,11 +13,11 @@ public class ClockTest {
 
         assertThat((double) clock.getTime())
                 .isEqualTo(System.currentTimeMillis(),
-                           offset(100.0));
+                        offset(100.0));
 
         assertThat((double) clock.getTick())
                 .isEqualTo(System.nanoTime(),
-                           offset(100000.0));
+                        offset(100000.0));
     }
 
     @Test

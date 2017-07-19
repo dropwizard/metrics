@@ -20,7 +20,7 @@ public class AdminServlet extends HttpServlet {
     public static final String PING_URI_PARAM_KEY = "ping-uri";
     public static final String THREADS_URI_PARAM_KEY = "threads-uri";
     public static final String HEALTHCHECK_URI_PARAM_KEY = "healthcheck-uri";
-    public static final String SERVICE_NAME_PARAM_KEY= "service-name";
+    public static final String SERVICE_NAME_PARAM_KEY = "service-name";
     public static final String CPU_PROFILE_URI_PARAM_KEY = "cpu-profile-uri";
 
     private static final String TEMPLATE = String.format(

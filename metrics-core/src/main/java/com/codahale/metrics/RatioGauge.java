@@ -16,8 +16,8 @@ public abstract class RatioGauge implements Gauge<Double> {
         /**
          * Creates a new ratio with the given numerator and denominator.
          *
-         * @param numerator      the numerator of the ratio
-         * @param denominator    the denominator of the ratio
+         * @param numerator   the numerator of the ratio
+         * @param denominator the denominator of the ratio
          * @return {@code numerator:denominator}
          */
         public static Ratio of(double numerator, double denominator) {

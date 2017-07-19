@@ -6,7 +6,7 @@ package com.codahale.metrics.jdbi.strategies;
 public class NaiveNameStrategy extends DelegatingStatementNameStrategy {
     public NaiveNameStrategy() {
         super(NameStrategies.CHECK_EMPTY,
-              NameStrategies.CHECK_RAW,
-              NameStrategies.NAIVE_NAME);
+                NameStrategies.CHECK_RAW,
+                NameStrategies.NAIVE_NAME);
     }
 }

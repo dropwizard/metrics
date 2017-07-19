@@ -26,16 +26,16 @@ public class HealthCheckModuleTest {
     public void serializesAHealthyResultWithAMessage() throws Exception {
         assertThat(mapper.writeValueAsString(HealthCheck.Result.healthy("yay for %s", "me")))
                 .isEqualTo("{" +
-                                   "\"healthy\":true," +
-                                   "\"message\":\"yay for me\"}");
+                        "\"healthy\":true," +
+                        "\"message\":\"yay for me\"}");
     }
 
     @Test
     public void serializesAnUnhealthyResult() throws Exception {
         assertThat(mapper.writeValueAsString(HealthCheck.Result.unhealthy("boo")))
                 .isEqualTo("{" +
-                                   "\"healthy\":false," +
-                                   "\"message\":\"boo\"}");
+                        "\"healthy\":false," +
+                        "\"message\":\"boo\"}");
     }
 
     @Test
@@ -48,13 +48,13 @@ public class HealthCheckModuleTest {
 
         assertThat(mapper.writeValueAsString(HealthCheck.Result.unhealthy(e)))
                 .isEqualTo("{" +
-                                   "\"healthy\":false," +
-                                   "\"message\":\"oh no\"," +
-                                   "\"error\":{" +
-                                       "\"message\":\"oh no\"," +
-                                       "\"stack\":[\"Blah.bloo(Blah.java:100)\"]" +
-                                   "}" +
-                                   "}");
+                        "\"healthy\":false," +
+                        "\"message\":\"oh no\"," +
+                        "\"error\":{" +
+                        "\"message\":\"oh no\"," +
+                        "\"stack\":[\"Blah.bloo(Blah.java:100)\"]" +
+                        "}" +
+                        "}");
     }
 
     @Test
@@ -74,17 +74,17 @@ public class HealthCheckModuleTest {
 
         assertThat(mapper.writeValueAsString(HealthCheck.Result.unhealthy(b)))
                 .isEqualTo("{" +
-                                   "\"healthy\":false," +
-                                   "\"message\":\"oh well\"," +
-                                   "\"error\":{" +
-                                       "\"message\":\"oh well\"," +
-                                       "\"stack\":[\"Blah.blee(Blah.java:150)\"]," +
-                                       "\"cause\":{" +
-                                           "\"message\":\"oh no\"," +
-                                           "\"stack\":[\"Blah.bloo(Blah.java:100)\"]" +
-                                       "}" +
-                                   "}" +
-                                   "}");
+                        "\"healthy\":false," +
+                        "\"message\":\"oh well\"," +
+                        "\"error\":{" +
+                        "\"message\":\"oh well\"," +
+                        "\"stack\":[\"Blah.blee(Blah.java:150)\"]," +
+                        "\"cause\":{" +
+                        "\"message\":\"oh no\"," +
+                        "\"stack\":[\"Blah.bloo(Blah.java:100)\"]" +
+                        "}" +
+                        "}" +
+                        "}");
     }
 
     @Test
@@ -93,32 +93,32 @@ public class HealthCheckModuleTest {
         complex.put("field", "value");
 
         HealthCheck.Result result = HealthCheck.Result.builder()
-            .healthy()
-            .withDetail("boolean", true)
-            .withDetail("integer", 1)
-            .withDetail("long", 2L)
-            .withDetail("float", 3.546F)
-            .withDetail("double", 4.567D)
-            .withDetail("BigInteger", new BigInteger("12345"))
-            .withDetail("BigDecimal", new BigDecimal("12345.56789"))
-            .withDetail("String", "string")
-            .withDetail("complex", complex)
-            .build();
+                .healthy()
+                .withDetail("boolean", true)
+                .withDetail("integer", 1)
+                .withDetail("long", 2L)
+                .withDetail("float", 3.546F)
+                .withDetail("double", 4.567D)
+                .withDetail("BigInteger", new BigInteger("12345"))
+                .withDetail("BigDecimal", new BigDecimal("12345.56789"))
+                .withDetail("String", "string")
+                .withDetail("complex", complex)
+                .build();
 
         assertThat(mapper.writeValueAsString(result))
-            .isEqualTo("{" +
-                "\"healthy\":true," +
-                "\"boolean\":true," +
-                "\"integer\":1," +
-                "\"long\":2," +
-                "\"float\":3.546," +
-                "\"double\":4.567," +
-                "\"BigInteger\":12345," +
-                "\"BigDecimal\":12345.56789," +
-                "\"String\":\"string\"," +
-                "\"complex\":{" +
-                    "\"field\":\"value\"" +
-                "}" +
-            "}");
+                .isEqualTo("{" +
+                        "\"healthy\":true," +
+                        "\"boolean\":true," +
+                        "\"integer\":1," +
+                        "\"long\":2," +
+                        "\"float\":3.546," +
+                        "\"double\":4.567," +
+                        "\"BigInteger\":12345," +
+                        "\"BigDecimal\":12345.56789," +
+                        "\"String\":\"string\"," +
+                        "\"complex\":{" +
+                        "\"field\":\"value\"" +
+                        "}" +
+                        "}");
     }
 }

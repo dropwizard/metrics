@@ -25,8 +25,8 @@ public class MemoryUsageGaugeSetTest {
     private final MemoryPoolMXBean weirdMemoryPool = mock(MemoryPoolMXBean.class);
 
     private final MemoryUsageGaugeSet gauges = new MemoryUsageGaugeSet(mxBean,
-                                                                       Arrays.asList(memoryPool,
-                                                                                     weirdMemoryPool));
+            Arrays.asList(memoryPool,
+                    weirdMemoryPool));
 
     @Before
     public void setUp() throws Exception {

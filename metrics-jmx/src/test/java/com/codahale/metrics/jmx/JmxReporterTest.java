@@ -31,12 +31,12 @@ public class JmxReporterTest {
     private final MetricRegistry registry = new MetricRegistry();
 
     private final JmxReporter reporter = JmxReporter.forRegistry(registry)
-                                                    .registerWith(mBeanServer)
-                                                    .inDomain(name)
-                                                    .convertDurationsTo(TimeUnit.MILLISECONDS)
-                                                    .convertRatesTo(TimeUnit.SECONDS)
-                                                    .filter(MetricFilter.ALL)
-                                                    .build();
+            .registerWith(mBeanServer)
+            .inDomain(name)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .convertRatesTo(TimeUnit.SECONDS)
+            .filter(MetricFilter.ALL)
+            .build();
 
     private final Gauge gauge = mock(Gauge.class);
     private final Counter counter = mock(Counter.class);
@@ -112,30 +112,30 @@ public class JmxReporterTest {
 
     @Test
     public void registersMBeansForMetricObjectsUsingProvidedObjectNameFactory() throws Exception {
-    	ObjectName n = new ObjectName(name + ":name=dummy");
-    	try {
-    		String widgetName = "something";
-    		when(mockObjectNameFactory.createName(any(String.class), any(String.class), any(String.class))).thenReturn(n);
-    		Gauge aGauge = mock(Gauge.class);
+        ObjectName n = new ObjectName(name + ":name=dummy");
+        try {
+            String widgetName = "something";
+            when(mockObjectNameFactory.createName(any(String.class), any(String.class), any(String.class))).thenReturn(n);
+            Gauge aGauge = mock(Gauge.class);
             when(aGauge.getValue()).thenReturn(1);
 
-    		JmxReporter reporter = JmxReporter.forRegistry(registry)
-	                .registerWith(mBeanServer)
-	                .inDomain(name)
-	                .createsObjectNamesWith(mockObjectNameFactory)
-	                .build();
-	        registry.register(widgetName, aGauge);
-	        reporter.start();
-	        verify(mockObjectNameFactory).createName(eq("gauges"), any(String.class), eq("something"));
-	        //verifyNoMoreInteractions(mockObjectNameFactory);
-    	} finally {
-    		reporter.stop();
-    		if(mBeanServer.isRegistered(n)) {
-    			mBeanServer.unregisterMBean(n);
-    		}
-    	}
+            JmxReporter reporter = JmxReporter.forRegistry(registry)
+                    .registerWith(mBeanServer)
+                    .inDomain(name)
+                    .createsObjectNamesWith(mockObjectNameFactory)
+                    .build();
+            registry.register(widgetName, aGauge);
+            reporter.start();
+            verify(mockObjectNameFactory).createName(eq("gauges"), any(String.class), eq("something"));
+            //verifyNoMoreInteractions(mockObjectNameFactory);
+        } finally {
+            reporter.stop();
+            if (mBeanServer.isRegistered(n)) {
+                mBeanServer.unregisterMBean(n);
+            }
+        }
     }
-    
+
     @Test
     public void registersMBeansForGauges() throws Exception {
         final AttributeList attributes = getAttributes("gauge", "Value");
@@ -155,18 +155,18 @@ public class JmxReporterTest {
     @Test
     public void registersMBeansForHistograms() throws Exception {
         final AttributeList attributes = getAttributes("test.histogram",
-                                                       "Count",
-                                                       "Max",
-                                                       "Mean",
-                                                       "Min",
-                                                       "StdDev",
-                                                       "50thPercentile",
-                                                       "75thPercentile",
-                                                       "95thPercentile",
-                                                       "98thPercentile",
-                                                       "99thPercentile",
-                                                       "999thPercentile",
-                                                       "SnapshotSize");
+                "Count",
+                "Max",
+                "Mean",
+                "Min",
+                "StdDev",
+                "50thPercentile",
+                "75thPercentile",
+                "95thPercentile",
+                "98thPercentile",
+                "99thPercentile",
+                "999thPercentile",
+                "SnapshotSize");
 
         assertThat(values(attributes))
                 .contains(entry("Count", 1L))
@@ -187,12 +187,12 @@ public class JmxReporterTest {
     @Test
     public void registersMBeansForMeters() throws Exception {
         final AttributeList attributes = getAttributes("test.meter",
-                                                       "Count",
-                                                       "MeanRate",
-                                                       "OneMinuteRate",
-                                                       "FiveMinuteRate",
-                                                       "FifteenMinuteRate",
-                                                       "RateUnit");
+                "Count",
+                "MeanRate",
+                "OneMinuteRate",
+                "FiveMinuteRate",
+                "FifteenMinuteRate",
+                "RateUnit");
 
         assertThat(values(attributes))
                 .contains(entry("Count", 1L))
@@ -206,23 +206,23 @@ public class JmxReporterTest {
     @Test
     public void registersMBeansForTimers() throws Exception {
         final AttributeList attributes = getAttributes("test.another.timer",
-                                                       "Count",
-                                                       "MeanRate",
-                                                       "OneMinuteRate",
-                                                       "FiveMinuteRate",
-                                                       "FifteenMinuteRate",
-                                                       "Max",
-                                                       "Mean",
-                                                       "Min",
-                                                       "StdDev",
-                                                       "50thPercentile",
-                                                       "75thPercentile",
-                                                       "95thPercentile",
-                                                       "98thPercentile",
-                                                       "99thPercentile",
-                                                       "999thPercentile",
-                                                       "RateUnit",
-                                                       "DurationUnit");
+                "Count",
+                "MeanRate",
+                "OneMinuteRate",
+                "FiveMinuteRate",
+                "FifteenMinuteRate",
+                "Max",
+                "Mean",
+                "Min",
+                "StdDev",
+                "50thPercentile",
+                "75thPercentile",
+                "95thPercentile",
+                "98thPercentile",
+                "99thPercentile",
+                "999thPercentile",
+                "RateUnit",
+                "DurationUnit");
 
         assertThat(values(attributes))
                 .contains(entry("Count", 1L))
@@ -255,30 +255,30 @@ public class JmxReporterTest {
 
         }
     }
-    
+
     @Test
     public void objectNameModifyingMBeanServer() throws Exception {
-    	MBeanServer mockedMBeanServer = mock(MBeanServer.class);
-    	
-    	// overwrite the objectName
-    	when(mockedMBeanServer.registerMBean(any(Object.class), any(ObjectName.class))).thenReturn(new ObjectInstance("DOMAIN:key=value","className"));
-    	
-    	MetricRegistry testRegistry = new MetricRegistry();
-    	JmxReporter testJmxReporter = JmxReporter.forRegistry(testRegistry)
+        MBeanServer mockedMBeanServer = mock(MBeanServer.class);
+
+        // overwrite the objectName
+        when(mockedMBeanServer.registerMBean(any(Object.class), any(ObjectName.class))).thenReturn(new ObjectInstance("DOMAIN:key=value", "className"));
+
+        MetricRegistry testRegistry = new MetricRegistry();
+        JmxReporter testJmxReporter = JmxReporter.forRegistry(testRegistry)
                 .registerWith(mockedMBeanServer)
                 .inDomain(name)
                 .build();
-    	
-    	testJmxReporter.start();
-    
-    	// should trigger a registerMBean
-    	testRegistry.timer("test");
-    	
-    	// should trigger an unregisterMBean with the overwritten objectName = "DOMAIN:key=value"
-    	testJmxReporter.stop();
-    	
-    	verify(mockedMBeanServer).unregisterMBean(new ObjectName("DOMAIN:key=value"));
-    	
+
+        testJmxReporter.start();
+
+        // should trigger a registerMBean
+        testRegistry.timer("test");
+
+        // should trigger an unregisterMBean with the overwritten objectName = "DOMAIN:key=value"
+        testJmxReporter.stop();
+
+        verify(mockedMBeanServer).unregisterMBean(new ObjectName("DOMAIN:key=value"));
+
     }
 
     @Test
@@ -289,7 +289,7 @@ public class JmxReporterTest {
     }
 
     private AttributeList getAttributes(String name, String... attributeNames) throws JMException {
-    	ObjectName n = concreteObjectNameFactory.createName("only-for-logging-error", this.name, name);
+        ObjectName n = concreteObjectNameFactory.createName("only-for-logging-error", this.name, name);
         return mBeanServer.getAttributes(n, attributeNames);
     }
 

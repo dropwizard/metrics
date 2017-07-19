@@ -21,7 +21,7 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
     protected void setUp(ServletTester tester) {
         tester.setAttribute("com.codahale.metrics.servlets.MetricsServlet.registry", registry);
         tester.addServlet(MetricsServlet.class, "/metrics");
-        tester.getContext().addEventListener(new MetricsServlet.ContextListener(){
+        tester.getContext().addEventListener(new MetricsServlet.ContextListener() {
             @Override
             protected MetricRegistry getMetricRegistry() {
                 return registry;

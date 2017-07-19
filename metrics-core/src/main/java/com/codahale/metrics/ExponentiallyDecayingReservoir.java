@@ -19,7 +19,7 @@ import com.codahale.metrics.WeightedSnapshot.WeightedSample;
  *
  * @see <a href="http://dimacs.rutgers.edu/~graham/pubs/papers/fwddecay.pdf">
  * Cormode et al. Forward Decay: A Practical Time Decay Model for Streaming Systems. ICDE '09:
- *      Proceedings of the 2009 IEEE International Conference on Data Engineering (2009)</a>
+ * Proceedings of the 2009 IEEE International Conference on Data Engineering (2009)</a>
  */
 public class ExponentiallyDecayingReservoir implements Reservoir {
     private static final int DEFAULT_SIZE = 1028;
@@ -97,7 +97,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
             final double itemWeight = weight(timestamp - startTime);
             final WeightedSample sample = new WeightedSample(value, itemWeight);
             final double priority = itemWeight / ThreadLocalRandom.current().nextDouble();
-            
+
             final long newCount = count.incrementAndGet();
             if (newCount <= size) {
                 values.put(priority, sample);

@@ -12,11 +12,11 @@ public class ManualClock extends Clock {
     public synchronized void addSeconds(long seconds) {
         ticksInNanos += TimeUnit.SECONDS.toNanos(seconds);
     }
-    
+
     public synchronized void addMillis(long millis) {
         ticksInNanos += TimeUnit.MILLISECONDS.toNanos(millis);
     }
-    
+
     public synchronized void addHours(long hours) {
         ticksInNanos += TimeUnit.HOURS.toNanos(hours);
     }
@@ -30,5 +30,5 @@ public class ManualClock extends Clock {
     public synchronized long getTime() {
         return TimeUnit.NANOSECONDS.toMillis(ticksInNanos);
     }
-    
+
 }

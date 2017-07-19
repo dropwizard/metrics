@@ -30,11 +30,11 @@ public class InstrumentedAppender extends UnsynchronizedAppenderBase<ILoggingEve
 
     /**
      * Create a new instrumented appender using the given registry name.
-     *
      */
     public InstrumentedAppender() {
-      this(System.getProperty(REGISTRY_PROPERTY_NAME, DEFAULT_REGISTRY));
+        this(System.getProperty(REGISTRY_PROPERTY_NAME, DEFAULT_REGISTRY));
     }
+
     /**
      * Create a new instrumented appender using the given registry name.
      *

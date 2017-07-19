@@ -43,7 +43,7 @@ public class ScheduledReporterTest {
     );
     private final ScheduledReporter reporterWithCustomExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor);
     private final ScheduledReporter reporterWithExternallyManagedExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor, false);
-    private final ScheduledReporter[] reporters = new ScheduledReporter[] {reporter, reporterWithCustomExecutor, reporterWithExternallyManagedExecutor};
+    private final ScheduledReporter[] reporters = new ScheduledReporter[]{reporter, reporterWithCustomExecutor, reporterWithExternallyManagedExecutor};
 
     @Before
     @SuppressWarnings("unchecked")
@@ -83,7 +83,7 @@ public class ScheduledReporterTest {
         reporterWithCustomExecutor.start(200, TimeUnit.MILLISECONDS);
 
         verify(executor, times(1)).scheduleAtFixedRate(
-            any(Runnable.class), eq(200L), eq(200L), eq(TimeUnit.MILLISECONDS)
+                any(Runnable.class), eq(200L), eq(200L), eq(TimeUnit.MILLISECONDS)
         );
     }
 
@@ -92,7 +92,7 @@ public class ScheduledReporterTest {
         reporterWithCustomExecutor.start(350, 100, TimeUnit.MILLISECONDS);
 
         verify(executor).scheduleAtFixedRate(
-            any(Runnable.class), eq(350L), eq(100L), eq(TimeUnit.MILLISECONDS)
+                any(Runnable.class), eq(350L), eq(100L), eq(TimeUnit.MILLISECONDS)
         );
     }
 

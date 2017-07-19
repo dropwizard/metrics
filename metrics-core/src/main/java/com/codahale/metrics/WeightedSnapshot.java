@@ -13,7 +13,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * A statistical snapshot of a {@link WeightedSnapshot}.
  */
 public class WeightedSnapshot extends Snapshot {
-    
+
     /**
      * A single sample item with value and its weights for {@link WeightedSnapshot}.
      */
@@ -34,17 +34,17 @@ public class WeightedSnapshot extends Snapshot {
     /**
      * Create a new {@link Snapshot} with the given values.
      *
-     * @param values    an unordered set of values in the reservoir
+     * @param values an unordered set of values in the reservoir
      */
     public WeightedSnapshot(Collection<WeightedSample> values) {
-        final WeightedSample[] copy = values.toArray( new WeightedSample[]{} );
+        final WeightedSample[] copy = values.toArray(new WeightedSample[]{});
 
         Arrays.sort(copy, Comparator.comparing(w -> w.value));
 
         this.values = new long[copy.length];
         this.normWeights = new double[copy.length];
         this.quantiles = new double[copy.length];
-        
+
         double sumWeight = 0;
         for (WeightedSample sample : copy) {
             sumWeight += sample.weight;
@@ -63,12 +63,12 @@ public class WeightedSnapshot extends Snapshot {
     /**
      * Returns the value at the given quantile.
      *
-     * @param quantile    a given quantile, in {@code [0..1]}
+     * @param quantile a given quantile, in {@code [0..1]}
      * @return the value in the distribution at {@code quantile}
      */
     @Override
     public double getValue(double quantile) {
-        if (quantile < 0.0 || quantile > 1.0 || Double.isNaN( quantile )) {
+        if (quantile < 0.0 || quantile > 1.0 || Double.isNaN(quantile)) {
             throw new IllegalArgumentException(quantile + " is not in [0..1]");
         }
 
@@ -173,7 +173,7 @@ public class WeightedSnapshot extends Snapshot {
 
         for (int i = 0; i < values.length; i++) {
             final double diff = values[i] - mean;
-            variance += normWeights[i] * diff*diff;
+            variance += normWeights[i] * diff * diff;
         }
 
         return Math.sqrt(variance);

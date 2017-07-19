@@ -58,26 +58,20 @@ public abstract class AbstractInstrumentedFilter implements Filter {
         final MetricRegistry metricsRegistry = getMetricsFactory(filterConfig);
 
         String metricName = filterConfig.getInitParameter(METRIC_PREFIX);
-        if(metricName == null || metricName.isEmpty()) {
+        if (metricName == null || metricName.isEmpty()) {
             metricName = getClass().getName();
         }
 
-        this.metersByStatusCode = new ConcurrentHashMap<>(meterNamesByStatusCode
-                .size());
+        this.metersByStatusCode = new ConcurrentHashMap<>(meterNamesByStatusCode.size());
         for (Entry<Integer, String> entry : meterNamesByStatusCode.entrySet()) {
             metersByStatusCode.put(entry.getKey(),
                     metricsRegistry.meter(name(metricName, entry.getValue())));
         }
-        this.otherMeter = metricsRegistry.meter(name(metricName,
-                                                     otherMetricName));
-        this.timeoutsMeter = metricsRegistry.meter(name(metricName,
-                                                        "timeouts"));
-        this.errorsMeter = metricsRegistry.meter(name(metricName,
-                                                      "errors"));
-        this.activeRequests = metricsRegistry.counter(name(metricName,
-                                                           "activeRequests"));
-        this.requestTimer = metricsRegistry.timer(name(metricName,
-                                                       "requests"));
+        this.otherMeter = metricsRegistry.meter(name(metricName, otherMetricName));
+        this.timeoutsMeter = metricsRegistry.meter(name(metricName, "timeouts"));
+        this.errorsMeter = metricsRegistry.meter(name(metricName, "errors"));
+        this.activeRequests = metricsRegistry.counter(name(metricName, "activeRequests"));
+        this.requestTimer = metricsRegistry.timer(name(metricName, "requests"));
 
     }
 
@@ -95,7 +89,7 @@ public abstract class AbstractInstrumentedFilter implements Filter {
 
     @Override
     public void destroy() {
-        
+
     }
 
     @Override

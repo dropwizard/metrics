@@ -4,8 +4,10 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.httpclient.HttpClientMetricNameStrategies;
 import com.codahale.metrics.httpclient.HttpClientMetricNameStrategy;
+
 import java.io.IOException;
 import java.util.concurrent.Future;
+
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.concurrent.FutureCallback;
@@ -92,7 +94,7 @@ public class InstrumentedNHttpClientBuilder extends HttpAsyncClientBuilder {
         @Override
         public void completed(T result) {
             timerContext.stop();
-            if(callback != null) {
+            if (callback != null) {
                 callback.completed(result);
             }
         }
@@ -100,7 +102,7 @@ public class InstrumentedNHttpClientBuilder extends HttpAsyncClientBuilder {
         @Override
         public void failed(Exception ex) {
             timerContext.stop();
-            if(callback != null) {
+            if (callback != null) {
                 callback.failed(ex);
             }
         }
@@ -108,7 +110,7 @@ public class InstrumentedNHttpClientBuilder extends HttpAsyncClientBuilder {
         @Override
         public void cancelled() {
             timerContext.stop();
-            if(callback != null) {
+            if (callback != null) {
                 callback.cancelled();
             }
         }

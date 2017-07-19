@@ -19,7 +19,7 @@ public class UniformSnapshot extends Snapshot {
     /**
      * Create a new {@link Snapshot} with the given values.
      *
-     * @param values    an unordered set of values in the reservoir
+     * @param values an unordered set of values in the reservoir
      */
     public UniformSnapshot(Collection<Long> values) {
         final Object[] copy = values.toArray();
@@ -33,7 +33,7 @@ public class UniformSnapshot extends Snapshot {
     /**
      * Create a new {@link Snapshot} with the given values.
      *
-     * @param values    an unordered set of values in the reservoir that can be used by this class directly
+     * @param values an unordered set of values in the reservoir that can be used by this class directly
      */
     public UniformSnapshot(long[] values) {
         this.values = Arrays.copyOf(values, values.length);
@@ -43,12 +43,12 @@ public class UniformSnapshot extends Snapshot {
     /**
      * Returns the value at the given quantile.
      *
-     * @param quantile    a given quantile, in {@code [0..1]}
+     * @param quantile a given quantile, in {@code [0..1]}
      * @return the value in the distribution at {@code quantile}
      */
     @Override
     public double getValue(double quantile) {
-        if (quantile < 0.0 || quantile > 1.0 || Double.isNaN( quantile )) {
+        if (quantile < 0.0 || quantile > 1.0 || Double.isNaN(quantile)) {
             throw new IllegalArgumentException(quantile + " is not in [0..1]");
         }
 

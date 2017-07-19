@@ -26,7 +26,7 @@ public class SlidingTimeWindowArrayReservoirTest {
         reservoir.update(2);
 
         assertThat(reservoir.getSnapshot().getValues())
-            .containsOnly(1, 2);
+                .containsOnly(1, 2);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class SlidingTimeWindowArrayReservoirTest {
         reservoir.update(5);
 
         assertThat(reservoir.getSnapshot().getValues())
-            .containsOnly(4, 5);
+                .containsOnly(4, 5);
     }
 
     @Test
@@ -111,8 +111,8 @@ public class SlidingTimeWindowArrayReservoirTest {
                     // Randomly check the reservoir size
                     if (random.nextDouble() < 0.1) {
                         assertThat(reservoir.size())
-                            .as("Bad reservoir size with: threshold=%d, updatesPerTick=%d", threshold, updatesPerTick)
-                            .isLessThanOrEqualTo(window * 256);
+                                .as("Bad reservoir size with: threshold=%d, updatesPerTick=%d", threshold, updatesPerTick)
+                                .isLessThanOrEqualTo(window * 256);
                     }
 
                     // Update the clock
@@ -128,8 +128,8 @@ public class SlidingTimeWindowArrayReservoirTest {
 
                 // Check the final reservoir size
                 assertThat(reservoir.size())
-                    .as("Bad final reservoir size with: threshold=%d, updatesPerTick=%d", threshold, updatesPerTick)
-                    .isLessThanOrEqualTo(window * 256);
+                        .as("Bad final reservoir size with: threshold=%d, updatesPerTick=%d", threshold, updatesPerTick)
+                        .isLessThanOrEqualTo(window * 256);
 
                 // Advance the clock far enough to clear the reservoir.  Note that here the window only loosely defines
                 // the reservoir window; when updatesPerTick is greater than 128 the sliding window will always be well
@@ -142,8 +142,8 @@ public class SlidingTimeWindowArrayReservoirTest {
 
                 // The reservoir should now be empty
                 assertThat(reservoir.size())
-                    .as("Bad reservoir size after delay with: threshold=%d, updatesPerTick=%d", threshold, updatesPerTick)
-                    .isEqualTo(0);
+                        .as("Bad reservoir size after delay with: threshold=%d, updatesPerTick=%d", threshold, updatesPerTick)
+                        .isEqualTo(0);
             }
         }
     }

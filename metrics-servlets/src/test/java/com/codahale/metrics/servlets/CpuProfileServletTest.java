@@ -1,6 +1,7 @@
 package com.codahale.metrics.servlets;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Before;

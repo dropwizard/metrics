@@ -113,41 +113,41 @@ public class HealthCheckTest {
     @Test
     public void canHaveHealthyBuilderWithDetail() throws Exception {
         final HealthCheck.Result result = HealthCheck.Result.builder()
-            .healthy()
-            .withDetail("detail", "value")
-            .build();
+                .healthy()
+                .withDetail("detail", "value")
+                .build();
 
         assertThat(result.isHealthy())
-            .isTrue();
+                .isTrue();
 
         assertThat(result.getMessage())
-            .isNull();
+                .isNull();
 
         assertThat(result.getError())
-            .isNull();
+                .isNull();
 
         assertThat(result.getDetails())
-            .containsEntry("detail", "value");
+                .containsEntry("detail", "value");
     }
 
     @Test
     public void canHaveUnHealthyBuilderWithDetail() throws Exception {
         final HealthCheck.Result result = HealthCheck.Result.builder()
-            .unhealthy()
-            .withDetail("detail", "value")
-            .build();
+                .unhealthy()
+                .withDetail("detail", "value")
+                .build();
 
         assertThat(result.isHealthy())
-            .isFalse();
+                .isFalse();
 
         assertThat(result.getMessage())
-            .isNull();
+                .isNull();
 
         assertThat(result.getError())
-            .isNull();
+                .isNull();
 
         assertThat(result.getDetails())
-            .containsEntry("detail", "value");
+                .containsEntry("detail", "value");
     }
 
     @Test
@@ -156,22 +156,22 @@ public class HealthCheckTest {
         when(e.getMessage()).thenReturn("oh noes");
 
         final HealthCheck.Result result = HealthCheck.Result
-            .builder()
-            .unhealthy(e)
-            .withDetail("detail", "value")
-            .build();
+                .builder()
+                .unhealthy(e)
+                .withDetail("detail", "value")
+                .build();
 
         assertThat(result.isHealthy())
-            .isFalse();
+                .isFalse();
 
         assertThat(result.getMessage())
-            .isEqualTo("oh noes");
+                .isEqualTo("oh noes");
 
         assertThat(result.getError())
-            .isEqualTo(e);
+                .isEqualTo(e);
 
         assertThat(result.getDetails())
-            .containsEntry("detail", "value");
+                .containsEntry("detail", "value");
     }
 
     @Test
@@ -204,12 +204,12 @@ public class HealthCheckTest {
     @Test
     public void toStringWorksEvenForNullAttributes() throws Exception {
         final HealthCheck.Result resultWithNullDetailValue = HealthCheck.Result.builder()
-           .unhealthy()
-           .withDetail("aNullDetail", null)
-           .build();
+                .unhealthy()
+                .withDetail("aNullDetail", null)
+                .build();
         assertThat(resultWithNullDetailValue.toString())
-           .contains(
-              "Result{isHealthy=false, timestamp=", // Skip the timestamp part of the String.
-              ", aNullDetail=null}");
+                .contains(
+                        "Result{isHealthy=false, timestamp=", // Skip the timestamp part of the String.
+                        ", aNullDetail=null}");
     }
 }

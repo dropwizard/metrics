@@ -64,7 +64,7 @@ public class JmxReporter implements Reporter, Closeable {
         /**
          * Register MBeans with the given {@link MBeanServer}.
          *
-         * @param mBeanServer     an {@link MBeanServer}
+         * @param mBeanServer an {@link MBeanServer}
          * @return {@code this}
          */
         public Builder registerWith(MBeanServer mBeanServer) {
@@ -84,13 +84,13 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         public Builder createsObjectNamesWith(ObjectNameFactory onFactory) {
-        	if(onFactory == null) {
-        		throw new IllegalArgumentException("null objectNameFactory");
-        	}
-        	this.objectNameFactory = onFactory;
-        	return this;
+            if (onFactory == null) {
+                throw new IllegalArgumentException("null objectNameFactory");
+            }
+            this.objectNameFactory = onFactory;
+            return this;
         }
-        
+
         /**
          * Convert durations to the given time unit.
          *
@@ -148,8 +148,8 @@ public class JmxReporter implements Reporter, Closeable {
          */
         public JmxReporter build() {
             final MetricTimeUnits timeUnits = new MetricTimeUnits(rateUnit, durationUnit, specificRateUnits, specificDurationUnits);
-            if (mBeanServer==null) {
-            	mBeanServer = ManagementFactory.getPlatformMBeanServer();
+            if (mBeanServer == null) {
+                mBeanServer = ManagementFactory.getPlatformMBeanServer();
             }
             return new JmxReporter(mBeanServer, domain, registry, filter, timeUnits, objectNameFactory);
         }
@@ -526,7 +526,7 @@ public class JmxReporter implements Reporter, Closeable {
             }
         }
 
-            @Override
+        @Override
         public void onGaugeAdded(String name, Gauge<?> gauge) {
             try {
                 if (filter.matches(name, gauge)) {
@@ -706,7 +706,7 @@ public class JmxReporter implements Reporter, Closeable {
                         String domain,
                         MetricRegistry registry,
                         MetricFilter filter,
-                        MetricTimeUnits timeUnits, 
+                        MetricTimeUnits timeUnits,
                         ObjectNameFactory objectNameFactory) {
         this.registry = registry;
         this.listener = new JmxListener(mBeanServer, domain, filter, timeUnits, objectNameFactory);

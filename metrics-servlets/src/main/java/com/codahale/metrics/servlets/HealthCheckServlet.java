@@ -61,7 +61,7 @@ public class HealthCheckServlet extends HttpServlet {
     public HealthCheckServlet(HealthCheckRegistry registry) {
         this.registry = registry;
     }
-    
+
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);

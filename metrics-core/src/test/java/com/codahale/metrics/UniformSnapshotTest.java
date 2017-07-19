@@ -29,17 +29,17 @@ public class UniformSnapshotTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void disallowsNotANumberQuantile() {
-        snapshot.getValue( Double.NaN );
+        snapshot.getValue(Double.NaN);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void disallowsNegativeQuantile() {
-        snapshot.getValue( -0.5 );
+        snapshot.getValue(-0.5);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void disallowsQuantileOverOne() {
-       snapshot.getValue( 1.5 );
+        snapshot.getValue(1.5);
     }
 
     @Test
@@ -158,7 +158,7 @@ public class UniformSnapshotTest {
 
     @Test
     public void calculatesAMinOfZeroForAnEmptySnapshot() throws Exception {
-        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{ });
+        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{});
 
         assertThat(emptySnapshot.getMin())
                 .isZero();
@@ -166,7 +166,7 @@ public class UniformSnapshotTest {
 
     @Test
     public void calculatesAMaxOfZeroForAnEmptySnapshot() throws Exception {
-        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{ });
+        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{});
 
         assertThat(emptySnapshot.getMax())
                 .isZero();
@@ -174,7 +174,7 @@ public class UniformSnapshotTest {
 
     @Test
     public void calculatesAMeanOfZeroForAnEmptySnapshot() throws Exception {
-        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{ });
+        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{});
 
         assertThat(emptySnapshot.getMean())
                 .isZero();
@@ -182,7 +182,7 @@ public class UniformSnapshotTest {
 
     @Test
     public void calculatesAStdDevOfZeroForAnEmptySnapshot() throws Exception {
-        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{ });
+        final Snapshot emptySnapshot = new UniformSnapshot(new long[]{});
 
         assertThat(emptySnapshot.getStdDev())
                 .isZero();
@@ -190,7 +190,7 @@ public class UniformSnapshotTest {
 
     @Test
     public void calculatesAStdDevOfZeroForASingletonSnapshot() throws Exception {
-        final Snapshot singleItemSnapshot = new UniformSnapshot(new long[]{ 1 });
+        final Snapshot singleItemSnapshot = new UniformSnapshot(new long[]{1});
 
         assertThat(singleItemSnapshot.getStdDev())
                 .isZero();

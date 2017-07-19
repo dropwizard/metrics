@@ -174,16 +174,16 @@ public class ConsoleReporter extends ScheduledReporter {
          */
         public ConsoleReporter build() {
             return new ConsoleReporter(registry,
-                                       output,
-                                       locale,
-                                       clock,
-                                       timeZone,
-                                       rateUnit,
-                                       durationUnit,
-                                       filter,
-                                       executor,
-                                       shutdownExecutorOnStop,
-                                       disabledMetricAttributes);
+                    output,
+                    locale,
+                    clock,
+                    timeZone,
+                    rateUnit,
+                    durationUnit,
+                    filter,
+                    executor,
+                    shutdownExecutorOnStop,
+                    disabledMetricAttributes);
         }
     }
 
@@ -210,8 +210,8 @@ public class ConsoleReporter extends ScheduledReporter {
         this.locale = locale;
         this.clock = clock;
         this.dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT,
-                                                         DateFormat.MEDIUM,
-                                                         locale);
+                DateFormat.MEDIUM,
+                locale);
         dateFormat.setTimeZone(timeZone);
     }
 
@@ -337,11 +337,12 @@ public class ConsoleReporter extends ScheduledReporter {
 
     /**
      * Print only if the attribute is enabled
-     * @param type Metric attribute
+     *
+     * @param type   Metric attribute
      * @param status Status to be logged
      */
     private void printIfEnabled(MetricAttribute type, String status) {
-        if(getDisabledMetricAttributes().contains(type)) {
+        if (getDisabledMetricAttributes().contains(type)) {
             return;
         }
 

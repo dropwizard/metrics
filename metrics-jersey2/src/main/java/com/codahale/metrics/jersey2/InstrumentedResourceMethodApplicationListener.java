@@ -292,7 +292,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         }
 
         return name(name(method.getInvocable().getDefinitionMethod().getDeclaringClass(),
-                        method.getInvocable().getDefinitionMethod().getName()),
+                method.getInvocable().getDefinitionMethod().getName()),
                 suffixes);
     }
 }

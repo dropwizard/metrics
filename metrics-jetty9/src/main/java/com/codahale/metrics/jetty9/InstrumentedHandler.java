@@ -71,24 +71,22 @@ public class InstrumentedHandler extends HandlerWrapper {
     /**
      * Create a new instrumented handler using a given metrics registry.
      *
-     * @param registry   the registry for the metrics
-     *
+     * @param registry the registry for the metrics
      */
     public InstrumentedHandler(MetricRegistry registry) {
         this(registry, null);
     }
 
-	/**
-	 * Create a new instrumented handler using a given metrics registry.
-	 *
-	 * @param registry   the registry for the metrics
-	 * @param prefix     the prefix to use for the metrics names
-	 *
-	 */
-	public InstrumentedHandler(MetricRegistry registry, String prefix) {
-		this.metricRegistry = registry;
-		this.prefix = prefix;
-	}
+    /**
+     * Create a new instrumented handler using a given metrics registry.
+     *
+     * @param registry the registry for the metrics
+     * @param prefix   the prefix to use for the metrics names
+     */
+    public InstrumentedHandler(MetricRegistry registry, String prefix) {
+        this.metricRegistry = registry;
+        this.prefix = prefix;
+    }
 
     public String getName() {
         return name;

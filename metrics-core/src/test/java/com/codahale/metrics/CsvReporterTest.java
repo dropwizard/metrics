@@ -20,7 +20,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class CsvReporterTest {
-    @Rule public final TemporaryFolder folder = new TemporaryFolder();
+    @Rule
+    public final TemporaryFolder folder = new TemporaryFolder();
 
     private final MetricRegistry registry = mock(MetricRegistry.class);
     private final Clock clock = mock(Clock.class);
@@ -35,12 +36,12 @@ public class CsvReporterTest {
         this.dataDirectory = folder.newFolder();
 
         this.reporter = CsvReporter.forRegistry(registry)
-                                   .formatFor(Locale.US)
-                                   .convertRatesTo(TimeUnit.SECONDS)
-                                   .convertDurationsTo(TimeUnit.MILLISECONDS)
-                                   .withClock(clock)
-                                   .filter(MetricFilter.ALL)
-                                   .build(dataDirectory);
+                .formatFor(Locale.US)
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .withClock(clock)
+                .filter(MetricFilter.ALL)
+                .build(dataDirectory);
     }
 
     @Test
@@ -48,10 +49,10 @@ public class CsvReporterTest {
         final Gauge<Integer> gauge = () -> 1;
 
         reporter.report(map("gauge", gauge),
-                        map(),
-                        map(),
-                        map(),
-                        map());
+                map(),
+                map(),
+                map(),
+                map());
 
         assertThat(fileContents("gauge.csv"))
                 .isEqualTo(csv(
@@ -66,10 +67,10 @@ public class CsvReporterTest {
         when(counter.getCount()).thenReturn(100L);
 
         reporter.report(map(),
-                        map("test.counter", counter),
-                        map(),
-                        map(),
-                        map());
+                map("test.counter", counter),
+                map(),
+                map(),
+                map());
 
         assertThat(fileContents("test.counter.csv"))
                 .isEqualTo(csv(
@@ -98,10 +99,10 @@ public class CsvReporterTest {
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
         reporter.report(map(),
-                        map(),
-                        map("test.histogram", histogram),
-                        map(),
-                        map());
+                map(),
+                map("test.histogram", histogram),
+                map(),
+                map());
 
         assertThat(fileContents("test.histogram.csv"))
                 .isEqualTo(csv(
@@ -120,10 +121,10 @@ public class CsvReporterTest {
         when(meter.getFifteenMinuteRate()).thenReturn(5.0);
 
         reporter.report(map(),
-                        map(),
-                        map(),
-                        map("test.meter", meter),
-                        map());
+                map(),
+                map(),
+                map("test.meter", meter),
+                map());
 
         assertThat(fileContents("test.meter.csv"))
                 .isEqualTo(csv(
@@ -156,10 +157,10 @@ public class CsvReporterTest {
         when(timer.getSnapshot()).thenReturn(snapshot);
 
         reporter.report(map(),
-                        map(),
-                        map(),
-                        map(),
-                        map("test.another.timer", timer));
+                map(),
+                map(),
+                map(),
+                map("test.another.timer", timer));
 
         assertThat(fileContents("test.another.timer.csv"))
                 .isEqualTo(csv(

@@ -11,10 +11,10 @@ package com.codahale.metrics.jdbi.strategies;
 public class SmartNameStrategy extends DelegatingStatementNameStrategy {
     public SmartNameStrategy() {
         super(NameStrategies.CHECK_EMPTY,
-              NameStrategies.CONTEXT_CLASS,
-              NameStrategies.CONTEXT_NAME,
-              NameStrategies.SQL_OBJECT,
-              NameStrategies.CHECK_RAW,
-              NameStrategies.NAIVE_NAME);
+                NameStrategies.CONTEXT_CLASS,
+                NameStrategies.CONTEXT_NAME,
+                NameStrategies.SQL_OBJECT,
+                NameStrategies.CHECK_RAW,
+                NameStrategies.NAIVE_NAME);
     }
 }

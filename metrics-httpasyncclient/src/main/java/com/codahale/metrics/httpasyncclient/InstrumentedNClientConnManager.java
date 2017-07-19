@@ -2,8 +2,11 @@ package com.codahale.metrics.httpasyncclient;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
+
 import static com.codahale.metrics.MetricRegistry.name;
+
 import java.util.concurrent.TimeUnit;
+
 import org.apache.http.config.Registry;
 import org.apache.http.conn.DnsResolver;
 import org.apache.http.conn.SchemePortResolver;

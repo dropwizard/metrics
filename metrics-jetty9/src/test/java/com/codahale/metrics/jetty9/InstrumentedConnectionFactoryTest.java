@@ -27,7 +27,7 @@ public class InstrumentedConnectionFactoryTest {
     private final Server server = new Server();
     private final ServerConnector connector =
             new ServerConnector(server, new InstrumentedConnectionFactory(new HttpConnectionFactory(),
-                                                                          registry.timer("http.connections")));
+                    registry.timer("http.connections")));
     private final HttpClient client = new HttpClient();
 
     @Before

@@ -13,25 +13,25 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @JCStressTest
 @Outcome(
-    id = "\\[240, 241, 242, 243, 244, 245, 246, 247, 248, 249\\]",
-    expect = Expect.ACCEPTABLE,
-    desc = "Actor1 made read before Actor2 even started"
+        id = "\\[240, 241, 242, 243, 244, 245, 246, 247, 248, 249\\]",
+        expect = Expect.ACCEPTABLE,
+        desc = "Actor1 made read before Actor2 even started"
 )
 @Outcome(
-    id = "\\[243, 244, 245, 246, 247, 248, 249\\]",
-    expect = Expect.ACCEPTABLE,
-    desc = "Actor2 made trim before Actor1 even started"
+        id = "\\[243, 244, 245, 246, 247, 248, 249\\]",
+        expect = Expect.ACCEPTABLE,
+        desc = "Actor2 made trim before Actor1 even started"
 )
 @Outcome(
-    id = "\\[244, 245, 246, 247, 248, 249\\]",
-    expect = Expect.ACCEPTABLE,
-    desc = "Actor1 made trim, then Actor2 started trim and made startIndex change, " +
-        "before Actor1 concurrent read."
+        id = "\\[244, 245, 246, 247, 248, 249\\]",
+        expect = Expect.ACCEPTABLE,
+        desc = "Actor1 made trim, then Actor2 started trim and made startIndex change, " +
+                "before Actor1 concurrent read."
 )
 @Outcome(
-    id = "\\[243, 244, 245, 246, 247, 248\\]",
-    expect = Expect.ACCEPTABLE,
-    desc = "Actor1 made trim, then Actor2 started trim, but not finished startIndex change, before Actor1 concurrent read."
+        id = "\\[243, 244, 245, 246, 247, 248\\]",
+        expect = Expect.ACCEPTABLE,
+        desc = "Actor1 made trim, then Actor2 started trim, but not finished startIndex change, before Actor1 concurrent read."
 )
 @State
 public class SlidingTimeWindowArrayReservoirTrimReadTest {

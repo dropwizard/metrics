@@ -44,20 +44,20 @@ public class ThreadDeadlockDetectorTest {
                 new StackTraceElement("Blah", "bloo", "Blah.java", 150)
         });
 
-        final long[] ids = { 1, 2 };
+        final long[] ids = {1, 2};
         when(threads.findDeadlockedThreads()).thenReturn(ids);
         when(threads.getThreadInfo(eq(ids), anyInt()))
-                .thenReturn(new ThreadInfo[]{ thread1, thread2 });
+                .thenReturn(new ThreadInfo[]{thread1, thread2});
 
         assertThat(detector.getDeadlockedThreads())
                 .containsOnly(String.format(Locale.US,
-                                            "thread1 locked on lock2 (owned by thread2):%n" +
-                                                    "\t at Blah.bloo(Blah.java:150)%n" +
-                                                    "\t at Blah.blee(Blah.java:100)%n"),
-                              String.format(Locale.US,
-                                            "thread2 locked on lock1 (owned by thread1):%n" +
-                                                    "\t at Blah.blee(Blah.java:100)%n" +
-                                                    "\t at Blah.bloo(Blah.java:150)%n"));
+                        "thread1 locked on lock2 (owned by thread2):%n" +
+                                "\t at Blah.bloo(Blah.java:150)%n" +
+                                "\t at Blah.blee(Blah.java:100)%n"),
+                        String.format(Locale.US,
+                                "thread2 locked on lock1 (owned by thread1):%n" +
+                                        "\t at Blah.blee(Blah.java:100)%n" +
+                                        "\t at Blah.bloo(Blah.java:150)%n"));
     }
 
     @Test
