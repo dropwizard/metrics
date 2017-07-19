@@ -238,7 +238,7 @@ public class MetricsModule extends Module {
 
     @Override
     public void setupModule(SetupContext context) {
-        context.addSerializers(new SimpleSerializers(Arrays.<JsonSerializer<?>>asList(
+        context.addSerializers(new SimpleSerializers(Arrays.asList(
                 new GaugeSerializer(),
                 new CounterSerializer(),
                 new HistogramSerializer(showSamples),

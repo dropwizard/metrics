@@ -121,8 +121,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 TimeUnit durationUnit,
                                 ScheduledExecutorService executor,
                                 boolean shutdownExecutorOnStop) {
-       this(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
-               Collections.<MetricAttribute>emptySet());
+       this(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, Collections.emptySet());
     }
 
     protected ScheduledReporter(MetricRegistry registry,
@@ -142,7 +141,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
         this.durationFactor = durationUnit.toNanos(1);
         this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
         this.disabledMetricAttributes = disabledMetricAttributes != null ? disabledMetricAttributes :
-                Collections.<MetricAttribute>emptySet();
+                Collections.emptySet();
     }
 
     /**

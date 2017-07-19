@@ -18,7 +18,7 @@ public class ThreadDeadlockHealthCheckTest {
         final ThreadDeadlockDetector detector = mock(ThreadDeadlockDetector.class);
         final ThreadDeadlockHealthCheck healthCheck = new ThreadDeadlockHealthCheck(detector);
 
-        when(detector.getDeadlockedThreads()).thenReturn(Collections.<String>emptySet());
+        when(detector.getDeadlockedThreads()).thenReturn(Collections.emptySet());
 
         assertThat(healthCheck.execute().isHealthy())
                 .isTrue();
