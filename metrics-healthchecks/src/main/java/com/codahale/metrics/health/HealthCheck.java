@@ -196,10 +196,8 @@ public abstract class HealthCheck {
             }
             builder.append(", timestamp=").append(timestamp);
             if (details != null) {
-                Iterator<Map.Entry<String, Object>> it = details.entrySet().iterator();
-                while (it.hasNext()) {
+                for (Map.Entry<String, Object> e : details.entrySet()) {
                     builder.append(", ");
-                    Map.Entry<String, Object> e = it.next();
                     builder.append(e.getKey())
                             .append("=")
                             .append(String.valueOf(e.getValue()));
