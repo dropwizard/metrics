@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class DelegatingStatementNameStrategy implements StatementNameStrategy {
-    private final List<StatementNameStrategy> strategies = new ArrayList<StatementNameStrategy>();
+    private final List<StatementNameStrategy> strategies = new ArrayList<>();
 
     protected DelegatingStatementNameStrategy(StatementNameStrategy... strategies) {
         registerStrategies(strategies);

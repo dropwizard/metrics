@@ -96,7 +96,7 @@ public class UniformSnapshotTest {
 
     @Test
     public void correctlyCreatedFromCollectionWithWeakIterator() throws Exception {
-        final ConcurrentSkipListSet<Long> values = new ConcurrentSkipListSet<Long>();
+        final ConcurrentSkipListSet<Long> values = new ConcurrentSkipListSet<>();
 
         // Create a latch to make sure that the background thread has started and
         // pushed some data to the collection.

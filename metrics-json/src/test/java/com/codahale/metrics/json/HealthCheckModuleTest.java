@@ -89,7 +89,7 @@ public class HealthCheckModuleTest {
 
     @Test
     public void serializeResultWithDetail() throws Exception {
-        Map<String, Object> complex = new LinkedHashMap<String, Object>();
+        Map<String, Object> complex = new LinkedHashMap<>();
         complex.put("field", "value");
 
         HealthCheck.Result result = HealthCheck.Result.builder()

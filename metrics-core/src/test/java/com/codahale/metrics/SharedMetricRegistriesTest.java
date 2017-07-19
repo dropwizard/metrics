@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class SharedMetricRegistriesTest {
     @Before
     public void setUp() throws Exception {
-        SharedMetricRegistries.setDefaultRegistryName(new AtomicReference<String>());
+        SharedMetricRegistries.setDefaultRegistryName(new AtomicReference<>());
         SharedMetricRegistries.clear();
     }
 

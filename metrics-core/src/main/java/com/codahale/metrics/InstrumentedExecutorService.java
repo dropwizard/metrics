@@ -85,7 +85,7 @@ public class InstrumentedExecutorService implements ExecutorService {
     @Override
     public <T> Future<T> submit(Callable<T> task) {
         submitted.mark();
-        return delegate.submit(new InstrumentedCallable<T>(task));
+        return delegate.submit(new InstrumentedCallable<>(task));
     }
 
     /**
@@ -129,9 +129,9 @@ public class InstrumentedExecutorService implements ExecutorService {
     }
 
     private <T> Collection<? extends Callable<T>> instrument(Collection<? extends Callable<T>> tasks) {
-        final List<InstrumentedCallable<T>> instrumented = new ArrayList<InstrumentedCallable<T>>(tasks.size());
+        final List<InstrumentedCallable<T>> instrumented = new ArrayList<>(tasks.size());
         for (Callable<T> task : tasks) {
-            instrumented.add(new InstrumentedCallable<T>(task));
+            instrumented.add(new InstrumentedCallable<>(task));
         }
         return instrumented;
     }

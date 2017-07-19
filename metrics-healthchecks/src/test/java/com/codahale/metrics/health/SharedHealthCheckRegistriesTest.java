@@ -16,7 +16,7 @@ public class SharedHealthCheckRegistriesTest {
 
     @Before
     public void setUp() {
-        SharedHealthCheckRegistries.setDefaultRegistryName(new AtomicReference<String>());
+        SharedHealthCheckRegistries.setDefaultRegistryName(new AtomicReference<>());
         SharedHealthCheckRegistries.clear();
     }
 

@@ -64,7 +64,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
      * @param clock the clock used to timestamp samples and track rescaling
      */
     public ExponentiallyDecayingReservoir(int size, double alpha, Clock clock) {
-        this.values = new ConcurrentSkipListMap<Double, WeightedSample>();
+        this.values = new ConcurrentSkipListMap<>();
         this.lock = new ReentrantReadWriteLock();
         this.alpha = alpha;
         this.size = size;
@@ -170,7 +170,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
                 if (Double.compare(scalingFactor, 0) == 0) {
                     values.clear();
                 } else {
-                    final ArrayList<Double> keys = new ArrayList<Double>(values.keySet());
+                    final ArrayList<Double> keys = new ArrayList<>(values.keySet());
                     for (Double key : keys) {
                         final WeightedSample sample = values.remove(key);
                         final WeightedSample newSample = new WeightedSample(sample.value, sample.weight * scalingFactor);

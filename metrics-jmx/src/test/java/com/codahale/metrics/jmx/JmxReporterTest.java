@@ -294,7 +294,7 @@ public class JmxReporterTest {
     }
 
     private SortedMap<String, Object> values(AttributeList attributes) {
-        final TreeMap<String, Object> values = new TreeMap<String, Object>();
+        final TreeMap<String, Object> values = new TreeMap<>();
         for (Object o : attributes) {
             final Attribute attribute = (Attribute) o;
             values.put(attribute.getName(), attribute.getValue());

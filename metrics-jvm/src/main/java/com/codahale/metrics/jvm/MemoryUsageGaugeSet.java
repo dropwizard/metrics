@@ -37,7 +37,7 @@ public class MemoryUsageGaugeSet implements MetricSet {
 
     @Override
     public Map<String, Metric> getMetrics() {
-        final Map<String, Metric> gauges = new HashMap<String, Metric>();
+        final Map<String, Metric> gauges = new HashMap<>();
 
         gauges.put("total.init", (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getInit() +
                 mxBean.getNonHeapMemoryUsage().getInit());

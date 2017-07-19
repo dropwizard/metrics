@@ -57,7 +57,7 @@ public class PickledGraphite implements GraphiteSender {
 
     private int batchSize;
     // graphite expects a python-pickled list of nested tuples.
-    private List<MetricTuple> metrics = new LinkedList<MetricTuple>();
+    private List<MetricTuple> metrics = new LinkedList<>();
 
     private final String hostname;
     private final int port;

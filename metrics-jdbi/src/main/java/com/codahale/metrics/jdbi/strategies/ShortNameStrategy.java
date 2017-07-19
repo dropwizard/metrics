@@ -13,7 +13,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  * by class name and method; a shortening strategy is applied to make the JMX output nicer.
  */
 public final class ShortNameStrategy extends DelegatingStatementNameStrategy {
-    private final ConcurrentMap<String, String> shortClassNames = new ConcurrentHashMap<String, String>();
+    private final ConcurrentMap<String, String> shortClassNames = new ConcurrentHashMap<>();
 
     private final String baseJmxName;
 

@@ -26,7 +26,7 @@ public class ThreadDeadlockHealthCheckTest {
 
     @Test
     public void isUnhealthyIfThreadsAreDeadlocked() throws Exception {
-        final Set<String> threads = new TreeSet<String>();
+        final Set<String> threads = new TreeSet<>();
         threads.add("one");
         threads.add("two");
 

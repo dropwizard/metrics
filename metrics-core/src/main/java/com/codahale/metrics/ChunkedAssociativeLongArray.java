@@ -21,7 +21,7 @@ class ChunkedAssociativeLongArray {
      * So if you have constant or slowly changing load ChunkedAssociativeLongArray will never
      * throw away old chunks or allocate new ones which makes this data structure almost garbage free.
      */
-    private final ArrayDeque<SoftReference<Chunk>> chunksCache = new ArrayDeque<SoftReference<Chunk>>();
+    private final ArrayDeque<SoftReference<Chunk>> chunksCache = new ArrayDeque<>();
 
     /*
      * Why LinkedList if we are creating fast data structure with low GC overhead?
@@ -33,7 +33,7 @@ class ChunkedAssociativeLongArray {
      *
      * LinkedList gives us O(1) complexity for all this operations and that is not the case with ArrayList.
      */
-    private final LinkedList<Chunk> chunks = new LinkedList<Chunk>();
+    private final LinkedList<Chunk> chunks = new LinkedList<>();
 
     ChunkedAssociativeLongArray() {
         this(DEFAULT_CHUNK_SIZE);
@@ -61,7 +61,7 @@ class ChunkedAssociativeLongArray {
 
     private void freeChunk(Chunk chunk) {
         if (chunksCache.size() < MAX_CACHE_SIZE) {
-            chunksCache.add(new SoftReference<Chunk>(chunk));
+            chunksCache.add(new SoftReference<>(chunk));
         }
     }
 

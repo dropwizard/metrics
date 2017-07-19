@@ -501,7 +501,7 @@ public class JmxReporter implements Reporter, Closeable {
             this.name = name;
             this.filter = filter;
             this.timeUnits = timeUnits;
-            this.registered = new ConcurrentHashMap<ObjectName, ObjectName>();
+            this.registered = new ConcurrentHashMap<>();
             this.objectNameFactory = objectNameFactory;
         }
 

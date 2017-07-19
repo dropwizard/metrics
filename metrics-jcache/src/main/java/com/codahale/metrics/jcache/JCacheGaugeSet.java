@@ -41,7 +41,7 @@ public class JCacheGaugeSet implements MetricSet {
         Set<ObjectInstance> cacheBeans = getCacheBeans();
         List<String> availableStatsNames = retrieveStatsNames();
 
-        Map<String, Metric> gauges = new HashMap<String, Metric>(cacheBeans.size() * availableStatsNames.size());
+        Map<String, Metric> gauges = new HashMap<>(cacheBeans.size() * availableStatsNames.size());
 
         for (ObjectInstance cacheBean : cacheBeans) {
             ObjectName objectName = cacheBean.getObjectName();
@@ -68,7 +68,7 @@ public class JCacheGaugeSet implements MetricSet {
 
     private List<String> retrieveStatsNames() {
         Method[] methods = CacheStatisticsMXBean.class.getDeclaredMethods();
-        List<String> availableStatsNames = new ArrayList<String>(methods.length);
+        List<String> availableStatsNames = new ArrayList<>(methods.length);
 
         for (Method method : methods) {
             String methodName = method.getName();

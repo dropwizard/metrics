@@ -40,7 +40,7 @@ public class ThreadDeadlockDetector {
     public Set<String> getDeadlockedThreads() {
         final long[] ids = threads.findDeadlockedThreads();
         if (ids != null) {
-            final Set<String> deadlocks = new HashSet<String>();
+            final Set<String> deadlocks = new HashSet<>();
             for (ThreadInfo info : threads.getThreadInfo(ids, MAX_STACK_TRACE_DEPTH)) {
                 final StringBuilder stackTrace = new StringBuilder();
                 for (StackTraceElement element : info.getStackTrace()) {

@@ -26,7 +26,7 @@ public class ThreadStatesGaugeSetTest {
     private final ThreadInfo timedWaitingThread = mock(ThreadInfo.class);
     private final ThreadInfo terminatedThread = mock(ThreadInfo.class);
 
-    private final Set<String> deadlocks = new HashSet<String>();
+    private final Set<String> deadlocks = new HashSet<>();
 
     @Before
     public void setUp() throws Exception {

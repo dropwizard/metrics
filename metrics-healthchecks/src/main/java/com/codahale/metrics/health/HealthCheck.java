@@ -222,7 +222,7 @@ public abstract class HealthCheck {
 
         protected ResultBuilder() {
             this.healthy = true;
-            this.details = new LinkedHashMap<String, Object>();
+            this.details = new LinkedHashMap<>();
         }
 
         /**
@@ -290,7 +290,7 @@ public abstract class HealthCheck {
          */
         public ResultBuilder withDetail(String key, Object data) {
             if (this.details == null) {
-                this.details = new LinkedHashMap<String, Object>();
+                this.details = new LinkedHashMap<>();
             }
             this.details.put(key, data);
             return this;

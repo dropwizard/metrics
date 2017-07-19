@@ -62,7 +62,7 @@ public abstract class AbstractInstrumentedFilter implements Filter {
             metricName = getClass().getName();
         }
 
-        this.metersByStatusCode = new ConcurrentHashMap<Integer, Meter>(meterNamesByStatusCode
+        this.metersByStatusCode = new ConcurrentHashMap<>(meterNamesByStatusCode
                 .size());
         for (Entry<Integer, String> entry : meterNamesByStatusCode.entrySet()) {
             metersByStatusCode.put(entry.getKey(),

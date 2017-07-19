@@ -36,7 +36,7 @@ public class InstrumentedFilter extends AbstractInstrumentedFilter {
     }
 
     private static Map<Integer, String> createMeterNamesByStatusCode() {
-        final Map<Integer, String> meterNamesByStatusCode = new HashMap<Integer, String>(6);
+        final Map<Integer, String> meterNamesByStatusCode = new HashMap<>(6);
         meterNamesByStatusCode.put(OK, NAME_PREFIX + "ok");
         meterNamesByStatusCode.put(CREATED, NAME_PREFIX + "created");
         meterNamesByStatusCode.put(NO_CONTENT, NAME_PREFIX + "noContent");
