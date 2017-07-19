@@ -121,6 +121,30 @@ public class HealthCheckRegistryTest {
     }
 
     @Test
+    public void runsRegisteredHealthChecksWithFilter() throws Exception {
+        final Map<String, HealthCheck.Result> results = registry.runHealthChecks(new HealthCheckFilter() {
+            @Override
+            public boolean matches(String name, HealthCheck healthCheck) {
+                return "hc1".equals(name);
+            }
+        });
+
+        assertThat(results).containsOnly(entry("hc1", r1));
+    }
+
+    @Test
+    public void runsRegisteredHealthChecksWithNonMatchingFilter() throws Exception {
+        final Map<String, HealthCheck.Result> results = registry.runHealthChecks(new HealthCheckFilter() {
+            @Override
+            public boolean matches(String name, HealthCheck healthCheck) {
+                return false;
+            }
+        });
+
+        assertThat(results).isEmpty();
+    }
+
+    @Test
     public void runsRegisteredHealthChecksInParallel() throws Exception {
         final ExecutorService executor = Executors.newFixedThreadPool(10);
         final Map<String, HealthCheck.Result> results = registry.runHealthChecks(executor);
@@ -131,6 +155,38 @@ public class HealthCheckRegistryTest {
         assertThat(results).contains(entry("hc1", r1));
         assertThat(results).contains(entry("hc2", r2));
         assertThat(results).containsKey("ahc");
+    }
+
+    @Test
+    public void runsRegisteredHealthChecksInParallelWithNonMatchingFilter() throws Exception {
+        final ExecutorService executor = Executors.newFixedThreadPool(10);
+        final Map<String, HealthCheck.Result> results = registry.runHealthChecks(executor, new HealthCheckFilter() {
+            @Override
+            public boolean matches(String name, HealthCheck healthCheck) {
+                return false;
+            }
+        });
+
+        executor.shutdown();
+        executor.awaitTermination(1, TimeUnit.SECONDS);
+
+        assertThat(results).isEmpty();
+    }
+
+    @Test
+    public void runsRegisteredHealthChecksInParallelWithFilter() throws Exception {
+        final ExecutorService executor = Executors.newFixedThreadPool(10);
+        final Map<String, HealthCheck.Result> results = registry.runHealthChecks(executor, new HealthCheckFilter() {
+            @Override
+            public boolean matches(String name, HealthCheck healthCheck) {
+                return "hc2".equals(name);
+            }
+        });
+
+        executor.shutdown();
+        executor.awaitTermination(1, TimeUnit.SECONDS);
+
+        assertThat(results).containsOnly(entry("hc2", r2));
     }
 
     @Test
