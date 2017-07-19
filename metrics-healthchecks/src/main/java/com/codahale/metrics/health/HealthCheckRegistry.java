@@ -119,7 +119,7 @@ public class HealthCheckRegistry {
      * @param name the name of the {@link HealthCheck} instance
      */
     public void unregister(String name) {
-        HealthCheck healthCheck = null;
+        HealthCheck healthCheck;
         synchronized (lock) {
             healthCheck = healthChecks.remove(name);
             if (healthCheck instanceof AsyncHealthCheckDecorator) {
