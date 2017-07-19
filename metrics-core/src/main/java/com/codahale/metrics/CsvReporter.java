@@ -286,15 +286,12 @@ public class CsvReporter extends ScheduledReporter {
             final File file = csvFileProvider.getFile(directory, name);
             final boolean fileAlreadyExists = file.exists();
             if (fileAlreadyExists || file.createNewFile()) {
-                final PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file,true),
-                        UTF_8));
-                try {
+                try (PrintWriter out = new PrintWriter(new OutputStreamWriter(
+                        new FileOutputStream(file, true), UTF_8))) {
                     if (!fileAlreadyExists) {
                         out.println("t," + header);
                     }
                     out.printf(locale, String.format(locale, "%d,%s%n", timestamp, line), values);
-                } finally {
-                    out.close();
                 }
             }
         } catch (IOException e) {

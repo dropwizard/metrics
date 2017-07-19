@@ -168,13 +168,10 @@ public class UniformSnapshot extends Snapshot {
      */
     @Override
     public void dump(OutputStream output) {
-        final PrintWriter out = new PrintWriter(new OutputStreamWriter(output, UTF_8));
-        try {
+        try (PrintWriter out = new PrintWriter(new OutputStreamWriter(output, UTF_8))) {
             for (long value : values) {
                 out.printf("%d%n", value);
             }
-        } finally {
-            out.close();
         }
     }
 }
