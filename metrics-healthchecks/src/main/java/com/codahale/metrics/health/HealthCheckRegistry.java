@@ -2,8 +2,6 @@ package com.codahale.metrics.health;
 
 import static com.codahale.metrics.health.HealthCheck.Result;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -17,9 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -224,21 +222,10 @@ public class HealthCheckRegistry {
     }
 
     private static ScheduledExecutorService createExecutorService(int corePoolSize) {
-        ScheduledExecutorService asyncExecutorService = Executors.newScheduledThreadPool(corePoolSize,
-                new NamedThreadFactory("healthcheck-async-executor-"));
-        try {
-            Method method = asyncExecutorService.getClass().getMethod("setRemoveOnCancelPolicy", Boolean.TYPE);
-            method.invoke(asyncExecutorService, true);
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            logSetExecutorCancellationPolicyFailure(e);
-        }
+        final ScheduledThreadPoolExecutor asyncExecutorService = new ScheduledThreadPoolExecutor(corePoolSize,
+                        new NamedThreadFactory("healthcheck-async-executor-"));
+        asyncExecutorService.setRemoveOnCancelPolicy(true);
         return asyncExecutorService;
-    }
-
-    private static void logSetExecutorCancellationPolicyFailure(Exception e) {
-        LOGGER.warn("Tried but failed to set executor cancellation policy to remove on cancel which has been introduced " +
-                "in Java 7. This could result in a memory leak if many asynchronous health checks are registered and " +
-                "removed because cancellation does not actually remove them from the executor.", e);
     }
 
     private static class NamedThreadFactory implements ThreadFactory {
