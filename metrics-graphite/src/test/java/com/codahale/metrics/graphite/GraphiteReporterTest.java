@@ -1,7 +1,6 @@
 package com.codahale.metrics.graphite;
 
 import com.codahale.metrics.*;
-import com.codahale.metrics.Timer;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;

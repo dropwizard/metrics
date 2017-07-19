@@ -2,8 +2,6 @@ package com.codahale.metrics;
 
 import org.junit.Test;
 
-import java.lang.management.ManagementFactory;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
 

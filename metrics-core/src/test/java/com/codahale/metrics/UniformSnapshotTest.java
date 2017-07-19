@@ -11,8 +11,6 @@ import java.util.concurrent.TimeUnit;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 public class UniformSnapshotTest {
     private final Snapshot snapshot = new UniformSnapshot(new long[]{5, 1, 2, 3, 4});

@@ -4,7 +4,6 @@ import com.codahale.metrics.*;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;

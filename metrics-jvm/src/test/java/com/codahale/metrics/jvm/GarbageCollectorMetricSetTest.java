@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.management.GarbageCollectorMXBean;
-import java.util.Arrays;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
