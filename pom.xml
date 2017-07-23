@@ -55,6 +55,7 @@
         <jdbi2.version>2.78</jdbi2.version>
         <ehcache.version>3.3.1</ehcache.version>
         <cache-api.version>1.0.0</cache-api.version>
+        <http-client.version>4.5.3</http-client.version>
     </properties>
 
     <developers>
