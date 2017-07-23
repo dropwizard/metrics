@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>${ehcache.version}</version>
+            <version>${ehcache3.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

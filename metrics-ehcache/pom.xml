@@ -24,7 +24,7 @@
         <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>2.8.3</version>
+            <version>${ehcache2.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
