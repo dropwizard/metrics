@@ -11,6 +11,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -18,8 +19,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -159,10 +160,24 @@ public class HealthCheckRegistry {
      * @return a map of the health check results
      */
     public SortedMap<String, HealthCheck.Result> runHealthChecks() {
+        return runHealthChecks(HealthCheckFilter.ALL);
+    }
+
+    /**
+     * Runs the registered health checks matching the filter and returns a map of the results.
+     *
+     * @param filter health check filter
+     * @return a map of the health check results
+     */
+    public SortedMap<String, HealthCheck.Result> runHealthChecks(HealthCheckFilter filter) {
         final SortedMap<String, HealthCheck.Result> results = new TreeMap<>();
         for (Map.Entry<String, HealthCheck> entry : healthChecks.entrySet()) {
-            final Result result = entry.getValue().execute();
-            results.put(entry.getKey(), result);
+            final String name = entry.getKey();
+            final HealthCheck healthCheck = entry.getValue();
+            if (filter.matches(name, healthCheck)) {
+                final Result result = entry.getValue().execute();
+                results.put(entry.getKey(), result);
+            }
         }
         return Collections.unmodifiableSortedMap(results);
     }
@@ -174,9 +189,29 @@ public class HealthCheckRegistry {
      * @return a map of the health check results
      */
     public SortedMap<String, HealthCheck.Result> runHealthChecks(ExecutorService executor) {
+        return runHealthChecks(executor, HealthCheckFilter.ALL);
+    }
+
+    /**
+     * Runs the registered health checks matching the filter in parallel and returns a map of the results.
+     *
+     * @param executor object to launch and track health checks progress
+     * @param filter   health check filter
+     * @return a map of the health check results
+     */
+    public SortedMap<String, HealthCheck.Result> runHealthChecks(ExecutorService executor, HealthCheckFilter filter) {
         final Map<String, Future<HealthCheck.Result>> futures = new HashMap<>();
         for (final Map.Entry<String, HealthCheck> entry : healthChecks.entrySet()) {
-            futures.put(entry.getKey(), executor.submit(() -> entry.getValue().execute()));
+            final String name = entry.getKey();
+            final HealthCheck healthCheck = entry.getValue();
+            if (filter.matches(name, healthCheck)) {
+                futures.put(name, executor.submit(new Callable<Result>() {
+                    @Override
+                    public Result call() throws Exception {
+                        return healthCheck.execute();
+                    }
+                }));
+            }
         }
 
         final SortedMap<String, HealthCheck.Result> results = new TreeMap<>();

@@ -1,20 +1,26 @@
 package com.codahale.metrics.servlets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.codahale.metrics.health.HealthCheck;
-import com.codahale.metrics.health.HealthCheckRegistry;
-import com.codahale.metrics.json.HealthCheckModule;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.ExecutorService;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.codahale.metrics.health.HealthCheck;
+import com.codahale.metrics.health.HealthCheckFilter;
+import com.codahale.metrics.health.HealthCheckRegistry;
+import com.codahale.metrics.json.HealthCheckModule;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 public class HealthCheckServlet extends HttpServlet {
     public static abstract class ContextListener implements ServletContextListener {
@@ -32,6 +38,14 @@ public class HealthCheckServlet extends HttpServlet {
             return null;
         }
 
+        /**
+         * @return the {@link HealthCheckFilter} that shall be used to filter health checks,
+         * or {@link HealthCheckFilter#ALL} if the default should be used.
+         */
+        protected HealthCheckFilter getHealthCheckFilter() {
+            return HealthCheckFilter.ALL;
+        }
+
         @Override
         public void contextInitialized(ServletContextEvent event) {
             final ServletContext context = event.getServletContext();
@@ -47,12 +61,14 @@ public class HealthCheckServlet extends HttpServlet {
 
     public static final String HEALTH_CHECK_REGISTRY = HealthCheckServlet.class.getCanonicalName() + ".registry";
     public static final String HEALTH_CHECK_EXECUTOR = HealthCheckServlet.class.getCanonicalName() + ".executor";
+    public static final String HEALTH_CHECK_FILTER = HealthCheckServlet.class.getCanonicalName() + ".healthCheckFilter";
 
     private static final long serialVersionUID = -8432996484889177321L;
     private static final String CONTENT_TYPE = "application/json";
 
     private transient HealthCheckRegistry registry;
     private transient ExecutorService executorService;
+    private transient HealthCheckFilter filter;
     private transient ObjectMapper mapper;
 
     public HealthCheckServlet() {
@@ -66,8 +82,9 @@ public class HealthCheckServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
 
+        final ServletContext context = config.getServletContext();
         if (null == registry) {
-            final Object registryAttr = config.getServletContext().getAttribute(HEALTH_CHECK_REGISTRY);
+            final Object registryAttr = context.getAttribute(HEALTH_CHECK_REGISTRY);
             if (registryAttr instanceof HealthCheckRegistry) {
                 this.registry = (HealthCheckRegistry) registryAttr;
             } else {
@@ -75,9 +92,18 @@ public class HealthCheckServlet extends HttpServlet {
             }
         }
 
-        final Object executorAttr = config.getServletContext().getAttribute(HEALTH_CHECK_EXECUTOR);
+        final Object executorAttr = context.getAttribute(HEALTH_CHECK_EXECUTOR);
         if (executorAttr instanceof ExecutorService) {
             this.executorService = (ExecutorService) executorAttr;
+        }
+
+
+        final Object filterAttr = context.getAttribute(HEALTH_CHECK_FILTER);
+        if (filterAttr instanceof HealthCheckFilter) {
+            filter = (HealthCheckFilter) filterAttr;
+        }
+        if (filter == null) {
+            filter = HealthCheckFilter.ALL;
         }
 
         this.mapper = new ObjectMapper().registerModule(new HealthCheckModule());
@@ -120,9 +146,9 @@ public class HealthCheckServlet extends HttpServlet {
 
     private SortedMap<String, HealthCheck.Result> runHealthChecks() {
         if (executorService == null) {
-            return registry.runHealthChecks();
+            return registry.runHealthChecks(filter);
         }
-        return registry.runHealthChecks(executorService);
+        return registry.runHealthChecks(executorService, filter);
     }
 
     private static boolean isAllHealthy(Map<String, HealthCheck.Result> results) {
