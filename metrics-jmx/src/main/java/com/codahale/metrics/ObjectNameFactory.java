@@ -1,4 +1,4 @@
-package com.codahale.metrics.jmx;
+package com.codahale.metrics;
 
 import javax.management.ObjectName;
 
