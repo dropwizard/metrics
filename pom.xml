@@ -56,6 +56,7 @@
         <ehcache.version>3.3.1</ehcache.version>
         <cache-api.version>1.0.0</cache-api.version>
         <http-client.version>4.5.3</http-client.version>
+        <http-async-client.version>4.1.3</http-async-client.version>
     </properties>
 
     <developers>
