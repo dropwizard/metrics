@@ -16,10 +16,6 @@
         An instrumented appender for Log4j 2.x.
     </description>
 
-    <properties>
-        <log4j2.version>2.3</log4j2.version>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
