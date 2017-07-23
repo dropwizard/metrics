@@ -25,6 +25,8 @@ import javax.script.ScriptEngineManager;
 import javax.script.SimpleBindings;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -37,17 +39,6 @@ public class PickledGraphiteTest {
 
     private final Socket socket = mock(Socket.class);
     private final ByteArrayOutputStream output = spy(new ByteArrayOutputStream());
-
-    // Pulls apart the pickled payload. This skips ahead 4 characters to safely ignore
-    // the header (length)
-    private static final String UNPICKLER_SCRIPT =
-        "import cPickle\n" +
-            "import struct\n" +
-            "format = '!L'\n" +
-            "headerLength = struct.calcsize(format)\n" +
-            "payloadLength, = struct.unpack(format, payload[:headerLength])\n" +
-            "batchLength = headerLength + payloadLength.intValue()\n" +
-            "metrics = cPickle.loads(payload[headerLength:batchLength])\n";
 
     private CompiledScript unpickleScript;
 
@@ -80,7 +71,9 @@ public class PickledGraphiteTest {
 
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("python");
         Compilable compilable = (Compilable) engine;
-        unpickleScript = compilable.compile(UNPICKLER_SCRIPT);
+        try (InputStream is = PickledGraphiteTest.class.getResource("/upickle.py").openStream()) {
+            unpickleScript = compilable.compile(new InputStreamReader(is));
+        }
     }
 
     @Test
