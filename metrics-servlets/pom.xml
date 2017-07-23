@@ -41,7 +41,7 @@
         <dependency>
             <groupId>com.papertrail</groupId>
             <artifactId>profiler</artifactId>
-            <version>1.0.2</version>
+            <version>${papertrail.profiler.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
