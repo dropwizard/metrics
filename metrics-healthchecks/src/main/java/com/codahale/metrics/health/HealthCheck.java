@@ -16,7 +16,7 @@ public abstract class HealthCheck {
      * or unhealthy (with either an error message or a thrown exception and optional details).
      */
     public static class Result {
-        private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+        private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
         private static final int PRIME = 31;
 
         /**
