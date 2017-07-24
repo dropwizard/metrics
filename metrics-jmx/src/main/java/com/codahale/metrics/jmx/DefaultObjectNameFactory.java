@@ -1,4 +1,4 @@
-package com.codahale.metrics;
+package com.codahale.metrics.jmx;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;

@@ -1,5 +1,15 @@
-package com.codahale.metrics;
+package com.codahale.metrics.jmx;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Snapshot;
+import com.codahale.metrics.Timer;
+import com.codahale.metrics.jmx.JmxReporter;
+import com.codahale.metrics.jmx.ObjectNameFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
