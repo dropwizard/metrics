@@ -215,22 +215,6 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                 }
                 // just cancel the scheduledFuture and exit
                 this.scheduledFuture.cancel(false);
-                try {
-                    // Wait a while for existing tasks to terminate
-                    scheduledFuture.get(1, TimeUnit.SECONDS);
-                } catch (ExecutionException e) {
-                    // well, we should get this error when future is cancelled normally, just ignore it
-                } catch (InterruptedException e) {
-                    // The thread was interrupted while waiting future to complete
-                    // Preserve interrupt status
-                    Thread.currentThread().interrupt();
-                    if (!this.scheduledFuture.isDone()) {
-                        LOG.warn("The reporting schedulingFuture is not cancelled yet");
-                    }
-                } catch (TimeoutException e) {
-                    // The last reporting cycle is still in progress, nothing wrong, just add log record
-                    LOG.warn("The reporting schedulingFuture is not cancelled yet");
-                }
             }
         }
     }
