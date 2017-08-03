@@ -30,6 +30,16 @@ public class GraphiteReporterTest {
                                                               .disabledMetricAttributes(Collections.emptySet())
                                                               .build(graphite);
 
+    private final GraphiteReporter minuteRateReporter = GraphiteReporter
+            .forRegistry(registry)
+            .withClock(clock)
+            .prefixedWith("prefix")
+            .convertRatesTo(TimeUnit.MINUTES)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .filter(MetricFilter.ALL)
+            .disabledMetricAttributes(Collections.<MetricAttribute>emptySet())
+            .build(graphite);
+
     @Before
     public void setUp() throws Exception {
         when(clock.getTime()).thenReturn(timestamp * 1000);
@@ -291,6 +301,34 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.meter.m5_rate", "3.00", timestamp);
         inOrder.verify(graphite).send("prefix.meter.m15_rate", "4.00", timestamp);
         inOrder.verify(graphite).send("prefix.meter.mean_rate", "5.00", timestamp);
+        inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
+
+        verifyNoMoreInteractions(graphite);
+    }
+
+    @Test
+    public void reportsMetersInMinutes() throws Exception {
+        final Meter meter = mock(Meter.class);
+        when(meter.getCount()).thenReturn(1L);
+        when(meter.getOneMinuteRate()).thenReturn(2.0);
+        when(meter.getFiveMinuteRate()).thenReturn(3.0);
+        when(meter.getFifteenMinuteRate()).thenReturn(4.0);
+        when(meter.getMeanRate()).thenReturn(5.0);
+
+        minuteRateReporter.report(this.<Gauge>map(),
+                this.<Counter>map(),
+                this.<Histogram>map(),
+                this.<Meter>map("meter", meter),
+                this.<Timer>map());
+
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send("prefix.meter.count", "1", timestamp);
+        inOrder.verify(graphite).send("prefix.meter.m1_rate", "120.00", timestamp);
+        inOrder.verify(graphite).send("prefix.meter.m5_rate", "180.00", timestamp);
+        inOrder.verify(graphite).send("prefix.meter.m15_rate", "240.00", timestamp);
+        inOrder.verify(graphite).send("prefix.meter.mean_rate", "300.00", timestamp);
         inOrder.verify(graphite).flush();
         inOrder.verify(graphite).close();
 
