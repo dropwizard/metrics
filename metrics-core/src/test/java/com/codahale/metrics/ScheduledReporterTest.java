@@ -7,12 +7,15 @@ import org.junit.Test;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
@@ -30,9 +33,9 @@ public class ScheduledReporterTest {
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
 
-    @SuppressWarnings("rawtypes")
-    private final ScheduledFuture scheduledFuture = mock(ScheduledFuture.class);
-    private final ScheduledExecutorService executor = mock(ScheduledExecutorService.class);
+    private final ScheduledExecutorService mockExecutor = mock(ScheduledExecutorService.class);
+    private final ScheduledExecutorService customExecutor = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService externalExecutor = Executors.newSingleThreadScheduledExecutor();
 
     private final MetricRegistry registry = new MetricRegistry();
     private final ScheduledReporter reporter = spy(
@@ -41,9 +44,10 @@ public class ScheduledReporterTest {
     private final ScheduledReporter reporterWithNullExecutor = spy(
             new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, null)
     );
-    private final ScheduledReporter reporterWithCustomExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor);
-    private final ScheduledReporter reporterWithExternallyManagedExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor, false);
-    private final ScheduledReporter[] reporters = new ScheduledReporter[]{reporter, reporterWithCustomExecutor, reporterWithExternallyManagedExecutor};
+    private final ScheduledReporter reporterWithCustomMockExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, mockExecutor);
+    private final ScheduledReporter reporterWithCustomExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, customExecutor);
+    private final DummyReporter reporterWithExternallyManagedExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, externalExecutor, false);
+    private final ScheduledReporter[] reporters = new ScheduledReporter[] {reporter, reporterWithCustomExecutor, reporterWithExternallyManagedExecutor};
 
     @Before
     @SuppressWarnings("unchecked")
@@ -53,13 +57,12 @@ public class ScheduledReporterTest {
         registry.register("histogram", histogram);
         registry.register("meter", meter);
         registry.register("timer", timer);
-
-        when(executor.scheduleAtFixedRate(any(Runnable.class), any(Long.class), any(Long.class), eq(TimeUnit.MILLISECONDS)))
-                .thenReturn(scheduledFuture);
     }
 
     @After
     public void tearDown() throws Exception {
+        customExecutor.shutdown();
+        externalExecutor.shutdown();
         reporter.stop();
         reporterWithNullExecutor.stop();
     }
@@ -80,19 +83,19 @@ public class ScheduledReporterTest {
 
     @Test
     public void shouldUsePeriodAsInitialDelayIfNotSpecifiedOtherwise() throws Exception {
-        reporterWithCustomExecutor.start(200, TimeUnit.MILLISECONDS);
+        reporterWithCustomMockExecutor.start(200, TimeUnit.MILLISECONDS);
 
-        verify(executor, times(1)).scheduleAtFixedRate(
-                any(Runnable.class), eq(200L), eq(200L), eq(TimeUnit.MILLISECONDS)
+        verify(mockExecutor, times(1)).scheduleAtFixedRate(
+            any(Runnable.class), eq(200L), eq(200L), eq(TimeUnit.MILLISECONDS)
         );
     }
 
     @Test
     public void shouldStartWithSpecifiedInitialDelay() throws Exception {
-        reporterWithCustomExecutor.start(350, 100, TimeUnit.MILLISECONDS);
+        reporterWithCustomMockExecutor.start(350, 100, TimeUnit.MILLISECONDS);
 
-        verify(executor).scheduleAtFixedRate(
-                any(Runnable.class), eq(350L), eq(100L), eq(TimeUnit.MILLISECONDS)
+        verify(mockExecutor).scheduleAtFixedRate(
+            any(Runnable.class), eq(350L), eq(100L), eq(TimeUnit.MILLISECONDS)
         );
     }
 
@@ -149,48 +152,28 @@ public class ScheduledReporterTest {
     public void shouldShutdownExecutorOnStopByDefault() {
         reporterWithCustomExecutor.start(200, TimeUnit.MILLISECONDS);
         reporterWithCustomExecutor.stop();
-        verify(executor).shutdown();
-        verify(executor).shutdownNow();
+        assertTrue(customExecutor.isTerminated());
     }
 
     @Test
     public void shouldNotShutdownExternallyManagedExecutorOnStop() {
         reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
         reporterWithExternallyManagedExecutor.stop();
-        verify(executor, never()).shutdown();
-        verify(executor, never()).shutdownNow();
+        assertFalse(mockExecutor.isTerminated());
+        assertFalse(mockExecutor.isShutdown());
     }
 
     @Test
     public void shouldCancelScheduledFutureWhenStoppingWithExternallyManagedExecutor() throws InterruptedException, ExecutionException, TimeoutException {
-        reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
+        // configure very frequency rate of execution
+        reporterWithExternallyManagedExecutor.start(1, TimeUnit.MILLISECONDS);
         reporterWithExternallyManagedExecutor.stop();
-        // should cancel future
-        verify(scheduledFuture).cancel(false);
-        // should wait 1 second to future complete
-        verify(scheduledFuture).get(1, TimeUnit.SECONDS);
-    }
+        Thread.sleep(100);
 
-    @Test
-    public void shouldIgnoreExecutionExceptionByDesign() throws InterruptedException, ExecutionException, TimeoutException {
-        when(scheduledFuture.get(1, TimeUnit.SECONDS)).thenThrow(ExecutionException.class);
-        reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
-        reporterWithExternallyManagedExecutor.stop(); // TimeoutException should be ignored
-    }
-
-    @Test
-    public void shouldRestoreInterruptionFlagWhenStoppingWithExternallyManagedExecutor() throws InterruptedException, ExecutionException, TimeoutException {
-        when(scheduledFuture.get(1, TimeUnit.SECONDS)).thenThrow(new InterruptedException());
-        reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
-        reporterWithExternallyManagedExecutor.stop();
-        assertTrue(Thread.interrupted());
-    }
-
-    @Test
-    public void shouldIgnoreTimeoutExceptionWhenFutureIsNotCancelledInOneSecond() throws InterruptedException, ExecutionException, TimeoutException {
-        when(scheduledFuture.get(1, TimeUnit.SECONDS)).thenThrow(new TimeoutException());
-        reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
-        reporterWithExternallyManagedExecutor.stop(); // TimeoutException should be ignored
+        // executionCount should not increase when scheduled future is canceled properly
+        int executionCount = reporterWithExternallyManagedExecutor.executionCount.get();
+        Thread.sleep(500);
+        assertEquals(executionCount, reporterWithExternallyManagedExecutor.executionCount.get());
     }
 
     @Test
@@ -205,6 +188,8 @@ public class ScheduledReporterTest {
     }
 
     private static class DummyReporter extends ScheduledReporter {
+
+        private AtomicInteger executionCount = new AtomicInteger();
 
         DummyReporter(MetricRegistry registry, String name, MetricFilter filter, TimeUnit rateUnit, TimeUnit durationUnit) {
             super(registry, name, filter, rateUnit, durationUnit);
@@ -221,6 +206,7 @@ public class ScheduledReporterTest {
         @Override
         @SuppressWarnings("rawtypes")
         public void report(SortedMap<String, Gauge> gauges, SortedMap<String, Counter> counters, SortedMap<String, Histogram> histograms, SortedMap<String, Meter> meters, SortedMap<String, Timer> timers) {
+            executionCount.incrementAndGet();
             // nothing doing!
         }
     }
