@@ -140,6 +140,15 @@ public class HealthCheckRegistry {
     }
 
     /**
+     * Returns the {@link HealthCheck} instance with a given name
+     *
+     * @param name the name of the {@link HealthCheck} instance
+     */
+    public HealthCheck getHealthCheck(String name) {
+        return healthChecks.get(name);
+    }
+
+    /**
      * Runs the health check with the given name.
      *
      * @param name the health check's name
