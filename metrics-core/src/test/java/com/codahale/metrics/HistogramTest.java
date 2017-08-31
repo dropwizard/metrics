@@ -10,14 +10,19 @@ public class HistogramTest {
     private final Histogram histogram = new Histogram(reservoir);
 
     @Test
-    public void updatesTheCountOnUpdates() throws Exception {
+    public void updatesTheCountAndSumOnUpdates() throws Exception {
         assertThat(histogram.getCount())
+                .isZero();
+        assertThat(histogram.getSum())
                 .isZero();
 
         histogram.update(1);
+        histogram.update(5);
 
         assertThat(histogram.getCount())
-                .isEqualTo(1);
+                .isEqualTo(2);
+        assertThat(histogram.getSum())
+                .isEqualTo(6);
     }
 
     @Test

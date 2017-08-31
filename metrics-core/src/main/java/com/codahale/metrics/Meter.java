@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
- * A meter metric which measures mean throughput and one-, five-, and fifteen-minute
+ * A meter metric which measures mean, summed throughput and one-, five-, and fifteen-minute
  * exponentially-weighted moving average throughputs.
  *
  * @see EWMA
@@ -18,6 +18,7 @@ public class Meter implements Metered {
     private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
 
     private final LongAdder count = new LongAdder();
+    private final LongAdder sum = new LongAdder();
     private final long startTime;
     private final AtomicLong lastTick;
     private final Clock clock;
@@ -67,6 +68,7 @@ public class Meter implements Metered {
         if (age > TICK_INTERVAL) {
             final long newIntervalStartTick = newTick - age % TICK_INTERVAL;
             if (lastTick.compareAndSet(oldTick, newIntervalStartTick)) {
+                sum.add(age);
                 final long requiredTicks = age / TICK_INTERVAL;
                 for (long i = 0; i < requiredTicks; i++) {
                     m1Rate.tick();
@@ -80,6 +82,11 @@ public class Meter implements Metered {
     @Override
     public long getCount() {
         return count.sum();
+    }
+
+    @Override
+    public long getSum() {
+        return sum.sum();
     }
 
     @Override

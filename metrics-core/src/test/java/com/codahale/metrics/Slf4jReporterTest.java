@@ -64,6 +64,7 @@ public class Slf4jReporterTest {
     public void reportsHistogramValuesAtError() throws Exception {
         final Histogram histogram = mock(Histogram.class);
         when(histogram.getCount()).thenReturn(1L);
+        when(histogram.getSum()).thenReturn(12L);
 
         final Snapshot snapshot = mock(Snapshot.class);
         when(snapshot.getMax()).thenReturn(2L);
@@ -87,10 +88,11 @@ public class Slf4jReporterTest {
                 map());
 
         verify(logger).error(marker,
-                "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
+                "type={}, name={}, count={}, sum={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
                 "HISTOGRAM",
                 "test.histogram",
                 1L,
+                12L,
                 4L,
                 2L,
                 3.0,
@@ -107,6 +109,7 @@ public class Slf4jReporterTest {
     public void reportsMeterValuesAtError() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
+        when(meter.getSum()).thenReturn(6L);
         when(meter.getMeanRate()).thenReturn(2.0);
         when(meter.getOneMinuteRate()).thenReturn(3.0);
         when(meter.getFiveMinuteRate()).thenReturn(4.0);
@@ -120,10 +123,11 @@ public class Slf4jReporterTest {
                 map());
 
         verify(logger).error(marker,
-                "type={}, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
+                "type={}, name={}, count={}, sum={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
                 "METER",
                 "test.meter",
                 1L,
+                6L,
                 2.0,
                 3.0,
                 4.0,
@@ -135,6 +139,7 @@ public class Slf4jReporterTest {
     public void reportsTimerValuesAtError() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
+        when(timer.getSum()).thenReturn(6L);
 
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
@@ -165,10 +170,11 @@ public class Slf4jReporterTest {
                 map("test.another.timer", timer));
 
         verify(logger).error(marker,
-                "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
+                "type={}, name={}, count={}, sum={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
                 "TIMER",
                 "test.another.timer",
                 1L,
+                6L,
                 300.0,
                 100.0,
                 200.0,
@@ -218,6 +224,7 @@ public class Slf4jReporterTest {
     public void reportsHistogramValues() throws Exception {
         final Histogram histogram = mock(Histogram.class);
         when(histogram.getCount()).thenReturn(1L);
+        when(histogram.getSum()).thenReturn(12L);
 
         final Snapshot snapshot = mock(Snapshot.class);
         when(snapshot.getMax()).thenReturn(2L);
@@ -241,10 +248,11 @@ public class Slf4jReporterTest {
                 map());
 
         verify(logger).info(marker,
-                "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
+                "type={}, name={}, count={}, sum={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
                 "HISTOGRAM",
                 "prefix.test.histogram",
                 1L,
+                12L,
                 4L,
                 2L,
                 3.0,
@@ -261,6 +269,7 @@ public class Slf4jReporterTest {
     public void reportsMeterValues() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
+        when(meter.getSum()).thenReturn(6L);
         when(meter.getMeanRate()).thenReturn(2.0);
         when(meter.getOneMinuteRate()).thenReturn(3.0);
         when(meter.getFiveMinuteRate()).thenReturn(4.0);
@@ -274,10 +283,11 @@ public class Slf4jReporterTest {
                 map());
 
         verify(logger).info(marker,
-                "type={}, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
+                "type={}, name={}, count={}, sum={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
                 "METER",
                 "prefix.test.meter",
                 1L,
+                6L,
                 2.0,
                 3.0,
                 4.0,
@@ -289,6 +299,7 @@ public class Slf4jReporterTest {
     public void reportsTimerValues() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
+        when(timer.getSum()).thenReturn(6L);
 
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
@@ -318,10 +329,11 @@ public class Slf4jReporterTest {
                 map("test.another.timer", timer));
 
         verify(logger).info(marker,
-                "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
+                "type={}, name={}, count={}, sum={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
                 "TIMER",
                 "prefix.test.another.timer",
                 1L,
+                6L,
                 300.0,
                 100.0,
                 200.0,

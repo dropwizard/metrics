@@ -300,6 +300,7 @@ public class GraphiteReporter extends ScheduledReporter {
 
     private void reportMetered(String name, Metered meter, long timestamp) throws IOException {
         sendIfEnabled(COUNT, name, meter.getCount(), timestamp);
+        sendIfEnabled(SUM, name, meter.getSum(), timestamp);
         sendIfEnabled(M1_RATE, name, convertRate(meter.getOneMinuteRate()), timestamp);
         sendIfEnabled(M5_RATE, name, convertRate(meter.getFiveMinuteRate()), timestamp);
         sendIfEnabled(M15_RATE, name, convertRate(meter.getFifteenMinuteRate()), timestamp);
@@ -309,6 +310,7 @@ public class GraphiteReporter extends ScheduledReporter {
     private void reportHistogram(String name, Histogram histogram, long timestamp) throws IOException {
         final Snapshot snapshot = histogram.getSnapshot();
         sendIfEnabled(COUNT, name, histogram.getCount(), timestamp);
+        sendIfEnabled(SUM, name, histogram.getSum(), timestamp);
         sendIfEnabled(MAX, name, snapshot.getMax(), timestamp);
         sendIfEnabled(MEAN, name, snapshot.getMean(), timestamp);
         sendIfEnabled(MIN, name, snapshot.getMin(), timestamp);

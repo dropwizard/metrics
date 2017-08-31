@@ -3,7 +3,7 @@ package com.codahale.metrics;
 /**
  * An object which maintains mean and exponentially-weighted rate.
  */
-public interface Metered extends Metric, Counting {
+public interface Metered extends Metric, Counting, Summing {
     /**
      * Returns the number of events which have been marked.
      *
@@ -11,6 +11,14 @@ public interface Metered extends Metric, Counting {
      */
     @Override
     long getCount();
+
+    /**
+     * Returns the sum of events which have been marked.
+     *
+     * @return the sum of events which have been marked
+     */
+    @Override
+    long getSum();
 
     /**
      * Returns the fifteen-minute exponentially-weighted moving average rate at which events have

@@ -16,6 +16,7 @@ public enum MetricAttribute {
     P99("p99"),
     P999("p999"),
     COUNT("count"),
+    SUM("sum"),
     M1_RATE("m1_rate"),
     M5_RATE("m5_rate"),
     M15_RATE("m15_rate"),
