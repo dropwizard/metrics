@@ -230,6 +230,30 @@ public class MetricName implements Comparable<MetricName> {
         return true;
     }
 
+    public boolean startsWith(MetricName prefix) {
+        return key.startsWith(prefix.getKey());
+    }
+
+    public boolean endsWith(MetricName suffix) {
+      return key.endsWith(suffix.getKey());
+    }
+
+    public boolean contains(MetricName sub) {
+      return key.contains(sub.getKey());
+    }
+
+    public boolean startsWith(String prefix) {
+        return key.startsWith(prefix);
+    }
+
+    public boolean endsWith(String suffix) {
+        return key.endsWith(suffix);
+    }
+
+    public boolean contains(String sub) {
+        return key.contains(sub);
+    }
+
     @Override
     public int compareTo(MetricName o) {
         if (o == null)
