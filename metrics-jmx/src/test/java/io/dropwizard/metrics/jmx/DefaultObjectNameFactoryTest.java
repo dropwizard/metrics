@@ -1,4 +1,4 @@
-package io.dropwizard.metrics;
+package io.dropwizard.metrics.jmx;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,8 +7,8 @@ import javax.management.ObjectName;
 
 import org.junit.Test;
 
-import io.dropwizard.metrics.DefaultObjectNameFactory;
 import io.dropwizard.metrics.MetricName;
+import io.dropwizard.metrics.jmx.DefaultObjectNameFactory;
 
 public class DefaultObjectNameFactoryTest {
 
