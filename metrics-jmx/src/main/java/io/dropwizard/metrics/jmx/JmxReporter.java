@@ -1,7 +1,19 @@
-package io.dropwizard.metrics;
+package io.dropwizard.metrics.jmx;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.dropwizard.metrics.Counter;
+import io.dropwizard.metrics.Gauge;
+import io.dropwizard.metrics.Histogram;
+import io.dropwizard.metrics.Meter;
+import io.dropwizard.metrics.Metered;
+import io.dropwizard.metrics.MetricFilter;
+import io.dropwizard.metrics.MetricName;
+import io.dropwizard.metrics.MetricRegistry;
+import io.dropwizard.metrics.MetricRegistryListener;
+import io.dropwizard.metrics.Reporter;
+import io.dropwizard.metrics.Timer;
 
 import javax.management.*;
 
@@ -148,12 +160,10 @@ public class JmxReporter implements Reporter, Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JmxReporter.class);
 
-    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface MetricMBean {
         ObjectName objectName();
     }
-    // CHECKSTYLE:ON
 
 
     private abstract static class AbstractBean implements MetricMBean {
@@ -169,12 +179,10 @@ public class JmxReporter implements Reporter, Closeable {
         }
     }
 
-    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface JmxGaugeMBean extends MetricMBean {
         Object getValue();
     }
-    // CHECKSTYLE:ON
 
     private static class JmxGauge extends AbstractBean implements JmxGaugeMBean {
         private final Gauge<?> metric;
@@ -190,12 +198,10 @@ public class JmxReporter implements Reporter, Closeable {
         }
     }
 
-    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface JmxCounterMBean extends MetricMBean {
         long getCount();
     }
-    // CHECKSTYLE:ON
 
     private static class JmxCounter extends AbstractBean implements JmxCounterMBean {
         private final Counter metric;
@@ -211,7 +217,6 @@ public class JmxReporter implements Reporter, Closeable {
         }
     }
 
-    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface JmxHistogramMBean extends MetricMBean {
         long getCount();
@@ -238,7 +243,6 @@ public class JmxReporter implements Reporter, Closeable {
 
         long[] values();
     }
-    // CHECKSTYLE:ON
 
     private static class JmxHistogram implements JmxHistogramMBean {
         private final ObjectName objectName;
@@ -315,7 +319,6 @@ public class JmxReporter implements Reporter, Closeable {
         }
     }
 
-    //CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface JmxMeterMBean extends MetricMBean {
         long getCount();
@@ -330,7 +333,6 @@ public class JmxReporter implements Reporter, Closeable {
 
         String getRateUnit();
     }
-    //CHECKSTYLE:ON
 
     private static class JmxMeter extends AbstractBean implements JmxMeterMBean {
         private final Metered metric;
@@ -380,7 +382,6 @@ public class JmxReporter implements Reporter, Closeable {
         }
     }
 
-    // CHECKSTYLE:OFF
     @SuppressWarnings("UnusedDeclaration")
     public interface JmxTimerMBean extends JmxMeterMBean {
         double getMin();
@@ -406,7 +407,6 @@ public class JmxReporter implements Reporter, Closeable {
         long[] values();
         String getDurationUnit();
     }
-    // CHECKSTYLE:ON
 
     static class JmxTimer extends JmxMeter implements JmxTimerMBean {
         private final Timer metric;
@@ -687,11 +687,11 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         public TimeUnit durationFor(String name) {
-            return durationOverrides.containsKey(name) ? durationOverrides.get(name) : defaultDuration;
+            return durationOverrides.getOrDefault(name, defaultDuration);
         }
 
         public TimeUnit rateFor(String name) {
-            return rateOverrides.containsKey(name) ? rateOverrides.get(name) : defaultRate;
+            return rateOverrides.getOrDefault(name, defaultRate);
         }
     }
 

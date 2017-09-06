@@ -5,7 +5,6 @@ import static io.dropwizard.metrics.MetricRegistry.name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.dropwizard.metrics.JmxAttributeGauge;
 import io.dropwizard.metrics.Metric;
 import io.dropwizard.metrics.MetricName;
 import io.dropwizard.metrics.MetricSet;

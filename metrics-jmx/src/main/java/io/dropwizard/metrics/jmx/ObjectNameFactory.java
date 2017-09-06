@@ -1,7 +1,9 @@
-package io.dropwizard.metrics;
+package io.dropwizard.metrics.jmx;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+
+import io.dropwizard.metrics.MetricName;
 
 public interface ObjectNameFactory {
 

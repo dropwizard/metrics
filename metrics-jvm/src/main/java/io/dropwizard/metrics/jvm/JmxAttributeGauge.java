@@ -1,10 +1,12 @@
-package io.dropwizard.metrics;
+package io.dropwizard.metrics.jvm;
 
 import java.io.IOException;
 
 import javax.management.JMException;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
+
+import io.dropwizard.metrics.Gauge;
 
 import java.lang.management.ManagementFactory;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package io.dropwizard.metrics;
+package io.dropwizard.metrics.jvm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,6 +14,8 @@ import javax.management.ObjectName;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import io.dropwizard.metrics.jvm.JmxAttributeGauge;
 
 public class JmxAttributeGaugeTest {
 

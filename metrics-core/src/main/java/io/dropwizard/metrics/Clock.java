@@ -1,8 +1,5 @@
 package io.dropwizard.metrics;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
-
 /**
  * An abstraction for how time passes. It is passed to {@link Timer} to track timing.
  */
@@ -34,7 +31,6 @@ public abstract class Clock {
      * The default clock to use.
      *
      * @return the default {@link Clock} instance
-     *
      * @see Clock.UserTimeClock
      */
     public static Clock defaultClock() {
@@ -48,18 +44,6 @@ public abstract class Clock {
         @Override
         public long getTick() {
             return System.nanoTime();
-        }
-    }
-
-    /**
-     * A clock implementation which returns the current thread's CPU time.
-     */
-    public static class CpuTimeClock extends Clock {
-        private static final ThreadMXBean THREAD_MX_BEAN = ManagementFactory.getThreadMXBean();
-
-        @Override
-        public long getTick() {
-            return THREAD_MX_BEAN.getCurrentThreadCpuTime();
         }
     }
 }
