@@ -2,10 +2,12 @@ package com.codahale.metrics.jersey2.resources;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
+import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 
 @Path("/")
@@ -33,6 +35,27 @@ public class InstrumentedResource {
             throw new IOException("AUGH");
         }
         return "fuh";
+    }
+
+    @GET
+    @ResponseMetered
+    @Path("/response-2xx-metered")
+    public Response response2xxMetered() {
+        return Response.ok().build();
+    }
+
+    @GET
+    @ResponseMetered
+    @Path("/response-4xx-metered")
+    public Response response4xxMetered() {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    @GET
+    @ResponseMetered
+    @Path("/response-5xx-metered")
+    public Response response5xxMetered() {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
 
     @Path("/subresource")

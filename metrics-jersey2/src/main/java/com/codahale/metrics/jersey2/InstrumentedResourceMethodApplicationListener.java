@@ -7,7 +7,9 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
+import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
+import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.model.ModelProcessor;
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceMethod;
@@ -47,6 +49,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     private ConcurrentMap<EventTypeAndMethod, Timer> timers = new ConcurrentHashMap<>();
     private ConcurrentMap<Method, Meter> meters = new ConcurrentHashMap<>();
     private ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters = new ConcurrentHashMap<>();
+    private ConcurrentMap<Method, ResponseMeterMetric> responseMeters = new ConcurrentHashMap<>();
 
     private final Clock clock;
     private final boolean trackFilters;
@@ -93,6 +96,27 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                     exceptionMetered.absolute(), method, ExceptionMetered.DEFAULT_NAME_SUFFIX);
             this.meter = registry.meter(name);
             this.cause = exceptionMetered.cause();
+        }
+    }
+
+    /**
+     * A private class to maintain the metrics for a method annotated with the
+     * {@link ResponseMetered} annotation, which needs to maintain meters for
+     * different response codes
+     */
+    private static class ResponseMeterMetric {
+        public final Meter[] meters;
+        public ResponseMeterMetric(final MetricRegistry registry,
+                                   final ResourceMethod method,
+                                   final ResponseMetered responseMetered) {
+            final String metricName = chooseName(responseMetered.name(), responseMetered.absolute(), method);
+            this.meters = new Meter[]{
+                    registry.meter(name(metricName, "1xx-responses")), // 1xx
+                    registry.meter(name(metricName, "2xx-responses")), // 2xx
+                    registry.meter(name(metricName, "3xx-responses")), // 3xx
+                    registry.meter(name(metricName, "4xx-responses")), // 4xx
+                    registry.meter(name(metricName, "5xx-responses"))  // 5xx
+            };
         }
     }
 
@@ -208,6 +232,37 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         }
     }
 
+    private static class ResponseMeterRequestEventListener implements RequestEventListener {
+        private final ConcurrentMap<Method, ResponseMeterMetric> responseMeters;
+
+        public ResponseMeterRequestEventListener(final ConcurrentMap<Method, ResponseMeterMetric> responseMeters) {
+            this.responseMeters = responseMeters;
+        }
+
+        @Override
+        public void onEvent(RequestEvent event) {
+            if (event.getType() == RequestEvent.Type.FINISHED) {
+                final ResourceMethod method = event.getUriInfo().getMatchedResourceMethod();
+                final ResponseMeterMetric metric = (method != null) ?
+                        this.responseMeters.get(method.getInvocable().getDefinitionMethod()) : null;
+
+                if (metric != null) {
+                    ContainerResponse containerResponse = event.getContainerResponse();
+                    if (containerResponse == null) {
+                        if (event.getException() != null) {
+                            metric.meters[4].mark();
+                        }
+                    } else {
+                        final int responseStatus = containerResponse.getStatus() / 100;
+                        if (responseStatus >= 1 && responseStatus <= 5) {
+                            metric.meters[responseStatus - 1].mark();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private static class ChainedRequestEventListener implements RequestEventListener {
         private final RequestEventListener[] listeners;
 
@@ -247,11 +302,13 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
             final Timed classLevelTimed = getClassLevelAnnotation(resource, Timed.class);
             final Metered classLevelMetered = getClassLevelAnnotation(resource, Metered.class);
             final ExceptionMetered classLevelExceptionMetered = getClassLevelAnnotation(resource, ExceptionMetered.class);
+            final ResponseMetered classLevelResponseMetered = getClassLevelAnnotation(resource, ResponseMetered.class);
 
             for (final ResourceMethod method : resource.getAllMethods()) {
                 registerTimedAnnotations(method, classLevelTimed);
                 registerMeteredAnnotations(method, classLevelMetered);
                 registerExceptionMeteredAnnotations(method, classLevelExceptionMetered);
+                registerResponseMeteredAnnotations(method, classLevelResponseMetered);
             }
 
             for (final Resource childResource : resource.getChildResources()) {
@@ -259,15 +316,16 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                 final Timed classLevelTimedChild = getClassLevelAnnotation(childResource, Timed.class);
                 final Metered classLevelMeteredChild = getClassLevelAnnotation(childResource, Metered.class);
                 final ExceptionMetered classLevelExceptionMeteredChild = getClassLevelAnnotation(childResource, ExceptionMetered.class);
+                final ResponseMetered classLevelResponseMeteredChild = getClassLevelAnnotation(childResource, ResponseMetered.class);
 
                 for (final ResourceMethod method : childResource.getAllMethods()) {
                     registerTimedAnnotations(method, classLevelTimedChild);
                     registerMeteredAnnotations(method, classLevelMeteredChild);
                     registerExceptionMeteredAnnotations(method, classLevelExceptionMeteredChild);
+                    registerResponseMeteredAnnotations(method, classLevelResponseMeteredChild);
                 }
             }
         }
-
     }
 
     @Override
@@ -275,7 +333,8 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         final RequestEventListener listener = new ChainedRequestEventListener(
                 new TimerRequestEventListener(timers, clock),
                 new MeterRequestEventListener(meters),
-                new ExceptionMeterRequestEventListener(exceptionMeters));
+                new ExceptionMeterRequestEventListener(exceptionMeters),
+                new ResponseMeterRequestEventListener(responseMeters));
 
         return listener;
     }
@@ -340,6 +399,20 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
 
         if (annotation != null) {
             exceptionMeters.putIfAbsent(definitionMethod, new ExceptionMeterMetric(metrics, method, annotation));
+        }
+    }
+
+    private void registerResponseMeteredAnnotations(final ResourceMethod method, final ResponseMetered classLevelResponseMetered) {
+        final Method definitionMethod = method.getInvocable().getDefinitionMethod();
+
+        if (classLevelResponseMetered != null) {
+            responseMeters.putIfAbsent(definitionMethod, new ResponseMeterMetric(metrics, method, classLevelResponseMetered));
+            return;
+        }
+        final ResponseMetered annotation = definitionMethod.getAnnotation(ResponseMetered.class);
+
+        if (annotation != null) {
+            responseMeters.putIfAbsent(definitionMethod, new ResponseMeterMetric(metrics, method, annotation));
         }
     }
 
