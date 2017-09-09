@@ -1,6 +1,5 @@
 package com.codahale.metrics.jersey2;
 
-import com.codahale.metrics.Clock;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;

@@ -94,13 +94,16 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         return new EventTypeAndMethod(event.getType(), resourceMethod.getInvocable().getDefinitionMethod());
     }
 
-    private class TimerRequestEventListener implements RequestEventListener {
+    private static class TimerRequestEventListener implements RequestEventListener {
+
         private final ConcurrentMap<EventTypeAndMethod, Timer> timers;
+        private final Clock clock;
         private Timer.Context context = null;
         private final long start;
 
-        public TimerRequestEventListener(final ConcurrentMap<EventTypeAndMethod, Timer> timers) {
+        public TimerRequestEventListener(final ConcurrentMap<EventTypeAndMethod, Timer> timers, Clock clock) {
             this.timers = timers;
+            this.clock = clock;
             start = clock.getTick();
         }
 
@@ -255,7 +258,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     @Override
     public RequestEventListener onRequest(final RequestEvent event) {
         final RequestEventListener listener = new ChainedRequestEventListener(
-                new TimerRequestEventListener(timers),
+                new TimerRequestEventListener(timers, clock),
                 new MeterRequestEventListener(meters),
                 new ExceptionMeterRequestEventListener(exceptionMeters));
 
