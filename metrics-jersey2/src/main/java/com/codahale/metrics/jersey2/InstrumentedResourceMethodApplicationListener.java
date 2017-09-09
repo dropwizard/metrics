@@ -90,10 +90,12 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
 
         private final ConcurrentMap<EventTypeAndMethod, Timer> timers;
         private final Clock clock;
-        private Timer.Context context = null;
         private final long start;
+        private Timer.Context resourceMethodStartContext;
+        private Timer.Context requestMatchedContext;
+        private Timer.Context responseFiltersStartContext;
 
-        public TimerRequestEventListener(final ConcurrentMap<EventTypeAndMethod, Timer> timers, Clock clock) {
+        public TimerRequestEventListener(final ConcurrentMap<EventTypeAndMethod, Timer> timers, final Clock clock) {
             this.timers = timers;
             this.clock = clock;
             start = clock.getTick();
@@ -103,33 +105,39 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         public void onEvent(RequestEvent event) {
             switch (event.getType()) {
                 case RESOURCE_METHOD_START:
+                    resourceMethodStartContext = context(event);
+                    break;
                 case REQUEST_MATCHED:
+                    requestMatchedContext = context(event);
+                    break;
                 case RESP_FILTERS_START:
-                    final Timer timer = timer(event);
-                    if (timer == null) {
-                        return;
-                    }
-                    this.context = timer.time();
+                    responseFiltersStartContext = context(event);
                     break;
                 case RESOURCE_METHOD_FINISHED:
+                    if (resourceMethodStartContext != null) {
+                        resourceMethodStartContext.close();
+                    }
+                    break;
                 case REQUEST_FILTERED:
+                    if (requestMatchedContext != null) {
+                        requestMatchedContext.close();
+                    }
+                    break;
                 case RESP_FILTERS_FINISHED:
+                    if (responseFiltersStartContext != null) {
+                        responseFiltersStartContext.close();
+                    }
+                    break;
                 case FINISHED:
-                    if (this.context != null) {
-                        this.context.close();
-                        this.context = null;
+                    if (requestMatchedContext != null && responseFiltersStartContext != null) {
+                        final Timer timer = timer(event);
+                        if (timer != null) {
+                            timer.update(clock.getTick() - start, TimeUnit.NANOSECONDS);
+                        }
                     }
                     break;
                 default:
                     break;
-            }
-            if (event.getType() == RequestEvent.Type.FINISHED) {
-                final Timer timer = timer(event);
-                if (timer == null) {
-                    return;
-                }
-                long end = clock.getTick();
-                timer.update(end - start, TimeUnit.NANOSECONDS);
             }
         }
 
@@ -139,6 +147,11 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                 return null;
             }
             return timers.get(new EventTypeAndMethod(event.getType(), resourceMethod.getInvocable().getDefinitionMethod()));
+        }
+
+        private Timer.Context context(RequestEvent event) {
+            final Timer timer = timer(event);
+            return timer != null ? timer.time() : null;
         }
     }
 
