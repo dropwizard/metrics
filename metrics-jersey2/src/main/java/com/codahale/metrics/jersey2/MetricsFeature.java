@@ -15,14 +15,20 @@ public class MetricsFeature implements Feature {
 
     private final MetricRegistry registry;
     private final Clock clock;
+    private final boolean trackFilters;
 
     public MetricsFeature(MetricRegistry registry) {
-        this(registry, null);
+        this(registry, Clock.defaultClock());
     }
 
     public MetricsFeature(MetricRegistry registry, Clock clock) {
+        this(registry, clock, false);
+    }
+
+    public MetricsFeature(MetricRegistry registry, Clock clock, boolean trackFilters) {
         this.registry = registry;
         this.clock = clock;
+        this.trackFilters = trackFilters;
     }
 
     public MetricsFeature(String registryName) {
@@ -50,7 +56,7 @@ public class MetricsFeature implements Feature {
      */
     @Override
     public boolean configure(FeatureContext context) {
-        context.register(new InstrumentedResourceMethodApplicationListener(registry, clock));
+        context.register(new InstrumentedResourceMethodApplicationListener(registry, clock, trackFilters));
         return true;
     }
 }

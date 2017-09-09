@@ -49,6 +49,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     private ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters = new ConcurrentHashMap<>();
 
     private final Clock clock;
+    private final boolean trackFilters;
 
     /**
      * Construct an application event listener using the given metrics registry.
@@ -59,12 +60,21 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
      * @param metrics a {@link MetricRegistry}
      */
     public InstrumentedResourceMethodApplicationListener(final MetricRegistry metrics) {
-        this(metrics, null);
+        this(metrics, Clock.defaultClock(), false);
     }
 
-    public InstrumentedResourceMethodApplicationListener(final MetricRegistry metrics, final Clock clock) {
+    /**
+     * Constructs a custom application listener.
+     *
+     * @param metrics      the metrics registry where the metrics will be stored
+     * @param clock        the {@link Clock} to track time (used mostly in testing) in timers
+     * @param trackFilters whether the processing time for request and response filters should be tracked
+     */
+    public InstrumentedResourceMethodApplicationListener(final MetricRegistry metrics, final Clock clock,
+                                                         final boolean trackFilters) {
         this.metrics = metrics;
-        this.clock = clock != null ? clock : Clock.defaultClock();
+        this.clock = clock;
+        this.trackFilters = trackFilters;
     }
 
     /**
@@ -286,30 +296,22 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     private void registerTimedAnnotations(final ResourceMethod method, final Timed classLevelTimed) {
         final Method definitionMethod = method.getInvocable().getDefinitionMethod();
         if (classLevelTimed != null) {
-            timers.putIfAbsent(EventTypeAndMethod.requestMethodStart(definitionMethod), timerMetric(metrics, method, classLevelTimed));
-            if (classLevelTimed.name().isEmpty()) {
-                timers.putIfAbsent(EventTypeAndMethod.requestMatched(definitionMethod),
-                        timerMetric(metrics, method, classLevelTimed, REQUEST_FILTERING));
-                timers.putIfAbsent(EventTypeAndMethod.respFiltersStart(definitionMethod),
-                        timerMetric(metrics, method, classLevelTimed, RESPONSE_FILTERING));
-                timers.putIfAbsent(EventTypeAndMethod.finished(definitionMethod),
-                        timerMetric(metrics, method, classLevelTimed, TOTAL));
-            }
+            registerTimers(method, definitionMethod, classLevelTimed);
             return;
         }
 
         final Timed annotation = definitionMethod.getAnnotation(Timed.class);
-
         if (annotation != null) {
-            timers.putIfAbsent(EventTypeAndMethod.requestMethodStart(definitionMethod), timerMetric(metrics, method, annotation));
-            if (annotation.name().isEmpty()) {
-                timers.putIfAbsent(EventTypeAndMethod.requestMatched(definitionMethod),
-                        timerMetric(metrics, method, annotation, REQUEST_FILTERING));
-                timers.putIfAbsent(EventTypeAndMethod.respFiltersStart(definitionMethod),
-                        timerMetric(metrics, method, annotation, RESPONSE_FILTERING));
-                timers.putIfAbsent(EventTypeAndMethod.finished(definitionMethod),
-                        timerMetric(metrics, method, annotation, TOTAL));
-            }
+            registerTimers(method, definitionMethod, annotation);
+        }
+    }
+
+    private void registerTimers(ResourceMethod method, Method definitionMethod, Timed annotation) {
+        timers.putIfAbsent(EventTypeAndMethod.requestMethodStart(definitionMethod), timerMetric(metrics, method, annotation));
+        if (trackFilters) {
+            timers.putIfAbsent(EventTypeAndMethod.requestMatched(definitionMethod), timerMetric(metrics, method, annotation, REQUEST_FILTERING));
+            timers.putIfAbsent(EventTypeAndMethod.respFiltersStart(definitionMethod), timerMetric(metrics, method, annotation, RESPONSE_FILTERING));
+            timers.putIfAbsent(EventTypeAndMethod.finished(definitionMethod), timerMetric(metrics, method, annotation, TOTAL));
         }
     }
 
@@ -361,17 +363,16 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         return registry.meter(name);
     }
 
-    protected static String chooseName(final String explicitName, final boolean absolute, final ResourceMethod method, final String... suffixes) {
+    protected static String chooseName(final String explicitName, final boolean absolute, final ResourceMethod method,
+                                       final String... suffixes) {
+        final Method definitionMethod = method.getInvocable().getDefinitionMethod();
+        final String metricName;
         if (explicitName != null && !explicitName.isEmpty()) {
-            if (absolute) {
-                return explicitName;
-            }
-            return name(method.getInvocable().getDefinitionMethod().getDeclaringClass(), explicitName);
+            metricName = absolute ? explicitName : name(definitionMethod.getDeclaringClass(), explicitName);
+        } else {
+            metricName = name(definitionMethod.getDeclaringClass(), definitionMethod.getName());
         }
-
-        return name(name(method.getInvocable().getDefinitionMethod().getDeclaringClass(),
-                method.getInvocable().getDefinitionMethod().getName()),
-                suffixes);
+        return name(metricName, suffixes);
     }
 
     private static class EventTypeAndMethod {
