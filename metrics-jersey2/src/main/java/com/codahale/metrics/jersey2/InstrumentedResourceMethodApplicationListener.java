@@ -86,14 +86,6 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         }
     }
 
-    private static EventTypeAndMethod key(RequestEvent event) {
-        final ResourceMethod resourceMethod = event.getUriInfo().getMatchedResourceMethod();
-        if (resourceMethod == null) {
-            return null;
-        }
-        return new EventTypeAndMethod(event.getType(), resourceMethod.getInvocable().getDefinitionMethod());
-    }
-
     private static class TimerRequestEventListener implements RequestEventListener {
 
         private final ConcurrentMap<EventTypeAndMethod, Timer> timers;
@@ -142,11 +134,11 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         }
 
         private Timer timer(RequestEvent event) {
-            final EventTypeAndMethod key = key(event);
-            if (key == null) {
+            final ResourceMethod resourceMethod = event.getUriInfo().getMatchedResourceMethod();
+            if (resourceMethod == null) {
                 return null;
             }
-            return timers.get(key);
+            return timers.get(new EventTypeAndMethod(event.getType(), resourceMethod.getInvocable().getDefinitionMethod()));
         }
     }
 
