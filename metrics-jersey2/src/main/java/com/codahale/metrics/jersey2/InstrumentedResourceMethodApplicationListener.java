@@ -18,7 +18,6 @@ import org.glassfish.jersey.server.monitoring.RequestEvent;
 import org.glassfish.jersey.server.monitoring.RequestEventListener;
 
 import javax.ws.rs.core.Configuration;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.ext.Provider;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -37,27 +36,22 @@ import static com.codahale.metrics.MetricRegistry.name;
  * request events indicating that the method is about to be invoked, or just got done
  * being invoked.
  */
-
 @Provider
 public class InstrumentedResourceMethodApplicationListener implements ApplicationEventListener, ModelProcessor {
 
     private static final String[] REQUEST_FILTERING = {"request", "filtering"};
     private static final String[] RESPONSE_FILTERING = {"response", "filtering"};
     private static final String TOTAL = "total";
+
     private final MetricRegistry metrics;
     private ConcurrentMap<EventTypeAndMethod, Timer> timers = new ConcurrentHashMap<>();
     private ConcurrentMap<Method, Meter> meters = new ConcurrentHashMap<>();
     private ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters = new ConcurrentHashMap<>();
 
-    public interface ClockProvider {
-        Clock get();
-    }
-
-    private final ClockProvider clockProvider;
+    private final Clock clock;
 
     /**
      * Construct an application event listener using the given metrics registry.
-     * <p/>
      * <p/>
      * When using this constructor, the {@link InstrumentedResourceMethodApplicationListener}
      * should be added to a Jersey {@code ResourceConfig} as a singleton.
@@ -68,14 +62,9 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         this(metrics, null);
     }
 
-    public InstrumentedResourceMethodApplicationListener(final MetricRegistry metrics, ClockProvider clockProvider) {
+    public InstrumentedResourceMethodApplicationListener(final MetricRegistry metrics, final Clock clock) {
         this.metrics = metrics;
-        this.clockProvider = clockProvider != null ? clockProvider : new ClockProvider() {
-            @Override
-            public Clock get() {
-                return Clock.defaultClock();
-            }
-        };
+        this.clock = clock != null ? clock : Clock.defaultClock();
     }
 
     /**
@@ -102,9 +91,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         if (resourceMethod == null) {
             return null;
         }
-        return new EventTypeAndMethod(
-            event.getType(), resourceMethod.getInvocable().getDefinitionMethod()
-        );
+        return new EventTypeAndMethod(event.getType(), resourceMethod.getInvocable().getDefinitionMethod());
     }
 
     private class TimerRequestEventListener implements RequestEventListener {
@@ -114,39 +101,39 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
 
         public TimerRequestEventListener(final ConcurrentMap<EventTypeAndMethod, Timer> timers) {
             this.timers = timers;
-            start = clockProvider.get().getTick();
+            start = clock.getTick();
         }
 
         @Override
         public void onEvent(RequestEvent event) {
             switch (event.getType()) {
-            case RESOURCE_METHOD_START:
-            case REQUEST_MATCHED:
-            case RESP_FILTERS_START:
-                final Timer timer = timer(event);
-                if (timer == null) {
-                    return;
-                }
-                this.context = timer.time();
-                break;
-            case RESOURCE_METHOD_FINISHED:
-            case REQUEST_FILTERED:
-            case RESP_FILTERS_FINISHED:
-            case FINISHED:
-                if (this.context != null) {
-                    this.context.close();
-                    this.context = null;
-                }
-                break;
-            default:
-                break;
+                case RESOURCE_METHOD_START:
+                case REQUEST_MATCHED:
+                case RESP_FILTERS_START:
+                    final Timer timer = timer(event);
+                    if (timer == null) {
+                        return;
+                    }
+                    this.context = timer.time();
+                    break;
+                case RESOURCE_METHOD_FINISHED:
+                case REQUEST_FILTERED:
+                case RESP_FILTERS_FINISHED:
+                case FINISHED:
+                    if (this.context != null) {
+                        this.context.close();
+                        this.context = null;
+                    }
+                    break;
+                default:
+                    break;
             }
             if (event.getType() == RequestEvent.Type.FINISHED) {
                 final Timer timer = timer(event);
                 if (timer == null) {
                     return;
                 }
-                long end = clockProvider.get().getTick();
+                long end = clock.getTick();
                 timer.update(end - start, TimeUnit.NANOSECONDS);
             }
         }
@@ -291,14 +278,14 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     private void registerTimedAnnotations(final ResourceMethod method, final Timed classLevelTimed) {
         final Method definitionMethod = method.getInvocable().getDefinitionMethod();
         if (classLevelTimed != null) {
-            timers.putIfAbsent(EventTypeAndMethod.requestMethodStart(definitionMethod), timerMetric(this.metrics, method, classLevelTimed));
+            timers.putIfAbsent(EventTypeAndMethod.requestMethodStart(definitionMethod), timerMetric(metrics, method, classLevelTimed));
             if (classLevelTimed.name().isEmpty()) {
                 timers.putIfAbsent(EventTypeAndMethod.requestMatched(definitionMethod),
-                    timerMetric(this.metrics, method, classLevelTimed, REQUEST_FILTERING));
+                        timerMetric(metrics, method, classLevelTimed, REQUEST_FILTERING));
                 timers.putIfAbsent(EventTypeAndMethod.respFiltersStart(definitionMethod),
-                    timerMetric(this.metrics, method, classLevelTimed, RESPONSE_FILTERING));
+                        timerMetric(metrics, method, classLevelTimed, RESPONSE_FILTERING));
                 timers.putIfAbsent(EventTypeAndMethod.finished(definitionMethod),
-                    timerMetric(this.metrics, method, classLevelTimed, TOTAL));
+                        timerMetric(metrics, method, classLevelTimed, TOTAL));
             }
             return;
         }
@@ -306,14 +293,14 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         final Timed annotation = definitionMethod.getAnnotation(Timed.class);
 
         if (annotation != null) {
-            timers.putIfAbsent(EventTypeAndMethod.requestMethodStart(definitionMethod), timerMetric(this.metrics, method, annotation));
+            timers.putIfAbsent(EventTypeAndMethod.requestMethodStart(definitionMethod), timerMetric(metrics, method, annotation));
             if (annotation.name().isEmpty()) {
                 timers.putIfAbsent(EventTypeAndMethod.requestMatched(definitionMethod),
-                    timerMetric(this.metrics, method, annotation, REQUEST_FILTERING));
+                        timerMetric(metrics, method, annotation, REQUEST_FILTERING));
                 timers.putIfAbsent(EventTypeAndMethod.respFiltersStart(definitionMethod),
-                    timerMetric(this.metrics, method, annotation, RESPONSE_FILTERING));
+                        timerMetric(metrics, method, annotation, RESPONSE_FILTERING));
                 timers.putIfAbsent(EventTypeAndMethod.finished(definitionMethod),
-                    timerMetric(this.metrics, method, annotation, TOTAL));
+                        timerMetric(metrics, method, annotation, TOTAL));
             }
         }
     }
@@ -347,14 +334,14 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private Timer timerMetric(final MetricRegistry registry,
-                                     final ResourceMethod method,
-                                     final Timed timed,
-                                     final String... suffixes) {
+                              final ResourceMethod method,
+                              final Timed timed,
+                              final String... suffixes) {
         final String name = chooseName(timed.name(), timed.absolute(), method, suffixes);
         return registry.timer(name, new MetricRegistry.MetricSupplier<Timer>() {
             @Override
             public Timer newMetric() {
-                return new Timer(new ExponentiallyDecayingReservoir(), clockProvider.get());
+                return new Timer(new ExponentiallyDecayingReservoir(), clock);
             }
         });
     }
@@ -375,34 +362,33 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         }
 
         return name(name(method.getInvocable().getDefinitionMethod().getDeclaringClass(),
-                        method.getInvocable().getDefinitionMethod().getName()),
+                method.getInvocable().getDefinitionMethod().getName()),
                 suffixes);
     }
 
-    static final class EventTypeAndMethod {
-        @NotNull
+    private static class EventTypeAndMethod {
+
         private final RequestEvent.Type type;
-        @NotNull
         private final Method method;
 
-        public EventTypeAndMethod(RequestEvent.Type type, Method method) {
+        private EventTypeAndMethod(RequestEvent.Type type, Method method) {
             this.type = type;
             this.method = method;
         }
 
-        public static EventTypeAndMethod requestMethodStart(Method method) {
+        static EventTypeAndMethod requestMethodStart(Method method) {
             return new EventTypeAndMethod(RequestEvent.Type.RESOURCE_METHOD_START, method);
         }
 
-        public static EventTypeAndMethod requestMatched(Method method) {
+        static EventTypeAndMethod requestMatched(Method method) {
             return new EventTypeAndMethod(RequestEvent.Type.REQUEST_MATCHED, method);
         }
 
-        public static EventTypeAndMethod respFiltersStart(Method method) {
+        static EventTypeAndMethod respFiltersStart(Method method) {
             return new EventTypeAndMethod(RequestEvent.Type.RESP_FILTERS_START, method);
         }
 
-        public static EventTypeAndMethod finished(Method method) {
+        static EventTypeAndMethod finished(Method method) {
             return new EventTypeAndMethod(RequestEvent.Type.FINISHED, method);
         }
 

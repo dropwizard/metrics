@@ -12,6 +12,7 @@ import java.io.IOException;
 @Path("/")
 @Produces(MediaType.TEXT_PLAIN)
 public class InstrumentedResource {
+
     private final TestClock testClock;
 
     public InstrumentedResource(TestClock testClock) {

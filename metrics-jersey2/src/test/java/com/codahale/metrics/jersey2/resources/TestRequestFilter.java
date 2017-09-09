@@ -1,13 +1,13 @@
 package com.codahale.metrics.jersey2.resources;
 
-import java.io.IOException;
+import com.codahale.metrics.jersey2.TestClock;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import java.io.IOException;
 
-import com.codahale.metrics.jersey2.TestClock;
+public class TestRequestFilter implements ContainerRequestFilter {
 
-public class TestRequestFilter implements ContainerRequestFilter{
     private final TestClock testClock;
 
     public TestRequestFilter(TestClock testClock) {

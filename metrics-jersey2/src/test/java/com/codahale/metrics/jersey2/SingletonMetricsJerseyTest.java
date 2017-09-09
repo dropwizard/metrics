@@ -39,19 +39,12 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
 
     private TestClock testClock;
 
-    public class TestClockProvider implements InstrumentedResourceMethodApplicationListener.ClockProvider {
-        @Override
-        public Clock get() {
-            return testClock;
-        }
-    }
-
     @Override
     protected Application configure() {
-        this.registry = new MetricRegistry();
+        registry = new MetricRegistry();
         testClock = new TestClock();
         ResourceConfig config = new ResourceConfig();
-        config = config.register(new MetricsFeature(this.registry, new TestClockProvider()));
+        config = config.register(new MetricsFeature(this.registry, testClock));
         config = config.register(new TestRequestFilter(testClock));
         config = config.register(new InstrumentedResource(testClock));
 

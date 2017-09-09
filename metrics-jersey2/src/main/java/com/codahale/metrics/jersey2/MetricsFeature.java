@@ -1,5 +1,6 @@
 package com.codahale.metrics.jersey2;
 
+import com.codahale.metrics.Clock;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SharedMetricRegistries;
 
@@ -13,15 +14,15 @@ import javax.ws.rs.core.FeatureContext;
 public class MetricsFeature implements Feature {
 
     private final MetricRegistry registry;
-    private final InstrumentedResourceMethodApplicationListener.ClockProvider clockProvider;
+    private final Clock clock;
 
     public MetricsFeature(MetricRegistry registry) {
         this(registry, null);
     }
 
-    public MetricsFeature(MetricRegistry registry, InstrumentedResourceMethodApplicationListener.ClockProvider clockProvider) {
+    public MetricsFeature(MetricRegistry registry, Clock clock) {
         this.registry = registry;
-        this.clockProvider = clockProvider;
+        this.clock = clock;
     }
 
     public MetricsFeature(String registryName) {
@@ -49,7 +50,7 @@ public class MetricsFeature implements Feature {
      */
     @Override
     public boolean configure(FeatureContext context) {
-        context.register(new InstrumentedResourceMethodApplicationListener(registry, clockProvider));
+        context.register(new InstrumentedResourceMethodApplicationListener(registry, clock));
         return true;
     }
 }
