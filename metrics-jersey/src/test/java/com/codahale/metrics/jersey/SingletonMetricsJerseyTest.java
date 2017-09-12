@@ -1,5 +1,6 @@
 package com.codahale.metrics.jersey;
 
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.test.framework.AppDescriptor;
@@ -63,6 +64,77 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
+    public void responseMetered2xxMethodsAreMetered() {
+        final Meter meter = registry.meter(name(InstrumentedResource.class,
+                "responseMetered2xx",
+                "2xx-responses"));
+
+        assertThat(meter.getCount())
+                .isZero();
+
+        assertThat(resource().path("response-metered-2xx")
+                .get(ClientResponse.class).getStatus()).isEqualTo(200);
+
+
+        assertThat(meter.getCount())
+                .isEqualTo(1);
+    }
+
+    @Test
+    public void responseMetered3xxMethodsAreMetered() {
+        final Meter meter = registry.meter(name(InstrumentedResource.class,
+                "responseMetered3xx",
+                "3xx-responses"));
+
+        assertThat(meter.getCount())
+                .isZero();
+
+        assertThat(resource().path("response-metered-3xx")
+                .get(ClientResponse.class).getStatus()).isEqualTo(304);
+
+
+        assertThat(meter.getCount())
+                .isEqualTo(1);
+    }
+
+    @Test
+    public void responseMetered5xxMethodsAreMetered() {
+        final Meter meter = registry.meter(name(InstrumentedResource.class,
+                "responseMetered5xx",
+                "5xx-responses"));
+
+        assertThat(meter.getCount())
+                .isZero();
+
+        assertThat(resource().path("response-metered-5xx")
+                .get(ClientResponse.class).getStatus()).isEqualTo(500);
+
+
+        assertThat(meter.getCount())
+                .isEqualTo(1);
+    }
+
+    @Test
+    public void responseMeteredIOExceptionMethodsAreMetered() {
+        final Meter meter = registry.meter(name(InstrumentedResource.class,
+                "responseMeteredIOException",
+                "5xx-responses"));
+
+        assertThat(meter.getCount())
+                .isZero();
+        try {
+            resource().path("response-metered-io-exception").get(String.class);
+            failBecauseExceptionWasNotThrown(MappableContainerException.class);
+        } catch (MappableContainerException e) {
+            assertThat(e.getCause())
+                    .isInstanceOf(IOException.class);
+        }
+
+        assertThat(meter.getCount())
+                .isEqualTo(1);
+    }
+
+    @Test
     public void exceptionMeteredMethodsAreExceptionMetered() {
         final Meter meter = registry.meter(name(InstrumentedResource.class,
                                                 "exceptionMetered",
@@ -73,7 +145,7 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
 
         assertThat(meter.getCount())
                 .isZero();
-        
+
         try {
             resource().path("exception-metered").queryParam("splode", "true").get(String.class);
             failBecauseExceptionWasNotThrown(MappableContainerException.class);
