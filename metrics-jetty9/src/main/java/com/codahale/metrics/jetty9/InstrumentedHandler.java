@@ -1,26 +1,27 @@
 package com.codahale.metrics.jetty9;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.Metered;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.RatioGauge;
 import com.codahale.metrics.Timer;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.server.AsyncContextState;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpChannelState;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
-
-import javax.servlet.AsyncEvent;
-import javax.servlet.AsyncListener;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * A Jetty {@link Handler} which records various metrics about an underlying {@link Handler}
@@ -131,53 +132,15 @@ public class InstrumentedHandler extends HandlerWrapper {
         this.moveRequests = metricRegistry.timer(name(prefix, "move-requests"));
         this.otherRequests = metricRegistry.timer(name(prefix, "other-requests"));
 
-        metricRegistry.register(name(prefix, "percent-4xx-1m"), new RatioGauge() {
-            @Override
-            protected Ratio getRatio() {
-                return Ratio.of(responses[3].getOneMinuteRate(),
-                        requests.getOneMinuteRate());
-            }
-        });
+        final Meter responses4xx = responses[3];
+        metricRegistry.register(name(prefix, "percent-4xx-1m"), new ResponseFamilyGuage(requests, responses4xx, ResponseFamilyGuage.ONE_MINUTE_RATE));
+        metricRegistry.register(name(prefix, "percent-4xx-5m"), new ResponseFamilyGuage(requests, responses4xx, ResponseFamilyGuage.FIVE_MINUTE_RATE));
+        metricRegistry.register(name(prefix, "percent-4xx-15m"), new ResponseFamilyGuage(requests, responses4xx, ResponseFamilyGuage.FIFTEEN_MINUTE_RATE));
 
-        metricRegistry.register(name(prefix, "percent-4xx-5m"), new RatioGauge() {
-            @Override
-            protected Ratio getRatio() {
-                return Ratio.of(responses[3].getFiveMinuteRate(),
-                        requests.getFiveMinuteRate());
-            }
-        });
-
-        metricRegistry.register(name(prefix, "percent-4xx-15m"), new RatioGauge() {
-            @Override
-            protected Ratio getRatio() {
-                return Ratio.of(responses[3].getFifteenMinuteRate(),
-                        requests.getFifteenMinuteRate());
-            }
-        });
-
-        metricRegistry.register(name(prefix, "percent-5xx-1m"), new RatioGauge() {
-            @Override
-            protected Ratio getRatio() {
-                return Ratio.of(responses[4].getOneMinuteRate(),
-                        requests.getOneMinuteRate());
-            }
-        });
-
-        metricRegistry.register(name(prefix, "percent-5xx-5m"), new RatioGauge() {
-            @Override
-            protected Ratio getRatio() {
-                return Ratio.of(responses[4].getFiveMinuteRate(),
-                        requests.getFiveMinuteRate());
-            }
-        });
-
-        metricRegistry.register(name(prefix, "percent-5xx-15m"), new RatioGauge() {
-            @Override
-            public Ratio getRatio() {
-                return Ratio.of(responses[4].getFifteenMinuteRate(),
-                        requests.getFifteenMinuteRate());
-            }
-        });
+        final Meter responses5xx = responses[4];
+        metricRegistry.register(name(prefix, "percent-5xx-1m"), new ResponseFamilyGuage(requests, responses5xx, ResponseFamilyGuage.ONE_MINUTE_RATE));
+        metricRegistry.register(name(prefix, "percent-5xx-5m"), new ResponseFamilyGuage(requests, responses5xx, ResponseFamilyGuage.FIVE_MINUTE_RATE));
+        metricRegistry.register(name(prefix, "percent-5xx-15m"), new ResponseFamilyGuage(requests, responses5xx, ResponseFamilyGuage.FIFTEEN_MINUTE_RATE));
 
 
         this.listener = new AsyncListener() {
@@ -292,5 +255,27 @@ public class InstrumentedHandler extends HandlerWrapper {
         final long elapsedTime = System.currentTimeMillis() - start;
         requests.update(elapsedTime, TimeUnit.MILLISECONDS);
         requestTimer(request.getMethod()).update(elapsedTime, TimeUnit.MILLISECONDS);
+    }
+
+    static class ResponseFamilyGuage extends RatioGauge {
+        static final Function<Metered, Double> ONE_MINUTE_RATE = (meter) -> meter.getOneMinuteRate();
+        static final Function<Metered, Double> FIVE_MINUTE_RATE = (meter) -> meter.getFiveMinuteRate();
+        static final Function<Metered, Double> FIFTEEN_MINUTE_RATE = (meter) -> meter.getFifteenMinuteRate();
+
+        private final Metered requests;
+        private final Metered responses;
+        private final Function<Metered, Double> rateFunction;
+
+        public ResponseFamilyGuage(Metered requests, Metered responses, Function<Metered, Double> rateFunction) {
+            this.requests = requests;
+            this.responses = responses;
+            this.rateFunction = rateFunction;
+        }
+
+        @Override
+        protected Ratio getRatio() {
+            return Ratio.of(rateFunction.apply(responses),
+                            rateFunction.apply(requests));
+        }
     }
 }

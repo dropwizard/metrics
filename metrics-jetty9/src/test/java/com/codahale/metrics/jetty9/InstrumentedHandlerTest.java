@@ -1,6 +1,27 @@
 package com.codahale.metrics.jetty9;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.offset;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.codahale.metrics.Clock;
+import com.codahale.metrics.ExponentiallyDecayingReservoir;
+import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.RatioGauge;
+import com.codahale.metrics.Timer;
+import com.codahale.metrics.jetty9.InstrumentedHandler.ResponseFamilyGuage;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
+import javax.servlet.AsyncContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.server.Request;
@@ -11,21 +32,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.LockSupport;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class InstrumentedHandlerTest {
+    private static final long FIRST_JAN_2017 = 1483228800000000000l;
+    public static final long ONE_SECOND_NS = TimeUnit.SECONDS.toNanos(1);
+    public static final long ONE_DAY_NS = TimeUnit.DAYS.toNanos(1);
     private final HttpClient client = new HttpClient();
     private final MetricRegistry registry = new MetricRegistry();
     private final Server server = new Server();
@@ -127,6 +137,36 @@ public class InstrumentedHandlerTest {
 
         assertThat(registry.getTimers().get(metricName() + ".requests")
                 .getSnapshot().getMedian()).isGreaterThan(0.0).isLessThan(TimeUnit.SECONDS.toNanos(1));
+    }
+
+    /**
+     * Because of double arithmetic being in-precise, decaying a double might eventually reach a steady value of 3.0E-323 for example.
+     * If the EWMAs used in the requests and response metrics eventually tend to such a steady value, the percent-Nxx guages would also tend to 1.0.
+     * This might give the false impression that there is a high failure rate in response metrics. We test here that the response family guages eventually reach NaN rather than 1.0.
+     */
+    @Test
+    public void responseFamilyGuageDoesNotTendToOne() {
+        Clock clock = mock(Clock.class);
+        when(clock.getTick()).thenReturn(FIRST_JAN_2017);
+
+        Timer requests = new Timer(new ExponentiallyDecayingReservoir(), clock);
+        Meter responses = new Meter(clock);
+
+        requests.update(1, TimeUnit.MILLISECONDS);
+        requests.update(1, TimeUnit.MILLISECONDS);
+        responses.mark();
+
+        when(clock.getTick()).thenReturn(FIRST_JAN_2017 + ONE_SECOND_NS * 10l);
+
+        RatioGauge guage = new ResponseFamilyGuage(requests, responses, ResponseFamilyGuage.ONE_MINUTE_RATE);
+
+        assertThat(guage.getValue()).isEqualTo(0.5, offset(0.000001));
+
+        when(clock.getTick()).thenReturn(FIRST_JAN_2017 + ONE_DAY_NS);
+
+        assertThat(guage.getValue()).isNotEqualTo(1.0);
+        assertThat(guage.getValue()).isEqualTo(Double.NaN);
+
     }
 
     private String uri(String path) {
