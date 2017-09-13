@@ -262,6 +262,8 @@ public class InstrumentedHandler extends HandlerWrapper {
         static final Function<Metered, Double> FIVE_MINUTE_RATE = (meter) -> meter.getFiveMinuteRate();
         static final Function<Metered, Double> FIFTEEN_MINUTE_RATE = (meter) -> meter.getFifteenMinuteRate();
 
+        private static final double EPSILON = 3.0E-300;
+
         private final Metered requests;
         private final Metered responses;
         private final Function<Metered, Double> rateFunction;
@@ -274,8 +276,11 @@ public class InstrumentedHandler extends HandlerWrapper {
 
         @Override
         protected Ratio getRatio() {
-            return Ratio.of(rateFunction.apply(responses),
-                            rateFunction.apply(requests));
+            double responseRate = rateFunction.apply(responses);
+            double requestRate = rateFunction.apply(requests);
+
+            return Ratio.of(responseRate < EPSILON ? 0 : responseRate,
+                            requestRate);
         }
     }
 }

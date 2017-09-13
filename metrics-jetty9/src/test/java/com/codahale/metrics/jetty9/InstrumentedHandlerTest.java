@@ -1,5 +1,7 @@
 package com.codahale.metrics.jetty9;
 
+import static java.util.concurrent.TimeUnit.DAYS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
 import static org.mockito.Mockito.mock;
@@ -33,9 +35,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class InstrumentedHandlerTest {
-    private static final long FIRST_JAN_2017 = 1483228800000000000l;
-    public static final long ONE_SECOND_NS = TimeUnit.SECONDS.toNanos(1);
-    public static final long ONE_DAY_NS = TimeUnit.DAYS.toNanos(1);
     private final HttpClient client = new HttpClient();
     private final MetricRegistry registry = new MetricRegistry();
     private final Server server = new Server();
@@ -133,10 +132,10 @@ public class InstrumentedHandlerTest {
 
 
         assertThat(registry.getTimers().get(metricName() + ".get-requests")
-                .getSnapshot().getMedian()).isGreaterThan(0.0).isLessThan(TimeUnit.SECONDS.toNanos(1));
+                .getSnapshot().getMedian()).isGreaterThan(0.0).isLessThan(SECONDS.toNanos(1));
 
         assertThat(registry.getTimers().get(metricName() + ".requests")
-                .getSnapshot().getMedian()).isGreaterThan(0.0).isLessThan(TimeUnit.SECONDS.toNanos(1));
+                .getSnapshot().getMedian()).isGreaterThan(0.0).isLessThan(SECONDS.toNanos(1));
     }
 
     /**
@@ -147,7 +146,7 @@ public class InstrumentedHandlerTest {
     @Test
     public void responseFamilyGuageDoesNotTendToOne() {
         Clock clock = mock(Clock.class);
-        when(clock.getTick()).thenReturn(FIRST_JAN_2017);
+        when(clock.getTick()).thenReturn(0L);
 
         Timer requests = new Timer(new ExponentiallyDecayingReservoir(), clock);
         Meter responses = new Meter(clock);
@@ -156,16 +155,16 @@ public class InstrumentedHandlerTest {
         requests.update(1, TimeUnit.MILLISECONDS);
         responses.mark();
 
-        when(clock.getTick()).thenReturn(FIRST_JAN_2017 + ONE_SECOND_NS * 10l);
+        when(clock.getTick()).thenReturn(SECONDS.toNanos(10));
 
         RatioGauge guage = new ResponseFamilyGuage(requests, responses, ResponseFamilyGuage.ONE_MINUTE_RATE);
 
         assertThat(guage.getValue()).isEqualTo(0.5, offset(0.000001));
 
-        when(clock.getTick()).thenReturn(FIRST_JAN_2017 + ONE_DAY_NS);
+        when(clock.getTick()).thenReturn(DAYS.toNanos(1));
 
         assertThat(guage.getValue()).isNotEqualTo(1.0);
-        assertThat(guage.getValue()).isEqualTo(Double.NaN);
+        assertThat(guage.getValue()).isEqualTo(0.0);
 
     }
 
