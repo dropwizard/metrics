@@ -68,55 +68,55 @@ public class ThreadStatesGaugeSetTest {
 
     @Test
     public void hasAGaugeForEachThreadState() throws Exception {
-        assertThat(((Gauge) gauges.getMetrics().get("new.count")).getValue())
+        assertThat(((Gauge<?>) gauges.getMetrics().get("new.count")).getValue())
                 .isEqualTo(1);
 
-        assertThat(((Gauge) gauges.getMetrics().get("runnable.count")).getValue())
+        assertThat(((Gauge<?>) gauges.getMetrics().get("runnable.count")).getValue())
                 .isEqualTo(1);
 
-        assertThat(((Gauge) gauges.getMetrics().get("blocked.count")).getValue())
+        assertThat(((Gauge<?>) gauges.getMetrics().get("blocked.count")).getValue())
                 .isEqualTo(1);
 
-        assertThat(((Gauge) gauges.getMetrics().get("waiting.count")).getValue())
+        assertThat(((Gauge<?>) gauges.getMetrics().get("waiting.count")).getValue())
                 .isEqualTo(1);
 
-        assertThat(((Gauge) gauges.getMetrics().get("timed_waiting.count")).getValue())
+        assertThat(((Gauge<?>) gauges.getMetrics().get("timed_waiting.count")).getValue())
                 .isEqualTo(1);
 
-        assertThat(((Gauge) gauges.getMetrics().get("terminated.count")).getValue())
+        assertThat(((Gauge<?>) gauges.getMetrics().get("terminated.count")).getValue())
                 .isEqualTo(1);
     }
 
     @Test
     public void hasAGaugeForTheNumberOfThreads() throws Exception {
-        assertThat(((Gauge) gauges.getMetrics().get("count")).getValue())
+        assertThat(((Gauge<?>) gauges.getMetrics().get("count")).getValue())
                 .isEqualTo(12);
     }
 
     @Test
     public void hasAGaugeForTheNumberOfDaemonThreads() throws Exception {
-        assertThat(((Gauge) gauges.getMetrics().get("daemon.count")).getValue())
+        assertThat(((Gauge<?>) gauges.getMetrics().get("daemon.count")).getValue())
                 .isEqualTo(13);
     }
 
     @Test
     public void hasAGaugeForAnyDeadlocks() throws Exception {
-        assertThat(((Gauge) gauges.getMetrics().get("deadlocks")).getValue())
+        assertThat(((Gauge<?>) gauges.getMetrics().get("deadlocks")).getValue())
                 .isEqualTo(deadlocks);
     }
 
     @Test
     public void hasAGaugeForAnyDeadlockCount() throws Exception {
-        assertThat(((Gauge) gauges.getMetrics().get("deadlock.count")).getValue())
+        assertThat(((Gauge<?>) gauges.getMetrics().get("deadlock.count")).getValue())
                 .isEqualTo(1);
     }
 
     @Test
     public void autoDiscoversTheMXBeans() throws Exception {
         final ThreadStatesGaugeSet set = new ThreadStatesGaugeSet();
-        assertThat(((Gauge) set.getMetrics().get("count")).getValue())
+        assertThat(((Gauge<?>) set.getMetrics().get("count")).getValue())
                 .isNotNull();
-        assertThat(((Gauge) set.getMetrics().get("deadlocks")).getValue())
+        assertThat(((Gauge<?>) set.getMetrics().get("deadlocks")).getValue())
                 .isNotNull();
     }
 }
