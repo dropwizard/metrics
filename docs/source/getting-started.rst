@@ -138,7 +138,7 @@ To run
 
 .. code-block:: sh
 
-  mvn package exec:java -Dexec.mainClass=sample.First
+  mvn package exec:java -Dexec.mainClass=sample.GetStarted
 
 
 .. _gs-registry:
