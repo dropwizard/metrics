@@ -21,7 +21,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class CsvReporter extends ScheduledReporter {
     private static final String DEFAULT_SEPARATOR = ",";
-    
+
     /**
      * Returns a new {@link Builder} for {@link CsvReporter}.
      *
@@ -122,7 +122,7 @@ public class CsvReporter extends ScheduledReporter {
 
         /**
          * Use the given string to use as the separator for values.
-         * 
+         *
          * @param separator the string to use for the separator.
          * @return {@code this}
          */
@@ -210,9 +210,9 @@ public class CsvReporter extends ScheduledReporter {
         this.clock = clock;
         this.csvFileProvider = csvFileProvider;
 
-        this.histogramFormat = String.join(separator, "%d","%d","%f","%d","%f","%f","%f","%f","%f","%f","%f");
+        this.histogramFormat = String.join(separator, "%d", "%d", "%f", "%d", "%f", "%f", "%f", "%f", "%f", "%f", "%f");
         this.meterFormat = String.join(separator, "%d", "%f", "%f", "%f", "%f", "events/%s");
-        this.timerFormat = String.join(separator, "%d","%f","%f","%f","%f","%f","%f","%f","%f","%f","%f","%f","%f","%f","%f","calls/%s","%s");
+        this.timerFormat = String.join(separator, "%d", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "calls/%s", "%s");
     }
 
     @Override
