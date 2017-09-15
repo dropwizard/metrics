@@ -16,6 +16,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * A reporter which creates a comma-separated values file of the measurements for each metric.
  */
 public class CsvReporter extends ScheduledReporter {
+    private static final char DEFAULT_SEPARATOR = ',';
+    
     /**
      * Returns a new {@link Builder} for {@link CsvReporter}.
      *
@@ -33,6 +35,7 @@ public class CsvReporter extends ScheduledReporter {
     public static class Builder {
         private final MetricRegistry registry;
         private Locale locale;
+        private char separator;
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private Clock clock;
@@ -44,6 +47,7 @@ public class CsvReporter extends ScheduledReporter {
         private Builder(MetricRegistry registry) {
             this.registry = registry;
             this.locale = Locale.getDefault();
+            this.separator = DEFAULT_SEPARATOR;
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.clock = Clock.defaultClock();
@@ -113,6 +117,17 @@ public class CsvReporter extends ScheduledReporter {
         }
 
         /**
+         * Use the given character as the separator for values.
+         * 
+         * @param separator the character to use for the separator.
+         * @return {@code this}
+         */
+        public Builder withSeparator(char separator) {
+            this.separator = separator;
+            return this;
+        }
+
+        /**
          * Use the given {@link Clock} instance for the time.
          *
          * @param clock a {@link Clock} instance
@@ -150,6 +165,7 @@ public class CsvReporter extends ScheduledReporter {
             return new CsvReporter(registry,
                     directory,
                     locale,
+                    separator,
                     rateUnit,
                     durationUnit,
                     clock,
@@ -164,12 +180,14 @@ public class CsvReporter extends ScheduledReporter {
 
     private final File directory;
     private final Locale locale;
+    private final char separator;
     private final Clock clock;
     private final CsvFileProvider csvFileProvider;
 
     private CsvReporter(MetricRegistry registry,
                         File directory,
                         Locale locale,
+                        char separator,
                         TimeUnit rateUnit,
                         TimeUnit durationUnit,
                         Clock clock,
@@ -180,6 +198,7 @@ public class CsvReporter extends ScheduledReporter {
         super(registry, "csv-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop);
         this.directory = directory;
         this.locale = locale;
+        this.separator = separator;
         this.clock = clock;
         this.csvFileProvider = csvFileProvider;
     }
@@ -220,7 +239,10 @@ public class CsvReporter extends ScheduledReporter {
         report(timestamp,
                 name,
                 "count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
-                "%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,calls/%s,%s",
+                "%d" + separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f" +
+                        separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f" +
+                        separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f" + separator + "calls/%s" +
+                        separator + "%s",
                 timer.getCount(),
                 convertDuration(snapshot.getMax()),
                 convertDuration(snapshot.getMean()),
@@ -244,7 +266,7 @@ public class CsvReporter extends ScheduledReporter {
         report(timestamp,
                 name,
                 "count,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit",
-                "%d,%f,%f,%f,%f,events/%s",
+                "%d" + separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f" + separator + "events/%s",
                 meter.getCount(),
                 convertRate(meter.getMeanRate()),
                 convertRate(meter.getOneMinuteRate()),
@@ -259,7 +281,8 @@ public class CsvReporter extends ScheduledReporter {
         report(timestamp,
                 name,
                 "count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999",
-                "%d,%d,%f,%d,%f,%f,%f,%f,%f,%f,%f",
+                "%d" + separator +"%d" + separator + "%f" + separator + "%d" + separator + "%f" + separator + "%f" 
+                        + separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f",
                 histogram.getCount(),
                 snapshot.getMax(),
                 snapshot.getMean(),
@@ -291,7 +314,7 @@ public class CsvReporter extends ScheduledReporter {
                     if (!fileAlreadyExists) {
                         out.println("t," + header);
                     }
-                    out.printf(locale, String.format(locale, "%d,%s%n", timestamp, line), values);
+                    out.printf(locale, String.format(locale, "%d" + separator + "%s%n", timestamp, line), values);
                 }
             }
         } catch (IOException e) {
