@@ -166,27 +166,21 @@ public class GraphiteReporterTest {
 
     @Test
     public void reportsDoubleGaugeValuesWithCustomFormat() throws Exception {
-        final GraphiteReporter graphiteReporter = new GraphiteReporter(registry, graphite, clock, "prefix",
-                TimeUnit.SECONDS, TimeUnit.MICROSECONDS, MetricFilter.ALL, null, false,
-                Collections.emptySet()){
-            @Override
-            protected String format(double v) {
-                return String.format(Locale.US, "%4.4f", v);
-            }
-        };
-        graphiteReporter.report(map("gauge", gauge(1.13574)),
-                map(),
-                map(),
-                map(),
-                map());
+        try (final GraphiteReporter graphiteReporter = getReporterWithCustomFormat()) {
+          graphiteReporter.report(map("gauge", gauge(1.13574)),
+                  map(),
+                  map(),
+                  map(),
+                  map());
 
-        final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).connect();
-        inOrder.verify(graphite).send("prefix.gauge", "1.1357", timestamp);
-        inOrder.verify(graphite).flush();
-        inOrder.verify(graphite).close();
+          final InOrder inOrder = inOrder(graphite);
+          inOrder.verify(graphite).connect();
+          inOrder.verify(graphite).send("prefix.gauge", "1.1357", timestamp);
+          inOrder.verify(graphite).flush();
+          inOrder.verify(graphite).close();
 
-        verifyNoMoreInteractions(graphite);
+          verifyNoMoreInteractions(graphite);
+        }
     }
 
     @Test
@@ -455,6 +449,16 @@ public class GraphiteReporterTest {
         verifyNoMoreInteractions(graphite);
     }
 
+    private GraphiteReporter getReporterWithCustomFormat() {
+      return new GraphiteReporter(registry, graphite, clock, "prefix",
+          TimeUnit.SECONDS, TimeUnit.MICROSECONDS, MetricFilter.ALL, null, false,
+          Collections.emptySet()) {
+        @Override
+        protected String format(double v) {
+          return String.format(Locale.US, "%4.4f", v);
+        }
+      };
+    }
 
     private <T> SortedMap<String, T> map() {
         return new TreeMap<>();
