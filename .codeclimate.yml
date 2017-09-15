@@ -12,6 +12,8 @@ ratings:
   - "**.java"
 
 exclude_paths:
+- "docs/"
+- "spec/"
 - "**.png"
 - "**.ts"
 - "**.p12"
