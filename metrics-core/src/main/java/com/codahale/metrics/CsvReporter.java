@@ -16,7 +16,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * A reporter which creates a comma-separated values file of the measurements for each metric.
  */
 public class CsvReporter extends ScheduledReporter {
-    private static final char DEFAULT_SEPARATOR = ',';
+    private static final String DEFAULT_SEPARATOR = ",";
     
     /**
      * Returns a new {@link Builder} for {@link CsvReporter}.
@@ -35,7 +35,7 @@ public class CsvReporter extends ScheduledReporter {
     public static class Builder {
         private final MetricRegistry registry;
         private Locale locale;
-        private char separator;
+        private String separator;
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private Clock clock;
@@ -117,12 +117,12 @@ public class CsvReporter extends ScheduledReporter {
         }
 
         /**
-         * Use the given character as the separator for values.
+         * Use the given string to use as the separator for values.
          * 
-         * @param separator the character to use for the separator.
+         * @param separator the string to use for the separator.
          * @return {@code this}
          */
-        public Builder withSeparator(char separator) {
+        public Builder withSeparator(String separator) {
             this.separator = separator;
             return this;
         }
@@ -180,14 +180,18 @@ public class CsvReporter extends ScheduledReporter {
 
     private final File directory;
     private final Locale locale;
-    private final char separator;
+    private final String separator;
     private final Clock clock;
     private final CsvFileProvider csvFileProvider;
+
+    private final String histogramFormat;
+    private final String meterFormat;
+    private final String timerFormat;
 
     private CsvReporter(MetricRegistry registry,
                         File directory,
                         Locale locale,
-                        char separator,
+                        String separator,
                         TimeUnit rateUnit,
                         TimeUnit durationUnit,
                         Clock clock,
@@ -201,6 +205,10 @@ public class CsvReporter extends ScheduledReporter {
         this.separator = separator;
         this.clock = clock;
         this.csvFileProvider = csvFileProvider;
+
+        this.histogramFormat = String.join(separator, "%d","%d","%f","%d","%f","%f","%f","%f","%f","%f","%f");
+        this.meterFormat = String.join(separator, "%d", "%f", "%f", "%f", "%f", "events/%s");
+        this.timerFormat = String.join(separator, "%d","%f","%f","%f","%f","%f","%f","%f","%f","%f","%f","%f","%f","%f","%f","calls/%s","%s");
     }
 
     @Override
@@ -239,10 +247,7 @@ public class CsvReporter extends ScheduledReporter {
         report(timestamp,
                 name,
                 "count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
-                "%d" + separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f" +
-                        separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f" +
-                        separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f" + separator + "calls/%s" +
-                        separator + "%s",
+                timerFormat,
                 timer.getCount(),
                 convertDuration(snapshot.getMax()),
                 convertDuration(snapshot.getMean()),
@@ -266,7 +271,7 @@ public class CsvReporter extends ScheduledReporter {
         report(timestamp,
                 name,
                 "count,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit",
-                "%d" + separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f" + separator + "events/%s",
+                meterFormat,
                 meter.getCount(),
                 convertRate(meter.getMeanRate()),
                 convertRate(meter.getOneMinuteRate()),
@@ -281,8 +286,7 @@ public class CsvReporter extends ScheduledReporter {
         report(timestamp,
                 name,
                 "count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999",
-                "%d" + separator +"%d" + separator + "%f" + separator + "%d" + separator + "%f" + separator + "%f" 
-                        + separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f" + separator + "%f",
+                histogramFormat,
                 histogram.getCount(),
                 snapshot.getMax(),
                 snapshot.getMean(),

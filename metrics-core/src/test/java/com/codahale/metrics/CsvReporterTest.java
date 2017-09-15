@@ -190,7 +190,7 @@ public class CsvReporterTest {
 
         CsvReporter customSeparatorReporter = CsvReporter.forRegistry(registry)
                 .formatFor(Locale.US)
-                .withSeparator('|')
+                .withSeparator("|")
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .withClock(clock)
