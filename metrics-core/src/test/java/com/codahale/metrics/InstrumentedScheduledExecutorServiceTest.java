@@ -244,6 +244,51 @@ public class InstrumentedScheduledExecutorServiceTest {
         assertThat(percentOfPeriod.getCount()).isNotEqualTo(0);
     }
 
+    @Test
+    public void testScheduleFixedDelayCallable() throws Exception {
+        assertThat(submitted.getCount()).isZero();
+
+        assertThat(running.getCount()).isZero();
+        assertThat(completed.getCount()).isZero();
+        assertThat(duration.getCount()).isZero();
+
+        assertThat(scheduledOnce.getCount()).isZero();
+        assertThat(scheduledRepetitively.getCount()).isZero();
+        assertThat(scheduledOverrun.getCount()).isZero();
+        assertThat(percentOfPeriod.getCount()).isZero();
+
+        ScheduledFuture<?> theFuture = instrumentedScheduledExecutor.scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+                assertThat(submitted.getCount()).isZero();
+
+                assertThat(running.getCount()).isEqualTo(1);
+
+                assertThat(scheduledOnce.getCount()).isEqualTo(0);
+                assertThat(scheduledRepetitively.getCount()).isEqualTo(1);
+
+                try {
+                    TimeUnit.MILLISECONDS.sleep(50);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+
+                return;
+            }
+        }, 10L, 10L, TimeUnit.MILLISECONDS);
+
+        TimeUnit.MILLISECONDS.sleep(100);
+        theFuture.cancel(true);
+        TimeUnit.MILLISECONDS.sleep(100);
+
+        assertThat(submitted.getCount()).isZero();
+
+        assertThat(running.getCount()).isZero();
+        assertThat(completed.getCount()).isNotEqualTo(0);
+        assertThat(duration.getCount()).isNotEqualTo(0);
+        assertThat(duration.getSnapshot().size()).isNotEqualTo(0);
+    }
+
     @After
     public void tearDown() throws Exception {
         instrumentedScheduledExecutor.shutdown();
