@@ -106,6 +106,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
      */
     private static class ResponseMeterMetric {
         public final Meter[] meters;
+
         public ResponseMeterMetric(final MetricRegistry registry,
                                    final ResourceMethod method,
                                    final ResponseMetered responseMetered) {
@@ -421,19 +422,14 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                               final Timed timed,
                               final String... suffixes) {
         final String name = chooseName(timed.name(), timed.absolute(), method, suffixes);
-        return registry.timer(name, new MetricRegistry.MetricSupplier<Timer>() {
-            @Override
-            public Timer newMetric() {
-                return new Timer(new ExponentiallyDecayingReservoir(), clock);
-            }
-        });
+        return registry.timer(name, () -> new Timer(new ExponentiallyDecayingReservoir(), clock));
     }
 
-    private static Meter meterMetric(final MetricRegistry registry,
-                                     final ResourceMethod method,
-                                     final Metered metered) {
+    private Meter meterMetric(final MetricRegistry registry,
+                              final ResourceMethod method,
+                              final Metered metered) {
         final String name = chooseName(metered.name(), metered.absolute(), method);
-        return registry.meter(name);
+        return registry.meter(name, () -> new Meter(clock));
     }
 
     protected static String chooseName(final String explicitName, final boolean absolute, final ResourceMethod method,
