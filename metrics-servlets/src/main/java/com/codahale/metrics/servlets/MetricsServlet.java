@@ -180,6 +180,15 @@ public class MetricsServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Send Response
+        super.doOptions(req,  resp);
+        if (allowedOrigin != null) {
+            resp.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+        }
+    }
+
     private ObjectWriter getWriter(HttpServletRequest request) {
         final boolean prettyPrint = Boolean.parseBoolean(request.getParameter("pretty"));
         if (prettyPrint) {
