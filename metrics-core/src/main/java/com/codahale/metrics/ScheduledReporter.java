@@ -159,7 +159,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      *
      * @param initialDelay the time to delay the first execution
      * @param period       the amount of time between polls
-     * @param unit         the unit for {@code period}
+     * @param unit         the unit for {@code period} and {@code initialDelay}
      */
     synchronized public void start(long initialDelay, long period, TimeUnit unit) {
         if (this.scheduledFuture != null) {
