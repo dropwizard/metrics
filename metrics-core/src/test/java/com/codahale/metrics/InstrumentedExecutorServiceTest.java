@@ -40,7 +40,7 @@ public class InstrumentedExecutorServiceTest {
             assertThat(completed.getCount()).isEqualTo(0);
             assertThat(duration.getCount()).isEqualTo(0);
             assertThat(idle.getCount()).isEqualTo(1);
-    });
+        });
 
         theFuture.get();
 

@@ -21,7 +21,7 @@ public class ThreadDeadlockDetectorTest {
         when(threads.findDeadlockedThreads()).thenReturn(null);
 
         assertThat(detector.getDeadlockedThreads())
-                .isEmpty();
+            .isEmpty();
     }
 
     @Test
@@ -31,8 +31,8 @@ public class ThreadDeadlockDetectorTest {
         when(thread1.getLockName()).thenReturn("lock2");
         when(thread1.getLockOwnerName()).thenReturn("thread2");
         when(thread1.getStackTrace()).thenReturn(new StackTraceElement[]{
-                new StackTraceElement("Blah", "bloo", "Blah.java", 150),
-                new StackTraceElement("Blah", "blee", "Blah.java", 100)
+            new StackTraceElement("Blah", "bloo", "Blah.java", 150),
+            new StackTraceElement("Blah", "blee", "Blah.java", 100)
         });
 
         final ThreadInfo thread2 = mock(ThreadInfo.class);
@@ -40,29 +40,29 @@ public class ThreadDeadlockDetectorTest {
         when(thread2.getLockName()).thenReturn("lock1");
         when(thread2.getLockOwnerName()).thenReturn("thread1");
         when(thread2.getStackTrace()).thenReturn(new StackTraceElement[]{
-                new StackTraceElement("Blah", "blee", "Blah.java", 100),
-                new StackTraceElement("Blah", "bloo", "Blah.java", 150)
+            new StackTraceElement("Blah", "blee", "Blah.java", 100),
+            new StackTraceElement("Blah", "bloo", "Blah.java", 150)
         });
 
         final long[] ids = {1, 2};
         when(threads.findDeadlockedThreads()).thenReturn(ids);
         when(threads.getThreadInfo(eq(ids), anyInt()))
-                .thenReturn(new ThreadInfo[]{thread1, thread2});
+            .thenReturn(new ThreadInfo[]{thread1, thread2});
 
         assertThat(detector.getDeadlockedThreads())
-                .containsOnly(String.format(Locale.US,
-                        "thread1 locked on lock2 (owned by thread2):%n" +
-                                "\t at Blah.bloo(Blah.java:150)%n" +
-                                "\t at Blah.blee(Blah.java:100)%n"),
-                        String.format(Locale.US,
-                                "thread2 locked on lock1 (owned by thread1):%n" +
-                                        "\t at Blah.blee(Blah.java:100)%n" +
-                                        "\t at Blah.bloo(Blah.java:150)%n"));
+            .containsOnly(String.format(Locale.US,
+                "thread1 locked on lock2 (owned by thread2):%n" +
+                    "\t at Blah.bloo(Blah.java:150)%n" +
+                    "\t at Blah.blee(Blah.java:100)%n"),
+                String.format(Locale.US,
+                    "thread2 locked on lock1 (owned by thread1):%n" +
+                        "\t at Blah.blee(Blah.java:100)%n" +
+                        "\t at Blah.bloo(Blah.java:150)%n"));
     }
 
     @Test
     public void autoDiscoversTheThreadMXBean() throws Exception {
         assertThat(new ThreadDeadlockDetector().getDeadlockedThreads())
-                .isNotNull();
+            .isNotNull();
     }
 }

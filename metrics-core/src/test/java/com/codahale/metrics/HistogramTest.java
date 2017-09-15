@@ -3,7 +3,9 @@ package com.codahale.metrics;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class HistogramTest {
     private final Reservoir reservoir = mock(Reservoir.class);

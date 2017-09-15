@@ -49,7 +49,7 @@ public class HealthCheckRegistryTest {
         when(hc1.execute()).thenReturn(r1);
         when(hc2.execute()).thenReturn(r2);
         when(executorService.scheduleAtFixedRate(any(AsyncHealthCheckDecorator.class), eq(0L), eq(10L), eq(TimeUnit.SECONDS)))
-                .thenReturn(af);
+            .thenReturn(af);
 
         registry.register("hc1", hc1);
         registry.register("hc2", hc2);
@@ -165,7 +165,7 @@ public class HealthCheckRegistryTest {
     public void runsRegisteredHealthChecksInParallelWithFilter() throws Exception {
         final ExecutorService executor = Executors.newFixedThreadPool(10);
         final Map<String, HealthCheck.Result> results = registry.runHealthChecks(executor,
-                (name, healthCheck) -> "hc2".equals(name));
+            (name, healthCheck) -> "hc2".equals(name));
 
         executor.shutdown();
         executor.awaitTermination(1, TimeUnit.SECONDS);
@@ -201,7 +201,7 @@ public class HealthCheckRegistryTest {
             failBecauseExceptionWasNotThrown(NoSuchElementException.class);
         } catch (NoSuchElementException e) {
             assertThat(e.getMessage())
-                    .isEqualTo("No health check named what exists");
+                .isEqualTo("No health check named what exists");
         }
 
     }

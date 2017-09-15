@@ -33,7 +33,7 @@ public class ThreadDumpTest {
         when(runnable.getLockedSynchronizers()).thenReturn(new LockInfo[]{});
 
         when(threadMXBean.dumpAllThreads(true, true)).thenReturn(new ThreadInfo[]{
-                runnable
+            runnable
         });
     }
 
@@ -43,9 +43,9 @@ public class ThreadDumpTest {
         threadDump.dump(output);
 
         assertThat(output.toString())
-                .isEqualTo(String.format("\"runnable\" id=100 state=RUNNABLE%n" +
-                        "    at Blah.blee(Blah.java:100)%n" +
-                        "%n" +
-                        "%n"));
+            .isEqualTo(String.format("\"runnable\" id=100 state=RUNNABLE%n" +
+                "    at Blah.blee(Blah.java:100)%n" +
+                "%n" +
+                "%n"));
     }
 }

@@ -2,7 +2,6 @@ package com.codahale.metrics.log4j2;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SharedMetricRegistries;
-import com.codahale.metrics.log4j2.InstrumentedAppender;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;

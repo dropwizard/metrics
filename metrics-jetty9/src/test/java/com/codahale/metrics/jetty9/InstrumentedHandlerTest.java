@@ -51,7 +51,7 @@ public class InstrumentedHandlerTest {
     @Test
     public void hasAName() throws Exception {
         assertThat(handler.getName())
-                .isEqualTo("handler");
+            .isEqualTo("handler");
     }
 
     @Test
@@ -59,39 +59,39 @@ public class InstrumentedHandlerTest {
         final ContentResponse response = client.GET(uri("/hello"));
 
         assertThat(response.getStatus())
-                .isEqualTo(404);
+            .isEqualTo(404);
 
         assertThat(registry.getNames())
-                .containsOnly(
-                        MetricRegistry.name(TestHandler.class, "handler.1xx-responses"),
-                        MetricRegistry.name(TestHandler.class, "handler.2xx-responses"),
-                        MetricRegistry.name(TestHandler.class, "handler.3xx-responses"),
-                        MetricRegistry.name(TestHandler.class, "handler.4xx-responses"),
-                        MetricRegistry.name(TestHandler.class, "handler.5xx-responses"),
-                        MetricRegistry.name(TestHandler.class, "handler.percent-4xx-1m"),
-                        MetricRegistry.name(TestHandler.class, "handler.percent-4xx-5m"),
-                        MetricRegistry.name(TestHandler.class, "handler.percent-4xx-15m"),
-                        MetricRegistry.name(TestHandler.class, "handler.percent-5xx-1m"),
-                        MetricRegistry.name(TestHandler.class, "handler.percent-5xx-5m"),
-                        MetricRegistry.name(TestHandler.class, "handler.percent-5xx-15m"),
-                        MetricRegistry.name(TestHandler.class, "handler.requests"),
-                        MetricRegistry.name(TestHandler.class, "handler.active-suspended"),
-                        MetricRegistry.name(TestHandler.class, "handler.async-dispatches"),
-                        MetricRegistry.name(TestHandler.class, "handler.async-timeouts"),
-                        MetricRegistry.name(TestHandler.class, "handler.get-requests"),
-                        MetricRegistry.name(TestHandler.class, "handler.put-requests"),
-                        MetricRegistry.name(TestHandler.class, "handler.active-dispatches"),
-                        MetricRegistry.name(TestHandler.class, "handler.trace-requests"),
-                        MetricRegistry.name(TestHandler.class, "handler.other-requests"),
-                        MetricRegistry.name(TestHandler.class, "handler.connect-requests"),
-                        MetricRegistry.name(TestHandler.class, "handler.dispatches"),
-                        MetricRegistry.name(TestHandler.class, "handler.head-requests"),
-                        MetricRegistry.name(TestHandler.class, "handler.post-requests"),
-                        MetricRegistry.name(TestHandler.class, "handler.options-requests"),
-                        MetricRegistry.name(TestHandler.class, "handler.active-requests"),
-                        MetricRegistry.name(TestHandler.class, "handler.delete-requests"),
-                        MetricRegistry.name(TestHandler.class, "handler.move-requests")
-                );
+            .containsOnly(
+                MetricRegistry.name(TestHandler.class, "handler.1xx-responses"),
+                MetricRegistry.name(TestHandler.class, "handler.2xx-responses"),
+                MetricRegistry.name(TestHandler.class, "handler.3xx-responses"),
+                MetricRegistry.name(TestHandler.class, "handler.4xx-responses"),
+                MetricRegistry.name(TestHandler.class, "handler.5xx-responses"),
+                MetricRegistry.name(TestHandler.class, "handler.percent-4xx-1m"),
+                MetricRegistry.name(TestHandler.class, "handler.percent-4xx-5m"),
+                MetricRegistry.name(TestHandler.class, "handler.percent-4xx-15m"),
+                MetricRegistry.name(TestHandler.class, "handler.percent-5xx-1m"),
+                MetricRegistry.name(TestHandler.class, "handler.percent-5xx-5m"),
+                MetricRegistry.name(TestHandler.class, "handler.percent-5xx-15m"),
+                MetricRegistry.name(TestHandler.class, "handler.requests"),
+                MetricRegistry.name(TestHandler.class, "handler.active-suspended"),
+                MetricRegistry.name(TestHandler.class, "handler.async-dispatches"),
+                MetricRegistry.name(TestHandler.class, "handler.async-timeouts"),
+                MetricRegistry.name(TestHandler.class, "handler.get-requests"),
+                MetricRegistry.name(TestHandler.class, "handler.put-requests"),
+                MetricRegistry.name(TestHandler.class, "handler.active-dispatches"),
+                MetricRegistry.name(TestHandler.class, "handler.trace-requests"),
+                MetricRegistry.name(TestHandler.class, "handler.other-requests"),
+                MetricRegistry.name(TestHandler.class, "handler.connect-requests"),
+                MetricRegistry.name(TestHandler.class, "handler.dispatches"),
+                MetricRegistry.name(TestHandler.class, "handler.head-requests"),
+                MetricRegistry.name(TestHandler.class, "handler.post-requests"),
+                MetricRegistry.name(TestHandler.class, "handler.options-requests"),
+                MetricRegistry.name(TestHandler.class, "handler.active-requests"),
+                MetricRegistry.name(TestHandler.class, "handler.delete-requests"),
+                MetricRegistry.name(TestHandler.class, "handler.move-requests")
+            );
     }
 
 
@@ -101,7 +101,7 @@ public class InstrumentedHandlerTest {
         final ContentResponse response = client.GET(uri("/blocking"));
 
         assertThat(response.getStatus())
-                .isEqualTo(200);
+            .isEqualTo(200);
 
         assertResponseTimesValid();
     }
@@ -112,21 +112,21 @@ public class InstrumentedHandlerTest {
         final ContentResponse response = client.GET(uri("/async"));
 
         assertThat(response.getStatus())
-                .isEqualTo(200);
+            .isEqualTo(200);
 
         assertResponseTimesValid();
     }
 
     private void assertResponseTimesValid() {
         assertThat(registry.getMeters().get(metricName() + ".2xx-responses")
-                .getCount()).isGreaterThan(0L);
+            .getCount()).isGreaterThan(0L);
 
 
         assertThat(registry.getTimers().get(metricName() + ".get-requests")
-                .getSnapshot().getMedian()).isGreaterThan(0.0).isLessThan(TimeUnit.SECONDS.toNanos(1));
+            .getSnapshot().getMedian()).isGreaterThan(0.0).isLessThan(TimeUnit.SECONDS.toNanos(1));
 
         assertThat(registry.getTimers().get(metricName() + ".requests")
-                .getSnapshot().getMedian()).isGreaterThan(0.0).isLessThan(TimeUnit.SECONDS.toNanos(1));
+            .getSnapshot().getMedian()).isGreaterThan(0.0).isLessThan(TimeUnit.SECONDS.toNanos(1));
     }
 
     private String uri(String path) {
@@ -150,10 +150,10 @@ public class InstrumentedHandlerTest {
     private static class TestHandler extends AbstractHandler {
         @Override
         public void handle(
-                String path,
-                Request request,
-                final HttpServletRequest httpServletRequest,
-                final HttpServletResponse httpServletResponse
+            String path,
+            Request request,
+            final HttpServletRequest httpServletRequest,
+            final HttpServletResponse httpServletResponse
         ) throws IOException, ServletException {
             request.setHandled(true);
             switch (path) {
@@ -173,19 +173,19 @@ public class InstrumentedHandlerTest {
                         try {
                             servletOutputStream = httpServletResponse.getOutputStream();
                             servletOutputStream.setWriteListener(
-                                    new WriteListener() {
-                                        @Override
-                                        public void onWritePossible() throws IOException {
-                                            servletOutputStream.write("some content from the async\n"
-                                                    .getBytes(StandardCharsets.UTF_8));
-                                            context.complete();
-                                        }
-
-                                        @Override
-                                        public void onError(Throwable throwable) {
-                                            context.complete();
-                                        }
+                                new WriteListener() {
+                                    @Override
+                                    public void onWritePossible() throws IOException {
+                                        servletOutputStream.write("some content from the async\n"
+                                            .getBytes(StandardCharsets.UTF_8));
+                                        context.complete();
                                     }
+
+                                    @Override
+                                    public void onError(Throwable throwable) {
+                                        context.complete();
+                                    }
+                                }
                             );
                         } catch (IOException e) {
                             context.complete();

@@ -12,11 +12,16 @@ import java.net.UnknownHostException;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.failBecauseExceptionWasNotThrown;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import static org.mockito.Mockito.*;
-
-public class GraphiteRabbitMQTest
-{
+public class GraphiteRabbitMQTest {
     private final ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
     private final Connection connection = mock(Connection.class);
     private final Channel channel = mock(Channel.class);
@@ -36,8 +41,8 @@ public class GraphiteRabbitMQTest
         when(bogusConnectionFactory.newConnection()).thenReturn(bogusConnection);
         when(bogusConnection.createChannel()).thenReturn(bogusChannel);
         doThrow(new IOException())
-                .when(bogusChannel)
-                .basicPublish(anyString(), anyString(), any(), any(byte[].class));
+            .when(bogusChannel)
+            .basicPublish(anyString(), anyString(), any(), any(byte[].class));
     }
 
     @Test
@@ -54,10 +59,10 @@ public class GraphiteRabbitMQTest
         try (final GraphiteRabbitMQ graphite = new GraphiteRabbitMQ(bogusConnectionFactory, "graphite")) {
             graphite.connect();
             try {
-              graphite.send("name", "value", 0);
-              failBecauseExceptionWasNotThrown(IOException.class);
+                graphite.send("name", "value", 0);
+                failBecauseExceptionWasNotThrown(IOException.class);
             } catch (IOException e) {
-              assertThat(graphite.getFailures()).isEqualTo(1);
+                assertThat(graphite.getFailures()).isEqualTo(1);
             }
         }
     }
@@ -78,7 +83,7 @@ public class GraphiteRabbitMQTest
             failBecauseExceptionWasNotThrown(IllegalStateException.class);
         } catch (IllegalStateException e) {
             assertThat(e.getMessage()).isEqualTo("Already connected");
-       }
+        }
     }
 
     @Test
@@ -89,7 +94,7 @@ public class GraphiteRabbitMQTest
         String expectedMessage = "name value 100\n";
 
         verify(channel, times(1)).basicPublish("graphite", "name", null,
-                expectedMessage.getBytes(UTF_8));
+            expectedMessage.getBytes(UTF_8));
 
         assertThat(graphite.getFailures()).isZero();
     }
@@ -102,7 +107,7 @@ public class GraphiteRabbitMQTest
         String expectedMessage = "name-to-sanitize value-to-sanitize 100\n";
 
         verify(channel, times(1)).basicPublish("graphite", "name-to-sanitize", null,
-                expectedMessage.getBytes(UTF_8));
+            expectedMessage.getBytes(UTF_8));
 
         assertThat(graphite.getFailures()).isZero();
     }
