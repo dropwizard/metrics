@@ -37,7 +37,7 @@ public class GraphiteReporterTest {
             .convertRatesTo(TimeUnit.MINUTES)
             .convertDurationsTo(TimeUnit.MILLISECONDS)
             .filter(MetricFilter.ALL)
-            .disabledMetricAttributes(Collections.<MetricAttribute>emptySet())
+            .disabledMetricAttributes(Collections.emptySet())
             .build(graphite);
 
     @Before
@@ -316,11 +316,11 @@ public class GraphiteReporterTest {
         when(meter.getFifteenMinuteRate()).thenReturn(4.0);
         when(meter.getMeanRate()).thenReturn(5.0);
 
-        minuteRateReporter.report(this.<Gauge>map(),
-                this.<Counter>map(),
-                this.<Histogram>map(),
-                this.<Meter>map("meter", meter),
-                this.<Timer>map());
+        minuteRateReporter.report(this.map(),
+                this.map(),
+                this.map(),
+                this.map("meter", meter),
+                this.map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
