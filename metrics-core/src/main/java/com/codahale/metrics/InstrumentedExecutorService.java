@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * "your-executor-service.submitted", "your-executor-service.running", etc.
  */
 public class InstrumentedExecutorService implements ExecutorService {
-    private static final AtomicLong nameCounter = new AtomicLong();
+    private static final AtomicLong NAME_COUNTER = new AtomicLong();
 
     private final ExecutorService delegate;
     private final Meter submitted;
@@ -35,7 +35,7 @@ public class InstrumentedExecutorService implements ExecutorService {
      * @param registry {@link MetricRegistry} that will contain the metrics.
      */
     public InstrumentedExecutorService(ExecutorService delegate, MetricRegistry registry) {
-        this(delegate, registry, "instrumented-delegate-" + nameCounter.incrementAndGet());
+        this(delegate, registry, "instrumented-delegate-" + NAME_COUNTER.incrementAndGet());
     }
 
     /**
@@ -174,13 +174,13 @@ public class InstrumentedExecutorService implements ExecutorService {
 
         @Override
         public void run() {
-        	idleContext.stop();
+            idleContext.stop();
             running.inc();
             final Timer.Context durationContext = duration.time();
             try {
                 task.run();
             } finally {
-            	durationContext.stop();
+                durationContext.stop();
                 running.dec();
                 completed.mark();
             }

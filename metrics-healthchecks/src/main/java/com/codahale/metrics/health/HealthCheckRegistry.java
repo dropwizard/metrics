@@ -1,6 +1,8 @@
 package com.codahale.metrics.health;
 
-import static com.codahale.metrics.health.HealthCheck.Result;
+import com.codahale.metrics.health.annotation.Async;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,10 +24,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.codahale.metrics.health.annotation.Async;
+import static com.codahale.metrics.health.HealthCheck.Result;
 
 /**
  * A registry for health checks.

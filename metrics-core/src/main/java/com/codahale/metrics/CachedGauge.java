@@ -54,7 +54,7 @@ public abstract class CachedGauge<T> implements Gauge<T> {
     }
 
     private boolean shouldLoad() {
-        for (; ; ) {
+        for ( ;; ) {
             final long time = clock.getTick();
             final long current = reloadAt.get();
             if (current > time) {

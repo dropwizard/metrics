@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * "your-thread-delegate.created", "your-thread-delegate.running", etc.
  */
 public class InstrumentedThreadFactory implements ThreadFactory {
-    private static final AtomicLong nameCounter = new AtomicLong();
+    private static final AtomicLong NAME_COUNTER = new AtomicLong();
 
     private final ThreadFactory delegate;
     private final Meter created;
@@ -24,7 +24,7 @@ public class InstrumentedThreadFactory implements ThreadFactory {
      * @param registry {@link MetricRegistry} that will contain the metrics.
      */
     public InstrumentedThreadFactory(ThreadFactory delegate, MetricRegistry registry) {
-        this(delegate, registry, "instrumented-thread-delegate-" + nameCounter.incrementAndGet());
+        this(delegate, registry, "instrumented-thread-delegate-" + NAME_COUNTER.incrementAndGet());
     }
 
     /**

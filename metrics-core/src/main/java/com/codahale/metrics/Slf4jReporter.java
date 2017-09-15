@@ -26,7 +26,7 @@ public class Slf4jReporter extends ScheduledReporter {
         return new Builder(registry);
     }
 
-    public enum LoggingLevel {TRACE, DEBUG, INFO, WARN, ERROR}
+    public enum LoggingLevel { TRACE, DEBUG, INFO, WARN, ERROR }
 
     /**
      * A builder for {@link Slf4jReporter} instances. Defaults to logging to {@code metrics}, not

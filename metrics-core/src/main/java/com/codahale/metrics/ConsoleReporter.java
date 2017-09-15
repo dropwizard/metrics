@@ -2,7 +2,13 @@ package com.codahale.metrics;
 
 import java.io.PrintStream;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TimeZone;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
