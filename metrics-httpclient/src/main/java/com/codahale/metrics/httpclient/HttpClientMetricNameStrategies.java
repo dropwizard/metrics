@@ -14,28 +14,28 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class HttpClientMetricNameStrategies {
 
     public static final HttpClientMetricNameStrategy METHOD_ONLY =
-            (name, request) -> name(HttpClient.class,
-                    name,
-                    methodNameString(request));
+        (name, request) -> name(HttpClient.class,
+            name,
+            methodNameString(request));
 
     public static final HttpClientMetricNameStrategy HOST_AND_METHOD =
-            (name, request) -> name(HttpClient.class,
-                    name,
-                    requestURI(request).getHost(),
-                    methodNameString(request));
+        (name, request) -> name(HttpClient.class,
+            name,
+            requestURI(request).getHost(),
+            methodNameString(request));
 
     public static final HttpClientMetricNameStrategy QUERYLESS_URL_AND_METHOD =
-            (name, request) -> {
-                try {
-                    final URIBuilder url = new URIBuilder(requestURI(request));
-                    return name(HttpClient.class,
-                            name,
-                            url.removeQuery().build().toString(),
-                            methodNameString(request));
-                } catch (URISyntaxException e) {
-                    throw new IllegalArgumentException(e);
-                }
-            };
+        (name, request) -> {
+            try {
+                final URIBuilder url = new URIBuilder(requestURI(request));
+                return name(HttpClient.class,
+                    name,
+                    url.removeQuery().build().toString(),
+                    methodNameString(request));
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException(e);
+            }
+        };
 
     private static String methodNameString(HttpRequest request) {
         return request.getRequestLine().getMethod().toLowerCase() + "-requests";
@@ -46,7 +46,7 @@ public class HttpClientMetricNameStrategies {
             return requestURI(((HttpRequestWrapper) request).getOriginal());
 
         return (request instanceof HttpUriRequest) ?
-                ((HttpUriRequest) request).getURI() :
-                URI.create(request.getRequestLine().getUri());
+            ((HttpUriRequest) request).getURI() :
+            URI.create(request.getRequestLine().getUri());
     }
 }

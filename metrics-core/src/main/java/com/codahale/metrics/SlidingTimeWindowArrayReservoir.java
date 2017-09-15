@@ -76,7 +76,7 @@ public class SlidingTimeWindowArrayReservoir implements Reservoir {
     }
 
     private long getTick() {
-        for (; ; ) {
+        for ( ;; ) {
             final long oldTick = lastTick.get();
             final long tick = (clock.getTick() - startTick) * COLLISION_BUFFER;
             // ensure the tick is strictly incrementing even if there are duplicate ticks
