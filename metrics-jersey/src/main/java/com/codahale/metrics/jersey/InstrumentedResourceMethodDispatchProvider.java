@@ -1,5 +1,6 @@
 package com.codahale.metrics.jersey;
 
+import com.codahale.metrics.annotation.ResponseMetered;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
@@ -77,6 +78,31 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
         }
     }
 
+    private static class ResponseMeteredRequestDispatcher implements RequestDispatcher {
+        private final RequestDispatcher underlying;
+        private final Meter[] meters;
+
+        private ResponseMeteredRequestDispatcher(RequestDispatcher underlying,
+                                                  Meter[] meters) {
+            this.underlying = underlying;
+            this.meters = meters;
+        }
+
+        @Override
+        public void dispatch(Object resource, HttpContext httpContext) {
+            try {
+                underlying.dispatch(resource, httpContext);
+                final int responseStatus = httpContext.getResponse().getStatus() / 100;
+                if (responseStatus >= 1 && responseStatus <= 5) {
+                    meters[responseStatus - 1].mark();
+                }
+            } catch (Exception e) {
+                meters[4].mark();
+                InstrumentedResourceMethodDispatchProvider.<RuntimeException>throwUnchecked(e);
+            }
+        }
+    }
+
     /*
      * A dirty hack to allow us to throw exceptions of any type without bringing down the unsafe
      * thunder.
@@ -127,6 +153,21 @@ class InstrumentedResourceMethodDispatchProvider implements ResourceMethodDispat
             dispatcher = new ExceptionMeteredRequestDispatcher(dispatcher,
                                                                meter,
                                                                annotation.cause());
+        }
+
+        if (method.getMethod().isAnnotationPresent(ResponseMetered.class)) {
+            final ResponseMetered annotation = method.getMethod()
+                    .getAnnotation(ResponseMetered.class);
+            final String metricName = chooseName(annotation.name(), annotation.absolute(), method);
+            final Meter[] meters = new Meter[]{
+                    registry.meter(name(metricName, "1xx-responses")), // 1xx
+                    registry.meter(name(metricName, "2xx-responses")), // 2xx
+                    registry.meter(name(metricName, "3xx-responses")), // 3xx
+                    registry.meter(name(metricName, "4xx-responses")), // 4xx
+                    registry.meter(name(metricName, "5xx-responses"))  // 5xx
+            };
+            dispatcher = new ResponseMeteredRequestDispatcher(dispatcher,
+                    meters);
         }
 
         return dispatcher;
