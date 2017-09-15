@@ -12,7 +12,6 @@ ratings:
   - "**.java"
 
 exclude_paths:
-- "dropwizard-archetypes/"
 - "**.png"
 - "**.ts"
 - "**.p12"
