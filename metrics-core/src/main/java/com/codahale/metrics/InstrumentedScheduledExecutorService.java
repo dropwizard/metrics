@@ -93,7 +93,7 @@ public class InstrumentedScheduledExecutorService implements ScheduledExecutorSe
     @Override
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
         scheduledRepetitively.mark();
-        return delegate.scheduleAtFixedRate(new InstrumentedRunnable(command), initialDelay, delay, unit);
+        return delegate.scheduleWithFixedDelay(new InstrumentedRunnable(command), initialDelay, delay, unit);
     }
 
     /**
