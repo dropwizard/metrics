@@ -51,14 +51,14 @@ public class GraphiteRabbitMQTest
 
     @Test
     public void measuresFailures() throws Exception {
-        final GraphiteRabbitMQ graphite = new GraphiteRabbitMQ(bogusConnectionFactory, "graphite");
-        graphite.connect();
-
-        try {
-            graphite.send("name", "value", 0);
-            failBecauseExceptionWasNotThrown(IOException.class);
-        } catch (IOException e) {
-            assertThat(graphite.getFailures()).isEqualTo(1);
+        try (final GraphiteRabbitMQ graphite = new GraphiteRabbitMQ(bogusConnectionFactory, "graphite")) {
+            graphite.connect();
+            try {
+              graphite.send("name", "value", 0);
+              failBecauseExceptionWasNotThrown(IOException.class);
+            } catch (IOException e) {
+              assertThat(graphite.getFailures()).isEqualTo(1);
+            }
         }
     }
 
@@ -112,9 +112,7 @@ public class GraphiteRabbitMQTest
         ConnectionFactory connectionFactory = new ConnectionFactory();
         connectionFactory.setHost("some-unknown-host");
 
-        GraphiteRabbitMQ unavailableGraphite = new GraphiteRabbitMQ(connectionFactory, "graphite");
-
-        try {
+        try (GraphiteRabbitMQ unavailableGraphite = new GraphiteRabbitMQ(connectionFactory, "graphite")) {
             unavailableGraphite.connect();
             failBecauseExceptionWasNotThrown(UnknownHostException.class);
         } catch (Exception e) {
