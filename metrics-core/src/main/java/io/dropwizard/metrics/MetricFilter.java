@@ -7,12 +7,31 @@ public interface MetricFilter {
     /**
      * Matches all metrics, regardless of type or name.
      */
-    MetricFilter ALL = new MetricFilter() {
-        @Override
-        public boolean matches(MetricName name, Metric metric) {
-            return true;
-        }
-    };
+    MetricFilter ALL = (name, metric) -> true;
+
+    static MetricFilter startsWith(String prefix) {
+        return (name, metric) -> name.startsWith(prefix);
+    }
+
+    static MetricFilter endsWith(String suffix) {
+        return (name, metric) -> name.endsWith(suffix);
+    }
+
+    static MetricFilter contains(String substring) {
+        return (name, metric) -> name.contains(substring);
+    }
+
+    static MetricFilter startsWith(MetricName prefix) {
+        return (name, metric) -> name.startsWith(prefix);
+    }
+
+    static MetricFilter endsWith(MetricName suffix) {
+        return (name, metric) -> name.endsWith(suffix);
+    }
+
+    static MetricFilter contains(MetricName substring) {
+        return (name, metric) -> name.contains(substring);
+    }
 
     /**
      * Returns {@code true} if the metric matches the filter; {@code false} otherwise.
