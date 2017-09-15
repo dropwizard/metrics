@@ -24,8 +24,6 @@ import static com.codahale.metrics.MetricRegistry.name;
 @Plugin(name = "MetricsAppender", category = "Core", elementType = "appender")
 public class InstrumentedAppender extends AbstractAppender {
 
-    private static final long serialVersionUID = 1L;
-
     private transient final MetricRegistry registry;
 
     private transient Meter all;
