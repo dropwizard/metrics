@@ -1,7 +1,14 @@
 package com.codahale.metrics.json;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Snapshot;
+import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.codahale.metrics.*;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;

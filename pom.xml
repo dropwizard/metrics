@@ -332,6 +332,7 @@
                 <version>2.17</version>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
                 </configuration>
             </plugin>
         </plugins>

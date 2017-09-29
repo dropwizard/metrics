@@ -1,6 +1,11 @@
 package com.codahale.metrics.servlets;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.Clock;
+import com.codahale.metrics.ExponentiallyDecayingReservoir;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Before;

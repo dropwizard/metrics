@@ -18,7 +18,7 @@ public abstract class HttpClientTestBase {
     /**
      * {@link HttpRequestHandler} that responds with a {@code 200 OK}.
      */
-    public static HttpRequestHandler STATUS_OK = (request, response, context) -> response.setStatusCode(200);
+    public static final HttpRequestHandler STATUS_OK = (request, response, context) -> response.setStatusCode(200);
 
     private HttpServer server;
 

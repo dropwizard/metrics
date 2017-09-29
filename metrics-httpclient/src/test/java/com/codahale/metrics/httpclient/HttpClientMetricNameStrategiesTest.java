@@ -11,7 +11,9 @@ import org.junit.Test;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static com.codahale.metrics.httpclient.HttpClientMetricNameStrategies.*;
+import static com.codahale.metrics.httpclient.HttpClientMetricNameStrategies.HOST_AND_METHOD;
+import static com.codahale.metrics.httpclient.HttpClientMetricNameStrategies.METHOD_ONLY;
+import static com.codahale.metrics.httpclient.HttpClientMetricNameStrategies.QUERYLESS_URL_AND_METHOD;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 

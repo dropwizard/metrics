@@ -1,20 +1,35 @@
 package com.codahale.metrics.graphite;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.Clock;
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricAttribute;
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Snapshot;
+import com.codahale.metrics.Timer;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 
 import java.net.UnknownHostException;
-import java.util.Locale;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 public class GraphiteReporterTest {
     private final long timestamp = 1000198;
@@ -22,23 +37,23 @@ public class GraphiteReporterTest {
     private final Graphite graphite = mock(Graphite.class);
     private final MetricRegistry registry = mock(MetricRegistry.class);
     private final GraphiteReporter reporter = GraphiteReporter.forRegistry(registry)
-                                                              .withClock(clock)
-                                                              .prefixedWith("prefix")
-                                                              .convertRatesTo(TimeUnit.SECONDS)
-                                                              .convertDurationsTo(TimeUnit.MILLISECONDS)
-                                                              .filter(MetricFilter.ALL)
-                                                              .disabledMetricAttributes(Collections.emptySet())
-                                                              .build(graphite);
+        .withClock(clock)
+        .prefixedWith("prefix")
+        .convertRatesTo(TimeUnit.SECONDS)
+        .convertDurationsTo(TimeUnit.MILLISECONDS)
+        .filter(MetricFilter.ALL)
+        .disabledMetricAttributes(Collections.emptySet())
+        .build(graphite);
 
     private final GraphiteReporter minuteRateReporter = GraphiteReporter
-            .forRegistry(registry)
-            .withClock(clock)
-            .prefixedWith("prefix")
-            .convertRatesTo(TimeUnit.MINUTES)
-            .convertDurationsTo(TimeUnit.MILLISECONDS)
-            .filter(MetricFilter.ALL)
-            .disabledMetricAttributes(Collections.emptySet())
-            .build(graphite);
+        .forRegistry(registry)
+        .withClock(clock)
+        .prefixedWith("prefix")
+        .convertRatesTo(TimeUnit.MINUTES)
+        .convertDurationsTo(TimeUnit.MILLISECONDS)
+        .filter(MetricFilter.ALL)
+        .disabledMetricAttributes(Collections.emptySet())
+        .build(graphite);
 
     @Before
     public void setUp() throws Exception {
@@ -48,10 +63,10 @@ public class GraphiteReporterTest {
     @Test
     public void doesNotReportStringGaugeValues() throws Exception {
         reporter.report(map("gauge", gauge("value")),
-                        map(),
-                        map(),
-                        map(),
-                        map());
+            map(),
+            map(),
+            map(),
+            map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
@@ -65,10 +80,10 @@ public class GraphiteReporterTest {
     @Test
     public void reportsByteGaugeValues() throws Exception {
         reporter.report(map("gauge", gauge((byte) 1)),
-                        map(),
-                        map(),
-                        map(),
-                        map());
+            map(),
+            map(),
+            map(),
+            map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
@@ -82,10 +97,10 @@ public class GraphiteReporterTest {
     @Test
     public void reportsShortGaugeValues() throws Exception {
         reporter.report(map("gauge", gauge((short) 1)),
-                        map(),
-                        map(),
-                        map(),
-                        map());
+            map(),
+            map(),
+            map(),
+            map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
@@ -99,10 +114,10 @@ public class GraphiteReporterTest {
     @Test
     public void reportsIntegerGaugeValues() throws Exception {
         reporter.report(map("gauge", gauge(1)),
-                        map(),
-                        map(),
-                        map(),
-                        map());
+            map(),
+            map(),
+            map(),
+            map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
@@ -116,10 +131,10 @@ public class GraphiteReporterTest {
     @Test
     public void reportsLongGaugeValues() throws Exception {
         reporter.report(map("gauge", gauge(1L)),
-                        map(),
-                        map(),
-                        map(),
-                        map());
+            map(),
+            map(),
+            map(),
+            map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
@@ -133,10 +148,10 @@ public class GraphiteReporterTest {
     @Test
     public void reportsFloatGaugeValues() throws Exception {
         reporter.report(map("gauge", gauge(1.1f)),
-                        map(),
-                        map(),
-                        map(),
-                        map());
+            map(),
+            map(),
+            map(),
+            map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
@@ -150,10 +165,10 @@ public class GraphiteReporterTest {
     @Test
     public void reportsDoubleGaugeValues() throws Exception {
         reporter.report(map("gauge", gauge(1.1)),
-                        map(),
-                        map(),
-                        map(),
-                        map());
+            map(),
+            map(),
+            map(),
+            map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
@@ -167,35 +182,35 @@ public class GraphiteReporterTest {
     @Test
     public void reportsDoubleGaugeValuesWithCustomFormat() throws Exception {
         try (final GraphiteReporter graphiteReporter = getReporterWithCustomFormat()) {
-          graphiteReporter.report(map("gauge", gauge(1.13574)),
-                  map(),
-                  map(),
-                  map(),
-                  map());
+            graphiteReporter.report(map("gauge", gauge(1.13574)),
+                map(),
+                map(),
+                map(),
+                map());
 
-          final InOrder inOrder = inOrder(graphite);
-          inOrder.verify(graphite).connect();
-          inOrder.verify(graphite).send("prefix.gauge", "1.1357", timestamp);
-          inOrder.verify(graphite).flush();
-          inOrder.verify(graphite).close();
+            final InOrder inOrder = inOrder(graphite);
+            inOrder.verify(graphite).connect();
+            inOrder.verify(graphite).send("prefix.gauge", "1.1357", timestamp);
+            inOrder.verify(graphite).flush();
+            inOrder.verify(graphite).close();
 
-          verifyNoMoreInteractions(graphite);
+            verifyNoMoreInteractions(graphite);
         }
     }
 
     @Test
     public void reportsBooleanGaugeValues() throws Exception {
         reporter.report(map("gauge", gauge(true)),
-                        map(),
-                        map(),
-                        map(),
-                        map());
+            map(),
+            map(),
+            map(),
+            map());
 
         reporter.report(map("gauge", gauge(false)),
-                        map(),
-                        map(),
-                        map(),
-                        map());
+            map(),
+            map(),
+            map(),
+            map());
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.gauge", "1", timestamp);
@@ -215,10 +230,10 @@ public class GraphiteReporterTest {
         when(counter.getCount()).thenReturn(100L);
 
         reporter.report(map(),
-                        map("counter", counter),
-                        map(),
-                        map(),
-                        map());
+            map("counter", counter),
+            map(),
+            map(),
+            map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
@@ -249,10 +264,10 @@ public class GraphiteReporterTest {
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
         reporter.report(map(),
-                        map(),
-                        map("histogram", histogram),
-                        map(),
-                        map());
+            map(),
+            map("histogram", histogram),
+            map(),
+            map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
@@ -283,10 +298,10 @@ public class GraphiteReporterTest {
         when(meter.getMeanRate()).thenReturn(5.0);
 
         reporter.report(map(),
-                        map(),
-                        map(),
-                        map("meter", meter),
-                        map());
+            map(),
+            map(),
+            map("meter", meter),
+            map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
@@ -311,10 +326,10 @@ public class GraphiteReporterTest {
         when(meter.getMeanRate()).thenReturn(5.0);
 
         minuteRateReporter.report(this.map(),
-                this.map(),
-                this.map(),
-                this.map("meter", meter),
-                this.map());
+            this.map(),
+            this.map(),
+            this.map("meter", meter),
+            this.map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
@@ -349,15 +364,15 @@ public class GraphiteReporterTest {
         when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
         when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
         when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS
-                                                                        .toNanos(1000));
+            .toNanos(1000));
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
         reporter.report(map(),
-                        map(),
-                        map(),
-                        map(),
-                        map("timer", timer));
+            map(),
+            map(),
+            map(),
+            map("timer", timer));
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
@@ -424,18 +439,18 @@ public class GraphiteReporterTest {
 
         Set<MetricAttribute> disabledMetricAttributes = EnumSet.of(MetricAttribute.M15_RATE, MetricAttribute.M5_RATE);
         GraphiteReporter reporterWithdisabledMetricAttributes = GraphiteReporter.forRegistry(registry)
-                .withClock(clock)
-                .prefixedWith("prefix")
-                .convertRatesTo(TimeUnit.SECONDS)
-                .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .filter(MetricFilter.ALL)
-                .disabledMetricAttributes(disabledMetricAttributes)
-                .build(graphite);
+            .withClock(clock)
+            .prefixedWith("prefix")
+            .convertRatesTo(TimeUnit.SECONDS)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .filter(MetricFilter.ALL)
+            .disabledMetricAttributes(disabledMetricAttributes)
+            .build(graphite);
         reporterWithdisabledMetricAttributes.report(map(),
-                map("counter", counter),
-                map(),
-                map("meter", meter),
-                map());
+            map("counter", counter),
+            map(),
+            map("meter", meter),
+            map());
 
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
@@ -450,14 +465,14 @@ public class GraphiteReporterTest {
     }
 
     private GraphiteReporter getReporterWithCustomFormat() {
-      return new GraphiteReporter(registry, graphite, clock, "prefix",
-          TimeUnit.SECONDS, TimeUnit.MICROSECONDS, MetricFilter.ALL, null, false,
-          Collections.emptySet()) {
-        @Override
-        protected String format(double v) {
-          return String.format(Locale.US, "%4.4f", v);
-        }
-      };
+        return new GraphiteReporter(registry, graphite, clock, "prefix",
+            TimeUnit.SECONDS, TimeUnit.MICROSECONDS, MetricFilter.ALL, null, false,
+            Collections.emptySet()) {
+            @Override
+            protected String format(double v) {
+                return String.format(Locale.US, "%4.4f", v);
+            }
+        };
     }
 
     private <T> SortedMap<String, T> map() {
