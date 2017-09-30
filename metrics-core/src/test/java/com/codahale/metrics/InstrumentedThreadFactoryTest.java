@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,7 +26,6 @@ public class InstrumentedThreadFactoryTest {
      * TODO: Try not using real threads in a unit test?
      */
     @Test
-    @SuppressWarnings("unused")
     public void reportsThreadInformation() throws Exception {
         final CountDownLatch allTasksAreCreated = new CountDownLatch(THREAD_COUNT);
         final CountDownLatch allTasksAreCounted = new CountDownLatch(1);
@@ -39,7 +39,7 @@ public class InstrumentedThreadFactoryTest {
 
         // generate demand so the executor service creates the threads through our factory.
         for (int i = 0; i < THREAD_COUNT + 1; i++) {
-            executor.submit(() -> {
+            Future<?> t = executor.submit(() -> {
                 allTasksAreCreated.countDown();
 
                 // This asserts that all threads have wait wail the testing thread notifies all.
@@ -52,6 +52,7 @@ public class InstrumentedThreadFactoryTest {
                     Thread.currentThread().interrupt();
                 }
             });
+            assertThat(t).isNotNull();
         }
 
         allTasksAreCreated.await(1, TimeUnit.SECONDS);
