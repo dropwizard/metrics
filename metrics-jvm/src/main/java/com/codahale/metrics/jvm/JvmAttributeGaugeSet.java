@@ -45,6 +45,7 @@ public class JvmAttributeGaugeSet implements MetricSet {
                 runtime.getVmVersion(),
                 runtime.getSpecVersion()));
         gauges.put("uptime", (Gauge<Long>) runtime::getUptime);
+        gauges.put("processCpuLoad", new ProcessCpuLoadGauge());
 
         return Collections.unmodifiableMap(gauges);
     }
