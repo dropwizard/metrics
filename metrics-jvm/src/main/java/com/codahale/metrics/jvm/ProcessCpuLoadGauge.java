@@ -16,12 +16,12 @@ public class ProcessCpuLoadGauge implements Gauge<Double> {
 			ObjectName objName = new ObjectName("java.lang:type=OperatingSystem");
 			Object objValue = mbs.getAttribute(objName, "ProcessCpuLoad");
 			if(objValue instanceof Double) {
-				return ((Double)objValue).doubleValue();
+				return (Double) objValue;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
-		return 0.0;
+		return Double.valueOf(0.00);
 	}
 
 }
