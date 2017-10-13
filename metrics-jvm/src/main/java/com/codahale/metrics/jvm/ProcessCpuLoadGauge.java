@@ -21,7 +21,7 @@ public class ProcessCpuLoadGauge implements Gauge<Double> {
 			ObjectName objName = new ObjectName("java.lang:type=OperatingSystem");
 			Object objValue = mbs.getAttribute(objName, "ProcessCpuLoad");
 			if(objValue instanceof Double) {
-				return ((Double)objValue).doubleValue();
+				return (Double)objValue;
 			}
 		} catch (MalformedObjectNameException | InstanceNotFoundException | AttributeNotFoundException | ReflectionException | MBeanException e) {
 			e.printStackTrace();
