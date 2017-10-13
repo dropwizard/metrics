@@ -1,6 +1,8 @@
 package com.codahale.metrics.health;
 
-import static com.codahale.metrics.health.HealthCheck.Result;
+import com.codahale.metrics.health.annotation.Async;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,7 +13,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,10 +24,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.codahale.metrics.health.annotation.Async;
+import static com.codahale.metrics.health.HealthCheck.Result;
 
 /**
  * A registry for health checks.
@@ -214,12 +212,7 @@ public class HealthCheckRegistry {
             final String name = entry.getKey();
             final HealthCheck healthCheck = entry.getValue();
             if (filter.matches(name, healthCheck)) {
-                futures.put(name, executor.submit(new Callable<Result>() {
-                    @Override
-                    public Result call() throws Exception {
-                        return healthCheck.execute();
-                    }
-                }));
+                futures.put(name, executor.submit(() -> healthCheck.execute()));
             }
         }
 

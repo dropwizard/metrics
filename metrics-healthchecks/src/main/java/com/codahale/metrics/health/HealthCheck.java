@@ -177,7 +177,7 @@ public abstract class HealthCheck {
 
         @Override
         public int hashCode() {
-            int result = (healthy ? 1 : 0);
+            int result = healthy ? 1 : 0;
             result = PRIME * result + (message != null ? message.hashCode() : 0);
             result = PRIME * result + (error != null ? error.hashCode() : 0);
             result = PRIME * result + (timestamp != null ? timestamp.hashCode() : 0);

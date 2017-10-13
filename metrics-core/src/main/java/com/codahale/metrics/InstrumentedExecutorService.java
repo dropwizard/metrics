@@ -19,12 +19,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * "your-executor-service.submitted", "your-executor-service.running", etc.
  */
 public class InstrumentedExecutorService implements ExecutorService {
-    private static final AtomicLong nameCounter = new AtomicLong();
+    private static final AtomicLong NAME_COUNTER = new AtomicLong();
 
     private final ExecutorService delegate;
     private final Meter submitted;
     private final Counter running;
     private final Meter completed;
+    private final Timer idle;
     private final Timer duration;
 
     /**
@@ -34,7 +35,7 @@ public class InstrumentedExecutorService implements ExecutorService {
      * @param registry {@link MetricRegistry} that will contain the metrics.
      */
     public InstrumentedExecutorService(ExecutorService delegate, MetricRegistry registry) {
-        this(delegate, registry, "instrumented-delegate-" + nameCounter.incrementAndGet());
+        this(delegate, registry, "instrumented-delegate-" + NAME_COUNTER.incrementAndGet());
     }
 
     /**
@@ -49,6 +50,7 @@ public class InstrumentedExecutorService implements ExecutorService {
         this.submitted = registry.meter(MetricRegistry.name(name, "submitted"));
         this.running = registry.counter(MetricRegistry.name(name, "running"));
         this.completed = registry.meter(MetricRegistry.name(name, "completed"));
+        this.idle = registry.timer(MetricRegistry.name(name, "idle"));
         this.duration = registry.timer(MetricRegistry.name(name, "duration"));
     }
 
@@ -163,19 +165,22 @@ public class InstrumentedExecutorService implements ExecutorService {
 
     private class InstrumentedRunnable implements Runnable {
         private final Runnable task;
+        private final Timer.Context idleContext;
 
         InstrumentedRunnable(Runnable task) {
             this.task = task;
+            this.idleContext = idle.time();
         }
 
         @Override
         public void run() {
+            idleContext.stop();
             running.inc();
-            final Timer.Context context = duration.time();
+            final Timer.Context durationContext = duration.time();
             try {
                 task.run();
             } finally {
-                context.stop();
+                durationContext.stop();
                 running.dec();
                 completed.mark();
             }

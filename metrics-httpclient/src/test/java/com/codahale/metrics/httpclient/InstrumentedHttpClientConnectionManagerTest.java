@@ -17,6 +17,7 @@ public class InstrumentedHttpClientConnectionManagerTest {
         Assert.assertEquals(0, metricRegistry.getGauges().size());
 
         // should be able to create another one with the same name ("")
-        new InstrumentedHttpClientConnectionManager(metricRegistry);
+        try (InstrumentedHttpClientConnectionManager unused = new InstrumentedHttpClientConnectionManager(metricRegistry)) {
+        }
     }
 }

@@ -113,12 +113,7 @@ public class CsvReporterTest {
 
     @Test
     public void reportsMeterValues() throws Exception {
-        final Meter meter = mock(Meter.class);
-        when(meter.getCount()).thenReturn(1L);
-        when(meter.getMeanRate()).thenReturn(2.0);
-        when(meter.getOneMinuteRate()).thenReturn(3.0);
-        when(meter.getFiveMinuteRate()).thenReturn(4.0);
-        when(meter.getFifteenMinuteRate()).thenReturn(5.0);
+        final Meter meter = mockMeter();
 
         reporter.report(map(),
                 map(),
@@ -187,6 +182,43 @@ public class CsvReporterTest {
                 map());
 
         verify(fileProvider).getFile(dataDirectory, "gauge");
+    }
+
+    @Test
+    public void itFormatsWithCustomSeparator() throws Exception {
+        final Meter meter = mockMeter();
+
+        CsvReporter customSeparatorReporter = CsvReporter.forRegistry(registry)
+                .formatFor(Locale.US)
+                .withSeparator("|")
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .withClock(clock)
+                .filter(MetricFilter.ALL)
+                .build(dataDirectory);
+
+        customSeparatorReporter.report(map(),
+                map(),
+                map(),
+                map("test.meter", meter),
+                map());
+
+        assertThat(fileContents("test.meter.csv"))
+                .isEqualTo(csv(
+                        "t,count,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit",
+                        "19910191|1|2.000000|3.000000|4.000000|5.000000|events/second"
+                ));
+    }
+
+    private Meter mockMeter() {
+        final Meter meter = mock(Meter.class);
+        when(meter.getCount()).thenReturn(1L);
+        when(meter.getMeanRate()).thenReturn(2.0);
+        when(meter.getOneMinuteRate()).thenReturn(3.0);
+        when(meter.getFiveMinuteRate()).thenReturn(4.0);
+        when(meter.getFifteenMinuteRate()).thenReturn(5.0);
+
+        return meter;
     }
 
     private String csv(String... lines) {

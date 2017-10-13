@@ -3,7 +3,13 @@ package com.codahale.metrics;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -14,7 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * "your-executor-service.submitted", "your-executor-service.running", etc.
  */
 public class InstrumentedScheduledExecutorService implements ScheduledExecutorService {
-    private static final AtomicLong nameCounter = new AtomicLong();
+    private static final AtomicLong NAME_COUNTER = new AtomicLong();
 
     private final ScheduledExecutorService delegate;
 
@@ -35,7 +41,7 @@ public class InstrumentedScheduledExecutorService implements ScheduledExecutorSe
      * @param registry {@link MetricRegistry} that will contain the metrics.
      */
     public InstrumentedScheduledExecutorService(ScheduledExecutorService delegate, MetricRegistry registry) {
-        this(delegate, registry, "instrumented-scheduled-executor-service-" + nameCounter.incrementAndGet());
+        this(delegate, registry, "instrumented-scheduled-executor-service-" + NAME_COUNTER.incrementAndGet());
     }
 
     /**
@@ -93,7 +99,7 @@ public class InstrumentedScheduledExecutorService implements ScheduledExecutorSe
     @Override
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
         scheduledRepetitively.mark();
-        return delegate.scheduleAtFixedRate(new InstrumentedRunnable(command), initialDelay, delay, unit);
+        return delegate.scheduleWithFixedDelay(new InstrumentedRunnable(command), initialDelay, delay, unit);
     }
 
     /**

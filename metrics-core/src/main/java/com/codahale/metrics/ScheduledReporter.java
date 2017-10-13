@@ -8,13 +8,11 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -159,7 +157,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      *
      * @param initialDelay the time to delay the first execution
      * @param period       the amount of time between polls
-     * @param unit         the unit for {@code period}
+     * @param unit         the unit for {@code period} and {@code initialDelay}
      */
     synchronized public void start(long initialDelay, long period, TimeUnit unit) {
         if (this.scheduledFuture != null) {

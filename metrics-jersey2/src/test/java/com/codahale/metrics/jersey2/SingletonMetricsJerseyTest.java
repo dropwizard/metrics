@@ -95,6 +95,41 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
+    public void responseMeteredMethodsAreMetered() {
+        final Meter meter2xx = registry.meter(name(InstrumentedResource.class,
+                "response2xxMetered",
+                "2xx-responses"));
+        final Meter meter4xx = registry.meter(name(InstrumentedResource.class,
+                "response4xxMetered",
+                "4xx-responses"));
+        final Meter meter5xx = registry.meter(name(InstrumentedResource.class,
+                "response5xxMetered",
+                "5xx-responses"));
+
+        assertThat(meter2xx.getCount()).isZero();
+        assertThat(target("response-2xx-metered")
+                .request()
+                .get().getStatus())
+                .isEqualTo(200);
+
+        assertThat(meter4xx.getCount()).isZero();
+        assertThat(target("response-4xx-metered")
+                .request()
+                .get().getStatus())
+                .isEqualTo(400);
+
+        assertThat(meter5xx.getCount()).isZero();
+        assertThat(target("response-5xx-metered")
+                .request()
+                .get().getStatus())
+                .isEqualTo(500);
+
+        assertThat(meter2xx.getCount()).isEqualTo(1);
+        assertThat(meter4xx.getCount()).isEqualTo(1);
+        assertThat(meter5xx.getCount()).isEqualTo(1);
+    }
+
+    @Test
     public void testResourceNotFound() {
         final Response response = target().path("not-found").request().get();
         assertThat(response.getStatus()).isEqualTo(404);

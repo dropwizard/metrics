@@ -1,6 +1,17 @@
 package com.codahale.metrics.graphite;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.Clock;
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.Metered;
+import com.codahale.metrics.MetricAttribute;
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.ScheduledReporter;
+import com.codahale.metrics.Snapshot;
+import com.codahale.metrics.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +26,21 @@ import java.util.SortedMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.codahale.metrics.MetricAttribute.*;
+import static com.codahale.metrics.MetricAttribute.COUNT;
+import static com.codahale.metrics.MetricAttribute.M15_RATE;
+import static com.codahale.metrics.MetricAttribute.M1_RATE;
+import static com.codahale.metrics.MetricAttribute.M5_RATE;
+import static com.codahale.metrics.MetricAttribute.MAX;
+import static com.codahale.metrics.MetricAttribute.MEAN;
+import static com.codahale.metrics.MetricAttribute.MEAN_RATE;
+import static com.codahale.metrics.MetricAttribute.MIN;
+import static com.codahale.metrics.MetricAttribute.P50;
+import static com.codahale.metrics.MetricAttribute.P75;
+import static com.codahale.metrics.MetricAttribute.P95;
+import static com.codahale.metrics.MetricAttribute.P98;
+import static com.codahale.metrics.MetricAttribute.P99;
+import static com.codahale.metrics.MetricAttribute.P999;
+import static com.codahale.metrics.MetricAttribute.STDDEV;
 
 /**
  * A reporter which publishes metric values to a Graphite server.

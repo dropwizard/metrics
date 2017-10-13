@@ -8,21 +8,31 @@ import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
-import com.codahale.metrics.jmx.JmxReporter;
-import com.codahale.metrics.jmx.ObjectNameFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.management.*;
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.InstanceNotFoundException;
+import javax.management.JMException;
+import javax.management.MBeanServer;
+import javax.management.ObjectInstance;
+import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings("rawtypes")
 public class JmxReporterTest {
@@ -180,8 +190,7 @@ public class JmxReporterTest {
                 .contains(entry("98thPercentile", 9.0))
                 .contains(entry("99thPercentile", 10.0))
                 .contains(entry("999thPercentile", 11.0))
-                .contains(entry("SnapshotSize", 1L))
-        ;
+                .contains(entry("SnapshotSize", 1L));
     }
 
     @Test

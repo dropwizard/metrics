@@ -72,7 +72,7 @@ public class PickledGraphiteTest {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("python");
         Compilable compilable = (Compilable) engine;
         try (InputStream is = PickledGraphiteTest.class.getResource("/upickle.py").openStream()) {
-            unpickleScript = compilable.compile(new InputStreamReader(is));
+            unpickleScript = compilable.compile(new InputStreamReader(is, UTF_8));
         }
     }
 
