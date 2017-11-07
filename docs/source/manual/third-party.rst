@@ -19,6 +19,7 @@ Instrumented Libraries
 * `metrics-guice <https://github.com/palominolabs/metrics-guice>`_ provides integration with `Guice <https://code.google.com/p/google-guice/>`_.
 * `metrics-guice-servlet <https://github.com/palominolabs/metrics-guice-servlet>`_ provides `Guice Servlet <https://github.com/google/guice/wiki/Servlets>`_ integration with AdminServlet.
 * `metrics-okhttp <https://github.com/raskasa/metrics-okhttp>`_ provides integration with `OkHttp <http://square.github.io/okhttp>`_.
+* `metrics-feign <https://github.com/mwiede/metrics-feign>`_ provides integration with `Feign <https://github.com/OpenFeign/feign>`_.
 * `metrics-play <https://github.com/kenshoo/metrics-play>`_ provides an integration with the `Play Framework <https://www.playframework.com/>`_.
 * `metrics-spring <https://github.com/ryantenney/metrics-spring>`_ provides integration with `Spring <http://spring.io/>`_.
 * `wicket-metrics <https://github.com/NitorCreations/wicket-metrics>`_ provides easy integration for your `Wicket <http://wicket.apache.org/>`_ application.
