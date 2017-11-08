@@ -8,18 +8,16 @@ import java.text.DateFormat;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * A {@link ScheduledReporter} subclass that periodically pumps collected metrics to an Akka actor.
  */
 public class AkkaReporter extends ScheduledReporter {
-    private ActorRef metricsReceiver;
+    private ActorRef metricReceiver;
     private final Clock clock;
 
     private AkkaReporter(MetricRegistry registry,
-                          ActorRef metricsReceiver,
+                          ActorRef metricReceiver,
                           Locale locale,
                           Clock clock,
                           TimeZone timeZone,
@@ -32,7 +30,7 @@ public class AkkaReporter extends ScheduledReporter {
         super(registry, "akka-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
             disabledMetricAttributes);
 
-        this.metricsReceiver = metricsReceiver;
+        this.metricReceiver = metricReceiver;
         this.clock = clock;
         DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, locale);
 
@@ -42,23 +40,24 @@ public class AkkaReporter extends ScheduledReporter {
     @Override
     public void report(SortedMap<String, Gauge> gauges, SortedMap<String, Counter> counters,
             SortedMap<String, Histogram> histograms, SortedMap<String, Meter> meters, SortedMap<String, Timer> timers) {
-        Map<String,Metric> allMetrics =
-            Stream.of(gauges.entrySet(), counters.entrySet(), histograms.entrySet(), meters.entrySet(), timers.entrySet())
-                .flatMap(Set::stream)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        MetricsUpdate update = new MetricsUpdate(allMetrics, new Date(clock.getTime()));
-
-        metricsReceiver.tell(update, null);
+        metricReceiver.tell(new MetricUpdate(gauges, counters, histograms, meters, timers, new Date(clock.getTime())),
+            null);
     }
 
-    public static Builder withBuilder(MetricRegistry registry, ActorRef metricsReceiver) {
-        return new Builder(registry, metricsReceiver);
+    /**
+     * Returns a new {@link Builder} for {@link AkkaReporter}.
+     *
+     * @param metricRegistry the registry to report
+     * @param metricReceiver the Akka actor that will be receiving reported metrics
+     * @return a {@link Builder} instance for a {@link AkkaReporter}
+     */
+    public static Builder forRegistryAndReceiver(MetricRegistry metricRegistry, ActorRef metricReceiver) {
+        return new Builder(metricRegistry, metricReceiver);
     }
 
     public static class Builder {
         private final MetricRegistry registry;
-        private ActorRef metricsReceiver;
+        private ActorRef metricReceiver;
         private Locale locale;
         private Clock clock;
         private TimeZone timeZone;
@@ -69,9 +68,9 @@ public class AkkaReporter extends ScheduledReporter {
         private boolean shutdownExecutorOnStop;
         private Set<MetricAttribute> disabledMetricAttributes;
 
-        private Builder(MetricRegistry registry, ActorRef metricsReceiver) {
+        private Builder(MetricRegistry registry, ActorRef metricReceiver) {
             this.registry = registry;
-            this.metricsReceiver = metricsReceiver;
+            this.metricReceiver = metricReceiver;
             this.locale = Locale.getDefault();
             this.clock = Clock.defaultClock();
             this.timeZone = TimeZone.getDefault();
@@ -86,7 +85,7 @@ public class AkkaReporter extends ScheduledReporter {
         public AkkaReporter build() {
             return new AkkaReporter(
                 registry,
-                metricsReceiver,
+                    metricReceiver,
                 locale,
                 clock,
                 timeZone,
