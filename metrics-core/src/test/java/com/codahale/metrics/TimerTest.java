@@ -68,6 +68,19 @@ public class TimerTest {
     }
 
     @Test
+    public void timesSuppliedInstances() {
+        final String value = timer.timeSupplier(() -> "one");
+
+        assertThat(timer.getCount())
+                .isEqualTo(1);
+
+        assertThat(value)
+                .isEqualTo("one");
+
+        verify(reservoir).update(50000000);
+    }
+
+    @Test
     public void timesRunnableInstances() throws Exception {
         final AtomicBoolean called = new AtomicBoolean();
         timer.time(() -> called.set(true));
