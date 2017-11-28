@@ -9,21 +9,13 @@ import java.util.function.Supplier;
  * throughput statistics via {@link Meter}.
  */
 public class Timer implements Metered, Sampling {
+
     /**
      * A timing context.
      *
      * @see Timer#time()
      */
-    public static class Context implements AutoCloseable {
-        private final Timer timer;
-        private final Clock clock;
-        private final long startTime;
-
-        private Context(Timer timer, Clock clock) {
-            this.timer = timer;
-            this.clock = clock;
-            this.startTime = clock.getTick();
-        }
+    public interface Context extends AutoCloseable {
 
         /**
          * Updates the timer with the difference between current and start time. Call to this method will
@@ -31,18 +23,37 @@ public class Timer implements Metered, Sampling {
          *
          * @return the elapsed time in nanoseconds
          */
-        public long stop() {
-            final long elapsed = clock.getTick() - startTime;
-            timer.update(elapsed, TimeUnit.NANOSECONDS);
-            return elapsed;
-        }
+        long stop();
 
         /**
          * Equivalent to calling {@link #stop()}.
          */
         @Override
-        public void close() {
+        default void close() {
             stop();
+        }
+    }
+
+    /**
+     * The default timing context.
+     */
+    private static class DefaultContext implements Context {
+
+        private final Timer timer;
+        private final Clock clock;
+        private final long startTime;
+
+        private DefaultContext(Timer timer, Clock clock) {
+            this.timer = timer;
+            this.clock = clock;
+            this.startTime = clock.getTick();
+        }
+
+        @Override
+        public long stop() {
+            final long elapsed = clock.getTick() - startTime;
+            timer.update(elapsed, TimeUnit.NANOSECONDS);
+            return elapsed;
         }
     }
 
@@ -147,7 +158,7 @@ public class Timer implements Metered, Sampling {
      * @see Context
      */
     public Context time() {
-        return new Context(this, clock);
+        return new DefaultContext(this, clock);
     }
 
     @Override
