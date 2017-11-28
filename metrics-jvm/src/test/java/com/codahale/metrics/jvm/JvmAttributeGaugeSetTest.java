@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.lang.management.RuntimeMXBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,7 +30,7 @@ public class JvmAttributeGaugeSetTest {
     @Test
     public void hasASetOfGauges() throws Exception {
         assertThat(gauges.getMetrics().keySet())
-                .containsOnly("vendor", "name", "uptime");
+                .containsOnly("vendor", "name", "uptime", "processCpuLoad");
     }
 
     @Test
@@ -61,5 +62,12 @@ public class JvmAttributeGaugeSetTest {
         final Gauge<Long> gauge = (Gauge<Long>) new JvmAttributeGaugeSet().getMetrics().get("uptime");
 
         assertThat(gauge.getValue()).isPositive();
+    }
+    
+    @Test
+    public void hasAGuageForProcessCpuLoad() throws Exception{
+    	Gauge<Double> gauge = (Gauge<Double>) new JvmAttributeGaugeSet().getMetrics().get("processCpuLoad");
+    	assertNotNull(gauge);
+    	assertThat(gauge.getValue()).isNotNull();
     }
 }
