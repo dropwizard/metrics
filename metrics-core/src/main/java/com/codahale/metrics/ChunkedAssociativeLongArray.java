@@ -177,77 +177,8 @@ class ChunkedAssociativeLongArray {
         }
     }
 
-    /**
-     * Clear all items in specified boundaries.
-     *
-     * @param startKey the minimal value (inclusive) after which all elements should be removed
-     * @param endKey   the maximum value (exlusive) before which all elements should be removed
-     */
-    synchronized void clear(long startKey, long endKey) {
-        /*
-         * [3, 4, 5, 9] -> [10, 13, 14, 15] -> [21, 24, 29, 30] -> [31] :: start layout
-         *       |5______________________________23|                    :: clear(5, 23)
-         * [3, 4]               ->                 [24, 29, 30] -> [31] :: result layout
-         */
-        ListIterator<Chunk> fromHeadIterator = chunks.listIterator(chunks.size());
-        while (fromHeadIterator.hasPrevious()) {
-            Chunk currentTail = fromHeadIterator.previous();
-            if (!isFirstElementIsEmptyOrGreaterEqualThanKey(currentTail, endKey)) {
-                Chunk afterTailChunk = splitChunkOnTwoSeparateChunks(currentTail, endKey);
-                if (afterTailChunk != null) {
-                    fromHeadIterator.add(afterTailChunk);
-                    break;
-                }
-            }
-        }
-
-        // now we should remove specified gap [startKey, endKey]
-        while (fromHeadIterator.hasPrevious()) {
-            Chunk afterGapHead = fromHeadIterator.previous();
-            if (isFirstElementIsEmptyOrGreaterEqualThanKey(afterGapHead, startKey)) {
-                freeChunk(afterGapHead);
-                fromHeadIterator.remove();
-            } else {
-                int newEndIndex = findFirstIndexOfGreaterEqualElements(
-                        afterGapHead.keys, afterGapHead.startIndex, afterGapHead.cursor, startKey
-                );
-                if (newEndIndex == afterGapHead.startIndex) {
-                    break;
-                }
-                if (afterGapHead.cursor != newEndIndex) {
-                    afterGapHead.cursor = newEndIndex;
-                    afterGapHead.chunkSize = afterGapHead.cursor - afterGapHead.startIndex;
-                    break;
-                }
-            }
-        }
-    }
-
     synchronized void clear() {
         chunks.clear();
-    }
-
-    private Chunk splitChunkOnTwoSeparateChunks(Chunk chunk, long key) {
-        /*
-         * [1, 2, 3, 4, 5, 6, 7, 8] :: beforeSplit
-         * |s--------chunk-------e|
-         *
-         *  splitChunkOnTwoSeparateChunks(chunk, 5)
-         *
-         * [1, 2, 3, 4, 5, 6, 7, 8] :: afterSplit
-         * |s--tail--e||s--head--e|
-         */
-        int splitIndex = findFirstIndexOfGreaterEqualElements(
-                chunk.keys, chunk.startIndex, chunk.cursor, key
-        );
-        if (splitIndex == chunk.startIndex || splitIndex == chunk.cursor) {
-            return null;
-        }
-        int newTailSize = splitIndex - chunk.startIndex;
-        Chunk newTail = new Chunk(chunk.keys, chunk.values, chunk.startIndex, splitIndex, newTailSize);
-        chunk.startIndex = splitIndex;
-        chunk.chunkSize = chunk.chunkSize - newTailSize;
-        return newTail;
     }
 
     private boolean isFirstElementIsEmptyOrGreaterEqualThanKey(Chunk chunk, long key) {
@@ -286,15 +217,6 @@ class ChunkedAssociativeLongArray {
             this.chunkSize = chunkSize;
             this.keys = new long[chunkSize];
             this.values = new long[chunkSize];
-        }
-
-        private Chunk(final long[] keys, final long[] values,
-                      final int startIndex, final int cursor, final int chunkSize) {
-            this.keys = keys;
-            this.values = values;
-            this.startIndex = startIndex;
-            this.cursor = cursor;
-            this.chunkSize = chunkSize;
         }
 
         private void append(long key, long value) {

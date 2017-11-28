@@ -94,7 +94,8 @@ public class SlidingTimeWindowArrayReservoir implements Reservoir {
         if (windowStart < windowEnd) {
             measurements.trim(windowStart, windowEnd);
         } else {
-            measurements.clear(windowEnd, windowStart);
+            // long overflow handling that can happen only after 1 year after class loading
+            measurements.clear();
         }
     }
 }
