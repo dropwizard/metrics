@@ -17,6 +17,7 @@
 
     <modules>
         <module>docs</module>
+        <module>metrics-akka</module>
         <module>metrics-annotation</module>
         <module>metrics-benchmarks</module>
         <module>metrics-core</module>
