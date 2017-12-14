@@ -151,7 +151,7 @@ public class ExponentiallyDecayingReservoirTest {
         clock.addMillis(100);
         context.stop();
 
-        for(int i = 1; i < 48; i++) {
+        for (int i = 1; i < 48; i++) {
             clock.addHours(1);
             assertThat(reservoir.getSnapshot().getMean()).isBetween(0.0, Double.MAX_VALUE);
         }
