@@ -142,7 +142,7 @@ public class ExponentiallyDecayingReservoirTest {
     }
 
     @Test
-    public void removeZeroWeightsInSamplesToPreventNaNInMeanValues() throws Exception {
+    public void removeZeroWeightsInSamplesToPreventNaNInMeanValues() {
         final ManualClock clock = new ManualClock();
         final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(1028, 0.015, clock);
         Timer timer = new Timer(reservoir, clock);
