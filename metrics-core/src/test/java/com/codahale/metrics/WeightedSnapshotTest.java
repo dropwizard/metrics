@@ -217,7 +217,7 @@ public class WeightedSnapshotTest {
     @Test
     public void doesNotProduceNaNValues() {
         WeightedSnapshot weightedSnapshot = new WeightedSnapshot(
-                weightedArray(new long[]{1, 2, 3}, new double[]{0, 0, 0}));
+                WeightedArray(new long[]{1, 2, 3}, new double[]{0, 0, 0}));
         assertThat(weightedSnapshot.getMean()).isEqualTo(0);
     }
 
