@@ -91,6 +91,9 @@ public class InstrumentedHandlerTest {
                         MetricRegistry.name(TestHandler.class,"handler.delete-requests"),
                         MetricRegistry.name(TestHandler.class,"handler.move-requests")
                 );
+
+        assertThat(registry.getMeters().get(metricName() + ".4xx-responses")
+                .getCount()).isGreaterThan(0L);
     }
 
 
@@ -154,13 +157,14 @@ public class InstrumentedHandlerTest {
                 final HttpServletRequest httpServletRequest,
                 final HttpServletResponse httpServletResponse
         ) throws IOException, ServletException {
-            request.setHandled(true);
             if (path.equals("/blocking")) {
+                request.setHandled(true);
                 LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(1));
                 httpServletResponse.setStatus(200);
                 httpServletResponse.setContentType("text/plain");
                 httpServletResponse.getWriter().write("some content from the blocking request\n");
             } else if (path.equals("/async")) {
+                request.setHandled(true);
                 final AsyncContext context = request.startAsync();
                 Thread t = new Thread() {
                     public void run() {
@@ -190,10 +194,6 @@ public class InstrumentedHandlerTest {
                     }
                 };
                 t.start();
-            } else {
-                httpServletResponse.setStatus(404);
-                httpServletResponse.setContentType("text/plain");
-                httpServletResponse.getWriter().write("Not Found\n");
             }
         }
     }
