@@ -5,7 +5,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -259,6 +264,7 @@ public class InstrumentedScheduledExecutorServiceTest {
         assertThat(scheduledOverrun.getCount()).isZero();
         assertThat(percentOfPeriod.getCount()).isZero();
 
+        CountDownLatch countDownLatch = new CountDownLatch(1);
         ScheduledFuture<?> theFuture = instrumentedScheduledExecutor.scheduleWithFixedDelay(() -> {
             assertThat(submitted.getCount()).isZero();
 
@@ -272,11 +278,11 @@ public class InstrumentedScheduledExecutorServiceTest {
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
-
-            return;
+            countDownLatch.countDown();
         }, 10L, 10L, TimeUnit.MILLISECONDS);
 
         TimeUnit.MILLISECONDS.sleep(100);
+        countDownLatch.await(5, TimeUnit.SECONDS);
         theFuture.cancel(true);
         TimeUnit.MILLISECONDS.sleep(100);
 
