@@ -56,9 +56,18 @@ public class ScheduledReporterTest {
 
     @Test
     public void pollsPeriodically() throws Exception {
-        reporter.start(200, TimeUnit.MILLISECONDS);
+        final CountDownLatch latch = new CountDownLatch(2);
+        reporter.start(100, 100, TimeUnit.MILLISECONDS, new Runnable() {
+            @Override
+            public void run() {
+                if (latch.getCount() > 0) {
+                    reporter.report();
+                    latch.countDown();
+                }
+            }
+        });
+        latch.await(5, TimeUnit.SECONDS);
 
-        Thread.sleep(500);
         verify(reporter, times(2)).report(
                 map("gauge", gauge),
                 map("counter", counter),
@@ -88,9 +97,17 @@ public class ScheduledReporterTest {
 
     @Test
     public void shouldAutoCreateExecutorWhenItNull() throws Exception {
-        reporterWithNullExecutor.start(200, TimeUnit.MILLISECONDS);
-
-        Thread.sleep(500);
+        final CountDownLatch latch = new CountDownLatch(2);
+        reporterWithNullExecutor.start(100, 100, TimeUnit.MILLISECONDS, new Runnable() {
+            @Override
+            public void run() {
+                if (latch.getCount() > 0) {
+                    reporterWithNullExecutor.report();
+                    latch.countDown();
+                }
+            }
+        });
+        latch.await(5, TimeUnit.SECONDS);
         verify(reporterWithNullExecutor, times(2)).report(
                 map("gauge", gauge),
                 map("counter", counter),
