@@ -12,6 +12,6 @@ For more information, please see [the documentation](http://dropwizard.github.io
 License
 -------
 
-Copyright (c) 2010-2013 Coda Hale, Yammer.com
+Copyright (c) 2010-2013 Coda Hale, Yammer.com, 2014-2017 Dropwizard Team
 
 Published under Apache Software License 2.0, see LICENSE
