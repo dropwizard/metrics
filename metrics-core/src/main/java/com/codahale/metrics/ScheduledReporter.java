@@ -153,6 +153,18 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
     }
 
     /**
+     * Starts the reporter polling at the given period with the specific runnable action.
+     * Visible only for testing.
+     */
+    synchronized public void start(long initialDelay, long period, TimeUnit unit, Runnable runnable) {
+        if (this.scheduledFuture != null) {
+            throw new IllegalArgumentException("Reporter already started");
+        }
+
+        this.scheduledFuture = executor.scheduleAtFixedRate(runnable, initialDelay, period, unit);
+    }
+
+    /**
      * Starts the reporter polling at the given period.
      *
      * @param initialDelay the time to delay the first execution
@@ -160,17 +172,13 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * @param unit         the unit for {@code period} and {@code initialDelay}
      */
     synchronized public void start(long initialDelay, long period, TimeUnit unit) {
-        if (this.scheduledFuture != null) {
-            throw new IllegalArgumentException("Reporter already started");
-        }
-
-        this.scheduledFuture = executor.scheduleAtFixedRate(() -> {
+        start(initialDelay, period, unit, () -> {
             try {
                 report();
             } catch (Throwable ex) {
                 LOG.error("Exception thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
             }
-        }, initialDelay, period, unit);
+        });
     }
 
     /**
