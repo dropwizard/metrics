@@ -156,7 +156,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * Starts the reporter polling at the given period with the specific runnable action.
      * Visible only for testing.
      */
-    synchronized public void start(long initialDelay, long period, TimeUnit unit, Runnable runnable) {
+    synchronized void start(long initialDelay, long period, TimeUnit unit, Runnable runnable) {
         if (this.scheduledFuture != null) {
             throw new IllegalArgumentException("Reporter already started");
         }
