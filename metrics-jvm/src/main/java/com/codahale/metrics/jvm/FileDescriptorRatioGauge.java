@@ -1,11 +1,10 @@
 package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.RatioGauge;
+import com.sun.management.UnixOperatingSystemMXBean;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * A gauge for the ratio of used to total file descriptors.
@@ -31,17 +30,11 @@ public class FileDescriptorRatioGauge extends RatioGauge {
 
     @Override
     protected Ratio getRatio() {
-        try {
-            return Ratio.of(invoke("getOpenFileDescriptorCount"),
-                    invoke("getMaxFileDescriptorCount"));
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+        if (os instanceof UnixOperatingSystemMXBean) {
+            final UnixOperatingSystemMXBean unixOs = (UnixOperatingSystemMXBean) os;
+            return Ratio.of(unixOs.getOpenFileDescriptorCount(), unixOs.getMaxFileDescriptorCount());
+        } else {
             return Ratio.of(Double.NaN, Double.NaN);
         }
-    }
-
-    private long invoke(String name) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        final Method method = os.getClass().getDeclaredMethod(name);
-        method.setAccessible(true);
-        return (Long) method.invoke(os);
     }
 }

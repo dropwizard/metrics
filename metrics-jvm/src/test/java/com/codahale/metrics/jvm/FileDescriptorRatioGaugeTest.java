@@ -1,5 +1,6 @@
 package com.codahale.metrics.jvm;
 
+import com.sun.management.UnixOperatingSystemMXBean;
 import org.junit.Test;
 
 import javax.management.ObjectName;
@@ -12,7 +13,7 @@ import static org.mockito.Mockito.mock;
 
 @SuppressWarnings("UnusedDeclaration")
 public class FileDescriptorRatioGaugeTest {
-    private final OperatingSystemMXBean os = new OperatingSystemMXBean() {
+    private final OperatingSystemMXBean os = new UnixOperatingSystemMXBean() {
         @Override
         public String getName() {
             return null;
@@ -38,14 +39,54 @@ public class FileDescriptorRatioGaugeTest {
             return 0;
         }
 
-        // these duplicate methods from UnixOperatingSystem
-
-        private long getOpenFileDescriptorCount() {
+        @Override
+        public long getOpenFileDescriptorCount() {
             return 10;
         }
 
-        private long getMaxFileDescriptorCount() {
+        @Override
+        public long getMaxFileDescriptorCount() {
             return 100;
+        }
+
+        @Override
+        public long getCommittedVirtualMemorySize() {
+            return 0;
+        }
+
+        @Override
+        public long getTotalSwapSpaceSize() {
+            return 0;
+        }
+
+        @Override
+        public long getFreeSwapSpaceSize() {
+            return 0;
+        }
+
+        @Override
+        public long getProcessCpuTime() {
+            return 0;
+        }
+
+        @Override
+        public long getFreePhysicalMemorySize() {
+            return 0;
+        }
+
+        @Override
+        public long getTotalPhysicalMemorySize() {
+            return 0;
+        }
+
+        @Override
+        public double getSystemCpuLoad() {
+            return 0;
+        }
+
+        @Override
+        public double getProcessCpuLoad() {
+            return 0;
         }
 
         // overridden on Java 1.7; random crap on Java 1.6
