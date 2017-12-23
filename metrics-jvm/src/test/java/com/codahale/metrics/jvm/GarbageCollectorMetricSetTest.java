@@ -17,34 +17,34 @@ public class GarbageCollectorMetricSetTest {
     private final GarbageCollectorMetricSet metrics = new GarbageCollectorMetricSet(Collections.singletonList(gc));
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         when(gc.getName()).thenReturn("PS OldGen");
         when(gc.getCollectionCount()).thenReturn(1L);
         when(gc.getCollectionTime()).thenReturn(2L);
     }
 
     @Test
-    public void hasGaugesForGcCountsAndElapsedTimes() throws Exception {
+    public void hasGaugesForGcCountsAndElapsedTimes() {
         assertThat(metrics.getMetrics().keySet())
                 .containsOnly("PS-OldGen.time", "PS-OldGen.count");
     }
 
     @Test
-    public void hasAGaugeForGcCounts() throws Exception {
+    public void hasAGaugeForGcCounts() {
         final Gauge<Long> gauge = (Gauge<Long>) metrics.getMetrics().get("PS-OldGen.count");
         assertThat(gauge.getValue())
                 .isEqualTo(1L);
     }
 
     @Test
-    public void hasAGaugeForGcTimes() throws Exception {
+    public void hasAGaugeForGcTimes() {
         final Gauge<Long> gauge = (Gauge<Long>) metrics.getMetrics().get("PS-OldGen.time");
         assertThat(gauge.getValue())
                 .isEqualTo(2L);
     }
 
     @Test
-    public void autoDiscoversGCs() throws Exception {
+    public void autoDiscoversGCs() {
         assertThat(new GarbageCollectorMetricSet().getMetrics().keySet())
                 .isNotEmpty();
     }

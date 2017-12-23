@@ -78,7 +78,7 @@ public class GraphiteTest {
     }
 
     @Test
-    public void measuresFailures() throws Exception {
+    public void measuresFailures() {
         graphite = new Graphite(address, socketFactory);
         assertThat(graphite.getFailures())
                 .isZero();
@@ -140,7 +140,7 @@ public class GraphiteTest {
     }
 
     @Test
-    public void notifiesIfGraphiteIsUnavailable() throws Exception {
+    public void notifiesIfGraphiteIsUnavailable() {
         final String unavailableHost = "unknown-host-10el6m7yg56ge7dmcom";
         InetSocketAddress unavailableAddress = new InetSocketAddress(unavailableHost, 1234);
 

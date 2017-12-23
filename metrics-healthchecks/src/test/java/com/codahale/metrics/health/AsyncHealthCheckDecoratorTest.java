@@ -149,7 +149,7 @@ public class AsyncHealthCheckDecoratorTest {
     private static class NegativePeriodAsyncHealthCheck extends HealthCheck {
 
         @Override
-        protected Result check() throws Exception {
+        protected Result check() {
             return null;
         }
     }
@@ -158,7 +158,7 @@ public class AsyncHealthCheckDecoratorTest {
     private static class ZeroPeriodAsyncHealthCheck extends HealthCheck {
 
         @Override
-        protected Result check() throws Exception {
+        protected Result check() {
             return null;
         }
     }
@@ -167,7 +167,7 @@ public class AsyncHealthCheckDecoratorTest {
     private static class NegativeInitialDelayAsyncHealthCheck extends HealthCheck {
 
         @Override
-        protected Result check() throws Exception {
+        protected Result check() {
             return null;
         }
     }
@@ -176,7 +176,7 @@ public class AsyncHealthCheckDecoratorTest {
     private static class DefaultAsyncHealthCheck extends HealthCheck {
 
         @Override
-        protected Result check() throws Exception {
+        protected Result check() {
             return null;
         }
     }
@@ -185,7 +185,7 @@ public class AsyncHealthCheckDecoratorTest {
     private static class FixedDelayAsyncHealthCheck extends HealthCheck {
 
         @Override
-        protected Result check() throws Exception {
+        protected Result check() {
             return null;
         }
     }
@@ -194,7 +194,7 @@ public class AsyncHealthCheckDecoratorTest {
     private static class UnhealthyAsyncHealthCheck extends HealthCheck {
 
         @Override
-        protected Result check() throws Exception {
+        protected Result check() {
             return null;
         }
     }

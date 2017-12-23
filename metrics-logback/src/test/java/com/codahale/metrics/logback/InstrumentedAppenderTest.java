@@ -22,17 +22,17 @@ public class InstrumentedAppenderTest {
     private final ILoggingEvent event = mock(ILoggingEvent.class);
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         appender.start();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         SharedMetricRegistries.clear();
     }
 
     @Test
-    public void metersTraceEvents() throws Exception {
+    public void metersTraceEvents() {
         when(event.getLevel()).thenReturn(Level.TRACE);
 
         appender.doAppend(event);
@@ -45,7 +45,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void metersDebugEvents() throws Exception {
+    public void metersDebugEvents() {
         when(event.getLevel()).thenReturn(Level.DEBUG);
 
         appender.doAppend(event);
@@ -58,7 +58,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void metersInfoEvents() throws Exception {
+    public void metersInfoEvents() {
         when(event.getLevel()).thenReturn(Level.INFO);
 
         appender.doAppend(event);
@@ -71,7 +71,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void metersWarnEvents() throws Exception {
+    public void metersWarnEvents() {
         when(event.getLevel()).thenReturn(Level.WARN);
 
         appender.doAppend(event);
@@ -84,7 +84,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void metersErrorEvents() throws Exception {
+    public void metersErrorEvents() {
         when(event.getLevel()).thenReturn(Level.ERROR);
 
         appender.doAppend(event);
@@ -97,7 +97,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void usesSharedRegistries() throws Exception {
+    public void usesSharedRegistries() {
 
         String registryName = "registry";
 
@@ -114,7 +114,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void usesDefaultRegistry() throws Exception {
+    public void usesDefaultRegistry() {
         SharedMetricRegistries.add(InstrumentedAppender.DEFAULT_REGISTRY, registry);
         final InstrumentedAppender shared = new InstrumentedAppender();
         shared.start();
@@ -127,7 +127,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void usesRegistryFromProperty() throws Exception {
+    public void usesRegistryFromProperty() {
         SharedMetricRegistries.add("something_else", registry);
         System.setProperty(InstrumentedAppender.REGISTRY_PROPERTY_NAME, "something_else");
         final InstrumentedAppender shared = new InstrumentedAppender();

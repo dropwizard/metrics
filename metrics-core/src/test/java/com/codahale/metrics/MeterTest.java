@@ -21,7 +21,7 @@ public class MeterTest {
     }
 
     @Test
-    public void startsOutWithNoRatesOrCount() throws Exception {
+    public void startsOutWithNoRatesOrCount() {
         assertThat(meter.getCount())
                 .isZero();
 
@@ -39,7 +39,7 @@ public class MeterTest {
     }
 
     @Test
-    public void marksEventsAndUpdatesRatesAndCount() throws Exception {
+    public void marksEventsAndUpdatesRatesAndCount() {
         meter.mark();
         meter.mark(2);
 

@@ -43,7 +43,7 @@ public class HealthCheckRegistryTest {
 
     @Before
     @SuppressWarnings("unchecked")
-    public void setUp() throws Exception {
+    public void setUp() {
         registry.addListener(listener);
 
         when(hc1.execute()).thenReturn(r1);
@@ -115,7 +115,7 @@ public class HealthCheckRegistryTest {
     }
 
     @Test
-    public void runsRegisteredHealthChecks() throws Exception {
+    public void runsRegisteredHealthChecks() {
         final Map<String, HealthCheck.Result> results = registry.runHealthChecks();
 
         assertThat(results).contains(entry("hc1", r1));
@@ -124,14 +124,14 @@ public class HealthCheckRegistryTest {
     }
 
     @Test
-    public void runsRegisteredHealthChecksWithFilter() throws Exception {
+    public void runsRegisteredHealthChecksWithFilter() {
         final Map<String, HealthCheck.Result> results = registry.runHealthChecks((name, healthCheck) -> "hc1".equals(name));
 
         assertThat(results).containsOnly(entry("hc1", r1));
     }
 
     @Test
-    public void runsRegisteredHealthChecksWithNonMatchingFilter() throws Exception {
+    public void runsRegisteredHealthChecksWithNonMatchingFilter() {
         final Map<String, HealthCheck.Result> results = registry.runHealthChecks((name, healthCheck) -> false);
 
         assertThat(results).isEmpty();
@@ -174,7 +174,7 @@ public class HealthCheckRegistryTest {
     }
 
     @Test
-    public void removesRegisteredHealthChecks() throws Exception {
+    public void removesRegisteredHealthChecks() {
         registry.unregister("hc1");
 
         final Map<String, HealthCheck.Result> results = registry.runHealthChecks();
@@ -185,17 +185,17 @@ public class HealthCheckRegistryTest {
     }
 
     @Test
-    public void hasASetOfHealthCheckNames() throws Exception {
+    public void hasASetOfHealthCheckNames() {
         assertThat(registry.getNames()).containsOnly("hc1", "hc2", "ahc");
     }
 
     @Test
-    public void runsHealthChecksByName() throws Exception {
+    public void runsHealthChecksByName() {
         assertThat(registry.runHealthCheck("hc1")).isEqualTo(r1);
     }
 
     @Test
-    public void doesNotRunNonexistentHealthChecks() throws Exception {
+    public void doesNotRunNonexistentHealthChecks()  {
         try {
             registry.runHealthCheck("what");
             failBecauseExceptionWasNotThrown(NoSuchElementException.class);
@@ -215,7 +215,7 @@ public class HealthCheckRegistryTest {
         }
 
         @Override
-        protected Result check() throws Exception {
+        protected Result check() {
             return result;
         }
     }

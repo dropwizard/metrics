@@ -32,13 +32,13 @@ public class WeightedSnapshotTest {
             weightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2}));
 
     @Test
-    public void smallQuantilesAreTheFirstValue() throws Exception {
+    public void smallQuantilesAreTheFirstValue() {
         assertThat(snapshot.getValue(0.0))
                 .isEqualTo(1.0, offset(0.1));
     }
 
     @Test
-    public void bigQuantilesAreTheLastValue() throws Exception {
+    public void bigQuantilesAreTheLastValue() {
         assertThat(snapshot.getValue(1.0))
                 .isEqualTo(5.0, offset(0.1));
     }
@@ -59,49 +59,49 @@ public class WeightedSnapshotTest {
     }
 
     @Test
-    public void hasAMedian() throws Exception {
+    public void hasAMedian() {
         assertThat(snapshot.getMedian()).isEqualTo(3.0, offset(0.1));
     }
 
     @Test
-    public void hasAp75() throws Exception {
+    public void hasAp75() {
         assertThat(snapshot.get75thPercentile()).isEqualTo(4.0, offset(0.1));
     }
 
     @Test
-    public void hasAp95() throws Exception {
+    public void hasAp95() {
         assertThat(snapshot.get95thPercentile()).isEqualTo(5.0, offset(0.1));
     }
 
     @Test
-    public void hasAp98() throws Exception {
+    public void hasAp98() {
         assertThat(snapshot.get98thPercentile()).isEqualTo(5.0, offset(0.1));
     }
 
     @Test
-    public void hasAp99() throws Exception {
+    public void hasAp99() {
         assertThat(snapshot.get99thPercentile()).isEqualTo(5.0, offset(0.1));
     }
 
     @Test
-    public void hasAp999() throws Exception {
+    public void hasAp999() {
         assertThat(snapshot.get999thPercentile()).isEqualTo(5.0, offset(0.1));
     }
 
     @Test
-    public void hasValues() throws Exception {
+    public void hasValues() {
         assertThat(snapshot.getValues())
                 .containsOnly(1, 2, 3, 4, 5);
     }
 
     @Test
-    public void hasASize() throws Exception {
+    public void hasASize() {
         assertThat(snapshot.size())
                 .isEqualTo(5);
     }
 
     @Test
-    public void worksWithUnderestimatedCollections() throws Exception {
+    public void worksWithUnderestimatedCollections() {
         final List<WeightedSample> items = spy(weightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2}));
         when(items.size()).thenReturn(4, 5);
 
@@ -112,7 +112,7 @@ public class WeightedSnapshotTest {
     }
 
     @Test
-    public void worksWithOverestimatedCollections() throws Exception {
+    public void worksWithOverestimatedCollections() {
         final List<WeightedSample> items = spy(weightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2}));
         when(items.size()).thenReturn(6, 5);
 
@@ -123,7 +123,7 @@ public class WeightedSnapshotTest {
     }
 
     @Test
-    public void dumpsToAStream() throws Exception {
+    public void dumpsToAStream() {
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         snapshot.dump(output);
@@ -133,31 +133,31 @@ public class WeightedSnapshotTest {
     }
 
     @Test
-    public void calculatesTheMinimumValue() throws Exception {
+    public void calculatesTheMinimumValue() {
         assertThat(snapshot.getMin())
                 .isEqualTo(1);
     }
 
     @Test
-    public void calculatesTheMaximumValue() throws Exception {
+    public void calculatesTheMaximumValue() {
         assertThat(snapshot.getMax())
                 .isEqualTo(5);
     }
 
     @Test
-    public void calculatesTheMeanValue() throws Exception {
+    public void calculatesTheMeanValue() {
         assertThat(snapshot.getMean())
                 .isEqualTo(2.7);
     }
 
     @Test
-    public void calculatesTheStdDev() throws Exception {
+    public void calculatesTheStdDev() {
         assertThat(snapshot.getStdDev())
                 .isEqualTo(1.2688, offset(0.0001));
     }
 
     @Test
-    public void calculatesAMinOfZeroForAnEmptySnapshot() throws Exception {
+    public void calculatesAMinOfZeroForAnEmptySnapshot() {
         final Snapshot emptySnapshot = new WeightedSnapshot(
                 weightedArray(new long[]{}, new double[]{}));
 
@@ -166,7 +166,7 @@ public class WeightedSnapshotTest {
     }
 
     @Test
-    public void calculatesAMaxOfZeroForAnEmptySnapshot() throws Exception {
+    public void calculatesAMaxOfZeroForAnEmptySnapshot() {
         final Snapshot emptySnapshot = new WeightedSnapshot(
                 weightedArray(new long[]{}, new double[]{}));
 
@@ -175,7 +175,7 @@ public class WeightedSnapshotTest {
     }
 
     @Test
-    public void calculatesAMeanOfZeroForAnEmptySnapshot() throws Exception {
+    public void calculatesAMeanOfZeroForAnEmptySnapshot() {
         final Snapshot emptySnapshot = new WeightedSnapshot(
                 weightedArray(new long[]{}, new double[]{}));
 
@@ -184,7 +184,7 @@ public class WeightedSnapshotTest {
     }
 
     @Test
-    public void calculatesAStdDevOfZeroForAnEmptySnapshot() throws Exception {
+    public void calculatesAStdDevOfZeroForAnEmptySnapshot() {
         final Snapshot emptySnapshot = new WeightedSnapshot(
                 weightedArray(new long[]{}, new double[]{}));
 
@@ -193,7 +193,7 @@ public class WeightedSnapshotTest {
     }
 
     @Test
-    public void calculatesAStdDevOfZeroForASingletonSnapshot() throws Exception {
+    public void calculatesAStdDevOfZeroForASingletonSnapshot() {
         final Snapshot singleItemSnapshot = new WeightedSnapshot(
                 weightedArray(new long[]{1}, new double[]{1.0}));
 
@@ -202,7 +202,7 @@ public class WeightedSnapshotTest {
     }
 
     @Test
-    public void expectNoOverflowForLowWeights() throws Exception {
+    public void expectNoOverflowForLowWeights() {
         final Snapshot scatteredSnapshot = new WeightedSnapshot(
                 weightedArray(
                         new long[]{1, 2, 3},

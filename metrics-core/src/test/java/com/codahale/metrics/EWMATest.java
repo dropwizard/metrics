@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.offset;
 
 public class EWMATest {
     @Test
-    public void aOneMinuteEWMAWithAValueOfThree() throws Exception {
+    public void aOneMinuteEWMAWithAValueOfThree() {
         final EWMA ewma = EWMA.oneMinuteEWMA();
         ewma.update(3);
         ewma.tick();
@@ -78,7 +78,7 @@ public class EWMATest {
     }
 
     @Test
-    public void aFiveMinuteEWMAWithAValueOfThree() throws Exception {
+    public void aFiveMinuteEWMAWithAValueOfThree() {
         final EWMA ewma = EWMA.fiveMinuteEWMA();
         ewma.update(3);
         ewma.tick();
@@ -147,7 +147,7 @@ public class EWMATest {
     }
 
     @Test
-    public void aFifteenMinuteEWMAWithAValueOfThree() throws Exception {
+    public void aFifteenMinuteEWMAWithAValueOfThree() {
         final EWMA ewma = EWMA.fifteenMinuteEWMA();
         ewma.update(3);
         ewma.tick();

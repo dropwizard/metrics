@@ -12,7 +12,7 @@ public class HistogramTest {
     private final Histogram histogram = new Histogram(reservoir);
 
     @Test
-    public void updatesTheCountOnUpdates() throws Exception {
+    public void updatesTheCountOnUpdates() {
         assertThat(histogram.getCount())
                 .isZero();
 
@@ -23,7 +23,7 @@ public class HistogramTest {
     }
 
     @Test
-    public void returnsTheSnapshotFromTheReservoir() throws Exception {
+    public void returnsTheSnapshotFromTheReservoir() {
         final Snapshot snapshot = mock(Snapshot.class);
         when(reservoir.getSnapshot()).thenReturn(snapshot);
 

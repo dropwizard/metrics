@@ -39,14 +39,14 @@ public class HealthCheckServletTest extends AbstractServletTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         request.setMethod("GET");
         request.setURI("/healthchecks");
         request.setVersion("HTTP/1.0");
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         threadPool.shutdown();
     }
 

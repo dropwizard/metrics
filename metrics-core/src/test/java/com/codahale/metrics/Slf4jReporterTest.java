@@ -36,7 +36,7 @@ public class Slf4jReporterTest {
             .build();
 
     @Test
-    public void reportsGaugeValuesAtError() throws Exception {
+    public void reportsGaugeValuesAtError() {
         when(logger.isErrorEnabled(marker)).thenReturn(true);
         errorReporter.report(map("gauge", () -> "value"),
                 map(),
@@ -48,7 +48,7 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsCounterValuesAtError() throws Exception {
+    public void reportsCounterValuesAtError() {
         final Counter counter = mock(Counter.class);
         when(counter.getCount()).thenReturn(100L);
         when(logger.isErrorEnabled(marker)).thenReturn(true);
@@ -63,7 +63,7 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsHistogramValuesAtError() throws Exception {
+    public void reportsHistogramValuesAtError() {
         final Histogram histogram = mock(Histogram.class);
         when(histogram.getCount()).thenReturn(1L);
 
@@ -106,7 +106,7 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsMeterValuesAtError() throws Exception {
+    public void reportsMeterValuesAtError() {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
         when(meter.getMeanRate()).thenReturn(2.0);
@@ -134,7 +134,7 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsTimerValuesAtError() throws Exception {
+    public void reportsTimerValuesAtError() {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
 
@@ -190,7 +190,7 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsGaugeValues() throws Exception {
+    public void reportsGaugeValues() {
         when(logger.isInfoEnabled(marker)).thenReturn(true);
         infoReporter.report(map("gauge", () -> "value"),
                 map(),
@@ -202,7 +202,7 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsCounterValues() throws Exception {
+    public void reportsCounterValues() {
         final Counter counter = mock(Counter.class);
         when(counter.getCount()).thenReturn(100L);
         when(logger.isInfoEnabled(marker)).thenReturn(true);
@@ -217,7 +217,7 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsHistogramValues() throws Exception {
+    public void reportsHistogramValues() {
         final Histogram histogram = mock(Histogram.class);
         when(histogram.getCount()).thenReturn(1L);
 
@@ -260,7 +260,7 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsMeterValues() throws Exception {
+    public void reportsMeterValues() {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
         when(meter.getMeanRate()).thenReturn(2.0);
@@ -288,7 +288,7 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsTimerValues() throws Exception {
+    public void reportsTimerValues() {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
 

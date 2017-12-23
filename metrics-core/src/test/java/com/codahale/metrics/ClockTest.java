@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.offset;
 public class ClockTest {
 
     @Test
-    public void userTimeClock() throws Exception {
+    public void userTimeClock() {
         final Clock.UserTimeClock clock = new Clock.UserTimeClock();
 
         assertThat((double) clock.getTime())
@@ -21,7 +21,7 @@ public class ClockTest {
     }
 
     @Test
-    public void defaultsToUserTime() throws Exception {
+    public void defaultsToUserTime() {
         assertThat(Clock.defaultClock())
                 .isInstanceOf(Clock.UserTimeClock.class);
     }

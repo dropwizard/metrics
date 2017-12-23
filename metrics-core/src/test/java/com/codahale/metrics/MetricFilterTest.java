@@ -7,13 +7,13 @@ import static org.mockito.Mockito.mock;
 
 public class MetricFilterTest {
     @Test
-    public void theAllFilterMatchesAllMetrics() throws Exception {
+    public void theAllFilterMatchesAllMetrics() {
         assertThat(MetricFilter.ALL.matches("", mock(Metric.class)))
                 .isTrue();
     }
 
     @Test
-    public void theStartsWithFilterMatches() throws Exception {
+    public void theStartsWithFilterMatches() {
         assertThat(MetricFilter.startsWith("foo").matches("foo.bar", mock(Metric.class)))
                 .isTrue();
         assertThat(MetricFilter.startsWith("foo").matches("bar.foo", mock(Metric.class)))
@@ -21,7 +21,7 @@ public class MetricFilterTest {
     }
 
     @Test
-    public void theEndsWithFilterMatches() throws Exception {
+    public void theEndsWithFilterMatches() {
         assertThat(MetricFilter.endsWith("foo").matches("foo.bar", mock(Metric.class)))
                 .isFalse();
         assertThat(MetricFilter.endsWith("foo").matches("bar.foo", mock(Metric.class)))
@@ -29,7 +29,7 @@ public class MetricFilterTest {
     }
 
     @Test
-    public void theContainsFilterMatches() throws Exception {
+    public void theContainsFilterMatches() {
         assertThat(MetricFilter.contains("foo").matches("bar.foo.bar", mock(Metric.class)))
                 .isTrue();
         assertThat(MetricFilter.contains("foo").matches("bar.bar", mock(Metric.class)))

@@ -28,7 +28,7 @@ public class BufferPoolMetricSetTest {
     }
 
     @Test
-    public void includesGaugesForDirectAndMappedPools() throws Exception {
+    public void includesGaugesForDirectAndMappedPools() {
         assertThat(buffers.getMetrics().keySet())
                 .containsOnly("direct.count",
                         "mapped.used",

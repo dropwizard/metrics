@@ -20,7 +20,7 @@ public class InstrumentedFilterContextListenerTest {
     };
 
     @Test
-    public void injectsTheMetricRegistryIntoTheServletContext() throws Exception {
+    public void injectsTheMetricRegistryIntoTheServletContext() {
         final ServletContext context = mock(ServletContext.class);
 
         final ServletContextEvent event = mock(ServletContextEvent.class);

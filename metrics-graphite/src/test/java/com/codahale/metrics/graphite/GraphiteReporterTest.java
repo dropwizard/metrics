@@ -56,7 +56,7 @@ public class GraphiteReporterTest {
         .build(graphite);
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         when(clock.getTime()).thenReturn(timestamp * 1000);
     }
 

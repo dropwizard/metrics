@@ -14,7 +14,7 @@ public class DerivativeGaugeTest {
     };
 
     @Test
-    public void returnsATransformedValue() throws Exception {
+    public void returnsATransformedValue() {
         assertThat(gauge2.getValue())
                 .isEqualTo(3);
     }

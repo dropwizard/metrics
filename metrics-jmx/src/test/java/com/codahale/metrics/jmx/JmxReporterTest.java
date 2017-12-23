@@ -116,7 +116,7 @@ public class JmxReporterTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         reporter.stop();
     }
 
