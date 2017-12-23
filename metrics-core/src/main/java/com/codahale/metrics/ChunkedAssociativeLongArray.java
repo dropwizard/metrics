@@ -102,10 +102,10 @@ class ChunkedAssociativeLongArray {
     }
 
     synchronized String out() {
-        Iterator<Chunk> fromTailIterator = chunks.iterator();
+        Iterator<Chunk> iterator = chunks.iterator();
         StringBuilder builder = new StringBuilder();
-        while (fromTailIterator.hasNext()) {
-            Chunk copySourceChunk = fromTailIterator.next();
+        while (iterator.hasNext()) {
+            Chunk copySourceChunk = iterator.next();
             builder.append('[');
             for (int i = copySourceChunk.startIndex; i < copySourceChunk.cursor; i++) {
                 long key = copySourceChunk.keys[i];
@@ -113,7 +113,7 @@ class ChunkedAssociativeLongArray {
                 builder.append('(').append(key).append(": ").append(value).append(')').append(' ');
             }
             builder.append(']');
-            if (fromTailIterator.hasNext()) {
+            if (iterator.hasNext()) {
                 builder.append("->");
             }
         }
@@ -132,34 +132,34 @@ class ChunkedAssociativeLongArray {
          *       |5______________________________23|                    :: trim(5, 23)
          *       [5, 9] -> [10, 13, 14, 15] -> [21]                     :: result layout
          */
-        Iterator<Chunk> fromHeadIterator = chunks.descendingIterator();
-        while (fromHeadIterator.hasNext()) {
-            Chunk currentHead = fromHeadIterator.next();
-            if (isFirstElementIsEmptyOrGreaterEqualThanKey(currentHead, endKey)) {
-                freeChunk(currentHead);
-                fromHeadIterator.remove();
+        Iterator<Chunk> descendingIterator = chunks.descendingIterator();
+        while (descendingIterator.hasNext()) {
+            Chunk currentTail = descendingIterator.next();
+            if (isFirstElementIsEmptyOrGreaterEqualThanKey(currentTail, endKey)) {
+                freeChunk(currentTail);
+                descendingIterator.remove();
             } else {
                 int newEndIndex = findFirstIndexOfGreaterEqualElements(
-                        currentHead.keys, currentHead.startIndex, currentHead.cursor, endKey
+                        currentTail.keys, currentTail.startIndex, currentTail.cursor, endKey
                 );
-                currentHead.cursor = newEndIndex;
+                currentTail.cursor = newEndIndex;
                 break;
             }
         }
 
-        Iterator<Chunk> fromTailIterator = chunks.iterator();
-        while (fromTailIterator.hasNext()) {
-            Chunk currentTail = fromTailIterator.next();
-            if (isLastElementIsLessThanKey(currentTail, startKey)) {
-                freeChunk(currentTail);
-                fromTailIterator.remove();
+        Iterator<Chunk> iterator = chunks.iterator();
+        while (iterator.hasNext()) {
+            Chunk currentHead = iterator.next();
+            if (isLastElementIsLessThanKey(currentHead, startKey)) {
+                freeChunk(currentHead);
+                iterator.remove();
             } else {
                 int newStartIndex = findFirstIndexOfGreaterEqualElements(
-                        currentTail.keys, currentTail.startIndex, currentTail.cursor, startKey
+                        currentHead.keys, currentHead.startIndex, currentHead.cursor, startKey
                 );
-                if (currentTail.startIndex != newStartIndex) {
-                    currentTail.startIndex = newStartIndex;
-                    currentTail.chunkSize = currentTail.cursor - currentTail.startIndex;
+                if (currentHead.startIndex != newStartIndex) {
+                    currentHead.startIndex = newStartIndex;
+                    currentHead.chunkSize = currentHead.cursor - currentHead.startIndex;
                 }
                 break;
             }
