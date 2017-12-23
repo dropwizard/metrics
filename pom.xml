@@ -210,6 +210,10 @@
                     <compilerArgument>-Xlint:all</compilerArgument>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <fork>true</fork>
+                    <compilerArgs>
+                        <arg>-XepDisableWarningsInGeneratedCode</arg>
+                    </compilerArgs>
                 </configuration>
                 <dependencies>
                     <dependency>
