@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class RatioGaugeTest {
     @Test
-    public void ratiosAreHumanReadable() throws Exception {
+    public void ratiosAreHumanReadable() {
         final RatioGauge.Ratio ratio = RatioGauge.Ratio.of(100, 200);
 
         assertThat(ratio.toString())
@@ -14,7 +14,7 @@ public class RatioGaugeTest {
     }
 
     @Test
-    public void calculatesTheRatioOfTheNumeratorToTheDenominator() throws Exception {
+    public void calculatesTheRatioOfTheNumeratorToTheDenominator() {
         final RatioGauge regular = new RatioGauge() {
             @Override
             protected Ratio getRatio() {
@@ -27,7 +27,7 @@ public class RatioGaugeTest {
     }
 
     @Test
-    public void handlesDivideByZeroIssues() throws Exception {
+    public void handlesDivideByZeroIssues() {
         final RatioGauge divByZero = new RatioGauge() {
             @Override
             protected Ratio getRatio() {
@@ -40,7 +40,7 @@ public class RatioGaugeTest {
     }
 
     @Test
-    public void handlesInfiniteDenominators() throws Exception {
+    public void handlesInfiniteDenominators() {
         final RatioGauge infinite = new RatioGauge() {
             @Override
             protected Ratio getRatio() {
@@ -53,7 +53,7 @@ public class RatioGaugeTest {
     }
 
     @Test
-    public void handlesNaNDenominators() throws Exception {
+    public void handlesNaNDenominators() {
         final RatioGauge nan = new RatioGauge() {
             @Override
             protected Ratio getRatio() {

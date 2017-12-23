@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 
 public class SlidingTimeWindowReservoirTest {
     @Test
-    public void storesMeasurementsWithDuplicateTicks() throws Exception {
+    public void storesMeasurementsWithDuplicateTicks() {
         final Clock clock = mock(Clock.class);
         final SlidingTimeWindowReservoir reservoir = new SlidingTimeWindowReservoir(10, NANOSECONDS, clock);
 
@@ -26,7 +26,7 @@ public class SlidingTimeWindowReservoirTest {
     }
 
     @Test
-    public void boundsMeasurementsToATimeWindow() throws Exception {
+    public void boundsMeasurementsToATimeWindow() {
         final Clock clock = mock(Clock.class);
         final SlidingTimeWindowReservoir reservoir = new SlidingTimeWindowReservoir(10, NANOSECONDS, clock);
 

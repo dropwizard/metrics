@@ -17,7 +17,7 @@ public class ThreadDeadlockDetectorTest {
     private final ThreadDeadlockDetector detector = new ThreadDeadlockDetector(threads);
 
     @Test
-    public void returnsAnEmptySetIfNoThreadsAreDeadlocked() throws Exception {
+    public void returnsAnEmptySetIfNoThreadsAreDeadlocked() {
         when(threads.findDeadlockedThreads()).thenReturn(null);
 
         assertThat(detector.getDeadlockedThreads())
@@ -25,7 +25,7 @@ public class ThreadDeadlockDetectorTest {
     }
 
     @Test
-    public void returnsASetOfThreadsIfAnyAreDeadlocked() throws Exception {
+    public void returnsASetOfThreadsIfAnyAreDeadlocked() {
         final ThreadInfo thread1 = mock(ThreadInfo.class);
         when(thread1.getThreadName()).thenReturn("thread1");
         when(thread1.getLockName()).thenReturn("lock2");
@@ -61,7 +61,7 @@ public class ThreadDeadlockDetectorTest {
     }
 
     @Test
-    public void autoDiscoversTheThreadMXBean() throws Exception {
+    public void autoDiscoversTheThreadMXBean() {
         assertThat(new ThreadDeadlockDetector().getDeadlockedThreads())
             .isNotNull();
     }

@@ -17,19 +17,19 @@ public class ClassLoadingGaugeSetTest {
     private final ClassLoadingGaugeSet gauges = new ClassLoadingGaugeSet(cl);
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         when(cl.getTotalLoadedClassCount()).thenReturn(2L);
         when(cl.getUnloadedClassCount()).thenReturn(1L);
     }
 
     @Test
-    public void loadedGauge() throws Exception {
+    public void loadedGauge() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("loaded");
         assertThat(gauge.getValue()).isEqualTo(2L);
     }
 
     @Test
-    public void unLoadedGauge() throws Exception {
+    public void unLoadedGauge() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("unloaded");
         assertThat(gauge.getValue()).isEqualTo(1L);
     }

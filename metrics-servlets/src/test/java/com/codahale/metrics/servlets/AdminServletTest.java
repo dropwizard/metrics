@@ -23,7 +23,7 @@ public class AdminServletTest extends AbstractServletTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         request.setMethod("GET");
         request.setURI("/context/admin");
         request.setVersion("HTTP/1.0");

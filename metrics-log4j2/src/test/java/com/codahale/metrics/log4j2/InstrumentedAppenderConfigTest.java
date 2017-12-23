@@ -27,14 +27,14 @@ public class InstrumentedAppenderConfigTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         context.stop();
     }
 
     // The biggest test is that we can initialize the log4j2 config at all.
 
     @Test
-    public void canRecordAll() throws Exception {
+    public void canRecordAll() {
         Logger logger = context.getLogger(this.getClass().getName());
 
         long initialAllCount = registry.meter(METRIC_NAME_PREFIX + ".all").getCount();
@@ -44,7 +44,7 @@ public class InstrumentedAppenderConfigTest {
     }
 
     @Test
-    public void canRecordError() throws Exception {
+    public void canRecordError() {
         Logger logger = context.getLogger(this.getClass().getName());
 
         long initialErrorCount = registry.meter(METRIC_NAME_PREFIX + ".error").getCount();
@@ -54,7 +54,7 @@ public class InstrumentedAppenderConfigTest {
     }
 
     @Test
-    public void noInvalidRecording() throws Exception {
+    public void noInvalidRecording() {
         Logger logger = context.getLogger(this.getClass().getName());
 
         long initialInfoCount = registry.meter(METRIC_NAME_PREFIX + ".info").getCount();

@@ -30,7 +30,7 @@ public class MeterApproximationTest {
     }
 
     @Test
-    public void controlMeter1MinuteMeanApproximation() throws Exception {
+    public void controlMeter1MinuteMeanApproximation() {
         final Meter meter = simulateMetronome(
                 62934, TimeUnit.MILLISECONDS,
                 3, TimeUnit.MINUTES);
@@ -40,7 +40,7 @@ public class MeterApproximationTest {
     }
 
     @Test
-    public void controlMeter5MinuteMeanApproximation() throws Exception {
+    public void controlMeter5MinuteMeanApproximation() {
         final Meter meter = simulateMetronome(
                 62934, TimeUnit.MILLISECONDS,
                 13, TimeUnit.MINUTES);
@@ -50,7 +50,7 @@ public class MeterApproximationTest {
     }
 
     @Test
-    public void controlMeter15MinuteMeanApproximation() throws Exception {
+    public void controlMeter15MinuteMeanApproximation() {
         final Meter meter = simulateMetronome(
                 62934, TimeUnit.MILLISECONDS,
                 38, TimeUnit.MINUTES);

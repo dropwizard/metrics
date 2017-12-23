@@ -50,7 +50,7 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         when(clock.getTick()).thenReturn(100L, 200L, 300L, 400L);
 
         registry.register("g1", (Gauge<Long>) () -> 100L);

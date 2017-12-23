@@ -113,7 +113,7 @@ public class GraphiteRabbitMQTest {
     }
 
     @Test
-    public void shouldFailWhenGraphiteHostUnavailable() throws Exception {
+    public void shouldFailWhenGraphiteHostUnavailable() {
         ConnectionFactory connectionFactory = new ConnectionFactory();
         connectionFactory.setHost("some-unknown-host");
 

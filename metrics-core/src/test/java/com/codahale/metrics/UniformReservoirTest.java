@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class UniformReservoirTest {
     @Test
     @SuppressWarnings("unchecked")
-    public void aReservoirOf100OutOf1000Elements() throws Exception {
+    public void aReservoirOf100OutOf1000Elements() {
         final UniformReservoir reservoir = new UniformReservoir(100);
         for (int i = 0; i < 1000; i++) {
             reservoir.update(i);

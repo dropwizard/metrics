@@ -29,7 +29,7 @@ public class ThreadStatesGaugeSetTest {
     private final Set<String> deadlocks = new HashSet<>();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         deadlocks.add("yay");
 
         when(newThread.getThreadState()).thenReturn(Thread.State.NEW);
@@ -52,7 +52,7 @@ public class ThreadStatesGaugeSetTest {
     }
 
     @Test
-    public void hasASetOfGauges() throws Exception {
+    public void hasASetOfGauges() {
         assertThat(gauges.getMetrics().keySet())
             .containsOnly("terminated.count",
                 "new.count",
@@ -67,7 +67,7 @@ public class ThreadStatesGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForEachThreadState() throws Exception {
+    public void hasAGaugeForEachThreadState() {
         assertThat(((Gauge<?>) gauges.getMetrics().get("new.count")).getValue())
             .isEqualTo(1);
 
@@ -88,31 +88,31 @@ public class ThreadStatesGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForTheNumberOfThreads() throws Exception {
+    public void hasAGaugeForTheNumberOfThreads() {
         assertThat(((Gauge<?>) gauges.getMetrics().get("count")).getValue())
             .isEqualTo(12);
     }
 
     @Test
-    public void hasAGaugeForTheNumberOfDaemonThreads() throws Exception {
+    public void hasAGaugeForTheNumberOfDaemonThreads() {
         assertThat(((Gauge<?>) gauges.getMetrics().get("daemon.count")).getValue())
             .isEqualTo(13);
     }
 
     @Test
-    public void hasAGaugeForAnyDeadlocks() throws Exception {
+    public void hasAGaugeForAnyDeadlocks() {
         assertThat(((Gauge<?>) gauges.getMetrics().get("deadlocks")).getValue())
             .isEqualTo(deadlocks);
     }
 
     @Test
-    public void hasAGaugeForAnyDeadlockCount() throws Exception {
+    public void hasAGaugeForAnyDeadlockCount() {
         assertThat(((Gauge<?>) gauges.getMetrics().get("deadlock.count")).getValue())
             .isEqualTo(1);
     }
 
     @Test
-    public void autoDiscoversTheMXBeans() throws Exception {
+    public void autoDiscoversTheMXBeans() {
         final ThreadStatesGaugeSet set = new ThreadStatesGaugeSet();
         assertThat(((Gauge<?>) set.getMetrics().get("count")).getValue())
             .isNotNull();

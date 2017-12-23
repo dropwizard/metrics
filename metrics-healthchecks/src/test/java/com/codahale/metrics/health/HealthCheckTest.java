@@ -15,7 +15,7 @@ public class HealthCheckTest {
         }
 
         @Override
-        protected Result check() throws Exception {
+        protected Result check() {
             return underlying.execute();
         }
     }
@@ -24,7 +24,7 @@ public class HealthCheckTest {
     private final HealthCheck healthCheck = new ExampleHealthCheck(underlying);
 
     @Test
-    public void canHaveHealthyResults() throws Exception {
+    public void canHaveHealthyResults() {
         final HealthCheck.Result result = HealthCheck.Result.healthy();
 
         assertThat(result.isHealthy())
@@ -38,7 +38,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveHealthyResultsWithMessages() throws Exception {
+    public void canHaveHealthyResultsWithMessages() {
         final HealthCheck.Result result = HealthCheck.Result.healthy("woo");
 
         assertThat(result.isHealthy())
@@ -52,7 +52,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveHealthyResultsWithFormattedMessages() throws Exception {
+    public void canHaveHealthyResultsWithFormattedMessages() {
         final HealthCheck.Result result = HealthCheck.Result.healthy("foo %s", "bar");
 
         assertThat(result.isHealthy())
@@ -66,7 +66,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveUnhealthyResults() throws Exception {
+    public void canHaveUnhealthyResults() {
         final HealthCheck.Result result = HealthCheck.Result.unhealthy("bad");
 
         assertThat(result.isHealthy())
@@ -80,7 +80,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveUnhealthyResultsWithFormattedMessages() throws Exception {
+    public void canHaveUnhealthyResultsWithFormattedMessages() {
         final HealthCheck.Result result = HealthCheck.Result.unhealthy("foo %s %d", "bar", 123);
 
         assertThat(result.isHealthy())
@@ -94,7 +94,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveUnhealthyResultsWithExceptions() throws Exception {
+    public void canHaveUnhealthyResultsWithExceptions() {
         final RuntimeException e = mock(RuntimeException.class);
         when(e.getMessage()).thenReturn("oh noes");
 
@@ -111,7 +111,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveHealthyBuilderWithDetail() throws Exception {
+    public void canHaveHealthyBuilderWithDetail() {
         final HealthCheck.Result result = HealthCheck.Result.builder()
                 .healthy()
                 .withDetail("detail", "value")
@@ -131,7 +131,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveUnHealthyBuilderWithDetail() throws Exception {
+    public void canHaveUnHealthyBuilderWithDetail() {
         final HealthCheck.Result result = HealthCheck.Result.builder()
                 .unhealthy()
                 .withDetail("detail", "value")
@@ -151,7 +151,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveUnHealthyBuilderWithDetailAndError() throws Exception {
+    public void canHaveUnHealthyBuilderWithDetailAndError() {
         final RuntimeException e = mock(RuntimeException.class);
         when(e.getMessage()).thenReturn("oh noes");
 
@@ -175,7 +175,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void returnsResultsWhenExecuted() throws Exception {
+    public void returnsResultsWhenExecuted() {
         final HealthCheck.Result result = mock(HealthCheck.Result.class);
         when(underlying.execute()).thenReturn(result);
 
@@ -184,7 +184,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void wrapsExceptionsWhenExecuted() throws Exception {
+    public void wrapsExceptionsWhenExecuted() {
         final RuntimeException e = mock(RuntimeException.class);
         when(e.getMessage()).thenReturn("oh noes");
 
@@ -202,7 +202,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void toStringWorksEvenForNullAttributes() throws Exception {
+    public void toStringWorksEvenForNullAttributes() {
         final HealthCheck.Result resultWithNullDetailValue = HealthCheck.Result.builder()
                 .unhealthy()
                 .withDetail("aNullDetail", null)

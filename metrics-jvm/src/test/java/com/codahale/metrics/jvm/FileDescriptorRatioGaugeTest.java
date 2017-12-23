@@ -99,13 +99,13 @@ public class FileDescriptorRatioGaugeTest {
     private final FileDescriptorRatioGauge gauge = new FileDescriptorRatioGauge(os);
 
     @Test
-    public void calculatesTheRatioOfUsedToTotalFileDescriptors() throws Exception {
+    public void calculatesTheRatioOfUsedToTotalFileDescriptors() {
         assertThat(gauge.getValue())
                 .isEqualTo(0.1);
     }
 
     @Test
-    public void validateFileDescriptorRatioPresenceOnNixPlatforms() throws Exception {
+    public void validateFileDescriptorRatioPresenceOnNixPlatforms() {
         OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
         assumeTrue(osBean instanceof com.sun.management.UnixOperatingSystemMXBean);
 
@@ -115,7 +115,7 @@ public class FileDescriptorRatioGaugeTest {
     }
 
     @Test
-    public void returnsNaNWhenTheInformationIsUnavailable() throws Exception {
+    public void returnsNaNWhenTheInformationIsUnavailable() {
         assertThat(new FileDescriptorRatioGauge(mock(OperatingSystemMXBean.class)).getValue())
                 .isNaN();
     }

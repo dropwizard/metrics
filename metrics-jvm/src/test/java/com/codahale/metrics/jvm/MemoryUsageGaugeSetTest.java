@@ -29,7 +29,7 @@ public class MemoryUsageGaugeSetTest {
                     weirdMemoryPool));
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         when(heap.getCommitted()).thenReturn(10L);
         when(heap.getInit()).thenReturn(20L);
         when(heap.getUsed()).thenReturn(30L);
@@ -67,7 +67,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasASetOfGauges() throws Exception {
+    public void hasASetOfGauges() {
         assertThat(gauges.getMetrics().keySet())
                 .containsOnly(
                         "heap.init",
@@ -99,7 +99,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForTotalCommitted() throws Exception {
+    public void hasAGaugeForTotalCommitted() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("total.committed");
 
         assertThat(gauge.getValue())
@@ -107,7 +107,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForTotalInit() throws Exception {
+    public void hasAGaugeForTotalInit() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("total.init");
 
         assertThat(gauge.getValue())
@@ -115,7 +115,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForTotalUsed() throws Exception {
+    public void hasAGaugeForTotalUsed() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("total.used");
 
         assertThat(gauge.getValue())
@@ -123,7 +123,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForTotalMax() throws Exception {
+    public void hasAGaugeForTotalMax() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("total.max");
 
         assertThat(gauge.getValue())
@@ -131,7 +131,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForHeapCommitted() throws Exception {
+    public void hasAGaugeForHeapCommitted() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("heap.committed");
 
         assertThat(gauge.getValue())
@@ -139,7 +139,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForHeapInit() throws Exception {
+    public void hasAGaugeForHeapInit() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("heap.init");
 
         assertThat(gauge.getValue())
@@ -147,7 +147,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForHeapUsed() throws Exception {
+    public void hasAGaugeForHeapUsed() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("heap.used");
 
         assertThat(gauge.getValue())
@@ -155,7 +155,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForHeapMax() throws Exception {
+    public void hasAGaugeForHeapMax() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("heap.max");
 
         assertThat(gauge.getValue())
@@ -163,7 +163,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForHeapUsage() throws Exception {
+    public void hasAGaugeForHeapUsage() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("heap.usage");
 
         assertThat(gauge.getValue())
@@ -171,7 +171,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForNonHeapCommitted() throws Exception {
+    public void hasAGaugeForNonHeapCommitted() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("non-heap.committed");
 
         assertThat(gauge.getValue())
@@ -179,7 +179,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForNonHeapInit() throws Exception {
+    public void hasAGaugeForNonHeapInit() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("non-heap.init");
 
         assertThat(gauge.getValue())
@@ -187,7 +187,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForNonHeapUsed() throws Exception {
+    public void hasAGaugeForNonHeapUsed() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("non-heap.used");
 
         assertThat(gauge.getValue())
@@ -195,7 +195,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForNonHeapMax() throws Exception {
+    public void hasAGaugeForNonHeapMax() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("non-heap.max");
 
         assertThat(gauge.getValue())
@@ -203,7 +203,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForNonHeapUsage() throws Exception {
+    public void hasAGaugeForNonHeapUsage() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("non-heap.usage");
 
         assertThat(gauge.getValue())
@@ -211,7 +211,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForMemoryPoolUsage() throws Exception {
+    public void hasAGaugeForMemoryPoolUsage() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Big-Pool.usage");
 
         assertThat(gauge.getValue())
@@ -219,7 +219,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForWeirdMemoryPoolInit() throws Exception {
+    public void hasAGaugeForWeirdMemoryPoolInit() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.init");
 
         assertThat(gauge.getValue())
@@ -227,7 +227,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForWeirdMemoryPoolCommitted() throws Exception {
+    public void hasAGaugeForWeirdMemoryPoolCommitted() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.committed");
 
         assertThat(gauge.getValue())
@@ -235,7 +235,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForWeirdMemoryPoolUsed() throws Exception {
+    public void hasAGaugeForWeirdMemoryPoolUsed() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.used");
 
         assertThat(gauge.getValue())
@@ -243,7 +243,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForWeirdMemoryPoolUsage() throws Exception {
+    public void hasAGaugeForWeirdMemoryPoolUsage() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.usage");
 
         assertThat(gauge.getValue())
@@ -251,7 +251,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForWeirdMemoryPoolMax() throws Exception {
+    public void hasAGaugeForWeirdMemoryPoolMax() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.max");
 
         assertThat(gauge.getValue())
@@ -259,7 +259,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForWeirdCollectionPoolUsed() throws Exception {
+    public void hasAGaugeForWeirdCollectionPoolUsed() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.used-after-gc");
 
         assertThat(gauge.getValue())
@@ -267,7 +267,7 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
-    public void autoDetectsMemoryUsageBeanAndMemoryPools() throws Exception {
+    public void autoDetectsMemoryUsageBeanAndMemoryPools() {
         assertThat(new MemoryUsageGaugeSet().getMetrics().keySet())
                 .isNotEmpty();
     }

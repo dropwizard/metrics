@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class SlidingTimeWindowArrayReservoirTest {
 
     @Test
-    public void storesMeasurementsWithDuplicateTicks() throws Exception {
+    public void storesMeasurementsWithDuplicateTicks() {
         final Clock clock = mock(Clock.class);
         final SlidingTimeWindowArrayReservoir reservoir = new SlidingTimeWindowArrayReservoir(10, NANOSECONDS, clock);
 
@@ -30,7 +30,7 @@ public class SlidingTimeWindowArrayReservoirTest {
     }
 
     @Test
-    public void boundsMeasurementsToATimeWindow() throws Exception {
+    public void boundsMeasurementsToATimeWindow() {
         final Clock clock = mock(Clock.class);
         final SlidingTimeWindowArrayReservoir reservoir = new SlidingTimeWindowArrayReservoir(10, NANOSECONDS, clock);
 
