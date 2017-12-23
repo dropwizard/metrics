@@ -230,7 +230,7 @@
                     <target>1.8</target>
                     <fork>true</fork>
                     <compilerArgs>
-                        <arg>-XepDisableWarningsInGeneratedCode</arg>
+                        <arg>-XepExcludedPaths:.*/target/generated-sources/.*</arg>
                     </compilerArgs>
                 </configuration>
                 <dependencies>
