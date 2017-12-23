@@ -3,6 +3,7 @@ package com.codahale.metrics.servlets;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletConfig;
@@ -78,6 +79,14 @@ public class MetricsServlet extends HttpServlet {
             return MetricFilter.ALL;
         }
 
+        /**
+         * @return the optional non-negative number which determines the count of decimal digits in the
+         * fractional part of floating point values. If not set, no scaling will be performed.
+         */
+        protected Optional<Integer> getScale() {
+            return Optional.empty();
+        }
+
         @Override
         public void contextInitialized(ServletContextEvent event) {
             final ServletContext context = event.getServletContext();
@@ -95,6 +104,7 @@ public class MetricsServlet extends HttpServlet {
             if (getJsonpCallbackParameter() != null) {
                 context.setAttribute(CALLBACK_PARAM, getJsonpCallbackParameter());
             }
+            getScale().ifPresent(s -> context.setInitParameter(SCALE_PARAM, String.valueOf(s)));
         }
 
         @Override
@@ -110,6 +120,7 @@ public class MetricsServlet extends HttpServlet {
     public static final String ALLOWED_ORIGIN = MetricsServlet.class.getCanonicalName() + ".allowedOrigin";
     public static final String METRIC_FILTER = MetricsServlet.class.getCanonicalName() + ".metricFilter";
     public static final String CALLBACK_PARAM = MetricsServlet.class.getCanonicalName() + ".jsonpCallback";
+    public static final String SCALE_PARAM = MetricsServlet.class.getCanonicalName() + ".scale";
 
     private static final long serialVersionUID = 1049773947734939602L;
     private static final String CONTENT_TYPE = "application/json";
@@ -155,11 +166,17 @@ public class MetricsServlet extends HttpServlet {
         if (filter == null) {
             filter = MetricFilter.ALL;
         }
-
+        final Optional<Integer> scale;
+        try {
+            scale = Optional.ofNullable(context.getInitParameter(SCALE_PARAM)).map(Integer::parseInt);
+        } catch (NumberFormatException e){
+            throw new IllegalArgumentException("Couldn't parse scale", e);
+        }
         this.mapper = new ObjectMapper().registerModule(new MetricsModule(rateUnit,
                 durationUnit,
                 showSamples,
-                filter));
+                filter,
+                scale));
     }
 
     @Override
@@ -189,7 +206,7 @@ public class MetricsServlet extends HttpServlet {
         return mapper.writer();
     }
 
-    protected TimeUnit parseTimeUnit(String value, TimeUnit defaultValue) {
+    private TimeUnit parseTimeUnit(String value, TimeUnit defaultValue) {
         try {
             return TimeUnit.valueOf(String.valueOf(value).toUpperCase(Locale.US));
         } catch (IllegalArgumentException e) {

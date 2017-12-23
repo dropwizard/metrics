@@ -144,6 +144,31 @@ public class MetricsServletTest extends AbstractServletTest {
     }
 
     @Test
+    public void roundValuesIfScaleIsSet() throws Exception {
+        request.setURI("/metrics");
+        tester.getContext().setInitParameter("com.codahale.metrics.servlets.MetricsServlet.scale", "2");
+        processRequest();
+
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(response.getContent()).isEqualTo("{" +
+                        "\"version\":\"4.0.0\"," +
+                        "\"gauges\":{" +
+                        "\"g1\":{\"value\":100}" +
+                        "}," +
+                        "\"counters\":{" +
+                        "\"c\":{\"count\":1}" +
+                        "}," +
+                        "\"histograms\":{" +
+                        "\"h\":{\"count\":1,\"max\":1,\"mean\":1.0,\"min\":1,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0}" +
+                        "}," +
+                        "\"meters\":{" +
+                        "\"m\":{\"count\":1,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":3333333.33,\"units\":\"events/second\"}},\"timers\":{\"t\":{\"count\":1,\"max\":1.0,\"mean\":1.0,\"min\":1.0,\"p50\":1.0,\"p75\":1.0,\"p95\":1.0,\"p98\":1.0,\"p99\":1.0,\"p999\":1.0,\"stddev\":0.0,\"m15_rate\":0.0,\"m1_rate\":0.0,\"m5_rate\":0.0,\"mean_rate\":1.0E7,\"duration_units\":\"seconds\",\"rate_units\":\"calls/second\"}" +
+                        "}" +
+                        "}");
+        assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
+    }
+
+    @Test
     public void optionallyPrettyPrintsTheJson() throws Exception {
         request.setURI("/metrics?pretty=true");
 

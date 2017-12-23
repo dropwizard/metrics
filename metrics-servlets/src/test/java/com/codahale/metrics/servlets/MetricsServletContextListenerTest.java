@@ -11,6 +11,7 @@ import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,6 +46,11 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
             @Override
             protected String getAllowedOrigin() {
                 return allowedOrigin;
+            }
+
+            @Override
+            protected Optional<Integer> getScale() {
+                return Optional.of(2);
             }
         });
     }
