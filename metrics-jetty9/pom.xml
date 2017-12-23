@@ -16,6 +16,18 @@
         metrics, and application latency and utilization.
     </description>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
@@ -25,12 +37,10 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>${jetty9.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-client</artifactId>
-            <version>${jetty9.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -14,6 +14,7 @@
 
     <modules>
         <module>docs</module>
+        <module>metrics-bom</module>
         <module>metrics-annotation</module>
         <module>metrics-benchmarks</module>
         <module>metrics-core</module>
@@ -40,22 +41,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <servlet.version>3.1.0</servlet.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <jackson.version>2.9.3</jackson.version>
-        <jetty9.version>9.4.8.v20171121</jetty9.version>
-        <rabbitmq.version>4.4.1</rabbitmq.version>
-        <log4j2.version>2.10.0</log4j2.version>
-        <javadoc.doclint.none>-Xdoclint:none</javadoc.doclint.none>
-        <logback.version>1.2.3</logback.version>
-        <papertrail.profiler.version>1.0.2</papertrail.profiler.version>
-        <jersey.version>2.25.1</jersey.version>
-        <jdbi2.version>2.78</jdbi2.version>
-        <ehcache2.version>2.10.4</ehcache2.version>
-        <ehcache3.version>3.4.0</ehcache3.version>
-        <cache-api.version>1.0.0</cache-api.version>
-        <http-client.version>4.5.4</http-client.version>
-        <http-async-client.version>4.1.3</http-async-client.version>
+        <assertj.version>3.6.2</assertj.version>
+        <mockito.version>2.7.12</mockito.version>
+        <junit.version>4.12</junit.version>
     </properties>
 
     <developers>
@@ -118,37 +107,28 @@
         </repository>
     </distributionManagement>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.6.2</version>
+            <version>${assertj.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>2.7.12</version>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -314,7 +294,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.9</version>
                 <configuration>
-                    <additionalparam>${javadoc.doclint.none}</additionalparam>
+                    <additionalparam>-Xdoclint:none</additionalparam>
                     <quiet>true</quiet>
                 </configuration>
                 <executions>
