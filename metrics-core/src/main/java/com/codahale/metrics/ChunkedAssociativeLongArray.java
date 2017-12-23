@@ -14,6 +14,7 @@ class ChunkedAssociativeLongArray {
     private static final int MAX_CACHE_SIZE = 128;
 
     private final int defaultChunkSize;
+
     /*
      * We use this ArrayDeque as cache to store chunks that are expired and removed from main data structure.
      * Then instead of allocating new Chunk immediately we are trying to poll one from this deque.
@@ -56,38 +57,31 @@ class ChunkedAssociativeLongArray {
 
     synchronized boolean put(long key, long value) {
         Chunk activeChunk = chunks.peekLast();
-
-        if (activeChunk == null) { // lazy chunk creation
+        if (activeChunk != null && activeChunk.cursor != 0 && activeChunk.keys[activeChunk.cursor - 1] > key) {
+            // key should be the same as last inserted or bigger
+            return false;
+        }
+        if (activeChunk == null || activeChunk.cursor - activeChunk.startIndex == activeChunk.chunkSize) {
+            // The last chunk doesn't exist or full
             activeChunk = allocateChunk();
             chunks.add(activeChunk);
-
-        } else {
-            if (activeChunk.cursor != 0 && activeChunk.keys[activeChunk.cursor - 1] > key) {
-                return false; // key should be the same as last inserted or bigger
-            }
-            boolean isFull = activeChunk.cursor - activeChunk.startIndex == activeChunk.chunkSize;
-            if (isFull) {
-                activeChunk = allocateChunk();
-                chunks.add(activeChunk);
-            }
         }
-
         activeChunk.append(key, value);
         return true;
     }
 
     synchronized long[] values() {
-        int valuesSize = size();
+        final int valuesSize = size();
         if (valuesSize == 0) {
             return EMPTY;
         }
 
-        long[] values = new long[valuesSize];
+        final long[] values = new long[valuesSize];
         int valuesIndex = 0;
-        for (Chunk copySourceChunk : chunks) {
-            int length = copySourceChunk.cursor - copySourceChunk.startIndex;
+        for (Chunk chunk : chunks) {
+            int length = chunk.cursor - chunk.startIndex;
             int itemsToCopy = Math.min(valuesSize - valuesIndex, length);
-            arraycopy(copySourceChunk.values, copySourceChunk.startIndex, values, valuesIndex, itemsToCopy);
+            arraycopy(chunk.values, chunk.startIndex, values, valuesIndex, itemsToCopy);
             valuesIndex += length;
         }
         return values;
@@ -102,15 +96,14 @@ class ChunkedAssociativeLongArray {
     }
 
     synchronized String out() {
-        Iterator<Chunk> iterator = chunks.iterator();
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
+        final Iterator<Chunk> iterator = chunks.iterator();
         while (iterator.hasNext()) {
-            Chunk copySourceChunk = iterator.next();
+            final Chunk chunk = iterator.next();
             builder.append('[');
-            for (int i = copySourceChunk.startIndex; i < copySourceChunk.cursor; i++) {
-                long key = copySourceChunk.keys[i];
-                long value = copySourceChunk.values[i];
-                builder.append('(').append(key).append(": ").append(value).append(')').append(' ');
+            for (int i = chunk.startIndex; i < chunk.cursor; i++) {
+                builder.append('(').append(chunk.keys[i]).append(": ")
+                        .append(chunk.values[i]).append(')').append(' ');
             }
             builder.append(']');
             if (iterator.hasNext()) {
@@ -132,31 +125,28 @@ class ChunkedAssociativeLongArray {
          *       |5______________________________23|                    :: trim(5, 23)
          *       [5, 9] -> [10, 13, 14, 15] -> [21]                     :: result layout
          */
-        Iterator<Chunk> descendingIterator = chunks.descendingIterator();
+        final Iterator<Chunk> descendingIterator = chunks.descendingIterator();
         while (descendingIterator.hasNext()) {
-            Chunk currentTail = descendingIterator.next();
+            final Chunk currentTail = descendingIterator.next();
             if (isFirstElementIsEmptyOrGreaterEqualThanKey(currentTail, endKey)) {
                 freeChunk(currentTail);
                 descendingIterator.remove();
             } else {
-                int newEndIndex = findFirstIndexOfGreaterEqualElements(
-                        currentTail.keys, currentTail.startIndex, currentTail.cursor, endKey
-                );
-                currentTail.cursor = newEndIndex;
+                currentTail.cursor = findFirstIndexOfGreaterEqualElements(currentTail.keys, currentTail.startIndex,
+                        currentTail.cursor, endKey);
                 break;
             }
         }
 
-        Iterator<Chunk> iterator = chunks.iterator();
+        final Iterator<Chunk> iterator = chunks.iterator();
         while (iterator.hasNext()) {
-            Chunk currentHead = iterator.next();
+            final Chunk currentHead = iterator.next();
             if (isLastElementIsLessThanKey(currentHead, startKey)) {
                 freeChunk(currentHead);
                 iterator.remove();
             } else {
-                int newStartIndex = findFirstIndexOfGreaterEqualElements(
-                        currentHead.keys, currentHead.startIndex, currentHead.cursor, startKey
-                );
+                final int newStartIndex = findFirstIndexOfGreaterEqualElements(currentHead.keys, currentHead.startIndex,
+                        currentHead.cursor, startKey);
                 if (currentHead.startIndex != newStartIndex) {
                     currentHead.startIndex = newStartIndex;
                     currentHead.chunkSize = currentHead.cursor - currentHead.startIndex;
@@ -178,19 +168,12 @@ class ChunkedAssociativeLongArray {
         return chunk.cursor == chunk.startIndex || chunk.keys[chunk.cursor - 1] < key;
     }
 
-
     private int findFirstIndexOfGreaterEqualElements(long[] array, int startIndex, int endIndex, long minKey) {
         if (endIndex == startIndex || array[startIndex] >= minKey) {
             return startIndex;
         }
-        int searchIndex = binarySearch(array, startIndex, endIndex, minKey);
-        int realIndex;
-        if (searchIndex < 0) {
-            realIndex = -(searchIndex + 1);
-        } else {
-            realIndex = searchIndex;
-        }
-        return realIndex;
+        final int keyIndex = binarySearch(array, startIndex, endIndex, minKey);
+        return keyIndex < 0 ? -(keyIndex + 1) : keyIndex;
     }
 
     private static class Chunk {
