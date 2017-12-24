@@ -4,7 +4,7 @@
 
     <groupId>io.dropwizard.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>4.0.0</version>
+    <version>5.0.0</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
