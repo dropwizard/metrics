@@ -5,7 +5,7 @@ Release Notes
 #############
 
 
-.. _rel-3.2.6:
+.. _rel-4.0.0:
 
 v4.0.0: Dec 24 2017
 ===================
@@ -25,7 +25,7 @@ v4.0.0: Dec 24 2017
 * Add ``ResponseMetered`` annotation for Jersey resources `#1186 <https://github.com/dropwizard/metrics/pull/1186>`_
 * Add a method for timing non-throwing functions. `#1224 <https://github.com/dropwizard/metrics/pull/1224>`_
 * Unnecessary clear operation for ChunkedAssociativeArray `#1211 <https://github.com/dropwizard/metrics/pull/1211>`_
-* Add some common metric filters `#1211 <https://github.com/dropwizard/metrics/pull/1210>`_
+* Add some common metric filters `#1210 <https://github.com/dropwizard/metrics/pull/1210>`_
 * Add possibility to subclass Timer.Context `#1226 <https://github.com/dropwizard/metrics/pull/1226>`_
 
 .. _rel-3.2.6:
