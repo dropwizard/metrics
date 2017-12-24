@@ -4,6 +4,13 @@
 Release Notes
 #############
 
+.. _rel-3.2.5:
+
+v3.2.5: Sep 15 2017
+===================
+
+* [InstrumentedScheduledExecutorService] Fix the scheduledFixedDelay to call the correct method `#1192 <https://github.com/dropwizard/metrics/pull/1192>`_
+
 .. _rel-3.2.4:
 
 v3.2.4: Aug 24 2017
