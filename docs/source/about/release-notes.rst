@@ -4,6 +4,15 @@
 Release Notes
 #############
 
+.. _rel-3.2.6:
+
+v3.2.6: Dec 24 2017
+===================
+
+* Jetty9: unhandled response should be counted as 404 and not 200 `#1232 <https://github.com/dropwizard/metrics/pull/1232>`_
+* Prevent NaN values when calculating mean `#1230 <https://github.com/dropwizard/metrics/pull/1230>`_
+* Avoid NaN values in WeightedSnapshot `#1233 <https://github.com/dropwizard/metrics/pull/1233>`_
+
 .. _rel-3.2.5:
 
 v3.2.5: Sep 15 2017
