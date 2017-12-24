@@ -4,6 +4,15 @@
 Release Notes
 #############
 
+.. _rel-3.2.4:
+
+v3.2.4: Aug 24 2017
+===================
+
+* Fix GraphiteReporter rate reporting `#1167 <https://github.com/dropwizard/metrics/pull/1167>`_
+* Remove non Jdk6 compatible letter from date pattern `#1163 <https://github.com/dropwizard/metrics/pull/1163>`_
+* Fix uncaught CancellationException when stopping reporter `#1170 <https://github.com/dropwizard/metrics/pull/1170>`_
+
 .. _rel-3.2.3:
 
 v3.2.3: Jun 28 2017
