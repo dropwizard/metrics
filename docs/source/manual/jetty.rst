@@ -4,12 +4,11 @@
 Instrumenting Jetty
 ###################
 
-The ``metrics-jetty8`` (Jetty 8.0), ``metrics-jetty9-legacy`` (Jetty 9.0), and ``metrics-jetty9``
-(Jetty 9.1 and higher) modules provides a set of instrumented equivalents of Jetty_ classes:
+The ``metrics-jetty9``(Jetty 9.3 and higher) modules provides a set of instrumented equivalents of Jetty_ classes:
 ``InstrumentedBlockingChannelConnector``, ``InstrumentedHandler``, ``InstrumentedQueuedThreadPool``,
 ``InstrumentedSelectChannelConnector``, and ``InstrumentedSocketConnector``.
 
-.. _Jetty: http://www.eclipse.org/jetty/
+.. _Jetty: https://www.eclipse.org/jetty/
 
 The ``Connector`` implementations are simple, instrumented subclasses of the Jetty connector types
 which measure connection duration, the rate of accepted connections, connections, disconnections,
