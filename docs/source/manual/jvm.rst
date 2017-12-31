@@ -13,4 +13,4 @@ Supported metrics include:
 * Memory usage for all memory pools, including off-heap memory
 * Breakdown of thread states, including deadlocks
 * File descriptor usage
-* Buffer pool sizes and utilization (Java 7 only)
+* Buffer pool sizes and utilization

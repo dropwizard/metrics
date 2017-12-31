@@ -42,7 +42,8 @@ Reporters
 * `metrics-elasticsearch-reporter <https://github.com/elasticsearch/elasticsearch-metrics-reporter-java>`_ provides a reporter for `elasticsearch <http://www.elasticsearch.org/>`_
 * `metrics-hadoop-metrics2-reporter <https://github.com/joshelser/dropwizard-hadoop-metrics2>`_ provides a reporter for `Hadoop Metrics2 <https://hadoop.apache.org/docs/r2.7.2/api/org/apache/hadoop/metrics2/package-summary.html>`_.
 * `metrics-hawkular <https://github.com/hawkular/hawkular-dropwizard-reporter>`_ provides a reporter for `Hawkular Metrics <http://www.hawkular.org/>`_.
-* `metrics-influxdb <https://github.com/novaquark/metrics-influxdb>`_ provides a reporter which announces measurements to `InfluxDB <http://influxdb.org/>`_
+* `metrics-influxdb <https://github.com/iZettle/dropwizard-metrics-influxdb>`_ provides a reporter for `InfluxDB <http://influxdb.org/>`_ with the Dropwizard framework integration.
+* `metrics-influxdb <https://github.com/kickstarter/dropwizard-influxdb-reporter>`_ provides a reporter for `InfluxDB <http://influxdb.org/>`_ 1.2+._
 * `metrics-instrumental <https://github.com/egineering-llc/metrics-instrumental>`_ provides a reporter to send data to `Instrumental <http://instrumentalapp.com/>`_.
 * `metrics-kafka <https://github.com/hengyunabc/metrics-kafka>`_ provides a reporter for `Kafka <http://kafka.apache.org/>`_.
 * `metrics-librato <https://github.com/librato/metrics-librato>`_ provides a reporter for `Librato Metrics <https://metrics.librato.com/>`_, a scalable metric collection, aggregation, monitoring, and alerting service.
