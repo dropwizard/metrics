@@ -1,3 +1,4 @@
+import com.codahale.metrics.MetricName;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,41 +39,43 @@ public class JCacheGaugeSetTest {
     public void measuresGauges() throws Exception {
 
         myOtherCache.get("woo");
-        assertThat(registry.getGauges().get("jcache.statistics.myOtherCache.cache-misses").getValue())
+        assertThat(registry.getGauges().get(MetricName.build("jcache.statistics.myOtherCache.cache-misses"))
+                .getValue())
                 .isEqualTo(1L);
 
         myCache.get("woo");
-        assertThat(registry.getGauges().get("jcache.statistics.myCache.cache-misses").getValue())
+        MetricName myCache = MetricName.build("jcache.statistics.myCache");
+        assertThat(registry.getGauges().get(myCache.resolve("cache-misses")).getValue())
                 .isEqualTo(1L);
-        assertThat(registry.getGauges().get("jcache.statistics.myCache.cache-hits").getValue())
+        assertThat(registry.getGauges().get(myCache.resolve("cache-hits")).getValue())
                 .isEqualTo(0L);
-        assertThat(registry.getGauges().get("jcache.statistics.myCache.cache-gets").getValue())
+        assertThat(registry.getGauges().get(myCache.resolve("cache-gets")).getValue())
                 .isEqualTo(1L);
 
-        myCache.put("woo", "whee");
-        myCache.get("woo");
-        assertThat(registry.getGauges().get("jcache.statistics.myCache.cache-puts").getValue())
+        this.myCache.put("woo", "whee");
+        this.myCache.get("woo");
+        assertThat(registry.getGauges().get(myCache.resolve("cache-puts")).getValue())
                 .isEqualTo(1L);
-        assertThat(registry.getGauges().get("jcache.statistics.myCache.cache-hits").getValue())
+        assertThat(registry.getGauges().get(myCache.resolve("cache-hits")).getValue())
                 .isEqualTo(1L);
-        assertThat(registry.getGauges().get("jcache.statistics.myCache.cache-hit-percentage").getValue())
+        assertThat(registry.getGauges().get(myCache.resolve("cache-hit-percentage")).getValue())
                 .isEqualTo(50.0f);
-        assertThat(registry.getGauges().get("jcache.statistics.myCache.cache-miss-percentage").getValue())
+        assertThat(registry.getGauges().get(myCache.resolve("cache-miss-percentage")).getValue())
                 .isEqualTo(50.0f);
-        assertThat(registry.getGauges().get("jcache.statistics.myCache.cache-gets").getValue())
+        assertThat(registry.getGauges().get(myCache.resolve("cache-gets")).getValue())
                 .isEqualTo(2L);
 
         // cache size being 1, eviction occurs after this line
-        myCache.put("woo2", "whoza");
-        assertThat(registry.getGauges().get("jcache.statistics.myCache.cache-evictions").getValue())
+        this.myCache.put("woo2", "whoza");
+        assertThat(registry.getGauges().get(myCache.resolve("cache-evictions")).getValue())
                 .isEqualTo(1L);
 
-        myCache.remove("woo2");
-        assertThat((Float) registry.getGauges().get("jcache.statistics.myCache.average-get-time").getValue())
+        this.myCache.remove("woo2");
+        assertThat((Float) registry.getGauges().get(myCache.resolve("average-get-time")).getValue())
                 .isGreaterThan(0.0f);
-        assertThat((Float) registry.getGauges().get("jcache.statistics.myCache.average-put-time").getValue())
+        assertThat((Float) registry.getGauges().get(myCache.resolve("average-put-time")).getValue())
                 .isGreaterThan(0.0f);
-        assertThat((Float) registry.getGauges().get("jcache.statistics.myCache.average-remove-time").getValue())
+        assertThat((Float) registry.getGauges().get(myCache.resolve("average-remove-time")).getValue())
                 .isGreaterThan(0.0f);
 
     }

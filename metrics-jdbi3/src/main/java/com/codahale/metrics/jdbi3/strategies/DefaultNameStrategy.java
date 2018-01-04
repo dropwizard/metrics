@@ -1,5 +1,6 @@
 package com.codahale.metrics.jdbi3.strategies;
 
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import org.jdbi.v3.core.extension.ExtensionMethod;
 import org.jdbi.v3.core.statement.StatementContext;
@@ -14,9 +15,9 @@ public enum DefaultNameStrategy implements StatementNameStrategy {
      */
     CHECK_EMPTY {
         @Override
-        public String getStatementName(StatementContext statementContext) {
+        public MetricName getStatementName(StatementContext statementContext) {
             final String rawSql = statementContext.getRawSql();
-            return rawSql == null || rawSql.isEmpty() ? "sql.empty" : null;
+            return rawSql == null || rawSql.isEmpty() ? MetricName.build("sql.empty") : null;
         }
     },
 
@@ -27,7 +28,7 @@ public enum DefaultNameStrategy implements StatementNameStrategy {
      */
     SQL_OBJECT {
         @Override
-        public String getStatementName(StatementContext statementContext) {
+        public MetricName getStatementName(StatementContext statementContext) {
             ExtensionMethod extensionMethod = statementContext.getExtensionMethod();
             if (extensionMethod != null) {
                 return MetricRegistry.name(extensionMethod.getType(), extensionMethod.getMethod().getName());
@@ -41,8 +42,8 @@ public enum DefaultNameStrategy implements StatementNameStrategy {
      */
     NAIVE_NAME {
         @Override
-        public String getStatementName(StatementContext statementContext) {
-            return statementContext.getRawSql();
+        public MetricName getStatementName(StatementContext statementContext) {
+            return MetricName.build(statementContext.getRawSql());
         }
     },
 
@@ -51,8 +52,8 @@ public enum DefaultNameStrategy implements StatementNameStrategy {
      */
     CONSTANT_SQL_RAW {
         @Override
-        public String getStatementName(StatementContext statementContext) {
-            return "sql.raw";
+        public MetricName getStatementName(StatementContext statementContext) {
+            return MetricName.build("sql.raw");
         }
     }
 

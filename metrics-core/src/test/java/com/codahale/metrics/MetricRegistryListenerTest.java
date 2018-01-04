@@ -6,6 +6,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 public class MetricRegistryListenerTest {
+    private static final MetricName BLAH = MetricName.build("blah");
+
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
     private final Meter meter = mock(Meter.class);
@@ -16,45 +18,45 @@ public class MetricRegistryListenerTest {
 
     @Test
     public void noOpsOnGaugeAdded() {
-        listener.onGaugeAdded("blah", () -> {
+        listener.onGaugeAdded(BLAH, () -> {
             throw new RuntimeException("Should not be called");
         });
     }
 
     @Test
     public void noOpsOnCounterAdded() {
-        listener.onCounterAdded("blah", counter);
+        listener.onCounterAdded(BLAH, counter);
 
         verifyZeroInteractions(counter);
     }
 
     @Test
     public void noOpsOnHistogramAdded() {
-        listener.onHistogramAdded("blah", histogram);
+        listener.onHistogramAdded(BLAH, histogram);
 
         verifyZeroInteractions(histogram);
     }
 
     @Test
     public void noOpsOnMeterAdded() {
-        listener.onMeterAdded("blah", meter);
+        listener.onMeterAdded(BLAH, meter);
 
         verifyZeroInteractions(meter);
     }
 
     @Test
     public void noOpsOnTimerAdded() {
-        listener.onTimerAdded("blah", timer);
+        listener.onTimerAdded(BLAH, timer);
 
         verifyZeroInteractions(timer);
     }
 
     @Test
     public void doesNotExplodeWhenMetricsAreRemoved() {
-        listener.onGaugeRemoved("blah");
-        listener.onCounterRemoved("blah");
-        listener.onHistogramRemoved("blah");
-        listener.onMeterRemoved("blah");
-        listener.onTimerRemoved("blah");
+        listener.onGaugeRemoved(BLAH);
+        listener.onCounterRemoved(BLAH);
+        listener.onHistogramRemoved(BLAH);
+        listener.onMeterRemoved(BLAH);
+        listener.onTimerRemoved(BLAH);
     }
 }

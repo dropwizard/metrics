@@ -1,5 +1,6 @@
 package com.codahale.metrics.jcache;
 
+import com.codahale.metrics.MetricName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,11 +38,11 @@ public class JCacheGaugeSet implements MetricSet {
     private static final Logger LOGGER = LoggerFactory.getLogger(JCacheGaugeSet.class);
 
     @Override
-    public Map<String, Metric> getMetrics() {
+    public Map<MetricName, Metric> getMetrics() {
         Set<ObjectInstance> cacheBeans = getCacheBeans();
         List<String> availableStatsNames = retrieveStatsNames();
 
-        Map<String, Metric> gauges = new HashMap<>(cacheBeans.size() * availableStatsNames.size());
+        Map<MetricName, Metric> gauges = new HashMap<>(cacheBeans.size() * availableStatsNames.size());
 
         for (ObjectInstance cacheBean : cacheBeans) {
             ObjectName objectName = cacheBean.getObjectName();

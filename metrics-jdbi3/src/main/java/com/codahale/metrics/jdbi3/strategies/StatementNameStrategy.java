@@ -1,5 +1,6 @@
 package com.codahale.metrics.jdbi3.strategies;
 
+import com.codahale.metrics.MetricName;
 import org.jdbi.v3.core.statement.StatementContext;
 
 /**
@@ -8,5 +9,5 @@ import org.jdbi.v3.core.statement.StatementContext;
 @FunctionalInterface
 public interface StatementNameStrategy {
 
-    String getStatementName(StatementContext statementContext);
+    MetricName getStatementName(StatementContext statementContext);
 }

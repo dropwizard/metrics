@@ -1,11 +1,13 @@
 package com.codahale.metrics.jdbi;
 
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.jdbi.strategies.NameStrategies;
 import com.codahale.metrics.jdbi.strategies.ShortNameStrategy;
 import com.codahale.metrics.jdbi.strategies.SmartNameStrategy;
 import com.codahale.metrics.jdbi.strategies.StatementNameStrategy;
+
 import org.junit.Test;
 import org.skife.jdbi.v2.StatementContext;
 
@@ -31,7 +33,7 @@ public class InstrumentedTimingCollectorTest {
 
         collector.collect(TimeUnit.SECONDS.toNanos(1), ctx);
 
-        final String name = strategy.getStatementName(ctx);
+        final MetricName name = strategy.getStatementName(ctx);
         final Timer timer = registry.timer(name);
 
         assertThat(name)
@@ -51,7 +53,7 @@ public class InstrumentedTimingCollectorTest {
 
         collector.collect(TimeUnit.SECONDS.toNanos(1), ctx);
 
-        final String name = strategy.getStatementName(ctx);
+        final MetricName name = strategy.getStatementName(ctx);
         final Timer timer = registry.timer(name);
 
         assertThat(name)
@@ -70,7 +72,7 @@ public class InstrumentedTimingCollectorTest {
 
         collector.collect(TimeUnit.SECONDS.toNanos(2), ctx);
 
-        final String name = strategy.getStatementName(ctx);
+        final MetricName name = strategy.getStatementName(ctx);
         final Timer timer = registry.timer(name);
 
         assertThat(name)
@@ -88,7 +90,7 @@ public class InstrumentedTimingCollectorTest {
 
         collector.collect(TimeUnit.SECONDS.toNanos(2), ctx);
 
-        final String name = strategy.getStatementName(ctx);
+        final MetricName name = strategy.getStatementName(ctx);
         final Timer timer = registry.timer(name);
 
         assertThat(name)
@@ -107,7 +109,7 @@ public class InstrumentedTimingCollectorTest {
 
         collector.collect(TimeUnit.SECONDS.toNanos(3), ctx);
 
-        final String name = strategy.getStatementName(ctx);
+        final MetricName name = strategy.getStatementName(ctx);
         final Timer timer = registry.timer(name);
 
         assertThat(name)
@@ -129,7 +131,7 @@ public class InstrumentedTimingCollectorTest {
 
         collector.collect(TimeUnit.SECONDS.toNanos(3), ctx);
 
-        final String name = strategy.getStatementName(ctx);
+        final MetricName name = strategy.getStatementName(ctx);
         final Timer timer = registry.timer(name);
 
         assertThat(name)
@@ -151,7 +153,7 @@ public class InstrumentedTimingCollectorTest {
 
         collector.collect(TimeUnit.SECONDS.toNanos(4), ctx);
 
-        final String name = strategy.getStatementName(ctx);
+        final MetricName name = strategy.getStatementName(ctx);
         final Timer timer = registry.timer(name);
 
         assertThat(name)
@@ -173,7 +175,7 @@ public class InstrumentedTimingCollectorTest {
 
         collector.collect(TimeUnit.SECONDS.toNanos(4), ctx);
 
-        final String name = strategy.getStatementName(ctx);
+        final MetricName name = strategy.getStatementName(ctx);
         final Timer timer = registry.timer(name);
 
         assertThat(name)
@@ -196,7 +198,7 @@ public class InstrumentedTimingCollectorTest {
 
         collector.collect(TimeUnit.SECONDS.toNanos(5), ctx);
 
-        final String name = strategy.getStatementName(ctx);
+        final MetricName name = strategy.getStatementName(ctx);
         final Timer timer = registry.timer(name);
 
         assertThat(name)
@@ -218,7 +220,7 @@ public class InstrumentedTimingCollectorTest {
 
         collector.collect(TimeUnit.SECONDS.toNanos(1), ctx);
 
-        final String name = strategy.getStatementName(ctx);
+        final MetricName name = strategy.getStatementName(ctx);
         final Timer timer = registry.timer(name);
 
         assertThat(name)
@@ -242,7 +244,7 @@ public class InstrumentedTimingCollectorTest {
 
         collector.collect(TimeUnit.SECONDS.toNanos(3), ctx);
 
-        final String name = strategy.getStatementName(ctx);
+        final MetricName name = strategy.getStatementName(ctx);
         final Timer timer = registry.timer(name);
 
         assertThat(name)

@@ -3,6 +3,8 @@ package com.codahale.metrics.jdbi.strategies;
 import org.skife.jdbi.v2.ClasspathStatementLocator;
 import org.skife.jdbi.v2.StatementContext;
 
+import com.codahale.metrics.MetricName;
+
 import java.lang.reflect.Method;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,12 +22,12 @@ public final class NameStrategies {
     /**
      * An empty SQL statement.
      */
-    private static final String EMPTY_SQL = "sql.empty";
+    private static final MetricName EMPTY_SQL = MetricName.build("sql.empty");
 
     /**
      * Unknown SQL.
      */
-    static final String UNKNOWN_SQL = "sql.unknown";
+    static final MetricName UNKNOWN_SQL = MetricName.build("sql.unknown");
 
     /**
      * Context attribute name for the metric class.
@@ -47,7 +49,7 @@ public final class NameStrategies {
      */
     public static final String STATEMENT_NAME = "_metric_name";
 
-    private static String forRawSql(String rawSql) {
+    private static MetricName forRawSql(String rawSql) {
         return name("sql", "raw", rawSql);
     }
 
@@ -56,7 +58,7 @@ public final class NameStrategies {
         }
 
         @Override
-        public String getStatementName(StatementContext statementContext) {
+        public MetricName getStatementName(StatementContext statementContext) {
             final String rawSql = statementContext.getRawSql();
 
             if (rawSql == null || rawSql.length() == 0) {
@@ -71,7 +73,7 @@ public final class NameStrategies {
         }
 
         @Override
-        public String getStatementName(StatementContext statementContext) {
+        public MetricName getStatementName(StatementContext statementContext) {
             final String rawSql = statementContext.getRawSql();
 
             if (ClasspathStatementLocator.looksLikeSql(rawSql)) {
@@ -86,7 +88,7 @@ public final class NameStrategies {
         }
 
         @Override
-        public String getStatementName(StatementContext statementContext) {
+        public MetricName getStatementName(StatementContext statementContext) {
             final String rawSql = statementContext.getRawSql();
 
             // Is it using the template loader?
@@ -108,7 +110,7 @@ public final class NameStrategies {
         }
 
         @Override
-        public String getStatementName(StatementContext statementContext) {
+        public MetricName getStatementName(StatementContext statementContext) {
             final Class<?> clazz = statementContext.getSqlObjectType();
             final Method method = statementContext.getSqlObjectMethod();
             if (clazz != null) {
@@ -128,7 +130,7 @@ public final class NameStrategies {
         }
 
         @Override
-        public String getStatementName(StatementContext statementContext) {
+        public MetricName getStatementName(StatementContext statementContext) {
             final Object classObj = statementContext.getAttribute(STATEMENT_CLASS);
             final Object nameObj = statementContext.getAttribute(STATEMENT_NAME);
 
@@ -160,7 +162,7 @@ public final class NameStrategies {
         }
 
         @Override
-        public String getStatementName(StatementContext statementContext) {
+        public MetricName getStatementName(StatementContext statementContext) {
             final Object groupObj = statementContext.getAttribute(STATEMENT_GROUP);
             final Object typeObj = statementContext.getAttribute(STATEMENT_TYPE);
             final Object nameObj = statementContext.getAttribute(STATEMENT_NAME);

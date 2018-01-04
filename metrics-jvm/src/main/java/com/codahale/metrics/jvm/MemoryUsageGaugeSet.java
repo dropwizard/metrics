@@ -2,6 +2,7 @@ package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricSet;
 import com.codahale.metrics.RatioGauge;
 
@@ -40,23 +41,23 @@ public class MemoryUsageGaugeSet implements MetricSet {
     }
 
     @Override
-    public Map<String, Metric> getMetrics() {
-        final Map<String, Metric> gauges = new HashMap<>();
+    public Map<MetricName, Metric> getMetrics() {
+        final Map<MetricName, Metric> gauges = new HashMap<>();
 
-        gauges.put("total.init", (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getInit() +
+        gauges.put(MetricName.build("total.init"), (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getInit() +
                 mxBean.getNonHeapMemoryUsage().getInit());
-        gauges.put("total.used", (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getUsed() +
+        gauges.put(MetricName.build("total.used"), (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getUsed() +
                 mxBean.getNonHeapMemoryUsage().getUsed());
-        gauges.put("total.max", (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getMax() +
+        gauges.put(MetricName.build("total.max"), (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getMax() +
                 mxBean.getNonHeapMemoryUsage().getMax());
-        gauges.put("total.committed", (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getCommitted() +
+        gauges.put(MetricName.build("total.committed"), (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getCommitted() +
                 mxBean.getNonHeapMemoryUsage().getCommitted());
 
-        gauges.put("heap.init", (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getInit());
-        gauges.put("heap.used", (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getUsed());
-        gauges.put("heap.max", (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getMax());
-        gauges.put("heap.committed", (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getCommitted());
-        gauges.put("heap.usage", new RatioGauge() {
+        gauges.put(MetricName.build("heap.init"), (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getInit());
+        gauges.put(MetricName.build("heap.used"), (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getUsed());
+        gauges.put(MetricName.build("heap.max"), (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getMax());
+        gauges.put(MetricName.build("heap.committed"), (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getCommitted());
+        gauges.put(MetricName.build("heap.usage"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 final MemoryUsage usage = mxBean.getHeapMemoryUsage();
@@ -64,11 +65,11 @@ public class MemoryUsageGaugeSet implements MetricSet {
             }
         });
 
-        gauges.put("non-heap.init", (Gauge<Long>) () -> mxBean.getNonHeapMemoryUsage().getInit());
-        gauges.put("non-heap.used", (Gauge<Long>) () -> mxBean.getNonHeapMemoryUsage().getUsed());
-        gauges.put("non-heap.max", (Gauge<Long>) () -> mxBean.getNonHeapMemoryUsage().getMax());
-        gauges.put("non-heap.committed", (Gauge<Long>) () -> mxBean.getNonHeapMemoryUsage().getCommitted());
-        gauges.put("non-heap.usage", new RatioGauge() {
+        gauges.put(MetricName.build("non-heap.init"), (Gauge<Long>) () -> mxBean.getNonHeapMemoryUsage().getInit());
+        gauges.put(MetricName.build("non-heap.used"), (Gauge<Long>) () -> mxBean.getNonHeapMemoryUsage().getUsed());
+        gauges.put(MetricName.build("non-heap.max"), (Gauge<Long>) () -> mxBean.getNonHeapMemoryUsage().getMax());
+        gauges.put(MetricName.build("non-heap.committed"), (Gauge<Long>) () -> mxBean.getNonHeapMemoryUsage().getCommitted());
+        gauges.put(MetricName.build("non-heap.usage"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 final MemoryUsage usage = mxBean.getNonHeapMemoryUsage();
@@ -77,7 +78,7 @@ public class MemoryUsageGaugeSet implements MetricSet {
         });
 
         for (final MemoryPoolMXBean pool : memoryPools) {
-            final String poolName = name("pools", WHITESPACE.matcher(pool.getName()).replaceAll("-"));
+            final String poolName = "pools." + WHITESPACE.matcher(pool.getName()).replaceAll("-");
 
             gauges.put(name(poolName, "usage"), new RatioGauge() {
                 @Override

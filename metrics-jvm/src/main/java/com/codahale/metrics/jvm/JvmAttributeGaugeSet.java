@@ -2,6 +2,7 @@ package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricSet;
 
 import java.lang.management.ManagementFactory;
@@ -34,17 +35,17 @@ public class JvmAttributeGaugeSet implements MetricSet {
     }
 
     @Override
-    public Map<String, Metric> getMetrics() {
-        final Map<String, Metric> gauges = new HashMap<>();
+    public Map<MetricName, Metric> getMetrics() {
+        final Map<MetricName, Metric> gauges = new HashMap<>();
 
-        gauges.put("name", (Gauge<String>) runtime::getName);
-        gauges.put("vendor", (Gauge<String>) () -> String.format(Locale.US,
+        gauges.put(MetricName.build("name"), (Gauge<String>) runtime::getName);
+        gauges.put(MetricName.build("vendor"), (Gauge<String>) () -> String.format(Locale.US,
                 "%s %s %s (%s)",
                 runtime.getVmVendor(),
                 runtime.getVmName(),
                 runtime.getVmVersion(),
                 runtime.getSpecVersion()));
-        gauges.put("uptime", (Gauge<Long>) runtime::getUptime);
+        gauges.put(MetricName.build("uptime"), (Gauge<Long>) runtime::getUptime);
 
         return Collections.unmodifiableMap(gauges);
     }

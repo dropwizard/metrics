@@ -51,7 +51,7 @@ public class ConsoleReporterTest {
     public void reportsGaugeValues() throws Exception {
         final Gauge<Integer> gauge = () -> 1;
 
-        reporter.report(map("gauge", gauge),
+        reporter.report(map(MetricName.build("gauge"), gauge),
                 map(),
                 map(),
                 map(),
@@ -75,7 +75,7 @@ public class ConsoleReporterTest {
         when(counter.getCount()).thenReturn(100L);
 
         reporter.report(map(),
-                map("test.counter", counter),
+                map(MetricName.build("test.counter"), counter),
                 map(),
                 map(),
                 map());
@@ -113,7 +113,7 @@ public class ConsoleReporterTest {
 
         reporter.report(map(),
                 map(),
-                map("test.histogram", histogram),
+                map(MetricName.build("test.histogram"), histogram),
                 map(),
                 map());
 
@@ -151,7 +151,7 @@ public class ConsoleReporterTest {
         reporter.report(map(),
                 map(),
                 map(),
-                map("test.meter", meter),
+                map(MetricName.build("test.meter"), meter),
                 map());
 
         assertThat(consoleOutput())
@@ -198,7 +198,7 @@ public class ConsoleReporterTest {
                 map(),
                 map(),
                 map(),
-                map("test.another.timer", timer));
+                map(MetricName.build("test.another.timer"), timer));
 
         assertThat(consoleOutput())
                 .isEqualTo(lines(
@@ -251,7 +251,7 @@ public class ConsoleReporterTest {
         customReporter.report(map(),
                 map(),
                 map(),
-                map("test.meter", meter),
+                map(MetricName.build("test.meter"), meter),
                 map());
 
         assertThat(consoleOutput())
@@ -308,7 +308,7 @@ public class ConsoleReporterTest {
                 map(),
                 map(),
                 map(),
-                map("test.another.timer", timer));
+                map(MetricName.build("test.another.timer"), timer));
 
         assertThat(consoleOutput())
                 .isEqualTo(lines(
@@ -366,7 +366,7 @@ public class ConsoleReporterTest {
 
         customReporter.report(map(),
                 map(),
-                map("test.histogram", histogram),
+                map(MetricName.build("test.histogram"), histogram),
                 map(),
                 map());
 
@@ -400,12 +400,12 @@ public class ConsoleReporterTest {
         return bytes.toString("UTF-8");
     }
 
-    private <T> SortedMap<String, T> map() {
+    private <T> SortedMap<MetricName, T> map() {
         return new TreeMap<>();
     }
 
-    private <T> SortedMap<String, T> map(String name, T metric) {
-        final TreeMap<String, T> map = new TreeMap<>();
+    private <T> SortedMap<MetricName, T> map(MetricName name, T metric) {
+        final TreeMap<MetricName, T> map = new TreeMap<>();
         map.put(name, metric);
         return map;
     }

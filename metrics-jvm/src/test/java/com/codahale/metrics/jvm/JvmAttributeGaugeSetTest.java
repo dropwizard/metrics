@@ -1,6 +1,7 @@
 package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricName;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,12 +30,14 @@ public class JvmAttributeGaugeSetTest {
     @Test
     public void hasASetOfGauges() {
         assertThat(gauges.getMetrics().keySet())
-                .containsOnly("vendor", "name", "uptime");
+                .containsOnly(MetricName.build("vendor"),
+                        MetricName.build("name"),
+                        MetricName.build("uptime"));
     }
 
     @Test
     public void hasAGaugeForTheJVMName() {
-        final Gauge<String> gauge = (Gauge<String>) gauges.getMetrics().get("name");
+        final Gauge<String> gauge = (Gauge<String>) gauges.getMetrics().get(MetricName.build("name"));
 
         assertThat(gauge.getValue())
                 .isEqualTo("9928@example.com");
@@ -42,7 +45,7 @@ public class JvmAttributeGaugeSetTest {
 
     @Test
     public void hasAGaugeForTheJVMVendor() {
-        final Gauge<String> gauge = (Gauge<String>) gauges.getMetrics().get("vendor");
+        final Gauge<String> gauge = (Gauge<String>) gauges.getMetrics().get(MetricName.build("vendor"));
 
         assertThat(gauge.getValue())
                 .isEqualTo("Oracle Corporation Java HotSpot(TM) 64-Bit Server VM 23.7-b01 (1.7)");
@@ -50,7 +53,7 @@ public class JvmAttributeGaugeSetTest {
 
     @Test
     public void hasAGaugeForTheJVMUptime() {
-        final Gauge<Long> gauge = (Gauge<Long>) gauges.getMetrics().get("uptime");
+        final Gauge<Long> gauge = (Gauge<Long>) gauges.getMetrics().get(MetricName.build("uptime"));
 
         assertThat(gauge.getValue())
                 .isEqualTo(100L);
@@ -58,7 +61,7 @@ public class JvmAttributeGaugeSetTest {
 
     @Test
     public void autoDiscoversTheRuntimeBean() {
-        final Gauge<Long> gauge = (Gauge<Long>) new JvmAttributeGaugeSet().getMetrics().get("uptime");
+        final Gauge<Long> gauge = (Gauge<Long>) new JvmAttributeGaugeSet().getMetrics().get(MetricName.build("uptime"));
 
         assertThat(gauge.getValue()).isPositive();
     }

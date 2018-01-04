@@ -1,5 +1,6 @@
 package com.codahale.metrics.jdbi3.strategies;
 
+import com.codahale.metrics.MetricName;
 import org.jdbi.v3.core.statement.StatementContext;
 
 import java.util.Arrays;
@@ -10,7 +11,7 @@ public abstract class DelegatingStatementNameStrategy implements StatementNameSt
     /**
      * Unknown SQL.
      */
-    private static final String UNKNOWN_SQL = "sql.unknown";
+    private static final MetricName UNKNOWN_SQL = MetricName.build("sql.unknown");
 
     private final List<StatementNameStrategy> strategies;
 
@@ -19,9 +20,9 @@ public abstract class DelegatingStatementNameStrategy implements StatementNameSt
     }
 
     @Override
-    public String getStatementName(StatementContext statementContext) {
+    public MetricName getStatementName(StatementContext statementContext) {
         for (StatementNameStrategy strategy : strategies) {
-            final String statementName = strategy.getStatementName(statementContext);
+            final MetricName statementName = strategy.getStatementName(statementContext);
             if (statementName != null) {
                 return statementName;
             }

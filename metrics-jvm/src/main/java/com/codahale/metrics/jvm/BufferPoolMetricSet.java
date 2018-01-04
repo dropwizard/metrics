@@ -2,6 +2,8 @@ package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricSet;
+import com.codahale.metrics.MetricName;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +34,8 @@ public class BufferPoolMetricSet implements MetricSet {
     }
 
     @Override
-    public Map<String, Metric> getMetrics() {
-        final Map<String, Metric> gauges = new HashMap<>();
+    public Map<MetricName, Metric> getMetrics() {
+        final Map<MetricName, Metric> gauges = new HashMap<>();
         for (String pool : POOLS) {
             for (int i = 0; i < ATTRIBUTES.length; i++) {
                 final String attribute = ATTRIBUTES[i];

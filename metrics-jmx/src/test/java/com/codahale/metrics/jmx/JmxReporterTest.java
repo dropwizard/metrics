@@ -1,13 +1,6 @@
 package com.codahale.metrics.jmx;
 
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.Histogram;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Snapshot;
-import com.codahale.metrics.Timer;
+import com.codahale.metrics.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -125,7 +118,7 @@ public class JmxReporterTest {
         ObjectName n = new ObjectName(name + ":name=dummy");
         try {
             String widgetName = "something";
-            when(mockObjectNameFactory.createName(any(String.class), any(String.class), any(String.class))).thenReturn(n);
+            when(mockObjectNameFactory.createName(any(String.class), any(String.class), any(MetricName.class))).thenReturn(n);
             Gauge aGauge = mock(Gauge.class);
             when(aGauge.getValue()).thenReturn(1);
 
@@ -136,7 +129,7 @@ public class JmxReporterTest {
                     .build();
             registry.register(widgetName, aGauge);
             reporter.start();
-            verify(mockObjectNameFactory).createName(eq("gauges"), any(String.class), eq("something"));
+            verify(mockObjectNameFactory).createName(eq("gauges"), any(String.class), eq(MetricName.build("something")));
             //verifyNoMoreInteractions(mockObjectNameFactory);
         } finally {
             reporter.stop();
@@ -298,7 +291,7 @@ public class JmxReporterTest {
     }
 
     private AttributeList getAttributes(String name, String... attributeNames) throws JMException {
-        ObjectName n = concreteObjectNameFactory.createName("only-for-logging-error", this.name, name);
+        ObjectName n = concreteObjectNameFactory.createName("only-for-logging-error", this.name, MetricName.build(name));
         return mBeanServer.getAttributes(n, attributeNames);
     }
 

@@ -1,17 +1,6 @@
 package com.codahale.metrics.graphite;
 
-import com.codahale.metrics.Clock;
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.Histogram;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.Metered;
-import com.codahale.metrics.MetricAttribute;
-import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.ScheduledReporter;
-import com.codahale.metrics.Snapshot;
-import com.codahale.metrics.Timer;
+import com.codahale.metrics.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -217,7 +206,7 @@ public class GraphiteReporter extends ScheduledReporter {
 
     private final GraphiteSender graphite;
     private final Clock clock;
-    private final String prefix;
+    private final MetricName prefix;
 
     /**
      * Creates a new {@link GraphiteReporter} instance.
@@ -248,39 +237,39 @@ public class GraphiteReporter extends ScheduledReporter {
                 disabledMetricAttributes);
         this.graphite = graphite;
         this.clock = clock;
-        this.prefix = prefix;
+        this.prefix = MetricName.build(prefix);
     }
 
     @Override
     @SuppressWarnings("rawtypes")
-    public void report(SortedMap<String, Gauge> gauges,
-                       SortedMap<String, Counter> counters,
-                       SortedMap<String, Histogram> histograms,
-                       SortedMap<String, Meter> meters,
-                       SortedMap<String, Timer> timers) {
+    public void report(SortedMap<MetricName, Gauge> gauges,
+                       SortedMap<MetricName, Counter> counters,
+                       SortedMap<MetricName, Histogram> histograms,
+                       SortedMap<MetricName, Meter> meters,
+                       SortedMap<MetricName, Timer> timers) {
         final long timestamp = clock.getTime() / 1000;
 
         // oh it'd be lovely to use Java 7 here
         try {
             graphite.connect();
 
-            for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
+            for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
                 reportGauge(entry.getKey(), entry.getValue(), timestamp);
             }
 
-            for (Map.Entry<String, Counter> entry : counters.entrySet()) {
+            for (Map.Entry<MetricName, Counter> entry : counters.entrySet()) {
                 reportCounter(entry.getKey(), entry.getValue(), timestamp);
             }
 
-            for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
+            for (Map.Entry<MetricName, Histogram> entry : histograms.entrySet()) {
                 reportHistogram(entry.getKey(), entry.getValue(), timestamp);
             }
 
-            for (Map.Entry<String, Meter> entry : meters.entrySet()) {
+            for (Map.Entry<MetricName, Meter> entry : meters.entrySet()) {
                 reportMetered(entry.getKey(), entry.getValue(), timestamp);
             }
 
-            for (Map.Entry<String, Timer> entry : timers.entrySet()) {
+            for (Map.Entry<MetricName, Timer> entry : timers.entrySet()) {
                 reportTimer(entry.getKey(), entry.getValue(), timestamp);
             }
             graphite.flush();
@@ -308,7 +297,7 @@ public class GraphiteReporter extends ScheduledReporter {
         }
     }
 
-    private void reportTimer(String name, Timer timer, long timestamp) throws IOException {
+    private void reportTimer(MetricName name, Timer timer, long timestamp) throws IOException {
         final Snapshot snapshot = timer.getSnapshot();
         sendIfEnabled(MAX, name, convertDuration(snapshot.getMax()), timestamp);
         sendIfEnabled(MEAN, name, convertDuration(snapshot.getMean()), timestamp);
@@ -323,7 +312,7 @@ public class GraphiteReporter extends ScheduledReporter {
         reportMetered(name, timer, timestamp);
     }
 
-    private void reportMetered(String name, Metered meter, long timestamp) throws IOException {
+    private void reportMetered(MetricName name, Metered meter, long timestamp) throws IOException {
         sendIfEnabled(COUNT, name, meter.getCount(), timestamp);
         sendIfEnabled(M1_RATE, name, convertRate(meter.getOneMinuteRate()), timestamp);
         sendIfEnabled(M5_RATE, name, convertRate(meter.getFiveMinuteRate()), timestamp);
@@ -331,7 +320,7 @@ public class GraphiteReporter extends ScheduledReporter {
         sendIfEnabled(MEAN_RATE, name, convertRate(meter.getMeanRate()), timestamp);
     }
 
-    private void reportHistogram(String name, Histogram histogram, long timestamp) throws IOException {
+    private void reportHistogram(MetricName name, Histogram histogram, long timestamp) throws IOException {
         final Snapshot snapshot = histogram.getSnapshot();
         sendIfEnabled(COUNT, name, histogram.getCount(), timestamp);
         sendIfEnabled(MAX, name, snapshot.getMax(), timestamp);
@@ -346,25 +335,25 @@ public class GraphiteReporter extends ScheduledReporter {
         sendIfEnabled(P999, name, snapshot.get999thPercentile(), timestamp);
     }
 
-    private void sendIfEnabled(MetricAttribute type, String name, double value, long timestamp) throws IOException {
+    private void sendIfEnabled(MetricAttribute type, MetricName name, double value, long timestamp) throws IOException {
         if (getDisabledMetricAttributes().contains(type)) {
             return;
         }
         graphite.send(prefix(name, type.getCode()), format(value), timestamp);
     }
 
-    private void sendIfEnabled(MetricAttribute type, String name, long value, long timestamp) throws IOException {
+    private void sendIfEnabled(MetricAttribute type, MetricName name, long value, long timestamp) throws IOException {
         if (getDisabledMetricAttributes().contains(type)) {
             return;
         }
         graphite.send(prefix(name, type.getCode()), format(value), timestamp);
     }
 
-    private void reportCounter(String name, Counter counter, long timestamp) throws IOException {
+    private void reportCounter(MetricName name, Counter counter, long timestamp) throws IOException {
         graphite.send(prefix(name, COUNT.getCode()), format(counter.getCount()), timestamp);
     }
 
-    private void reportGauge(String name, Gauge<?> gauge, long timestamp) throws IOException {
+    private void reportGauge(MetricName name, Gauge<?> gauge, long timestamp) throws IOException {
         final String value = format(gauge.getValue());
         if (value != null) {
             graphite.send(prefix(name), value, timestamp);
@@ -394,8 +383,8 @@ public class GraphiteReporter extends ScheduledReporter {
         return null;
     }
 
-    private String prefix(String... components) {
-        return MetricRegistry.name(prefix, components);
+    private String prefix(MetricName name, String... components) {
+        return MetricName.join(MetricName.join(prefix, name), MetricName.build(components)).getKey();
     }
 
     private String format(long n) {

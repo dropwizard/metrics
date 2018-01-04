@@ -2,6 +2,8 @@ package com.codahale.metrics.jdbi.strategies;
 
 import org.skife.jdbi.v2.StatementContext;
 
+import com.codahale.metrics.MetricName;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,9 +20,9 @@ public abstract class DelegatingStatementNameStrategy implements StatementNameSt
     }
 
     @Override
-    public String getStatementName(StatementContext statementContext) {
+    public MetricName getStatementName(StatementContext statementContext) {
         for (StatementNameStrategy strategy : strategies) {
-            final String statementName = strategy.getStatementName(statementContext);
+            final MetricName statementName = strategy.getStatementName(statementContext);
             if (statementName != null) {
                 return statementName;
             }
