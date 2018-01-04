@@ -105,7 +105,9 @@ public class HealthCheckRegistry {
                 healthChecks.put(name, registered);
             }
         }
-        if (registered != null) {
+        if (registered == null) {
+            throw new IllegalArgumentException("A health check named " + name + " already exists");
+        } else {
             onHealthCheckAdded(name, registered);
         }
     }

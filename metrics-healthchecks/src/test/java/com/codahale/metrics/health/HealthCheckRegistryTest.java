@@ -70,6 +70,11 @@ public class HealthCheckRegistryTest {
         verify(af).cancel(true);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void registeringHealthCheckTwiceThrowsException() {
+        registry.register("hc1", hc1);
+    }
+
     @Test
     public void registeringHealthCheckTriggersNotification() {
         verify(listener).onHealthCheckAdded("hc1", hc1);
