@@ -95,19 +95,18 @@ public class HealthCheckRegistry {
      * @param healthCheck the {@link HealthCheck} instance
      */
     public void register(String name, HealthCheck healthCheck) {
-        HealthCheck registered = null;
+        HealthCheck registered;
         synchronized (lock) {
-            if (!healthChecks.containsKey(name)) {
-                registered = healthCheck;
-                if (healthCheck.getClass().isAnnotationPresent(Async.class)) {
-                    registered = new AsyncHealthCheckDecorator(healthCheck, asyncExecutorService);
-                }
-                healthChecks.put(name, registered);
+            if (healthChecks.containsKey(name)) {
+                throw new IllegalArgumentException("A health check named " + name + " already exists");
             }
+            registered = healthCheck;
+            if (healthCheck.getClass().isAnnotationPresent(Async.class)) {
+                registered = new AsyncHealthCheckDecorator(healthCheck, asyncExecutorService);
+            }
+            healthChecks.put(name, registered);
         }
-        if (registered != null) {
-            onHealthCheckAdded(name, registered);
-        }
+        onHealthCheckAdded(name, registered);
     }
 
     /**
