@@ -167,6 +167,11 @@ public class Timer implements Metered, Sampling {
     }
 
     @Override
+    public long getSum() {
+        return histogram.getSum();
+    }
+
+    @Override
     public double getFifteenMinuteRate() {
         return meter.getFifteenMinuteRate();
     }

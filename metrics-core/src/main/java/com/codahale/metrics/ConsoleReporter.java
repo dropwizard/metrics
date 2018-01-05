@@ -283,6 +283,7 @@ public class ConsoleReporter extends ScheduledReporter {
 
     private void printMeter(Meter meter) {
         printIfEnabled(MetricAttribute.COUNT, String.format(locale, "             count = %d", meter.getCount()));
+        printIfEnabled(MetricAttribute.SUM, String.format(locale, "               sum = %d", meter.getSum()));
         printIfEnabled(MetricAttribute.MEAN_RATE, String.format(locale, "         mean rate = %2.2f events/%s", convertRate(meter.getMeanRate()), getRateUnit()));
         printIfEnabled(MetricAttribute.M1_RATE, String.format(locale, "     1-minute rate = %2.2f events/%s", convertRate(meter.getOneMinuteRate()), getRateUnit()));
         printIfEnabled(MetricAttribute.M5_RATE, String.format(locale, "     5-minute rate = %2.2f events/%s", convertRate(meter.getFiveMinuteRate()), getRateUnit()));
@@ -299,6 +300,7 @@ public class ConsoleReporter extends ScheduledReporter {
 
     private void printHistogram(Histogram histogram) {
         printIfEnabled(MetricAttribute.COUNT, String.format(locale, "             count = %d", histogram.getCount()));
+        printIfEnabled(MetricAttribute.SUM, String.format(locale, "               sum = %d", histogram.getSum()));
         Snapshot snapshot = histogram.getSnapshot();
         printIfEnabled(MetricAttribute.MIN, String.format(locale, "               min = %d", snapshot.getMin()));
         printIfEnabled(MetricAttribute.MAX, String.format(locale, "               max = %d", snapshot.getMax()));
@@ -315,6 +317,7 @@ public class ConsoleReporter extends ScheduledReporter {
     private void printTimer(Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
         printIfEnabled(MetricAttribute.COUNT, String.format(locale, "             count = %d", timer.getCount()));
+        printIfEnabled(MetricAttribute.SUM, String.format(locale, "               sum = %d", timer.getSum()));
         printIfEnabled(MetricAttribute.MEAN_RATE, String.format(locale, "         mean rate = %2.2f calls/%s", convertRate(timer.getMeanRate()), getRateUnit()));
         printIfEnabled(MetricAttribute.M1_RATE, String.format(locale, "     1-minute rate = %2.2f calls/%s", convertRate(timer.getOneMinuteRate()), getRateUnit()));
         printIfEnabled(MetricAttribute.M5_RATE, String.format(locale, "     5-minute rate = %2.2f calls/%s", convertRate(timer.getFiveMinuteRate()), getRateUnit()));

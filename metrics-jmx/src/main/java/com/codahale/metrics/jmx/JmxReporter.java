@@ -223,6 +223,8 @@ public class JmxReporter implements Reporter, Closeable {
     public interface JmxHistogramMBean extends MetricMBean {
         long getCount();
 
+        long getSum();
+
         long getMin();
 
         long getMax();
@@ -270,6 +272,11 @@ public class JmxReporter implements Reporter, Closeable {
         @Override
         public long getCount() {
             return metric.getCount();
+        }
+
+        @Override
+        public long getSum() {
+            return metric.getSum();
         }
 
         @Override
@@ -332,6 +339,8 @@ public class JmxReporter implements Reporter, Closeable {
     public interface JmxMeterMBean extends MetricMBean {
         long getCount();
 
+        long getSum();
+
         double getMeanRate();
 
         double getOneMinuteRate();
@@ -358,6 +367,11 @@ public class JmxReporter implements Reporter, Closeable {
         @Override
         public long getCount() {
             return metric.getCount();
+        }
+
+        @Override
+        public long getSum() {
+            return metric.getSum();
         }
 
         @Override

@@ -63,6 +63,7 @@ public class JmxReporterTest {
         when(counter.getCount()).thenReturn(100L);
 
         when(histogram.getCount()).thenReturn(1L);
+        when(histogram.getSum()).thenReturn(12L);
 
         final Snapshot hSnapshot = mock(Snapshot.class);
         when(hSnapshot.getMax()).thenReturn(2L);
@@ -80,12 +81,14 @@ public class JmxReporterTest {
         when(histogram.getSnapshot()).thenReturn(hSnapshot);
 
         when(meter.getCount()).thenReturn(1L);
+        when(meter.getSum()).thenReturn(6L);
         when(meter.getMeanRate()).thenReturn(2.0);
         when(meter.getOneMinuteRate()).thenReturn(3.0);
         when(meter.getFiveMinuteRate()).thenReturn(4.0);
         when(meter.getFifteenMinuteRate()).thenReturn(5.0);
 
         when(timer.getCount()).thenReturn(1L);
+        when(timer.getSum()).thenReturn(6L);
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
         when(timer.getFiveMinuteRate()).thenReturn(4.0);
@@ -166,6 +169,7 @@ public class JmxReporterTest {
     public void registersMBeansForHistograms() throws Exception {
         final AttributeList attributes = getAttributes("test.histogram",
                 "Count",
+                "Sum",
                 "Max",
                 "Mean",
                 "Min",
@@ -180,6 +184,7 @@ public class JmxReporterTest {
 
         assertThat(values(attributes))
                 .contains(entry("Count", 1L))
+                .contains(entry("Sum", 12L))
                 .contains(entry("Max", 2L))
                 .contains(entry("Mean", 3.0))
                 .contains(entry("Min", 4L))
@@ -197,6 +202,7 @@ public class JmxReporterTest {
     public void registersMBeansForMeters() throws Exception {
         final AttributeList attributes = getAttributes("test.meter",
                 "Count",
+                "Sum",
                 "MeanRate",
                 "OneMinuteRate",
                 "FiveMinuteRate",
@@ -205,6 +211,7 @@ public class JmxReporterTest {
 
         assertThat(values(attributes))
                 .contains(entry("Count", 1L))
+                .contains(entry("Sum", 6L))
                 .contains(entry("MeanRate", 2.0))
                 .contains(entry("OneMinuteRate", 3.0))
                 .contains(entry("FiveMinuteRate", 4.0))
@@ -216,6 +223,7 @@ public class JmxReporterTest {
     public void registersMBeansForTimers() throws Exception {
         final AttributeList attributes = getAttributes("test.another.timer",
                 "Count",
+                "Sum",
                 "MeanRate",
                 "OneMinuteRate",
                 "FiveMinuteRate",
@@ -235,6 +243,7 @@ public class JmxReporterTest {
 
         assertThat(values(attributes))
                 .contains(entry("Count", 1L))
+                .contains(entry("Sum", 6L))
                 .contains(entry("MeanRate", 2.0))
                 .contains(entry("OneMinuteRate", 3.0))
                 .contains(entry("FiveMinuteRate", 4.0))

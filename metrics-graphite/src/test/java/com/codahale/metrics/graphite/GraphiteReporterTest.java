@@ -248,6 +248,7 @@ public class GraphiteReporterTest {
     public void reportsHistograms() throws Exception {
         final Histogram histogram = mock(Histogram.class);
         when(histogram.getCount()).thenReturn(1L);
+        when(histogram.getSum()).thenReturn(12L);
 
         final Snapshot snapshot = mock(Snapshot.class);
         when(snapshot.getMax()).thenReturn(2L);
@@ -272,6 +273,7 @@ public class GraphiteReporterTest {
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.histogram.count", "1", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.sum", "12", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.max", "2", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.mean", "3.00", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.min", "4", timestamp);
@@ -292,6 +294,7 @@ public class GraphiteReporterTest {
     public void reportsMeters() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
+        when(meter.getSum()).thenReturn(6L);
         when(meter.getOneMinuteRate()).thenReturn(2.0);
         when(meter.getFiveMinuteRate()).thenReturn(3.0);
         when(meter.getFifteenMinuteRate()).thenReturn(4.0);
@@ -306,6 +309,7 @@ public class GraphiteReporterTest {
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.meter.count", "1", timestamp);
+        inOrder.verify(graphite).send("prefix.meter.sum", "6", timestamp);
         inOrder.verify(graphite).send("prefix.meter.m1_rate", "2.00", timestamp);
         inOrder.verify(graphite).send("prefix.meter.m5_rate", "3.00", timestamp);
         inOrder.verify(graphite).send("prefix.meter.m15_rate", "4.00", timestamp);
@@ -320,6 +324,7 @@ public class GraphiteReporterTest {
     public void reportsMetersInMinutes() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
+        when(meter.getSum()).thenReturn(6L);
         when(meter.getOneMinuteRate()).thenReturn(2.0);
         when(meter.getFiveMinuteRate()).thenReturn(3.0);
         when(meter.getFifteenMinuteRate()).thenReturn(4.0);
@@ -334,6 +339,7 @@ public class GraphiteReporterTest {
         final InOrder inOrder = inOrder(graphite);
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.meter.count", "1", timestamp);
+        inOrder.verify(graphite).send("prefix.meter.sum", "6", timestamp);
         inOrder.verify(graphite).send("prefix.meter.m1_rate", "120.00", timestamp);
         inOrder.verify(graphite).send("prefix.meter.m5_rate", "180.00", timestamp);
         inOrder.verify(graphite).send("prefix.meter.m15_rate", "240.00", timestamp);
@@ -348,6 +354,7 @@ public class GraphiteReporterTest {
     public void reportsTimers() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
+        when(timer.getSum()).thenReturn(6L);
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
         when(timer.getFiveMinuteRate()).thenReturn(4.0);
@@ -387,6 +394,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.timer.p99", "900.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.p999", "1000.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.count", "1", timestamp);
+        inOrder.verify(graphite).send("prefix.timer.sum", "6", timestamp);
         inOrder.verify(graphite).send("prefix.timer.m1_rate", "3.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.m5_rate", "4.00", timestamp);
         inOrder.verify(graphite).send("prefix.timer.m15_rate", "5.00", timestamp);
@@ -429,6 +437,7 @@ public class GraphiteReporterTest {
     public void disabledMetricsAttribute() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
+        when(meter.getSum()).thenReturn(6L);
         when(meter.getOneMinuteRate()).thenReturn(2.0);
         when(meter.getFiveMinuteRate()).thenReturn(3.0);
         when(meter.getFifteenMinuteRate()).thenReturn(4.0);
@@ -456,6 +465,7 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).connect();
         inOrder.verify(graphite).send("prefix.counter.count", "11", timestamp);
         inOrder.verify(graphite).send("prefix.meter.count", "1", timestamp);
+        inOrder.verify(graphite).send("prefix.meter.sum", "6", timestamp);
         inOrder.verify(graphite).send("prefix.meter.m1_rate", "2.00", timestamp);
         inOrder.verify(graphite).send("prefix.meter.mean_rate", "5.00", timestamp);
         inOrder.verify(graphite).flush();
