@@ -155,15 +155,16 @@ public class InstrumentedHandlerTest {
             final HttpServletRequest httpServletRequest,
             final HttpServletResponse httpServletResponse
         ) throws IOException, ServletException {
-            request.setHandled(true);
             switch (path) {
                 case "/blocking":
+                    request.setHandled(true);
                     LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(1));
                     httpServletResponse.setStatus(200);
                     httpServletResponse.setContentType("text/plain");
                     httpServletResponse.getWriter().write("some content from the blocking request\n");
                     break;
                 case "/async":
+                    request.setHandled(true);
                     final AsyncContext context = request.startAsync();
                     Thread t = new Thread(() -> {
                         LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(1));
@@ -193,11 +194,8 @@ public class InstrumentedHandlerTest {
                     });
                     t.start();
                     break;
-                default:
-                    httpServletResponse.setStatus(404);
-                    httpServletResponse.setContentType("text/plain");
-                    httpServletResponse.getWriter().write("Not Found\n");
-                    break;
+                 default:
+                     break;
             }
         }
     }
