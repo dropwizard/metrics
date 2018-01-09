@@ -38,13 +38,13 @@ public class Slf4jReporterTest {
     @Test
     public void reportsGaugeValuesAtError() {
         when(logger.isErrorEnabled(marker)).thenReturn(true);
-        errorReporter.report(map("gauge", () -> "value"),
+        errorReporter.report(map(MetricName.build("gauge"), () -> "value"),
                 map(),
                 map(),
                 map(),
                 map());
 
-        verify(logger).error(marker, "type={}, name={}, value={}", "GAUGE", "gauge", "value");
+        verify(logger).error(marker, "type={}, name={}, value={}", "GAUGE", MetricName.build("gauge"), "value");
     }
 
     @Test
@@ -54,12 +54,12 @@ public class Slf4jReporterTest {
         when(logger.isErrorEnabled(marker)).thenReturn(true);
 
         errorReporter.report(map(),
-                map("test.counter", counter),
+                map(MetricName.build("test.counter"), counter),
                 map(),
                 map(),
                 map());
 
-        verify(logger).error(marker, "type={}, name={}, count={}", "COUNTER", "test.counter", 100L);
+        verify(logger).error(marker, "type={}, name={}, count={}", "COUNTER", MetricName.build("test.counter"), 100L);
     }
 
     @Test
@@ -84,14 +84,14 @@ public class Slf4jReporterTest {
 
         errorReporter.report(map(),
                 map(),
-                map("test.histogram", histogram),
+                map(MetricName.build("test.histogram"), histogram),
                 map(),
                 map());
 
         verify(logger).error(marker,
                 "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
                 "HISTOGRAM",
-                "test.histogram",
+                MetricName.build( "test.histogram"),
                 1L,
                 4L,
                 2L,
@@ -118,13 +118,13 @@ public class Slf4jReporterTest {
         errorReporter.report(map(),
                 map(),
                 map(),
-                map("test.meter", meter),
+                map(MetricName.build("test.meter"), meter),
                 map());
 
         verify(logger).error(marker,
                 "type={}, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
                 "METER",
-                "test.meter",
+                MetricName.build("test.meter"),
                 1L,
                 2.0,
                 3.0,
@@ -164,12 +164,12 @@ public class Slf4jReporterTest {
                 map(),
                 map(),
                 map(),
-                map("test.another.timer", timer));
+                map(MetricName.build("test.another.timer"), timer));
 
         verify(logger).error(marker,
                 "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
                 "TIMER",
-                "test.another.timer",
+                MetricName.build("test.another.timer"),
                 1L,
                 300.0,
                 100.0,
@@ -192,13 +192,13 @@ public class Slf4jReporterTest {
     @Test
     public void reportsGaugeValues() {
         when(logger.isInfoEnabled(marker)).thenReturn(true);
-        infoReporter.report(map("gauge", () -> "value"),
+        infoReporter.report(map(MetricName.build("gauge"), () -> "value"),
                 map(),
                 map(),
                 map(),
                 map());
 
-        verify(logger).info(marker, "type={}, name={}, value={}", "GAUGE", "prefix.gauge", "value");
+        verify(logger).info(marker, "type={}, name={}, value={}", "GAUGE", MetricName.build("prefix.gauge"), "value");
     }
 
     @Test
@@ -208,12 +208,12 @@ public class Slf4jReporterTest {
         when(logger.isInfoEnabled(marker)).thenReturn(true);
 
         infoReporter.report(map(),
-                map("test.counter", counter),
+                map(MetricName.build("test.counter"), counter),
                 map(),
                 map(),
                 map());
 
-        verify(logger).info(marker, "type={}, name={}, count={}", "COUNTER", "prefix.test.counter", 100L);
+        verify(logger).info(marker, "type={}, name={}, count={}", "COUNTER", MetricName.build("prefix.test.counter"), 100L);
     }
 
     @Test
@@ -238,14 +238,14 @@ public class Slf4jReporterTest {
 
         infoReporter.report(map(),
                 map(),
-                map("test.histogram", histogram),
+                map(MetricName.build("test.histogram"), histogram),
                 map(),
                 map());
 
         verify(logger).info(marker,
                 "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
                 "HISTOGRAM",
-                "prefix.test.histogram",
+                MetricName.build("prefix.test.histogram"),
                 1L,
                 4L,
                 2L,
@@ -272,13 +272,13 @@ public class Slf4jReporterTest {
         infoReporter.report(map(),
                 map(),
                 map(),
-                map("test.meter", meter),
+                map(MetricName.build("test.meter"), meter),
                 map());
 
         verify(logger).info(marker,
                 "type={}, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
                 "METER",
-                "prefix.test.meter",
+                MetricName.build("prefix.test.meter"),
                 1L,
                 2.0,
                 3.0,
@@ -317,12 +317,12 @@ public class Slf4jReporterTest {
                 map(),
                 map(),
                 map(),
-                map("test.another.timer", timer));
+                map(MetricName.build("test.another.timer"), timer));
 
         verify(logger).info(marker,
                 "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
                 "TIMER",
-                "prefix.test.another.timer",
+                MetricName.build("prefix.test.another.timer"),
                 1L,
                 300.0,
                 100.0,
@@ -342,12 +342,12 @@ public class Slf4jReporterTest {
                 "milliseconds");
     }
 
-    private <T> SortedMap<String, T> map() {
+    private <T> SortedMap<MetricName, T> map() {
         return new TreeMap<>();
     }
 
-    private <T> SortedMap<String, T> map(String name, T metric) {
-        final TreeMap<String, T> map = new TreeMap<>();
+    private <T> SortedMap<MetricName, T> map(MetricName name, T metric) {
+        final TreeMap<MetricName, T> map = new TreeMap<>();
         map.put(name, metric);
         return map;
     }

@@ -1,9 +1,11 @@
 package com.codahale.metrics.httpasyncclient;
 
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.httpclient.HttpClientMetricNameStrategy;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.concurrent.FutureCallback;
@@ -21,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
@@ -42,13 +45,13 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
     @Before
     public void setUp() throws Exception {
         CloseableHttpAsyncClient chac = new InstrumentedNHttpClientBuilder(metricRegistry,
-                mock(HttpClientMetricNameStrategy.class)).build();
+                (name, request) -> MetricName.build("test")).build();
         chac.start();
         asyncHttpClient = chac;
 
         Timer timer = mock(Timer.class);
         when(timer.time()).thenReturn(context);
-        when(metricRegistry.timer(any())).thenReturn(timer);
+        when(metricRegistry.timer(MetricName.build("test"))).thenReturn(timer);
     }
 
     @Test

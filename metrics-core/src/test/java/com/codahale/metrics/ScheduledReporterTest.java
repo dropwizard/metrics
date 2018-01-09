@@ -77,11 +77,11 @@ public class ScheduledReporterTest {
         latch.await(5, TimeUnit.SECONDS);
 
         verify(reporter, times(2)).report(
-                map("gauge", gauge),
-                map("counter", counter),
-                map("histogram", histogram),
-                map("meter", meter),
-                map("timer", timer)
+                map(MetricName.build("gauge"), gauge),
+                map(MetricName.build("counter"), counter),
+                map(MetricName.build("histogram"), histogram),
+                map(MetricName.build("meter"), meter),
+                map(MetricName.build("timer"), timer)
         );
     }
 
@@ -114,11 +114,11 @@ public class ScheduledReporterTest {
         });
         latch.await(5, TimeUnit.SECONDS);
         verify(reporterWithNullExecutor, times(2)).report(
-                map("gauge", gauge),
-                map("counter", counter),
-                map("histogram", histogram),
-                map("meter", meter),
-                map("timer", timer)
+                map(MetricName.build("gauge"), gauge),
+                map(MetricName.build("counter"), counter),
+                map(MetricName.build("histogram"), histogram),
+                map(MetricName.build("meter"), meter),
+                map(MetricName.build("timer"), timer)
         );
     }
 
@@ -190,8 +190,8 @@ public class ScheduledReporterTest {
         assertEquals(2.0E-5, reporter.convertDuration(20), 0.0);
     }
 
-    private <T> SortedMap<String, T> map(String name, T value) {
-        final SortedMap<String, T> map = new TreeMap<>();
+    private <T> SortedMap<MetricName, T> map(MetricName name, T value) {
+        final SortedMap<MetricName, T> map = new TreeMap<>();
         map.put(name, value);
         return map;
     }
@@ -214,7 +214,7 @@ public class ScheduledReporterTest {
 
         @Override
         @SuppressWarnings("rawtypes")
-        public void report(SortedMap<String, Gauge> gauges, SortedMap<String, Counter> counters, SortedMap<String, Histogram> histograms, SortedMap<String, Meter> meters, SortedMap<String, Timer> timers) {
+        public void report(SortedMap<MetricName, Gauge> gauges, SortedMap<MetricName, Counter> counters, SortedMap<MetricName, Histogram> histograms, SortedMap<MetricName, Meter> meters, SortedMap<MetricName, Timer> timers) {
             executionCount.incrementAndGet();
             // nothing doing!
         }

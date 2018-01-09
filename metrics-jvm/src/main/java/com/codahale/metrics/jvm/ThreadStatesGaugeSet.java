@@ -2,6 +2,7 @@ package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricSet;
 
 import java.lang.management.ManagementFactory;
@@ -45,18 +46,18 @@ public class ThreadStatesGaugeSet implements MetricSet {
     }
 
     @Override
-    public Map<String, Metric> getMetrics() {
-        final Map<String, Metric> gauges = new HashMap<>();
+    public Map<MetricName, Metric> getMetrics() {
+        final Map<MetricName, Metric> gauges = new HashMap<>();
 
         for (final Thread.State state : Thread.State.values()) {
             gauges.put(name(state.toString().toLowerCase(), "count"),
                     (Gauge<Object>) () -> getThreadCount(state));
         }
 
-        gauges.put("count", (Gauge<Integer>) threads::getThreadCount);
-        gauges.put("daemon.count", (Gauge<Integer>) threads::getDaemonThreadCount);
-        gauges.put("deadlock.count", (Gauge<Integer>) () -> deadlockDetector.getDeadlockedThreads().size());
-        gauges.put("deadlocks", (Gauge<Set<String>>) deadlockDetector::getDeadlockedThreads);
+        gauges.put(MetricName.build("count"), (Gauge<Integer>) threads::getThreadCount);
+        gauges.put(MetricName.build("daemon.count"), (Gauge<Integer>) threads::getDaemonThreadCount);
+        gauges.put(MetricName.build("deadlock.count"), (Gauge<Integer>) () -> deadlockDetector.getDeadlockedThreads().size());
+        gauges.put(MetricName.build("deadlocks"), (Gauge<Set<String>>) deadlockDetector::getDeadlockedThreads);
 
         return Collections.unmodifiableMap(gauges);
     }

@@ -1,6 +1,8 @@
 package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricName;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,6 +29,37 @@ public class MemoryUsageGaugeSetTest {
     private final MemoryUsageGaugeSet gauges = new MemoryUsageGaugeSet(mxBean,
             Arrays.asList(memoryPool,
                     weirdMemoryPool));
+
+    private static final MetricName TOTAL = MetricName.build("total");
+    private static final MetricName HEAP = MetricName.build("heap");
+    private static final MetricName NON_HEAP = MetricName.build("non-heap");
+    private static final MetricName POOLS = MetricName.build("pools");
+
+    private static final MetricName TOTAL_MAX = TOTAL.resolve("max");
+    private static final MetricName TOTAL_INIT = TOTAL.resolve("init");
+    private static final MetricName TOTAL_USED = TOTAL.resolve("used");
+    private static final MetricName TOTAL_COMMITTED = TOTAL.resolve("committed");
+    private static final MetricName POOLS_BIG_POOL_USAGE = POOLS.resolve("Big-Pool.usage");
+    private static final MetricName POOLS_BIG_POOL_USED = POOLS.resolve("Big-Pool.used");
+    private static final MetricName POOLS_BIG_POOL_INIT = POOLS.resolve("Big-Pool.init");
+    private static final MetricName POOLS_BIG_POOL_COMMITED = POOLS.resolve("Big-Pool.committed");
+    private static final MetricName POOLS_BIG_POOL_MAX = POOLS.resolve("Big-Pool.max");
+    private static final MetricName POOLS_WEIRD_POOL_USAGE = POOLS.resolve("Weird-Pool.usage");
+    private static final MetricName POOLS_WEIRD_POOL_INIT = POOLS.resolve("Weird-Pool.init");
+    private static final MetricName POOLS_WEIRD_POOL_MAX = POOLS.resolve("Weird-Pool.max");
+    private static final MetricName POOLS_WEIRD_POOL_USED = POOLS.resolve("Weird-Pool.used");
+    private static final MetricName POOLS_WEIRD_POOL_USED_AFTER_GC = POOLS.resolve("Weird-Pool.used-after-gc");
+    private static final MetricName POOLS_WEIRD_POOL_COMMITTED = POOLS.resolve("Weird-Pool.committed");
+    private static final MetricName HEAP_INIT = HEAP.resolve("init");
+    private static final MetricName HEAP_COMMITTED = HEAP.resolve("committed");
+    private static final MetricName HEAP_USAGE = HEAP.resolve("usage");
+    private static final MetricName HEAP_USED = HEAP.resolve("used");
+    private static final MetricName HEAP_MAX = HEAP.resolve("max");
+    private static final MetricName NON_HEAP_USAGE = NON_HEAP.resolve("usage");
+    private static final MetricName NON_HEAP_MAX = NON_HEAP.resolve("max");
+    private static final MetricName NON_HEAP_USED = NON_HEAP.resolve("used");
+    private static final MetricName NON_HEAP_INIT = NON_HEAP.resolve("init");
+    private static final MetricName NON_HEAP_COMMITTED = NON_HEAP.resolve("committed");
 
     @Before
     public void setUp() {
@@ -70,37 +103,37 @@ public class MemoryUsageGaugeSetTest {
     public void hasASetOfGauges() {
         assertThat(gauges.getMetrics().keySet())
                 .containsOnly(
-                        "heap.init",
-                        "heap.committed",
-                        "heap.used",
-                        "heap.usage",
-                        "heap.max",
-                        "non-heap.init",
-                        "non-heap.committed",
-                        "non-heap.used",
-                        "non-heap.usage",
-                        "non-heap.max",
-                        "total.init",
-                        "total.committed",
-                        "total.used",
-                        "total.max",
-                        "pools.Big-Pool.init",
-                        "pools.Big-Pool.committed",
-                        "pools.Big-Pool.used",
-                        "pools.Big-Pool.usage",
-                        "pools.Big-Pool.max",
+                        TOTAL_MAX,
+                        TOTAL_INIT,
+                        TOTAL_USED,
+                        TOTAL_COMMITTED,
+                        HEAP_INIT,
+                        HEAP_COMMITTED,
+                        HEAP_USAGE,
+                        HEAP_USED,
+                        HEAP_MAX,
+                        NON_HEAP_USAGE,
+                        NON_HEAP_MAX,
+                        NON_HEAP_USED,
+                        NON_HEAP_INIT,
+                        NON_HEAP_COMMITTED,
+                        POOLS_BIG_POOL_INIT,
+                        POOLS_BIG_POOL_COMMITED,
+                        POOLS_BIG_POOL_USED,
+                        POOLS_BIG_POOL_USAGE,
+                        POOLS_BIG_POOL_MAX,
                         // skip in non-collected pools - "pools.Big-Pool.used-after-gc",
-                        "pools.Weird-Pool.init",
-                        "pools.Weird-Pool.committed",
-                        "pools.Weird-Pool.used",
-                        "pools.Weird-Pool.used-after-gc",
-                        "pools.Weird-Pool.usage",
-                        "pools.Weird-Pool.max");
+                        POOLS_WEIRD_POOL_USAGE,
+                        POOLS_WEIRD_POOL_USED,
+                        POOLS_WEIRD_POOL_INIT,
+                        POOLS_WEIRD_POOL_MAX,
+                        POOLS_WEIRD_POOL_COMMITTED,
+                        POOLS_WEIRD_POOL_USED_AFTER_GC);
     }
 
     @Test
     public void hasAGaugeForTotalCommitted() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("total.committed");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(TOTAL_COMMITTED);
 
         assertThat(gauge.getValue())
                 .isEqualTo(11L);
@@ -108,7 +141,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForTotalInit() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("total.init");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(TOTAL_INIT);
 
         assertThat(gauge.getValue())
                 .isEqualTo(22L);
@@ -116,7 +149,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForTotalUsed() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("total.used");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(TOTAL_USED);
 
         assertThat(gauge.getValue())
                 .isEqualTo(33L);
@@ -124,7 +157,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForTotalMax() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("total.max");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(TOTAL_MAX);
 
         assertThat(gauge.getValue())
                 .isEqualTo(44L);
@@ -132,7 +165,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForHeapCommitted() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("heap.committed");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(HEAP_COMMITTED);
 
         assertThat(gauge.getValue())
                 .isEqualTo(10L);
@@ -140,7 +173,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForHeapInit() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("heap.init");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(HEAP_INIT);
 
         assertThat(gauge.getValue())
                 .isEqualTo(20L);
@@ -148,7 +181,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForHeapUsed() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("heap.used");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(HEAP_USED);
 
         assertThat(gauge.getValue())
                 .isEqualTo(30L);
@@ -156,7 +189,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForHeapMax() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("heap.max");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(HEAP_MAX);
 
         assertThat(gauge.getValue())
                 .isEqualTo(40L);
@@ -164,7 +197,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForHeapUsage() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("heap.usage");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(HEAP_USAGE);
 
         assertThat(gauge.getValue())
                 .isEqualTo(0.75);
@@ -172,7 +205,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForNonHeapCommitted() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("non-heap.committed");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(NON_HEAP_COMMITTED);
 
         assertThat(gauge.getValue())
                 .isEqualTo(1L);
@@ -180,7 +213,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForNonHeapInit() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("non-heap.init");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(NON_HEAP_INIT);
 
         assertThat(gauge.getValue())
                 .isEqualTo(2L);
@@ -188,7 +221,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForNonHeapUsed() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("non-heap.used");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(NON_HEAP_USED);
 
         assertThat(gauge.getValue())
                 .isEqualTo(3L);
@@ -196,7 +229,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForNonHeapMax() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("non-heap.max");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(NON_HEAP_MAX);
 
         assertThat(gauge.getValue())
                 .isEqualTo(4L);
@@ -204,7 +237,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForNonHeapUsage() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("non-heap.usage");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(NON_HEAP_USAGE);
 
         assertThat(gauge.getValue())
                 .isEqualTo(0.75);
@@ -212,7 +245,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForMemoryPoolUsage() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Big-Pool.usage");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(POOLS_BIG_POOL_USAGE);
 
         assertThat(gauge.getValue())
                 .isEqualTo(0.75);
@@ -220,7 +253,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForWeirdMemoryPoolInit() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.init");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(POOLS_WEIRD_POOL_INIT);
 
         assertThat(gauge.getValue())
                 .isEqualTo(200L);
@@ -228,7 +261,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForWeirdMemoryPoolCommitted() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.committed");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(POOLS_WEIRD_POOL_COMMITTED);
 
         assertThat(gauge.getValue())
                 .isEqualTo(100L);
@@ -236,7 +269,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForWeirdMemoryPoolUsed() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.used");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(POOLS_WEIRD_POOL_USED);
 
         assertThat(gauge.getValue())
                 .isEqualTo(300L);
@@ -244,7 +277,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForWeirdMemoryPoolUsage() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.usage");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(POOLS_WEIRD_POOL_USAGE);
 
         assertThat(gauge.getValue())
                 .isEqualTo(3.0);
@@ -252,7 +285,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForWeirdMemoryPoolMax() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.max");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(POOLS_WEIRD_POOL_MAX);
 
         assertThat(gauge.getValue())
                 .isEqualTo(-1L);
@@ -260,7 +293,7 @@ public class MemoryUsageGaugeSetTest {
 
     @Test
     public void hasAGaugeForWeirdCollectionPoolUsed() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("pools.Weird-Pool.used-after-gc");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(POOLS_WEIRD_POOL_USED_AFTER_GC);
 
         assertThat(gauge.getValue())
                 .isEqualTo(290L);

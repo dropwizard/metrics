@@ -1,6 +1,7 @@
 package com.codahale.metrics.jetty9;
 
 import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.RatioGauge;
 import org.eclipse.jetty.util.annotation.Name;
@@ -67,22 +68,22 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
     protected void doStart() throws Exception {
         super.doStart();
 
-        final String prefix = this.prefix == null ? name(QueuedThreadPool.class, getName()) : name(this.prefix, getName());
+        final MetricName prefix = this.prefix == null ? name(QueuedThreadPool.class, getName()) : name(this.prefix, getName());
 
-        metricRegistry.register(name(prefix, "utilization"), new RatioGauge() {
+        metricRegistry.register(prefix.resolve("utilization"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(getThreads() - getIdleThreads(), getThreads());
             }
         });
-        metricRegistry.register(name(prefix, "utilization-max"), new RatioGauge() {
+        metricRegistry.register(prefix.resolve("utilization-max"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(getThreads() - getIdleThreads(), getMaxThreads());
             }
         });
-        metricRegistry.register(name(prefix, "size"), (Gauge<Integer>) this::getThreads);
-        metricRegistry.register(name(prefix, "jobs"), (Gauge<Integer>) () -> {
+        metricRegistry.register(prefix.resolve("size"), (Gauge<Integer>) this::getThreads);
+        metricRegistry.register(prefix.resolve("jobs"), (Gauge<Integer>) () -> {
             // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
             // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.
             return getQueue().size();

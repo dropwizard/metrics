@@ -1,5 +1,6 @@
 package com.codahale.metrics.jdbi3.strategies;
 
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.annotation.Timed;
 import org.jdbi.v3.core.extension.ExtensionMethod;
 import org.junit.Test;
@@ -46,33 +47,33 @@ public class TimedAnnotationNameStrategyTest extends AbstractStrategyTest {
     public void testAnnotationOnMethod() throws Exception {
         when(ctx.getExtensionMethod()).thenReturn(new ExtensionMethod(Foo.class, Foo.class.getMethod("update")));
         assertThat(timedAnnotationNameStrategy.getStatementName(ctx))
-                .isEqualTo("com.codahale.metrics.jdbi3.strategies.TimedAnnotationNameStrategyTest$Foo.update");
+                .isEqualTo(MetricName.build("com.codahale.metrics.jdbi3.strategies.TimedAnnotationNameStrategyTest$Foo.update"));
     }
 
     @Test
     public void testAnnotationOnMethodWithCustomName() throws Exception {
         when(ctx.getExtensionMethod()).thenReturn(new ExtensionMethod(Foo.class, Foo.class.getMethod("customUpdate")));
         assertThat(timedAnnotationNameStrategy.getStatementName(ctx))
-                .isEqualTo("com.codahale.metrics.jdbi3.strategies.TimedAnnotationNameStrategyTest$Foo.custom-update");
+                .isEqualTo(MetricName.build("com.codahale.metrics.jdbi3.strategies.TimedAnnotationNameStrategyTest$Foo.custom-update"));
     }
 
     @Test
     public void testAnnotationOnMethodWithCustomAbsoluteName() throws Exception {
         when(ctx.getExtensionMethod()).thenReturn(new ExtensionMethod(Foo.class, Foo.class.getMethod("absoluteUpdate")));
-        assertThat(timedAnnotationNameStrategy.getStatementName(ctx)).isEqualTo("absolute-update");
+        assertThat(timedAnnotationNameStrategy.getStatementName(ctx)).isEqualTo(MetricName.build("absolute-update"));
     }
 
     @Test
     public void testAnnotationOnClass() throws Exception {
         when(ctx.getExtensionMethod()).thenReturn(new ExtensionMethod(Bar.class, Bar.class.getMethod("update")));
         assertThat(timedAnnotationNameStrategy.getStatementName(ctx))
-                .isEqualTo("com.codahale.metrics.jdbi3.strategies.TimedAnnotationNameStrategyTest$Bar.update");
+                .isEqualTo(MetricName.build("com.codahale.metrics.jdbi3.strategies.TimedAnnotationNameStrategyTest$Bar.update"));
     }
 
     @Test
     public void testAnnotationOnMethodAndClassWithCustomNames() throws Exception {
         when(ctx.getExtensionMethod()).thenReturn(new ExtensionMethod(CustomBar.class, CustomBar.class.getMethod("find", String.class)));
-        assertThat(timedAnnotationNameStrategy.getStatementName(ctx)).isEqualTo("custom-bar.find-by-id");
+        assertThat(timedAnnotationNameStrategy.getStatementName(ctx)).isEqualTo(MetricName.build("custom-bar.find-by-id"));
     }
 
     @Test

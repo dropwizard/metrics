@@ -1,5 +1,6 @@
 package com.codahale.metrics.jetty9;
 
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
@@ -61,37 +62,38 @@ public class InstrumentedHandlerTest {
         assertThat(response.getStatus())
             .isEqualTo(404);
 
+        final MetricName prefix = MetricRegistry.name(TestHandler.class, "handler");
+
         assertThat(registry.getNames())
             .containsOnly(
-                MetricRegistry.name(TestHandler.class, "handler.1xx-responses"),
-                MetricRegistry.name(TestHandler.class, "handler.2xx-responses"),
-                MetricRegistry.name(TestHandler.class, "handler.3xx-responses"),
-                MetricRegistry.name(TestHandler.class, "handler.4xx-responses"),
-                MetricRegistry.name(TestHandler.class, "handler.5xx-responses"),
-                MetricRegistry.name(TestHandler.class, "handler.percent-4xx-1m"),
-                MetricRegistry.name(TestHandler.class, "handler.percent-4xx-5m"),
-                MetricRegistry.name(TestHandler.class, "handler.percent-4xx-15m"),
-                MetricRegistry.name(TestHandler.class, "handler.percent-5xx-1m"),
-                MetricRegistry.name(TestHandler.class, "handler.percent-5xx-5m"),
-                MetricRegistry.name(TestHandler.class, "handler.percent-5xx-15m"),
-                MetricRegistry.name(TestHandler.class, "handler.requests"),
-                MetricRegistry.name(TestHandler.class, "handler.active-suspended"),
-                MetricRegistry.name(TestHandler.class, "handler.async-dispatches"),
-                MetricRegistry.name(TestHandler.class, "handler.async-timeouts"),
-                MetricRegistry.name(TestHandler.class, "handler.get-requests"),
-                MetricRegistry.name(TestHandler.class, "handler.put-requests"),
-                MetricRegistry.name(TestHandler.class, "handler.active-dispatches"),
-                MetricRegistry.name(TestHandler.class, "handler.trace-requests"),
-                MetricRegistry.name(TestHandler.class, "handler.other-requests"),
-                MetricRegistry.name(TestHandler.class, "handler.connect-requests"),
-                MetricRegistry.name(TestHandler.class, "handler.dispatches"),
-                MetricRegistry.name(TestHandler.class, "handler.head-requests"),
-                MetricRegistry.name(TestHandler.class, "handler.post-requests"),
-                MetricRegistry.name(TestHandler.class, "handler.options-requests"),
-                MetricRegistry.name(TestHandler.class, "handler.active-requests"),
-                MetricRegistry.name(TestHandler.class, "handler.delete-requests"),
-                MetricRegistry.name(TestHandler.class, "handler.move-requests")
-            );
+                    prefix.resolve("1xx-responses"),
+                    prefix.resolve("2xx-responses"),
+                    prefix.resolve("3xx-responses"),
+                    prefix.resolve("4xx-responses"),
+                    prefix.resolve("5xx-responses"),
+                    prefix.resolve("percent-4xx-1m"),
+                    prefix.resolve("percent-4xx-5m"),
+                    prefix.resolve("percent-4xx-15m"),
+                    prefix.resolve("percent-5xx-1m"),
+                    prefix.resolve("percent-5xx-5m"),
+                    prefix.resolve("percent-5xx-15m"),
+                    prefix.resolve("requests"),
+                    prefix.resolve("active-suspended"),
+                    prefix.resolve("async-dispatches"),
+                    prefix.resolve("async-timeouts"),
+                    prefix.resolve("get-requests"),
+                    prefix.resolve("put-requests"),
+                    prefix.resolve("active-dispatches"),
+                    prefix.resolve("trace-requests"),
+                    prefix.resolve("other-requests"),
+                    prefix.resolve("connect-requests"),
+                    prefix.resolve("dispatches"),
+                    prefix.resolve("head-requests"),
+                    prefix.resolve("post-requests"),
+                    prefix.resolve("options-requests"),
+                    prefix.resolve("active-requests"),
+                    prefix.resolve("delete-requests"),
+                    prefix.resolve("move-requests"));
     }
 
 
@@ -118,14 +120,14 @@ public class InstrumentedHandlerTest {
     }
 
     private void assertResponseTimesValid() {
-        assertThat(registry.getMeters().get(metricName() + ".2xx-responses")
+        assertThat(registry.getMeters().get(metricName().resolve("2xx-responses"))
             .getCount()).isGreaterThan(0L);
 
 
-        assertThat(registry.getTimers().get(metricName() + ".get-requests")
+        assertThat(registry.getTimers().get(metricName().resolve("get-requests"))
             .getSnapshot().getMedian()).isGreaterThan(0.0).isLessThan(TimeUnit.SECONDS.toNanos(1));
 
-        assertThat(registry.getTimers().get(metricName() + ".requests")
+        assertThat(registry.getTimers().get(metricName().resolve("requests"))
             .getSnapshot().getMedian()).isGreaterThan(0.0).isLessThan(TimeUnit.SECONDS.toNanos(1));
     }
 
@@ -133,7 +135,7 @@ public class InstrumentedHandlerTest {
         return "http://localhost:" + connector.getLocalPort() + path;
     }
 
-    private String metricName() {
+    private MetricName metricName() {
         return MetricRegistry.name(TestHandler.class.getName(), "handler");
     }
 

@@ -1,6 +1,8 @@
 package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricName;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,13 +26,13 @@ public class ClassLoadingGaugeSetTest {
 
     @Test
     public void loadedGauge() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("loaded");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(MetricName.build("loaded"));
         assertThat(gauge.getValue()).isEqualTo(2L);
     }
 
     @Test
     public void unLoadedGauge() {
-        final Gauge gauge = (Gauge) gauges.getMetrics().get("unloaded");
+        final Gauge gauge = (Gauge) gauges.getMetrics().get(MetricName.build("unloaded"));
         assertThat(gauge.getValue()).isEqualTo(1L);
     }
 

@@ -1,5 +1,6 @@
 package com.codahale.metrics.httpasyncclient;
 
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.httpclient.HttpClientMetricNameStrategies;
@@ -44,7 +45,8 @@ public class InstrumentedNHttpClientBuilder extends HttpAsyncClientBuilder {
     }
 
     private Timer timer(HttpRequest request) {
-        return metricRegistry.timer(metricNameStrategy.getNameFor(name, request));
+        MetricName nameFor = metricNameStrategy.getNameFor(name, request);
+        return metricRegistry.timer(nameFor);
     }
 
     @Override

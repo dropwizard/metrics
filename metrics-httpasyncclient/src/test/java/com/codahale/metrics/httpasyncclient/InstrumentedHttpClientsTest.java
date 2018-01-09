@@ -1,5 +1,6 @@
 package com.codahale.metrics.httpasyncclient;
 
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricRegistryListener;
 import com.codahale.metrics.Timer;
@@ -37,7 +38,7 @@ public class InstrumentedHttpClientsTest extends HttpClientTestBase {
     public void registersExpectedMetricsGivenNameStrategy() throws Exception {
         HttpHost host = startServerWithGlobalRequestHandler(STATUS_OK);
         final HttpGet get = new HttpGet("/q=anything");
-        final String metricName = MetricRegistry.name("some.made.up.metric.name");
+        final MetricName metricName = MetricName.build("some.made.up.metric.name");
 
         when(metricNameStrategy.getNameFor(any(), any(HttpRequest.class)))
                 .thenReturn(metricName);

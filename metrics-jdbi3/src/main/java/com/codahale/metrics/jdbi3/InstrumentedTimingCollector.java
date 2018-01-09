@@ -1,5 +1,6 @@
 package com.codahale.metrics.jdbi3;
 
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.jdbi3.strategies.SmartNameStrategy;
 import com.codahale.metrics.jdbi3.strategies.StatementNameStrategy;
@@ -29,7 +30,7 @@ public class InstrumentedTimingCollector implements TimingCollector {
 
     @Override
     public void collect(long elapsedTime, StatementContext ctx) {
-        String statementName = statementNameStrategy.getStatementName(ctx);
+        MetricName statementName = statementNameStrategy.getStatementName(ctx);
         if (statementName != null) {
             registry.timer(statementName).update(elapsedTime, TimeUnit.NANOSECONDS);
         }

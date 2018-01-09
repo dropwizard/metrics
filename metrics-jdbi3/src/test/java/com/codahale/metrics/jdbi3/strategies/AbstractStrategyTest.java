@@ -1,5 +1,6 @@
 package com.codahale.metrics.jdbi3.strategies;
 
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.junit.Before;
@@ -17,7 +18,7 @@ public class AbstractStrategyTest {
         when(ctx.getRawSql()).thenReturn("SELECT 1");
     }
 
-    long getTimerMaxValue(String name) {
+    long getTimerMaxValue(MetricName name) {
         return registry.timer(name).getSnapshot().getMax();
     }
 }

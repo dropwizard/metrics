@@ -3,6 +3,7 @@ package com.codahale.metrics.jersey2;
 import com.codahale.metrics.Clock;
 import com.codahale.metrics.ExponentiallyDecayingReservoir;
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.ExceptionMetered;
@@ -95,7 +96,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         public ExceptionMeterMetric(final MetricRegistry registry,
                                     final ResourceMethod method,
                                     final ExceptionMetered exceptionMetered) {
-            final String name = chooseName(exceptionMetered.name(),
+            final MetricName name = chooseName(exceptionMetered.name(),
                     exceptionMetered.absolute(), method, ExceptionMetered.DEFAULT_NAME_SUFFIX);
             this.meter = registry.meter(name);
             this.cause = exceptionMetered.cause();
@@ -113,13 +114,13 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         public ResponseMeterMetric(final MetricRegistry registry,
                                    final ResourceMethod method,
                                    final ResponseMetered responseMetered) {
-            final String metricName = chooseName(responseMetered.name(), responseMetered.absolute(), method);
+            final MetricName metricName = chooseName(responseMetered.name(), responseMetered.absolute(), method);
             this.meters = Collections.unmodifiableList(Arrays.asList(
-                    registry.meter(name(metricName, "1xx-responses")), // 1xx
-                    registry.meter(name(metricName, "2xx-responses")), // 2xx
-                    registry.meter(name(metricName, "3xx-responses")), // 3xx
-                    registry.meter(name(metricName, "4xx-responses")), // 4xx
-                    registry.meter(name(metricName, "5xx-responses"))  // 5xx
+                    registry.meter(metricName.resolve("1xx-responses")), // 1xx
+                    registry.meter(metricName.resolve("2xx-responses")), // 2xx
+                    registry.meter(metricName.resolve("3xx-responses")), // 3xx
+                    registry.meter(metricName.resolve("4xx-responses")), // 4xx
+                    registry.meter(metricName.resolve("5xx-responses"))  // 5xx
             ));
         }
     }
@@ -424,27 +425,30 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                               final ResourceMethod method,
                               final Timed timed,
                               final String... suffixes) {
-        final String name = chooseName(timed.name(), timed.absolute(), method, suffixes);
+        final MetricName name = chooseName(timed.name(), timed.absolute(), method, suffixes);
         return registry.timer(name, () -> new Timer(new ExponentiallyDecayingReservoir(), clock));
     }
 
     private Meter meterMetric(final MetricRegistry registry,
                               final ResourceMethod method,
                               final Metered metered) {
-        final String name = chooseName(metered.name(), metered.absolute(), method);
+        final MetricName name = chooseName(metered.name(), metered.absolute(), method);
         return registry.meter(name, () -> new Meter(clock));
     }
 
-    protected static String chooseName(final String explicitName, final boolean absolute, final ResourceMethod method,
+    protected static MetricName chooseName(final String explicitName, final boolean absolute, final ResourceMethod method,
                                        final String... suffixes) {
         final Method definitionMethod = method.getInvocable().getDefinitionMethod();
-        final String metricName;
+        MetricName metricName;
         if (explicitName != null && !explicitName.isEmpty()) {
-            metricName = absolute ? explicitName : name(definitionMethod.getDeclaringClass(), explicitName);
+            metricName = absolute ? name(explicitName) : name(definitionMethod.getDeclaringClass(), explicitName);
         } else {
             metricName = name(definitionMethod.getDeclaringClass(), definitionMethod.getName());
         }
-        return name(metricName, suffixes);
+        for (String suffix : suffixes) {
+            metricName = metricName.resolve(suffix);
+        }
+        return metricName;
     }
 
     private static class EventTypeAndMethod {

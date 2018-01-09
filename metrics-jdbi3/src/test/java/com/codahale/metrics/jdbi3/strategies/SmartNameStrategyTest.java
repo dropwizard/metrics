@@ -1,5 +1,6 @@
 package com.codahale.metrics.jdbi3.strategies;
 
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.jdbi3.InstrumentedTimingCollector;
 import org.jdbi.v3.core.extension.ExtensionMethod;
 import org.junit.Before;
@@ -30,7 +31,7 @@ public class SmartNameStrategyTest extends AbstractStrategyTest {
 
         collector.collect(TimeUnit.SECONDS.toNanos(1), ctx);
 
-        String name = smartNameStrategy.getStatementName(ctx);
+        MetricName name = smartNameStrategy.getStatementName(ctx);
         assertThat(name).isEqualTo(name(getClass(), "updatesTimerForSqlObjects"));
         assertThat(getTimerMaxValue(name)).isEqualTo(1000000000);
     }
@@ -39,7 +40,7 @@ public class SmartNameStrategyTest extends AbstractStrategyTest {
     public void updatesTimerForRawSql() throws Exception {
         collector.collect(TimeUnit.SECONDS.toNanos(2), ctx);
 
-        String name = smartNameStrategy.getStatementName(ctx);
+        MetricName name = smartNameStrategy.getStatementName(ctx);
         assertThat(name).isEqualTo(name("sql", "raw"));
         assertThat(getTimerMaxValue(name)).isEqualTo(2000000000);
     }
@@ -50,7 +51,7 @@ public class SmartNameStrategyTest extends AbstractStrategyTest {
 
         collector.collect(TimeUnit.SECONDS.toNanos(2), ctx);
 
-        String name = smartNameStrategy.getStatementName(ctx);
+        MetricName name = smartNameStrategy.getStatementName(ctx);
         assertThat(name).isEqualTo(name("sql", "empty"));
         assertThat(getTimerMaxValue(name)).isEqualTo(2000000000);
     }
@@ -61,7 +62,7 @@ public class SmartNameStrategyTest extends AbstractStrategyTest {
                 getClass().getMethod("updatesTimerForContextClass")));
         collector.collect(TimeUnit.SECONDS.toNanos(3), ctx);
 
-        String name = smartNameStrategy.getStatementName(ctx);
+        MetricName name = smartNameStrategy.getStatementName(ctx);
         assertThat(name).isEqualTo(name(getClass(), "updatesTimerForContextClass"));
         assertThat(getTimerMaxValue(name)).isEqualTo(3000000000L);
     }

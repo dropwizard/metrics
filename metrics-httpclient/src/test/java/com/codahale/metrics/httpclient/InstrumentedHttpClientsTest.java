@@ -1,5 +1,6 @@
 package com.codahale.metrics.httpclient;
 
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricRegistryListener;
 import com.codahale.metrics.Timer;
@@ -39,7 +40,7 @@ public class InstrumentedHttpClientsTest {
     @Test
     public void registersExpectedMetricsGivenNameStrategy() throws Exception {
         final HttpGet get = new HttpGet("http://example.com?q=anything");
-        final String metricName = "some.made.up.metric.name";
+        final MetricName metricName = MetricName.build("some.made.up.metric.name");
 
         when(metricNameStrategy.getNameFor(any(), any(HttpRequest.class)))
                 .thenReturn(metricName);
@@ -54,8 +55,8 @@ public class InstrumentedHttpClientsTest {
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(0), 0);
 
         final HttpGet get = new HttpGet("http://localhost:" + httpServer.getAddress().getPort() + "/");
-        final String requestMetricName = "request";
-        final String exceptionMetricName = "exception";
+        final MetricName requestMetricName = MetricName.build("request");
+        final MetricName exceptionMetricName = MetricName.build("exception");
 
         httpServer.createContext("/", HttpExchange::close);
         httpServer.start();
@@ -69,7 +70,7 @@ public class InstrumentedHttpClientsTest {
             client.execute(get);
             fail();
         } catch (NoHttpResponseException expected) {
-            assertThat(metricRegistry.getMeters()).containsKey("exception");
+            assertThat(metricRegistry.getMeters()).containsKey(MetricName.build("exception"));
         } finally {
             httpServer.stop(0);
         }

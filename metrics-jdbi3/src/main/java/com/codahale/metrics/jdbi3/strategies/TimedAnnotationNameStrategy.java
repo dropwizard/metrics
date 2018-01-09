@@ -1,5 +1,6 @@
 package com.codahale.metrics.jdbi3.strategies;
 
+import com.codahale.metrics.MetricName;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import org.jdbi.v3.core.extension.ExtensionMethod;
@@ -13,7 +14,7 @@ import java.lang.reflect.Method;
 public class TimedAnnotationNameStrategy implements StatementNameStrategy {
 
     @Override
-    public String getStatementName(StatementContext statementContext) {
+    public MetricName getStatementName(StatementContext statementContext) {
         final ExtensionMethod extensionMethod = statementContext.getExtensionMethod();
         if (extensionMethod == null) {
             return null;
@@ -28,7 +29,7 @@ public class TimedAnnotationNameStrategy implements StatementNameStrategy {
         if (methodTimed != null) {
             String methodName = methodTimed.name().isEmpty() ? method.getName() : methodTimed.name();
             if (methodTimed.absolute()) {
-                return methodName;
+                return MetricName.build(methodName);
             } else {
                 // We need to check if the class has a custom timer name
                 return classTimed == null || classTimed.name().isEmpty() ?
