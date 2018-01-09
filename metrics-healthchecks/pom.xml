@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.dropwizard.metrics</groupId>
+        <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
         <version>5.0.0</version>
     </parent>
@@ -19,7 +19,7 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.dropwizard.metrics</groupId>
+                <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-bom</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
@@ -30,7 +30,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
+            <groupId>io.dropwizard.metrics5</groupId>
             <artifactId>metrics-jvm</artifactId>
             <optional>true</optional>
         </dependency>
