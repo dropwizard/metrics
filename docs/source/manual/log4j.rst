@@ -39,7 +39,7 @@ You can also use standard log4j2 configuration, via plugin support:
 .. code-block:: xml
 
     <?xml version="1.0" encoding="UTF-8"?>
-    <Configuration status="INFO" name="log4j2-config" packages="com.codahale.metrics.log4j2">
+    <Configuration status="INFO" name="log4j2-config" packages="io.dropwizard.metrics5.log4j2">
     <Appenders>
         <MetricsAppender name="metrics" registryName="shared-metrics-registry"/>
     </Appenders>

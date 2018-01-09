@@ -80,7 +80,7 @@ So the complete Getting Started is
 .. code-block:: java
     
     package sample;
-    import com.codahale.metrics.*;
+    import io.dropwizard.metrics5.*;
     import java.util.concurrent.TimeUnit;
 
     public class GetStarted {

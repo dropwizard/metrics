@@ -1,10 +1,9 @@
-import com.codahale.metrics.MetricName;
+import io.dropwizard.metrics5.MetricName;
+import io.dropwizard.metrics5.MetricRegistry;
+import io.dropwizard.metrics5.jcache.JCacheGaugeSet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.jcache.JCacheGaugeSet;
 
 import javax.cache.Cache;
 import javax.cache.CacheManager;
