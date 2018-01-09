@@ -242,12 +242,13 @@ public class Slf4jReporter extends ScheduledReporter {
     private void logTimer(MetricName name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
         loggerProxy.log(marker,
-                "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, " +
+                "type={}, name={}, count={}, sum={}, min={}, max={}, mean={}, stddev={}, median={}, " +
                         "p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, " +
                         "m15={}, rate_unit={}, duration_unit={}",
                 "TIMER",
                 prefix(name),
                 timer.getCount(),
+                timer.getSum(),
                 convertDuration(snapshot.getMin()),
                 convertDuration(snapshot.getMax()),
                 convertDuration(snapshot.getMean()),
@@ -268,10 +269,11 @@ public class Slf4jReporter extends ScheduledReporter {
 
     private void logMeter(MetricName name, Meter meter) {
         loggerProxy.log(marker,
-                "type={}, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
+                "type={}, name={}, count={}, sum={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
                 "METER",
                 prefix(name),
                 meter.getCount(),
+                meter.getSum(),
                 convertRate(meter.getMeanRate()),
                 convertRate(meter.getOneMinuteRate()),
                 convertRate(meter.getFiveMinuteRate()),
@@ -282,11 +284,12 @@ public class Slf4jReporter extends ScheduledReporter {
     private void logHistogram(MetricName name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
         loggerProxy.log(marker,
-                "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, " +
+                "type={}, name={}, count={}, sum={}, min={}, max={}, mean={}, stddev={}, " +
                         "median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
                 "HISTOGRAM",
                 prefix(name),
                 histogram.getCount(),
+                histogram.getSum(),
                 snapshot.getMin(),
                 snapshot.getMax(),
                 snapshot.getMean(),

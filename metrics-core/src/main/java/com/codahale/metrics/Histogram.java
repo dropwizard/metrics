@@ -8,9 +8,10 @@ import java.util.concurrent.atomic.LongAdder;
  * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately computing running
  * variance</a>
  */
-public class Histogram implements Metric, Sampling, Counting {
+public class Histogram implements Metric, Sampling, Counting, Summing {
     private final Reservoir reservoir;
     private final LongAdder count;
+    private final LongAdder sum;
 
     /**
      * Creates a new {@link Histogram} with the given reservoir.
@@ -20,6 +21,7 @@ public class Histogram implements Metric, Sampling, Counting {
     public Histogram(Reservoir reservoir) {
         this.reservoir = reservoir;
         this.count = new LongAdder();
+        this.sum = new LongAdder();
     }
 
     /**
@@ -38,6 +40,7 @@ public class Histogram implements Metric, Sampling, Counting {
      */
     public void update(long value) {
         count.increment();
+        sum.add(value);
         reservoir.update(value);
     }
 
@@ -49,6 +52,16 @@ public class Histogram implements Metric, Sampling, Counting {
     @Override
     public long getCount() {
         return count.sum();
+    }
+
+    /**
+     * Returns the sum of values recorded.
+     *
+     * @return the sum of values recorded
+     */
+    @Override
+    public long getSum() {
+        return sum.sum();
     }
 
     @Override

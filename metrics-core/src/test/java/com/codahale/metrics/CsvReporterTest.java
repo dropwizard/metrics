@@ -83,6 +83,7 @@ public class CsvReporterTest {
     public void reportsHistogramValues() throws Exception {
         final Histogram histogram = mock(Histogram.class);
         when(histogram.getCount()).thenReturn(1L);
+        when(histogram.getSum()).thenReturn(12L);
 
         final Snapshot snapshot = mock(Snapshot.class);
         when(snapshot.getMax()).thenReturn(2L);
@@ -106,8 +107,8 @@ public class CsvReporterTest {
 
         assertThat(fileContents("test.histogram.csv"))
                 .isEqualTo(csv(
-                        "t,count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999",
-                        "19910191,1,2,3.000000,4,5.000000,6.000000,7.000000,8.000000,9.000000,10.000000,11.000000"
+                        "t,count,sum,max,mean,min,stddev,p50,p75,p95,p98,p99,p999",
+                        "19910191,1,12,2,3.000000,4,5.000000,6.000000,7.000000,8.000000,9.000000,10.000000,11.000000"
                 ));
     }
 
@@ -123,8 +124,8 @@ public class CsvReporterTest {
 
         assertThat(fileContents("test.meter.csv"))
                 .isEqualTo(csv(
-                        "t,count,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit",
-                        "19910191,1,2.000000,3.000000,4.000000,5.000000,events/second"
+                        "t,count,sum,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit",
+                        "19910191,1,6,2.000000,3.000000,4.000000,5.000000,events/second"
                 ));
     }
 
@@ -132,6 +133,7 @@ public class CsvReporterTest {
     public void reportsTimerValues() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
+        when(timer.getSum()).thenReturn(6L);
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
         when(timer.getFiveMinuteRate()).thenReturn(4.0);
@@ -159,8 +161,8 @@ public class CsvReporterTest {
 
         assertThat(fileContents("test.another.timer.csv"))
                 .isEqualTo(csv(
-                        "t,count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
-                        "19910191,1,100.000000,200.000000,300.000000,400.000000,500.000000,600.000000,700.000000,800.000000,900.000000,1000.000000,2.000000,3.000000,4.000000,5.000000,calls/second,milliseconds"
+                        "t,count,sum,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
+                        "19910191,1,6,100.000000,200.000000,300.000000,400.000000,500.000000,600.000000,700.000000,800.000000,900.000000,1000.000000,2.000000,3.000000,4.000000,5.000000,calls/second,milliseconds"
                 ));
     }
 
@@ -205,14 +207,15 @@ public class CsvReporterTest {
 
         assertThat(fileContents("test.meter.csv"))
                 .isEqualTo(csv(
-                        "t,count,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit",
-                        "19910191|1|2.000000|3.000000|4.000000|5.000000|events/second"
+                        "t,count,sum,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit",
+                        "19910191|1|6|2.000000|3.000000|4.000000|5.000000|events/second"
                 ));
     }
 
     private Meter mockMeter() {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
+        when(meter.getSum()).thenReturn(6L);
         when(meter.getMeanRate()).thenReturn(2.0);
         when(meter.getOneMinuteRate()).thenReturn(3.0);
         when(meter.getFiveMinuteRate()).thenReturn(4.0);

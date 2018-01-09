@@ -210,9 +210,9 @@ public class CsvReporter extends ScheduledReporter {
         this.clock = clock;
         this.csvFileProvider = csvFileProvider;
 
-        this.histogramFormat = String.join(separator, "%d", "%d", "%f", "%d", "%f", "%f", "%f", "%f", "%f", "%f", "%f");
-        this.meterFormat = String.join(separator, "%d", "%f", "%f", "%f", "%f", "events/%s");
-        this.timerFormat = String.join(separator, "%d", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "calls/%s", "%s");
+        this.histogramFormat = String.join(separator, "%d", "%d", "%d", "%f", "%d", "%f", "%f", "%f", "%f", "%f", "%f", "%f");
+        this.meterFormat = String.join(separator, "%d", "%d", "%f", "%f", "%f", "%f", "events/%s");
+        this.timerFormat = String.join(separator, "%d", "%d", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "calls/%s", "%s");
     }
 
     @Override
@@ -250,9 +250,10 @@ public class CsvReporter extends ScheduledReporter {
 
         report(timestamp,
                 name,
-                "count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
+                "count,sum,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
                 timerFormat,
                 timer.getCount(),
+                timer.getSum(),
                 convertDuration(snapshot.getMax()),
                 convertDuration(snapshot.getMean()),
                 convertDuration(snapshot.getMin()),
@@ -274,9 +275,10 @@ public class CsvReporter extends ScheduledReporter {
     private void reportMeter(long timestamp, MetricName name, Meter meter) {
         report(timestamp,
                 name,
-                "count,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit",
+                "count,sum,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit",
                 meterFormat,
                 meter.getCount(),
+                meter.getSum(),
                 convertRate(meter.getMeanRate()),
                 convertRate(meter.getOneMinuteRate()),
                 convertRate(meter.getFiveMinuteRate()),
@@ -289,9 +291,10 @@ public class CsvReporter extends ScheduledReporter {
 
         report(timestamp,
                 name,
-                "count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999",
+                "count,sum,max,mean,min,stddev,p50,p75,p95,p98,p99,p999",
                 histogramFormat,
                 histogram.getCount(),
+                histogram.getSum(),
                 snapshot.getMax(),
                 snapshot.getMean(),
                 snapshot.getMin(),

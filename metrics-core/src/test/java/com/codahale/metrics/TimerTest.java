@@ -30,6 +30,9 @@ public class TimerTest {
         assertThat(timer.getCount())
                 .isZero();
 
+        assertThat(timer.getSum())
+                .isZero();
+
         assertThat(timer.getMeanRate())
                 .isEqualTo(0.0, offset(0.001));
 
@@ -44,14 +47,19 @@ public class TimerTest {
     }
 
     @Test
-    public void updatesTheCountOnUpdates() {
+    public void updatesTheCountAndSumOnUpdates() {
         assertThat(timer.getCount())
+                .isZero();
+        assertThat(timer.getSum())
                 .isZero();
 
         timer.update(1, TimeUnit.SECONDS);
+        timer.update(5, TimeUnit.SECONDS);
 
         assertThat(timer.getCount())
-                .isEqualTo(1);
+                .isEqualTo(2);
+        assertThat(timer.getSum())
+                .isEqualTo(6000000000L);
     }
 
     @Test
@@ -60,6 +68,8 @@ public class TimerTest {
 
         assertThat(timer.getCount())
                 .isEqualTo(1);
+        assertThat(timer.getSum())
+                .isEqualTo(50000000);
 
         assertThat(value)
                 .isEqualTo("one");
@@ -87,6 +97,8 @@ public class TimerTest {
 
         assertThat(timer.getCount())
                 .isEqualTo(1);
+        assertThat(timer.getSum())
+                .isEqualTo(50000000);
 
         assertThat(called.get())
                 .isTrue();
@@ -100,6 +112,8 @@ public class TimerTest {
 
         assertThat(timer.getCount())
                 .isEqualTo(1);
+        assertThat(timer.getSum())
+                .isEqualTo(50000000);
 
         verify(reservoir).update(50000000);
     }
@@ -119,6 +133,8 @@ public class TimerTest {
 
         assertThat(timer.getCount())
                 .isZero();
+        assertThat(timer.getSum())
+                .isZero();
 
         verifyZeroInteractions(reservoir);
     }
@@ -126,6 +142,7 @@ public class TimerTest {
     @Test
     public void tryWithResourcesWork() {
         assertThat(timer.getCount()).isZero();
+        assertThat(timer.getSum()).isZero();
 
         int dummy = 0;
         try (Timer.Context context = timer.time()) {
@@ -135,6 +152,8 @@ public class TimerTest {
         assertThat(dummy).isEqualTo(1);
         assertThat(timer.getCount())
                 .isEqualTo(1);
+        assertThat(timer.getSum())
+                .isEqualTo(50000000);
 
         verify(reservoir).update(50000000);
     }
