@@ -236,7 +236,7 @@ public class InstrumentedScheduledExecutorServiceTest {
         TimeUnit.MILLISECONDS.sleep(100); // Give some time for the task to be run
         countDownLatch.await(5, TimeUnit.SECONDS); // Don't cancel until it didn't complete once
         theFuture.cancel(true);
-        TimeUnit.MILLISECONDS.sleep(100);         // Wait while the task is cancelled
+        TimeUnit.MILLISECONDS.sleep(200);         // Wait while the task is cancelled
 
         assertThat(submitted.getCount()).isZero();
 
@@ -284,7 +284,7 @@ public class InstrumentedScheduledExecutorServiceTest {
         TimeUnit.MILLISECONDS.sleep(100);
         countDownLatch.await(5, TimeUnit.SECONDS);
         theFuture.cancel(true);
-        TimeUnit.MILLISECONDS.sleep(100);
+        TimeUnit.MILLISECONDS.sleep(200);
 
         assertThat(submitted.getCount()).isZero();
 

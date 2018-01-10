@@ -343,7 +343,20 @@ built-in thread deadlock detection to determine if any threads are deadlocked.
 Reporting Via JMX
 =================
 
-To report metrics via JMX:
+To report metrics via JMX, include the ``metrics-jmx`` module as a dependency:
+
+.. code-block:: xml
+
+    <dependency>
+        <groupId>io.dropwizard.metrics</groupId>
+        <artifactId>metrics-jmx</artifactId>
+        <version>${metrics.version}</version>
+    </dependency>
+
+.. note::
+
+    Make sure you have a ``metrics.version`` property declared in your POM with the current version,
+    which is |release|.
 
 .. code-block:: java
 
@@ -399,5 +412,4 @@ In addition to JMX and HTTP, Metrics also has reporters for the following output
 * ``STDOUT``, using :ref:`ConsoleReporter <man-core-reporters-console>` from ``metrics-core``
 * ``CSV`` files, using :ref:`CsvReporter <man-core-reporters-csv>` from ``metrics-core``
 * SLF4J loggers, using :ref:`Slf4jReporter <man-core-reporters-slf4j>` from ``metrics-core``
-* Ganglia, using :ref:`GangliaReporter <manual-ganglia>` from ``metrics-ganglia``
 * Graphite, using :ref:`GraphiteReporter <manual-graphite>` from ``metrics-graphite``

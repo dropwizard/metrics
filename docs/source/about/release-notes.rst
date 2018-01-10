@@ -4,6 +4,55 @@
 Release Notes
 #############
 
+
+.. _rel-4.0.0:
+
+v4.0.0: Dec 24 2017
+===================
+
+* Compiled and targeted JDK8
+* Support for running under JDK9 `#1236 <https://github.com/dropwizard/metrics/pull/1236>`_
+* Move JMX reporting to the ``metrics-jmx`` module
+* Add Bill of Materials for Metrics #1239 `#1239 <https://github.com/dropwizard/metrics/pull/1239>`_
+* Used Java 8 Time API for data formatting
+* Removed unnecessary reflection hacks for ``HealthCheckRegistry``
+* Removed internal ``LongAdder``
+* Removed internal ``ThreadLocalRandom``
+* Optimized generating random numbers
+* ``Timer.Context`` now implements ``AutoCloseable``
+* Upgrade Jetty integration to Jetty 9.4
+* Support tracking Jersey filters in Jersey resources `#1118 <https://github.com/dropwizard/metrics/pull/1239>`_
+* Add ``ResponseMetered`` annotation for Jersey resources `#1186 <https://github.com/dropwizard/metrics/pull/1186>`_
+* Add a method for timing non-throwing functions. `#1224 <https://github.com/dropwizard/metrics/pull/1224>`_
+* Unnecessary clear operation for ChunkedAssociativeArray `#1211 <https://github.com/dropwizard/metrics/pull/1211>`_
+* Add some common metric filters `#1210 <https://github.com/dropwizard/metrics/pull/1210>`_
+* Add possibility to subclass Timer.Context `#1226 <https://github.com/dropwizard/metrics/pull/1226>`_
+
+.. _rel-3.2.6:
+
+v3.2.6: Dec 24 2017
+===================
+
+* Jetty9: unhandled response should be counted as 404 and not 200 `#1232 <https://github.com/dropwizard/metrics/pull/1232>`_
+* Prevent NaN values when calculating mean `#1230 <https://github.com/dropwizard/metrics/pull/1230>`_
+* Avoid NaN values in WeightedSnapshot `#1233 <https://github.com/dropwizard/metrics/pull/1233>`_
+
+.. _rel-3.2.5:
+
+v3.2.5: Sep 15 2017
+===================
+
+* [InstrumentedScheduledExecutorService] Fix the scheduledFixedDelay to call the correct method `#1192 <https://github.com/dropwizard/metrics/pull/1192>`_
+
+.. _rel-3.2.4:
+
+v3.2.4: Aug 24 2017
+===================
+
+* Fix GraphiteReporter rate reporting `#1167 <https://github.com/dropwizard/metrics/pull/1167>`_
+* Remove non Jdk6 compatible letter from date pattern `#1163 <https://github.com/dropwizard/metrics/pull/1163>`_
+* Fix uncaught CancellationException when stopping reporter `#1170 <https://github.com/dropwizard/metrics/pull/1170>`_
+
 .. _rel-3.2.3:
 
 v3.2.3: Jun 28 2017

@@ -12,7 +12,7 @@ Metrics is a Java library which gives you unparalleled insight into what your co
 **in your production environment.**
 
 With modules for common libraries like **Jetty**, **Logback**, **Log4j**, **Apache HttpClient**,
-**Ehcache**, **JDBI**, **Jersey** and reporting backends like **Ganglia** and **Graphite**, Metrics
+**Ehcache**, **JDBI**, **Jersey** and reporting backends like **Graphite**, Metrics
 provides you with full-stack visibility.
 
 .. toctree::

@@ -14,7 +14,6 @@ User Manual
     core
     healthchecks
     ehcache
-    ganglia
     graphite
     httpclient
     jdbi
