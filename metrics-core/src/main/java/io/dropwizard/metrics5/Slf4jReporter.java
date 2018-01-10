@@ -311,7 +311,7 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     @Override
-    protected String getRateUnit() {
+    public String getRateUnit() {
         return "events/" + super.getRateUnit();
     }
 

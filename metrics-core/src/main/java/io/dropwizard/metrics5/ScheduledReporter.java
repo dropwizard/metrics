@@ -258,27 +258,27 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 SortedMap<MetricName, Meter> meters,
                                 SortedMap<MetricName, Timer> timers);
 
-    protected String getRateUnit() {
+    public String getRateUnit() {
         return rateUnit;
     }
 
-    protected String getDurationUnit() {
+    public String getDurationUnit() {
         return durationUnit;
     }
 
-    protected double convertDuration(double duration) {
+    public double convertDuration(double duration) {
         return duration / durationFactor;
     }
 
-    protected double convertRate(double rate) {
+    public double convertRate(double rate) {
         return rate * rateFactor;
     }
 
-    protected boolean isShutdownExecutorOnStop() {
+    public boolean isShutdownExecutorOnStop() {
         return shutdownExecutorOnStop;
     }
 
-    protected Set<MetricAttribute> getDisabledMetricAttributes() {
+    public Set<MetricAttribute> getDisabledMetricAttributes() {
         return disabledMetricAttributes;
     }
 

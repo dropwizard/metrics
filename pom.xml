@@ -37,6 +37,8 @@
         <module>metrics-servlets</module>
         <module>metrics-jcstress</module>
         <module>metrics-jmx</module>
+        <module>metrics-legacy-adapter</module>
+        <module>metrics-legacy-adapter-healthchecks</module>
     </modules>
 
     <properties>
