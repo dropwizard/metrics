@@ -21,7 +21,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class MetricsModule extends Module {
-    static final Version VERSION = new Version(4, 0, 0, "", "io.dropwizard.metrics", "metrics-json");
+    static final Version VERSION = new Version(5, 0, 0, "", "io.dropwizard.metrics5", "metrics-json");
 
     @SuppressWarnings("rawtypes")
     private static class GaugeSerializer extends StdSerializer<Gauge> {
