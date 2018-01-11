@@ -14,6 +14,7 @@ User Manual
     core
     healthchecks
     ehcache
+    collectd
     graphite
     httpclient
     jdbi
