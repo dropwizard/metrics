@@ -16,6 +16,10 @@
         durations and rates, and other useful information.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.httpasyncclient</javaModuleName>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

@@ -15,6 +15,10 @@
         A JDBI wrapper providing Metrics instrumentation of query durations and rates.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.jdbi</javaModuleName>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

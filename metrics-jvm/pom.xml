@@ -16,6 +16,10 @@
         using Metrics.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.jvm</javaModuleName>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

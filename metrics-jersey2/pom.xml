@@ -16,6 +16,10 @@
         implementation.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.jersey2</javaModuleName>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

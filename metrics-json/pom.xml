@@ -15,6 +15,10 @@
         A set of Jackson modules which provide serializers for most Metrics classes.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.json</javaModuleName>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

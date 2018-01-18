@@ -16,4 +16,8 @@
         production. Metrics provides a powerful toolkit of ways to measure the behavior of critical
         components in your production environment.
     </description>
+
+    <properties>
+        <javaModuleName>com.codahale.metrics</javaModuleName>
+    </properties>
 </project>

@@ -15,6 +15,10 @@
         A reporter for Metrics which announces measurements to Collectd.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.collectd</javaModuleName>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
