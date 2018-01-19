@@ -16,6 +16,10 @@
         Uses the CacheStatisticsMXBean provided statistics.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.jcache</javaModuleName>
+    </properties>
+
     <profiles>
         <profile>
             <id>jdk9</id>

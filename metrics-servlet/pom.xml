@@ -15,6 +15,10 @@
         An instrumented filter for servlet environments.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.servlet</javaModuleName>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

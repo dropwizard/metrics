@@ -15,6 +15,10 @@
         A reporter for Metrics which announces measurements to a Graphite server.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.graphite</javaModuleName>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

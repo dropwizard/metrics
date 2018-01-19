@@ -15,6 +15,10 @@
         An Ehcache wrapper providing Metrics instrumentation of caches.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.ehcache</javaModuleName>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
