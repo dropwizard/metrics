@@ -12,10 +12,10 @@ import java.util.concurrent.TimeUnit;
 
 public final class Receiver extends ExternalResource {
 
-    private int port;
+    private final int port;
+
     private UdpReceiver receiver;
-    private Thread receiverThread;
-    private BlockingQueue<ValueList> queue;
+    private BlockingQueue<ValueList> queue = new LinkedBlockingQueue<>();
 
     public Receiver(int port) {
         this.port = port;
@@ -23,21 +23,25 @@ public final class Receiver extends ExternalResource {
 
     @Override
     protected void before() throws Throwable {
-        queue = new LinkedBlockingQueue<ValueList>();
-        receiver = new UdpReceiver(new QueueDispatcher(queue));
-        receiver.setPort(port);
-        start();
-    }
+        receiver = new UdpReceiver(new Dispatcher() {
+            @Override
+            public void dispatch(ValueList values) {
+                queue.offer(new ValueList(values));
+            }
 
-    private void start() {
-        receiverThread = new Thread(() -> {
+            @Override
+            public void dispatch(Notification notification) {
+                throw new UnsupportedOperationException();
+            }
+        });
+        receiver.setPort(port);
+        new Thread(() -> {
             try {
                 receiver.listen();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
-        receiverThread.start();
+        }).start();
     }
 
     public ValueList next() throws InterruptedException {
@@ -46,29 +50,6 @@ public final class Receiver extends ExternalResource {
 
     @Override
     protected void after() {
-        stop();
-    }
-
-    private void stop() {
         receiver.shutdown();
-    }
-
-    class QueueDispatcher implements Dispatcher {
-
-        private final BlockingQueue<ValueList> queue;
-
-        QueueDispatcher(BlockingQueue<ValueList> queue) {
-            this.queue = queue;
-        }
-
-        @Override
-        public void dispatch(ValueList valueList) {
-            queue.offer(new ValueList(valueList));
-        }
-
-        @Override
-        public void dispatch(Notification notification) {
-            throw new UnsupportedOperationException();
-        }
     }
 }

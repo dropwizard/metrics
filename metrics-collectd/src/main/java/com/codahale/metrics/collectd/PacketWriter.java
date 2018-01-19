@@ -7,16 +7,16 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-final class PacketWriter {
+class PacketWriter {
 
-    private static final int TYPE_HOST            = 0;
-    private static final int TYPE_TIME            = 1;
-    private static final int TYPE_PLUGIN          = 2;
+    private static final int TYPE_HOST = 0;
+    private static final int TYPE_TIME = 1;
+    private static final int TYPE_PLUGIN = 2;
     private static final int TYPE_PLUGIN_INSTANCE = 3;
-    private static final int TYPE_TYPE            = 4;
-    private static final int TYPE_TYPE_INSTANCE   = 5;
-    private static final int TYPE_VALUES          = 6;
-    private static final int TYPE_INTERVAL        = 7;
+    private static final int TYPE_TYPE = 4;
+    private static final int TYPE_TYPE_INSTANCE = 5;
+    private static final int TYPE_VALUES = 6;
+    private static final int TYPE_INTERVAL = 7;
 
     private static final int UINT16_LEN = 2;
     private static final int UINT32_LEN = UINT16_LEN * 2;
@@ -25,6 +25,7 @@ final class PacketWriter {
     private static final int BUFFER_SIZE = 1024;
 
     private static final int VALUE_COUNT_LEN = UINT16_LEN;
+    private static final int NUMBER_LEN = HEADER_LEN + UINT64_LEN;
     private static final int VALUE_LEN = 9;
     private static final byte DATA_TYPE_GAUGE = (byte) 1;
     private static final byte NULL = (byte) '\0';
@@ -36,9 +37,10 @@ final class PacketWriter {
     }
 
     void write(MetaData metaData, Number... values) throws BufferOverflowException, IOException {
-        ByteBuffer packet = ByteBuffer.allocate(BUFFER_SIZE);
+        final ByteBuffer packet = ByteBuffer.allocate(BUFFER_SIZE);
         write(packet, metaData);
         write(packet, values);
+        packet.flip();
         sender.send(packet);
     }
 
@@ -59,8 +61,8 @@ final class PacketWriter {
         buffer.putShort((short) numValues);
         buffer.put(nCopies(numValues, DATA_TYPE_GAUGE));
         buffer.order(ByteOrder.LITTLE_ENDIAN);
-        for (int i = 0; i < numValues; i++) {
-            buffer.putDouble(values[i].doubleValue());
+        for (Number value : values) {
+            buffer.putDouble(value.doubleValue());
         }
         buffer.order(ByteOrder.BIG_ENDIAN);
     }
@@ -81,8 +83,7 @@ final class PacketWriter {
     }
 
     private void writeNumber(ByteBuffer buffer, int type, long val) {
-        int len = HEADER_LEN + UINT64_LEN;
-        writeHeader(buffer, type, len);
+        writeHeader(buffer, type, NUMBER_LEN);
         buffer.putLong(val);
     }
 

@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @see <a href="https://collectd.org/wiki/index.php/Naming_schema>Collectd naming schema</a>
  */
-final class Sanitize {
+class Sanitize {
 
     private static final int MAX_LENGTH = 63;
 
@@ -18,6 +18,9 @@ final class Sanitize {
     private static final List<Character> INSTANCE_RESERVED = Arrays.asList(SLASH, NULL);
     private static final List<Character> NAME_RESERVED = Arrays.asList(DASH, SLASH, NULL);
 
+    private Sanitize() {
+    }
+
     static String name(String name) {
         return sanitize(name, NAME_RESERVED);
     }
@@ -27,11 +30,11 @@ final class Sanitize {
     }
 
     private static String sanitize(String string, List<Character> reservedChars) {
-        StringBuilder buffer = new StringBuilder(string.length());
-        int len = Math.min(string.length(), MAX_LENGTH);
+        final StringBuilder buffer = new StringBuilder(string.length());
+        final int len = Math.min(string.length(), MAX_LENGTH);
         for (int i = 0; i < len; i++) {
-            char c = string.charAt(i);
-            boolean legal = ((int) c) < 128 && !reservedChars.contains(c);
+            final char c = string.charAt(i);
+            final boolean legal = ((int) c) < 128 && !reservedChars.contains(c);
             buffer.append(legal ? c : UNDERSCORE);
         }
         return buffer.toString();
