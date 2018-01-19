@@ -15,6 +15,10 @@
         An instrumented appender for Log4j 2.x.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.log4j2</javaModuleName>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

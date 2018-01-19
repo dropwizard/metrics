@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.dropwizard.metrics</groupId>
+        <artifactId>metrics-parent</artifactId>
+        <version>4.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>metrics-collectd</artifactId>
+    <name>Metrics Integration for Collectd</name>
+    <packaging>bundle</packaging>
+    <description>
+        A reporter for Metrics which announces measurements to Collectd.
+    </description>
+
+    <properties>
+        <javaModuleName>com.codahale.metrics.collectd</javaModuleName>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hardis.collectd</groupId>
+            <artifactId>jcollectd</artifactId>
+            <version>1.0.3</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

@@ -16,6 +16,10 @@
         your production environment.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.servlets</javaModuleName>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

@@ -8,6 +8,10 @@
         <version>5.0.0-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.annotation</javaModuleName>
+    </properties>
+
     <artifactId>metrics-annotation</artifactId>
     <name>Annotations for Metrics</name>
     <packaging>bundle</packaging>

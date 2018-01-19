@@ -16,6 +16,10 @@
         metrics, and application latency and utilization.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.jetty9</javaModuleName>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

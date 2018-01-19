@@ -17,7 +17,7 @@ public class ClockTest {
 
         assertThat((double) clock.getTick())
                 .isEqualTo(System.nanoTime(),
-                        offset(100000.0));
+                        offset(1000000.0));
     }
 
     @Test

@@ -16,6 +16,10 @@
         allowing you to check your application's heath in production.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.health</javaModuleName>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

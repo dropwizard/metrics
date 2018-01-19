@@ -9,6 +9,7 @@ Many, many thanks to:
 * `Alan Woodward <https://github.com/romseygeek>`_
 * `Alexander Reelsen <https://github.com/spinscale>`_
 * `Alex Lambert <https://github.com/alambert>`_
+* `Andrey Rodionov <https://github.com/dernasherbrezon>`_ 
 * `Anil V <https://github.com/avaitla>`_
 * `Anthony Dahanne <https://github.com/anthonydahanne>`_
 * `Antonin Stefanutti <https://github.com/astefanutti>`_
@@ -83,6 +84,7 @@ Many, many thanks to:
 * `John-John Tedro <https://github.com/udoprog>`_
 * `John Wang <https://github.com/javasoze>`_
 * `Jordan Focht <https://github.com/jfocht>`_
+* `Jörg Fischer <https://github.com/g-fresh>`_
 * `Juha Syrjälä <https://github.com/jsyrjala>`_
 * `Julio Lopez <https://github.com/julio-maginatics>`_
 * `Justin Plock <https://github.com/jplock>`_
