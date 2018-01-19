@@ -1,6 +1,16 @@
 package com.codahale.metrics.collectd;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.Clock;
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.ScheduledReporter;
+import com.codahale.metrics.Snapshot;
+import com.codahale.metrics.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,20 +24,20 @@ import java.util.concurrent.TimeUnit;
  * A reporter which publishes metric values to a Collectd server.
  *
  * @see <a href="https://collectd.org">collectd – The system statistics
- *      collection daemon</a>
+ * collection daemon</a>
  */
 public class CollectdReporter extends ScheduledReporter {
 
     /**
      * Returns a builder for the specified registry.
-     *
+     * <p>
      * The default settings are:
      * <ul>
-     *     <li>hostName: InetAddress.getLocalHost().getHostName()</li>
-     *     <li>clock: Clock.defaultClock()</li>
-     *     <li>rateUnit: TimeUnit.SECONDS</li>
-     *     <li>durationUnit: TimeUnit.MILLISECONDS</li>
-     *     <li>filter: MetricFilter.ALL</li>
+     * <li>hostName: InetAddress.getLocalHost().getHostName()</li>
+     * <li>clock: Clock.defaultClock()</li>
+     * <li>rateUnit: TimeUnit.SECONDS</li>
+     * <li>durationUnit: TimeUnit.MILLISECONDS</li>
+     * <li>filter: MetricFilter.ALL</li>
      * </ul>
      */
     public static Builder forRegistry(MetricRegistry registry) {
@@ -139,7 +149,6 @@ public class CollectdReporter extends ScheduledReporter {
             SortedMap<String, Histogram> histograms,
             SortedMap<String, Meter> meters,
             SortedMap<String, Timer> timers) {
-
         final MetaData.Builder metaData = createMetaDataBuilder();
         try {
             connect(sender);
@@ -148,7 +157,6 @@ public class CollectdReporter extends ScheduledReporter {
             report(histograms, metaData, histogramSerializer);
             report(meters, metaData, meterSerializer);
             report(timers, metaData, timerSerializer);
-
         } catch (IOException e) {
             LOG.warn("Unable to report to Collectd", e);
         } finally {
@@ -167,9 +175,11 @@ public class CollectdReporter extends ScheduledReporter {
         }
     }
 
-    private <M extends Metric> void report(
-            Map<String, M> metrics, MetaData.Builder metaData, Serializer<M> serializer) {
-        metrics.forEach((name, metric) -> serializer.serialize(metaData.plugin(name), metric));
+    private <M extends Metric> void report(Map<String, M> metrics, MetaData.Builder metaData,
+                                           Serializer<M> serializer) {
+        for (Map.Entry<String, M> entry : metrics.entrySet()) {
+            serializer.serialize(metaData.plugin(entry.getKey()), entry.getValue());
+        }
     }
 
     private void disconnect(Sender sender) {
@@ -182,23 +192,22 @@ public class CollectdReporter extends ScheduledReporter {
 
     abstract class Serializer<M extends Metric> {
 
-        protected final Logger LOG = LoggerFactory.getLogger(getClass());
+        final Logger log = LoggerFactory.getLogger(getClass());
+        final PacketWriter writer;
 
-        protected final PacketWriter writer;
-
-        protected Serializer(PacketWriter writer) {
+        Serializer(PacketWriter writer) {
             this.writer = writer;
         }
 
         protected abstract void serialize(MetaData.Builder metaData, M metric);
 
-        protected final void write(MetaData metaData, Number... values) {
+        final void write(MetaData metaData, Number... values) {
             try {
                 writer.write(metaData, values);
             } catch (RuntimeException e) {
-                LOG.warn("Failed to process metric '" + metaData.getPlugin() + "': " + e.getMessage());
+                log.warn("Failed to process metric '" + metaData.getPlugin() + "': " + e.getMessage());
             } catch (IOException e) {
-                LOG.error("Failed to send metric to collectd: " + e.getMessage(), e);
+                log.error("Failed to send metric to collectd: " + e.getMessage(), e);
             }
         }
     }
@@ -214,7 +223,7 @@ public class CollectdReporter extends ScheduledReporter {
             try {
                 write(metaData.typeInstance("value").get(), getValue(metric));
             } catch (IllegalArgumentException e) {
-                LOG.warn("Failed to process metric '" + metaData.get().getPlugin() + "': " + e.getMessage());
+                log.warn("Failed to process metric '" + metaData.get().getPlugin() + "': " + e.getMessage());
             }
         }
 
@@ -222,8 +231,7 @@ public class CollectdReporter extends ScheduledReporter {
             Object value = gauge.getValue();
             if (value instanceof Number) {
                 return (Number) value;
-            }
-            if (value instanceof Boolean) {
+            } else if (value instanceof Boolean) {
                 return (boolean) value ? 1 : 0;
             }
             throw new IllegalArgumentException(
@@ -267,7 +275,7 @@ public class CollectdReporter extends ScheduledReporter {
 
         @Override
         public void serialize(MetaData.Builder metaData, Histogram metric) {
-            Snapshot snapshot = metric.getSnapshot();
+            final Snapshot snapshot = metric.getSnapshot();
             write(metaData.typeInstance("count").get(), (double) metric.getCount());
             write(metaData.typeInstance("max").get(), (double) snapshot.getMax());
             write(metaData.typeInstance("mean").get(), snapshot.getMean());
@@ -290,7 +298,7 @@ public class CollectdReporter extends ScheduledReporter {
 
         @Override
         public void serialize(MetaData.Builder metaData, Timer metric) {
-            Snapshot snapshot = metric.getSnapshot();
+            final Snapshot snapshot = metric.getSnapshot();
             write(metaData.typeInstance("count").get(), (double) metric.getCount());
             write(metaData.typeInstance("max").get(), convertDuration(snapshot.getMax()));
             write(metaData.typeInstance("mean").get(), convertDuration(snapshot.getMean()));
