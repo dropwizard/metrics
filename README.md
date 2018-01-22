@@ -35,7 +35,7 @@ Source code for 3.1.x is resided in the [3.1-maintenance branch](https://github.
 
 New not-backward compatible features (for example, support for tags) will be implemented in a 5.x.x release. The release will have new Maven coordinates, a new package name and an backwards-incompatible API. 
 
-Source code for 5.x.x is resided in the [5.0-development branch](https://github.com/dropwizard/metrics/tree5.0-development).
+Source code for 5.x.x is resided in the [5.0-development branch](https://github.com/dropwizard/metrics/tree/5.0-development).
 
 License
 -------
