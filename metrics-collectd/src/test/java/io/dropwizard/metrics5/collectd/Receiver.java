@@ -1,4 +1,4 @@
-package com.codahale.metrics.collectd;
+package io.dropwizard.metrics5.collectd;
 
 import org.collectd.api.Notification;
 import org.collectd.api.ValueList;

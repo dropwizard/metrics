@@ -1,6 +1,13 @@
-package com.codahale.metrics.collectd;
+package io.dropwizard.metrics5.collectd;
 
-import com.codahale.metrics.*;
+import io.dropwizard.metrics5.Counter;
+import io.dropwizard.metrics5.Gauge;
+import io.dropwizard.metrics5.Histogram;
+import io.dropwizard.metrics5.Meter;
+import io.dropwizard.metrics5.MetricName;
+import io.dropwizard.metrics5.MetricRegistry;
+import io.dropwizard.metrics5.Snapshot;
+import io.dropwizard.metrics5.Timer;
 import org.collectd.api.ValueList;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -60,7 +67,7 @@ public class CollectdReporterTest {
 
     private <T extends Number> void reportsGauges(T value) throws Exception {
         reporter.report(
-                map("gauge", (Gauge) () -> value),
+                map(MetricName.build("gauge"), (Gauge) () -> value),
                 map(),
                 map(),
                 map(),
@@ -73,7 +80,7 @@ public class CollectdReporterTest {
     @Test
     public void reportsBooleanGauges() throws Exception {
         reporter.report(
-                map("gauge", (Gauge) () -> true),
+                map(MetricName.build("gauge"), (Gauge) () -> true),
                 map(),
                 map(),
                 map(),
@@ -83,7 +90,7 @@ public class CollectdReporterTest {
         assertThat(data.getValues()).containsExactly(1d);
 
         reporter.report(
-                map("gauge", (Gauge) () -> false),
+                map(MetricName.build("gauge"), (Gauge) () -> false),
                 map(),
                 map(),
                 map(),
@@ -96,7 +103,7 @@ public class CollectdReporterTest {
     @Test
     public void doesNotReportStringGauges() throws Exception {
         reporter.report(
-                map("unsupported", (Gauge) () -> "value"),
+                map(MetricName.build("unsupported"), (Gauge) () -> "value"),
                 map(),
                 map(),
                 map(),
@@ -112,7 +119,7 @@ public class CollectdReporterTest {
 
         reporter.report(
                 map(),
-                map("api.rest.requests.count", counter),
+                map(MetricName.build("api.rest.requests.count"), counter),
                 map(),
                 map(),
                 map());
@@ -134,7 +141,7 @@ public class CollectdReporterTest {
                 map(),
                 map(),
                 map(),
-                map("api.rest.requests", meter),
+                map(MetricName.build("api.rest.requests"), meter),
                 map());
 
         assertThat(receiver.next().getValues()).containsExactly(1d);
@@ -164,7 +171,7 @@ public class CollectdReporterTest {
         reporter.report(
                 map(),
                 map(),
-                map("histogram", histogram),
+                map(MetricName.build("histogram"), histogram),
                 map(),
                 map());
 
@@ -200,7 +207,7 @@ public class CollectdReporterTest {
                 map(),
                 map(),
                 map(),
-                map("timer", timer));
+                map(MetricName.build("timer"), timer));
 
         assertThat(receiver.next().getValues()).containsExactly(1d);
         assertThat(receiver.next().getValues()).containsExactly(100d);
@@ -230,12 +237,12 @@ public class CollectdReporterTest {
         assertThat(values.getPlugin()).isEqualTo("dash_illegal.slash_illegal");
     }
 
-    private <T> SortedMap<String, T> map() {
+    private <T> SortedMap<MetricName, T> map() {
         return new TreeMap<>();
     }
 
-    private <T> SortedMap<String, T> map(String name, T metric) {
-        final SortedMap<String, T> map = map();
+    private <T> SortedMap<MetricName, T> map(MetricName name, T metric) {
+        final SortedMap<MetricName, T> map = map();
         map.put(name, metric);
         return map;
     }

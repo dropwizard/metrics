@@ -1,16 +1,17 @@
-package com.codahale.metrics.collectd;
+package io.dropwizard.metrics5.collectd;
 
-import com.codahale.metrics.Clock;
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.Histogram;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.Metric;
-import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.ScheduledReporter;
-import com.codahale.metrics.Snapshot;
-import com.codahale.metrics.Timer;
+import io.dropwizard.metrics5.Clock;
+import io.dropwizard.metrics5.Counter;
+import io.dropwizard.metrics5.Gauge;
+import io.dropwizard.metrics5.Histogram;
+import io.dropwizard.metrics5.Meter;
+import io.dropwizard.metrics5.Metric;
+import io.dropwizard.metrics5.MetricFilter;
+import io.dropwizard.metrics5.MetricName;
+import io.dropwizard.metrics5.MetricRegistry;
+import io.dropwizard.metrics5.ScheduledReporter;
+import io.dropwizard.metrics5.Snapshot;
+import io.dropwizard.metrics5.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,26 +125,27 @@ public class CollectdReporter extends ScheduledReporter {
     }
 
     @Override
-    public void report(SortedMap<String, Gauge> gauges, SortedMap<String, Counter> counters,
-            SortedMap<String, Histogram> histograms, SortedMap<String, Meter> meters, SortedMap<String, Timer> timers) {
+    public void report(SortedMap<MetricName, Gauge> gauges, SortedMap<MetricName, Counter> counters,
+                       SortedMap<MetricName, Histogram> histograms, SortedMap<MetricName, Meter> meters,
+                       SortedMap<MetricName, Timer> timers) {
         MetaData.Builder metaData = new MetaData.Builder(hostName, clock.getTime() / 1000, period)
                 .type(COLLECTD_TYPE_GAUGE);
         try {
             connect(sender);
-            for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
-                serializeGauge(metaData.plugin(entry.getKey()), entry.getValue());
+            for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
+                serializeGauge(metaData.plugin(entry.getKey().getKey()), entry.getValue());
             }
-            for (Map.Entry<String, Counter> entry : counters.entrySet()) {
-                serializeCounter(metaData.plugin(entry.getKey()), entry.getValue());
+            for (Map.Entry<MetricName, Counter> entry : counters.entrySet()) {
+                serializeCounter(metaData.plugin(entry.getKey().getKey()), entry.getValue());
             }
-            for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
-                serializeHistogram(metaData.plugin(entry.getKey()), entry.getValue());
+            for (Map.Entry<MetricName, Histogram> entry : histograms.entrySet()) {
+                serializeHistogram(metaData.plugin(entry.getKey().getKey()), entry.getValue());
             }
-            for (Map.Entry<String, Meter> entry : meters.entrySet()) {
-                serializeMeter(metaData.plugin(entry.getKey()), entry.getValue());
+            for (Map.Entry<MetricName, Meter> entry : meters.entrySet()) {
+                serializeMeter(metaData.plugin(entry.getKey().getKey()), entry.getValue());
             }
-            for (Map.Entry<String, Timer> entry : timers.entrySet()) {
-                serializeTimer(metaData.plugin(entry.getKey()), entry.getValue());
+            for (Map.Entry<MetricName, Timer> entry : timers.entrySet()) {
+                serializeTimer(metaData.plugin(entry.getKey().getKey()), entry.getValue());
             }
         } catch (IOException e) {
             LOG.warn("Unable to report to Collectd", e);

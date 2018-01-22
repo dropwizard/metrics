@@ -1,4 +1,4 @@
-package com.codahale.metrics.collectd;
+package io.dropwizard.metrics5.collectd;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
