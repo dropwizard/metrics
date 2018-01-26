@@ -144,10 +144,10 @@ public class MetricRegistry implements MetricSet {
      * @param supplier a MetricSupplier that can be used to manufacture a counter.
      * @return a new or pre-existing {@link Counter}
      */
-    public Counter counter(MetricName name, final MetricSupplier<Counter> supplier) {
-        return getOrAdd(name, new MetricBuilder<Counter>() {
+    public <T extends Counter> T counter(MetricName name, final MetricSupplier<T> supplier) {
+        return getOrAdd(name, new MetricBuilder<T>() {
             @Override
-            public Counter newMetric() {
+            public T newMetric() {
                 return supplier.newMetric();
             }
 
