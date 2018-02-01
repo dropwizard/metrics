@@ -14,6 +14,18 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 public class MetricRegistryTest {
+
+    private static class CustomCounter extends Counter {
+
+        CustomCounter() {
+            super();
+        }
+
+        public void incTheAnswer() {
+            inc(42);
+        }
+    }
+
     private static final MetricName TIMER2 = MetricName.build("timer");
     private static final MetricName METER2 = MetricName.build("meter");
     private static final MetricName HISTOGRAM2 = MetricName.build("histogram");
@@ -29,7 +41,6 @@ public class MetricRegistryTest {
     private final Histogram histogram = mock(Histogram.class);
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
-
     @Before
     public void setUp() {
         registry.addListener(listener);
@@ -84,6 +95,14 @@ public class MetricRegistryTest {
         verify(listener).onCounterAdded(THING, counter1);
     }
 
+    @Test
+    public void createsTypesafeCustomCounter() {
+        MetricName name = MetricName.build("custom-counter");
+        final CustomCounter customCounter = registry.counter(name, CustomCounter::new);
+        customCounter.incTheAnswer();
+
+        assertThat(registry.counter(name).getCount()).isEqualTo(42);
+    }
 
     @Test
     public void removingACounterTriggersANotification() {
