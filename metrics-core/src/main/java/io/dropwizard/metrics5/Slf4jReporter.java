@@ -315,8 +315,8 @@ public class Slf4jReporter extends ScheduledReporter {
         return "events/" + super.getRateUnit();
     }
 
-    private MetricName prefix(MetricName metricName) {
-        return MetricName.join(prefix, metricName);
+    private String prefix(MetricName metricName) {
+        return MetricName.join(prefix, metricName).toString();
     }
 
     /* private class to allow logger configuration */
