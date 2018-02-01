@@ -16,7 +16,7 @@
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.log4j2</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5.log4j2</javaModuleName>
     </properties>
 
     <build>

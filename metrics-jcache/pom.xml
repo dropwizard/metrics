@@ -17,7 +17,7 @@
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.jcache</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5.jcache</javaModuleName>
     </properties>
 
     <profiles>

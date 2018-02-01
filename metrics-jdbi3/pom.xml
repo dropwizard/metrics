@@ -14,7 +14,7 @@
     <description>Provides instrumentation of Jdbi3 data access objects</description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.jdbi3</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5.jdbi3</javaModuleName>
     </properties>
 
     <dependencyManagement>

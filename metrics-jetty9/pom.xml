@@ -17,7 +17,7 @@
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.jetty9</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5.jetty9</javaModuleName>
     </properties>
 
     <dependencyManagement>

@@ -17,7 +17,7 @@
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.httpasyncclient</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5.httpasyncclient</javaModuleName>
     </properties>
 
     <dependencyManagement>

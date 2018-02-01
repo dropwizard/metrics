@@ -18,6 +18,6 @@
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5</javaModuleName>
     </properties>
 </project>

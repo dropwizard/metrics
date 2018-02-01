@@ -16,7 +16,7 @@
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.graphite</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5.graphite</javaModuleName>
     </properties>
 
     <dependencyManagement>

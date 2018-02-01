@@ -16,7 +16,7 @@
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.json</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5.json</javaModuleName>
     </properties>
 
     <dependencyManagement>

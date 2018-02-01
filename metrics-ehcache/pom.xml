@@ -16,7 +16,7 @@
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.ehcache</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5.ehcache</javaModuleName>
     </properties>
 
     <dependencyManagement>

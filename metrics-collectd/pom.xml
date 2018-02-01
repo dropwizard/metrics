@@ -16,7 +16,7 @@
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.collectd</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5.collectd</javaModuleName>
     </properties>
 
     <dependencies>

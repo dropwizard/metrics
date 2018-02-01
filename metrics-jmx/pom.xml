@@ -15,7 +15,7 @@
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.jmx</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5.jmx</javaModuleName>
     </properties>
 
     <dependencyManagement>

@@ -17,7 +17,7 @@
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.jersey2</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5.jersey2</javaModuleName>
     </properties>
 
     <dependencyManagement>

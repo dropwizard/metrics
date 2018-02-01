@@ -9,7 +9,7 @@
     </parent>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.annotation</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5.annotation</javaModuleName>
     </properties>
 
     <artifactId>metrics-annotation</artifactId>
