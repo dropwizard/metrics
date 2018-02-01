@@ -44,7 +44,7 @@ public class Slf4jReporterTest {
                 map(),
                 map());
 
-        verify(logger).error(marker, "type={}, name={}, value={}", "GAUGE", MetricName.build("gauge"), "value");
+        verify(logger).error(marker, "type={}, name={}, value={}", "GAUGE", "gauge", "value");
     }
 
     @Test
@@ -59,7 +59,7 @@ public class Slf4jReporterTest {
                 map(),
                 map());
 
-        verify(logger).error(marker, "type={}, name={}, count={}", "COUNTER", MetricName.build("test.counter"), 100L);
+        verify(logger).error(marker, "type={}, name={}, count={}", "COUNTER", "test.counter", 100L);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class Slf4jReporterTest {
         verify(logger).error(marker,
                 "type={}, name={}, count={}, sum={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
                 "HISTOGRAM",
-                MetricName.build( "test.histogram"),
+                "test.histogram",
                 1L,
                 12L,
                 4L,
@@ -127,7 +127,7 @@ public class Slf4jReporterTest {
         verify(logger).error(marker,
                 "type={}, name={}, count={}, sum={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
                 "METER",
-                MetricName.build("test.meter"),
+                "test.meter",
                 1L,
                 6L,
                 2.0,
@@ -174,7 +174,7 @@ public class Slf4jReporterTest {
         verify(logger).error(marker,
                 "type={}, name={}, count={}, sum={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
                 "TIMER",
-                MetricName.build("test.another.timer"),
+                "test.another.timer",
                 1L,
                 6L,
                 300.0,
@@ -204,7 +204,7 @@ public class Slf4jReporterTest {
                 map(),
                 map());
 
-        verify(logger).info(marker, "type={}, name={}, value={}", "GAUGE", MetricName.build("prefix.gauge"), "value");
+        verify(logger).info(marker, "type={}, name={}, value={}", "GAUGE", "prefix.gauge", "value");
     }
 
     @Test
@@ -219,7 +219,7 @@ public class Slf4jReporterTest {
                 map(),
                 map());
 
-        verify(logger).info(marker, "type={}, name={}, count={}", "COUNTER", MetricName.build("prefix.test.counter"), 100L);
+        verify(logger).info(marker, "type={}, name={}, count={}", "COUNTER", "prefix.test.counter", 100L);
     }
 
     @Test
@@ -252,7 +252,7 @@ public class Slf4jReporterTest {
         verify(logger).info(marker,
                 "type={}, name={}, count={}, sum={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
                 "HISTOGRAM",
-                MetricName.build("prefix.test.histogram"),
+                "prefix.test.histogram",
                 1L,
                 12L,
                 4L,
@@ -287,7 +287,7 @@ public class Slf4jReporterTest {
         verify(logger).info(marker,
                 "type={}, name={}, count={}, sum={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
                 "METER",
-                MetricName.build("prefix.test.meter"),
+                "prefix.test.meter",
                 1L,
                 6L,
                 2.0,
@@ -333,7 +333,7 @@ public class Slf4jReporterTest {
         verify(logger).info(marker,
                 "type={}, name={}, count={}, sum={}, min={}, max={}, mean={}, stddev={}, median={}, p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}, duration_unit={}",
                 "TIMER",
-                MetricName.build("prefix.test.another.timer"),
+                "prefix.test.another.timer",
                 1L,
                 6L,
                 300.0,
