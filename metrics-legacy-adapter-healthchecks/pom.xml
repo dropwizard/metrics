@@ -9,6 +9,10 @@
 
     <artifactId>metrics-legacy-adapter-healthchecks</artifactId>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.health</javaModuleName>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.dropwizard.metrics5</groupId>

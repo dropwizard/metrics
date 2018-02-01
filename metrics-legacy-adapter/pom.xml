@@ -9,6 +9,10 @@
 
 	<artifactId>metrics-legacy-adapter</artifactId>
 
+	<properties>
+		<javaModuleName>com.codahale.metrics</javaModuleName>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>io.dropwizard.metrics5</groupId>
