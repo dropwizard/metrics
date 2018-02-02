@@ -55,7 +55,7 @@ public class InfluxDbReporter extends ScheduledReporter {
     }
 
     /**
-     * A builder for {@link GraphiteReporter} instances. Defaults to not using a prefix, using the
+     * A builder for {@link InfluxDbReporter} instances. Defaults to not using a prefix, using the
      * default clock, converting rates to events/second, converting durations to milliseconds, and
      * not filtering metrics.
      */
