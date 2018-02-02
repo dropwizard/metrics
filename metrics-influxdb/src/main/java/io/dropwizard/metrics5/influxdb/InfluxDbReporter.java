@@ -13,7 +13,6 @@ import java.util.Map;
 import static io.dropwizard.metrics5.MetricAttribute.*;
 import io.dropwizard.metrics5.MetricFilter;
 import io.dropwizard.metrics5.MetricRegistry;
-import io.dropwizard.metrics5.ScheduledReporter;
 import io.dropwizard.metrics5.Snapshot;
 import io.dropwizard.metrics5.Timer;
 import java.io.IOException;
@@ -42,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * This InfluxDB reporter is "garbage free" in steady state.
  * This means objects and buffers are reused and no temporary objects are allocated as much as possible.
  */
-public class InfluxDbReporter extends ScheduledReporter {
+public class InfluxDbReporter extends GarbageFreeScheduledReporter {
 
     /**
      * Returns a new Builder for {@link InfluxDbReporter}.
