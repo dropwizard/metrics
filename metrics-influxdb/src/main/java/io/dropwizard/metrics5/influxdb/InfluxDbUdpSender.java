@@ -16,10 +16,10 @@ public class InfluxDbUdpSender implements InfluxDbSender {
     private final InetSocketAddress address;
     private int mtu = 1500;
 
-    private DatagramChannel datagramChannel = null;
-
+    private DatagramChannel datagramChannel;
     private ByteBuffer byteBuf;
     private CharBuffer charBuf;
+
     private final CharsetEncoder encoder = Charset.forName("UTF-8")
             .newEncoder()
             .onMalformedInput(CodingErrorAction.REPLACE)
@@ -42,8 +42,8 @@ public class InfluxDbUdpSender implements InfluxDbSender {
      */
     public InfluxDbUdpSender(InetSocketAddress address) {
         this.address = Objects.requireNonNull(address);
-        charBuf = CharBuffer.allocate(mtu*2);
-        byteBuf = ByteBuffer.allocate(mtu*2);
+        charBuf = CharBuffer.allocate(mtu * 2);
+        byteBuf = ByteBuffer.allocate(mtu * 2);
     }
 
     // for testing
@@ -55,7 +55,7 @@ public class InfluxDbUdpSender implements InfluxDbSender {
     void setDatagramChannel(DatagramChannel datagramChannel) {
         this.datagramChannel = datagramChannel;
     }
-    
+
     @Override
     public void connect() throws IllegalStateException, IOException {
         if (datagramChannel == null) {
@@ -68,7 +68,7 @@ public class InfluxDbUdpSender implements InfluxDbSender {
     public boolean isConnected() {
         return datagramChannel != null;
     }
-    
+
     @Override
     public void disconnect() throws IOException {
         // ignore, keep the datagram channel open
@@ -102,7 +102,7 @@ public class InfluxDbUdpSender implements InfluxDbSender {
             }
         }
     }
-    
+
     @Override
     public void flush() throws IOException {
         if (byteBuf.position() > 0) {
@@ -110,12 +110,12 @@ public class InfluxDbUdpSender implements InfluxDbSender {
             byteBuf.clear();
         }
     }
-    
+
     private void sendBuffer() throws IOException {
         byteBuf.flip();
         datagramChannel.send(byteBuf, address);
     }
-        
+
     private void encode(StringBuilder str) {
         // copy chars
         if (charBuf.capacity() < str.length()) {
@@ -125,15 +125,15 @@ public class InfluxDbUdpSender implements InfluxDbSender {
         }
         str.getChars(0, str.length(), charBuf.array(), charBuf.arrayOffset());
         charBuf.limit(str.length());
-        
+
         // encode chars
         encoder.reset();
-        
-        for(;;) {
+
+        for (; ; ) {
             CoderResult result = encoder.encode(charBuf, byteBuf, true);
             if (result.isOverflow()) {
                 // grow the buffer
-                ByteBuffer byteBuf2 = ByteBuffer.allocate(byteBuf.capacity()*2);
+                ByteBuffer byteBuf2 = ByteBuffer.allocate(byteBuf.capacity() * 2);
                 byteBuf.flip();
                 byteBuf2.put(byteBuf);
                 byteBuf = byteBuf2;
@@ -143,5 +143,5 @@ public class InfluxDbUdpSender implements InfluxDbSender {
         }
     }
 
-    
+
 }

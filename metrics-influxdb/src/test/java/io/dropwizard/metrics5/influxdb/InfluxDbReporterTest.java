@@ -11,7 +11,9 @@ import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.Snapshot;
 import io.dropwizard.metrics5.Timer;
+
 import java.io.IOException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -25,6 +27,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.mockito.Mockito.doThrow;
@@ -48,23 +51,23 @@ public class InfluxDbReporterTest {
     private final List<String> send = new ArrayList<>();
     private final MetricRegistry registry = mock(MetricRegistry.class);
     private final InfluxDbReporter reporter = InfluxDbReporter.forRegistry(registry)
-        .withClock(clock)
-        .prefixedWith(new MetricName("prefix", map("foo", "bar")))
-        .convertRatesTo(TimeUnit.SECONDS)
-        .convertDurationsTo(TimeUnit.MILLISECONDS)
-        .filter(MetricFilter.ALL)
-        .disabledMetricAttributes(Collections.emptySet())
-        .build(sender);
+            .withClock(clock)
+            .prefixedWith(new MetricName("prefix", map("foo", "bar")))
+            .convertRatesTo(TimeUnit.SECONDS)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .filter(MetricFilter.ALL)
+            .disabledMetricAttributes(Collections.emptySet())
+            .build(sender);
 
     private final InfluxDbReporter minuteRateReporter = InfluxDbReporter
-        .forRegistry(registry)
-        .withClock(clock)
-        .prefixedWith(new MetricName("prefix", map("foo", "bar")))
-        .convertRatesTo(TimeUnit.MINUTES)
-        .convertDurationsTo(TimeUnit.MILLISECONDS)
-        .filter(MetricFilter.ALL)
-        .disabledMetricAttributes(Collections.emptySet())
-        .build(sender);
+            .forRegistry(registry)
+            .withClock(clock)
+            .prefixedWith(new MetricName("prefix", map("foo", "bar")))
+            .convertRatesTo(TimeUnit.MINUTES)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .filter(MetricFilter.ALL)
+            .disabledMetricAttributes(Collections.emptySet())
+            .build(sender);
 
     @Before
     public void setUp() throws IOException {
@@ -77,10 +80,10 @@ public class InfluxDbReporterTest {
     @Test
     public void reportsStringGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge("value")),
-            map(),
-            map(),
-            map(),
-            map());
+                map(),
+                map(),
+                map(),
+                map());
 
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
@@ -95,10 +98,10 @@ public class InfluxDbReporterTest {
     @Test
     public void reportsByteGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge((byte) 1)),
-            map(),
-            map(),
-            map(),
-            map());
+                map(),
+                map(),
+                map(),
+                map());
 
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
@@ -113,10 +116,10 @@ public class InfluxDbReporterTest {
     @Test
     public void reportsShortGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge((short) 1)),
-            map(),
-            map(),
-            map(),
-            map());
+                map(),
+                map(),
+                map(),
+                map());
 
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
@@ -131,10 +134,10 @@ public class InfluxDbReporterTest {
     @Test
     public void reportsIntegerGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge(1)),
-            map(),
-            map(),
-            map(),
-            map());
+                map(),
+                map(),
+                map(),
+                map());
 
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
@@ -149,10 +152,10 @@ public class InfluxDbReporterTest {
     @Test
     public void reportsLongGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge(1L)),
-            map(),
-            map(),
-            map(),
-            map());
+                map(),
+                map(),
+                map(),
+                map());
 
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
@@ -167,10 +170,10 @@ public class InfluxDbReporterTest {
     @Test
     public void reportsFloatGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge(1.5f)),
-            map(),
-            map(),
-            map(),
-            map());
+                map(),
+                map(),
+                map(),
+                map());
 
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
@@ -185,10 +188,10 @@ public class InfluxDbReporterTest {
     @Test
     public void reportsDoubleGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge(1.1)),
-            map(),
-            map(),
-            map(),
-            map());
+                map(),
+                map(),
+                map(),
+                map());
 
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
@@ -203,29 +206,29 @@ public class InfluxDbReporterTest {
     @Test
     public void reportsBooleanGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge(true)),
-            map(),
-            map(),
-            map(),
-            map());
+                map(),
+                map(),
+                map(),
+                map());
 
         reporter.report(map(GAUGE, gauge(false)),
-            map(),
-            map(),
-            map(),
-            map());
+                map(),
+                map(),
+                map(),
+                map());
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
         inOrder.verify(sender).send(anySb());
         inOrder.verify(sender).flush();
         inOrder.verify(sender).disconnect();
-        
+
         inOrder.verify(sender).connect();
         inOrder.verify(sender).send(anySb());
         inOrder.verify(sender).flush();
         inOrder.verify(sender).disconnect();
 
         verifyNoMoreInteractions(sender);
-        
+
         assertThat(send).element(0).isEqualTo("prefix.gauge,foo=bar value=t 1000198000000000\n");
         assertThat(send).element(1).isEqualTo("prefix.gauge,foo=bar value=f 1000198000000000\n");
     }
@@ -236,10 +239,10 @@ public class InfluxDbReporterTest {
         when(counter.getCount()).thenReturn(100L);
 
         reporter.report(map(),
-            map(COUNTER, counter),
-            map(),
-            map(),
-            map());
+                map(COUNTER, counter),
+                map(),
+                map(),
+                map());
 
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
@@ -272,10 +275,10 @@ public class InfluxDbReporterTest {
         when(histogram.getSnapshot()).thenReturn(snapshot);
 
         reporter.report(map(),
-            map(),
-            map(MetricName.build("histogram"), histogram),
-            map(),
-            map());
+                map(),
+                map(MetricName.build("histogram"), histogram),
+                map(),
+                map());
 
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
@@ -299,10 +302,10 @@ public class InfluxDbReporterTest {
         when(meter.getMeanRate()).thenReturn(5.0);
 
         reporter.report(map(),
-            map(),
-            map(),
-            map(METER, meter),
-            map());
+                map(),
+                map(),
+                map(METER, meter),
+                map());
 
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
@@ -325,10 +328,10 @@ public class InfluxDbReporterTest {
         when(meter.getMeanRate()).thenReturn(5.0);
 
         minuteRateReporter.report(this.map(),
-            this.map(),
-            this.map(),
-            this.map(METER, meter),
-            this.map());
+                this.map(),
+                this.map(),
+                this.map(METER, meter),
+                this.map());
 
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
@@ -361,15 +364,15 @@ public class InfluxDbReporterTest {
         when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
         when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
         when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS
-            .toNanos(1000));
+                .toNanos(1000));
 
         when(timer.getSnapshot()).thenReturn(snapshot);
 
         reporter.report(map(),
-            map(),
-            map(),
-            map(),
-            map(MetricName.build("timer"), timer));
+                map(),
+                map(),
+                map(),
+                map(MetricName.build("timer"), timer));
 
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
@@ -387,10 +390,10 @@ public class InfluxDbReporterTest {
     public void disconnectsIfSenderIsUnavailable() throws Exception {
         doThrow(new UnknownHostException("UNKNOWN-HOST")).when(sender).connect();
         reporter.report(map(GAUGE, gauge(1)),
-            map(),
-            map(),
-            map(),
-            map());
+                map(),
+                map(),
+                map(),
+                map());
 
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
@@ -424,18 +427,18 @@ public class InfluxDbReporterTest {
 
         Set<MetricAttribute> disabledMetricAttributes = EnumSet.of(MetricAttribute.M15_RATE, MetricAttribute.M5_RATE);
         InfluxDbReporter reporterWithdisabledMetricAttributes = InfluxDbReporter.forRegistry(registry)
-            .withClock(clock)
-            .prefixedWith(MetricName.build("prefix"))
-            .convertRatesTo(TimeUnit.SECONDS)
-            .convertDurationsTo(TimeUnit.MILLISECONDS)
-            .filter(MetricFilter.ALL)
-            .disabledMetricAttributes(disabledMetricAttributes)
-            .build(sender);
+                .withClock(clock)
+                .prefixedWith(MetricName.build("prefix"))
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .filter(MetricFilter.ALL)
+                .disabledMetricAttributes(disabledMetricAttributes)
+                .build(sender);
         reporterWithdisabledMetricAttributes.report(map(),
-            map(COUNTER, counter),
-            map(),
-            map(METER, meter),
-            map());
+                map(COUNTER, counter),
+                map(),
+                map(METER, meter),
+                map());
 
         final InOrder inOrder = inOrder(sender);
         inOrder.verify(sender).connect();
@@ -444,7 +447,7 @@ public class InfluxDbReporterTest {
         inOrder.verify(sender).disconnect();
 
         verifyNoMoreInteractions(sender);
-        
+
         assertThat(send).element(0).isEqualTo("prefix.counter count=11i 1000198000000000\n");
         assertThat(send).element(1).isEqualTo("prefix.meter count=1i,sum=6i,m1_rate=2.0,mean_rate=5.0 1000198000000000\n");
     }
@@ -453,7 +456,7 @@ public class InfluxDbReporterTest {
         return new TreeMap<>();
     }
 
-    private <K,V> SortedMap<K, V> map(K key, V value) {
+    private <K, V> SortedMap<K, V> map(K key, V value) {
         final TreeMap<K, V> map = new TreeMap<>();
         map.put(key, value);
         return map;
@@ -462,7 +465,7 @@ public class InfluxDbReporterTest {
     private <T> Gauge<T> gauge(T value) {
         return () -> value;
     }
-    
+
     private StringBuilder anySb() {
         return any(StringBuilder.class);
     }

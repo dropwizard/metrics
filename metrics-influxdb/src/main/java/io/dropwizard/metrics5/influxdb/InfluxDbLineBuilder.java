@@ -2,6 +2,7 @@ package io.dropwizard.metrics5.influxdb;
 
 import io.dropwizard.metrics5.MetricAttribute;
 import io.dropwizard.metrics5.MetricName;
+
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
@@ -9,17 +10,17 @@ import java.util.WeakHashMap;
 
 /**
  * A builder to create a "measurement line" according to the Influx DB line protocol.
- * 
+ * <p>
  * Intended usage:
  * <pre>
  * // first:
  * builder.writeMeasurement(name);
- * 
+ *
  * // then write one or more fields:
  * builder.writeFieldIfEnabled(key, value);
  * // ... or ...
  * builder.writeField(key).writeFieldValue(value);
- * 
+ *
  * // finally:
  * builder.writeTimestampMillis(time);
  * if (builder.hasValues()) {
@@ -62,11 +63,11 @@ class InfluxDbLineBuilder {
                 .stream()
                 .sorted(Comparator.comparing(Map.Entry::getKey))
                 .forEach(tag -> {
-            sb.append(',');
-            appendName(tag.getKey(), sb);
-            sb.append('=');
-            appendName(tag.getValue(), sb);
-        });
+                    sb.append(',');
+                    appendName(tag.getKey(), sb);
+                    sb.append('=');
+                    appendName(tag.getValue(), sb);
+                });
         return sb.toString();
     }
 
@@ -135,14 +136,14 @@ class InfluxDbLineBuilder {
     boolean hasValues() {
         return !firstField;
     }
-    
+
     StringBuilder get() {
         return str;
-    }    
-    
+    }
+
     private static void appendName(CharSequence field, StringBuilder dst) {
         int len = field.length();
-        for (int i=0; i<len; i++) {
+        for (int i = 0; i < len; i++) {
             char ch = field.charAt(i);
             if (ch == ',' || ch == '=' || ch == ' ') {
                 // escape
@@ -151,9 +152,10 @@ class InfluxDbLineBuilder {
             dst.append(ch);
         }
     }
+
     private static void appendString(CharSequence field, StringBuilder dst) {
         int len = field.length();
-        for (int i=0; i<len; i++) {
+        for (int i = 0; i < len; i++) {
             char ch = field.charAt(i);
             if (ch == '"') {
                 // escape
@@ -162,5 +164,5 @@ class InfluxDbLineBuilder {
             dst.append(ch);
         }
     }
-    
+
 }

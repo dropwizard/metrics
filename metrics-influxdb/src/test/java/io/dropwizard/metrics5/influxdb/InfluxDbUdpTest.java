@@ -1,6 +1,7 @@
 package io.dropwizard.metrics5.influxdb;
 
 import java.io.IOException;
+
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -9,8 +10,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Before;
+
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
@@ -24,12 +28,12 @@ public class InfluxDbUdpTest {
     private InfluxDbUdpSender influxdbUdp;
     private final DatagramChannel datagramChannel = Mockito.mock(DatagramChannel.class);
     private final List<byte[]> sent = new ArrayList<>();
-    
+
     @Before
     public void setUp() throws IOException {
         sent.clear();
         doAnswer(invocation -> {
-            sent.add(toBytes(invocation.getArgument(0))); 
+            sent.add(toBytes(invocation.getArgument(0)));
             return 0;
         }).when(datagramChannel).send(any(ByteBuffer.class), any(SocketAddress.class));
         influxdbUdp = new InfluxDbUdpSender(host, port);
@@ -40,9 +44,9 @@ public class InfluxDbUdpTest {
     public void writesValue() throws Exception {
         influxdbUdp.send(new StringBuilder("räksmörgås value=123 456000000000\n"));
         influxdbUdp.flush();
-        
+
         verify(datagramChannel).send(any(), any());
-        
+
         assertThat(sent).first().isEqualTo("räksmörgås value=123 456000000000\n".getBytes("UTF-8"));
     }
 
@@ -53,11 +57,11 @@ public class InfluxDbUdpTest {
         influxdbUdp.flush();
 
         verify(datagramChannel).send(any(), any());
-        
+
         assertThat(sent).first().isEqualTo(
                 "name1 value=111 456000000000\nname2 value=222 456000000000\n".getBytes("UTF-8"));
     }
-    
+
     @Test
     public void respectsMTU() throws Exception {
         influxdbUdp.setMTU(40);
@@ -66,7 +70,7 @@ public class InfluxDbUdpTest {
         influxdbUdp.flush();
 
         verify(datagramChannel, times(2)).send(any(), any());
-        
+
         assertThat(sent).element(0).isEqualTo("name1 value=111 456000000000\n".getBytes("UTF-8"));
         assertThat(sent).element(1).isEqualTo("name2 value=222 456000000000\n".getBytes("UTF-8"));
     }

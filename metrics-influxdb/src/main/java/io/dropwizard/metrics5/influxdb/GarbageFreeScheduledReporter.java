@@ -11,6 +11,7 @@ import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.MetricRegistryListener;
 import io.dropwizard.metrics5.ScheduledReporter;
 import io.dropwizard.metrics5.Timer;
+
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -21,15 +22,11 @@ abstract class GarbageFreeScheduledReporter extends ScheduledReporter {
 
     private final MetricRegistry registry;
     private final RegistryMirror mirror;
-    
-    protected GarbageFreeScheduledReporter(MetricRegistry registry, 
-            String name,
-            MetricFilter filter, 
-            TimeUnit rateUnit, 
-            TimeUnit durationUnit, 
-            ScheduledExecutorService executor, 
-            boolean shutdownExecutorOnStop, 
-            Set<MetricAttribute> disabledMetricAttributes) {
+
+    protected GarbageFreeScheduledReporter(MetricRegistry registry, String name, MetricFilter filter, TimeUnit rateUnit,
+                                           TimeUnit durationUnit, ScheduledExecutorService executor,
+                                           boolean shutdownExecutorOnStop,
+                                           Set<MetricAttribute> disabledMetricAttributes) {
         super(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, disabledMetricAttributes);
         this.registry = registry;
         this.mirror = new RegistryMirror(filter);
@@ -49,14 +46,14 @@ abstract class GarbageFreeScheduledReporter extends ScheduledReporter {
     @SuppressWarnings("rawtypes")
     public void report() {
         synchronized (this) {
-            report(mirror.gauges(), 
-                    mirror.counters(), 
-                    mirror.histograms(), 
-                    mirror.meters(), 
+            report(mirror.gauges(),
+                    mirror.counters(),
+                    mirror.histograms(),
+                    mirror.meters(),
                     mirror.timers());
         }
     }
-    
+
     @SuppressWarnings("rawtypes") // because of signature (for Gauge) in ScheduledReporter#report(..)
     private static class RegistryMirror implements MetricRegistryListener {
 
@@ -67,10 +64,10 @@ abstract class GarbageFreeScheduledReporter extends ScheduledReporter {
         private final ConcurrentSkipListMap<MetricName, Meter> meters = new ConcurrentSkipListMap<>();
         private final ConcurrentSkipListMap<MetricName, Timer> timers = new ConcurrentSkipListMap<>();
 
-        public RegistryMirror(MetricFilter filter) {
+        RegistryMirror(MetricFilter filter) {
             this.filter = filter;
         }
-        
+
         SortedMap<MetricName, Gauge> gauges() {
             return gauges;
         }
@@ -90,8 +87,8 @@ abstract class GarbageFreeScheduledReporter extends ScheduledReporter {
         SortedMap<MetricName, Timer> timers() {
             return timers;
         }
-        
-        
+
+
         @Override
         public void onGaugeAdded(MetricName name, Gauge<?> gauge) {
             if (filter.matches(name, gauge)) {
@@ -151,7 +148,7 @@ abstract class GarbageFreeScheduledReporter extends ScheduledReporter {
         public void onTimerRemoved(MetricName name) {
             timers.remove(name);
         }
-        
+
     }
-    
+
 }

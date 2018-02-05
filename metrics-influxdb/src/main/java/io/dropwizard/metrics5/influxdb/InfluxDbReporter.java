@@ -8,33 +8,36 @@ import io.dropwizard.metrics5.Meter;
 import io.dropwizard.metrics5.Metered;
 import io.dropwizard.metrics5.MetricAttribute;
 import io.dropwizard.metrics5.MetricName;
+
 import java.util.Map;
 
 import static io.dropwizard.metrics5.MetricAttribute.*;
+
 import io.dropwizard.metrics5.MetricFilter;
 import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.Snapshot;
 import io.dropwizard.metrics5.Timer;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A reporter which publishes metric values to InfluxDB.
- * 
  * <p>
- * Metrics are reported according to the 
+ * Metrics are reported according to the
  * <a href="https://docs.influxdata.com/influxdb/v1.4/write_protocols/line_protocol_reference/">InfluxDB Line Protocol</a>.
  * Brief line protocol syntax as follows:
  * <pre>
  * measurement(,tag_key=tag_val)* field_key=field_val(,field_key_n=field_value_n)* (nanoseconds-timestamp)?
  * </pre>
- * 
+ * <p>
  * <p>
  * This InfluxDB reporter is "garbage free" in steady state.
  * This means objects and buffers are reused and no temporary objects are allocated as much as possible.
@@ -57,6 +60,7 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
      * not filtering metrics.
      */
     public static class Builder {
+
         private final MetricRegistry registry;
         private Clock clock;
         private MetricName prefix;
@@ -82,7 +86,7 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
         /**
          * Specifies whether or not, the executor (used for reporting) will be stopped with same time with reporter.
          * Default value is true.
-         * Setting this parameter to false, has the sense in combining with providing external managed executor via 
+         * Setting this parameter to false, has the sense in combining with providing external managed executor via
          * {@link #scheduleOn(ScheduledExecutorService)}.
          *
          * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
@@ -180,65 +184,50 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
          * @return the InfluxDbReporter
          */
         public InfluxDbReporter build(InfluxDbSender sender) {
-            return new InfluxDbReporter(registry,
-                    sender,
-                    clock,
-                    prefix,
-                    rateUnit,
-                    durationUnit,
-                    filter,
-                    executor,
-                    shutdownExecutorOnStop,
-                    disabledMetricAttributes);
+            return new InfluxDbReporter(registry, sender, clock, prefix, rateUnit, durationUnit, filter, executor,
+                    shutdownExecutorOnStop, disabledMetricAttributes);
         }
     }
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(InfluxDbReporter.class);
     private static final String VALUE = "value";
-    
+
     private final Clock clock;
     private final InfluxDbSender sender;
     private final InfluxDbLineBuilder builder;
-    
+
     /**
      * Creates a new InfluxDbReporter instance.
      *
-     * @param registry               the MetricRegistry containing the metrics this reporter will report
-     * @param sender                 the InfluxDbSender which is responsible for sending metrics to a influxdb
-     *                               server via a transport protocol
-     * @param clock                  the instance of the time. Use {@link Clock#defaultClock()} for the default
-     * @param prefix                 the prefix of all metric names (may be null)
-     * @param rateUnit               the time unit of in which rates will be converted
-     * @param durationUnit           the time unit of in which durations will be converted
-     * @param filter                 the filter for which metrics to report
-     * @param executor               the executor to use while scheduling reporting of metrics (may be null).
-     * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
+     * @param registry                 the MetricRegistry containing the metrics this reporter will report
+     * @param sender                   the InfluxDbSender which is responsible for sending metrics to a influxdb
+     *                                 server via a transport protocol
+     * @param clock                    the instance of the time. Use {@link Clock#defaultClock()} for the default
+     * @param prefix                   the prefix of all metric names (may be null)
+     * @param rateUnit                 the time unit of in which rates will be converted
+     * @param durationUnit             the time unit of in which durations will be converted
+     * @param filter                   the filter for which metrics to report
+     * @param executor                 the executor to use while scheduling reporting of metrics (may be null).
+     * @param shutdownExecutorOnStop   if true, then executor will be stopped in same time with this reporter
      * @param disabledMetricAttributes the disable metric attributes
      */
-    protected InfluxDbReporter(MetricRegistry registry,
-                               InfluxDbSender sender,
-                               Clock clock,
-                               MetricName prefix,
-                               TimeUnit rateUnit,
-                               TimeUnit durationUnit,
-                               MetricFilter filter,
-                               ScheduledExecutorService executor,
-                               boolean shutdownExecutorOnStop,
-                               Set<MetricAttribute> disabledMetricAttributes) {
+    public InfluxDbReporter(MetricRegistry registry, InfluxDbSender sender, Clock clock, MetricName prefix,
+                            TimeUnit rateUnit, TimeUnit durationUnit, MetricFilter filter, ScheduledExecutorService executor,
+                            boolean shutdownExecutorOnStop, Set<MetricAttribute> disabledMetricAttributes) {
         super(registry, "influxdb-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
                 disabledMetricAttributes);
         this.sender = sender;
         this.clock = clock;
         this.builder = new InfluxDbLineBuilder(disabledMetricAttributes, prefix);
-    }    
-    
+    }
+
     @Override
     @SuppressWarnings("rawtypes")
-    public void report(SortedMap<MetricName, Gauge> gauges, 
-            SortedMap<MetricName, Counter> counters, 
-            SortedMap<MetricName, Histogram> histograms, 
-            SortedMap<MetricName, Meter> meters, 
-            SortedMap<MetricName, Timer> timers) {
+    public void report(SortedMap<MetricName, Gauge> gauges,
+                       SortedMap<MetricName, Counter> counters,
+                       SortedMap<MetricName, Histogram> histograms,
+                       SortedMap<MetricName, Meter> meters,
+                       SortedMap<MetricName, Timer> timers) {
 
         final long timestamp = clock.getTime();
 
@@ -275,7 +264,7 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
             }
         }
     }
-    
+
     @Override
     public void stop() {
         try {
@@ -288,20 +277,20 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
             }
         }
     }
-    
+
     private void reportTimer(MetricName name, Timer timer, long timestamp) throws IOException {
         final Snapshot snapshot = timer.getSnapshot();
         builder.writeMeasurement(name)
-                .writeFieldIfEnabled(MAX,    convertDuration(snapshot.getMax()))
-                .writeFieldIfEnabled(MEAN,   convertDuration(snapshot.getMean()))
-                .writeFieldIfEnabled(MIN,    convertDuration(snapshot.getMin()))
+                .writeFieldIfEnabled(MAX, convertDuration(snapshot.getMax()))
+                .writeFieldIfEnabled(MEAN, convertDuration(snapshot.getMean()))
+                .writeFieldIfEnabled(MIN, convertDuration(snapshot.getMin()))
                 .writeFieldIfEnabled(STDDEV, convertDuration(snapshot.getStdDev()))
-                .writeFieldIfEnabled(P50,    convertDuration(snapshot.getMedian()))
-                .writeFieldIfEnabled(P75,    convertDuration(snapshot.get75thPercentile()))
-                .writeFieldIfEnabled(P95,    convertDuration(snapshot.get95thPercentile()))
-                .writeFieldIfEnabled(P98,    convertDuration(snapshot.get98thPercentile()))
-                .writeFieldIfEnabled(P99,    convertDuration(snapshot.get99thPercentile()))
-                .writeFieldIfEnabled(P999,   convertDuration(snapshot.get999thPercentile()));
+                .writeFieldIfEnabled(P50, convertDuration(snapshot.getMedian()))
+                .writeFieldIfEnabled(P75, convertDuration(snapshot.get75thPercentile()))
+                .writeFieldIfEnabled(P95, convertDuration(snapshot.get95thPercentile()))
+                .writeFieldIfEnabled(P98, convertDuration(snapshot.get98thPercentile()))
+                .writeFieldIfEnabled(P99, convertDuration(snapshot.get99thPercentile()))
+                .writeFieldIfEnabled(P999, convertDuration(snapshot.get999thPercentile()));
         writeMeteredFieldsIfEnabled(timer)
                 .writeTimestampMillis(timestamp);
 
@@ -312,77 +301,72 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
     private void reportHistogram(MetricName name, Histogram histogram, long timestamp) throws IOException {
         final Snapshot snapshot = histogram.getSnapshot();
         builder.writeMeasurement(name)
-                .writeFieldIfEnabled(COUNT,  histogram.getCount())
-                .writeFieldIfEnabled(SUM,    histogram.getSum())
-                .writeFieldIfEnabled(MAX,    snapshot.getMax())
-                .writeFieldIfEnabled(MEAN,   snapshot.getMean())
-                .writeFieldIfEnabled(MIN,    snapshot.getMin())
+                .writeFieldIfEnabled(COUNT, histogram.getCount())
+                .writeFieldIfEnabled(SUM, histogram.getSum())
+                .writeFieldIfEnabled(MAX, snapshot.getMax())
+                .writeFieldIfEnabled(MEAN, snapshot.getMean())
+                .writeFieldIfEnabled(MIN, snapshot.getMin())
                 .writeFieldIfEnabled(STDDEV, snapshot.getStdDev())
-                .writeFieldIfEnabled(P50,    snapshot.getMedian())
-                .writeFieldIfEnabled(P75,    snapshot.get75thPercentile())
-                .writeFieldIfEnabled(P95,    snapshot.get95thPercentile())
-                .writeFieldIfEnabled(P98,    snapshot.get98thPercentile())
-                .writeFieldIfEnabled(P99,    snapshot.get99thPercentile())
-                .writeFieldIfEnabled(P999,   snapshot.get999thPercentile())
+                .writeFieldIfEnabled(P50, snapshot.getMedian())
+                .writeFieldIfEnabled(P75, snapshot.get75thPercentile())
+                .writeFieldIfEnabled(P95, snapshot.get95thPercentile())
+                .writeFieldIfEnabled(P98, snapshot.get98thPercentile())
+                .writeFieldIfEnabled(P99, snapshot.get99thPercentile())
+                .writeFieldIfEnabled(P999, snapshot.get999thPercentile())
                 .writeTimestampMillis(timestamp);
-        
+
         reportLine();
     }
-    
-    
+
+
     private void reportMetered(MetricName name, Metered meter, long timestamp) throws IOException {
         builder.writeMeasurement(name);
         writeMeteredFieldsIfEnabled(meter)
                 .writeTimestampMillis(timestamp);
-            
+
         reportLine();
     }
 
     private InfluxDbLineBuilder writeMeteredFieldsIfEnabled(Metered meter) {
-        return builder
-                .writeFieldIfEnabled(COUNT,     meter.getCount())
-                .writeFieldIfEnabled(SUM,       meter.getSum())
-                .writeFieldIfEnabled(M1_RATE,   convertRate(meter.getOneMinuteRate()))
-                .writeFieldIfEnabled(M5_RATE,   convertRate(meter.getFiveMinuteRate()))
-                .writeFieldIfEnabled(M15_RATE,  convertRate(meter.getFifteenMinuteRate()))
+        return builder.writeFieldIfEnabled(COUNT, meter.getCount())
+                .writeFieldIfEnabled(SUM, meter.getSum())
+                .writeFieldIfEnabled(M1_RATE, convertRate(meter.getOneMinuteRate()))
+                .writeFieldIfEnabled(M5_RATE, convertRate(meter.getFiveMinuteRate()))
+                .writeFieldIfEnabled(M15_RATE, convertRate(meter.getFifteenMinuteRate()))
                 .writeFieldIfEnabled(MEAN_RATE, convertRate(meter.getMeanRate()));
     }
-    
+
     private void reportCounter(MetricName name, Counter counter, long timestamp) throws IOException {
         builder.writeMeasurement(name)
                 .writeFieldIfEnabled(COUNT, counter.getCount())
                 .writeTimestampMillis(timestamp);
-        
+
         reportLine();
     }
 
     private void reportGauge(MetricName name, Gauge<?> gauge, long timestamp) throws IOException {
         builder.writeMeasurement(name);
-        Object value = gauge.getValue();
+        final Object value = gauge.getValue();
         if (value != null) {
             builder.writeField(VALUE);
             if (value instanceof Number) {
-                Number number = (Number) value;
-                if (number instanceof Long || 
-                        number instanceof Integer || 
-                        number instanceof Short || 
+                final Number number = (Number) value;
+                if (number instanceof Long || number instanceof Integer || number instanceof Short ||
                         number instanceof Byte) {
                     builder.writeFieldValue(number.longValue());
                 } else {
                     builder.writeFieldValue(number.doubleValue());
                 }
             } else if (value instanceof Boolean) {
-                builder.writeFieldValue(((Boolean)value));
+                builder.writeFieldValue(((Boolean) value));
             } else {
                 builder.writeFieldValue(value.toString());
             }
         }
         builder.writeTimestampMillis(timestamp);
-        
         reportLine();
-    }    
-    
-    
+    }
+
     private void reportLine() throws IOException {
         if (builder.hasValues()) {
             sender.send(builder.get());
