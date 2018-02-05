@@ -8,6 +8,7 @@
     </parent>
 
     <artifactId>metrics-legacy-adapter-healthchecks</artifactId>
+    <name>Metrics Health Checks Adapter to Metrics 3/4 API</name>
 
     <properties>
         <javaModuleName>com.codahale.metrics.health</javaModuleName>
