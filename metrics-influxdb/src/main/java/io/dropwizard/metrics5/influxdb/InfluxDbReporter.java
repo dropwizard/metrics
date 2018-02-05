@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.WeakHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
@@ -199,12 +197,8 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
     private static final String VALUE = "value";
     
     private final Clock clock;
-    private final MetricName prefix;
     private final InfluxDbSender sender;
-
-    private final WeakHashMap<MetricName, char[]> encodedNameCache = new WeakHashMap<>();
-    private final StringBuilder str = new StringBuilder();
-    private boolean firstField;
+    private final InfluxDbLineBuilder builder;
     
     /**
      * Creates a new InfluxDbReporter instance.
@@ -235,7 +229,7 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
                 disabledMetricAttributes);
         this.sender = sender;
         this.clock = clock;
-        this.prefix = prefix != null ? prefix : MetricName.build();
+        this.builder = new InfluxDbLineBuilder(disabledMetricAttributes, prefix);
     }    
     
     @Override
@@ -297,221 +291,101 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
     
     private void reportTimer(MetricName name, Timer timer, long timestamp) throws IOException {
         final Snapshot snapshot = timer.getSnapshot();
-        writeMeasurement(name);
-        writeFieldIfEnabled(MAX,    convertDuration(snapshot.getMax()));
-        writeFieldIfEnabled(MEAN,   convertDuration(snapshot.getMean()));
-        writeFieldIfEnabled(MIN,    convertDuration(snapshot.getMin()));
-        writeFieldIfEnabled(STDDEV, convertDuration(snapshot.getStdDev()));
-        writeFieldIfEnabled(P50,    convertDuration(snapshot.getMedian()));
-        writeFieldIfEnabled(P75,    convertDuration(snapshot.get75thPercentile()));
-        writeFieldIfEnabled(P95,    convertDuration(snapshot.get95thPercentile()));
-        writeFieldIfEnabled(P98,    convertDuration(snapshot.get98thPercentile()));
-        writeFieldIfEnabled(P99,    convertDuration(snapshot.get99thPercentile()));
-        writeFieldIfEnabled(P999,   convertDuration(snapshot.get999thPercentile()));
-        writeMeteredFieldsIfEnabled(timer);
-        if (hasValues()) {
-            writeTimestampMillis(timestamp);
-            reportLine();
-        }
+        builder.writeMeasurement(name)
+                .writeFieldIfEnabled(MAX,    convertDuration(snapshot.getMax()))
+                .writeFieldIfEnabled(MEAN,   convertDuration(snapshot.getMean()))
+                .writeFieldIfEnabled(MIN,    convertDuration(snapshot.getMin()))
+                .writeFieldIfEnabled(STDDEV, convertDuration(snapshot.getStdDev()))
+                .writeFieldIfEnabled(P50,    convertDuration(snapshot.getMedian()))
+                .writeFieldIfEnabled(P75,    convertDuration(snapshot.get75thPercentile()))
+                .writeFieldIfEnabled(P95,    convertDuration(snapshot.get95thPercentile()))
+                .writeFieldIfEnabled(P98,    convertDuration(snapshot.get98thPercentile()))
+                .writeFieldIfEnabled(P99,    convertDuration(snapshot.get99thPercentile()))
+                .writeFieldIfEnabled(P999,   convertDuration(snapshot.get999thPercentile()));
+        writeMeteredFieldsIfEnabled(timer)
+                .writeTimestampMillis(timestamp);
+
+        reportLine();
     }
 
 
     private void reportHistogram(MetricName name, Histogram histogram, long timestamp) throws IOException {
-        writeMeasurement(name);
         final Snapshot snapshot = histogram.getSnapshot();
-        writeFieldIfEnabled(COUNT, histogram.getCount());
-        writeFieldIfEnabled(SUM, histogram.getSum());
-        writeFieldIfEnabled(MAX,    snapshot.getMax());
-        writeFieldIfEnabled(MEAN,   snapshot.getMean());
-        writeFieldIfEnabled(MIN,    snapshot.getMin());
-        writeFieldIfEnabled(STDDEV, snapshot.getStdDev());
-        writeFieldIfEnabled(P50,    snapshot.getMedian());
-        writeFieldIfEnabled(P75,    snapshot.get75thPercentile());
-        writeFieldIfEnabled(P95,    snapshot.get95thPercentile());
-        writeFieldIfEnabled(P98,    snapshot.get98thPercentile());
-        writeFieldIfEnabled(P99,    snapshot.get99thPercentile());
-        writeFieldIfEnabled(P999,   snapshot.get999thPercentile());
-        if (hasValues()) {
-            writeTimestampMillis(timestamp);
-            reportLine();
-        }
+        builder.writeMeasurement(name)
+                .writeFieldIfEnabled(COUNT,  histogram.getCount())
+                .writeFieldIfEnabled(SUM,    histogram.getSum())
+                .writeFieldIfEnabled(MAX,    snapshot.getMax())
+                .writeFieldIfEnabled(MEAN,   snapshot.getMean())
+                .writeFieldIfEnabled(MIN,    snapshot.getMin())
+                .writeFieldIfEnabled(STDDEV, snapshot.getStdDev())
+                .writeFieldIfEnabled(P50,    snapshot.getMedian())
+                .writeFieldIfEnabled(P75,    snapshot.get75thPercentile())
+                .writeFieldIfEnabled(P95,    snapshot.get95thPercentile())
+                .writeFieldIfEnabled(P98,    snapshot.get98thPercentile())
+                .writeFieldIfEnabled(P99,    snapshot.get99thPercentile())
+                .writeFieldIfEnabled(P999,   snapshot.get999thPercentile())
+                .writeTimestampMillis(timestamp);
+        
+        reportLine();
     }
     
     
     private void reportMetered(MetricName name, Metered meter, long timestamp) throws IOException {
-        writeMeasurement(name);
-        writeMeteredFieldsIfEnabled(meter);
-        if (hasValues()) {
-            writeTimestampMillis(timestamp);
-            reportLine();
-        }
+        builder.writeMeasurement(name);
+        writeMeteredFieldsIfEnabled(meter)
+                .writeTimestampMillis(timestamp);
+            
+        reportLine();
     }
 
-    private void writeMeteredFieldsIfEnabled(Metered meter) {
-        writeFieldIfEnabled(COUNT,     meter.getCount());
-        writeFieldIfEnabled(SUM,       meter.getSum());
-        writeFieldIfEnabled(M1_RATE,   convertRate(meter.getOneMinuteRate()));
-        writeFieldIfEnabled(M5_RATE,   convertRate(meter.getFiveMinuteRate()));
-        writeFieldIfEnabled(M15_RATE,  convertRate(meter.getFifteenMinuteRate()));
-        writeFieldIfEnabled(MEAN_RATE, convertRate(meter.getMeanRate()));
+    private InfluxDbLineBuilder writeMeteredFieldsIfEnabled(Metered meter) {
+        return builder
+                .writeFieldIfEnabled(COUNT,     meter.getCount())
+                .writeFieldIfEnabled(SUM,       meter.getSum())
+                .writeFieldIfEnabled(M1_RATE,   convertRate(meter.getOneMinuteRate()))
+                .writeFieldIfEnabled(M5_RATE,   convertRate(meter.getFiveMinuteRate()))
+                .writeFieldIfEnabled(M15_RATE,  convertRate(meter.getFifteenMinuteRate()))
+                .writeFieldIfEnabled(MEAN_RATE, convertRate(meter.getMeanRate()));
     }
     
     private void reportCounter(MetricName name, Counter counter, long timestamp) throws IOException {
-        writeMeasurement(name);
-        writeFieldIfEnabled(COUNT, counter.getCount());
-        if (hasValues()) {
-            writeTimestampMillis(timestamp);
-            reportLine();
-        }
+        builder.writeMeasurement(name)
+                .writeFieldIfEnabled(COUNT, counter.getCount())
+                .writeTimestampMillis(timestamp);
+        
+        reportLine();
     }
 
     private void reportGauge(MetricName name, Gauge<?> gauge, long timestamp) throws IOException {
-        writeMeasurement(name);
+        builder.writeMeasurement(name);
         Object value = gauge.getValue();
         if (value != null) {
-            writeField(VALUE);
+            builder.writeField(VALUE);
             if (value instanceof Number) {
                 Number number = (Number) value;
                 if (number instanceof Long || 
                         number instanceof Integer || 
                         number instanceof Short || 
                         number instanceof Byte) {
-                    writeFieldValue(number.longValue());
+                    builder.writeFieldValue(number.longValue());
                 } else {
-                    writeFieldValue(number.doubleValue());
+                    builder.writeFieldValue(number.doubleValue());
                 }
             } else if (value instanceof Boolean) {
-                writeFieldValue(((Boolean)value));
+                builder.writeFieldValue(((Boolean)value));
             } else {
-                writeFieldValue(value.toString());
+                builder.writeFieldValue(value.toString());
             }
         }
-        writeTimestampMillis(timestamp);
+        builder.writeTimestampMillis(timestamp);
+        
         reportLine();
     }    
     
-    private void reset() {
-        str.delete(0, str.length());
-    }
-    
-    private void writeMeasurement(MetricName name) {
-        reset();
-        char[] nameChars = encodedNameCache.get(name);
-        if (nameChars != null) {
-            str.append(nameChars);
-        } else {
-            writeMeasurementNoCache(name);
-            nameChars = new char[str.length()];
-            str.getChars(0, str.length(), nameChars, 0);
-            encodedNameCache.put(name, nameChars);
-        }
-        
-        str.append(' ');
-        firstField = true;
-    }
-    
-    private void writeMeasurementNoCache(MetricName name) {
-        MetricName prefixedName = MetricName.join(prefix, name);
-        
-        appendName(prefixedName.getKey(), str);
-        Map<String, String> tags = prefixedName.getTags();
-        if (!tags.isEmpty()) {
-            // InfluxDB Performance and Setup Tips:
-            // Sort tags by key before sending them to the database. 
-            // The sort should match the results from the Go bytes.Compare function.
-            TreeMap<String, String> sortedTags = new TreeMap<>(tags);
-            for (Map.Entry<String, String> tag : sortedTags.entrySet()) {
-                str.append(',');
-                appendName(tag.getKey(), str);
-                str.append('=');
-                appendName(tag.getValue(), str);
-            }
-        }
-    }
-    
-    private void writeTimestampMillis(long utcMillis) {
-        str.append(' ').append(utcMillis).append("000000\n");
-    }
-    
-    private boolean hasValues() {
-        return !firstField;
-    }
     
     private void reportLine() throws IOException {
-        sender.send(str);
-    }
-
-    private void writeFieldIfEnabled(MetricAttribute key, double value) {
-        if (!getDisabledMetricAttributes().contains(key)) {
-            writeField(key);
-            writeFieldValue(value);
+        if (builder.hasValues()) {
+            sender.send(builder.get());
         }
     }
-    
-    private void writeFieldIfEnabled(MetricAttribute key, long value) {
-        if (!getDisabledMetricAttributes().contains(key)) {
-            writeField(key);
-            writeFieldValue(value);
-        }
-    }
-    
-    private void writeField(MetricAttribute key) {
-        if (!firstField) {
-            str.append(',');
-        }
-        str.append(key.getCode()) // no need to escape, only safe chars
-           .append('=');
-        firstField = false;
-    }
-    
-    private void writeField(String key) {
-        if (!firstField) {
-            str.append(',');
-        }
-        appendName(key, str);
-        str.append('=');
-        firstField = false;
-    }
-    
-    private void writeFieldValue(double value) {
-        str.append(value);
-    }
-    
-    private void writeFieldValue(long value) {
-        str.append(value).append('i');
-    }
-    
-    private void writeFieldValue(String value) {
-        str.append('"');
-        appendString(value, str);
-        str.append('"');
-    }
-    
-    private void writeFieldValue(boolean value) {
-        str.append(value ? 't' : 'f');
-    }
-    
-    private static void appendName(CharSequence field, StringBuilder dst) {
-        int len = field.length();
-        for (int i=0; i<len; i++) {
-            char ch = field.charAt(i);
-            if (ch == ',' || ch == '=' || ch == ' ') {
-                // escape
-                dst.append('\\');
-            }
-            dst.append(ch);
-        }
-    }
-    private static void appendString(CharSequence field, StringBuilder dst) {
-        int len = field.length();
-        for (int i=0; i<len; i++) {
-            char ch = field.charAt(i);
-            if (ch == '"') {
-                // escape
-                dst.append('\\');
-            }
-            dst.append(ch);
-        }
-    }
-    
 }

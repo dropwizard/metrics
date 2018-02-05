@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class InfluxDbReporterAssumptionsTest {
+public class InfluxDbLineBuilderAssumptionsTest {
 
     @Test
     public void ensureMetricAttributeCodesAreSafeFieldKeys() {
