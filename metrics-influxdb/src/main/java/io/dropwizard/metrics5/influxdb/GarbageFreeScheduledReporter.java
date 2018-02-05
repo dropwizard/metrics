@@ -17,41 +17,11 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public abstract class GarbageFreeScheduledReporter extends ScheduledReporter {
+abstract class GarbageFreeScheduledReporter extends ScheduledReporter {
 
-    private MetricRegistry registry;
-    private RegistryMirror mirror;
+    private final MetricRegistry registry;
+    private final RegistryMirror mirror;
     
-    protected GarbageFreeScheduledReporter(MetricRegistry registry, 
-            String name, 
-            MetricFilter filter, 
-            TimeUnit rateUnit, 
-            TimeUnit durationUnit) {
-        super(registry, name, filter, rateUnit, durationUnit);
-        init(registry, filter);
-    }
-
-    protected GarbageFreeScheduledReporter(MetricRegistry registry, 
-            String name, 
-            MetricFilter filter, 
-            TimeUnit rateUnit, 
-            TimeUnit durationUnit, 
-            ScheduledExecutorService executor) {
-        super(registry, name, filter, rateUnit, durationUnit, executor);
-        init(registry, filter);
-    }
-
-    protected GarbageFreeScheduledReporter(MetricRegistry registry, 
-            String name, 
-            MetricFilter filter, 
-            TimeUnit rateUnit, 
-            TimeUnit durationUnit, 
-            ScheduledExecutorService executor, 
-            boolean shutdownExecutorOnStop) {
-        super(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop);
-        init(registry, filter);
-    }
-
     protected GarbageFreeScheduledReporter(MetricRegistry registry, 
             String name,
             MetricFilter filter, 
@@ -61,13 +31,9 @@ public abstract class GarbageFreeScheduledReporter extends ScheduledReporter {
             boolean shutdownExecutorOnStop, 
             Set<MetricAttribute> disabledMetricAttributes) {
         super(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, disabledMetricAttributes);
-        init(registry, filter);
-    }
-    
-    private void init(MetricRegistry registry, MetricFilter filter) {
         this.registry = registry;
         this.mirror = new RegistryMirror(filter);
-        mirror.register(registry);
+        registry.addListener(mirror);
     }
 
     @Override
@@ -75,7 +41,7 @@ public abstract class GarbageFreeScheduledReporter extends ScheduledReporter {
         try {
             super.stop();
         } finally {
-            mirror.unregister(registry);
+            registry.removeListener(mirror);
         }
     }
 
@@ -91,10 +57,10 @@ public abstract class GarbageFreeScheduledReporter extends ScheduledReporter {
         }
     }
     
+    @SuppressWarnings("rawtypes") // because of signature (for Gauge) in ScheduledReporter#report(..)
     private static class RegistryMirror implements MetricRegistryListener {
 
         private final MetricFilter filter;
-        @SuppressWarnings("rawtypes") // because of signature in ScheduledReporter#report(..)
         private final ConcurrentSkipListMap<MetricName, Gauge> gauges = new ConcurrentSkipListMap<>();
         private final ConcurrentSkipListMap<MetricName, Counter> counters = new ConcurrentSkipListMap<>();
         private final ConcurrentSkipListMap<MetricName, Histogram> histograms = new ConcurrentSkipListMap<>();
@@ -105,14 +71,6 @@ public abstract class GarbageFreeScheduledReporter extends ScheduledReporter {
             this.filter = filter;
         }
         
-        public void register(MetricRegistry registry) {
-            registry.addListener(this);
-        }
-        public void unregister(MetricRegistry registry) {
-            registry.removeListener(this);
-        }
-
-        @SuppressWarnings("rawtypes") // because of signature in ScheduledReporter#report(..)
         SortedMap<MetricName, Gauge> gauges() {
             return gauges;
         }
