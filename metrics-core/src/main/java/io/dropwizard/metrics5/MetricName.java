@@ -14,7 +14,7 @@ import java.util.TreeSet;
 public class MetricName implements Comparable<MetricName> {
 
     private static final String SEPARATOR = ".";
-    private static final Map<String, String> EMPTY_TAGS = Collections.unmodifiableMap(new HashMap<String, String>());
+    private static final Map<String, String> EMPTY_TAGS = Collections.emptyMap();
     static final MetricName EMPTY = new MetricName("");
 
     private final String key;
