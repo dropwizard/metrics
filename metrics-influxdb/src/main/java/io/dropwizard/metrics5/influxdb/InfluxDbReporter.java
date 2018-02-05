@@ -175,11 +175,11 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
         }
 
         /**
-         * Builds a GraphiteReporter with the given properties, sending metrics using the
+         * Builds a InfluxDbReporter with the given properties, sending metrics using the
          * given InfluxDbSender.
          *
-         * @param sender the GraphiteSender
-         * @return the GraphiteReporter
+         * @param sender the InfluxDbSender
+         * @return the InfluxDbReporter
          */
         public InfluxDbReporter build(InfluxDbSender sender) {
             return new InfluxDbReporter(registry,
