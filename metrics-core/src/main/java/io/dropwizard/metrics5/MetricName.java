@@ -67,8 +67,9 @@ public class MetricName implements Comparable<MetricName> {
      * @return A newly created metric name with the specified tags associated with it.
      */
     public MetricName tagged(Map<String, String> add) {
-        final Map<String, String> newTags = new HashMap<>(add);
+        final Map<String, String> newTags = new HashMap<>();
         newTags.putAll(tags);
+        newTags.putAll(add);
         return new MetricName(key, newTags);
     }
 
