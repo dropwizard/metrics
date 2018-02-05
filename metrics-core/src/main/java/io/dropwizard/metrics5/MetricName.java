@@ -26,7 +26,7 @@ public class MetricName implements Comparable<MetricName> {
 
     public MetricName(String key, Map<String, String> tags) {
         this.key = Objects.requireNonNull(key);
-        this.tags = tags.isEmpty() ? EMPTY_TAGS : Collections.unmodifiableMap(tags);
+        this.tags = tags.isEmpty() ? EMPTY_TAGS : Collections.unmodifiableMap(new HashMap<>(tags));
     }
 
     public String getKey() {
