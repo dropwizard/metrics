@@ -1,7 +1,6 @@
 package io.dropwizard.metrics5.influxdb;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
