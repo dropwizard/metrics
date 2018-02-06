@@ -44,6 +44,10 @@ public class MetricName implements Comparable<MetricName> {
         return key;
     }
 
+    /**
+     * Returns the tags, sorted by key.
+     * @return the tags (immutable), sorted by key.
+     */
     public Map<String, String> getTags() {
         return tags;
     }
