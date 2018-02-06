@@ -1,11 +1,12 @@
 package io.dropwizard.metrics5;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,9 +37,9 @@ public class MetricName implements Comparable<MetricName> {
 
     public MetricName(String key, Map<String, String> tags) {
         this.key = Objects.requireNonNull(key);
-        this.tags = tags.isEmpty() ? EMPTY_TAGS : Collections.unmodifiableMap(new HashMap<>(tags));
+        this.tags = tags.isEmpty() ? EMPTY_TAGS : unmodifiableSortedCopy(tags);
     }
-
+    
     public String getKey() {
         return key;
     }
@@ -162,36 +163,37 @@ public class MetricName implements Comparable<MetricName> {
     }
 
     private int compareTags(Map<String, String> left, Map<String, String> right) {
-        if (left.isEmpty() && right.isEmpty()) {
-            return 0;
-        } else if (left.isEmpty()) {
-            return -1;
-        } else if (right.isEmpty()) {
-            return 1;
-        }
-        final Iterable<String> keys = uniqueSortedKeys(left, right);
-        for (final String k : keys) {
-            final String a = left.get(k);
-            final String b = right.get(k);
-            if (a == null && b == null) {
-                continue;
-            } else if (a == null) {
-                return -1;
-            } else if (b == null) {
-                return 1;
+        Iterator<Map.Entry<String, String>> lit = left.entrySet().iterator();
+        Iterator<Map.Entry<String, String>> rit = right.entrySet().iterator();
+        
+        while (lit.hasNext() && rit.hasNext()) {
+            Map.Entry<String, String> l = lit.next();
+            Map.Entry<String, String> r = rit.next();
+            int c = l.getKey().compareTo(r.getKey());
+            if (c != 0) {
+                return c;
             }
-            int c = a.compareTo(b);
+            c = l.getValue().compareTo(r.getValue());
             if (c != 0) {
                 return c;
             }
         }
-
-        return 0;
+        if (lit.hasNext()) {
+            return 1;
+        } else if (rit.hasNext()) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 
-    private Iterable<String> uniqueSortedKeys(Map<String, String> left, Map<String, String> right) {
-        final Set<String> set = new TreeSet<>(left.keySet());
-        set.addAll(right.keySet());
-        return set;
+    private static <K extends Comparable<K>,V> Map<K, V> unmodifiableSortedCopy(Map<K, V> map) {
+        LinkedHashMap<K, V> sorted = new LinkedHashMap<>();
+        map.entrySet()
+                .stream()
+                .sorted(Comparator.comparing(Map.Entry::getKey))
+                .forEach(e -> sorted.put(e.getKey(), e.getValue()));
+        return Collections.unmodifiableMap(sorted);
     }
+
 }

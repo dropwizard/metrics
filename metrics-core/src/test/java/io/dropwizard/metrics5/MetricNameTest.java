@@ -83,4 +83,15 @@ public class MetricNameTest {
         assertThat(b.resolve("key").compareTo(b)).isGreaterThan(0);
         assertThat(b.compareTo(b.resolve("key"))).isLessThan(0);
     }
+
+    @Test
+    public void testCompareTo2() {
+        final MetricName a = MetricName.EMPTY.tagged("a", "x");
+        final MetricName b = MetricName.EMPTY.tagged("b", "x");
+
+        assertThat(MetricName.EMPTY.compareTo(a)).isLessThan(0);
+        assertThat(MetricName.EMPTY.compareTo(b)).isLessThan(0);
+        assertThat(a.compareTo(b)).isLessThan(0);
+        assertThat(b.compareTo(a)).isGreaterThan(0);
+    }
 }
