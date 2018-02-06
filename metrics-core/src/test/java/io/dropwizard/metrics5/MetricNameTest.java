@@ -14,7 +14,7 @@ public class MetricNameTest {
         assertThat(MetricName.EMPTY.getKey()).isEqualTo("");
 
         assertThat(MetricName.build()).isEqualTo(MetricName.EMPTY);
-        assertThat(MetricName.EMPTY.resolve(null)).isEqualTo(MetricName.EMPTY);
+        assertThat(MetricName.EMPTY.resolve((String)null)).isEqualTo(MetricName.EMPTY);
     }
 
     @Test
@@ -26,7 +26,7 @@ public class MetricNameTest {
     @Test
     public void testResolveToEmpty() {
         final MetricName name = MetricName.build("foo");
-        assertThat(name.resolve(null)).isEqualTo(MetricName.build("foo"));
+        assertThat(name.resolve((String)null)).isEqualTo(MetricName.build("foo"));
     }
 
     @Test
@@ -38,7 +38,7 @@ public class MetricNameTest {
     @Test
     public void testResolveBothEmpty() {
         final MetricName name = MetricName.build();
-        assertThat(name.resolve(null)).isEqualTo(MetricName.EMPTY);
+        assertThat(name.resolve((String)null)).isEqualTo(MetricName.EMPTY);
     }
 
     @Test

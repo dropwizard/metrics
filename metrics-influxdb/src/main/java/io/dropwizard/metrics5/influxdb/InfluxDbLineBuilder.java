@@ -39,7 +39,7 @@ class InfluxDbLineBuilder {
 
     InfluxDbLineBuilder(Set<MetricAttribute> disabledMetricAttributes, MetricName prefix) {
         this.disabledMetricAttributes = disabledMetricAttributes;
-        this.prefix = prefix != null ? prefix : MetricName.build();
+        this.prefix = prefix != null ? prefix : MetricName.empty();
     }
 
     InfluxDbLineBuilder writeMeasurement(MetricName name) {
@@ -53,7 +53,7 @@ class InfluxDbLineBuilder {
     private String writeMeasurementNoCache(MetricName name) {
         StringBuilder sb = new StringBuilder();
 
-        MetricName prefixedName = MetricName.join(prefix, name);
+        MetricName prefixedName = prefix.append(name);
         appendName(prefixedName.getKey(), sb);
         // InfluxDB Performance and Setup Tips:
         // Sort tags by key before sending them to the database. 

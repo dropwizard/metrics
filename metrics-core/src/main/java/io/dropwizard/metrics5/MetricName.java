@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A metric name with the ability to include semantic tags.
@@ -17,9 +19,17 @@ public class MetricName implements Comparable<MetricName> {
     private static final Map<String, String> EMPTY_TAGS = Collections.emptyMap();
     static final MetricName EMPTY = new MetricName("");
 
+    /**
+     * Returns an empty metric name.
+     * @return an empty metric name.
+     */
+    public static MetricName empty() {
+        return EMPTY;
+    }
+    
     private final String key;
     private final Map<String, String> tags;
-
+    
     private MetricName(String key) {
         this(key, EMPTY_TAGS);
     }
@@ -41,23 +51,19 @@ public class MetricName implements Comparable<MetricName> {
      * Build the MetricName that is this with another path appended to it.
      * The new MetricName inherits the tags of this one.
      *
-     * @param p The extra path element to add to the new metric.
+     * @param parts The extra path elements to add to the new metric.
      * @return A new metric name relative to the original by the path specified
-     * in p.
+     * in parts.
      */
-    public MetricName resolve(String p) {
-        final String next;
-        if (p != null && !p.isEmpty()) {
-            if (!key.isEmpty()) {
-                next = key + SEPARATOR + p;
-            } else {
-                next = p;
-            }
-        } else {
-            next = key;
+    public MetricName resolve(String... parts) {
+        if (parts == null || parts.length == 0) {
+            return this;
         }
-
-        return new MetricName(next, tags);
+        
+        String newKey = Stream.concat(Stream.of(key), Stream.of(parts))
+                .filter(s -> s != null && !s.isEmpty())
+                .collect(Collectors.joining(SEPARATOR));
+        return new MetricName(newKey, tags);
     }
 
     /**
@@ -96,74 +102,34 @@ public class MetricName implements Comparable<MetricName> {
 
         return tagged(add);
     }
-
+    
     /**
-     * Join the specified set of metric names.
+     * Build the MetricName that is this with another path and tags appended to it.
+     * 
+     * <p>
+     * Semantically equivalent to: <br>
+     * <code>this.resolve(append.getKey()).tagged(append.getTags());</code>
      *
-     * @param parts Multiple metric names to join using the separator.
-     * @return A newly created metric name which has the name of the specified
-     * parts and includes all tags of all child metric names.
-     **/
-    public static MetricName join(MetricName... parts) {
-        final StringBuilder nameBuilder = new StringBuilder();
-        final Map<String, String> tags = new HashMap<>();
-
-        boolean first = true;
-
-        for (MetricName part : parts) {
-            final String name = part.getKey();
-            if (name != null && !name.isEmpty()) {
-                if (first) {
-                    first = false;
-                } else {
-                    nameBuilder.append(SEPARATOR);
-                }
-
-                nameBuilder.append(name);
-            }
-
-            if (!part.getTags().isEmpty()) {
-                tags.putAll(part.getTags());
-            }
-        }
-
-        return new MetricName(nameBuilder.toString(), tags);
+     * @param append The extra name element to add to the new metric.
+     * @return A new metric name with path appended to the original, 
+     * and tags included from both names.
+     */
+    public MetricName append(MetricName append) {
+        return resolve(append.key).tagged(append.tags);
     }
-
+    
     /**
      * Build a new metric name using the specific path components.
+     * 
+     * <p>
+     * Equivalent to:<br>
+     * <code>MetricName.empty().resolve(parts);</code>
      *
      * @param parts Path of the new metric name.
      * @return A newly created metric name with the specified path.
      **/
     public static MetricName build(String... parts) {
-        if (parts == null || parts.length == 0) {
-            return MetricName.EMPTY;
-        } else if (parts.length == 1) {
-            return new MetricName(parts[0], EMPTY_TAGS);
-        }
-        return new MetricName(buildName(parts), EMPTY_TAGS);
-    }
-
-    private static String buildName(String... names) {
-        final StringBuilder builder = new StringBuilder();
-        boolean first = true;
-
-        for (String name : names) {
-            if (name == null || name.isEmpty()) {
-                continue;
-            }
-
-            if (first) {
-                first = false;
-            } else {
-                builder.append(SEPARATOR);
-            }
-
-            builder.append(name);
-        }
-
-        return builder.toString();
+        return EMPTY.resolve(parts);
     }
 
     @Override

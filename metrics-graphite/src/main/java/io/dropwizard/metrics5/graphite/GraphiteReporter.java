@@ -384,7 +384,7 @@ public class GraphiteReporter extends ScheduledReporter {
     }
 
     private String prefix(MetricName name, String... components) {
-        return MetricName.join(MetricName.join(prefix, name), MetricName.build(components)).getKey();
+        return prefix.append(name).resolve(components).getKey();
     }
 
     private String format(long n) {

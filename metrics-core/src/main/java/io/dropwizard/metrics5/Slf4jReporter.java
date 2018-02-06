@@ -316,7 +316,7 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     private String prefix(MetricName metricName) {
-        return MetricName.join(prefix, metricName).toString();
+        return prefix.append(metricName).toString();
     }
 
     /* private class to allow logger configuration */
