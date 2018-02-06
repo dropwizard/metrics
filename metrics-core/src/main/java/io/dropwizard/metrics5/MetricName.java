@@ -18,7 +18,7 @@ public class MetricName implements Comparable<MetricName> {
 
     private static final String SEPARATOR = ".";
     private static final Map<String, String> EMPTY_TAGS = Collections.emptyMap();
-    static final MetricName EMPTY = new MetricName("");
+    static final MetricName EMPTY = new MetricName("", EMPTY_TAGS);
 
     /**
      * Returns an empty metric name.
@@ -31,10 +31,6 @@ public class MetricName implements Comparable<MetricName> {
     private final String key;
     private final Map<String, String> tags;
     
-    private MetricName(String key) {
-        this(key, EMPTY_TAGS);
-    }
-
     public MetricName(String key, Map<String, String> tags) {
         this.key = Objects.requireNonNull(key);
         this.tags = tags.isEmpty() ? EMPTY_TAGS : unmodifiableSortedCopy(tags);
