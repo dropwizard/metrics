@@ -153,11 +153,7 @@ public class MetricName implements Comparable<MetricName> {
 
     @Override
     public int compareTo(MetricName o) {
-        if (o == null) {
-            return -1;
-        }
-
-        int c = compareName(key, o.getKey());
+        int c = key.compareTo(o.getKey());
         if (c != 0) {
             return c;
         }
@@ -165,30 +161,18 @@ public class MetricName implements Comparable<MetricName> {
         return compareTags(tags, o.getTags());
     }
 
-    private int compareName(String left, String right) {
-        if (left.isEmpty() && right.isEmpty()) {
-            return 0;
-        } else if (left.isEmpty()) {
-            return 1;
-        } else if (right.isEmpty()) {
-            return -1;
-        }
-
-        return left.compareTo(right);
-    }
-
     private int compareTags(Map<String, String> left, Map<String, String> right) {
         if (left.isEmpty() && right.isEmpty()) {
             return 0;
         } else if (left.isEmpty()) {
-            return 1;
-        } else if (right.isEmpty()) {
             return -1;
+        } else if (right.isEmpty()) {
+            return 1;
         }
         final Iterable<String> keys = uniqueSortedKeys(left, right);
-        for (final String key : keys) {
-            final String a = left.get(key);
-            final String b = right.get(key);
+        for (final String k : keys) {
+            final String a = left.get(k);
+            final String b = right.get(k);
             if (a == null && b == null) {
                 continue;
             } else if (a == null) {
