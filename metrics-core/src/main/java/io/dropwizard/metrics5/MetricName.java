@@ -1,11 +1,14 @@
 package io.dropwizard.metrics5;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A metric name with the ability to include semantic tags.
@@ -14,25 +17,33 @@ import java.util.TreeSet;
 public class MetricName implements Comparable<MetricName> {
 
     private static final String SEPARATOR = ".";
-    private static final Map<String, String> EMPTY_TAGS = Collections.unmodifiableMap(new HashMap<String, String>());
-    static final MetricName EMPTY = new MetricName("");
+    private static final Map<String, String> EMPTY_TAGS = Collections.emptyMap();
+    static final MetricName EMPTY = new MetricName("", EMPTY_TAGS);
 
+    /**
+     * Returns an empty metric name.
+     * @return an empty metric name.
+     */
+    public static MetricName empty() {
+        return EMPTY;
+    }
+    
     private final String key;
     private final Map<String, String> tags;
-
-    private MetricName(String key) {
-        this(key, EMPTY_TAGS);
-    }
-
+    
     public MetricName(String key, Map<String, String> tags) {
         this.key = Objects.requireNonNull(key);
-        this.tags = tags.isEmpty() ? EMPTY_TAGS : Collections.unmodifiableMap(tags);
+        this.tags = tags.isEmpty() ? EMPTY_TAGS : unmodifiableSortedCopy(tags);
     }
-
+    
     public String getKey() {
         return key;
     }
 
+    /**
+     * Returns the tags, sorted by key.
+     * @return the tags (immutable), sorted by key.
+     */
     public Map<String, String> getTags() {
         return tags;
     }
@@ -41,23 +52,19 @@ public class MetricName implements Comparable<MetricName> {
      * Build the MetricName that is this with another path appended to it.
      * The new MetricName inherits the tags of this one.
      *
-     * @param p The extra path element to add to the new metric.
+     * @param parts The extra path elements to add to the new metric.
      * @return A new metric name relative to the original by the path specified
-     * in p.
+     * in parts.
      */
-    public MetricName resolve(String p) {
-        final String next;
-        if (p != null && !p.isEmpty()) {
-            if (!key.isEmpty()) {
-                next = key + SEPARATOR + p;
-            } else {
-                next = p;
-            }
-        } else {
-            next = key;
+    public MetricName resolve(String... parts) {
+        if (parts == null || parts.length == 0) {
+            return this;
         }
-
-        return new MetricName(next, tags);
+        
+        String newKey = Stream.concat(Stream.of(key), Stream.of(parts))
+                .filter(s -> s != null && !s.isEmpty())
+                .collect(Collectors.joining(SEPARATOR));
+        return new MetricName(newKey, tags);
     }
 
     /**
@@ -67,8 +74,9 @@ public class MetricName implements Comparable<MetricName> {
      * @return A newly created metric name with the specified tags associated with it.
      */
     public MetricName tagged(Map<String, String> add) {
-        final Map<String, String> newTags = new HashMap<>(add);
+        final Map<String, String> newTags = new HashMap<>();
         newTags.putAll(tags);
+        newTags.putAll(add);
         return new MetricName(key, newTags);
     }
 
@@ -95,74 +103,34 @@ public class MetricName implements Comparable<MetricName> {
 
         return tagged(add);
     }
-
+    
     /**
-     * Join the specified set of metric names.
+     * Build the MetricName that is this with another path and tags appended to it.
+     * 
+     * <p>
+     * Semantically equivalent to: <br>
+     * <code>this.resolve(append.getKey()).tagged(append.getTags());</code>
      *
-     * @param parts Multiple metric names to join using the separator.
-     * @return A newly created metric name which has the name of the specified
-     * parts and includes all tags of all child metric names.
-     **/
-    public static MetricName join(MetricName... parts) {
-        final StringBuilder nameBuilder = new StringBuilder();
-        final Map<String, String> tags = new HashMap<>();
-
-        boolean first = true;
-
-        for (MetricName part : parts) {
-            final String name = part.getKey();
-            if (name != null && !name.isEmpty()) {
-                if (first) {
-                    first = false;
-                } else {
-                    nameBuilder.append(SEPARATOR);
-                }
-
-                nameBuilder.append(name);
-            }
-
-            if (!part.getTags().isEmpty()) {
-                tags.putAll(part.getTags());
-            }
-        }
-
-        return new MetricName(nameBuilder.toString(), tags);
+     * @param append The extra name element to add to the new metric.
+     * @return A new metric name with path appended to the original, 
+     * and tags included from both names.
+     */
+    public MetricName append(MetricName append) {
+        return resolve(append.key).tagged(append.tags);
     }
-
+    
     /**
      * Build a new metric name using the specific path components.
+     * 
+     * <p>
+     * Equivalent to:<br>
+     * <code>MetricName.empty().resolve(parts);</code>
      *
      * @param parts Path of the new metric name.
      * @return A newly created metric name with the specified path.
      **/
     public static MetricName build(String... parts) {
-        if (parts == null || parts.length == 0) {
-            return MetricName.EMPTY;
-        } else if (parts.length == 1) {
-            return new MetricName(parts[0], EMPTY_TAGS);
-        }
-        return new MetricName(buildName(parts), EMPTY_TAGS);
-    }
-
-    private static String buildName(String... names) {
-        final StringBuilder builder = new StringBuilder();
-        boolean first = true;
-
-        for (String name : names) {
-            if (name == null || name.isEmpty()) {
-                continue;
-            }
-
-            if (first) {
-                first = false;
-            } else {
-                builder.append(SEPARATOR);
-            }
-
-            builder.append(name);
-        }
-
-        return builder.toString();
+        return EMPTY.resolve(parts);
     }
 
     @Override
@@ -186,11 +154,7 @@ public class MetricName implements Comparable<MetricName> {
 
     @Override
     public int compareTo(MetricName o) {
-        if (o == null) {
-            return -1;
-        }
-
-        int c = compareName(key, o.getKey());
+        int c = key.compareTo(o.getKey());
         if (c != 0) {
             return c;
         }
@@ -198,49 +162,38 @@ public class MetricName implements Comparable<MetricName> {
         return compareTags(tags, o.getTags());
     }
 
-    private int compareName(String left, String right) {
-        if (left.isEmpty() && right.isEmpty()) {
-            return 0;
-        } else if (left.isEmpty()) {
-            return 1;
-        } else if (right.isEmpty()) {
-            return -1;
-        }
-
-        return left.compareTo(right);
-    }
-
     private int compareTags(Map<String, String> left, Map<String, String> right) {
-        if (left.isEmpty() && right.isEmpty()) {
-            return 0;
-        } else if (left.isEmpty()) {
-            return 1;
-        } else if (right.isEmpty()) {
-            return -1;
-        }
-        final Iterable<String> keys = uniqueSortedKeys(left, right);
-        for (final String key : keys) {
-            final String a = left.get(key);
-            final String b = right.get(key);
-            if (a == null && b == null) {
-                continue;
-            } else if (a == null) {
-                return -1;
-            } else if (b == null) {
-                return 1;
+        Iterator<Map.Entry<String, String>> lit = left.entrySet().iterator();
+        Iterator<Map.Entry<String, String>> rit = right.entrySet().iterator();
+        
+        while (lit.hasNext() && rit.hasNext()) {
+            Map.Entry<String, String> l = lit.next();
+            Map.Entry<String, String> r = rit.next();
+            int c = l.getKey().compareTo(r.getKey());
+            if (c != 0) {
+                return c;
             }
-            int c = a.compareTo(b);
+            c = l.getValue().compareTo(r.getValue());
             if (c != 0) {
                 return c;
             }
         }
-
-        return 0;
+        if (lit.hasNext()) {
+            return 1;
+        } else if (rit.hasNext()) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 
-    private Iterable<String> uniqueSortedKeys(Map<String, String> left, Map<String, String> right) {
-        final Set<String> set = new TreeSet<>(left.keySet());
-        set.addAll(right.keySet());
-        return set;
+    private static <K extends Comparable<K>,V> Map<K, V> unmodifiableSortedCopy(Map<K, V> map) {
+        LinkedHashMap<K, V> sorted = new LinkedHashMap<>();
+        map.entrySet()
+                .stream()
+                .sorted(Comparator.comparing(Map.Entry::getKey))
+                .forEach(e -> sorted.put(e.getKey(), e.getValue()));
+        return Collections.unmodifiableMap(sorted);
     }
+
 }

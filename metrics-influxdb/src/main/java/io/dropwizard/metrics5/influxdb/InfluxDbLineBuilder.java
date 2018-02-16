@@ -3,7 +3,6 @@ package io.dropwizard.metrics5.influxdb;
 import io.dropwizard.metrics5.MetricAttribute;
 import io.dropwizard.metrics5.MetricName;
 
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -39,7 +38,7 @@ class InfluxDbLineBuilder {
 
     InfluxDbLineBuilder(Set<MetricAttribute> disabledMetricAttributes, MetricName prefix) {
         this.disabledMetricAttributes = disabledMetricAttributes;
-        this.prefix = prefix != null ? prefix : MetricName.build();
+        this.prefix = prefix != null ? prefix : MetricName.empty();
     }
 
     InfluxDbLineBuilder writeMeasurement(MetricName name) {
@@ -53,21 +52,18 @@ class InfluxDbLineBuilder {
     private String writeMeasurementNoCache(MetricName name) {
         StringBuilder sb = new StringBuilder();
 
-        MetricName prefixedName = MetricName.join(prefix, name);
+        MetricName prefixedName = prefix.append(name);
         appendName(prefixedName.getKey(), sb);
         // InfluxDB Performance and Setup Tips:
         // Sort tags by key before sending them to the database. 
         // The sort should match the results from the Go bytes.Compare function.
-        prefixedName.getTags()
-                .entrySet()
-                .stream()
-                .sorted(Comparator.comparing(Map.Entry::getKey))
-                .forEach(tag -> {
-                    sb.append(',');
-                    appendName(tag.getKey(), sb);
-                    sb.append('=');
-                    appendName(tag.getValue(), sb);
-                });
+        // ... tags are already sorted in MetricName
+        for (Map.Entry<String, String> tag : prefixedName.getTags().entrySet()) {
+            sb.append(',');
+            appendName(tag.getKey(), sb);
+            sb.append('=');
+            appendName(tag.getValue(), sb);
+        }
         return sb.toString();
     }
 

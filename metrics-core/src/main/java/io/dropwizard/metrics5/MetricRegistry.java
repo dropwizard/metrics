@@ -537,9 +537,9 @@ public class MetricRegistry implements MetricSet {
 
         for (Map.Entry<MetricName, Metric> entry : metrics.getMetrics().entrySet()) {
             if (entry.getValue() instanceof MetricSet) {
-                registerAll(MetricName.join(prefix, entry.getKey()), (MetricSet) entry.getValue());
+                registerAll(prefix.append(entry.getKey()), (MetricSet) entry.getValue());
             } else {
-                register(MetricName.join(prefix, entry.getKey()), entry.getValue());
+                register(prefix.append(entry.getKey()), entry.getValue());
             }
         }
     }
