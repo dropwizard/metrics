@@ -58,6 +58,6 @@ Reporters
 * `metrics-zabbiz <https://github.com/hengyunabc/metrics-zabbix>`_ provides a reporter for `Zabbix <http://www.zabbix.com/>`_.
 * `sematext-metrics-reporter <https://github.com/sematext/sematext-metrics-reporter>`_ provides a reporter for `SPM <http://sematext.com/spm/index.html>`_.
 
-Advansed metrics implementations
+Advanced metrics implementations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * `rolling-metrics <https://github.com/vladimir-bukhtoyarov/rolling-metrics>`_ provides a collection of advanced metrics with rolling time window semantic, such as Rolling-Counter, Hit-Ratio, Top and Reservoir backed by HdrHistogram.
