@@ -10,8 +10,16 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import static com.codahale.metrics.MetricAttribute.*;
-import static org.mockito.Mockito.*;
+import static com.codahale.metrics.MetricAttribute.COUNT;
+import static com.codahale.metrics.MetricAttribute.M1_RATE;
+import static com.codahale.metrics.MetricAttribute.MEAN_RATE;
+import static com.codahale.metrics.MetricAttribute.MIN;
+import static com.codahale.metrics.MetricAttribute.P50;
+import static com.codahale.metrics.MetricAttribute.P999;
+import static com.codahale.metrics.MetricAttribute.STDDEV;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class Slf4jReporterTest {
 
@@ -19,7 +27,40 @@ public class Slf4jReporterTest {
     private final Marker marker = mock(Marker.class);
     private final MetricRegistry registry = mock(MetricRegistry.class);
 
+    /**
+     * The set of disabled metric attributes to pass to the Slf4jReporter builder
+     * in the default factory methods of {@link #infoReporter}
+     * and {@link #errorReporter}.
+     *
+     * This value can be overridden by tests before calling the {@link #infoReporter}
+     * and {@link #errorReporter} factory methods.
+     */
     private Set<MetricAttribute> disabledMetricAttributes = null;
+
+    private Slf4jReporter infoReporter() {
+        return Slf4jReporter.forRegistry(registry)
+                .outputTo(logger)
+                .markWith(marker)
+                .prefixedWith("prefix")
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .withLoggingLevel(Slf4jReporter.LoggingLevel.INFO)
+                .filter(MetricFilter.ALL)
+                .disabledMetricAttributes(disabledMetricAttributes)
+                .build();
+    }
+
+    private Slf4jReporter errorReporter() {
+        return Slf4jReporter.forRegistry(registry)
+                .outputTo(logger)
+                .markWith(marker)
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .withLoggingLevel(Slf4jReporter.LoggingLevel.ERROR)
+                .filter(MetricFilter.ALL)
+                .disabledMetricAttributes(disabledMetricAttributes)
+                .build();
+    }
 
     @Test
     public void reportsGaugeValuesAtErrorDefault() {
@@ -40,7 +81,7 @@ public class Slf4jReporterTest {
                 map(),
                 map());
 
-        verifyError(expectedLog);
+        verify(logger).error(marker, expectedLog);
     }
 
     @Test
@@ -49,17 +90,11 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsCounterValuesAtErrorAllDisabledButCount() {
-        disabledMetricAttributes = EnumSet.allOf(MetricAttribute.class);
-        disabledMetricAttributes.remove(COUNT);
+    public void reportsCounterValuesAtErrorAllDisabled() {
+        disabledMetricAttributes = EnumSet.allOf(MetricAttribute.class); // has no effect
         reportsCounterValuesAtError("type=COUNTER, name=test.counter, count=100");
     }
 
-    @Test
-    public void reportsCounterValuesAtErrorCountDisabled() {
-        disabledMetricAttributes = EnumSet.of(COUNT);
-        reportsCounterValuesAtError(null);
-    }
 
     private void reportsCounterValuesAtError(final String expectedLog) {
         final Counter counter = mock(Counter.class);
@@ -72,7 +107,7 @@ public class Slf4jReporterTest {
                 map(),
                 map());
 
-        verifyError(expectedLog);
+        verify(logger).error(marker, expectedLog);
     }
 
     @Test
@@ -111,7 +146,7 @@ public class Slf4jReporterTest {
                 map(),
                 map());
 
-        verifyError(expectedLog);
+        verify(logger).error(marker, expectedLog);
     }
 
     @Test
@@ -140,7 +175,7 @@ public class Slf4jReporterTest {
                 map("test.meter", meter),
                 map());
 
-        verifyError(expectedLog);
+        verify(logger).error(marker, expectedLog);
     }
 
     @Test
@@ -186,7 +221,7 @@ public class Slf4jReporterTest {
                 map(),
                 map("test.another.timer", timer));
 
-        verifyError(expectedLog);
+        verify(logger).error(marker, expectedLog);
     }
 
     @Test
@@ -202,7 +237,7 @@ public class Slf4jReporterTest {
                 map(),
                 map());
 
-        verifyInfo(expectedLog);
+        verify(logger).info(marker, expectedLog);
     }
 
     @Test
@@ -221,7 +256,7 @@ public class Slf4jReporterTest {
                 map(),
                 map());
 
-        verifyInfo(expectedLog);
+        verify(logger).info(marker, expectedLog);
     }
 
     @Test
@@ -277,7 +312,7 @@ public class Slf4jReporterTest {
                 map("test.meter", meter),
                 map());
 
-        verifyInfo(expectedLog);
+        verify(logger).info(marker, expectedLog);
     }
 
     @Test
@@ -316,48 +351,7 @@ public class Slf4jReporterTest {
                 map(),
                 map("test.another.timer", timer));
 
-        verifyInfo(expectedLog);
-    }
-
-    private Slf4jReporter infoReporter() {
-        return Slf4jReporter.forRegistry(registry)
-                .outputTo(logger)
-                .markWith(marker)
-                .prefixedWith("prefix")
-                .convertRatesTo(TimeUnit.SECONDS)
-                .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .withLoggingLevel(Slf4jReporter.LoggingLevel.INFO)
-                .filter(MetricFilter.ALL)
-                .disabledMetricAttributes(disabledMetricAttributes)
-                .build();
-    }
-
-    private Slf4jReporter errorReporter() {
-        return Slf4jReporter.forRegistry(registry)
-                .outputTo(logger)
-                .markWith(marker)
-                .convertRatesTo(TimeUnit.SECONDS)
-                .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .withLoggingLevel(Slf4jReporter.LoggingLevel.ERROR)
-                .filter(MetricFilter.ALL)
-                .disabledMetricAttributes(disabledMetricAttributes)
-                .build();
-    }
-
-    private void verifyError(String expectedLog) {
-        if (expectedLog == null) {
-            verify(logger, never()).error(marker, expectedLog);
-        } else {
-            verify(logger).error(marker, expectedLog);
-        }
-    }
-
-    private void verifyInfo(String expectedLog) {
-        if (expectedLog == null) {
-            verify(logger, never()).info(marker, expectedLog);
-        } else {
-            verify(logger).info(marker, expectedLog);
-        }
+        verify(logger).info(marker, expectedLog);
     }
 
     private <T> SortedMap<String, T> map() {

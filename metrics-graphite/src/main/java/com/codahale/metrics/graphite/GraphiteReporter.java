@@ -171,7 +171,7 @@ public class GraphiteReporter extends ScheduledReporter {
          * Don't report the passed metric attributes for all metrics (e.g. "p999", "stddev" or "m15").
          * See {@link MetricAttribute}.
          *
-         * @param disabledMetricAttributes a {@link MetricFilter}
+         * @param disabledMetricAttributes a set of {@link MetricAttribute}
          * @return {@code this}
          */
         public Builder disabledMetricAttributes(Set<MetricAttribute> disabledMetricAttributes) {
