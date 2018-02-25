@@ -219,7 +219,8 @@ public class Slf4jReporter extends ScheduledReporter {
                     loggerProxy = new DebugLoggerProxy(logger);
                     break;
             }
-            return new Slf4jReporter(registry, loggerProxy, marker, prefix, rateUnit, durationUnit, filter, executor, shutdownExecutorOnStop, disabledMetricAttributes);
+            return new Slf4jReporter(registry, loggerProxy, marker, prefix, rateUnit, durationUnit, filter, executor,
+                    shutdownExecutorOnStop, disabledMetricAttributes);
         }
     }
 
@@ -237,7 +238,8 @@ public class Slf4jReporter extends ScheduledReporter {
                           ScheduledExecutorService executor,
                           boolean shutdownExecutorOnStop,
                           Set<MetricAttribute> disabledMetricAttributes) {
-        super(registry, "logger-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, disabledMetricAttributes);
+        super(registry, "logger-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
+                disabledMetricAttributes);
         this.loggerProxy = loggerProxy;
         this.marker = marker;
         this.prefix = prefix;
@@ -276,7 +278,6 @@ public class Slf4jReporter extends ScheduledReporter {
 
     private void logTimer(StringBuilder b, String name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
-        b.setLength(0);
         b.append("type=TIMER");
         append(b, "name", prefix(name));
         appendCountIfEnabled(b, timer);
@@ -297,7 +298,6 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     private void logMeter(StringBuilder b, String name, Meter meter) {
-        b.setLength(0);
         b.append("type=METER");
         append(b, "name", prefix(name));
         appendCountIfEnabled(b, meter);
@@ -308,7 +308,6 @@ public class Slf4jReporter extends ScheduledReporter {
 
     private void logHistogram(StringBuilder b, String name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
-        b.setLength(0);
         b.append("type=HISTOGRAM");
         append(b, "name", prefix(name));
         appendCountIfEnabled(b, histogram);
@@ -326,7 +325,6 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     private void logCounter(StringBuilder b, String name, Counter counter) {
-        b.setLength(0);
         b.append("type=COUNTER");
         append(b, "name", prefix(name));
         append(b, COUNT.getCode(), counter.getCount());
@@ -334,32 +332,35 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     private void logGauge(StringBuilder b, String name, Gauge<?> gauge) {
-        b.setLength(0);
         b.append("type=GAUGE");
         append(b, "name", prefix(name));
         append(b, "value", gauge.getValue());
         loggerProxy.log(marker, b.toString());
     }
 
-    private void appendLongDurationIfEnabled(StringBuilder b, MetricAttribute metricAttribute, Supplier<Long> durationSupplier) {
+    private void appendLongDurationIfEnabled(StringBuilder b, MetricAttribute metricAttribute,
+                                             Supplier<Long> durationSupplier) {
         if (!getDisabledMetricAttributes().contains(metricAttribute)) {
             append(b, metricAttribute.getCode(), convertDuration(durationSupplier.get()));
         }
     }
 
-    private void appendDoubleDurationIfEnabled(StringBuilder b, MetricAttribute metricAttribute, Supplier<Double> durationSupplier) {
+    private void appendDoubleDurationIfEnabled(StringBuilder b, MetricAttribute metricAttribute,
+                                               Supplier<Double> durationSupplier) {
         if (!getDisabledMetricAttributes().contains(metricAttribute)) {
             append(b, metricAttribute.getCode(), convertDuration(durationSupplier.get()));
         }
     }
 
-    private void appendLongIfEnabled(StringBuilder b, MetricAttribute metricAttribute, Supplier<Long> valueSupplier) {
+    private void appendLongIfEnabled(StringBuilder b, MetricAttribute metricAttribute,
+                                     Supplier<Long> valueSupplier) {
         if (!getDisabledMetricAttributes().contains(metricAttribute)) {
             append(b, metricAttribute.getCode(), valueSupplier.get());
         }
     }
 
-    private void appendDoubleIfEnabled(StringBuilder b, MetricAttribute metricAttribute, Supplier<Double> valueSupplier) {
+    private void appendDoubleIfEnabled(StringBuilder b, MetricAttribute metricAttribute,
+                                       Supplier<Double> valueSupplier) {
         if (!getDisabledMetricAttributes().contains(metricAttribute)) {
             append(b, metricAttribute.getCode(), valueSupplier.get());
         }
