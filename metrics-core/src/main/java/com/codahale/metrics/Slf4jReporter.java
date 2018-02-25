@@ -4,10 +4,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
+import java.util.Collections;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
+import static com.codahale.metrics.MetricAttribute.COUNT;
+import static com.codahale.metrics.MetricAttribute.M15_RATE;
+import static com.codahale.metrics.MetricAttribute.M1_RATE;
+import static com.codahale.metrics.MetricAttribute.M5_RATE;
+import static com.codahale.metrics.MetricAttribute.MAX;
+import static com.codahale.metrics.MetricAttribute.MEAN;
+import static com.codahale.metrics.MetricAttribute.MEAN_RATE;
+import static com.codahale.metrics.MetricAttribute.MIN;
+import static com.codahale.metrics.MetricAttribute.P50;
+import static com.codahale.metrics.MetricAttribute.P75;
+import static com.codahale.metrics.MetricAttribute.P95;
+import static com.codahale.metrics.MetricAttribute.P98;
+import static com.codahale.metrics.MetricAttribute.P99;
+import static com.codahale.metrics.MetricAttribute.P999;
+import static com.codahale.metrics.MetricAttribute.STDDEV;
 
 /**
  * A reporter class for logging metrics values to a SLF4J {@link Logger} periodically, similar to
@@ -44,6 +63,7 @@ public class Slf4jReporter extends ScheduledReporter {
         private MetricFilter filter;
         private ScheduledExecutorService executor;
         private boolean shutdownExecutorOnStop;
+        private Set<MetricAttribute> disabledMetricAttributes;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -56,6 +76,7 @@ public class Slf4jReporter extends ScheduledReporter {
             this.loggingLevel = LoggingLevel.INFO;
             this.executor = null;
             this.shutdownExecutorOnStop = true;
+            this.disabledMetricAttributes = Collections.emptySet();
         }
 
         /**
@@ -162,6 +183,18 @@ public class Slf4jReporter extends ScheduledReporter {
         }
 
         /**
+         * Don't report the passed metric attributes for all metrics (e.g. "p999", "stddev" or "m15").
+         * See {@link MetricAttribute}.
+         *
+         * @param disabledMetricAttributes a set of {@link MetricAttribute}
+         * @return {@code this}
+         */
+        public Builder disabledMetricAttributes(Set<MetricAttribute> disabledMetricAttributes) {
+            this.disabledMetricAttributes = disabledMetricAttributes;
+            return this;
+        }
+
+        /**
          * Builds a {@link Slf4jReporter} with the given properties.
          *
          * @return a {@link Slf4jReporter}
@@ -186,7 +219,7 @@ public class Slf4jReporter extends ScheduledReporter {
                     loggerProxy = new DebugLoggerProxy(logger);
                     break;
             }
-            return new Slf4jReporter(registry, loggerProxy, marker, prefix, rateUnit, durationUnit, filter, executor, shutdownExecutorOnStop);
+            return new Slf4jReporter(registry, loggerProxy, marker, prefix, rateUnit, durationUnit, filter, executor, shutdownExecutorOnStop, disabledMetricAttributes);
         }
     }
 
@@ -202,8 +235,9 @@ public class Slf4jReporter extends ScheduledReporter {
                           TimeUnit durationUnit,
                           MetricFilter filter,
                           ScheduledExecutorService executor,
-                          boolean shutdownExecutorOnStop) {
-        super(registry, "logger-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop);
+                          boolean shutdownExecutorOnStop,
+                          Set<MetricAttribute> disabledMetricAttributes) {
+        super(registry, "logger-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, disabledMetricAttributes);
         this.loggerProxy = loggerProxy;
         this.marker = marker;
         this.prefix = prefix;
@@ -217,94 +251,153 @@ public class Slf4jReporter extends ScheduledReporter {
                        SortedMap<String, Meter> meters,
                        SortedMap<String, Timer> timers) {
         if (loggerProxy.isEnabled(marker)) {
+            StringBuilder b = new StringBuilder();
             for (Entry<String, Gauge> entry : gauges.entrySet()) {
-                logGauge(entry.getKey(), entry.getValue());
+                logGauge(b, entry.getKey(), entry.getValue());
             }
 
             for (Entry<String, Counter> entry : counters.entrySet()) {
-                logCounter(entry.getKey(), entry.getValue());
+                logCounter(b, entry.getKey(), entry.getValue());
             }
 
             for (Entry<String, Histogram> entry : histograms.entrySet()) {
-                logHistogram(entry.getKey(), entry.getValue());
+                logHistogram(b, entry.getKey(), entry.getValue());
             }
 
             for (Entry<String, Meter> entry : meters.entrySet()) {
-                logMeter(entry.getKey(), entry.getValue());
+                logMeter(b, entry.getKey(), entry.getValue());
             }
 
             for (Entry<String, Timer> entry : timers.entrySet()) {
-                logTimer(entry.getKey(), entry.getValue());
+                logTimer(b, entry.getKey(), entry.getValue());
             }
         }
     }
 
-    private void logTimer(String name, Timer timer) {
+    private void logTimer(StringBuilder b, String name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
-        loggerProxy.log(marker,
-                "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, median={}, " +
-                        "p75={}, p95={}, p98={}, p99={}, p999={}, mean_rate={}, m1={}, m5={}, " +
-                        "m15={}, rate_unit={}, duration_unit={}",
-                "TIMER",
-                prefix(name),
-                timer.getCount(),
-                convertDuration(snapshot.getMin()),
-                convertDuration(snapshot.getMax()),
-                convertDuration(snapshot.getMean()),
-                convertDuration(snapshot.getStdDev()),
-                convertDuration(snapshot.getMedian()),
-                convertDuration(snapshot.get75thPercentile()),
-                convertDuration(snapshot.get95thPercentile()),
-                convertDuration(snapshot.get98thPercentile()),
-                convertDuration(snapshot.get99thPercentile()),
-                convertDuration(snapshot.get999thPercentile()),
-                convertRate(timer.getMeanRate()),
-                convertRate(timer.getOneMinuteRate()),
-                convertRate(timer.getFiveMinuteRate()),
-                convertRate(timer.getFifteenMinuteRate()),
-                getRateUnit(),
-                getDurationUnit());
+        b.setLength(0);
+        b.append("type=TIMER");
+        append(b, "name", prefix(name));
+        appendCountIfEnabled(b, timer);
+        appendLongDurationIfEnabled(b, MIN, snapshot::getMin);
+        appendLongDurationIfEnabled(b, MAX, snapshot::getMax);
+        appendDoubleDurationIfEnabled(b, MEAN, snapshot::getMean);
+        appendDoubleDurationIfEnabled(b, STDDEV, snapshot::getStdDev);
+        appendDoubleDurationIfEnabled(b, P50, snapshot::getMedian);
+        appendDoubleDurationIfEnabled(b, P75, snapshot::get75thPercentile);
+        appendDoubleDurationIfEnabled(b, P95, snapshot::get95thPercentile);
+        appendDoubleDurationIfEnabled(b, P98, snapshot::get98thPercentile);
+        appendDoubleDurationIfEnabled(b, P99, snapshot::get99thPercentile);
+        appendDoubleDurationIfEnabled(b, P999, snapshot::get999thPercentile);
+        appendMetered(b, timer);
+        append(b, "rate_unit", getRateUnit());
+        append(b, "duration_unit", getDurationUnit());
+        loggerProxy.log(marker, b.toString());
     }
 
-    private void logMeter(String name, Meter meter) {
-        loggerProxy.log(marker,
-                "type={}, name={}, count={}, mean_rate={}, m1={}, m5={}, m15={}, rate_unit={}",
-                "METER",
-                prefix(name),
-                meter.getCount(),
-                convertRate(meter.getMeanRate()),
-                convertRate(meter.getOneMinuteRate()),
-                convertRate(meter.getFiveMinuteRate()),
-                convertRate(meter.getFifteenMinuteRate()),
-                getRateUnit());
+    private void logMeter(StringBuilder b, String name, Meter meter) {
+        b.setLength(0);
+        b.append("type=METER");
+        append(b, "name", prefix(name));
+        appendCountIfEnabled(b, meter);
+        appendMetered(b, meter);
+        append(b, "rate_unit", getRateUnit());
+        loggerProxy.log(marker, b.toString());
     }
 
-    private void logHistogram(String name, Histogram histogram) {
+    private void logHistogram(StringBuilder b, String name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
-        loggerProxy.log(marker,
-                "type={}, name={}, count={}, min={}, max={}, mean={}, stddev={}, " +
-                        "median={}, p75={}, p95={}, p98={}, p99={}, p999={}",
-                "HISTOGRAM",
-                prefix(name),
-                histogram.getCount(),
-                snapshot.getMin(),
-                snapshot.getMax(),
-                snapshot.getMean(),
-                snapshot.getStdDev(),
-                snapshot.getMedian(),
-                snapshot.get75thPercentile(),
-                snapshot.get95thPercentile(),
-                snapshot.get98thPercentile(),
-                snapshot.get99thPercentile(),
-                snapshot.get999thPercentile());
+        b.setLength(0);
+        b.append("type=HISTOGRAM");
+        append(b, "name", prefix(name));
+        appendCountIfEnabled(b, histogram);
+        appendLongIfEnabled(b, MIN, snapshot::getMin);
+        appendLongIfEnabled(b, MAX, snapshot::getMax);
+        appendDoubleIfEnabled(b, MEAN, snapshot::getMean);
+        appendDoubleIfEnabled(b, STDDEV, snapshot::getStdDev);
+        appendDoubleIfEnabled(b, P50, snapshot::getMedian);
+        appendDoubleIfEnabled(b, P75, snapshot::get75thPercentile);
+        appendDoubleIfEnabled(b, P95, snapshot::get95thPercentile);
+        appendDoubleIfEnabled(b, P98, snapshot::get98thPercentile);
+        appendDoubleIfEnabled(b, P99, snapshot::get99thPercentile);
+        appendDoubleIfEnabled(b, P999, snapshot::get999thPercentile);
+        loggerProxy.log(marker, b.toString());
     }
 
-    private void logCounter(String name, Counter counter) {
-        loggerProxy.log(marker, "type={}, name={}, count={}", "COUNTER", prefix(name), counter.getCount());
+    private void logCounter(StringBuilder b, String name, Counter counter) {
+        b.setLength(0);
+        b.append("type=COUNTER");
+        append(b, "name", prefix(name));
+        append(b, COUNT.getCode(), counter.getCount());
+        loggerProxy.log(marker, b.toString());
     }
 
-    private void logGauge(String name, Gauge<?> gauge) {
-        loggerProxy.log(marker, "type={}, name={}, value={}", "GAUGE", prefix(name), gauge.getValue());
+    private void logGauge(StringBuilder b, String name, Gauge<?> gauge) {
+        b.setLength(0);
+        b.append("type=GAUGE");
+        append(b, "name", prefix(name));
+        append(b, "value", gauge.getValue());
+        loggerProxy.log(marker, b.toString());
+    }
+
+    private void appendLongDurationIfEnabled(StringBuilder b, MetricAttribute metricAttribute, Supplier<Long> durationSupplier) {
+        if (!getDisabledMetricAttributes().contains(metricAttribute)) {
+            append(b, metricAttribute.getCode(), convertDuration(durationSupplier.get()));
+        }
+    }
+
+    private void appendDoubleDurationIfEnabled(StringBuilder b, MetricAttribute metricAttribute, Supplier<Double> durationSupplier) {
+        if (!getDisabledMetricAttributes().contains(metricAttribute)) {
+            append(b, metricAttribute.getCode(), convertDuration(durationSupplier.get()));
+        }
+    }
+
+    private void appendLongIfEnabled(StringBuilder b, MetricAttribute metricAttribute, Supplier<Long> valueSupplier) {
+        if (!getDisabledMetricAttributes().contains(metricAttribute)) {
+            append(b, metricAttribute.getCode(), valueSupplier.get());
+        }
+    }
+
+    private void appendDoubleIfEnabled(StringBuilder b, MetricAttribute metricAttribute, Supplier<Double> valueSupplier) {
+        if (!getDisabledMetricAttributes().contains(metricAttribute)) {
+            append(b, metricAttribute.getCode(), valueSupplier.get());
+        }
+    }
+
+    private void appendCountIfEnabled(StringBuilder b, Counting counting) {
+        if (!getDisabledMetricAttributes().contains(COUNT)) {
+            append(b, COUNT.getCode(), counting.getCount());
+        }
+    }
+
+    private void appendMetered(StringBuilder b, Metered meter) {
+        appendRateIfEnabled(b, M1_RATE, meter::getOneMinuteRate);
+        appendRateIfEnabled(b, M5_RATE, meter::getFiveMinuteRate);
+        appendRateIfEnabled(b, M15_RATE,  meter::getFifteenMinuteRate);
+        appendRateIfEnabled(b, MEAN_RATE,  meter::getMeanRate);
+    }
+
+    private void appendRateIfEnabled(StringBuilder b, MetricAttribute metricAttribute, Supplier<Double> rateSupplier) {
+        if (!getDisabledMetricAttributes().contains(metricAttribute)) {
+            append(b, metricAttribute.getCode(), convertRate(rateSupplier.get()));
+        }
+    }
+
+    private void append(StringBuilder b, String key, long value) {
+        b.append(", ").append(key).append('=').append(value);
+    }
+
+    private void append(StringBuilder b, String key, double value) {
+        b.append(", ").append(key).append('=').append(value);
+    }
+
+    private void append(StringBuilder b, String key, String value) {
+        b.append(", ").append(key).append('=').append(value);
+    }
+
+    private void append(StringBuilder b, String key, Object value) {
+        b.append(", ").append(key).append('=').append(value);
     }
 
     @Override
@@ -324,7 +417,7 @@ public class Slf4jReporter extends ScheduledReporter {
             this.logger = logger;
         }
 
-        abstract void log(Marker marker, String format, Object... arguments);
+        abstract void log(Marker marker, String format);
 
         abstract boolean isEnabled(Marker marker);
     }
@@ -336,8 +429,8 @@ public class Slf4jReporter extends ScheduledReporter {
         }
 
         @Override
-        public void log(Marker marker, String format, Object... arguments) {
-            logger.debug(marker, format, arguments);
+        public void log(Marker marker, String format) {
+            logger.debug(marker, format);
         }
 
         @Override
@@ -353,8 +446,8 @@ public class Slf4jReporter extends ScheduledReporter {
         }
 
         @Override
-        public void log(Marker marker, String format, Object... arguments) {
-            logger.trace(marker, format, arguments);
+        public void log(Marker marker, String format) {
+            logger.trace(marker, format);
         }
 
         @Override
@@ -370,8 +463,8 @@ public class Slf4jReporter extends ScheduledReporter {
         }
 
         @Override
-        public void log(Marker marker, String format, Object... arguments) {
-            logger.info(marker, format, arguments);
+        public void log(Marker marker, String format) {
+            logger.info(marker, format);
         }
 
         @Override
@@ -387,8 +480,8 @@ public class Slf4jReporter extends ScheduledReporter {
         }
 
         @Override
-        public void log(Marker marker, String format, Object... arguments) {
-            logger.warn(marker, format, arguments);
+        public void log(Marker marker, String format) {
+            logger.warn(marker, format);
         }
 
         @Override
@@ -404,8 +497,8 @@ public class Slf4jReporter extends ScheduledReporter {
         }
 
         @Override
-        public void log(Marker marker, String format, Object... arguments) {
-            logger.error(marker, format, arguments);
+        public void log(Marker marker, String format) {
+            logger.error(marker, format);
         }
 
         @Override
