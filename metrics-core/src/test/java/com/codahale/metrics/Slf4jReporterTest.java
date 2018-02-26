@@ -84,6 +84,69 @@ public class Slf4jReporterTest {
         verify(logger).error(marker, "type=GAUGE, name=gauge, value=value");
     }
 
+
+    private Timer timer() {
+        final Timer timer = mock(Timer.class);
+        when(timer.getCount()).thenReturn(1L);
+
+        when(timer.getMeanRate()).thenReturn(2.0);
+        when(timer.getOneMinuteRate()).thenReturn(3.0);
+        when(timer.getFiveMinuteRate()).thenReturn(4.0);
+        when(timer.getFifteenMinuteRate()).thenReturn(5.0);
+
+        final Snapshot snapshot = mock(Snapshot.class);
+        when(snapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));
+        when(snapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));
+        when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
+        when(snapshot.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));
+        when(snapshot.getMedian()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(500));
+        when(snapshot.get75thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(600));
+        when(snapshot.get95thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(700));
+        when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
+        when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
+        when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS
+                .toNanos(1000));
+
+        when(timer.getSnapshot()).thenReturn(snapshot);
+        return timer;
+    }
+
+    private Histogram histogram() {
+        final Histogram histogram = mock(Histogram.class);
+        when(histogram.getCount()).thenReturn(1L);
+
+        final Snapshot snapshot = mock(Snapshot.class);
+        when(snapshot.getMax()).thenReturn(2L);
+        when(snapshot.getMean()).thenReturn(3.0);
+        when(snapshot.getMin()).thenReturn(4L);
+        when(snapshot.getStdDev()).thenReturn(5.0);
+        when(snapshot.getMedian()).thenReturn(6.0);
+        when(snapshot.get75thPercentile()).thenReturn(7.0);
+        when(snapshot.get95thPercentile()).thenReturn(8.0);
+        when(snapshot.get98thPercentile()).thenReturn(9.0);
+        when(snapshot.get99thPercentile()).thenReturn(10.0);
+        when(snapshot.get999thPercentile()).thenReturn(11.0);
+
+        when(histogram.getSnapshot()).thenReturn(snapshot);
+        return histogram;
+    }
+
+    private Meter meter() {
+        final Meter meter = mock(Meter.class);
+        when(meter.getCount()).thenReturn(1L);
+        when(meter.getMeanRate()).thenReturn(2.0);
+        when(meter.getOneMinuteRate()).thenReturn(3.0);
+        when(meter.getFiveMinuteRate()).thenReturn(4.0);
+        when(meter.getFifteenMinuteRate()).thenReturn(5.0);
+        return meter;
+    }
+
+    private Counter counter() {
+        final Counter counter = mock(Counter.class);
+        when(counter.getCount()).thenReturn(100L);
+        return counter;
+    }
+
     @Test
     public void reportsCounterValuesAtErrorDefault() {
         reportsCounterValuesAtError();
@@ -96,8 +159,7 @@ public class Slf4jReporterTest {
     }
 
     private void reportsCounterValuesAtError() {
-        final Counter counter = mock(Counter.class);
-        when(counter.getCount()).thenReturn(100L);
+        final Counter counter = counter();
         when(logger.isErrorEnabled(marker)).thenReturn(true);
 
         errorReporter().report(map(),
@@ -123,22 +185,7 @@ public class Slf4jReporterTest {
     }
 
     private void reportsHistogramValuesAtError(final String expectedLog) {
-        final Histogram histogram = mock(Histogram.class);
-        when(histogram.getCount()).thenReturn(1L);
-
-        final Snapshot snapshot = mock(Snapshot.class);
-        when(snapshot.getMax()).thenReturn(2L);
-        when(snapshot.getMean()).thenReturn(3.0);
-        when(snapshot.getMin()).thenReturn(4L);
-        when(snapshot.getStdDev()).thenReturn(5.0);
-        when(snapshot.getMedian()).thenReturn(6.0);
-        when(snapshot.get75thPercentile()).thenReturn(7.0);
-        when(snapshot.get95thPercentile()).thenReturn(8.0);
-        when(snapshot.get98thPercentile()).thenReturn(9.0);
-        when(snapshot.get99thPercentile()).thenReturn(10.0);
-        when(snapshot.get999thPercentile()).thenReturn(11.0);
-
-        when(histogram.getSnapshot()).thenReturn(snapshot);
+        final Histogram histogram = histogram();
         when(logger.isErrorEnabled(marker)).thenReturn(true);
 
         errorReporter().report(map(),
@@ -164,12 +211,7 @@ public class Slf4jReporterTest {
     }
 
     private void reportsMeterValuesAtError(final String expectedLog) {
-        final Meter meter = mock(Meter.class);
-        when(meter.getCount()).thenReturn(1L);
-        when(meter.getMeanRate()).thenReturn(2.0);
-        when(meter.getOneMinuteRate()).thenReturn(3.0);
-        when(meter.getFiveMinuteRate()).thenReturn(4.0);
-        when(meter.getFifteenMinuteRate()).thenReturn(5.0);
+        final Meter meter = meter();
         when(logger.isErrorEnabled(marker)).thenReturn(true);
 
         errorReporter().report(map(),
@@ -180,6 +222,7 @@ public class Slf4jReporterTest {
 
         verify(logger).error(marker, expectedLog);
     }
+
 
     @Test
     public void reportsTimerValuesAtErrorDefault() {
@@ -198,28 +241,7 @@ public class Slf4jReporterTest {
     }
 
     private void reportsTimerValuesAtError(final String expectedLog) {
-        final Timer timer = mock(Timer.class);
-        when(timer.getCount()).thenReturn(1L);
-
-        when(timer.getMeanRate()).thenReturn(2.0);
-        when(timer.getOneMinuteRate()).thenReturn(3.0);
-        when(timer.getFiveMinuteRate()).thenReturn(4.0);
-        when(timer.getFifteenMinuteRate()).thenReturn(5.0);
-
-        final Snapshot snapshot = mock(Snapshot.class);
-        when(snapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));
-        when(snapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));
-        when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
-        when(snapshot.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));
-        when(snapshot.getMedian()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(500));
-        when(snapshot.get75thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(600));
-        when(snapshot.get95thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(700));
-        when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
-        when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
-        when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS
-                .toNanos(1000));
-
-        when(timer.getSnapshot()).thenReturn(snapshot);
+        final Timer timer = timer();
 
         when(logger.isErrorEnabled(marker)).thenReturn(true);
 
@@ -247,8 +269,7 @@ public class Slf4jReporterTest {
 
     @Test
     public void reportsCounterValuesDefault() {
-        final Counter counter = mock(Counter.class);
-        when(counter.getCount()).thenReturn(100L);
+        final Counter counter = counter();
         when(logger.isInfoEnabled(marker)).thenReturn(true);
 
         infoReporter().report(map(),
@@ -262,22 +283,7 @@ public class Slf4jReporterTest {
 
     @Test
     public void reportsHistogramValuesDefault() {
-        final Histogram histogram = mock(Histogram.class);
-        when(histogram.getCount()).thenReturn(1L);
-
-        final Snapshot snapshot = mock(Snapshot.class);
-        when(snapshot.getMax()).thenReturn(2L);
-        when(snapshot.getMean()).thenReturn(3.0);
-        when(snapshot.getMin()).thenReturn(4L);
-        when(snapshot.getStdDev()).thenReturn(5.0);
-        when(snapshot.getMedian()).thenReturn(6.0);
-        when(snapshot.get75thPercentile()).thenReturn(7.0);
-        when(snapshot.get95thPercentile()).thenReturn(8.0);
-        when(snapshot.get98thPercentile()).thenReturn(9.0);
-        when(snapshot.get99thPercentile()).thenReturn(10.0);
-        when(snapshot.get999thPercentile()).thenReturn(11.0);
-
-        when(histogram.getSnapshot()).thenReturn(snapshot);
+        final Histogram histogram = histogram();
         when(logger.isInfoEnabled(marker)).thenReturn(true);
 
         infoReporter().report(map(),
@@ -292,12 +298,7 @@ public class Slf4jReporterTest {
 
     @Test
     public void reportsMeterValuesDefault() {
-        final Meter meter = mock(Meter.class);
-        when(meter.getCount()).thenReturn(1L);
-        when(meter.getMeanRate()).thenReturn(2.0);
-        when(meter.getOneMinuteRate()).thenReturn(3.0);
-        when(meter.getFiveMinuteRate()).thenReturn(4.0);
-        when(meter.getFifteenMinuteRate()).thenReturn(5.0);
+        final Meter meter = meter();
         when(logger.isInfoEnabled(marker)).thenReturn(true);
 
         infoReporter().report(map(),
@@ -312,28 +313,7 @@ public class Slf4jReporterTest {
 
     @Test
     public void reportsTimerValuesDefault() {
-        final Timer timer = mock(Timer.class);
-        when(timer.getCount()).thenReturn(1L);
-
-        when(timer.getMeanRate()).thenReturn(2.0);
-        when(timer.getOneMinuteRate()).thenReturn(3.0);
-        when(timer.getFiveMinuteRate()).thenReturn(4.0);
-        when(timer.getFifteenMinuteRate()).thenReturn(5.0);
-
-        final Snapshot snapshot = mock(Snapshot.class);
-        when(snapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));
-        when(snapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));
-        when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
-        when(snapshot.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));
-        when(snapshot.getMedian()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(500));
-        when(snapshot.get75thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(600));
-        when(snapshot.get95thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(700));
-        when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));
-        when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));
-        when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS
-                .toNanos(1000));
-
-        when(timer.getSnapshot()).thenReturn(snapshot);
+        final Timer timer = timer();
         when(logger.isInfoEnabled(marker)).thenReturn(true);
 
         infoReporter().report(map(),
@@ -343,6 +323,28 @@ public class Slf4jReporterTest {
                 map("test.another.timer", timer));
 
         verify(logger).info(marker, "type=TIMER, name=prefix.test.another.timer, count=1, min=300.0, max=100.0, " +
+                "mean=200.0, stddev=400.0, p50=500.0, p75=600.0, p95=700.0, p98=800.0, p99=900.0, p999=1000.0," +
+                " m1_rate=3.0, m5_rate=4.0, m15_rate=5.0, mean_rate=2.0, rate_unit=events/second, duration_unit=milliseconds");
+    }
+
+
+    @Test
+    public void reportsAllMetricsDefault() {
+        when(logger.isInfoEnabled(marker)).thenReturn(true);
+
+        infoReporter().report(map("test.gauge", () -> "value"),
+                map("test.counter", counter()),
+                map("test.histogram", histogram()),
+                map("test.meter", meter()),
+                map("test.timer", timer()));
+
+        verify(logger).info(marker, "type=GAUGE, name=prefix.test.gauge, value=value");
+        verify(logger).info(marker, "type=COUNTER, name=prefix.test.counter, count=100");
+        verify(logger).info(marker, "type=HISTOGRAM, name=prefix.test.histogram, count=1, min=4, max=2, mean=3.0, " +
+                "stddev=5.0, p50=6.0, p75=7.0, p95=8.0, p98=9.0, p99=10.0, p999=11.0");
+        verify(logger).info(marker, "type=METER, name=prefix.test.meter, count=1, m1_rate=3.0, m5_rate=4.0, " +
+                "m15_rate=5.0, mean_rate=2.0, rate_unit=events/second");
+        verify(logger).info(marker, "type=TIMER, name=prefix.test.timer, count=1, min=300.0, max=100.0, " +
                 "mean=200.0, stddev=400.0, p50=500.0, p75=600.0, p95=700.0, p98=800.0, p99=900.0, p999=1000.0," +
                 " m1_rate=3.0, m5_rate=4.0, m15_rate=5.0, mean_rate=2.0, rate_unit=events/second, duration_unit=milliseconds");
     }
