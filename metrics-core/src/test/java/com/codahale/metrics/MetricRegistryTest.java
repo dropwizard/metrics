@@ -427,4 +427,37 @@ public class MetricRegistryTest {
         verify(listener).onTimerRemoved("timer-1");
         verify(listener).onHistogramRemoved("histogram-1");
     }
+    
+    @Test
+    public void removesMetrics() {
+        final MetricSet metrics = () -> {
+            final Map<String, Metric> m = new HashMap<>();
+            m.put("gauge", gauge);
+            m.put("counter", counter);
+            final MetricSet metricsSubset = () -> {
+                final Map<String, Metric> subsetMap = new HashMap<>();
+                subsetMap.put("meter", meter);
+                return subsetMap;
+            };
+            m.put("metricsSubset", metricsSubset);
+            return m;
+        };
+
+        
+        registry.registerAll(metrics);
+
+        assertThat(registry.getNames())
+                .containsOnly("gauge", "counter", "metricsSubset.meter");
+
+        Map<String,Object> removedMetricsStatus=registry.removeAll(metrics);
+        HashMap<String,Object> removedSubSetMetricsStatus=new HashMap<String,Object>();
+        removedSubSetMetricsStatus.put("meter", true);
+        assertThat(removedMetricsStatus).isNotEmpty().hasSize(3);
+        assertThat(removedMetricsStatus).contains(entry("gauge", true), entry("counter", true), entry("metricsSubset",removedSubSetMetricsStatus));
+        assertThat(registry.getNames()).doesNotContain("gauge", "counter", "metricsSubset.meter");
+
+        verify(listener).onCounterRemoved("counter");
+        verify(listener).onGaugeRemoved("gauge");
+        verify(listener).onMeterRemoved("metricsSubset.meter");
+    }
 }

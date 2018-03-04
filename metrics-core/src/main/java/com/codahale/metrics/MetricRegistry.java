@@ -1,6 +1,7 @@
 package com.codahale.metrics;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -294,6 +295,31 @@ public class MetricRegistry implements MetricSet {
         }
     }
 
+    
+    /**
+     * Given a metric set, removes them.
+     *
+     * @param metrics a set of metrics
+     * @return Hashmap with the removed status for each metric or metric sub set,
+     * Object will be instance of Boolean in case single metric,
+     * if metric set it will be returned as instance of Hashmap with status as Boolean for each metric in the set
+     */
+    public Map<String,Object> removeAll(MetricSet metrics) {
+        return removeAll(null, metrics);
+    }
+
+    public Map<String,Object> removeAll(String prefix, MetricSet metrics) {
+        HashMap removedMetricsStatus=new HashMap();
+        for (Map.Entry<String, Metric> entry : metrics.getMetrics().entrySet()) {
+            if (entry.getValue() instanceof MetricSet) {
+                removedMetricsStatus.put(entry.getKey(), removeAll(name(prefix, entry.getKey()), (MetricSet) entry.getValue()));
+            } else {
+                removedMetricsStatus.put(entry.getKey(), remove(name(prefix, entry.getKey())));
+            }
+        }
+        return removedMetricsStatus;
+    }
+    
     /**
      * Adds a {@link MetricRegistryListener} to a collection of listeners that will be notified on
      * metric creation.  Listeners will be notified in the order in which they are added.
