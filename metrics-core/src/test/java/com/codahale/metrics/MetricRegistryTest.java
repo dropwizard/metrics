@@ -449,11 +449,11 @@ public class MetricRegistryTest {
         assertThat(registry.getNames())
                 .containsOnly("gauge", "counter", "metricsSubset.meter");
 
-        Map<String,Object> removedMetricsStatus=registry.removeAll(metrics);
-        HashMap<String,Object> removedSubSetMetricsStatus=new HashMap<String,Object>();
+        Map<String, Object> removedMetricsStatus = registry.removeAll(metrics);
+        HashMap<String, Object> removedSubSetMetricsStatus = new HashMap<String, Object>();
         removedSubSetMetricsStatus.put("meter", true);
         assertThat(removedMetricsStatus).isNotEmpty().hasSize(3);
-        assertThat(removedMetricsStatus).contains(entry("gauge", true), entry("counter", true), entry("metricsSubset",removedSubSetMetricsStatus));
+        assertThat(removedMetricsStatus).contains(entry("gauge", true), entry("counter", true), entry("metricsSubset", removedSubSetMetricsStatus));
         assertThat(registry.getNames()).doesNotContain("gauge", "counter", "metricsSubset.meter");
 
         verify(listener).onCounterRemoved("counter");

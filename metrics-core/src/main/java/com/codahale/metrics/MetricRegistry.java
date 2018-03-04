@@ -304,12 +304,12 @@ public class MetricRegistry implements MetricSet {
      * Object will be instance of Boolean in case single metric,
      * if metric set it will be returned as instance of Hashmap with status as Boolean for each metric in the set
      */
-    public Map<String,Object> removeAll(MetricSet metrics) {
+    public Map<String, Object> removeAll(MetricSet metrics) {
         return removeAll(null, metrics);
     }
 
-    public Map<String,Object> removeAll(String prefix, MetricSet metrics) {
-        HashMap removedMetricsStatus=new HashMap();
+    public Map<String, Object> removeAll(String prefix, MetricSet metrics) {
+        HashMap removedMetricsStatus = new HashMap();
         for (Map.Entry<String, Metric> entry : metrics.getMetrics().entrySet()) {
             if (entry.getValue() instanceof MetricSet) {
                 removedMetricsStatus.put(entry.getKey(), removeAll(name(prefix, entry.getKey()), (MetricSet) entry.getValue()));
