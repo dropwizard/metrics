@@ -309,7 +309,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     public Map<String, Object> removeAll(String prefix, MetricSet metrics) {
-        HashMap removedMetricsStatus = new HashMap();
+        HashMap<String, Object> removedMetricsStatus = new HashMap<String, Object>();
         for (Map.Entry<String, Metric> entry : metrics.getMetrics().entrySet()) {
             if (entry.getValue() instanceof MetricSet) {
                 removedMetricsStatus.put(entry.getKey(), removeAll(name(prefix, entry.getKey()), (MetricSet) entry.getValue()));
