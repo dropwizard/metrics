@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * A health check which returns healthy if no threads are deadlocked.
  */
-public class ThreadDeadlockHealthCheck extends HealthCheck {
+public class ThreadDeadlockHealthCheck implements HealthCheck {
     private final ThreadDeadlockDetector detector;
 
     /**
@@ -28,7 +28,7 @@ public class ThreadDeadlockHealthCheck extends HealthCheck {
     }
 
     @Override
-    protected Result check() throws Exception {
+    public Result check() throws Exception {
         final Set<String> threads = detector.getDeadlockedThreads();
         if (threads.isEmpty()) {
             return Result.healthy();
