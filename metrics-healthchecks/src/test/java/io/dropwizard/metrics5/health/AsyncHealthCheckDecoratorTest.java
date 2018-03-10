@@ -145,61 +145,61 @@ public class AsyncHealthCheckDecoratorTest {
     }
 
     @Async(period = -1)
-    private static class NegativePeriodAsyncHealthCheck extends HealthCheck {
+    private static class NegativePeriodAsyncHealthCheck implements HealthCheck {
 
         @Override
-        protected Result check() {
+        public Result check() {
             return null;
         }
     }
 
     @Async(period = 0)
-    private static class ZeroPeriodAsyncHealthCheck extends HealthCheck {
+    private static class ZeroPeriodAsyncHealthCheck implements HealthCheck {
 
         @Override
-        protected Result check() {
+        public Result check() {
             return null;
         }
     }
 
     @Async(period = 1, initialDelay = -1)
-    private static class NegativeInitialDelayAsyncHealthCheck extends HealthCheck {
+    private static class NegativeInitialDelayAsyncHealthCheck implements HealthCheck {
 
         @Override
-        protected Result check() {
+        public Result check() {
             return null;
         }
     }
 
     @Async(period = 1)
-    private static class DefaultAsyncHealthCheck extends HealthCheck {
+    private static class DefaultAsyncHealthCheck implements HealthCheck {
 
         @Override
-        protected Result check() {
+        public Result check() {
             return null;
         }
     }
 
     @Async(period = 1, scheduleType = Async.ScheduleType.FIXED_DELAY)
-    private static class FixedDelayAsyncHealthCheck extends HealthCheck {
+    private static class FixedDelayAsyncHealthCheck implements HealthCheck {
 
         @Override
-        protected Result check() {
+        public Result check() {
             return null;
         }
     }
 
     @Async(period = 1, initialState = Async.InitialState.UNHEALTHY)
-    private static class UnhealthyAsyncHealthCheck extends HealthCheck {
+    private static class UnhealthyAsyncHealthCheck implements HealthCheck {
 
         @Override
-        protected Result check() {
+        public Result check() {
             return null;
         }
     }
 
     @Async(period = 1, initialState = Async.InitialState.UNHEALTHY)
-    private static class ConfigurableAsyncHealthCheck extends HealthCheck {
+    private static class ConfigurableAsyncHealthCheck implements HealthCheck {
         private final Result result;
         private final Exception exception;
 
@@ -217,7 +217,7 @@ public class AsyncHealthCheckDecoratorTest {
         }
 
         @Override
-        protected Result check() throws Exception {
+        public Result check() throws Exception {
             if (exception != null) {
                 throw exception;
             }

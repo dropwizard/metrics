@@ -211,7 +211,7 @@ public class HealthCheckRegistry {
             final String name = entry.getKey();
             final HealthCheck healthCheck = entry.getValue();
             if (filter.matches(name, healthCheck)) {
-                futures.put(name, executor.submit(() -> healthCheck.execute()));
+                futures.put(name, executor.submit(healthCheck::execute));
             }
         }
 
