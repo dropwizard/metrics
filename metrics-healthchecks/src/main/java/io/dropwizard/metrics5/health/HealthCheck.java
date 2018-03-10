@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * A health check for a component of your application.
  */
-public abstract class HealthCheck {
+public interface HealthCheck {
     /**
      * The result of a {@link HealthCheck} being run. It can be healthy (with an optional message and optional details)
      * or unhealthy (with either an error message or a thrown exception and optional details).
@@ -307,7 +307,7 @@ public abstract class HealthCheck {
      * @throws Exception if there is an unhandled error during the health check; this will result in
      *                   a failed health check
      */
-    protected abstract Result check() throws Exception;
+    public Result check() throws Exception;
 
     /**
      * Executes the health check, catching and handling any exceptions raised by {@link #check()}.
@@ -315,7 +315,7 @@ public abstract class HealthCheck {
      * @return if the component is healthy, a healthy {@link Result}; otherwise, an unhealthy {@link
      * Result} with a descriptive error message or exception
      */
-    public Result execute() {
+    public default Result execute() {
         try {
             return check();
         } catch (Exception e) {
