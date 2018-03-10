@@ -211,7 +211,7 @@ public class HealthCheckRegistryTest {
     }
 
     @Async(period = 10)
-    private static class TestAsyncHealthCheck extends HealthCheck {
+    private static class TestAsyncHealthCheck implements HealthCheck {
         private final Result result;
 
         TestAsyncHealthCheck(Result result) {
@@ -219,7 +219,7 @@ public class HealthCheckRegistryTest {
         }
 
         @Override
-        protected Result check() {
+        public Result check() {
             return result;
         }
     }

@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Test;
 
 public class HealthCheckTest {
-    private static class ExampleHealthCheck extends HealthCheck {
+    private static class ExampleHealthCheck implements HealthCheck {
         private final HealthCheck underlying;
 
         private ExampleHealthCheck(HealthCheck underlying) {
@@ -15,7 +15,7 @@ public class HealthCheckTest {
         }
 
         @Override
-        protected Result check() {
+        public Result check() {
             return underlying.execute();
         }
     }

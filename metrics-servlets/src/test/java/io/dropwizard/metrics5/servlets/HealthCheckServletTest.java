@@ -64,7 +64,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
     public void returnsA200IfAllHealthChecksAreHealthy() throws Exception {
         registry.register("fun", new HealthCheck() {
             @Override
-            protected Result check() throws Exception {
+            public Result check() throws Exception {
                 return Result.healthy("whee");
             }
         });
@@ -83,14 +83,14 @@ public class HealthCheckServletTest extends AbstractServletTest {
     public void returnsASubsetOfHealthChecksIfFiltered() throws Exception {
         registry.register("fun", new HealthCheck() {
             @Override
-            protected Result check() throws Exception {
+            public Result check() throws Exception {
                 return Result.healthy("whee");
             }
         });
 
         registry.register("filtered", new HealthCheck() {
             @Override
-            protected Result check() throws Exception {
+            public Result check() throws Exception {
                 return Result.unhealthy("whee");
             }
         });
@@ -109,14 +109,14 @@ public class HealthCheckServletTest extends AbstractServletTest {
     public void returnsA500IfAnyHealthChecksAreUnhealthy() throws Exception {
         registry.register("fun", new HealthCheck() {
             @Override
-            protected Result check() throws Exception {
+            public Result check() throws Exception {
                 return Result.healthy("whee");
             }
         });
 
         registry.register("notFun", new HealthCheck() {
             @Override
-            protected Result check() throws Exception {
+            public Result check() throws Exception {
                 return Result.unhealthy("whee");
             }
         });
@@ -135,7 +135,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
     public void optionallyPrettyPrintsTheJson() throws Exception {
         registry.register("fun", new HealthCheck() {
             @Override
-            protected Result check() throws Exception {
+            public Result check() throws Exception {
                 return Result.healthy("whee");
             }
         });
