@@ -62,12 +62,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
 
     @Test
     public void returnsA200IfAllHealthChecksAreHealthy() throws Exception {
-        registry.register("fun", new HealthCheck() {
-            @Override
-            public Result check() throws Exception {
-                return Result.healthy("whee");
-            }
-        });
+        registry.register("fun", () -> HealthCheck.Result.healthy("whee"));
 
         processRequest();
 
@@ -81,19 +76,9 @@ public class HealthCheckServletTest extends AbstractServletTest {
 
     @Test
     public void returnsASubsetOfHealthChecksIfFiltered() throws Exception {
-        registry.register("fun", new HealthCheck() {
-            @Override
-            public Result check() throws Exception {
-                return Result.healthy("whee");
-            }
-        });
+        registry.register("fun", () -> HealthCheck.Result.healthy("whee"));
 
-        registry.register("filtered", new HealthCheck() {
-            @Override
-            public Result check() throws Exception {
-                return Result.unhealthy("whee");
-            }
-        });
+        registry.register("filtered", () -> HealthCheck.Result.unhealthy("whee"));
 
         processRequest();
 
@@ -107,19 +92,9 @@ public class HealthCheckServletTest extends AbstractServletTest {
 
     @Test
     public void returnsA500IfAnyHealthChecksAreUnhealthy() throws Exception {
-        registry.register("fun", new HealthCheck() {
-            @Override
-            public Result check() throws Exception {
-                return Result.healthy("whee");
-            }
-        });
+        registry.register("fun", () -> HealthCheck.Result.healthy("whee"));
 
-        registry.register("notFun", new HealthCheck() {
-            @Override
-            public Result check() throws Exception {
-                return Result.unhealthy("whee");
-            }
-        });
+        registry.register("notFun", () -> HealthCheck.Result.unhealthy("whee"));
 
         processRequest();
 
@@ -133,12 +108,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
 
     @Test
     public void optionallyPrettyPrintsTheJson() throws Exception {
-        registry.register("fun", new HealthCheck() {
-            @Override
-            public Result check() throws Exception {
-                return Result.healthy("whee");
-            }
-        });
+        registry.register("fun", () -> HealthCheck.Result.healthy("whee"));
 
         request.setURI("/healthchecks?pretty=true");
 
