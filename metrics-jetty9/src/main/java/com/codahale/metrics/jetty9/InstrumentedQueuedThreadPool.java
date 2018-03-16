@@ -87,5 +87,12 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
             // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.
             return getQueue().size();
         });
+        metricRegistry.register(name(prefix, "jobs-queue-utilization"), new RatioGauge() {
+            @Override
+            protected Ratio getRatio() {
+                BlockingQueue<Runnable> queue = getQueue();
+                return Ratio.of(queue.size(), queue.size() + queue.remainingCapacity());
+            }
+        });
     }
 }
