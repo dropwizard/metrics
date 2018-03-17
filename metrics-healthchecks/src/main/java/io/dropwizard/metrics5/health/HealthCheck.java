@@ -14,7 +14,7 @@ public interface HealthCheck {
      * The result of a {@link HealthCheck} being run. It can be healthy (with an optional message and optional details)
      * or unhealthy (with either an error message or a thrown exception and optional details).
      */
-    public static class Result {
+    class Result {
         private static final DateTimeFormatter DATE_FORMAT_PATTERN =
                 DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         private static final int PRIME = 31;
@@ -212,7 +212,7 @@ public interface HealthCheck {
      * This a convenient builder for an {@link HealthCheck.Result}. It can be health (with optional message and detail)
      * or unhealthy (with optional message, error and detail)
      */
-    public static class ResultBuilder {
+    class ResultBuilder {
         private boolean healthy;
         private String message;
         private Throwable error;
@@ -307,7 +307,7 @@ public interface HealthCheck {
      * @throws Exception if there is an unhandled error during the health check; this will result in
      *                   a failed health check
      */
-    public Result check() throws Exception;
+    Result check() throws Exception;
 
     /**
      * Executes the health check, catching and handling any exceptions raised by {@link #check()}.
@@ -315,7 +315,7 @@ public interface HealthCheck {
      * @return if the component is healthy, a healthy {@link Result}; otherwise, an unhealthy {@link
      * Result} with a descriptive error message or exception
      */
-    public default Result execute() {
+    default Result execute() {
         try {
             return check();
         } catch (Exception e) {

@@ -149,12 +149,7 @@ public abstract class HealthCheck {
 
     public io.dropwizard.metrics5.health.HealthCheck transform() {
         final HealthCheck original = this;
-        return new io.dropwizard.metrics5.health.HealthCheck() {
-            @Override
-            public Result check() throws Exception {
-                return original.check().delegate;
-            }
-        };
+        return () -> original.check().delegate;
     }
 
     public static HealthCheck of(io.dropwizard.metrics5.health.HealthCheck delegate) {
