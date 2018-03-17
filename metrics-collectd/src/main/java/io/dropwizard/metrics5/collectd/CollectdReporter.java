@@ -5,7 +5,6 @@ import io.dropwizard.metrics5.Counter;
 import io.dropwizard.metrics5.Gauge;
 import io.dropwizard.metrics5.Histogram;
 import io.dropwizard.metrics5.Meter;
-import io.dropwizard.metrics5.Metric;
 import io.dropwizard.metrics5.MetricFilter;
 import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricRegistry;
@@ -39,6 +38,9 @@ public class CollectdReporter extends ScheduledReporter {
      * <li>rateUnit: TimeUnit.SECONDS</li>
      * <li>durationUnit: TimeUnit.MILLISECONDS</li>
      * <li>filter: MetricFilter.ALL</li>
+     * <li>securityLevel: NONE</li>
+     * <li>username: ""</li>
+     * <li>password: ""</li>
      * </ul>
      */
     public static Builder forRegistry(MetricRegistry registry) {
@@ -53,6 +55,9 @@ public class CollectdReporter extends ScheduledReporter {
         private TimeUnit rateUnit = TimeUnit.SECONDS;
         private TimeUnit durationUnit = TimeUnit.MILLISECONDS;
         private MetricFilter filter = MetricFilter.ALL;
+        private SecurityLevel securityLevel = SecurityLevel.NONE;
+        private String username = "";
+        private String password = "";
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -83,9 +88,32 @@ public class CollectdReporter extends ScheduledReporter {
             return this;
         }
 
+        public Builder withUsername(String username) {
+            this.username = username;
+            return this;
+        }
+
+        public Builder withPassword(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public Builder withSecurityLevel(SecurityLevel securityLevel) {
+            this.securityLevel = securityLevel;
+            return this;
+        }
+
         public CollectdReporter build(Sender sender) {
-            return new CollectdReporter(
-                    registry, hostName, sender, clock, rateUnit, durationUnit, filter);
+            if (securityLevel != SecurityLevel.NONE) {
+                if (username.isEmpty()) {
+                    throw new IllegalArgumentException("username is required for securityLevel: " + securityLevel);
+                }
+                if (password.isEmpty()) {
+                    throw new IllegalArgumentException("password is required for securityLevel: " + securityLevel);
+                }
+            }
+            return new CollectdReporter(registry, hostName, sender, clock, rateUnit, durationUnit, filter,
+                    username, password, securityLevel);
         }
     }
 
@@ -100,13 +128,14 @@ public class CollectdReporter extends ScheduledReporter {
     private long period;
     private final PacketWriter writer;
 
-    private CollectdReporter(MetricRegistry registry, String hostname, Sender sender, Clock clock,
-            TimeUnit rateUnit, TimeUnit durationUnit, MetricFilter filter) {
+    private CollectdReporter(MetricRegistry registry, String hostname, Sender sender, Clock clock, TimeUnit rateUnit,
+                             TimeUnit durationUnit, MetricFilter filter, String username, String password,
+                             SecurityLevel securityLevel) {
         super(registry, REPORTER_NAME, filter, rateUnit, durationUnit);
         this.hostName = (hostname != null) ? hostname : resolveHostName();
         this.sender = sender;
         this.clock = clock;
-        writer = new PacketWriter(sender);
+        writer = new PacketWriter(sender, username, password, securityLevel);
     }
 
     private String resolveHostName() {

@@ -18,7 +18,9 @@ import java.util.TreeMap;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class CollectdReporterTest {
 
@@ -67,7 +69,7 @@ public class CollectdReporterTest {
 
     private <T extends Number> void reportsGauges(T value) throws Exception {
         reporter.report(
-                map(MetricName.build("gauge"), (Gauge) () -> value),
+                map("gauge", (Gauge) () -> value),
                 map(),
                 map(),
                 map(),
@@ -80,7 +82,7 @@ public class CollectdReporterTest {
     @Test
     public void reportsBooleanGauges() throws Exception {
         reporter.report(
-                map(MetricName.build("gauge"), (Gauge) () -> true),
+                map("gauge", (Gauge) () -> true),
                 map(),
                 map(),
                 map(),
@@ -90,7 +92,7 @@ public class CollectdReporterTest {
         assertThat(data.getValues()).containsExactly(1d);
 
         reporter.report(
-                map(MetricName.build("gauge"), (Gauge) () -> false),
+                map("gauge", (Gauge) () -> false),
                 map(),
                 map(),
                 map(),
@@ -103,7 +105,7 @@ public class CollectdReporterTest {
     @Test
     public void doesNotReportStringGauges() throws Exception {
         reporter.report(
-                map(MetricName.build("unsupported"), (Gauge) () -> "value"),
+                map("unsupported", (Gauge) () -> "value"),
                 map(),
                 map(),
                 map(),
@@ -119,7 +121,7 @@ public class CollectdReporterTest {
 
         reporter.report(
                 map(),
-                map(MetricName.build("api.rest.requests.count"), counter),
+                map("api.rest.requests.count", counter),
                 map(),
                 map(),
                 map());
@@ -141,7 +143,7 @@ public class CollectdReporterTest {
                 map(),
                 map(),
                 map(),
-                map(MetricName.build("api.rest.requests"), meter),
+                map("api.rest.requests", meter),
                 map());
 
         assertThat(receiver.next().getValues()).containsExactly(1d);
@@ -171,7 +173,7 @@ public class CollectdReporterTest {
         reporter.report(
                 map(),
                 map(),
-                map(MetricName.build("histogram"), histogram),
+                map("histogram", histogram),
                 map(),
                 map());
 
@@ -207,7 +209,7 @@ public class CollectdReporterTest {
                 map(),
                 map(),
                 map(),
-                map(MetricName.build("timer"), timer));
+                map("timer", timer));
 
         assertThat(receiver.next().getValues()).containsExactly(1d);
         assertThat(receiver.next().getValues()).containsExactly(100d);
@@ -237,13 +239,35 @@ public class CollectdReporterTest {
         assertThat(values.getPlugin()).isEqualTo("dash_illegal.slash_illegal");
     }
 
+    @Test
+    public void testUnableSetSecurityLevelToSignWithoutUsername() {
+        assertThatIllegalArgumentException().isThrownBy(()->
+                CollectdReporter.forRegistry(registry)
+                        .withHostName("eddie")
+                        .withSecurityLevel(SecurityLevel.SIGN)
+                        .withPassword("t1_g3r")
+                        .build(new Sender("localhost", 25826)))
+                .withMessage("username is required for securityLevel: SIGN");
+    }
+
+    @Test
+    public void testUnableSetSecurityLevelToSignWithoutPassword() {
+        assertThatIllegalArgumentException().isThrownBy(()->
+                CollectdReporter.forRegistry(registry)
+                        .withHostName("eddie")
+                        .withSecurityLevel(SecurityLevel.SIGN)
+                        .withUsername("scott")
+                        .build(new Sender("localhost", 25826)))
+                .withMessage("password is required for securityLevel: SIGN");
+    }
+
     private <T> SortedMap<MetricName, T> map() {
         return new TreeMap<>();
     }
 
-    private <T> SortedMap<MetricName, T> map(MetricName name, T metric) {
+    private <T> SortedMap<MetricName, T> map(String name, T metric) {
         final SortedMap<MetricName, T> map = map();
-        map.put(name, metric);
+        map.put(MetricName.build(name), metric);
         return map;
     }
 

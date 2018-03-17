@@ -13,7 +13,7 @@ For more information, please see [the documentation](http://dropwizard.github.io
 
 #### Version 4.x.x ([Javadoc](https://www.javadoc.io/doc/io.dropwizard.metrics/metrics-core/4.0.1))
 
-Version 4.x.x (the last release is 4.0.1) is a Java 8/9 compatible and the most fresh release of Metrics. The version targets Java 8 and removes a lot of internal cruft from 3.2.x (for instance, there's no dependency on the Unsafe API and custom `LongAdder` and `ThreadLocalRandom` implementations). It's mostly compatible with the 3.2 API and the update should be painless in Java 8 environments. If you have a 3rd party application which is dependent on an old version of Metrics, you can force a new version by adding `metrics-bom` to your Maven configuration. Check out the [release notes](https://github.com/dropwizard/metrics/releases/tag/v4.0.0) for 4.0.0.
+Version 4.x.x (the last release is 4.0.2) is a Java 8/9 compatible and the most fresh release of Metrics. The version targets Java 8 and removes a lot of internal cruft from 3.2.x (for instance, there's no dependency on the Unsafe API and custom `LongAdder` and `ThreadLocalRandom` implementations). It's mostly compatible with the 3.2 API and the update should be painless in Java 8 environments. If you have a 3rd party application which is dependent on an old version of Metrics, you can force a new version by adding `metrics-bom` to your Maven configuration. Check out the [release notes](https://github.com/dropwizard/metrics/releases/tag/v4.0.0) for 4.0.0.
 
 Source code for 4.1.x is resided in the [4.1-development branch](https://github.com/dropwizard/metrics/tree/4.1-development).
 
@@ -35,7 +35,7 @@ Source code for 3.1.x is resided in the [3.1-maintenance branch](https://github.
 
 New not-backward compatible features (for example, support for tags) will be implemented in a 5.x.x release. The release will have new Maven coordinates, a new package name and an backwards-incompatible API. 
 
-Source code for 5.x.x is resided in the [5.0-development branch](https://github.com/dropwizard/metrics/tree5.0-development).
+Source code for 5.x.x is resided in the [5.0-development branch](https://github.com/dropwizard/metrics/tree/5.0-development).
 
 License
 -------
