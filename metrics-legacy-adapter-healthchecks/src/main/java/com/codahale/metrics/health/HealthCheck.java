@@ -151,7 +151,7 @@ public abstract class HealthCheck {
         final HealthCheck original = this;
         return new io.dropwizard.metrics5.health.HealthCheck() {
             @Override
-            protected Result check() throws Exception {
+            public Result check() throws Exception {
                 return original.check().delegate;
             }
         };
