@@ -13,12 +13,12 @@ public class CpuTimeClockTest {
     public void cpuTimeClock() {
         final CpuTimeClock clock = new CpuTimeClock();
 
-        assertThat((double) clock.getTime())
-                .isEqualTo(System.currentTimeMillis(),
-                        offset(200.0));
+        final long clockTime = clock.getTime();
+        final long systemTime = System.currentTimeMillis();
+        assertThat((double) clockTime).isEqualTo(systemTime, offset(200.0));
 
-        assertThat((double) clock.getTick())
-                .isEqualTo(ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime(),
-                        offset(1000000.0));
+        final long clockTick = clock.getTick();
+        final long systemTick = ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime();
+        assertThat((double) clockTick).isEqualTo(systemTick, offset(1000000.0));
     }
 }
