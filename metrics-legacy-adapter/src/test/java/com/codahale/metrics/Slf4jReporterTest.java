@@ -50,6 +50,6 @@ public class Slf4jReporterTest {
 
         slf4jReporter.report();
 
-        verify(logger).info(marker, "type={}, name={}, count={}", "COUNTER", "us-nw.test-counter", 100L);
+        verify(logger).info(marker, "type=COUNTER, name=us-nw.test-counter, count=100");
     }
 }
