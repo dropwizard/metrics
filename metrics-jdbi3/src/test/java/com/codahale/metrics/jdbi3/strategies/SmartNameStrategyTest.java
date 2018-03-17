@@ -18,6 +18,7 @@ public class SmartNameStrategyTest extends AbstractStrategyTest {
     private InstrumentedTimingCollector collector;
 
     @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         collector = new InstrumentedTimingCollector(registry, smartNameStrategy);

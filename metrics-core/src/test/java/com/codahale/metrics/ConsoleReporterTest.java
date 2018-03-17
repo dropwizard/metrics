@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 
 public class ConsoleReporterTest {
     private final Locale locale = Locale.US;
-    private final TimeZone timeZone = TimeZone.getTimeZone("PST");
+    private final TimeZone timeZone = TimeZone.getTimeZone("America/Los_Angeles");
 
     private final MetricRegistry registry = mock(MetricRegistry.class);
     private final Clock clock = mock(Clock.class);

@@ -177,7 +177,7 @@ public class CollectdReporterTest {
                 map());
 
         for (int i = 1; i <= 11; i++) {
-            assertThat(receiver.next().getValues()).containsExactly(new Double(i));
+            assertThat(receiver.next().getValues()).containsExactly((double) i);
         }
     }
 

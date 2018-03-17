@@ -147,7 +147,7 @@ public class PacketWriterTest {
         assertThat(hostLength).isEqualTo((short) 28);
         byte[] host = new byte[hostLength - 5];
         packet.get(host, 0, host.length);
-        assertThat(new String(host)).isEqualTo("nw-1.alpine.example.com");
+        assertThat(new String(host, UTF_8)).isEqualTo("nw-1.alpine.example.com");
         assertThat(packet.get()).isEqualTo((byte) 0);
 
         short timestampType = packet.getShort();
@@ -162,7 +162,7 @@ public class PacketWriterTest {
         assertThat(typeLength).isEqualTo((short) 10);
         byte[] type = new byte[typeLength - 5];
         packet.get(type, 0, type.length);
-        assertThat(new String(type)).isEqualTo("gauge");
+        assertThat(new String(type, UTF_8)).isEqualTo("gauge");
         assertThat(packet.get()).isEqualTo((byte) 0);
 
         short typeInstanceType = packet.getShort();
@@ -171,7 +171,7 @@ public class PacketWriterTest {
         assertThat(typeInstanceLength).isEqualTo((short) 10);
         byte[] typeInstance = new byte[typeInstanceLength - 5];
         packet.get(typeInstance, 0, typeInstance.length);
-        assertThat(new String(typeInstance)).isEqualTo("value");
+        assertThat(new String(typeInstance, UTF_8)).isEqualTo("value");
         assertThat(packet.get()).isEqualTo((byte) 0);
 
         short periodType = packet.getShort();
