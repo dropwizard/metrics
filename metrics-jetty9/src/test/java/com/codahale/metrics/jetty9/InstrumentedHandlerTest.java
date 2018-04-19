@@ -9,6 +9,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.servlet.AsyncContext;
@@ -106,6 +107,7 @@ public class InstrumentedHandlerTest {
     }
 
     @Test
+    @Ignore("flaky on virtual machines")
     public void responseTimesAreRecordedForAsyncResponses() throws Exception {
 
         final ContentResponse response = client.GET(uri("/async"));
