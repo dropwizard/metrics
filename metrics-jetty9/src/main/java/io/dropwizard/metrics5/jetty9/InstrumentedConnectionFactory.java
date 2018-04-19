@@ -1,7 +1,6 @@
 package io.dropwizard.metrics5.jetty9;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.jetty.io.Connection;
 import org.eclipse.jetty.io.EndPoint;
