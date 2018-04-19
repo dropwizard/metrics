@@ -1,5 +1,6 @@
 package io.dropwizard.metrics5.jetty9;
 
+import io.dropwizard.metrics5.Counter;
 import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.Timer;
 import org.eclipse.jetty.client.HttpClient;
@@ -26,7 +27,8 @@ public class InstrumentedConnectionFactoryTest {
     private final Server server = new Server();
     private final ServerConnector connector =
             new ServerConnector(server, new InstrumentedConnectionFactory(new HttpConnectionFactory(),
-                    registry.timer("http.connections")));
+                    registry.timer("http.connections"),
+                    registry.counter("http.active-connections")));
     private final HttpClient client = new HttpClient();
 
     @Before
@@ -68,5 +70,24 @@ public class InstrumentedConnectionFactoryTest {
         final Timer timer = registry.timer(MetricRegistry.name("http.connections"));
         assertThat(timer.getCount())
                 .isEqualTo(1);
+    }
+
+    @Test
+    public void instrumentsActiveConnections() throws Exception {
+        final Counter counter = registry.counter("http.active-connections");
+
+        final ContentResponse response = client.GET("http://localhost:" + connector.getLocalPort() + "/hello");
+        assertThat(response.getStatus())
+                .isEqualTo(200);
+
+        assertThat(counter.getCount())
+                .isEqualTo(1);
+
+        client.stop(); // close the connection
+
+        Thread.sleep(100); // make sure the connection is closed
+
+        assertThat(counter.getCount())
+                .isEqualTo(0);
     }
 }

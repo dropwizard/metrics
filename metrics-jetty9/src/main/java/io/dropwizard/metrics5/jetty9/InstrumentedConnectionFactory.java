@@ -1,5 +1,6 @@
 package io.dropwizard.metrics5.jetty9;
 
+import io.dropwizard.metrics5.Counter;
 import io.dropwizard.metrics5.Timer;
 import org.eclipse.jetty.io.Connection;
 import org.eclipse.jetty.io.EndPoint;
@@ -12,10 +13,16 @@ import java.util.List;
 public class InstrumentedConnectionFactory extends ContainerLifeCycle implements ConnectionFactory {
     private final ConnectionFactory connectionFactory;
     private final Timer timer;
+    private final Counter counter;
 
     public InstrumentedConnectionFactory(ConnectionFactory connectionFactory, Timer timer) {
+        this(connectionFactory, timer, null);
+    }
+
+    public InstrumentedConnectionFactory(ConnectionFactory connectionFactory, Timer timer, Counter counter) {
         this.connectionFactory = connectionFactory;
         this.timer = timer;
+        this.counter = counter;
         addBean(connectionFactory);
     }
 
@@ -38,11 +45,17 @@ public class InstrumentedConnectionFactory extends ContainerLifeCycle implements
             @Override
             public void onOpened(Connection connection) {
                 this.context = timer.time();
+                if (counter != null) {
+                    counter.inc();
+                }
             }
 
             @Override
             public void onClosed(Connection connection) {
                 context.stop();
+                if (counter != null) {
+                    counter.dec();
+                }
             }
         });
         return connection;
