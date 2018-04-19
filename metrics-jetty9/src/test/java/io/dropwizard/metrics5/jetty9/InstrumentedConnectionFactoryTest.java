@@ -1,14 +1,8 @@
 package io.dropwizard.metrics5.jetty9;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import io.dropwizard.metrics5.Counter;
+import io.dropwizard.metrics5.MetricRegistry;
+import io.dropwizard.metrics5.Timer;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -20,16 +14,21 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.dropwizard.metrics5.Counter;
-import io.dropwizard.metrics5.MetricRegistry;
-import io.dropwizard.metrics5.Timer;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class InstrumentedConnectionFactoryTest {
     private final MetricRegistry registry = new MetricRegistry();
     private final Server server = new Server();
     private final ServerConnector connector =
             new ServerConnector(server, new InstrumentedConnectionFactory(new HttpConnectionFactory(),
-                    registry.timer("http.connections"), registry.counter("http.active-connections")));
+                    registry.timer("http.connections"),
+                    registry.counter("http.active-connections")));
     private final HttpClient client = new HttpClient();
 
     @Before
