@@ -15,22 +15,16 @@ import io.dropwizard.metrics5.Timer;
 public class InstrumentedConnectionFactory extends ContainerLifeCycle implements ConnectionFactory {
     private final ConnectionFactory connectionFactory;
     private final Timer timer;
-    private final Optional<Counter> counterMaybe;
+    private final Counter counter;
 
     public InstrumentedConnectionFactory(ConnectionFactory connectionFactory, Timer timer) {
-        this(connectionFactory, timer, Optional.empty());
+        this(connectionFactory, timer, null);
     }
 
     public InstrumentedConnectionFactory(ConnectionFactory connectionFactory, Timer timer, Counter counter) {
-        this(connectionFactory, timer, Optional.of(counter));
-    }
-
-    private InstrumentedConnectionFactory(ConnectionFactory connectionFactory,
-                                          Timer timer,
-                                          Optional<Counter> counterMaybe) {
         this.connectionFactory = connectionFactory;
         this.timer = timer;
-        this.counterMaybe = counterMaybe;
+        this.counter = counter;
         addBean(connectionFactory);
     }
 
@@ -53,13 +47,17 @@ public class InstrumentedConnectionFactory extends ContainerLifeCycle implements
             @Override
             public void onOpened(Connection connection) {
                 this.context = timer.time();
-                counterMaybe.ifPresent(Counter::inc);
+                if (counter != null) {
+                    counter.inc();
+                }
             }
 
             @Override
             public void onClosed(Connection connection) {
                 context.stop();
-                counterMaybe.ifPresent(Counter::dec);
+                if (counter != null) {
+                    counter.dec();
+                }
             }
         });
         return connection;
