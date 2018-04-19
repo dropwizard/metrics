@@ -2,6 +2,7 @@ package com.codahale.metrics;
 
 import org.junit.Test;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -119,6 +120,24 @@ public class TimerTest {
 
         assertThat(timer.getCount())
                 .isZero();
+
+        verifyZeroInteractions(reservoir);
+    }
+
+    @Test
+    public void java8Duration() {
+        timer.update(Duration.ofSeconds(1234));
+
+        assertThat(timer.getCount()).isEqualTo(1);
+
+        verify(reservoir).update((long) 1234e9);
+    }
+
+    @Test
+    public void java8NegativeDuration() {
+        timer.update(Duration.ofMillis(-5678));
+
+        assertThat(timer.getCount()).isZero();
 
         verifyZeroInteractions(reservoir);
     }
