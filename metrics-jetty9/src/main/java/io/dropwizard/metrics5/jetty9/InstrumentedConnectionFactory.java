@@ -1,15 +1,14 @@
 package io.dropwizard.metrics5.jetty9;
 
-import java.util.List;
-
+import io.dropwizard.metrics5.Counter;
+import io.dropwizard.metrics5.Timer;
 import org.eclipse.jetty.io.Connection;
 import org.eclipse.jetty.io.EndPoint;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.util.component.ContainerLifeCycle;
 
-import io.dropwizard.metrics5.Counter;
-import io.dropwizard.metrics5.Timer;
+import java.util.List;
 
 public class InstrumentedConnectionFactory extends ContainerLifeCycle implements ConnectionFactory {
     private final ConnectionFactory connectionFactory;
