@@ -1,6 +1,7 @@
 package com.codahale.metrics;
 
 import java.io.Closeable;
+import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -78,6 +79,10 @@ public class Timer implements Metered, Sampling {
 
     public void update(long duration, TimeUnit unit) {
         delegate.update(duration, unit);
+    }
+
+    public void update(Duration duration) {
+        delegate.update(duration);
     }
 
     public <T> T time(Callable<T> event) throws Exception {

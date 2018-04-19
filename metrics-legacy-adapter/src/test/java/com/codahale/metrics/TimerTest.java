@@ -2,6 +2,7 @@ package com.codahale.metrics;
 
 import org.junit.Test;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -89,5 +90,14 @@ public class TimerTest {
 
         assertThat(result).isEqualTo(42);
         verifyOneEvent(timer);
+    }
+
+    @Test
+    public void testUpdateDuration() {
+        Timer timer = new Timer();
+        timer.update(Duration.ofMillis(100));
+        timer.update(Duration.ofMillis(200));
+
+        assertThat(timer.getCount()).isEqualTo(2);
     }
 }
