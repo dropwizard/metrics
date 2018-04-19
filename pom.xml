@@ -251,7 +251,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.14.1</version>
                 <configuration>
-                    <parallel>classes</parallel>
                     <argLine>-Djava.net.preferIPv4Stack=true</argLine>
                 </configuration>
             </plugin>
