@@ -6,6 +6,7 @@ import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.DnsResolver;
 import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.HttpClientConnectionOperator;
 import org.apache.http.conn.HttpConnectionFactory;
 import org.apache.http.conn.ManagedHttpClientConnection;
 import org.apache.http.conn.SchemePortResolver;
@@ -13,6 +14,7 @@ import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.conn.DefaultHttpClientConnectionOperator;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.conn.SystemDefaultDnsResolver;
 
@@ -53,17 +55,35 @@ public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientCo
         this(metricsRegistry, socketFactoryRegistry, null, null, SystemDefaultDnsResolver.INSTANCE, connTTL, connTTLTimeUnit, null);
     }
 
+
     public InstrumentedHttpClientConnectionManager(MetricRegistry metricsRegistry,
                                                    Registry<ConnectionSocketFactory> socketFactoryRegistry,
-                                                   HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection> connFactory,
+                                                   HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection>
+                                                           connFactory,
                                                    SchemePortResolver schemePortResolver,
                                                    DnsResolver dnsResolver,
                                                    long connTTL,
                                                    TimeUnit connTTLTimeUnit,
                                                    String name) {
-        super(socketFactoryRegistry, connFactory, schemePortResolver, dnsResolver, connTTL, connTTLTimeUnit);
+        this(metricsRegistry,
+             new DefaultHttpClientConnectionOperator(socketFactoryRegistry, schemePortResolver, dnsResolver),
+             connFactory,
+             connTTL,
+             connTTLTimeUnit,
+             name);
+    }
+
+    public InstrumentedHttpClientConnectionManager(MetricRegistry metricsRegistry,
+                                                   HttpClientConnectionOperator httpClientConnectionOperator,
+                                                   HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection>
+                                                           connFactory,
+                                                   long connTTL,
+                                                   TimeUnit connTTLTimeUnit,
+                                                   String name) {
+        super(httpClientConnectionOperator, connFactory, connTTL, connTTLTimeUnit);
         this.metricsRegistry = metricsRegistry;
         this.name = name;
+
         metricsRegistry.register(name(HttpClientConnectionManager.class, name, "available-connections"),
             (Gauge<Integer>) () -> {
                 // this acquires a lock on the connection pool; remove if contention sucks

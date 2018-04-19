@@ -1,5 +1,6 @@
 package io.dropwizard.metrics5;
 
+import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -87,6 +88,15 @@ public class Timer implements Metered, Sampling {
      */
     public void update(long duration, TimeUnit unit) {
         update(unit.toNanos(duration));
+    }
+
+    /**
+     * Adds a recorded duration.
+     *
+     * @param duration the {@link Duration} to add to the timer. Negative or zero value are ignored.
+     */
+    public void update(Duration duration) {
+        update(duration.toNanos());
     }
 
     /**
