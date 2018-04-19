@@ -10,11 +10,6 @@ jobs:
       - checkout
       - restore_cache:
           key: metrics-{{ checksum "pom.xml" }}
-      - run: mvn dependency:go-offline
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: metrics-{{ checksum "pom.xml" }}
       - run: mvn test
       - run:
           name: Save test results
