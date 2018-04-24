@@ -34,6 +34,9 @@ public class ThreadDumpServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse resp) throws ServletException, IOException {
+        final boolean includeMonitors = getParam(req.getParameter("monitors"), true);
+        final boolean includeSynchronizers = getParam(req.getParameter("synchronizers"), true);
+
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType(CONTENT_TYPE);
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
@@ -42,7 +45,11 @@ public class ThreadDumpServlet extends HttpServlet {
             return;
         }
         try (OutputStream output = resp.getOutputStream()) {
-            threadDump.dump(output);
+            threadDump.dump(includeMonitors, includeSynchronizers, output);
         }
+    }
+
+    private static Boolean getParam(String initParam, boolean defaultValue) {
+        return initParam == null ? defaultValue : Boolean.parseBoolean(initParam);
     }
 }
