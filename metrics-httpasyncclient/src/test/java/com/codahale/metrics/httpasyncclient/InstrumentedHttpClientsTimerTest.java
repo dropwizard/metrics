@@ -71,7 +71,7 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
         // After the computation is complete timer must be stopped
         // Materialzing the future and calling the future callback is not an atomic operation so
         // we need to wait for callback to succeed
-        verify(context, timeout(100).times(1)).stop();
+        verify(context, timeout(200).times(1)).stop();
     }
 
     @Test
@@ -97,8 +97,8 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
         // After the computation is complete timer must be stopped
         // Materialzing the future and calling the future callback is not an atomic operation so
         // we need to wait for callback to succeed
-        verify(futureCallback, timeout(100).times(1)).completed(any(HttpResponse.class));
-        verify(context, timeout(100).times(1)).stop();
+        verify(futureCallback, timeout(200).times(1)).completed(any(HttpResponse.class));
+        verify(context, timeout(200).times(1)).stop();
     }
 
     @Test
@@ -127,8 +127,8 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
         // After the computation is complete timer must be stopped
         // Materialzing the future and calling the future callback is not an atomic operation so
         // we need to wait for callback to succeed
-        verify(futureCallback, timeout(100).times(1)).failed(any(Exception.class));
-        verify(context, timeout(100).times(1)).stop();
+        verify(futureCallback, timeout(200).times(1)).failed(any(Exception.class));
+        verify(context, timeout(200).times(1)).stop();
     }
 
 }
