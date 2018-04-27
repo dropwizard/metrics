@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A reporter which listens for new metrics and exposes them as namespaced MBeans.
  */
-public class JmxReporter implements Reporter, Closeable {
+public class JmxReporter implements Reporter {
     /**
      * Returns a new {@link Builder} for {@link JmxReporter}.
      *
