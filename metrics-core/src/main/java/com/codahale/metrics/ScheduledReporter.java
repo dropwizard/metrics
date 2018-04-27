@@ -18,6 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * The abstract base class for all scheduled reporters (i.e., reporters which process a registry's
  * metrics periodically).
  *
+ * Since {@link Reporter} extends {@link java.io.Closeable} this class also satisfies that interface.
+ *
  * @see ConsoleReporter
  * @see CsvReporter
  * @see Slf4jReporter
