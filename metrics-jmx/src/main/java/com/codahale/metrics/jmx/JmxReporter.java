@@ -20,6 +20,7 @@ import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
+import java.io.Closeable;
 import java.lang.management.ManagementFactory;
 import java.util.Collections;
 import java.util.Locale;
@@ -29,9 +30,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A reporter which listens for new metrics and exposes them as namespaced MBeans.
- * Since {@link Reporter} extends {@link java.io.Closeable} this class also satisfies that interface.
  */
-public class JmxReporter implements Reporter {
+public class JmxReporter implements Reporter, Closeable {
     /**
      * Returns a new {@link Builder} for {@link JmxReporter}.
      *

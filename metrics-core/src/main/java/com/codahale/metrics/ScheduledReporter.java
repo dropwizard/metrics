@@ -3,6 +3,7 @@ package com.codahale.metrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
@@ -18,13 +19,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * The abstract base class for all scheduled reporters (i.e., reporters which process a registry's
  * metrics periodically).
  *
- * Since {@link Reporter} extends {@link java.io.Closeable} this class also satisfies that interface.
- *
  * @see ConsoleReporter
  * @see CsvReporter
  * @see Slf4jReporter
  */
-public abstract class ScheduledReporter implements Reporter {
+public abstract class ScheduledReporter implements Closeable, Reporter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScheduledReporter.class);
 
