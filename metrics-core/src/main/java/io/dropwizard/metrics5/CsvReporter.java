@@ -212,7 +212,7 @@ public class CsvReporter extends ScheduledReporter {
 
         this.histogramFormat = String.join(separator, "%d", "%d", "%d", "%f", "%d", "%f", "%f", "%f", "%f", "%f", "%f", "%f");
         this.meterFormat = String.join(separator, "%d", "%d", "%f", "%f", "%f", "%f", "events/%s");
-        this.timerFormat = String.join(separator, "%d", "%d", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "calls/%s", "%s");
+        this.timerFormat = String.join(separator, "%d", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "calls/%s", "%s");
     }
 
     @Override
@@ -253,7 +253,7 @@ public class CsvReporter extends ScheduledReporter {
                 "count,sum,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
                 timerFormat,
                 timer.getCount(),
-                timer.getSum(),
+                convertDuration(timer.getSum()),
                 convertDuration(snapshot.getMax()),
                 convertDuration(snapshot.getMean()),
                 convertDuration(snapshot.getMin()),

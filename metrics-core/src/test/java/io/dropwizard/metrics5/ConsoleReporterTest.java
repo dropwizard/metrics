@@ -178,7 +178,7 @@ public class ConsoleReporterTest {
     public void reportsTimerValues() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
-        when(timer.getSum()).thenReturn(5L);
+        when(timer.getSum()).thenReturn(TimeUnit.MILLISECONDS.toNanos(5));
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
         when(timer.getFiveMinuteRate()).thenReturn(4.0);
@@ -212,7 +212,7 @@ public class ConsoleReporterTest {
                         "-- Timers ----------------------------------------------------------------------",
                         "test.another.timer",
                         "             count = 1",
-                        "               sum = 5",
+                        "               sum = 5.00",
                         "         mean rate = 2.00 calls/second",
                         "     1-minute rate = 3.00 calls/second",
                         "     5-minute rate = 4.00 calls/second",
@@ -291,7 +291,7 @@ public class ConsoleReporterTest {
 
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
-        when(timer.getSum()).thenReturn(6L);
+        when(timer.getSum()).thenReturn(TimeUnit.MILLISECONDS.toNanos(6));
         when(timer.getMeanRate()).thenReturn(2.0);
         when(timer.getOneMinuteRate()).thenReturn(3.0);
         when(timer.getFiveMinuteRate()).thenReturn(4.0);
@@ -325,7 +325,7 @@ public class ConsoleReporterTest {
                         "-- Timers ----------------------------------------------------------------------",
                         "test.another.timer",
                         "             count = 1",
-                        "               sum = 6",
+                        "               sum = 6.00",
                         "         mean rate = 2.00 calls/second",
                         "     1-minute rate = 3.00 calls/second",
                         "    15-minute rate = 5.00 calls/second",

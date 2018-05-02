@@ -317,7 +317,7 @@ public class ConsoleReporter extends ScheduledReporter {
     private void printTimer(Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
         printIfEnabled(MetricAttribute.COUNT, String.format(locale, "             count = %d", timer.getCount()));
-        printIfEnabled(MetricAttribute.SUM, String.format(locale, "               sum = %d", timer.getSum()));
+        printIfEnabled(MetricAttribute.SUM, String.format(locale, "               sum = %2.2f", convertDuration(timer.getSum())));
         printIfEnabled(MetricAttribute.MEAN_RATE, String.format(locale, "         mean rate = %2.2f calls/%s", convertRate(timer.getMeanRate()), getRateUnit()));
         printIfEnabled(MetricAttribute.M1_RATE, String.format(locale, "     1-minute rate = %2.2f calls/%s", convertRate(timer.getOneMinuteRate()), getRateUnit()));
         printIfEnabled(MetricAttribute.M5_RATE, String.format(locale, "     5-minute rate = %2.2f calls/%s", convertRate(timer.getFiveMinuteRate()), getRateUnit()));
