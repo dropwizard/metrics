@@ -497,6 +497,11 @@ public class JmxReporter implements Reporter, Closeable {
         public double get999thPercentile() {
             return metric.getSnapshot().get999thPercentile() * durationFactor;
         }
+        
+        @Override
+        public long getSum() {
+        	return (long)(super.getSum() * durationFactor);
+        }
 
         @Override
         public long[] values() {

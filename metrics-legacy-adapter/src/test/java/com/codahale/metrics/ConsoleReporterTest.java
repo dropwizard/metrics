@@ -1,7 +1,6 @@
 package com.codahale.metrics;
 
-import org.junit.After;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -13,13 +12,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.After;
+import org.junit.Test;
 
 @SuppressWarnings("deprecation")
 public class ConsoleReporterTest {
 
-    private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    private String dateHeader = System.getProperty("java.version").startsWith("1.8") ?
+    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private final String dateHeader = System.getProperty("java.version").startsWith("1.8") ?
             "3/18/13 1:04:36 AM =============================================================" :
             "3/18/13, 1:04:36 AM ============================================================";
 
@@ -99,7 +99,7 @@ public class ConsoleReporterTest {
                         "-- Timers ----------------------------------------------------------------------\n" +
                         "test-timer\n" +
                         "             count = 0\n" +
-                        "               sum = 0\n" +
+                        "               sum = 0.00\n" +
                         "         mean rate = 0.00 calls/second\n" +
                         "     1-minute rate = 0.00 calls/second\n" +
                         "     5-minute rate = 0.00 calls/second\n" +
