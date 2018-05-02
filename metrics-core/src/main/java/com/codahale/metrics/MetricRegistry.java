@@ -501,7 +501,14 @@ public class MetricRegistry implements MetricSet {
         }
     }
 
-    private void registerAll(String prefix, MetricSet metrics) throws IllegalArgumentException {
+    /**
+     * Given a metric set, registers them with the given prefix prepended to their names.
+     *
+     * @param prefix a name prefix
+     * @param metrics a set of metrics
+     * @throws IllegalArgumentException if any of the names are already registered
+     */
+    public void registerAll(String prefix, MetricSet metrics) throws IllegalArgumentException {
         for (Map.Entry<String, Metric> entry : metrics.getMetrics().entrySet()) {
             if (entry.getValue() instanceof MetricSet) {
                 registerAll(name(prefix, entry.getKey()), (MetricSet) entry.getValue());
