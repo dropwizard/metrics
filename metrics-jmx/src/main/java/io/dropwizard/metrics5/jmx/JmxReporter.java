@@ -340,7 +340,7 @@ public class JmxReporter implements Reporter, Closeable {
     public interface JmxMeterMBean extends MetricMBean {
         long getCount();
 
-        long getSum();
+        double getSum();
 
         double getMeanRate();
 
@@ -371,7 +371,7 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public long getSum() {
+        public double getSum() {
             return metric.getSum();
         }
 
@@ -499,8 +499,8 @@ public class JmxReporter implements Reporter, Closeable {
         }
         
         @Override
-        public long getSum() {
-        	return (long)(super.getSum() * durationFactor);
+        public double getSum() {
+        	return super.getSum() * durationFactor;
         }
 
         @Override
