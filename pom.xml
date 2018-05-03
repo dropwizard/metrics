@@ -90,7 +90,7 @@
         <connection>scm:git:git://github.com/dropwizard/metrics.git</connection>
         <developerConnection>scm:git:git@github.com:dropwizard/metrics.git</developerConnection>
         <url>http://github.com/dropwizard/metrics/</url>
-        <tag>v4.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
