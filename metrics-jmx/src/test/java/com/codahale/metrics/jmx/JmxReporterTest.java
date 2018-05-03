@@ -148,7 +148,7 @@ public class JmxReporterTest {
 
     @Test
     public void registersMBeansForGauges() throws Exception {
-        final AttributeList attributes = getAttributes("gauge", "Value");
+        final AttributeList attributes = getAttributes("gauges", "gauge", "Value");
 
         assertThat(values(attributes))
                 .contains(entry("Value", 1));
@@ -156,7 +156,7 @@ public class JmxReporterTest {
 
     @Test
     public void registersMBeansForCounters() throws Exception {
-        final AttributeList attributes = getAttributes("test.counter", "Count");
+        final AttributeList attributes = getAttributes("counters", "test.counter", "Count");
 
         assertThat(values(attributes))
                 .contains(entry("Count", 100L));
@@ -164,7 +164,7 @@ public class JmxReporterTest {
 
     @Test
     public void registersMBeansForHistograms() throws Exception {
-        final AttributeList attributes = getAttributes("test.histogram",
+        final AttributeList attributes = getAttributes("histograms", "test.histogram",
                 "Count",
                 "Max",
                 "Mean",
@@ -195,7 +195,7 @@ public class JmxReporterTest {
 
     @Test
     public void registersMBeansForMeters() throws Exception {
-        final AttributeList attributes = getAttributes("test.meter",
+        final AttributeList attributes = getAttributes("meters", "test.meter",
                 "Count",
                 "MeanRate",
                 "OneMinuteRate",
@@ -214,7 +214,7 @@ public class JmxReporterTest {
 
     @Test
     public void registersMBeansForTimers() throws Exception {
-        final AttributeList attributes = getAttributes("test.another.timer",
+        final AttributeList attributes = getAttributes("timers", "test.another.timer",
                 "Count",
                 "MeanRate",
                 "OneMinuteRate",
@@ -258,7 +258,7 @@ public class JmxReporterTest {
         reporter.stop();
 
         try {
-            getAttributes("gauge", "Value");
+            getAttributes("gauges", "gauge", "Value");
             failBecauseExceptionWasNotThrown(InstanceNotFoundException.class);
         } catch (InstanceNotFoundException e) {
 
@@ -297,8 +297,8 @@ public class JmxReporterTest {
         metricRegistry.counter("test*");
     }
 
-    private AttributeList getAttributes(String name, String... attributeNames) throws JMException {
-        ObjectName n = concreteObjectNameFactory.createName("only-for-logging-error", this.name, name);
+    private AttributeList getAttributes(String type, String name, String... attributeNames) throws JMException {
+        ObjectName n = concreteObjectNameFactory.createName(type, this.name, name);
         return mBeanServer.getAttributes(n, attributeNames);
     }
 
