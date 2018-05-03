@@ -264,7 +264,7 @@ public class GraphiteReporter extends ScheduledReporter {
             }
 
             for (Map.Entry<MetricName, Meter> entry : meters.entrySet()) {
-                reportMetered(entry.getKey(), entry.getValue(), timestamp);
+                reportMetered(entry.getKey(), entry.getValue(), timestamp, false);
             }
 
             for (Map.Entry<MetricName, Timer> entry : timers.entrySet()) {
@@ -307,12 +307,12 @@ public class GraphiteReporter extends ScheduledReporter {
         sendIfEnabled(P98, name, convertDuration(snapshot.get98thPercentile()), timestamp);
         sendIfEnabled(P99, name, convertDuration(snapshot.get99thPercentile()), timestamp);
         sendIfEnabled(P999, name, convertDuration(snapshot.get999thPercentile()), timestamp);
-        reportMetered(name, timer, timestamp);
+        reportMetered(name, timer, timestamp, true);
     }
 
-    private void reportMetered(MetricName name, Metered meter, long timestamp) throws IOException {
+    private void reportMetered(MetricName name, Metered meter, long timestamp, boolean sumIsDuration) throws IOException {
         sendIfEnabled(COUNT, name, meter.getCount(), timestamp);
-        sendIfEnabled(SUM, name, meter.getSum(), timestamp);
+        sendIfEnabled(SUM, name, sumIsDuration ? convertDuration(meter.getSum()) : meter.getSum(), timestamp);
         sendIfEnabled(M1_RATE, name, convertRate(meter.getOneMinuteRate()), timestamp);
         sendIfEnabled(M5_RATE, name, convertRate(meter.getFiveMinuteRate()), timestamp);
         sendIfEnabled(M15_RATE, name, convertRate(meter.getFifteenMinuteRate()), timestamp);
