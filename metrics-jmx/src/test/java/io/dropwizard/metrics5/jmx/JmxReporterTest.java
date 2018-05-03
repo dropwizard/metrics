@@ -214,7 +214,7 @@ public class JmxReporterTest {
 
         assertThat(values(attributes))
                 .contains(entry("Count", 1L))
-                .contains(entry("Sum", 6L))
+                .contains(entry("Sum", 6.0))
                 .contains(entry("MeanRate", 2.0))
                 .contains(entry("OneMinuteRate", 3.0))
                 .contains(entry("FiveMinuteRate", 4.0))
@@ -246,7 +246,7 @@ public class JmxReporterTest {
 
         assertThat(values(attributes))
                 .contains(entry("Count", 1L))
-                .contains(entry("Sum", 6L))
+                .contains(entry("Sum", 6.0))
                 .contains(entry("MeanRate", 2.0))
                 .contains(entry("OneMinuteRate", 3.0))
                 .contains(entry("FiveMinuteRate", 4.0))
