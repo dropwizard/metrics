@@ -1,5 +1,9 @@
 language: java
 dist: trusty
+
+before_install:
+  - 'wget https://raw.githubusercontent.com/sormuras/bach/master/install-jdk.sh'
+
 install: echo "I trust Maven."
 
 # don't just run the tests, also run error-prone
@@ -14,11 +18,8 @@ matrix:
           packages:
             - oracle-java8-installer
     - os: linux
-      jdk: oraclejdk9
-      addons:
-        apt:
-          packages:
-            - oracle-java9-installer
+      env: JDK='OpenJDK 10'
+      install: . ./install-jdk.sh -F 10
 
 notifications:
   email:

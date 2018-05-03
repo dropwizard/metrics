@@ -530,7 +530,7 @@ public class MetricRegistry implements MetricSet {
         }
     }
 
-    private void registerAll(MetricName prefix, MetricSet metrics) throws IllegalArgumentException {
+    public void registerAll(MetricName prefix, MetricSet metrics) throws IllegalArgumentException {
         if (prefix == null) {
             prefix = MetricName.EMPTY;
         }
