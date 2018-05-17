@@ -38,16 +38,28 @@ public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientCo
     private final MetricRegistry metricsRegistry;
     private final String name;
 
+    /**
+     * @deprecated Use {@link #builder(MetricRegistry)} instead.
+     */
+    @Deprecated
     public InstrumentedHttpClientConnectionManager(MetricRegistry metricRegistry) {
         this(metricRegistry, getDefaultRegistry());
     }
 
+    /**
+     * @deprecated Use {@link #builder(MetricRegistry)} instead.
+     */
+    @Deprecated
     public InstrumentedHttpClientConnectionManager(MetricRegistry metricsRegistry,
                                                    Registry<ConnectionSocketFactory> socketFactoryRegistry) {
         this(metricsRegistry, socketFactoryRegistry, -1, TimeUnit.MILLISECONDS);
     }
 
 
+    /**
+     * @deprecated Use {@link #builder(MetricRegistry)} instead.
+     */
+    @Deprecated
     public InstrumentedHttpClientConnectionManager(MetricRegistry metricsRegistry,
                                                    Registry<ConnectionSocketFactory> socketFactoryRegistry,
                                                    long connTTL,
@@ -56,6 +68,10 @@ public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientCo
     }
 
 
+    /**
+     * @deprecated Use {@link #builder(MetricRegistry)} instead.
+     */
+    @Deprecated
     public InstrumentedHttpClientConnectionManager(MetricRegistry metricsRegistry,
                                                    Registry<ConnectionSocketFactory> socketFactoryRegistry,
                                                    HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection>
@@ -73,6 +89,10 @@ public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientCo
              name);
     }
 
+    /**
+     * @deprecated Use {@link #builder(MetricRegistry)} instead.
+     */
+    @Deprecated
     public InstrumentedHttpClientConnectionManager(MetricRegistry metricsRegistry,
                                                    HttpClientConnectionOperator httpClientConnectionOperator,
                                                    HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection>
@@ -114,4 +134,76 @@ public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientCo
         metricsRegistry.remove(name(HttpClientConnectionManager.class, name, "max-connections"));
         metricsRegistry.remove(name(HttpClientConnectionManager.class, name, "pending-connections"));
     }
+
+    public static Builder builder(MetricRegistry metricsRegistry) {
+        return new Builder().metricsRegistry(metricsRegistry);
+    }
+
+    public static class Builder {
+        private MetricRegistry metricsRegistry;
+        private HttpClientConnectionOperator httpClientConnectionOperator;
+        private Registry<ConnectionSocketFactory> socketFactoryRegistry = getDefaultRegistry();
+        private HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection> connFactory;
+        private SchemePortResolver schemePortResolver;
+        private DnsResolver dnsResolver = SystemDefaultDnsResolver.INSTANCE;
+        private long connTTL = -1;
+        private TimeUnit connTTLTimeUnit = TimeUnit.MILLISECONDS;
+        private String name;
+
+        Builder() {
+        }
+
+        public Builder metricsRegistry(MetricRegistry metricsRegistry) {
+            this.metricsRegistry = metricsRegistry;
+            return this;
+        }
+
+        public Builder socketFactoryRegistry(Registry<ConnectionSocketFactory> socketFactoryRegistry) {
+            this.socketFactoryRegistry = socketFactoryRegistry;
+            return this;
+        }
+
+        public Builder connFactory(HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection> connFactory) {
+            this.connFactory = connFactory;
+            return this;
+        }
+
+        public Builder schemePortResolver(SchemePortResolver schemePortResolver) {
+            this.schemePortResolver = schemePortResolver;
+            return this;
+        }
+
+        public Builder dnsResolver(DnsResolver dnsResolver) {
+            this.dnsResolver = dnsResolver;
+            return this;
+        }
+
+        public Builder connTTL(long connTTL) {
+            this.connTTL = connTTL;
+            return this;
+        }
+
+        public Builder connTTLTimeUnit(TimeUnit connTTLTimeUnit) {
+            this.connTTLTimeUnit = connTTLTimeUnit;
+            return this;
+        }
+
+        public Builder httpClientConnectionOperator(HttpClientConnectionOperator httpClientConnectionOperator) {
+            this.httpClientConnectionOperator = httpClientConnectionOperator;
+            return this;
+        }
+
+        public Builder name(final String name) {
+            this.name = name;
+            return this;
+        }
+
+        public InstrumentedHttpClientConnectionManager build() {
+            if (httpClientConnectionOperator == null) {
+                httpClientConnectionOperator = new DefaultHttpClientConnectionOperator(socketFactoryRegistry, schemePortResolver, dnsResolver);
+            }
+            return new InstrumentedHttpClientConnectionManager(metricsRegistry, httpClientConnectionOperator, connFactory, connTTL, connTTLTimeUnit, name);
+        }
+    }
+
 }
