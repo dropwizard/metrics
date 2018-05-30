@@ -239,6 +239,7 @@
                             javax.servlet*;version="[2.5.0,4.0.0)",
                             org.slf4j*;version="[1.6.0,2.0.0)",
                             sun.misc.*;resolution:=optional,
+                            com.sun.management.*;resolution:=optional,
                             *
                         ]]>
                         </Import-Package>
