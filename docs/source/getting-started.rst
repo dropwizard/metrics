@@ -360,6 +360,10 @@ To report metrics via JMX, include the ``metrics-jmx`` module as a dependency:
 
 .. code-block:: java
 
+    import com.codahale.metrics.jmx.*;
+
+.. code-block:: java
+
     final JmxReporter reporter = JmxReporter.forRegistry(registry).build();
     reporter.start();
 

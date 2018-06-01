@@ -363,6 +363,10 @@ To report metrics via JMX:
 
 .. code-block:: java
 
+    import com.codahale.metrics.jmx.*;
+
+.. code-block:: java
+
     final JmxReporter reporter = JmxReporter.forRegistry(registry).build();
     reporter.start();
 
