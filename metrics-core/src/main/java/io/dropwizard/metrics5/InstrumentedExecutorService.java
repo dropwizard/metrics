@@ -189,19 +189,22 @@ public class InstrumentedExecutorService implements ExecutorService {
 
     private class InstrumentedCallable<T> implements Callable<T> {
         private final Callable<T> callable;
+        private final Timer.Context idleContext;
 
         InstrumentedCallable(Callable<T> callable) {
             this.callable = callable;
+            this.idleContext = idle.time();
         }
 
         @Override
         public T call() throws Exception {
+        	idleContext.stop();
             running.inc();
-            final Timer.Context context = duration.time();
+            final Timer.Context durationContext = duration.time();
             try {
                 return callable.call();
             } finally {
-                context.stop();
+            	durationContext.stop();
                 running.dec();
                 completed.mark();
             }
