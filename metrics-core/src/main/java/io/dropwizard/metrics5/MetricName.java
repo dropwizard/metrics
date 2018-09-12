@@ -27,15 +27,15 @@ public class MetricName implements Comparable<MetricName> {
     public static MetricName empty() {
         return EMPTY;
     }
-    
+
     private final String key;
     private final Map<String, String> tags;
-    
+
     public MetricName(String key, Map<String, String> tags) {
         this.key = Objects.requireNonNull(key);
         this.tags = tags.isEmpty() ? EMPTY_TAGS : unmodifiableSortedCopy(tags);
     }
-    
+
     public String getKey() {
         return key;
     }
@@ -60,7 +60,7 @@ public class MetricName implements Comparable<MetricName> {
         if (parts == null || parts.length == 0) {
             return this;
         }
-        
+
         String newKey = Stream.concat(Stream.of(key), Stream.of(parts))
                 .filter(s -> s != null && !s.isEmpty())
                 .collect(Collectors.joining(SEPARATOR));
@@ -103,25 +103,25 @@ public class MetricName implements Comparable<MetricName> {
 
         return tagged(add);
     }
-    
+
     /**
      * Build the MetricName that is this with another path and tags appended to it.
-     * 
+     *
      * <p>
      * Semantically equivalent to: <br>
      * <code>this.resolve(append.getKey()).tagged(append.getTags());</code>
      *
      * @param append The extra name element to add to the new metric.
-     * @return A new metric name with path appended to the original, 
+     * @return A new metric name with path appended to the original,
      * and tags included from both names.
      */
     public MetricName append(MetricName append) {
         return resolve(append.key).tagged(append.tags);
     }
-    
+
     /**
      * Build a new metric name using the specific path components.
-     * 
+     *
      * <p>
      * Equivalent to:<br>
      * <code>MetricName.empty().resolve(parts);</code>
@@ -165,7 +165,7 @@ public class MetricName implements Comparable<MetricName> {
     private int compareTags(Map<String, String> left, Map<String, String> right) {
         Iterator<Map.Entry<String, String>> lit = left.entrySet().iterator();
         Iterator<Map.Entry<String, String>> rit = right.entrySet().iterator();
-        
+
         while (lit.hasNext() && rit.hasNext()) {
             Map.Entry<String, String> l = lit.next();
             Map.Entry<String, String> r = rit.next();
@@ -173,7 +173,15 @@ public class MetricName implements Comparable<MetricName> {
             if (c != 0) {
                 return c;
             }
-            c = l.getValue().compareTo(r.getValue());
+            if (l.getValue() == null && r.getValue() == null) {
+                return 0;
+            } else if (l.getValue() == null) {
+                return -1;
+            } else if (r.getValue() == null) {
+                return 1;
+            } else {
+                c = l.getValue().compareTo(r.getValue());
+            }
             if (c != 0) {
                 return c;
             }
