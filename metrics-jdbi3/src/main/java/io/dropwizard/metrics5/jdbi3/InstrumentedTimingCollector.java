@@ -4,6 +4,7 @@ import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.jdbi3.strategies.SmartNameStrategy;
 import io.dropwizard.metrics5.jdbi3.strategies.StatementNameStrategy;
+import org.jdbi.v3.core.statement.SqlLogger;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.jdbi.v3.core.statement.TimingCollector;
 
