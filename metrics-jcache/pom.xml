@@ -22,9 +22,9 @@
 
     <profiles>
         <profile>
-            <id>jdk10</id>
+            <id>jdk11</id>
             <activation>
-                <jdk>10</jdk>
+                <jdk>11</jdk>
             </activation>
             <build>
                 <plugins>
