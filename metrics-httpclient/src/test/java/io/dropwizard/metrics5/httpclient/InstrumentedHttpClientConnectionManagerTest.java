@@ -1,5 +1,6 @@
 package io.dropwizard.metrics5.httpclient;
 
+import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricRegistry;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,8 +36,8 @@ public class InstrumentedHttpClientConnectionManagerTest {
                 .build()
                 .close();
 
-        ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<MetricName> argumentCaptor = ArgumentCaptor.forClass(MetricName.class);
         Mockito.verify(registry, Mockito.atLeast(1)).register(argumentCaptor.capture(), any());
-        assertTrue(argumentCaptor.getValue().contains("some-other-name"));
+        assertTrue(argumentCaptor.getValue().getKey().contains("some-other-name"));
     }
 }

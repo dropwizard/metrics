@@ -38,7 +38,7 @@ public class MetricsFeature implements Feature {
     /**
      * A call-back method called when the feature is to be enabled in a given
      * runtime configuration scope.
-     * <p/>
+     * <p>
      * The responsibility of the feature is to properly update the supplied runtime configuration context
      * and return {@code true} if the feature was successfully enabled or {@code false} otherwise.
      * <p>
@@ -48,7 +48,7 @@ public class MetricsFeature implements Feature {
      * {@link javax.ws.rs.core.Configuration#isEnabled(javax.ws.rs.core.Feature)} or
      * {@link javax.ws.rs.core.Configuration#isEnabled(Class)} method
      * would return {@code false}.
-     * </p>
+     * <p>
      *
      * @param context configurable context in which the feature should be enabled.
      * @return {@code true} if the feature was successfully enabled, {@code false}

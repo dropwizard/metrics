@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * An annotation for marking a method of an annotated object as a gauge.
- * <p/>
+ * <p>
  * Given a method like this:
  * <pre><code>
  *     {@literal @}Gauge(name = "queueSize")
@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  *         return queue.size;
  *     }
  * </code></pre>
- * <p/>
+ * <p>
  * A gauge for the defining class with the name {@code queueSize} will be created which uses the
  * annotated method's return value as its value.
  */

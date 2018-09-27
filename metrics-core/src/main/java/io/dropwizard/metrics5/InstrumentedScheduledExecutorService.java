@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * An {@link ScheduledExecutorService} that monitors the number of tasks submitted, running,
  * completed and also keeps a {@link Timer} for the task duration.
- * <p/>
+ * <p>
  * It will register the metrics using the given (or auto-generated) name as classifier, e.g:
  * "your-executor-service.submitted", "your-executor-service.running", etc.
  */

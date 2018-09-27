@@ -1,6 +1,6 @@
 Metrics
 ======= 
-[![Build Status](https://secure.travis-ci.org/dropwizard/metrics.png)](http://travis-ci.org/dropwizard/metrics)
+[![Build Status](https://secure.travis-ci.org/dropwizard/metrics.png?branch=master)](http://travis-ci.org/dropwizard/metrics)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.dropwizard.metrics/metrics-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.dropwizard.metrics/metrics-core/)
 [![Javadoc](http://javadoc-badge.appspot.com/io.dropwizard.metrics/metrics-core.svg)](http://www.javadoc.io/doc/io.dropwizard.metrics/metrics-core)
 [![Code Climate](https://codeclimate.com/github/dropwizard/metrics/badges/gpa.svg)](https://codeclimate.com/github/dropwizard/metrics)

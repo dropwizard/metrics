@@ -40,7 +40,7 @@ public interface HealthCheck {
 
         /**
          * Returns a healthy {@link Result} with a formatted message.
-         * <p/>
+         * <p>
          * Message formatting follows the same rules as {@link String#format(String, Object...)}.
          *
          * @param message a message format
@@ -64,7 +64,7 @@ public interface HealthCheck {
 
         /**
          * Returns an unhealthy {@link Result} with a formatted message.
-         * <p/>
+         * <p>
          * Message formatting follows the same rules as {@link String#format(String, Object...)}.
          *
          * @param message a message format
@@ -267,7 +267,7 @@ public interface HealthCheck {
 
         /**
          * Set an optional formatted message
-         * <p/>
+         * <p>
          * Message formatting follows the same rules as {@link String#format(String, Object...)}.
          *
          * @param message a message format
