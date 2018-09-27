@@ -1,8 +1,9 @@
 package com.codahale.metrics.jdbi3;
 
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
-import com.codahale.metrics.jdbi3.strategies.StatementNameStrategy;
+import io.dropwizard.metrics5.MetricName;
+import io.dropwizard.metrics5.MetricRegistry;
+import io.dropwizard.metrics5.Timer;
+import io.dropwizard.metrics5.jdbi3.strategies.StatementNameStrategy;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.junit.Test;
 
@@ -10,9 +11,7 @@ import java.sql.SQLException;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class InstrumentedSqlLoggerTest {
     @Test
@@ -24,7 +23,7 @@ public class InstrumentedSqlLoggerTest {
         final StatementContext mockContext = mock(StatementContext.class);
         final Timer mockTimer = mock(Timer.class);
 
-        final String statementName = "my-fake-name";
+        final MetricName statementName = MetricName.build("my-fake-name");
         final long fakeElapsed = 1234L;
 
         when(mockNameStrategy.getStatementName(mockContext)).thenReturn(statementName);
@@ -46,7 +45,7 @@ public class InstrumentedSqlLoggerTest {
         final StatementContext mockContext = mock(StatementContext.class);
         final Timer mockTimer = mock(Timer.class);
 
-        final String statementName = "my-fake-name";
+        final MetricName statementName = MetricName.build("my-fake-name");
         final long fakeElapsed = 1234L;
 
         when(mockNameStrategy.getStatementName(mockContext)).thenReturn(statementName);
