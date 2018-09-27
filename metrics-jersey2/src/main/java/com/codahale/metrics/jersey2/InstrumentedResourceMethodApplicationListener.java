@@ -35,7 +35,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 /**
  * An application event listener that listens for Jersey application initialization to
  * be finished, then creates a map of resource method that have metrics annotations.
- * <p/>
+ * <p>
  * Finally, it listens for method start events, and returns a {@link RequestEventListener}
  * that updates the relevant metric for suitably annotated methods when it gets the
  * request events indicating that the method is about to be invoked, or just got done
@@ -59,7 +59,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
 
     /**
      * Construct an application event listener using the given metrics registry.
-     * <p/>
+     * <p>
      * When using this constructor, the {@link InstrumentedResourceMethodApplicationListener}
      * should be added to a Jersey {@code ResourceConfig} as a singleton.
      *
