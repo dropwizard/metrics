@@ -1,4 +1,4 @@
-package com.codahale.metrics.jdbi3;
+package io.dropwizard.metrics5.jdbi3;
 
 import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricRegistry;
