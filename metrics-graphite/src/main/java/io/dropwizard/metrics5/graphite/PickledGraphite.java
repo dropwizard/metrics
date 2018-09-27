@@ -194,9 +194,9 @@ public class PickledGraphite implements GraphiteSender {
 
     /**
      * Convert the metric to a python tuple of the form:
-     * <p/>
+     * <p>
      * (timestamp, (name, value))
-     * <p/>
+     * <p>
      * And add it to the list of metrics. If we reach the batch size, write them out.
      *
      * @param name      the name of the metric

@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 /**
  * An annotation for marking a method of an annotated object as metered.
- * <p/>
+ * <p>
  * Given a method like this:
  * <pre><code>
  *     {@literal @}ResponseMetered(name = "fancyName")
@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
  *         return "Sir Captain " + name;
  *     }
  * </code></pre>
- * <p/>
+ * <p>
  * A meter for the defining class with the name {@code fancyName} will be created for 1xx/2xx/3xx/4xx/5xx responses
  * and each time the {@code #fancyName(String)} method is invoked, the appropriate response meter will be marked.
  */

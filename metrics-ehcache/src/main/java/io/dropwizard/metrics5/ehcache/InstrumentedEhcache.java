@@ -19,7 +19,7 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
     /**
      * Instruments the given {@link Ehcache} instance with get and put timers
      * and a set of gauges for Ehcache's built-in statistics:
-     * <p/>
+     * <p>
      * <table>
      * <caption>Ehcache timered metrics</caption>
      * <tr>

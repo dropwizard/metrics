@@ -8,13 +8,13 @@ import java.lang.annotation.Target;
 /**
  * An annotation requesting that a metric be injected or registered.
  *
- * <p/>
+ * <p>
  * Given a field like this:
  * <pre><code>
  *     {@literal @}Metric
  *     public Histogram histogram;
  * </code></pre>
- * <p/>
+ * <p>
  * A meter of the field's type will be created and injected into managed objects.
  * It will be up to the user to interact with the metric. This annotation
  * can be used on fields of type Meter, Timer, Counter, and Histogram.
@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
  *     {@literal @}Metric
  *     public Histogram uniformHistogram = new Histogram(new UniformReservoir());
  * </code></pre>
- * </p>
+ * <p>
  *
  * @since 3.1
  */

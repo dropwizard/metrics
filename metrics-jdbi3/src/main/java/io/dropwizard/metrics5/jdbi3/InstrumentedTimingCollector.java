@@ -12,7 +12,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * A {@link TimingCollector} implementation for JDBI which uses the SQL objects' class names and
  * method names for millisecond-precision timers.
+ *
+ * @deprecated Use {@link InstrumentedSqlLogger} and {@link org.jdbi.v3.core.Jdbi#setSqlLogger(SqlLogger)} instead.
  */
+@Deprecated
 public class InstrumentedTimingCollector implements TimingCollector {
 
     private final MetricRegistry registry;
