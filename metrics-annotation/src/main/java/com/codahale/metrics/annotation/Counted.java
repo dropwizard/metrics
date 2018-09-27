@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * An annotation for marking a method of an annotated object as counted.
  *
- * <p/>
+ * <p>
  * Given a method like this:
  * <pre><code>
  *     {@literal @}Counted(name = "fancyName")
@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
  *         return "Sir Captain " + name;
  *     }
  * </code></pre>
- * <p/>
+ * <p>
  * A counter for the defining class with the name {@code fancyName} will be created and each time the
  * {@code #fancyName(String)} method is invoked, the counter will be marked.
  *

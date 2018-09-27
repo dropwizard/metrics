@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 /**
  * An annotation for marking a method of an annotated object as timed.
- * <p/>
+ * <p>
  * Given a method like this:
  * <pre><code>
  *     {@literal @}Timed(name = "fancyName")
@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
  *         return "Sir Captain " + name;
  *     }
  * </code></pre>
- * <p/>
+ * <p>
  * A timer for the defining class with the name {@code fancyName} will be created and each time the
  * {@code #fancyName(String)} method is invoked, the method's execution will be timed.
  */
