@@ -40,6 +40,6 @@ Source code for 5.x.x is resided in the [5.0-development branch](https://github.
 License
 -------
 
-Copyright (c) 2010-2013 Coda Hale, Yammer.com, 2014-2017 Dropwizard Team
+Copyright (c) 2010-2013 Coda Hale, Yammer.com, 2014-2018 Dropwizard Team
 
 Published under Apache Software License 2.0, see LICENSE
