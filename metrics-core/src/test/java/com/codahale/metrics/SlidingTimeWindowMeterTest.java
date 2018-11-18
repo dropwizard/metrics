@@ -29,12 +29,13 @@ public class SlidingTimeWindowMeterTest {
 
     private final MockingClock mockingClock = new MockingClock();
 
-    // use a Meter as variable to make sure a SlidingTimeWindowMeter can replace a Meter
+    private SlidingTimeWindowMeter movingAverages;
     private Meter meter;
 
     @Before
     public void init() {
-        meter = new SlidingTimeWindowMeter(mockingClock);
+        movingAverages = new SlidingTimeWindowMeter(mockingClock);
+        meter = new Meter(movingAverages, mockingClock);
     }
 
     @Test
@@ -74,7 +75,7 @@ public class SlidingTimeWindowMeterTest {
         }
 
         // verify that no cleanup happened yet
-        assertThat(((SlidingTimeWindowMeter) meter).oldestBucketTime, is(Instant.ofEpochSecond(0L)));
+        assertThat(movingAverages.oldestBucketTime, is(Instant.ofEpochSecond(0L)));
 
         assertThat(meter.getOneMinuteRate(), is(60.0));
         assertThat(meter.getFiveMinuteRate(), is(300.0));
@@ -92,7 +93,7 @@ public class SlidingTimeWindowMeterTest {
         }
 
         // verify that at least one cleanup happened
-        assertThat(((SlidingTimeWindowMeter) meter).oldestBucketTime, not(is(Instant.ofEpochSecond(0L))));
+        assertThat(movingAverages.oldestBucketTime, not(is(Instant.ofEpochSecond(0L))));
 
         assertThat(meter.getOneMinuteRate(), is(60.0));
         assertThat(meter.getFiveMinuteRate(), is(300.0));

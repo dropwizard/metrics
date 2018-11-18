@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.LongAdder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SlidingTimeWindowMeter extends Meter {
+public class SlidingTimeWindowMeter implements MovingAverages {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SlidingTimeWindowMeter.class);
 
@@ -21,9 +21,7 @@ public class SlidingTimeWindowMeter extends Meter {
     // package private for the benefit of the unit test
     static final int NUMBER_OF_BUCKETS = (int) (TIME_WINDOW_DURATION.toNanos() / TICK_INTERVAL);
 
-    private final LongAdder count = new LongAdder();
     private final long startTime;
-
     private final AtomicLong lastTick;
     private final Clock clock;
 
@@ -60,29 +58,15 @@ public class SlidingTimeWindowMeter extends Meter {
         currentBucketIndex = 0;
     }
 
-    /**
-     * Mark the occurrence of an event.
-     */
     @Override
-    public void mark() {
-        mark(1);
-    }
-
-    /**
-     * Mark the occurrence of a given number of events.
-     *
-     * @param n the number of events
-     */
-    @Override
-    public void mark(long n) {
-        updateLastTickIfNecessary();
-        count.add(n);
+    public void update(long n) {
         buckets.get(currentBucketIndex).add(n);
         LOGGER.trace("mark({}) : current bucket (idx/cnt): ({}/{})",
                 n, currentBucketIndex, buckets.get(currentBucketIndex).longValue());
     }
 
-    private void updateLastTickIfNecessary() {
+    @Override
+    public void tickIfNecessary() {
         final long oldTick = lastTick.get();
         final long newTick = clock.getTick();
         // System.out.printf("oldTick %d newTick %d\n", oldTick, newTick);
@@ -165,37 +149,19 @@ public class SlidingTimeWindowMeter extends Meter {
     }
 
     @Override
-    public long getCount() {
-        return count.sum();
-    }
-
-    @Override
-    public double getMeanRate() {
-        if (getCount() == 0) {
-            return 0.0;
-        } else {
-            final double elapsed = clock.getTick() - startTime;
-            return getCount() / elapsed * TimeUnit.SECONDS.toNanos(1);
-        }
-    }
-
-    @Override
-    public double getFifteenMinuteRate() {
-        updateLastTickIfNecessary();
+    public double getM15Rate() {
         Instant now = Instant.ofEpochSecond(0L, lastTick.get());
         return sumBuckets(now, (int) (TimeUnit.MINUTES.toNanos(15) / TICK_INTERVAL));
     }
 
     @Override
-    public double getFiveMinuteRate() {
-        updateLastTickIfNecessary();
+    public double getM5Rate() {
         Instant now = Instant.ofEpochSecond(0L, lastTick.get());
         return sumBuckets(now, (int) (TimeUnit.MINUTES.toNanos(5) / TICK_INTERVAL));
     }
 
     @Override
-    public double getOneMinuteRate() {
-        updateLastTickIfNecessary();
+    public double getM1Rate() {
         Instant now = Instant.ofEpochSecond(0L, lastTick.get());
         return sumBuckets(now, (int) (TimeUnit.MINUTES.toNanos(1) / TICK_INTERVAL));
     }
