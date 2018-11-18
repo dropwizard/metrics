@@ -3,6 +3,12 @@ package com.codahale.metrics;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * A triple (one, five and fifteen minutes) of exponentially-weighted moving average rates as needed by {@link Meter}.
+ * <p>
+ * The rates have the same exponential decay factor as the fifteen-minute load average in the
+ * {@code top} Unix command.
+ */
 public class ExponentialMovingAverages implements MovingAverages {
 
     private static final long TICK_INTERVAL = TimeUnit.SECONDS.toNanos(5);
@@ -11,18 +17,22 @@ public class ExponentialMovingAverages implements MovingAverages {
     private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
     private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
 
-    private final long startTime;
     private final AtomicLong lastTick;
     private final Clock clock;
 
+    /**
+     * Creates a new {@link ExponentialMovingAverages}.
+     */
     public ExponentialMovingAverages() {
         this(Clock.defaultClock());
     }
 
+    /**
+     * Creates a new {@link ExponentialMovingAverages}.
+     */
     public ExponentialMovingAverages(Clock clock) {
         this.clock = clock;
-        this.startTime = this.clock.getTick();
-        this.lastTick = new AtomicLong(startTime);
+        this.lastTick = new AtomicLong(this.clock.getTick());
     }
 
     @Override

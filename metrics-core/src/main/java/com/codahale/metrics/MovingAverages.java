@@ -1,5 +1,15 @@
 package com.codahale.metrics;
 
+/**
+ * A triple of moving averages (one-, five-, and fifteen-minute
+ * moving average) as needed by {@link Meter}.
+ * <p>
+ * Included implementations are:
+ * <ul>
+ * <li>{@link ExponentialMovingAverages} exponential decaying average similar to the {@code top} Unix command.
+ * <li>{@link SlidingTimeWindowMovingAverages} simple (unweighted) moving average
+ * </ul>
+ */
 public interface MovingAverages {
 
     /**

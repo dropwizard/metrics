@@ -10,6 +10,22 @@ import java.util.concurrent.atomic.LongAdder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A triple of simple moving average rates (one, five and fifteen minutes rates) as needed by {@link Meter}.
+ * <p>
+ * The averages are unweighted, i.e. they include strictly only the events in the
+ * sliding time window, every event having the same weight. Unlike the
+ * the more widely used {@link ExponentialMovingAverages} implementation,
+ * with this class the moving average rate drops immediately to zero if the last
+ * marked event is older than the time window.
+ * <p>
+ * A {@link Meter} with {@link SlidingTimeWindowMovingAverages} works similarly to
+ * a {@link Histogram} with an {@link SlidingTimeWindowArrayReservoir}, but as a Meter
+ * needs to keep track only of the count of events (not the events itself), the memory
+ * overhead is much smaller. SlidingTimeWindowMovingAverages uses buckets with just one
+ * counter to accumulate the number of events (one bucket per seconds, giving 900 buckets
+ * for the 15 minutes time window).
+ */
 public class SlidingTimeWindowMovingAverages implements MovingAverages {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SlidingTimeWindowMovingAverages.class);
@@ -21,7 +37,6 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
     // package private for the benefit of the unit test
     static final int NUMBER_OF_BUCKETS = (int) (TIME_WINDOW_DURATION.toNanos() / TICK_INTERVAL);
 
-    private final long startTime;
     private final AtomicLong lastTick;
     private final Clock clock;
 
@@ -45,7 +60,7 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
      */
     public SlidingTimeWindowMovingAverages(Clock clock) {
         this.clock = clock;
-        startTime = clock.getTick();
+        final long startTime = clock.getTick();
         lastTick = new AtomicLong(startTime);
 
         buckets = new ArrayList<>(NUMBER_OF_BUCKETS);
@@ -80,6 +95,24 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
                 cleanOldBuckets(currentInstant);
             }
         }
+    }
+
+    @Override
+    public double getM15Rate() {
+        Instant now = Instant.ofEpochSecond(0L, lastTick.get());
+        return sumBuckets(now, (int) (TimeUnit.MINUTES.toNanos(15) / TICK_INTERVAL));
+    }
+
+    @Override
+    public double getM5Rate() {
+        Instant now = Instant.ofEpochSecond(0L, lastTick.get());
+        return sumBuckets(now, (int) (TimeUnit.MINUTES.toNanos(5) / TICK_INTERVAL));
+    }
+
+    @Override
+    public double getM1Rate() {
+        Instant now = Instant.ofEpochSecond(0L, lastTick.get());
+        return sumBuckets(now, (int) (TimeUnit.MINUTES.toNanos(1) / TICK_INTERVAL));
     }
 
     int calculateIndexOfTick(Instant tickTime) {
@@ -146,23 +179,5 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
         LOGGER.info("sum at {} over {} buckets = {}, current/from/to index {}/{}/{}, oldest index/time {}/{}",
                 toTime, numberOfBuckets, retval, currentBucketIndex, fromIndex, toIndex, oldestBucketIndex, oldestBucketTime);
         return retval;
-    }
-
-    @Override
-    public double getM15Rate() {
-        Instant now = Instant.ofEpochSecond(0L, lastTick.get());
-        return sumBuckets(now, (int) (TimeUnit.MINUTES.toNanos(15) / TICK_INTERVAL));
-    }
-
-    @Override
-    public double getM5Rate() {
-        Instant now = Instant.ofEpochSecond(0L, lastTick.get());
-        return sumBuckets(now, (int) (TimeUnit.MINUTES.toNanos(5) / TICK_INTERVAL));
-    }
-
-    @Override
-    public double getM1Rate() {
-        Instant now = Instant.ofEpochSecond(0L, lastTick.get());
-        return sumBuckets(now, (int) (TimeUnit.MINUTES.toNanos(1) / TICK_INTERVAL));
     }
 }
