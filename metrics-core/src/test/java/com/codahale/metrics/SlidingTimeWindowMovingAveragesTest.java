@@ -1,6 +1,6 @@
 package com.codahale.metrics;
 
-import static com.codahale.metrics.SlidingTimeWindowMeter.NUMBER_OF_BUCKETS;
+import static com.codahale.metrics.SlidingTimeWindowMovingAverages.NUMBER_OF_BUCKETS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SlidingTimeWindowMeterTest {
+public class SlidingTimeWindowMovingAveragesTest {
 
     class MockingClock extends Clock {
 
@@ -29,19 +29,19 @@ public class SlidingTimeWindowMeterTest {
 
     private final MockingClock mockingClock = new MockingClock();
 
-    private SlidingTimeWindowMeter movingAverages;
+    private SlidingTimeWindowMovingAverages movingAverages;
     private Meter meter;
 
     @Before
     public void init() {
-        movingAverages = new SlidingTimeWindowMeter(mockingClock);
+        movingAverages = new SlidingTimeWindowMovingAverages(mockingClock);
         meter = new Meter(movingAverages, mockingClock);
     }
 
     @Test
     public void normalizeIndex() {
 
-        SlidingTimeWindowMeter stwm = new SlidingTimeWindowMeter();
+        SlidingTimeWindowMovingAverages stwm = new SlidingTimeWindowMovingAverages();
 
         assertThat(stwm.normalizeIndex(0), is(0));
         assertThat(stwm.normalizeIndex(900), is(0));
@@ -58,7 +58,7 @@ public class SlidingTimeWindowMeterTest {
     @Test
     public void calculateIndexOfTick() {
 
-        SlidingTimeWindowMeter stwm = new SlidingTimeWindowMeter(new MockingClock());
+        SlidingTimeWindowMovingAverages stwm = new SlidingTimeWindowMovingAverages(new MockingClock());
 
         assertThat(stwm.calculateIndexOfTick(Instant.ofEpochSecond(0L)), is(0));
         assertThat(stwm.calculateIndexOfTick(Instant.ofEpochSecond(1L)), is(1));

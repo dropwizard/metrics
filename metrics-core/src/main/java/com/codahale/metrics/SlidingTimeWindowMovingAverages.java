@@ -10,9 +10,9 @@ import java.util.concurrent.atomic.LongAdder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SlidingTimeWindowMeter implements MovingAverages {
+public class SlidingTimeWindowMovingAverages implements MovingAverages {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SlidingTimeWindowMeter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlidingTimeWindowMovingAverages.class);
 
     private static final long TIME_WINDOW_DURATION_MINUTES = 15;
     private static final long TICK_INTERVAL = TimeUnit.SECONDS.toNanos(1);
@@ -32,18 +32,18 @@ public class SlidingTimeWindowMeter implements MovingAverages {
     Instant oldestBucketTime;
 
     /**
-     * Creates a new {@link SlidingTimeWindowMeter}.
+     * Creates a new {@link SlidingTimeWindowMovingAverages}.
      */
-    public SlidingTimeWindowMeter() {
+    public SlidingTimeWindowMovingAverages() {
         this(Clock.defaultClock());
     }
 
     /**
-     * Creates a new {@link SlidingTimeWindowMeter}.
+     * Creates a new {@link SlidingTimeWindowMovingAverages}.
      *
      * @param clock the clock to use for the meter ticks
      */
-    public SlidingTimeWindowMeter(Clock clock) {
+    public SlidingTimeWindowMovingAverages(Clock clock) {
         this.clock = clock;
         startTime = clock.getTick();
         lastTick = new AtomicLong(startTime);
