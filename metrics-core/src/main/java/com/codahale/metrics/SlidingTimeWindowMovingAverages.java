@@ -7,9 +7,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * A triple of simple moving average rates (one, five and fifteen minutes rates) as needed by {@link Meter}.
  * <p>
@@ -27,8 +24,6 @@ import org.slf4j.LoggerFactory;
  * for the 15 minutes time window).
  */
 public class SlidingTimeWindowMovingAverages implements MovingAverages {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SlidingTimeWindowMovingAverages.class);
 
     private static final long TIME_WINDOW_DURATION_MINUTES = 15;
     private static final long TICK_INTERVAL = TimeUnit.SECONDS.toNanos(1);
@@ -76,22 +71,18 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
     @Override
     public void update(long n) {
         buckets.get(currentBucketIndex).add(n);
-        LOGGER.trace("mark({}) : current bucket (idx/cnt): ({}/{})",
-                n, currentBucketIndex, buckets.get(currentBucketIndex).longValue());
     }
 
     @Override
     public void tickIfNecessary() {
         final long oldTick = lastTick.get();
         final long newTick = clock.getTick();
-        // System.out.printf("oldTick %d newTick %d\n", oldTick, newTick);
         final long age = newTick - oldTick;
         if (age >= TICK_INTERVAL) {
             final long newLastTick = newTick - age % TICK_INTERVAL;
             if (lastTick.compareAndSet(oldTick, newLastTick)) {
                 Instant currentInstant = Instant.ofEpochSecond(0L, newLastTick);
                 currentBucketIndex = normalizeIndex(calculateIndexOfTick(currentInstant));
-                LOGGER.debug("new 'current bucket' {} for instant {}", currentBucketIndex, currentInstant);
                 cleanOldBuckets(currentInstant);
             }
         }
@@ -128,16 +119,11 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
         int newOldestIndex;
         Instant oldestStillNeededTime = currentTick.minus(TIME_WINDOW_DURATION).plusNanos(TICK_INTERVAL);
         Instant youngestNotInWindow = oldestBucketTime.plus(TIME_WINDOW_DURATION);
-        LOGGER.trace("current/oldest/stillNeeded/youngestNot {}/{}/{}/{}",
-                currentTick, oldestBucketTime, oldestStillNeededTime, youngestNotInWindow);
         if (oldestStillNeededTime.isAfter(youngestNotInWindow)) {
             newOldestIndex = oldestBucketIndex;
-            LOGGER.debug("cleanup: throw away all values, old/new 'oldest': {}/{}", oldestBucketTime, currentTick);
             oldestBucketTime = currentTick;
         } else if (oldestStillNeededTime.isAfter(oldestBucketTime)) {
             newOldestIndex = normalizeIndex(calculateIndexOfTick(oldestStillNeededTime));
-            LOGGER.debug("cleanup: old/new index {}/{}, old/new 'oldest': {}/{}",
-                    oldestBucketIndex, newOldestIndex, oldestBucketTime, currentTick);
             oldestBucketTime = oldestStillNeededTime;
         } else {
             return;
@@ -176,8 +162,6 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
             buckets.stream().skip(fromIndex).mapToLong(LongAdder::longValue).forEach(adder::add);
         }
         long retval = adder.longValue();
-        LOGGER.info("sum at {} over {} buckets = {}, current/from/to index {}/{}/{}, oldest index/time {}/{}",
-                toTime, numberOfBuckets, retval, currentBucketIndex, fromIndex, toIndex, oldestBucketIndex, oldestBucketTime);
         return retval;
     }
 }

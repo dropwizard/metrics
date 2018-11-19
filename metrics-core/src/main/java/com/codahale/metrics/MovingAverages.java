@@ -28,21 +28,21 @@ public interface MovingAverages {
     /**
      * Returns the one-minute moving average rate
      *
-     * @return
+     * @return the one-minute moving average rate
      */
     double getM1Rate();
 
     /**
      * Returns the five-minute moving average rate
      *
-     * @return
+     * @return the five-minute moving average rate
      */
     double getM5Rate();
 
     /**
      * Returns the fifteen-minute moving average rate
      *
-     * @return
+     * @return the fifteen-minute moving average rate
      */
     double getM15Rate();
 }
