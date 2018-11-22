@@ -6,36 +6,21 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.Instant;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class SlidingTimeWindowMovingAveragesTest {
 
-    class MockingClock extends Clock {
-
-        long nextTick = 0L;
-
-        public void setNextTick(long nextTick) {
-            this.nextTick = nextTick;
-        }
-
-        @Override
-        public long getTick() {
-            return nextTick;
-        }
-    }
-
-    private final MockingClock mockingClock = new MockingClock();
-
+    private ManualClock clock;
     private SlidingTimeWindowMovingAverages movingAverages;
     private Meter meter;
 
     @Before
     public void init() {
-        movingAverages = new SlidingTimeWindowMovingAverages(mockingClock);
-        meter = new Meter(movingAverages, mockingClock);
+        clock = new ManualClock();
+        movingAverages = new SlidingTimeWindowMovingAverages(clock);
+        meter = new Meter(movingAverages, clock);
     }
 
     @Test
@@ -58,7 +43,7 @@ public class SlidingTimeWindowMovingAveragesTest {
     @Test
     public void calculateIndexOfTick() {
 
-        SlidingTimeWindowMovingAverages stwm = new SlidingTimeWindowMovingAverages(new MockingClock());
+        SlidingTimeWindowMovingAverages stwm = new SlidingTimeWindowMovingAverages(clock);
 
         assertThat(stwm.calculateIndexOfTick(Instant.ofEpochSecond(0L)), is(0));
         assertThat(stwm.calculateIndexOfTick(Instant.ofEpochSecond(1L)), is(1));
@@ -69,8 +54,11 @@ public class SlidingTimeWindowMovingAveragesTest {
 
         int markCount = NUMBER_OF_BUCKETS;
 
+        // compensate the first addSeconds in the loop; first tick should be at zero
+        clock.addSeconds(-1);
+
         for (int i = 0; i < markCount; i++) {
-            mockingClock.setNextTick(TimeUnit.SECONDS.toNanos(i));
+            clock.addSeconds(1);
             meter.mark();
         }
 
@@ -87,8 +75,11 @@ public class SlidingTimeWindowMovingAveragesTest {
 
         int markCount = NUMBER_OF_BUCKETS + 1;
 
+        // compensate the first addSeconds in the loop; first tick should be at zero
+        clock.addSeconds(-1);
+
         for (int i = 0; i < markCount; i++) {
-            mockingClock.setNextTick(TimeUnit.SECONDS.toNanos(i));
+            clock.addSeconds(1);
             meter.mark();
         }
 
@@ -103,8 +94,11 @@ public class SlidingTimeWindowMovingAveragesTest {
     @Test
     public void mark_10_values() {
 
+        // compensate the first addSeconds in the loop; first tick should be at zero
+        clock.addSeconds(-1);
+
         for (int i = 0; i < 10; i++) {
-            mockingClock.setNextTick(TimeUnit.SECONDS.toNanos(i));
+            clock.addSeconds(1);
             meter.mark();
         }
 
@@ -118,7 +112,7 @@ public class SlidingTimeWindowMovingAveragesTest {
     public void mark_1000_values() {
 
         for (int i = 0; i < 1000; i++) {
-            mockingClock.setNextTick(TimeUnit.SECONDS.toNanos(i));
+            clock.addSeconds(1);
             meter.mark();
         }
 
