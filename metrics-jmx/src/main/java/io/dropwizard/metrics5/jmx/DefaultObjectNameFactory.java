@@ -21,6 +21,7 @@ public class DefaultObjectNameFactory implements ObjectNameFactory {
 
             properties.put("name", name.getKey());
             properties.put("type", type);
+            properties.putAll(name.getTags());
             objectName = new ObjectName(domain, properties);
 
             /*
