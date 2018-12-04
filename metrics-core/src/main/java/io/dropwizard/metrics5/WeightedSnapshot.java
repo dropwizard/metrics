@@ -39,7 +39,7 @@ public class WeightedSnapshot extends Snapshot {
     public WeightedSnapshot(Collection<WeightedSample> values) {
         final WeightedSample[] copy = values.toArray(new WeightedSample[]{});
 
-        Arrays.sort(copy, Comparator.comparing(w -> w.value));
+        Arrays.sort(copy, Comparator.comparingLong(w -> w.value));
 
         this.values = new long[copy.length];
         this.normWeights = new double[copy.length];
