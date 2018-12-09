@@ -17,7 +17,7 @@
         <servlet.version>3.1.0</servlet.version>
         <slf4j.version>1.7.25</slf4j.version>
         <jackson.version>2.9.5</jackson.version>
-        <jetty9.version>9.4.10.v20180503</jetty9.version>
+        <jetty9.version>9.4.14.v20181114</jetty9.version>
         <rabbitmq.version>4.4.1</rabbitmq.version>
         <log4j2.version>2.10.0</log4j2.version>
         <logback.version>1.2.3</logback.version>
