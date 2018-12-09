@@ -12,14 +12,19 @@ public class DefaultObjectNameFactoryTest {
     @Test
     public void createsObjectNameWithDomainInInput() {
         DefaultObjectNameFactory f = new DefaultObjectNameFactory();
-        ObjectName on = f.createName("type", "com.domain", MetricName.build("something.with.dots"));
+        ObjectName on = f.createName("type", "com.domain", MetricName.build("something.with.dots").tagged("foo", "bar", "baz", "biz"));
         assertThat(on.getDomain()).isEqualTo("com.domain");
+        assertThat(on.getKeyProperty("foo")).isEqualTo("bar");
+        assertThat(on.getKeyProperty("baz")).isEqualTo("biz");
     }
 
     @Test
     public void createsObjectNameWithNameAsKeyPropertyName() {
         DefaultObjectNameFactory f = new DefaultObjectNameFactory();
-        ObjectName on = f.createName("type", "com.domain", MetricName.build("something.with.dots"));
+        ObjectName on = f.createName("type", "com.domain", MetricName.build("something.with.dots").tagged("foo", "bar", "baz", "biz"));
         assertThat(on.getKeyProperty("name")).isEqualTo("something.with.dots");
+        assertThat(on.getKeyProperty("foo")).isEqualTo("bar");
+        assertThat(on.getKeyProperty("baz")).isEqualTo("biz");
+
     }
 }
