@@ -35,10 +35,31 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
     private final AtomicLong lastTick;
     private final Clock clock;
 
+    /**
+     * One counter per time bucket/slot (i.e. per second, see TICK_INTERVAL) for the entire
+     * time window (i.e. 15 minutes, see TIME_WINDOW_DURATION_MINUTES)
+     */
     private ArrayList<LongAdder> buckets;
+
+    /**
+     * Index into buckets, pointing at the bucket containing the oldest counts
+     */
     private int oldestBucketIndex;
+
+    /**
+     * Index into buckets, pointing at the bucket with the count for the current time (tick)
+     */
     private int currentBucketIndex;
+
+    /**
+     * Instant at creation time of the time window. Used to calculate the currentBucketIndex
+     * for the instant of a given tick (instant modulo time window duration)
+     */
     private final Instant bucketBaseTime;
+
+    /**
+     * Instant of the bucket with index oldestBucketIndex
+     */
     Instant oldestBucketTime;
 
     /**
@@ -79,6 +100,8 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
         final long newTick = clock.getTick();
         final long age = newTick - oldTick;
         if (age >= TICK_INTERVAL) {
+            // - the newTick doesn't fall into the same slot as the oldTick anymore
+            // - newLastTick is the lower border time of the new currentBucketIndex slot
             final long newLastTick = newTick - age % TICK_INTERVAL;
             if (lastTick.compareAndSet(oldTick, newLastTick)) {
                 Instant currentInstant = Instant.ofEpochSecond(0L, newLastTick);
@@ -90,20 +113,22 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
 
     @Override
     public double getM15Rate() {
-        Instant now = Instant.ofEpochSecond(0L, lastTick.get());
-        return sumBuckets(now, (int) (TimeUnit.MINUTES.toNanos(15) / TICK_INTERVAL));
+        return getMinuteRate(15);
     }
 
     @Override
     public double getM5Rate() {
-        Instant now = Instant.ofEpochSecond(0L, lastTick.get());
-        return sumBuckets(now, (int) (TimeUnit.MINUTES.toNanos(5) / TICK_INTERVAL));
+        return getMinuteRate(5);
     }
 
     @Override
     public double getM1Rate() {
+        return getMinuteRate(1);
+    }
+
+    private double getMinuteRate(int minutes) {
         Instant now = Instant.ofEpochSecond(0L, lastTick.get());
-        return sumBuckets(now, (int) (TimeUnit.MINUTES.toNanos(1) / TICK_INTERVAL));
+        return sumBuckets(now, (int) (TimeUnit.MINUTES.toNanos(minutes) / TICK_INTERVAL));
     }
 
     int calculateIndexOfTick(Instant tickTime) {
@@ -120,6 +145,7 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
         Instant oldestStillNeededTime = currentTick.minus(TIME_WINDOW_DURATION).plusNanos(TICK_INTERVAL);
         Instant youngestNotInWindow = oldestBucketTime.plus(TIME_WINDOW_DURATION);
         if (oldestStillNeededTime.isAfter(youngestNotInWindow)) {
+            // there was no update() call for more than two whole TIME_WINDOW_DURATION
             newOldestIndex = oldestBucketIndex;
             oldestBucketTime = currentTick;
         } else if (oldestStillNeededTime.isAfter(oldestBucketTime)) {
@@ -129,19 +155,23 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
             return;
         }
 
-        if (oldestBucketIndex < newOldestIndex) {
-            for (int i = oldestBucketIndex; i < newOldestIndex; i++) {
+        cleanBucketRange(oldestBucketIndex, newOldestIndex);
+        oldestBucketIndex = newOldestIndex;
+    }
+
+    private void cleanBucketRange(int fromIndex, int toIndex) {
+        if (fromIndex < toIndex) {
+            for (int i = fromIndex; i < toIndex; i++) {
                 buckets.get(i).reset();
             }
         } else {
-            for (int i = oldestBucketIndex; i < NUMBER_OF_BUCKETS; i++) {
+            for (int i = fromIndex; i < NUMBER_OF_BUCKETS; i++) {
                 buckets.get(i).reset();
             }
-            for (int i = 0; i < newOldestIndex; i++) {
+            for (int i = 0; i < toIndex; i++) {
                 buckets.get(i).reset();
             }
         }
-        oldestBucketIndex = newOldestIndex;
     }
 
     private long sumBuckets(Instant toTime, int numberOfBuckets) {

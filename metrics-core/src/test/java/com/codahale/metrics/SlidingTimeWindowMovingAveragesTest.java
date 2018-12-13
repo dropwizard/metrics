@@ -121,4 +121,48 @@ public class SlidingTimeWindowMovingAveragesTest {
         assertThat(meter.getFiveMinuteRate(), is(300.0));
         assertThat(meter.getFifteenMinuteRate(), is(900.0));
     }
+
+    @Test
+    public void cleanup_pause_shorter_than_window() {
+
+        meter.mark(10);
+
+        // no mark for three minutes
+        clock.addSeconds(180);
+        assertThat(meter.getOneMinuteRate(), is(0.0));
+        assertThat(meter.getFiveMinuteRate(), is(10.0));
+        assertThat(meter.getFifteenMinuteRate(), is(10.0));
+    }
+
+    @Test
+    public void cleanup_window_wrap_around() {
+
+        // mark at 14:40 minutes of the 15 minute window...
+        clock.addSeconds(880);
+        meter.mark(10);
+
+        // and query at 15:30 minutes (the bucket index must have wrapped around)
+        clock.addSeconds(50);
+        assertThat(meter.getOneMinuteRate(), is(10.0));
+        assertThat(meter.getFiveMinuteRate(), is(10.0));
+        assertThat(meter.getFifteenMinuteRate(), is(10.0));
+
+        // and query at 30:10 minutes (the bucket index must have wrapped around for the second time)
+        clock.addSeconds(880);
+        assertThat(meter.getOneMinuteRate(), is(0.0));
+        assertThat(meter.getFiveMinuteRate(), is(0.0));
+        assertThat(meter.getFifteenMinuteRate(), is(0.0));
+    }
+
+    @Test
+    public void cleanup_pause_longer_than_two_windows() {
+
+        meter.mark(10);
+
+        // after forty minutes all rates should be zero
+        clock.addSeconds(2400);
+        assertThat(meter.getOneMinuteRate(), is(0.0));
+        assertThat(meter.getFiveMinuteRate(), is(0.0));
+        assertThat(meter.getFifteenMinuteRate(), is(0.0));
+    }
 }
