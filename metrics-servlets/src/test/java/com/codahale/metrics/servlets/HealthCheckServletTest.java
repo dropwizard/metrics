@@ -76,7 +76,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
         assertThat(response.getStatus())
                 .isEqualTo(200);
         assertThat(response.getContent())
-                .isEqualTo("{\"fun\":{\"healthy\":true,\"message\":\"whee\"}}");
+                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":", "}}"); // Ignore variable duration time
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
@@ -102,7 +102,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
         assertThat(response.getStatus())
                 .isEqualTo(200);
         assertThat(response.getContent())
-                .isEqualTo("{\"fun\":{\"healthy\":true,\"message\":\"whee\"}}");
+                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":", "}}"); // Ignore variable duration time
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
@@ -128,7 +128,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
         assertThat(response.getStatus())
                 .isEqualTo(500);
         assertThat(response.getContent())
-                .isEqualTo("{\"fun\":{\"healthy\":true,\"message\":\"whee\"},\"notFun\":{\"healthy\":false,\"message\":\"whee\"}}");
+                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":", "},\"notFun\":{\"healthy\":false,\"message\":\"whee\",\"duration\":", "}}"); // Ignore variable duration time
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
@@ -152,7 +152,8 @@ public class HealthCheckServletTest extends AbstractServletTest {
                 .isEqualTo(String.format("{%n" +
                         "  \"fun\" : {%n" +
                         "    \"healthy\" : true,%n" +
-                        "    \"message\" : \"whee\"%n" +
+                        "    \"message\" : \"whee\",%n" +
+                        "    \"duration\" : 0%n" +
                         "  }%n" +
                         "}"));
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
