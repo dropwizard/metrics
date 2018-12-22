@@ -215,7 +215,7 @@ public class HealthCheckTest {
                 .build();
         assertThat(resultWithNullDetailValue.toString())
                 .contains(
-                        "Result{isHealthy=false, timestamp=", // Skip the timestamp part of the String.
+                        "Result{isHealthy=false, duration=0, timestamp=", // Skip the timestamp part of the String.
                         ", aNullDetail=null}");
     }
 }
