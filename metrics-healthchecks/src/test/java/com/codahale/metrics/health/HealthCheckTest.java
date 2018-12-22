@@ -1,6 +1,7 @@
 package com.codahale.metrics.health;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -184,7 +185,7 @@ public class HealthCheckTest {
         assertThat(healthCheck.execute())
                 .isEqualTo(result);
 
-        verify(result).setDuration(isA(Long.class));
+        verify(result).setDuration(anyLong());
     }
 
     @Test
@@ -204,7 +205,7 @@ public class HealthCheckTest {
         assertThat(actual.getDetails())
                 .isNull();
         assertThat(actual.getDuration())
-                .isNotNull();
+                .isGreaterThanOrEqualTo(0);
     }
 
     @Test
