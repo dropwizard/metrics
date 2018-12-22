@@ -101,7 +101,7 @@ public abstract class HealthCheck {
         private final Throwable error;
         private final Map<String, Object> details;
         private final String timestamp;
-        private Long duration;
+        private long duration;
 
         private Result(boolean isHealthy, String message, Throwable error) {
             this(isHealthy, message, error, null);
@@ -162,7 +162,7 @@ public abstract class HealthCheck {
          *
          * @return the duration
          */
-        public Long getDuration() {
+        public long getDuration() {
             return duration;
         }
 
@@ -171,7 +171,7 @@ public abstract class HealthCheck {
          *
          * @param duration The duration in milliseconds
          */
-        public void setDuration(Long duration) {
+        public void setDuration(long duration) {
             this.duration = duration;
         }
 
@@ -192,7 +192,7 @@ public abstract class HealthCheck {
                     !(error != null ? !error.equals(result.error) : result.error != null) &&
                     !(message != null ? !message.equals(result.message) : result.message != null) &&
                     !(timestamp != null ? !timestamp.equals(result.timestamp) : result.timestamp != null) &&
-                    !(duration != null ? !duration.equals(result.duration) : result.duration != null);
+                    duration == result.duration;
         }
 
         @Override
@@ -201,7 +201,7 @@ public abstract class HealthCheck {
             result = PRIME * result + (message != null ? message.hashCode() : 0);
             result = PRIME * result + (error != null ? error.hashCode() : 0);
             result = PRIME * result + (timestamp != null ? timestamp.hashCode() : 0);
-            result = PRIME * result + (duration != null ? duration.hashCode() : 0);
+            result = PRIME * result + Long.hashCode(duration);
             return result;
         }
 
@@ -215,9 +215,7 @@ public abstract class HealthCheck {
             if (error != null) {
                 builder.append(", error=").append(error);
             }
-            if (duration != null) {
-                builder.append(", duration=").append(duration);
-            }
+            builder.append(", duration=").append(duration);
             builder.append(", timestamp=").append(timestamp);
             if (details != null) {
                 for (Map.Entry<String, Object> e : details.entrySet()) {
