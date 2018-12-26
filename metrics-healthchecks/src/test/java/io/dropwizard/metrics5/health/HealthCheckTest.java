@@ -1,7 +1,9 @@
 package io.dropwizard.metrics5.health;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
@@ -181,6 +183,8 @@ public class HealthCheckTest {
 
         assertThat(healthCheck.execute())
                 .isEqualTo(result);
+
+        verify(result).setDuration(anyLong());
     }
 
     @Test
@@ -199,6 +203,8 @@ public class HealthCheckTest {
                 .isEqualTo(e);
         assertThat(actual.getDetails())
                 .isNull();
+        assertThat(actual.getDuration())
+                .isGreaterThanOrEqualTo(0);
     }
 
     @Test
@@ -209,7 +215,7 @@ public class HealthCheckTest {
                 .build();
         assertThat(resultWithNullDetailValue.toString())
                 .contains(
-                        "Result{isHealthy=false, timestamp=", // Skip the timestamp part of the String.
+                        "Result{isHealthy=false, duration=0, timestamp=", // Skip the timestamp part of the String.
                         ", aNullDetail=null}");
     }
 }

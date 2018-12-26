@@ -19,7 +19,7 @@ public class HealthCheckModuleTest {
     @Test
     public void serializesAHealthyResult() throws Exception {
         assertThat(mapper.writeValueAsString(HealthCheck.Result.healthy()))
-            .isEqualTo("{\"healthy\":true}");
+            .isEqualTo("{\"healthy\":true,\"duration\":0}");
     }
 
     @Test
@@ -27,7 +27,8 @@ public class HealthCheckModuleTest {
         assertThat(mapper.writeValueAsString(HealthCheck.Result.healthy("yay for %s", "me")))
             .isEqualTo("{" +
                 "\"healthy\":true," +
-                "\"message\":\"yay for me\"}");
+                "\"message\":\"yay for me\"," +
+                "\"duration\":0}");
     }
 
     @Test
@@ -35,7 +36,8 @@ public class HealthCheckModuleTest {
         assertThat(mapper.writeValueAsString(HealthCheck.Result.unhealthy("boo")))
             .isEqualTo("{" +
                 "\"healthy\":false," +
-                "\"message\":\"boo\"}");
+                "\"message\":\"boo\"," +
+                "\"duration\":0}");
     }
 
     @Test
@@ -53,7 +55,8 @@ public class HealthCheckModuleTest {
                 "\"error\":{" +
                 "\"message\":\"oh no\"," +
                 "\"stack\":[\"Blah.bloo(Blah.java:100)\"]" +
-                "}" +
+                "}," +
+                "\"duration\":0" +
                 "}");
     }
 
@@ -83,7 +86,8 @@ public class HealthCheckModuleTest {
                 "\"message\":\"oh no\"," +
                 "\"stack\":[\"Blah.bloo(Blah.java:100)\"]" +
                 "}" +
-                "}" +
+                "}," +
+                "\"duration\":0" +
                 "}");
     }
 
@@ -108,6 +112,7 @@ public class HealthCheckModuleTest {
         assertThat(mapper.writeValueAsString(result))
             .isEqualTo("{" +
                 "\"healthy\":true," +
+                "\"duration\":0," +
                 "\"boolean\":true," +
                 "\"integer\":1," +
                 "\"long\":2," +

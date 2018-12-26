@@ -1,10 +1,13 @@
 package io.dropwizard.metrics5.health;
 
+import io.dropwizard.metrics5.Clock;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A health check for a component of your application.
@@ -102,6 +105,8 @@ public interface HealthCheck {
         private final Map<String, Object> details;
         private final String timestamp;
 
+        private long duration; // Calculated field
+
         private Result(boolean isHealthy, String message, Throwable error) {
             this(isHealthy, message, error, null);
         }
@@ -156,6 +161,24 @@ public interface HealthCheck {
             return timestamp;
         }
 
+        /**
+         * Returns the duration in milliseconds that the healthcheck took to run
+         *
+         * @return the duration
+         */
+        public long getDuration() {
+            return duration;
+        }
+
+        /**
+         * Sets the duration in milliseconds. This will indicate the time it took to run the individual healthcheck
+         *
+         * @param duration The duration in milliseconds
+         */
+        public void setDuration(long duration) {
+            this.duration = duration;
+        }
+
         public Map<String, Object> getDetails() {
             return details;
         }
@@ -194,6 +217,7 @@ public interface HealthCheck {
             if (error != null) {
                 builder.append(", error=").append(error);
             }
+            builder.append(", duration=").append(duration);
             builder.append(", timestamp=").append(timestamp);
             if (details != null) {
                 for (Map.Entry<String, Object> e : details.entrySet()) {
@@ -316,10 +340,18 @@ public interface HealthCheck {
      * Result} with a descriptive error message or exception
      */
     default Result execute() {
+        long start = clock().getTick();
+        Result result;
         try {
-            return check();
+            result = check();
         } catch (Exception e) {
-            return Result.unhealthy(e);
+            result = Result.unhealthy(e);
         }
+        result.setDuration(TimeUnit.MILLISECONDS.convert(clock().getTick() - start, TimeUnit.NANOSECONDS));
+        return result;
+    }
+
+    default Clock clock() {
+        return Clock.defaultClock();
     }
 }
