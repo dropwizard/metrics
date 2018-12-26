@@ -1,5 +1,6 @@
 package io.dropwizard.metrics5.servlets;
 
+import io.dropwizard.metrics5.Clock;
 import io.dropwizard.metrics5.health.HealthCheck;
 import io.dropwizard.metrics5.health.HealthCheckFilter;
 import io.dropwizard.metrics5.health.HealthCheckRegistry;
@@ -24,6 +25,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class HealthCheckServletTest extends AbstractServletTest {
+
+    private static final Clock FIXED_CLOCK = new Clock() {
+        @Override
+        public long getTick() {
+            return 0L;
+        }
+    };
+
     private final HealthCheckRegistry registry = new HealthCheckRegistry();
     private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
@@ -62,53 +71,112 @@ public class HealthCheckServletTest extends AbstractServletTest {
 
     @Test
     public void returnsA200IfAllHealthChecksAreHealthy() throws Exception {
-        registry.register("fun", () -> HealthCheck.Result.healthy("whee"));
+        registry.register("fun", new HealthCheck() {
+            @Override
+            public Result check() throws Exception {
+                return Result.healthy("whee");
+            }
+
+            @Override
+            public Clock clock() {
+                return FIXED_CLOCK;
+            }
+        });
 
         processRequest();
 
         assertThat(response.getStatus())
                 .isEqualTo(200);
         assertThat(response.getContent())
-                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":", "}}"); // Ignore variable duration time
+                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":0}}");
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
 
     @Test
     public void returnsASubsetOfHealthChecksIfFiltered() throws Exception {
-        registry.register("fun", () -> HealthCheck.Result.healthy("whee"));
+        registry.register("fun", new HealthCheck() {
+            @Override
+            public Result check() throws Exception {
+                return Result.healthy("whee");
+            }
 
-        registry.register("filtered", () -> HealthCheck.Result.unhealthy("whee"));
+            @Override
+            public Clock clock() {
+                return FIXED_CLOCK;
+            }
+        });
+
+        registry.register("filtered", new HealthCheck() {
+            @Override
+            public Result check() throws Exception {
+                return Result.unhealthy("whee");
+            }
+
+            @Override
+            public Clock clock() {
+                return FIXED_CLOCK;
+            }
+        });
 
         processRequest();
 
         assertThat(response.getStatus())
                 .isEqualTo(200);
         assertThat(response.getContent())
-                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":", "}}"); // Ignore variable duration time
+                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":0}}");
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
 
     @Test
     public void returnsA500IfAnyHealthChecksAreUnhealthy() throws Exception {
-        registry.register("fun", () -> HealthCheck.Result.healthy("whee"));
+        registry.register("fun", new HealthCheck() {
+            @Override
+            public Result check() throws Exception {
+                return Result.healthy("whee");
+            }
 
-        registry.register("notFun", () -> HealthCheck.Result.unhealthy("whee"));
+            @Override
+            public Clock clock() {
+                return FIXED_CLOCK;
+            }
+        });
+
+        registry.register("notFun", new HealthCheck() {
+            @Override
+            public Result check() throws Exception {
+                return Result.unhealthy("whee");
+            }
+
+            @Override
+            public Clock clock() {
+                return FIXED_CLOCK;
+            }
+        });
 
         processRequest();
 
         assertThat(response.getStatus())
                 .isEqualTo(500);
         assertThat(response.getContent())
-                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":", "},\"notFun\":{\"healthy\":false,\"message\":\"whee\",\"duration\":", "}}"); // Ignore variable duration time
+                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":", "},\"notFun\":{\"healthy\":false,\"message\":\"whee\",\"duration\":0}}");
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
 
     @Test
     public void optionallyPrettyPrintsTheJson() throws Exception {
-        registry.register("fun", () -> HealthCheck.Result.healthy("whee"));
+        registry.register("fun", new HealthCheck() {
+            @Override
+            public Result check() throws Exception {
+                return Result.healthy("whee");
+            }
+            @Override
+            public Clock clock() {
+                return FIXED_CLOCK;
+            }
+        });
 
         request.setURI("/healthchecks?pretty=true");
 
