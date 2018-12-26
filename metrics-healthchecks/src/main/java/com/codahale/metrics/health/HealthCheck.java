@@ -105,7 +105,8 @@ public abstract class HealthCheck {
         private final Throwable error;
         private final Map<String, Object> details;
         private final String timestamp;
-        private long duration;
+
+        private long duration; // Calculated field
 
         private Result(boolean isHealthy, String message, Throwable error) {
             this(isHealthy, message, error, null);
@@ -195,8 +196,7 @@ public abstract class HealthCheck {
             return healthy == result.healthy &&
                     !(error != null ? !error.equals(result.error) : result.error != null) &&
                     !(message != null ? !message.equals(result.message) : result.message != null) &&
-                    !(timestamp != null ? !timestamp.equals(result.timestamp) : result.timestamp != null) &&
-                    duration == result.duration;
+                    !(timestamp != null ? !timestamp.equals(result.timestamp) : result.timestamp != null);
         }
 
         @Override
@@ -205,7 +205,6 @@ public abstract class HealthCheck {
             result = PRIME * result + (message != null ? message.hashCode() : 0);
             result = PRIME * result + (error != null ? error.hashCode() : 0);
             result = PRIME * result + (timestamp != null ? timestamp.hashCode() : 0);
-            result = PRIME * result + Long.hashCode(duration);
             return result;
         }
 
