@@ -101,6 +101,7 @@ public abstract class HealthCheck {
         private final Throwable error;
         private final Map<String, Object> details;
         private final String timestamp;
+        private long duration;
 
         private Result(boolean isHealthy, String message, Throwable error) {
             this(isHealthy, message, error, null);
@@ -156,6 +157,24 @@ public abstract class HealthCheck {
             return timestamp;
         }
 
+        /**
+         * Returns the duration in milliseconds that the healthcheck took to run
+         *
+         * @return the duration
+         */
+        public long getDuration() {
+            return duration;
+        }
+
+        /**
+         * Sets the duration in milliseconds. This will indicate the time it took to run the individual healthcheck
+         *
+         * @param duration The duration in milliseconds
+         */
+        public void setDuration(long duration) {
+            this.duration = duration;
+        }
+
         public Map<String, Object> getDetails() {
             return details;
         }
@@ -172,7 +191,8 @@ public abstract class HealthCheck {
             return healthy == result.healthy &&
                     !(error != null ? !error.equals(result.error) : result.error != null) &&
                     !(message != null ? !message.equals(result.message) : result.message != null) &&
-                    !(timestamp != null ? !timestamp.equals(result.timestamp) : result.timestamp != null);
+                    !(timestamp != null ? !timestamp.equals(result.timestamp) : result.timestamp != null) &&
+                    duration == result.duration;
         }
 
         @Override
@@ -181,6 +201,7 @@ public abstract class HealthCheck {
             result = PRIME * result + (message != null ? message.hashCode() : 0);
             result = PRIME * result + (error != null ? error.hashCode() : 0);
             result = PRIME * result + (timestamp != null ? timestamp.hashCode() : 0);
+            result = PRIME * result + Long.hashCode(duration);
             return result;
         }
 
@@ -194,6 +215,7 @@ public abstract class HealthCheck {
             if (error != null) {
                 builder.append(", error=").append(error);
             }
+            builder.append(", duration=").append(duration);
             builder.append(", timestamp=").append(timestamp);
             if (details != null) {
                 for (Map.Entry<String, Object> e : details.entrySet()) {
@@ -316,10 +338,14 @@ public abstract class HealthCheck {
      * Result} with a descriptive error message or exception
      */
     public Result execute() {
+        long start = System.currentTimeMillis();
+        Result result;
         try {
-            return check();
+            result = check();
         } catch (Exception e) {
-            return Result.unhealthy(e);
+            result = Result.unhealthy(e);
         }
+        result.setDuration(System.currentTimeMillis() - start);
+        return result;
     }
 }
