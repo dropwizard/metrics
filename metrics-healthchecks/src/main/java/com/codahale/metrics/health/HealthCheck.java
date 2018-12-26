@@ -1,5 +1,7 @@
 package com.codahale.metrics.health;
 
+import com.codahale.metrics.Clock;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -11,6 +13,7 @@ import java.util.concurrent.TimeUnit;
  * A health check for a component of your application.
  */
 public abstract class HealthCheck {
+
     /**
      * The result of a {@link HealthCheck} being run. It can be healthy (with an optional message and optional details)
      * or unhealthy (with either an error message or a thrown exception and optional details).
@@ -44,7 +47,7 @@ public abstract class HealthCheck {
          * <p>
          * Message formatting follows the same rules as {@link String#format(String, Object...)}.
          *
-         * @param message a message format
+         * @param message a message format\\
          * @param args    the arguments apply to the message format
          * @return a healthy {@link Result} with an additional message
          * @see String#format(String, Object...)
@@ -339,14 +342,18 @@ public abstract class HealthCheck {
      * Result} with a descriptive error message or exception
      */
     public Result execute() {
-        long start = System.nanoTime();
+        long start = clock().getTick();
         Result result;
         try {
             result = check();
         } catch (Exception e) {
             result = Result.unhealthy(e);
         }
-        result.setDuration(TimeUnit.MILLISECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
+        result.setDuration(TimeUnit.MILLISECONDS.convert(clock().getTick() - start, TimeUnit.NANOSECONDS));
         return result;
+    }
+
+    protected Clock clock() {
+        return Clock.defaultClock();
     }
 }
