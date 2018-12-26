@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A health check for a component of your application.
@@ -338,14 +339,14 @@ public abstract class HealthCheck {
      * Result} with a descriptive error message or exception
      */
     public Result execute() {
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         Result result;
         try {
             result = check();
         } catch (Exception e) {
             result = Result.unhealthy(e);
         }
-        result.setDuration(System.currentTimeMillis() - start);
+        result.setDuration(TimeUnit.MILLISECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS));
         return result;
     }
 }
