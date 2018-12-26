@@ -15,6 +15,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
+import com.codahale.metrics.Clock;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.After;
@@ -26,9 +27,17 @@ import com.codahale.metrics.health.HealthCheckFilter;
 import com.codahale.metrics.health.HealthCheckRegistry;
 
 public class HealthCheckServletTest extends AbstractServletTest {
+    
+    private static final Clock FIXED_CLOCK = new Clock() {
+        @Override
+        public long getTick() {
+            return 0L;
+        }
+    };
+    
     private final HealthCheckRegistry registry = new HealthCheckRegistry();
     private final ExecutorService threadPool = Executors.newCachedThreadPool();
-
+    
     @Override
     protected void setUp(ServletTester tester) {
         tester.addServlet(HealthCheckServlet.class, "/healthchecks");
@@ -69,6 +78,11 @@ public class HealthCheckServletTest extends AbstractServletTest {
             protected Result check() throws Exception {
                 return Result.healthy("whee");
             }
+
+            @Override
+            protected Clock clock() {
+                return FIXED_CLOCK;
+            }
         });
 
         processRequest();
@@ -76,7 +90,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
         assertThat(response.getStatus())
                 .isEqualTo(200);
         assertThat(response.getContent())
-                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":", "}}"); // Ignore variable duration time
+                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":0}}");
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
@@ -88,12 +102,22 @@ public class HealthCheckServletTest extends AbstractServletTest {
             protected Result check() throws Exception {
                 return Result.healthy("whee");
             }
+
+            @Override
+            protected Clock clock() {
+                return FIXED_CLOCK;
+            }
         });
 
         registry.register("filtered", new HealthCheck() {
             @Override
             protected Result check() throws Exception {
                 return Result.unhealthy("whee");
+            }
+
+            @Override
+            protected Clock clock() {
+                return FIXED_CLOCK;
             }
         });
 
@@ -102,7 +126,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
         assertThat(response.getStatus())
                 .isEqualTo(200);
         assertThat(response.getContent())
-                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":", "}}"); // Ignore variable duration time
+                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":0}}");
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
@@ -114,12 +138,22 @@ public class HealthCheckServletTest extends AbstractServletTest {
             protected Result check() throws Exception {
                 return Result.healthy("whee");
             }
+
+            @Override
+            protected Clock clock() {
+                return FIXED_CLOCK;
+            }
         });
 
         registry.register("notFun", new HealthCheck() {
             @Override
             protected Result check() throws Exception {
                 return Result.unhealthy("whee");
+            }
+
+            @Override
+            protected Clock clock() {
+                return FIXED_CLOCK;
             }
         });
 
@@ -128,7 +162,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
         assertThat(response.getStatus())
                 .isEqualTo(500);
         assertThat(response.getContent())
-                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":", "},\"notFun\":{\"healthy\":false,\"message\":\"whee\",\"duration\":", "}}"); // Ignore variable duration time
+                .contains("{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":", "},\"notFun\":{\"healthy\":false,\"message\":\"whee\",\"duration\":0}}"); 
         assertThat(response.get(HttpHeader.CONTENT_TYPE))
                 .isEqualTo("application/json");
     }
@@ -139,6 +173,10 @@ public class HealthCheckServletTest extends AbstractServletTest {
             @Override
             protected Result check() throws Exception {
                 return Result.healthy("whee");
+            }
+            @Override
+            protected Clock clock() {
+                return FIXED_CLOCK;
             }
         });
 
