@@ -18,6 +18,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.jetty9</javaModuleName>
+        <jetty9.version>9.4.14.v20181114</jetty9.version>
     </properties>
 
     <dependencyManagement>
@@ -41,10 +42,12 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
+            <version>${jetty9.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-client</artifactId>
+            <version>${jetty9.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

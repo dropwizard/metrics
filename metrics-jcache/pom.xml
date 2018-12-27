@@ -18,6 +18,8 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.jcache</javaModuleName>
+        <cache-api.version>1.0.0</cache-api.version>
+        <ehcache3.version>3.4.0</ehcache3.version>
     </properties>
 
     <dependencyManagement>
@@ -44,11 +46,19 @@
         <dependency>
             <groupId>javax.cache</groupId>
             <artifactId>cache-api</artifactId>
+            <version>${cache-api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
+            <version>${ehcache3.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
             <scope>test</scope>
         </dependency>
         <dependency>
