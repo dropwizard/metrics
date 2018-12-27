@@ -18,6 +18,10 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.servlets</javaModuleName>
+        <jetty9.version>9.4.14.v20181114</jetty9.version>
+        <papertrail.profiler.version>1.0.2</papertrail.profiler.version>
+        <servlet.version>3.1.0</servlet.version>
+        <jackson.version>2.9.5</jackson.version>
     </properties>
 
     <dependencyManagement>
@@ -52,31 +56,37 @@
         <dependency>
             <groupId>com.papertrail</groupId>
             <artifactId>profiler</artifactId>
+            <version>${papertrail.profiler.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
+            <version>${jetty9.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-http</artifactId>
             <classifier>tests</classifier>
+            <version>${jetty9.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
             <classifier>tests</classifier>
+            <version>${jetty9.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
