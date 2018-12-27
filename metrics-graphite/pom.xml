@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.graphite</javaModuleName>
-        <rabbitmq.version>4.4.1</rabbitmq.version>
+        <rabbitmq.version>4.9.1</rabbitmq.version>
     </properties>
 
     <dependencyManagement>
