@@ -15,6 +15,11 @@
         An instrumented appender for Log4j 2.x.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.log4j2</javaModuleName>
+        <log4j2.version>2.10.0</log4j2.version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -48,10 +53,12 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
+            <version>${log4j2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
+            <version>${log4j2.version}</version>
         </dependency>
     </dependencies>
 </project>

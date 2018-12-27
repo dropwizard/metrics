@@ -16,6 +16,11 @@
         durations and rates, and other useful information.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.httpclient</javaModuleName>
+        <http-client.version>4.5.5</http-client.version>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -36,6 +41,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
+            <version>${http-client.version}</version>
         </dependency>
     </dependencies>
 </project>

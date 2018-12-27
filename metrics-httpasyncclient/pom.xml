@@ -16,6 +16,11 @@
         durations and rates, and other useful information.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.httpasyncclient</javaModuleName>
+        <http-async-client.version>4.1.3</http-async-client.version>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -36,6 +41,17 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpasyncclient</artifactId>
+            <version>${http-async-client.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpcore</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

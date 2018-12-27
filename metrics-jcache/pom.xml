@@ -16,6 +16,12 @@
         Uses the CacheStatisticsMXBean provided statistics.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.jcache</javaModuleName>
+        <cache-api.version>1.0.0</cache-api.version>
+        <ehcache3.version>3.4.0</ehcache3.version>
+    </properties>
+
     <profiles>
         <profile>
             <id>jdk10</id>
@@ -71,11 +77,37 @@
         <dependency>
             <groupId>javax.cache</groupId>
             <artifactId>cache-api</artifactId>
+            <version>${cache-api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
+            <version>${ehcache3.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

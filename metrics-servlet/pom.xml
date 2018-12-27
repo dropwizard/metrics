@@ -15,6 +15,11 @@
         An instrumented filter for servlet environments.
     </description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.servlet</javaModuleName>
+        <servlet.version>3.1.0</servlet.version>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -35,6 +40,7 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -13,6 +13,11 @@
     <packaging>bundle</packaging>
     <description>Provides instrumentation of Jdbi3 data access objects</description>
 
+    <properties>
+        <javaModuleName>com.codahale.metrics.jdbi3</javaModuleName>
+        <jdbi3.version>3.3.0</jdbi3.version>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -39,6 +44,7 @@
         <dependency>
             <groupId>org.jdbi</groupId>
             <artifactId>jdbi3-core</artifactId>
+            <version>${jdbi3.version}</version>
         </dependency>
     </dependencies>
 
