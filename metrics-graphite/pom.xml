@@ -51,6 +51,7 @@
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
+            <scope>optional</scope>
         </dependency>
 
         <dependency>
