@@ -21,7 +21,7 @@
         <jetty9.version>9.4.14.v20181114</jetty9.version>
         <papertrail.profiler.version>1.0.2</papertrail.profiler.version>
         <servlet.version>3.1.0</servlet.version>
-        <jackson.version>2.9.5</jackson.version>
+        <jackson.version>2.9.8</jackson.version>
     </properties>
 
     <dependencyManagement>
