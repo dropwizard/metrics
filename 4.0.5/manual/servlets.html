@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Metrics Servlets | Metrics</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="../_static/metrics.css" type="text/css"/>
+    <link rel="top" title="Metrics" href="../index.html"/>
+    <link rel="up" title="User Manual" href="index.html"/>
+    <link rel="next" title="Instrumenting Web Applications" href="servlet.html"/>
+    <link rel="prev" title="JSON Support" href="json.html"/>
+    <style lang="text/css">
+        #top-bar, #top-bar small, #top-bar a {
+            text-shadow: 0px -1px 0px #cf2c0f;
+            color: #fff;
+        }
+        
+        #top-bar {
+            background-color: #ED4A2D;
+            background-image: -moz-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -ms-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ff684b), to(#cf2c0f));
+            background-image: -webkit-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -o-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: linear-gradient(top, #ff684b, #cf2c0f);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ff684b', endColorstr = '#cf2c0f', GradientType = 0);
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0;
+        }
+
+
+        .hero-unit {
+            background-image: url("../_static/metrics-hat.png") !important;
+            background-repeat: no-repeat !important;
+            background-position: 30px 50px;
+        }
+
+        .hero-unit div.section {
+            padding-left: 200px !important;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://github.com/dropwizard/metrics">
+        <img style="position: absolute; top: 0; right: 0; border: 0;"
+             src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"
+             alt="Fork me on GitHub"></a>
+    <div class="navbar">
+        <div class="navbar-inner container-fluid" id="top-bar">
+            <header class="row-fluid">
+                <h1 class="span12" id="title"><img class="logo" src="../_static/metrics-logo.png" alt="Logo"/>
+                    <a href="../index.html">Metrics</a>
+                    <small>Mind the gap.</small>
+                </h1>
+            </header>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span3" id="sidebar">
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">User Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="core.html">Metrics Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="healthchecks.html">Health Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ehcache.html">Instrumenting Ehcache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ganglia.html">Reporting to Ganglia</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graphite.html">Reporting to Graphite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="httpclient.html">Instrumenting Apache HttpClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jdbi.html">Instrumenting JDBI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jersey.html">Instrumenting Jersey 1.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jersey.html#instrumenting-jersey-2-x">Instrumenting Jersey 2.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jetty.html">Instrumenting Jetty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="log4j.html">Instrumenting Log4j</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logback.html">Instrumenting Logback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jvm.html">JVM Instrumentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="json.html">JSON Support</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Metrics Servlets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#healthcheckservlet">HealthCheckServlet</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#threaddumpservlet">ThreadDumpServlet</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metricsservlet">MetricsServlet</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pingservlet">PingServlet</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adminservlet">AdminServlet</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="servlet.html">Instrumenting Web Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="third-party.html">Third Party Libraries</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About Metrics</a></li>
+</ul>
+
+                <hr/>
+                <ul>
+                    <li><a href="https://dropwizard.github.io/metrics/4.0.5/apidocs/">Javadoc</a></li>
+                    <li><a href="https://groups.google.com/forum/#!forum/metrics-user">Mailing List</a></li>
+                </ul>
+            </div>
+            <div class="span9" id="body">
+                
+  <div class="section" id="metrics-servlets">
+<span id="manual-servlets"></span><h1>Metrics Servlets</h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">metrics-servlets</span></code> module provides a handful of useful servlets:</p>
+<div class="section" id="healthcheckservlet">
+<span id="man-servlet-healthcheck"></span><h2>HealthCheckServlet</h2>
+<p><code class="docutils literal notranslate"><span class="pre">HealthCheckServlet</span></code> responds to <code class="docutils literal notranslate"><span class="pre">GET</span></code> requests by running all the [health checks](#health-checks)
+and returning <code class="docutils literal notranslate"><span class="pre">501</span> <span class="pre">Not</span> <span class="pre">Implemented</span></code> if no health checks are registered, <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> if all pass, or
+<code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Service</span> <span class="pre">Error</span></code> if one or more fail. The results are returned as a human-readable
+<code class="docutils literal notranslate"><span class="pre">text/plain</span></code> entity.</p>
+<p><code class="docutils literal notranslate"><span class="pre">HealthCheckServlet</span></code> requires that the servlet context has a <code class="docutils literal notranslate"><span class="pre">HealthCheckRegistry</span></code> named
+<code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.HealthCheckServlet.registry</span></code>. You can subclass
+<code class="docutils literal notranslate"><span class="pre">MetricsServletContextListener</span></code>, which will add a specific <code class="docutils literal notranslate"><span class="pre">HealthCheckRegistry</span></code> to the servlet
+context.</p>
+</div>
+<div class="section" id="threaddumpservlet">
+<span id="man-servlet-threaddump"></span><h2>ThreadDumpServlet</h2>
+<p><code class="docutils literal notranslate"><span class="pre">ThreadDumpServlet</span></code> responds to <code class="docutils literal notranslate"><span class="pre">GET</span></code> requests with a <code class="docutils literal notranslate"><span class="pre">text/plain</span></code> representation of all the live
+threads in the JVM, their states, their stack traces, and the state of any locks they may be
+waiting for.</p>
+</div>
+<div class="section" id="metricsservlet">
+<span id="man-servlet-metrics"></span><h2>MetricsServlet</h2>
+<p><code class="docutils literal notranslate"><span class="pre">MetricsServlet</span></code> exposes the state of the metrics in a particular registry as a JSON object.</p>
+<p><code class="docutils literal notranslate"><span class="pre">MetricsServlet</span></code> requires that the servlet context has a <code class="docutils literal notranslate"><span class="pre">MetricRegistry</span></code> named
+<code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.MetricsServlet.registry</span></code>. You can subclass
+<code class="docutils literal notranslate"><span class="pre">MetricsServletContextListener</span></code>, which will add a specific <code class="docutils literal notranslate"><span class="pre">MetricRegistry</span></code> to the servlet
+context.</p>
+<p><code class="docutils literal notranslate"><span class="pre">MetricsServlet</span></code> also takes an initialization parameter, <code class="docutils literal notranslate"><span class="pre">show-jvm-metrics</span></code>, which if <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code> will
+disable the outputting of JVM-level information in the JSON object.</p>
+</div>
+<div class="section" id="pingservlet">
+<span id="man-servlet-ping"></span><h2>PingServlet</h2>
+<p><code class="docutils literal notranslate"><span class="pre">PingServlet</span></code> responds to <code class="docutils literal notranslate"><span class="pre">GET</span></code> requests with a <code class="docutils literal notranslate"><span class="pre">text/plain</span></code>/<code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> response of <code class="docutils literal notranslate"><span class="pre">pong</span></code>. This is
+useful for determining liveness for load balancers, etc.</p>
+</div>
+<div class="section" id="adminservlet">
+<span id="man-servlet-admin"></span><h2>AdminServlet</h2>
+<p><code class="docutils literal notranslate"><span class="pre">AdminServlet</span></code> aggregates <code class="docutils literal notranslate"><span class="pre">HealthCheckServlet</span></code>, <code class="docutils literal notranslate"><span class="pre">ThreadDumpServlet</span></code>, <code class="docutils literal notranslate"><span class="pre">MetricsServlet</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">PingServlet</span></code> into a single, easy-to-use servlet which provides a set of URIs:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">/</span></code>: an HTML admin menu with links to the following:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">/healthcheck</span></code>: <code class="docutils literal notranslate"><span class="pre">HealthCheckServlet</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">/metrics</span></code>: <code class="docutils literal notranslate"><span class="pre">MetricsServlet</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">/ping</span></code>: <code class="docutils literal notranslate"><span class="pre">PingServlet</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">/threads</span></code>: <code class="docutils literal notranslate"><span class="pre">ThreadDumpServlet</span></code></li>
+</ul>
+</li>
+</ul>
+<p>You will need to add your <code class="docutils literal notranslate"><span class="pre">MetricRegistry</span></code> and <code class="docutils literal notranslate"><span class="pre">HealthCheckRegistry</span></code> instances to the servlet
+context as attributes named <code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.MetricsServlet.registry</span></code> and
+<code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.HealthCheckServlet.registry</span></code>, respectively. You can do this using
+the Servlet API by extending <code class="docutils literal notranslate"><span class="pre">MetricsServlet.ContextListener</span></code> for MetricRegistry:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyMetricsServletContextListener</span> <span class="kd">extends</span> <span class="n">MetricsServlet</span><span class="o">.</span><span class="na">ContextListener</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">MetricRegistry</span> <span class="n">METRIC_REGISTRY</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MetricRegistry</span><span class="o">();</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="n">MetricRegistry</span> <span class="nf">getMetricRegistry</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">METRIC_REGISTRY</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>And by extending <code class="docutils literal notranslate"><span class="pre">HealthCheckServlet.ContextListener</span></code> for HealthCheckRegistry:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyHealthCheckServletContextListener</span> <span class="kd">extends</span> <span class="n">HealthCheckServlet</span><span class="o">.</span><span class="na">ContextListener</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">HealthCheckRegistry</span> <span class="n">HEALTH_CHECK_REGISTRY</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HealthCheckRegistry</span><span class="o">();</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="n">HealthCheckRegistry</span> <span class="nf">getHealthCheckRegistry</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">HEALTH_CHECK_REGISTRY</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Then you will need to register servlet context listeners either in you <code class="docutils literal notranslate"><span class="pre">web.xml</span></code> or annotating the class with <code class="docutils literal notranslate"><span class="pre">&#64;WebListener</span></code> if you are in servlet 3.0 environment. In <code class="docutils literal notranslate"><span class="pre">web.xml</span></code>:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;listener&gt;</span>
+        <span class="nt">&lt;listener-class&gt;</span>com.example.MyMetricsServletContextListener<span class="nt">&lt;/listener-class&gt;</span>
+<span class="nt">&lt;/listener&gt;</span>
+<span class="nt">&lt;listener&gt;</span>
+        <span class="nt">&lt;listener-class&gt;</span>com.example.MyHealthCheckServletContextListener<span class="nt">&lt;/listener-class&gt;</span>
+<span class="nt">&lt;/listener&gt;</span>
+</pre></div>
+</div>
+<p>You will also need to register <code class="docutils literal notranslate"><span class="pre">AdminServlet</span></code> in <code class="docutils literal notranslate"><span class="pre">web.xml</span></code>:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;servlet&gt;</span>
+        <span class="nt">&lt;servlet-name&gt;</span>metrics<span class="nt">&lt;/servlet-name&gt;</span>
+        <span class="nt">&lt;servlet-class&gt;</span>com.codahale.metrics.servlets.AdminServlet<span class="nt">&lt;/servlet-class&gt;</span>
+<span class="nt">&lt;/servlet&gt;</span>
+<span class="nt">&lt;servlet-mapping&gt;</span>
+        <span class="nt">&lt;servlet-name&gt;</span>metrics<span class="nt">&lt;/servlet-name&gt;</span>
+        <span class="nt">&lt;url-pattern&gt;</span>/metrics/*<span class="nt">&lt;/url-pattern&gt;</span>
+<span class="nt">&lt;/servlet-mapping&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+            </div></div>
+        <hr/>
+        <footer>
+            <p style="float: left">
+            &copy; Copyright 2010-2014, Coda Hale, Yammer Inc..
+            Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
+            1.8.2.
+            </p>
+            <p style="float: right">Dropwizard Metrics v4.0.5</p>
+        </footer>
+    </div>
+</body>
+</html>
+
+
