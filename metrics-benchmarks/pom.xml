@@ -15,7 +15,7 @@
     </description>
 
     <properties>
-        <jmh.version>1.19</jmh.version>
+        <jmh.version>1.21</jmh.version>
     </properties>
 
     <dependencyManagement>
