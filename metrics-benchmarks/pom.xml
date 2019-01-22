@@ -16,7 +16,7 @@
 
     <properties>
         <jmh.version>1.21</jmh.version>
-        <javaModuleName>com.codahale.metrics.docs</javaModuleName>
+        <javaModuleName>com.codahale.metrics.benchmarks</javaModuleName>
     </properties>
 
     <dependencyManagement>

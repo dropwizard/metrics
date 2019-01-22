@@ -48,6 +48,8 @@
             Name of the test Uber-JAR to generate.
           -->
         <uberjar.name>jcstress</uberjar.name>
+
+        <javaModuleName>com.codahale.metrics.jcstress</javaModuleName>
     </properties>
 
     <build>
