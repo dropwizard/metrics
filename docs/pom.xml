@@ -15,7 +15,7 @@
         <jar.skipIfEmpty>true</jar.skipIfEmpty>
         <mpir.skip>true</mpir.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
-       <javaModuleName>com.codahale.metrics.docs</javaModuleName>
+        <javaModuleName>com.codahale.metrics.docs</javaModuleName>
     </properties>
 
     <build>
