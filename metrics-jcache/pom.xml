@@ -19,7 +19,7 @@
     <properties>
         <javaModuleName>com.codahale.metrics.jcache</javaModuleName>
         <cache-api.version>1.0.0</cache-api.version>
-        <ehcache3.version>3.4.0</ehcache3.version>
+        <ehcache3.version>3.6.3</ehcache3.version>
     </properties>
 
     <dependencyManagement>
