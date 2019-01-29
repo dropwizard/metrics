@@ -5,6 +5,7 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricAttribute;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ScheduledReporter;
@@ -15,9 +16,28 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static com.codahale.metrics.MetricAttribute.COUNT;
+import static com.codahale.metrics.MetricAttribute.M15_RATE;
+import static com.codahale.metrics.MetricAttribute.M1_RATE;
+import static com.codahale.metrics.MetricAttribute.M5_RATE;
+import static com.codahale.metrics.MetricAttribute.MAX;
+import static com.codahale.metrics.MetricAttribute.MEAN;
+import static com.codahale.metrics.MetricAttribute.MEAN_RATE;
+import static com.codahale.metrics.MetricAttribute.MIN;
+import static com.codahale.metrics.MetricAttribute.P50;
+import static com.codahale.metrics.MetricAttribute.P75;
+import static com.codahale.metrics.MetricAttribute.P95;
+import static com.codahale.metrics.MetricAttribute.P98;
+import static com.codahale.metrics.MetricAttribute.P99;
+import static com.codahale.metrics.MetricAttribute.P999;
+import static com.codahale.metrics.MetricAttribute.STDDEV;
 
 /**
  * A reporter which publishes metric values to a Collectd server.
@@ -33,6 +53,8 @@ public class CollectdReporter extends ScheduledReporter {
      * The default settings are:
      * <ul>
      * <li>hostName: InetAddress.getLocalHost().getHostName()</li>
+     * <li>executor: default executor created by {@code ScheduledReporter}</li>
+     * <li>shutdownExecutorOnStop: true</li>
      * <li>clock: Clock.defaultClock()</li>
      * <li>rateUnit: TimeUnit.SECONDS</li>
      * <li>durationUnit: TimeUnit.MILLISECONDS</li>
@@ -50,6 +72,8 @@ public class CollectdReporter extends ScheduledReporter {
 
         private final MetricRegistry registry;
         private String hostName;
+        private ScheduledExecutorService executor;
+        private boolean shutdownExecutorOnStop = true;
         private Clock clock = Clock.defaultClock();
         private TimeUnit rateUnit = TimeUnit.SECONDS;
         private TimeUnit durationUnit = TimeUnit.MILLISECONDS;
@@ -57,6 +81,7 @@ public class CollectdReporter extends ScheduledReporter {
         private SecurityLevel securityLevel = SecurityLevel.NONE;
         private String username = "";
         private String password = "";
+        private Set<MetricAttribute> disabledMetricAttributes = Collections.emptySet();
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -64,6 +89,16 @@ public class CollectdReporter extends ScheduledReporter {
 
         public Builder withHostName(String hostName) {
             this.hostName = hostName;
+            return this;
+        }
+
+        public Builder shutdownExecutorOnStop(boolean shutdownExecutorOnStop) {
+            this.shutdownExecutorOnStop = shutdownExecutorOnStop;
+            return this;
+        }
+
+        public Builder scheduleOn(ScheduledExecutorService executor) {
+            this.executor = executor;
             return this;
         }
 
@@ -102,6 +137,11 @@ public class CollectdReporter extends ScheduledReporter {
             return this;
         }
 
+        public Builder disabledMetricAttributes(Set<MetricAttribute> attributes) {
+            this.disabledMetricAttributes = attributes;
+            return this;
+        }
+
         public CollectdReporter build(Sender sender) {
             if (securityLevel != SecurityLevel.NONE) {
                 if (username.isEmpty()) {
@@ -111,7 +151,11 @@ public class CollectdReporter extends ScheduledReporter {
                     throw new IllegalArgumentException("password is required for securityLevel: " + securityLevel);
                 }
             }
-            return new CollectdReporter(registry, hostName, sender, clock, rateUnit, durationUnit, filter,
+            return new CollectdReporter(registry,
+                    hostName, sender,
+                    executor, shutdownExecutorOnStop,
+                    clock, rateUnit, durationUnit,
+                    filter, disabledMetricAttributes,
                     username, password, securityLevel);
         }
     }
@@ -127,10 +171,15 @@ public class CollectdReporter extends ScheduledReporter {
     private long period;
     private final PacketWriter writer;
 
-    private CollectdReporter(MetricRegistry registry, String hostname, Sender sender, Clock clock, TimeUnit rateUnit,
-                             TimeUnit durationUnit, MetricFilter filter, String username, String password,
-                             SecurityLevel securityLevel) {
-        super(registry, REPORTER_NAME, filter, rateUnit, durationUnit);
+    private CollectdReporter(MetricRegistry registry,
+            String hostname, Sender sender,
+            ScheduledExecutorService executor, boolean shutdownExecutorOnStop,
+            Clock clock, TimeUnit rateUnit, TimeUnit durationUnit,
+            MetricFilter filter, Set<MetricAttribute> disabledMetricAttributes,
+            String username, String password,
+            SecurityLevel securityLevel) {
+        super(registry, REPORTER_NAME, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
+                disabledMetricAttributes);
         this.hostName = (hostname != null) ? hostname : resolveHostName();
         this.sender = sender;
         this.clock = clock;
@@ -196,9 +245,23 @@ public class CollectdReporter extends ScheduledReporter {
         }
     }
 
-    private void write(MetaData metaData, Number... values) {
+    private void writeValue(MetaData.Builder metaData, MetricAttribute attribute, Number value) {
+        if (!getDisabledMetricAttributes().contains(attribute)) {
+            write(metaData.typeInstance(attribute.getCode()).get(), value);
+        }
+    }
+
+    private void writeRate(MetaData.Builder metaData, MetricAttribute attribute, double rate) {
+        writeValue(metaData, attribute, convertRate(rate));
+    }
+
+    private void writeDuration(MetaData.Builder metaData, MetricAttribute attribute, double duration) {
+        writeValue(metaData, attribute, convertDuration(duration));
+    }
+
+    private void write(MetaData metaData, Number value) {
         try {
-            writer.write(metaData, values);
+            writer.write(metaData, value);
         } catch (RuntimeException e) {
             LOG.warn("Failed to process metric '" + metaData.getPlugin() + "': " + e.getMessage());
         } catch (IOException e) {
@@ -219,48 +282,48 @@ public class CollectdReporter extends ScheduledReporter {
     }
 
     private void serializeMeter(MetaData.Builder metaData, Meter metric) {
-        write(metaData.typeInstance("count").get(), (double) metric.getCount());
-        write(metaData.typeInstance("m1_rate").get(), convertRate(metric.getOneMinuteRate()));
-        write(metaData.typeInstance("m5_rate").get(), convertRate(metric.getFiveMinuteRate()));
-        write(metaData.typeInstance("m15_rate").get(), convertRate(metric.getFifteenMinuteRate()));
-        write(metaData.typeInstance("mean_rate").get(), convertRate(metric.getMeanRate()));
+        writeValue(metaData, COUNT, (double) metric.getCount());
+        writeRate(metaData, M1_RATE, metric.getOneMinuteRate());
+        writeRate(metaData, M5_RATE, metric.getFiveMinuteRate());
+        writeRate(metaData, M15_RATE, metric.getFifteenMinuteRate());
+        writeRate(metaData, MEAN_RATE, metric.getMeanRate());
     }
 
     private void serializeCounter(MetaData.Builder metaData, Counter metric) {
-        write(metaData.typeInstance("count").get(), (double) metric.getCount());
+        writeValue(metaData, COUNT, (double) metric.getCount());
     }
 
     private void serializeHistogram(MetaData.Builder metaData, Histogram metric) {
         final Snapshot snapshot = metric.getSnapshot();
-        write(metaData.typeInstance("count").get(), (double) metric.getCount());
-        write(metaData.typeInstance("max").get(), (double) snapshot.getMax());
-        write(metaData.typeInstance("mean").get(), snapshot.getMean());
-        write(metaData.typeInstance("min").get(), (double) snapshot.getMin());
-        write(metaData.typeInstance("stddev").get(), snapshot.getStdDev());
-        write(metaData.typeInstance("p50").get(), snapshot.getMedian());
-        write(metaData.typeInstance("p75").get(), snapshot.get75thPercentile());
-        write(metaData.typeInstance("p95").get(), snapshot.get95thPercentile());
-        write(metaData.typeInstance("p98").get(), snapshot.get98thPercentile());
-        write(metaData.typeInstance("p99").get(), snapshot.get99thPercentile());
-        write(metaData.typeInstance("p999").get(), snapshot.get999thPercentile());
+        writeValue(metaData, COUNT, (double) metric.getCount());
+        writeValue(metaData, MAX, (double) snapshot.getMax());
+        writeValue(metaData, MEAN, snapshot.getMean());
+        writeValue(metaData, MIN, (double) snapshot.getMin());
+        writeValue(metaData, STDDEV, snapshot.getStdDev());
+        writeValue(metaData, P50, snapshot.getMedian());
+        writeValue(metaData, P75, snapshot.get75thPercentile());
+        writeValue(metaData, P95, snapshot.get95thPercentile());
+        writeValue(metaData, P98, snapshot.get98thPercentile());
+        writeValue(metaData, P99, snapshot.get99thPercentile());
+        writeValue(metaData, P999, snapshot.get999thPercentile());
     }
 
     private void serializeTimer(MetaData.Builder metaData, Timer metric) {
         final Snapshot snapshot = metric.getSnapshot();
-        write(metaData.typeInstance("count").get(), (double) metric.getCount());
-        write(metaData.typeInstance("max").get(), convertDuration(snapshot.getMax()));
-        write(metaData.typeInstance("mean").get(), convertDuration(snapshot.getMean()));
-        write(metaData.typeInstance("min").get(), convertDuration(snapshot.getMin()));
-        write(metaData.typeInstance("stddev").get(), convertDuration(snapshot.getStdDev()));
-        write(metaData.typeInstance("p50").get(), convertDuration(snapshot.getMedian()));
-        write(metaData.typeInstance("p75").get(), convertDuration(snapshot.get75thPercentile()));
-        write(metaData.typeInstance("p95").get(), convertDuration(snapshot.get95thPercentile()));
-        write(metaData.typeInstance("p98").get(), convertDuration(snapshot.get98thPercentile()));
-        write(metaData.typeInstance("p99").get(), convertDuration(snapshot.get99thPercentile()));
-        write(metaData.typeInstance("p999").get(), convertDuration(snapshot.get999thPercentile()));
-        write(metaData.typeInstance("m1_rate").get(), convertRate(metric.getOneMinuteRate()));
-        write(metaData.typeInstance("m5_rate").get(), convertRate(metric.getFiveMinuteRate()));
-        write(metaData.typeInstance("m15_rate").get(), convertRate(metric.getFifteenMinuteRate()));
-        write(metaData.typeInstance("mean_rate").get(), convertRate(metric.getMeanRate()));
+        writeValue(metaData, COUNT, (double) metric.getCount());
+        writeDuration(metaData, MAX, (double) snapshot.getMax());
+        writeDuration(metaData, MEAN, snapshot.getMean());
+        writeDuration(metaData, MIN, (double) snapshot.getMin());
+        writeDuration(metaData, STDDEV, snapshot.getStdDev());
+        writeDuration(metaData, P50, snapshot.getMedian());
+        writeDuration(metaData, P75, snapshot.get75thPercentile());
+        writeDuration(metaData, P95, snapshot.get95thPercentile());
+        writeDuration(metaData, P98, snapshot.get98thPercentile());
+        writeDuration(metaData, P99, snapshot.get99thPercentile());
+        writeDuration(metaData, P999, snapshot.get999thPercentile());
+        writeRate(metaData, M1_RATE, metric.getOneMinuteRate());
+        writeRate(metaData, M5_RATE, metric.getFiveMinuteRate());
+        writeRate(metaData, M15_RATE, metric.getFifteenMinuteRate());
+        writeRate(metaData, MEAN_RATE, metric.getMeanRate());
     }
 }
