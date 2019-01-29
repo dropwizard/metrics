@@ -20,7 +20,6 @@ import java.util.TreeMap;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -265,28 +264,6 @@ public class CollectdReporterTest {
 
         ValueList values = receiver.next();
         assertThat(values.getPlugin()).isEqualTo("dash_illegal.slash_illegal");
-    }
-
-    @Test
-    public void testUnableSetSecurityLevelToSignWithoutUsername() {
-        assertThatIllegalArgumentException().isThrownBy(()->
-                CollectdReporter.forRegistry(registry)
-                        .withHostName("eddie")
-                        .withSecurityLevel(SecurityLevel.SIGN)
-                        .withPassword("t1_g3r")
-                        .build(new Sender("localhost", 25826)))
-                .withMessage("username is required for securityLevel: SIGN");
-    }
-
-    @Test
-    public void testUnableSetSecurityLevelToSignWithoutPassword() {
-        assertThatIllegalArgumentException().isThrownBy(()->
-                CollectdReporter.forRegistry(registry)
-                        .withHostName("eddie")
-                        .withSecurityLevel(SecurityLevel.SIGN)
-                        .withUsername("scott")
-                        .build(new Sender("localhost", 25826)))
-                .withMessage("password is required for securityLevel: SIGN");
     }
 
     private <T> SortedMap<String, T> map() {
