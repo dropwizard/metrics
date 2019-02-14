@@ -34,6 +34,7 @@ public class HealthCheckModule extends Module {
             }
 
             serializeThrowable(json, result.getError(), "error");
+            json.writeNumberField("duration", result.getDuration());
 
             Map<String, Object> details = result.getDetails();
             if (details != null && !details.isEmpty()) {
@@ -42,6 +43,7 @@ public class HealthCheckModule extends Module {
                 }
             }
 
+            json.writeStringField("timestamp", result.getTimestamp());
             json.writeEndObject();
         }
 

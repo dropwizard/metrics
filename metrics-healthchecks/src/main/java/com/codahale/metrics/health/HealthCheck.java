@@ -1,15 +1,21 @@
 package com.codahale.metrics.health;
 
+import com.codahale.metrics.Clock;
+
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A health check for a component of your application.
  */
 public abstract class HealthCheck {
+
     /**
      * The result of a {@link HealthCheck} being run. It can be healthy (with an optional message and optional details)
      * or unhealthy (with either an error message or a thrown exception and optional details).
@@ -43,7 +49,7 @@ public abstract class HealthCheck {
          * <p>
          * Message formatting follows the same rules as {@link String#format(String, Object...)}.
          *
-         * @param message a message format
+         * @param message a message format\\
          * @param args    the arguments apply to the message format
          * @return a healthy {@link Result} with an additional message
          * @see String#format(String, Object...)
@@ -102,20 +108,27 @@ public abstract class HealthCheck {
         private final Map<String, Object> details;
         private final String timestamp;
 
+        private long duration; // Calculated field
+
         private Result(boolean isHealthy, String message, Throwable error) {
-            this(isHealthy, message, error, null);
+            this(isHealthy, message, error, null, Clock.defaultClock());
         }
 
         private Result(ResultBuilder builder) {
-            this(builder.healthy, builder.message, builder.error, builder.details);
+            this(builder.healthy, builder.message, builder.error, builder.details, builder.clock);
         }
 
-        private Result(boolean isHealthy, String message, Throwable error, Map<String, Object> details) {
+        private Result(boolean isHealthy, String message, Throwable error, Map<String, Object> details, Clock clock) {
             this.healthy = isHealthy;
             this.message = message;
             this.error = error;
             this.details = details == null ? null : Collections.unmodifiableMap(details);
-            timestamp = DATE_FORMAT_PATTERN.format(ZonedDateTime.now());
+            this.timestamp = DATE_FORMAT_PATTERN.format(currentTimeFrom(clock));
+        }
+
+        private static ZonedDateTime currentTimeFrom(Clock clock) {
+            Instant currentInstant = Instant.ofEpochMilli(clock.getTime());
+            return ZonedDateTime.ofInstant(currentInstant, ZoneId.systemDefault());
         }
 
         /**
@@ -156,6 +169,24 @@ public abstract class HealthCheck {
             return timestamp;
         }
 
+        /**
+         * Returns the duration in milliseconds that the healthcheck took to run
+         *
+         * @return the duration
+         */
+        public long getDuration() {
+            return duration;
+        }
+
+        /**
+         * Sets the duration in milliseconds. This will indicate the time it took to run the individual healthcheck
+         *
+         * @param duration The duration in milliseconds
+         */
+        public void setDuration(long duration) {
+            this.duration = duration;
+        }
+
         public Map<String, Object> getDetails() {
             return details;
         }
@@ -194,6 +225,7 @@ public abstract class HealthCheck {
             if (error != null) {
                 builder.append(", error=").append(error);
             }
+            builder.append(", duration=").append(duration);
             builder.append(", timestamp=").append(timestamp);
             if (details != null) {
                 for (Map.Entry<String, Object> e : details.entrySet()) {
@@ -217,10 +249,12 @@ public abstract class HealthCheck {
         private String message;
         private Throwable error;
         private Map<String, Object> details;
+        private Clock clock;
 
         protected ResultBuilder() {
             this.healthy = true;
             this.details = new LinkedHashMap<>();
+            this.clock = Clock.defaultClock();
         }
 
         /**
@@ -294,6 +328,18 @@ public abstract class HealthCheck {
             return this;
         }
 
+        /**
+         * Configure this {@link ResultBuilder} to use the given {@code clock} instead of the default clock.
+         * If not specified, the default clock is {@link Clock#defaultClock()}.
+         *
+         * @param clock the {@link Clock} to use when generating the health check timestamp (useful for unit testing)
+         * @return this builder configured to use the given {@code clock}
+         */
+        public ResultBuilder usingClock(Clock clock) {
+            this.clock = clock;
+            return this;
+        }
+
         public Result build() {
             return new Result(this);
         }
@@ -316,10 +362,18 @@ public abstract class HealthCheck {
      * Result} with a descriptive error message or exception
      */
     public Result execute() {
+        long start = clock().getTick();
+        Result result;
         try {
-            return check();
+            result = check();
         } catch (Exception e) {
-            return Result.unhealthy(e);
+            result = Result.unhealthy(e);
         }
+        result.setDuration(TimeUnit.MILLISECONDS.convert(clock().getTick() - start, TimeUnit.NANOSECONDS));
+        return result;
+    }
+
+    protected Clock clock() {
+        return Clock.defaultClock();
     }
 }
