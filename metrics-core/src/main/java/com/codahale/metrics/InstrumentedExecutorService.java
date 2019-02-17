@@ -176,7 +176,7 @@ public class InstrumentedExecutorService implements ExecutorService {
         public void run() {
             idleContext.stop();
             running.inc();
-            try(Timer.Context durationContext = duration.time()) {
+            try (Timer.Context durationContext = duration.time()) {
                 task.run();
             } finally {
                 running.dec();
@@ -198,7 +198,7 @@ public class InstrumentedExecutorService implements ExecutorService {
         public T call() throws Exception {
             idleContext.stop();
             running.inc();
-            try(Timer.Context context = duration.time()) {
+            try (Timer.Context context = duration.time()) {
                 return callable.call();
             } finally {
                 running.dec();
