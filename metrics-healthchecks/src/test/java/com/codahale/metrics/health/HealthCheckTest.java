@@ -241,6 +241,8 @@ public class HealthCheckTest {
 
         assertThat(result.isHealthy()).isTrue();
 
+        assertThat(result.getTime()).isEqualTo(clock.getTime());
+
         assertThat(result.getTimestamp())
                 .isEqualTo(DATE_TIME_FORMATTER.format(dateTime));
     }
