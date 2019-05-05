@@ -1,6 +1,7 @@
 package com.codahale.metrics;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,24 +10,37 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Callable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class InstrumentedExecutorServiceTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InstrumentedExecutorServiceTest.class);
+    private ExecutorService executor;
+    private MetricRegistry registry;
+    private InstrumentedExecutorService instrumentedExecutorService;
+    private Meter submitted;
+    private Counter running;
+    private Meter completed;
+    private Timer duration;
+    private Timer idle;
 
-    private final ExecutorService executor = Executors.newCachedThreadPool();
-    private final MetricRegistry registry = new MetricRegistry();
-    private final InstrumentedExecutorService instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "xs");
+    @Before
+    public void setup() {
+        executor = Executors.newCachedThreadPool();
+        registry = new MetricRegistry();
+        instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "xs");
+        submitted = registry.meter("xs.submitted");
+        running = registry.counter("xs.running");
+        completed = registry.meter("xs.completed");
+        duration = registry.timer("xs.duration");
+        idle = registry.timer("xs.idle");
+    }
+
 
     @Test
-    public void reportsTasksInformation() throws Exception {
-        final Meter submitted = registry.meter("xs.submitted");
-        final Counter running = registry.counter("xs.running");
-        final Meter completed = registry.meter("xs.completed");
-        final Timer duration = registry.timer("xs.duration");
-        final Timer idle = registry.timer("xs.idle");
+    public void reportsTasksInformationForRunnable() throws Exception {
 
         assertThat(submitted.getCount()).isEqualTo(0);
         assertThat(running.getCount()).isEqualTo(0);
@@ -34,13 +48,46 @@ public class InstrumentedExecutorServiceTest {
         assertThat(duration.getCount()).isEqualTo(0);
         assertThat(idle.getCount()).isEqualTo(0);
 
-        Future<?> theFuture = instrumentedExecutorService.submit(() -> {
+        Runnable runnable = () -> {
             assertThat(submitted.getCount()).isEqualTo(1);
             assertThat(running.getCount()).isEqualTo(1);
             assertThat(completed.getCount()).isEqualTo(0);
             assertThat(duration.getCount()).isEqualTo(0);
             assertThat(idle.getCount()).isEqualTo(1);
-        });
+        };
+
+        Future<?> theFuture = instrumentedExecutorService.submit(runnable);
+
+        theFuture.get();
+
+        assertThat(submitted.getCount()).isEqualTo(1);
+        assertThat(running.getCount()).isEqualTo(0);
+        assertThat(completed.getCount()).isEqualTo(1);
+        assertThat(duration.getCount()).isEqualTo(1);
+        assertThat(duration.getSnapshot().size()).isEqualTo(1);
+        assertThat(idle.getCount()).isEqualTo(1);
+        assertThat(idle.getSnapshot().size()).isEqualTo(1);
+    }
+
+    @Test
+    public void reportsTasksInformationForCallable() throws Exception {
+
+        assertThat(submitted.getCount()).isEqualTo(0);
+        assertThat(running.getCount()).isEqualTo(0);
+        assertThat(completed.getCount()).isEqualTo(0);
+        assertThat(duration.getCount()).isEqualTo(0);
+        assertThat(idle.getCount()).isEqualTo(0);
+
+        Callable<Void> callable = () -> {
+            assertThat(submitted.getCount()).isEqualTo(1);
+            assertThat(running.getCount()).isEqualTo(1);
+            assertThat(completed.getCount()).isEqualTo(0);
+            assertThat(duration.getCount()).isEqualTo(0);
+            assertThat(idle.getCount()).isEqualTo(1);
+            return null;
+        };
+
+        Future<?> theFuture = instrumentedExecutorService.submit(callable);
 
         theFuture.get();
 
