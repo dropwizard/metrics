@@ -53,7 +53,7 @@ public class CpuUsageGaugeSetTest {
     public void hasAGaugeForSystemLoadAverage() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("system-load-average");
 
-    	assertThat(gauge.getValue())
+        assertThat(gauge.getValue())
                 .isEqualTo(30d);
     }
     
