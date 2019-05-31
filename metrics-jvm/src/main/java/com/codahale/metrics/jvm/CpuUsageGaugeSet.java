@@ -10,18 +10,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.codahale.metrics.MetricRegistry.name;
-
 /**
  * A set of gauges for JVM memory CPU usage
  */
 public class CpuUsageGaugeSet implements MetricSet {
-
     private final OperatingSystemMXBean operatingSystemMXBean;
 
-    public CpuUsageGaugeSet()
-    {
-    	this(ManagementFactory.getOperatingSystemMXBean());
+    public CpuUsageGaugeSet() {
+        this(ManagementFactory.getOperatingSystemMXBean());
     }
     
     public CpuUsageGaugeSet(OperatingSystemMXBean operatingSystemMXBean) {

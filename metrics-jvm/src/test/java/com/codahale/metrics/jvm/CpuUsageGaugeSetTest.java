@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.sun.management.OperatingSystemMXBean;
-import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -28,7 +27,7 @@ public class CpuUsageGaugeSetTest {
     public void hasASetOfGauges() {
         assertThat(gauges.getMetrics().keySet())
                 .containsOnly(
-                		"process-cpu-load-percentage",
+                        "process-cpu-load-percentage",
                         "system-cpu-load-percentage",
                         "system-load-average",
                         "process-cpu-time");
@@ -47,7 +46,7 @@ public class CpuUsageGaugeSetTest {
     	final Gauge gauge = (Gauge) gauges.getMetrics().get("system-cpu-load-percentage");
     	
     	assertThat(gauge.getValue())
-    	.isEqualTo(20d);
+    	        .isEqualTo(20d);
     }
     
     @Test
@@ -55,7 +54,7 @@ public class CpuUsageGaugeSetTest {
     	final Gauge gauge = (Gauge) gauges.getMetrics().get("system-load-average");
     	
     	assertThat(gauge.getValue())
-    	.isEqualTo(30d);
+    	        .isEqualTo(30d);
     }
     
     @Test
@@ -63,6 +62,6 @@ public class CpuUsageGaugeSetTest {
     	final Gauge gauge = (Gauge) gauges.getMetrics().get("process-cpu-time");
     	
     	assertThat(gauge.getValue())
-    	.isEqualTo(40L);
+    	        .isEqualTo(40L);
     }
 }
