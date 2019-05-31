@@ -43,25 +43,25 @@ public class CpuUsageGaugeSetTest {
     
     @Test
     public void hasAGaugeForSystemCpuLoadPercentage() {
-    	final Gauge gauge = (Gauge) gauges.getMetrics().get("system-cpu-load-percentage");
-    	
-    	assertThat(gauge.getValue())
-    	        .isEqualTo(20d);
+        final Gauge gauge = (Gauge) gauges.getMetrics().get("system-cpu-load-percentage");
+
+        assertThat(gauge.getValue())
+                .isEqualTo(20d);
     }
     
     @Test
     public void hasAGaugeForSystemLoadAverage() {
-    	final Gauge gauge = (Gauge) gauges.getMetrics().get("system-load-average");
-    	
+        final Gauge gauge = (Gauge) gauges.getMetrics().get("system-load-average");
+
     	assertThat(gauge.getValue())
-    	        .isEqualTo(30d);
+                .isEqualTo(30d);
     }
     
     @Test
     public void hasAGaugeForProcessCpuTime() {
-    	final Gauge gauge = (Gauge) gauges.getMetrics().get("process-cpu-time");
-    	
-    	assertThat(gauge.getValue())
-    	        .isEqualTo(40L);
+        final Gauge gauge = (Gauge) gauges.getMetrics().get("process-cpu-time");
+
+        assertThat(gauge.getValue())
+                .isEqualTo(40L);
     }
 }
