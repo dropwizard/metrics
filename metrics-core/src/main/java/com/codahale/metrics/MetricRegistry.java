@@ -89,15 +89,17 @@ public class MetricRegistry implements MetricSet {
     public <T extends Metric> T register(String name, T metric) throws IllegalArgumentException {
         if (metric instanceof MetricSet) {
             registerAll(name, (MetricSet) metric);
+            return metric;
         } else {
-            final Metric existing = metrics.putIfAbsent(name, metric);
-            if (existing == null) {
-                onMetricAdded(name, metric);
-            } else {
-                throw new IllegalArgumentException("A metric named " + name + " already exists");
+            Metric added = onMetricAdded(name, metric);
+            if (added == null) {
+                added = metric;
             }
+            metrics.merge(name, added, (v1, v2) -> {
+                throw new IllegalArgumentException("A metric named " + name + " already exists");
+            });
+            return (T) added;
         }
-        return metric;
     }
 
     /**
@@ -138,7 +140,7 @@ public class MetricRegistry implements MetricSet {
 
             @Override
             public boolean isInstance(Metric metric) {
-                return Counter.class.isInstance(metric);
+                return metric instanceof Counter;
             }
         });
     }
@@ -171,7 +173,7 @@ public class MetricRegistry implements MetricSet {
 
             @Override
             public boolean isInstance(Metric metric) {
-                return Histogram.class.isInstance(metric);
+                return metric instanceof Histogram;
             }
         });
     }
@@ -204,7 +206,7 @@ public class MetricRegistry implements MetricSet {
 
             @Override
             public boolean isInstance(Metric metric) {
-                return Meter.class.isInstance(metric);
+                return metric instanceof Meter;
             }
         });
     }
@@ -237,7 +239,7 @@ public class MetricRegistry implements MetricSet {
 
             @Override
             public boolean isInstance(Metric metric) {
-                return Timer.class.isInstance(metric);
+                return metric instanceof Timer;
             }
         });
     }
@@ -260,7 +262,7 @@ public class MetricRegistry implements MetricSet {
 
             @Override
             public boolean isInstance(Metric metric) {
-                return Gauge.class.isInstance(metric);
+                return metric instanceof Gauge;
             }
         });
     }
@@ -457,26 +459,33 @@ public class MetricRegistry implements MetricSet {
         return Collections.unmodifiableSortedMap(timers);
     }
 
-    private void onMetricAdded(String name, Metric metric) {
+    private Metric onMetricAdded(String name, Metric metric) {
+        Metric added = metric;
         for (MetricRegistryListener listener : listeners) {
-            notifyListenerOfAddedMetric(listener, metric, name);
+            Metric m = notifyListenerOfAddedMetric(listener, added, name);
+            if (m != null) {
+                added = m;
+            }
         }
+        return added;
     }
 
-    private void notifyListenerOfAddedMetric(MetricRegistryListener listener, Metric metric, String name) {
+    private Metric notifyListenerOfAddedMetric(MetricRegistryListener listener, Metric metric, String name) {
+        Metric added;
         if (metric instanceof Gauge) {
-            listener.onGaugeAdded(name, (Gauge<?>) metric);
+            added = listener.onGaugeAdded(name, (Gauge<?>) metric);
         } else if (metric instanceof Counter) {
-            listener.onCounterAdded(name, (Counter) metric);
+            added = listener.onCounterAdded(name, (Counter) metric);
         } else if (metric instanceof Histogram) {
-            listener.onHistogramAdded(name, (Histogram) metric);
+            added = listener.onHistogramAdded(name, (Histogram) metric);
         } else if (metric instanceof Meter) {
-            listener.onMeterAdded(name, (Meter) metric);
+            added = listener.onMeterAdded(name, (Meter) metric);
         } else if (metric instanceof Timer) {
-            listener.onTimerAdded(name, (Timer) metric);
+            added = listener.onTimerAdded(name, (Timer) metric);
         } else {
             throw new IllegalArgumentException("Unknown metric type: " + metric.getClass());
         }
+        return added;
     }
 
     private void onMetricRemoved(String name, Metric metric) {
@@ -504,7 +513,7 @@ public class MetricRegistry implements MetricSet {
     /**
      * Given a metric set, registers them with the given prefix prepended to their names.
      *
-     * @param prefix a name prefix
+     * @param prefix  a name prefix
      * @param metrics a set of metrics
      * @throws IllegalArgumentException if any of the names are already registered
      */
@@ -540,7 +549,7 @@ public class MetricRegistry implements MetricSet {
 
             @Override
             public boolean isInstance(Metric metric) {
-                return Counter.class.isInstance(metric);
+                return metric instanceof Counter;
             }
         };
 
@@ -552,7 +561,7 @@ public class MetricRegistry implements MetricSet {
 
             @Override
             public boolean isInstance(Metric metric) {
-                return Histogram.class.isInstance(metric);
+                return metric instanceof Histogram;
             }
         };
 
@@ -564,7 +573,7 @@ public class MetricRegistry implements MetricSet {
 
             @Override
             public boolean isInstance(Metric metric) {
-                return Meter.class.isInstance(metric);
+                return metric instanceof Meter;
             }
         };
 
@@ -576,7 +585,7 @@ public class MetricRegistry implements MetricSet {
 
             @Override
             public boolean isInstance(Metric metric) {
-                return Timer.class.isInstance(metric);
+                return metric instanceof Timer;
             }
         };
 

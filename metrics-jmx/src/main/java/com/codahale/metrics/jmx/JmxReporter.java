@@ -511,7 +511,7 @@ public class JmxReporter implements Reporter, Closeable {
             this.objectNameFactory = objectNameFactory;
         }
 
-        private void registerMBean(Object mBean, ObjectName objectName) throws InstanceAlreadyExistsException, JMException {
+        private void registerMBean(Object mBean, ObjectName objectName) throws JMException {
             ObjectInstance objectInstance = mBeanServer.registerMBean(mBean, objectName);
             if (objectInstance != null) {
                 // the websphere mbeanserver rewrites the objectname to include
@@ -533,7 +533,7 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onGaugeAdded(String name, Gauge<?> gauge) {
+        public Gauge<?> onGaugeAdded(String name, Gauge<?> gauge) {
             try {
                 if (filter.matches(name, gauge)) {
                     final ObjectName objectName = createName("gauges", name);
@@ -544,6 +544,7 @@ public class JmxReporter implements Reporter, Closeable {
             } catch (JMException e) {
                 LOGGER.warn("Unable to register gauge", e);
             }
+            return null;
         }
 
         @Override
@@ -559,7 +560,7 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onCounterAdded(String name, Counter counter) {
+        public Counter onCounterAdded(String name, Counter counter) {
             try {
                 if (filter.matches(name, counter)) {
                     final ObjectName objectName = createName("counters", name);
@@ -570,6 +571,7 @@ public class JmxReporter implements Reporter, Closeable {
             } catch (JMException e) {
                 LOGGER.warn("Unable to register counter", e);
             }
+            return null;
         }
 
         @Override
@@ -585,7 +587,7 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onHistogramAdded(String name, Histogram histogram) {
+        public Histogram onHistogramAdded(String name, Histogram histogram) {
             try {
                 if (filter.matches(name, histogram)) {
                     final ObjectName objectName = createName("histograms", name);
@@ -596,6 +598,7 @@ public class JmxReporter implements Reporter, Closeable {
             } catch (JMException e) {
                 LOGGER.warn("Unable to register histogram", e);
             }
+            return null;
         }
 
         @Override
@@ -611,7 +614,7 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onMeterAdded(String name, Meter meter) {
+        public Meter onMeterAdded(String name, Meter meter) {
             try {
                 if (filter.matches(name, meter)) {
                     final ObjectName objectName = createName("meters", name);
@@ -622,6 +625,7 @@ public class JmxReporter implements Reporter, Closeable {
             } catch (JMException e) {
                 LOGGER.warn("Unable to register meter", e);
             }
+            return null;
         }
 
         @Override
@@ -637,7 +641,7 @@ public class JmxReporter implements Reporter, Closeable {
         }
 
         @Override
-        public void onTimerAdded(String name, Timer timer) {
+        public Timer onTimerAdded(String name, Timer timer) {
             try {
                 if (filter.matches(name, timer)) {
                     final ObjectName objectName = createName("timers", name);
@@ -648,6 +652,7 @@ public class JmxReporter implements Reporter, Closeable {
             } catch (JMException e) {
                 LOGGER.warn("Unable to register timer", e);
             }
+            return null;
         }
 
         @Override

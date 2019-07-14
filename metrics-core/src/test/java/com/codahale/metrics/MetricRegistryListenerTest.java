@@ -2,51 +2,46 @@ package com.codahale.metrics;
 
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 public class MetricRegistryListenerTest {
-    private final Counter counter = mock(Counter.class);
-    private final Histogram histogram = mock(Histogram.class);
-    private final Meter meter = mock(Meter.class);
-    private final Timer timer = mock(Timer.class);
-    private final MetricRegistryListener listener = new MetricRegistryListener.Base() {
-
+    private final MetricRegistryListener listener = new MetricRegistryListener() {
     };
 
     @Test
-    public void noOpsOnGaugeAdded() {
-        listener.onGaugeAdded("blah", () -> {
-            throw new RuntimeException("Should not be called");
-        });
+    public void returnsSameGauge() {
+        Gauge<?> gauge = mock(Gauge.class);
+        assertThat(listener.onGaugeAdded("blah", gauge))
+                .isEqualTo(gauge);
     }
 
     @Test
-    public void noOpsOnCounterAdded() {
-        listener.onCounterAdded("blah", counter);
-
-        verifyZeroInteractions(counter);
+    public void returnsSameCounter() {
+        Counter counter = mock(Counter.class);
+        assertThat(listener.onCounterAdded("blah", counter))
+                .isEqualTo(counter);
     }
 
     @Test
-    public void noOpsOnHistogramAdded() {
-        listener.onHistogramAdded("blah", histogram);
-
-        verifyZeroInteractions(histogram);
+    public void returnsSameHistogram() {
+        Histogram histogram = mock(Histogram.class);
+        assertThat(listener.onHistogramAdded("blah", histogram))
+                .isEqualTo(histogram);
     }
 
     @Test
     public void noOpsOnMeterAdded() {
-        listener.onMeterAdded("blah", meter);
-
-        verifyZeroInteractions(meter);
+        Meter meter = mock(Meter.class);
+        assertThat(listener.onMeterAdded("blah", meter))
+                .isEqualTo(meter);
     }
 
     @Test
     public void noOpsOnTimerAdded() {
-        listener.onTimerAdded("blah", timer);
-
-        verifyZeroInteractions(timer);
+        Timer timer = mock(Timer.class);
+        assertThat(listener.onTimerAdded("blah", timer))
+                .isEqualTo(timer);
     }
 
     @Test

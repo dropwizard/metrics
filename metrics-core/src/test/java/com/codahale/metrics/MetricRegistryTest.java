@@ -8,10 +8,12 @@ import java.util.Map;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class MetricRegistryTest {
     private final MetricRegistryListener listener = mock(MetricRegistryListener.class);
@@ -426,5 +428,30 @@ public class MetricRegistryTest {
 
         verify(listener).onTimerRemoved("timer-1");
         verify(listener).onHistogramRemoved("histogram-1");
+    }
+
+    @Test
+    public void addingCounterTwiceThrowsException() {
+        assertThat(registry.register("thing", counter))
+                .isEqualTo(counter);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> registry.register("thing", counter));
+    }
+
+    @Test
+    public void registersOtherCounter() {
+        Counter other = mock(Counter.class);
+        when(listener.onCounterAdded("thing", counter))
+                .thenReturn(other);
+        assertThat(registry.register("thing", counter) == other)
+                .isTrue();
+    }
+
+    @Test
+    public void registersOriginalCounter() {
+        when(listener.onCounterAdded("thing", counter))
+                .thenReturn(null);
+        assertThat(registry.register("thing", counter))
+                .isEqualTo(counter);
     }
 }
