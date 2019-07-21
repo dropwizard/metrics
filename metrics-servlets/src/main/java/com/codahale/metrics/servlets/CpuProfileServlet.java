@@ -2,6 +2,7 @@ package com.codahale.metrics.servlets;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.Duration;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.servlet.ServletException;
@@ -9,7 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.joda.time.Duration;
 import com.papertrail.profiler.CpuProfile;
 
 /**
@@ -62,7 +62,7 @@ public class CpuProfileServlet extends HttpServlet {
     protected void doProfile(OutputStream out, int duration, int frequency, Thread.State state) throws IOException {
         if (lock.tryLock()) {
             try {
-                CpuProfile profile = CpuProfile.record(Duration.standardSeconds(duration),
+                CpuProfile profile = CpuProfile.record(Duration.ofSeconds(duration),
                         frequency, state);
                 if (profile == null) {
                     throw new RuntimeException("could not create CpuProfile");
