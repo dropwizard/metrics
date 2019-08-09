@@ -148,10 +148,10 @@ public class JmxReporterTest {
 
     @Test
     public void registersMBeansForGauges() throws Exception {
-        final AttributeList attributes = getAttributes("gauges", "gauge", "Value");
+        final AttributeList attributes = getAttributes("gauges", "gauge", "Value", "Number");
 
         assertThat(values(attributes))
-                .contains(entry("Value", 1));
+                .contains(entry("Value", 1), entry("Number", 1));
     }
 
     @Test
@@ -258,7 +258,7 @@ public class JmxReporterTest {
         reporter.stop();
 
         try {
-            getAttributes("gauges", "gauge", "Value");
+            getAttributes("gauges", "gauge", "Value", "Number");
             failBecauseExceptionWasNotThrown(InstanceNotFoundException.class);
         } catch (InstanceNotFoundException e) {
 
