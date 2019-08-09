@@ -184,6 +184,7 @@ public class JmxReporter implements Reporter, Closeable {
     @SuppressWarnings("UnusedDeclaration")
     public interface JmxGaugeMBean extends MetricMBean {
         Object getValue();
+        Number getNumber();
     }
 
     private static class JmxGauge extends AbstractBean implements JmxGaugeMBean {
@@ -197,6 +198,12 @@ public class JmxReporter implements Reporter, Closeable {
         @Override
         public Object getValue() {
             return metric.getValue();
+        }
+
+        @Override
+        public Number getNumber() {
+            Object value = metric.getValue();
+            return value instanceof Number ? (Number) value : 0;
         }
     }
 
