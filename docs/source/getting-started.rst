@@ -264,13 +264,10 @@ duration.
     private final Timer responses = metrics.timer(name(RequestHandler.class, "responses"));
 
     public String handleRequest(Request request, Response response) {
-        final Timer.Context context = responses.time();
-        try {
+        try(final Timer.Context context = responses.time()) {
             // etc;
             return "OK";
-        } finally {
-            context.stop();
-        }
+        } // catch and final logic goes here
     }
 
 This timer will measure the amount of time it takes to process each request in nanoseconds and

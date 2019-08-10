@@ -1,6 +1,8 @@
 package io.dropwizard.metrics5.health;
 
 import io.dropwizard.metrics5.health.annotation.Async;
+import io.dropwizard.metrics5.Clock;
+
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -8,13 +10,15 @@ import java.util.concurrent.ScheduledFuture;
 /**
  * A health check decorator to manage asynchronous executions.
  */
-class AsyncHealthCheckDecorator implements HealthCheck, Runnable {
+public class AsyncHealthCheckDecorator implements HealthCheck, Runnable {
     private static final String NO_RESULT_YET_MESSAGE = "Waiting for first asynchronous check result.";
     private final HealthCheck healthCheck;
     private final ScheduledFuture<?> future;
+    private final long healthyTtl;
+    private final Clock clock;
     private volatile Result result;
 
-    AsyncHealthCheckDecorator(HealthCheck healthCheck, ScheduledExecutorService executorService) {
+    AsyncHealthCheckDecorator(HealthCheck healthCheck, ScheduledExecutorService executorService, Clock clock) {
         check(healthCheck != null, "healthCheck cannot be null");
         check(executorService != null, "executorService cannot be null");
         Async async = healthCheck.getClass().getAnnotation(Async.class);
@@ -22,7 +26,10 @@ class AsyncHealthCheckDecorator implements HealthCheck, Runnable {
         check(async.period() > 0, "period cannot be less than or equal to zero");
         check(async.initialDelay() >= 0, "initialDelay cannot be less than zero");
 
+
+        this.clock = clock;
         this.healthCheck = healthCheck;
+        this.healthyTtl = async.unit().toMillis(async.healthyTtl() <= 0 ? 2 * async.period() : async.healthyTtl());
         result = Async.InitialState.HEALTHY.equals(async.initialState()) ? Result.healthy(NO_RESULT_YET_MESSAGE) :
                 Result.unhealthy(NO_RESULT_YET_MESSAGE);
         if (Async.ScheduleType.FIXED_RATE.equals(async.scheduleType())) {
@@ -33,6 +40,10 @@ class AsyncHealthCheckDecorator implements HealthCheck, Runnable {
 
     }
 
+    AsyncHealthCheckDecorator(HealthCheck healthCheck, ScheduledExecutorService executorService) {
+        this(healthCheck, executorService, Clock.defaultClock());
+    }
+
     @Override
     public void run() {
         result = healthCheck.execute();
@@ -40,6 +51,17 @@ class AsyncHealthCheckDecorator implements HealthCheck, Runnable {
 
     @Override
     public Result check() throws Exception {
+        long expiration = clock.getTime() - result.getTime() - healthyTtl;
+        if (expiration > 0) {
+            return Result.builder()
+                    .unhealthy()
+                    .usingClock(clock)
+                    .withMessage("Result was %s but it expired %d milliseconds ago",
+                            result.isHealthy() ? "healthy" : "unhealthy",
+                            expiration)
+                    .build();
+        }
+
         return result;
     }
 
@@ -47,7 +69,7 @@ class AsyncHealthCheckDecorator implements HealthCheck, Runnable {
         return future.cancel(true);
     }
 
-    HealthCheck getHealthCheck() {
+    public HealthCheck getHealthCheck() {
         return healthCheck;
     }
 
@@ -56,5 +78,4 @@ class AsyncHealthCheckDecorator implements HealthCheck, Runnable {
             throw new IllegalArgumentException(message);
         }
     }
-
 }

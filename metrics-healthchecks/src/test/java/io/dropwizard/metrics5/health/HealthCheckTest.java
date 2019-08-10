@@ -1,14 +1,22 @@
 package io.dropwizard.metrics5.health;
 
+import io.dropwizard.metrics5.Clock;
+import org.junit.Test;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
-
 public class HealthCheckTest {
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
     private static class ExampleHealthCheck implements HealthCheck {
         private final HealthCheck underlying;
 
@@ -113,6 +121,20 @@ public class HealthCheckTest {
     }
 
     @Test
+    public void canHaveHealthyBuilderWithFormattedMessage() {
+        final HealthCheck.Result result = HealthCheck.Result.builder()
+                .healthy()
+                .withMessage("There are %d %s in the %s", 42, "foos", "bar")
+                .build();
+
+        assertThat(result.isHealthy())
+                .isTrue();
+
+        assertThat(result.getMessage())
+                .isEqualTo("There are 42 foos in the bar");
+    }
+
+    @Test
     public void canHaveHealthyBuilderWithDetail() {
         final HealthCheck.Result result = HealthCheck.Result.builder()
                 .healthy()
@@ -208,14 +230,50 @@ public class HealthCheckTest {
     }
 
     @Test
+    public void canHaveUserSuppliedClockForTimestamp() {
+        ZonedDateTime dateTime = ZonedDateTime.now().minusMinutes(10);
+        Clock clock = clockWithFixedTime(dateTime);
+
+        HealthCheck.Result result = HealthCheck.Result.builder()
+                .healthy()
+                .usingClock(clock)
+                .build();
+
+        assertThat(result.isHealthy()).isTrue();
+
+        assertThat(result.getTime()).isEqualTo(clock.getTime());
+
+        assertThat(result.getTimestamp())
+                .isEqualTo(DATE_TIME_FORMATTER.format(dateTime));
+    }
+
+    @Test
     public void toStringWorksEvenForNullAttributes() {
+        ZonedDateTime dateTime = ZonedDateTime.now().minusMinutes(25);
+        Clock clock = clockWithFixedTime(dateTime);
+
         final HealthCheck.Result resultWithNullDetailValue = HealthCheck.Result.builder()
                 .unhealthy()
                 .withDetail("aNullDetail", null)
+                .usingClock(clock)
                 .build();
         assertThat(resultWithNullDetailValue.toString())
                 .contains(
-                        "Result{isHealthy=false, duration=0, timestamp=", // Skip the timestamp part of the String.
+                        "Result{isHealthy=false, duration=0, timestamp=" + DATE_TIME_FORMATTER.format(dateTime),
                         ", aNullDetail=null}");
+    }
+
+    private static Clock clockWithFixedTime(ZonedDateTime dateTime) {
+        return new Clock() {
+            @Override
+            public long getTick() {
+                return 0;
+            }
+
+            @Override
+            public long getTime() {
+                return dateTime.toInstant().toEpochMilli();
+            }
+        };
     }
 }

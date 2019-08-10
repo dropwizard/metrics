@@ -5,7 +5,7 @@ import org.openjdk.jcstress.annotations.Expect;
 import org.openjdk.jcstress.annotations.JCStressTest;
 import org.openjdk.jcstress.annotations.Outcome;
 import org.openjdk.jcstress.annotations.State;
-import org.openjdk.jcstress.infra.results.StringResult1;
+import org.openjdk.jcstress.infra.results.L_Result;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +36,7 @@ public class SlidingTimeWindowArrayReservoirWriteReadTest {
     }
 
     @Actor
-    public void actor3(StringResult1 r) {
+    public void actor3(L_Result r) {
         Snapshot snapshot = reservoir.getSnapshot();
         String stringValues = Arrays.toString(snapshot.getValues());
         r.r1 = stringValues;

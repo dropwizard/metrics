@@ -1,6 +1,5 @@
 package io.dropwizard.metrics5;
 
-import io.dropwizard.metrics5.WeightedSnapshot.WeightedSample;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -11,6 +10,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static java.lang.Math.exp;
 import static java.lang.Math.min;
+
+import io.dropwizard.metrics5.WeightedSnapshot.WeightedSample;
 
 /**
  * An exponentially-decaying random reservoir of {@code long}s. Uses Cormode et al's
@@ -99,7 +100,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
             final double priority = itemWeight / ThreadLocalRandom.current().nextDouble();
 
             final long newCount = count.incrementAndGet();
-            if (newCount <= size) {
+            if (newCount <= size || values.isEmpty()) {
                 values.put(priority, sample);
             } else {
                 Double first = values.firstKey();

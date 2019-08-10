@@ -48,7 +48,7 @@ public @interface Async {
     long initialDelay() default 0;
 
     /**
-     * Time unit of initial delay and period.
+     * Time unit of initial delay, period and healthyTtl.
      *
      * @return time unit
      */
@@ -60,5 +60,16 @@ public @interface Async {
      * @return initial health state
      */
     InitialState initialState() default InitialState.HEALTHY;
+
+    /**
+     * How long a healthy result is considered valid before being ignored.
+     *
+     * Handles cases where the asynchronous healthcheck did not run (for example thread starvation).
+     *
+     * Defaults to 2 * period
+     *
+     * @return healthy result time to live
+     */
+    long healthyTtl() default -1;
 
 }

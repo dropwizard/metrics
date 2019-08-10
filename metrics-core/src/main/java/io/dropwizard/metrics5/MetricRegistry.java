@@ -88,6 +88,7 @@ public class MetricRegistry implements MetricSet {
      */
     @SuppressWarnings("unchecked")
     public <T extends Metric> T register(MetricName name, T metric) throws IllegalArgumentException {
+
         if (metric instanceof MetricSet) {
             registerAll(name, (MetricSet) metric);
         } else {

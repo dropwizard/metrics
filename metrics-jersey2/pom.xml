@@ -18,6 +18,8 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.jersey2</javaModuleName>
+        <jersey.version>2.29</jersey.version>
+
     </properties>
 
     <dependencyManagement>
@@ -26,6 +28,13 @@
                 <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-bom</artifactId>
                 <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey</groupId>
+                <artifactId>jersey-bom</artifactId>
+                <version>${jersey.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -44,6 +53,11 @@
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.test-framework.providers</groupId>

@@ -121,7 +121,7 @@ public class GraphiteRabbitMQTest {
             unavailableGraphite.connect();
             failBecauseExceptionWasNotThrown(UnknownHostException.class);
         } catch (Exception e) {
-            assertThat(e.getMessage()).startsWith("some-unknown-host");
+            assertThat(e.getMessage()).contains("some-unknown-host");
         }
     }
 }

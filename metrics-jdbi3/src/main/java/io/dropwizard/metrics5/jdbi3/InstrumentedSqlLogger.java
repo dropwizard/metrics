@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A {@link SqlLogger} implementation for JDBI which uses the SQL objects' class names and
- * method names for millisecond-precision timers.
+ * method names for nanosecond-precision timers.
  */
 public class InstrumentedSqlLogger implements SqlLogger {
     private final MetricRegistry registry;

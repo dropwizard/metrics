@@ -2,6 +2,8 @@ package io.dropwizard.metrics5.health;
 
 import io.dropwizard.metrics5.Clock;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -103,24 +105,24 @@ public interface HealthCheck {
         private final String message;
         private final Throwable error;
         private final Map<String, Object> details;
-        private final String timestamp;
+        private final long time;
 
         private long duration; // Calculated field
 
         private Result(boolean isHealthy, String message, Throwable error) {
-            this(isHealthy, message, error, null);
+            this(isHealthy, message, error, null, Clock.defaultClock());
         }
 
         private Result(ResultBuilder builder) {
-            this(builder.healthy, builder.message, builder.error, builder.details);
+            this(builder.healthy, builder.message, builder.error, builder.details, builder.clock);
         }
 
-        private Result(boolean isHealthy, String message, Throwable error, Map<String, Object> details) {
+        private Result(boolean isHealthy, String message, Throwable error, Map<String, Object> details, Clock clock) {
             this.healthy = isHealthy;
             this.message = message;
             this.error = error;
             this.details = details == null ? null : Collections.unmodifiableMap(details);
-            timestamp = DATE_FORMAT_PATTERN.format(ZonedDateTime.now());
+            this.time = clock.getTime();
         }
 
         /**
@@ -153,12 +155,23 @@ public interface HealthCheck {
         }
 
         /**
-         * Returns the timestamp when the result was created.
+         * Returns the timestamp when the result was created as a formatted String.
          *
          * @return a formatted timestamp
          */
         public String getTimestamp() {
-            return timestamp;
+            Instant currentInstant = Instant.ofEpochMilli(time);
+            ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(currentInstant, ZoneId.systemDefault());
+            return DATE_FORMAT_PATTERN.format(zonedDateTime);
+        }
+
+        /**
+         * Returns the time when the result was created, in milliseconds since Epoch
+         *
+         * @return the time when the result was created
+         */
+        public long getTime() {
+            return time;
         }
 
         /**
@@ -195,7 +208,7 @@ public interface HealthCheck {
             return healthy == result.healthy &&
                     !(error != null ? !error.equals(result.error) : result.error != null) &&
                     !(message != null ? !message.equals(result.message) : result.message != null) &&
-                    !(timestamp != null ? !timestamp.equals(result.timestamp) : result.timestamp != null);
+                    time == result.time;
         }
 
         @Override
@@ -203,7 +216,7 @@ public interface HealthCheck {
             int result = healthy ? 1 : 0;
             result = PRIME * result + (message != null ? message.hashCode() : 0);
             result = PRIME * result + (error != null ? error.hashCode() : 0);
-            result = PRIME * result + (timestamp != null ? timestamp.hashCode() : 0);
+            result = PRIME * result + (Long.hashCode(time));
             return result;
         }
 
@@ -218,7 +231,7 @@ public interface HealthCheck {
                 builder.append(", error=").append(error);
             }
             builder.append(", duration=").append(duration);
-            builder.append(", timestamp=").append(timestamp);
+            builder.append(", timestamp=").append(getTimestamp());
             if (details != null) {
                 for (Map.Entry<String, Object> e : details.entrySet()) {
                     builder.append(", ");
@@ -241,10 +254,12 @@ public interface HealthCheck {
         private String message;
         private Throwable error;
         private Map<String, Object> details;
+        private Clock clock;
 
         protected ResultBuilder() {
             this.healthy = true;
             this.details = new LinkedHashMap<>();
+            this.clock = Clock.defaultClock();
         }
 
         /**
@@ -315,6 +330,18 @@ public interface HealthCheck {
                 this.details = new LinkedHashMap<>();
             }
             this.details.put(key, data);
+            return this;
+        }
+
+        /**
+         * Configure this {@link ResultBuilder} to use the given {@code clock} instead of the default clock.
+         * If not specified, the default clock is {@link Clock#defaultClock()}.
+         *
+         * @param clock the {@link Clock} to use when generating the health check timestamp (useful for unit testing)
+         * @return this builder configured to use the given {@code clock}
+         */
+        public ResultBuilder usingClock(Clock clock) {
+            this.clock = clock;
             return this;
         }
 

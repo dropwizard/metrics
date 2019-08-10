@@ -39,7 +39,9 @@ public class MetricsServletTest extends AbstractServletTest {
 
     @Before
     public void setUp() {
-        when(clock.getTick()).thenReturn(100L, 200L, 300L, 400L);
+        // provide ticks for the setup (calls getTick 6 times). The serialization in the tests themselves
+        // will call getTick again several times and always get the same value (the last specified here)
+        when(clock.getTick()).thenReturn(100L, 100L, 200L, 300L, 300L, 400L);
 
         registry.register("g1", (Gauge<Long>) () -> 100L);
         registry.counter("c").inc();

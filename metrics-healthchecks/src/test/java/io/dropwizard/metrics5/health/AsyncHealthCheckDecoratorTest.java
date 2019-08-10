@@ -1,5 +1,6 @@
 package io.dropwizard.metrics5.health;
 
+import io.dropwizard.metrics5.Clock;
 import io.dropwizard.metrics5.health.annotation.Async;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -12,15 +13,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link AsyncHealthCheckDecorator}.
  */
 public class AsyncHealthCheckDecoratorTest {
+
+    private static final long CURRENT_TIME = 1551002401000L;
+    
+    private static final Clock FIXED_CLOCK = clockWithFixedTime(CURRENT_TIME);
+
+    private static final HealthCheck.Result EXPECTED_EXPIRED_RESULT = HealthCheck.Result
+            .builder()
+            .usingClock(FIXED_CLOCK)
+            .unhealthy()
+            .withMessage("Result was healthy but it expired 1 milliseconds ago")
+            .build();
+    
     private final HealthCheck mockHealthCheck = mock(HealthCheck.class);
     private final ScheduledExecutorService mockExecutorService = mock(ScheduledExecutorService.class);
 
@@ -144,6 +154,54 @@ public class AsyncHealthCheckDecoratorTest {
         assertThat(result.getError()).isEqualTo(exception);
     }
 
+    @Test
+    public void returnUnhealthyIfPreviousResultIsExpiredBasedOnTtl() throws Exception {
+        HealthCheck healthCheck = new HealthyAsyncHealthCheckWithExpiredExplicitTtlInMilliseconds();
+        AsyncHealthCheckDecorator asyncDecorator = new AsyncHealthCheckDecorator(healthCheck, mockExecutorService, FIXED_CLOCK);
+        
+        ArgumentCaptor<Runnable> runnableCaptor = forClass(Runnable.class);
+        verify(mockExecutorService, times(1)).scheduleAtFixedRate(runnableCaptor.capture(),
+                eq(0L), eq(1000L), eq(TimeUnit.MILLISECONDS));
+        Runnable capturedRunnable = runnableCaptor.getValue();
+        capturedRunnable.run();
+
+        HealthCheck.Result result = asyncDecorator.check();
+
+        assertThat(result).isEqualTo(EXPECTED_EXPIRED_RESULT);
+    }
+
+    @Test
+    public void returnUnhealthyIfPreviousResultIsExpiredBasedOnPeriod() throws Exception {
+        HealthCheck healthCheck = new HealthyAsyncHealthCheckWithExpiredTtlInMillisecondsBasedOnPeriod();
+        AsyncHealthCheckDecorator asyncDecorator = new AsyncHealthCheckDecorator(healthCheck, mockExecutorService, FIXED_CLOCK);
+
+        ArgumentCaptor<Runnable> runnableCaptor = forClass(Runnable.class);
+        verify(mockExecutorService, times(1)).scheduleAtFixedRate(runnableCaptor.capture(),
+                eq(0L), eq(1000L), eq(TimeUnit.MILLISECONDS));
+        Runnable capturedRunnable = runnableCaptor.getValue();
+        capturedRunnable.run();
+
+        HealthCheck.Result result = asyncDecorator.check();
+
+        assertThat(result).isEqualTo(EXPECTED_EXPIRED_RESULT);
+    }
+
+    @Test
+    public void convertTtlToMillisecondsWhenCheckingExpiration() throws Exception {
+        HealthCheck healthCheck = new HealthyAsyncHealthCheckWithExpiredExplicitTtlInSeconds();
+        AsyncHealthCheckDecorator asyncDecorator = new AsyncHealthCheckDecorator(healthCheck, mockExecutorService, FIXED_CLOCK);
+
+        ArgumentCaptor<Runnable> runnableCaptor = forClass(Runnable.class);
+        verify(mockExecutorService, times(1)).scheduleAtFixedRate(runnableCaptor.capture(),
+                eq(0L), eq(1L), eq(TimeUnit.SECONDS));
+        Runnable capturedRunnable = runnableCaptor.getValue();
+        capturedRunnable.run();
+
+        HealthCheck.Result result = asyncDecorator.check();
+
+        assertThat(result).isEqualTo(EXPECTED_EXPIRED_RESULT);
+    }
+
     @Async(period = -1)
     private static class NegativePeriodAsyncHealthCheck implements HealthCheck {
 
@@ -223,6 +281,47 @@ public class AsyncHealthCheckDecoratorTest {
             }
             return result;
         }
+    }
+
+    @Async(period = 1000, initialState = Async.InitialState.UNHEALTHY, healthyTtl = 3000, unit = TimeUnit.MILLISECONDS)
+    private static class HealthyAsyncHealthCheckWithExpiredExplicitTtlInMilliseconds implements HealthCheck {
+
+        @Override
+        public Result check() {
+            return Result.builder().usingClock(clockWithFixedTime(CURRENT_TIME - 3001L)).healthy().build();
+        }
+    }
+
+    @Async(period = 1, initialState = Async.InitialState.UNHEALTHY, healthyTtl = 5, unit = TimeUnit.SECONDS)
+    private static class HealthyAsyncHealthCheckWithExpiredExplicitTtlInSeconds implements HealthCheck {
+
+        @Override
+        public Result check() {
+            return Result.builder().usingClock(clockWithFixedTime(CURRENT_TIME - 5001L)).healthy().build();
+        }
+    }
+
+    @Async(period = 1000, initialState = Async.InitialState.UNHEALTHY, unit = TimeUnit.MILLISECONDS)
+    private static class HealthyAsyncHealthCheckWithExpiredTtlInMillisecondsBasedOnPeriod implements HealthCheck {
+
+        @Override
+        public Result check() {
+            return Result.builder().usingClock(clockWithFixedTime(CURRENT_TIME - 2001L)).healthy().build();
+        }
+    }
+
+    private static Clock clockWithFixedTime(final long time) {
+        return new Clock() {
+            @Override
+            public long getTick() {
+                return 0;
+            }
+
+            @Override
+            public long getTime() {
+                return time;
+            }
+        };
     }
 
 }

@@ -17,6 +17,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.graphite</javaModuleName>
+        <rabbitmq.version>5.5.3</rabbitmq.version>
     </properties>
 
     <dependencyManagement>
@@ -39,6 +40,17 @@
         <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
+            <version>${rabbitmq.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.dropwizard.metrics</groupId>
+                    <artifactId>metrics-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

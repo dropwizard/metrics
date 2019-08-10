@@ -45,9 +45,6 @@ public class MeterTest {
         }
 
         assertThat(meter.getCount()).isEqualTo(180);
-        assertThat(meter.getFifteenMinuteRate()).isBetween(1.0, 2.0);
-        assertThat(meter.getFiveMinuteRate()).isBetween(1.0, 2.0);
-        assertThat(meter.getOneMinuteRate()).isBetween(1.0, 2.0);
         assertThat(meter.getMeanRate()).isBetween(1.0, 2.0);
     }
 }
