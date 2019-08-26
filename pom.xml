@@ -4,7 +4,7 @@
 
     <groupId>io.dropwizard.metrics5</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>5.0.0-rc3-SNAPSHOT</version>
+    <version>5.0.0-rc3</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
@@ -91,7 +91,7 @@
         <connection>scm:git:git://github.com/dropwizard/metrics.git</connection>
         <developerConnection>scm:git:git@github.com:dropwizard/metrics.git</developerConnection>
         <url>http://github.com/dropwizard/metrics/</url>
-        <tag>HEAD</tag>
+        <tag>v5.0.0-rc3</tag>
     </scm>
 
     <issueManagement>
