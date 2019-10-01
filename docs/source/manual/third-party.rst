@@ -49,6 +49,7 @@ Reporters
 * `metrics-librato <https://github.com/librato/metrics-librato>`_ provides a reporter for `Librato Metrics <https://metrics.librato.com/>`_, a scalable metric collection, aggregation, monitoring, and alerting service.
 * `metrics-mongodb-reporter <https://github.com/aparnachaudhary/mongodb-metrics-reporter>`_ provides a reporter for `MongoDB <https://www.mongodb.org/>`_.
 * `metrics-munin-reporter <https://github.com/slashidea/metrics-munin-reporter>`_ provides a reporter for `Munin <http://munin-monitoring.org/>`_
+* `dropwizard-metrics-newrelic <https://github.com/newrelic/dropwizard-metrics-newrelic>`_ Officially supported (by New Relic) exporter which sends data to `New Relic <http://newrelic.com/>`_ as dimensional metrics.
 * `metrics-new-relic <https://github.com/palominolabs/metrics-new-relic>`_ provides a reporter which sends data to `New Relic <http://newrelic.com/>`_.
 * `metrics-reporter-config <https://github.com/addthis/metrics-reporter-config>`_ DropWizard-esque YAML configuration of reporters.
 * `metrics-signalfx <https://github.com/signalfx/signalfx-java>`_ provides a reporter to send data to `SignalFx <http://www.signalfx.com/>`_.
