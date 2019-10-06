@@ -11,7 +11,7 @@ which allows you to instrument methods on your `Jersey 2.x`_ resource classes:
 The ``metrics-jersey2`` module provides ``InstrumentedResourceMethodApplicationListener``, which allows
 you to instrument methods on your `Jersey 2.x`_ resource classes:
 
-.. _Jersey 2.x: https://jersey.java.net/documentation/latest/index.html
+.. _Jersey 2.x: https://eclipse-ee4j.github.io/jersey.github.io/documentation/latest/index.html
 
 An instance of ``InstrumentedResourceMethodApplicationListener`` must be registered with your Jersey
 application's ``ResourceConfig`` as a singleton provider for this to work.

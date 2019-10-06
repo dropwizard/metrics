@@ -4,9 +4,10 @@
 Instrumenting Log4j
 ###################
 
-The ``metrics-log4j2`` module provide ``InstrumentedAppender``, a Log4j ``Appender`` implementation
+The ``metrics-log4j2`` module provide ``InstrumentedAppender``, a Log4j_ ``Appender`` implementation
 which records the rate of logged events by their logging level. You can add it to the root logger programmatically.
 
+.. _Log4j: https://logging.apache.org/log4j/
 .. code-block:: java
 
     Filter filter = null;        // That's fine if we don't use filters; https://logging.apache.org/log4j/2.x/manual/filters.html
