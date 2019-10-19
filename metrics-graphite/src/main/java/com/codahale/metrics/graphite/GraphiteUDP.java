@@ -2,6 +2,7 @@ package com.codahale.metrics.graphite;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 
@@ -50,7 +51,7 @@ public class GraphiteUDP implements GraphiteSender {
 
         // Resolve hostname
         if (hostname != null) {
-            address = new InetSocketAddress(hostname, port);
+            address = new InetSocketAddress(InetAddress.getByName(hostname), port);
         }
 
         datagramChannel = DatagramChannel.open();
