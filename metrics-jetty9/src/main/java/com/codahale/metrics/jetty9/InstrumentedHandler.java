@@ -213,7 +213,8 @@ public class InstrumentedHandler extends HandlerWrapper {
                 final HttpServletRequest request = (HttpServletRequest) state.getRequest();
                 final HttpServletResponse response = (HttpServletResponse) state.getResponse();
                 updateResponses(request, response, startTime, true);
-                if (state.getHttpChannelState().getState() != DISPATCHED_HACK) {
+                if (state.getHttpChannelState().getState() != DISPATCHED_HACK &&
+                        state.getHttpChannelState().isSuspended()) {
                     activeSuspended.dec();
                 }
             }
