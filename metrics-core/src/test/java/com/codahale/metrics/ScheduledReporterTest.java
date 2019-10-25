@@ -70,10 +70,10 @@ public class ScheduledReporterTest {
     public void createWithNullMetricRegistry() {
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         DummyReporter r = null;
-        try {    		
+        try {
             r = new DummyReporter(null, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor);
             Assert.fail("IllegalArgumentException must be thrown !!!");
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             Assert.assertEquals("MetricRegistry must not be null !!!", e.getMessage());
         } finally {
             if (r != null) {
@@ -81,7 +81,7 @@ public class ScheduledReporterTest {
             }
         }
     }
-    
+
     @Test
     public void pollsPeriodically() throws Exception {
         CountDownLatch latch = new CountDownLatch(2);
