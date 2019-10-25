@@ -67,19 +67,19 @@ public class ScheduledReporterTest {
     }
 
     @Test
-    public void createWithNullMetricRegistry() {    	
-    	ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    	DummyReporter r = null;
-    	try {    		
-    		r = new DummyReporter(null, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor);
-    		Assert.fail("IllegalArgumentException must be thrown !!!");
-    	}catch(IllegalArgumentException e) {
-    		Assert.assertEquals("MetricRegistry must not be null !!!", e.getMessage());
-    	}finally{
-    		if(r != null) {
-    			r.close();
-    		}
-    	}
+    public void createWithNullMetricRegistry() {
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        DummyReporter r = null;
+        try {    		
+            r = new DummyReporter(null, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor);
+            Assert.fail("IllegalArgumentException must be thrown !!!");
+        } catch(IllegalArgumentException e) {
+            Assert.assertEquals("MetricRegistry must not be null !!!", e.getMessage());
+        } finally {
+            if (r != null) {
+                r.close();
+            }
+        }
     }
     
     @Test
