@@ -573,7 +573,7 @@ public class MetricRegistryTest {
     @Test
     public void registerNullMetric() {
         MetricRegistry registry = new MetricRegistry();   
-        try {    		
+        try {
             registry.register("any_name", null);
             Assert.fail("IllegalArgumentException must be thrown !!!");
         } catch (IllegalArgumentException e) {

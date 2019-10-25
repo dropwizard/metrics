@@ -91,7 +91,7 @@ public class MetricRegistry implements MetricSet {
         if (metric == null) {
             throw new IllegalArgumentException("metric variable must not be null !!!");
         }
-    	
+
         if (metric instanceof MetricRegistry) {
             final MetricRegistry childRegistry = (MetricRegistry)metric;
             final String childName = name;
