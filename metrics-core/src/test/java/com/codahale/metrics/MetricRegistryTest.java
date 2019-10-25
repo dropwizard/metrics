@@ -572,12 +572,12 @@ public class MetricRegistryTest {
     
     @Test
     public void registerNullMetric() {
-    	MetricRegistry registry = new MetricRegistry();   
-    	try {    		
-    		registry.register("any_name", null);
-    		Assert.fail("IllegalArgumentException must be thrown !!!");
-    	}catch(IllegalArgumentException e) {
-    		Assert.assertEquals("metric variable must not be null !!!", e.getMessage());
-    	}
+        MetricRegistry registry = new MetricRegistry();   
+        try {    		
+            registry.register("any_name", null);
+            Assert.fail("IllegalArgumentException must be thrown !!!");
+        } catch (IllegalArgumentException e) {
+            Assert.assertEquals("metric variable must not be null !!!", e.getMessage());
+        }
     }
 }
