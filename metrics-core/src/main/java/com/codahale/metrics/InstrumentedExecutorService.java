@@ -206,4 +206,25 @@ public class InstrumentedExecutorService implements ExecutorService {
             }
         }
     }
+
+    Meter getSubmitted() {
+        return submitted;
+    }
+
+    Counter getRunning() {
+        return running;
+    }
+
+    Meter getCompleted() {
+        return completed;
+    }
+
+    Timer getIdle() {
+        return idle;
+    }
+
+    Timer getDuration() {
+        return duration;
+    }
+
 }
