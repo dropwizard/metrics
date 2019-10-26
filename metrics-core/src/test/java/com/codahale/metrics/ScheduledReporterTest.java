@@ -72,9 +72,9 @@ public class ScheduledReporterTest {
         DummyReporter r = null;
         try {
             r = new DummyReporter(null, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor);
-            Assert.fail("IllegalArgumentException must be thrown !!!");
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("MetricRegistry must not be null !!!", e.getMessage());
+            Assert.fail("NullPointerException must be thrown !!!");
+        } catch (NullPointerException e) {
+            Assert.assertEquals("registry == null", e.getMessage());
         } finally {
             if (r != null) {
                 r.close();

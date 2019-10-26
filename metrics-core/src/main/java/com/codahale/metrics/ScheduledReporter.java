@@ -132,7 +132,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 Set<MetricAttribute> disabledMetricAttributes) {
 
         if (registry == null) {
-            throw new IllegalArgumentException("MetricRegistry must not be null !!!");
+            throw new NullPointerException("registry == null");
         }
 
         this.registry = registry;
