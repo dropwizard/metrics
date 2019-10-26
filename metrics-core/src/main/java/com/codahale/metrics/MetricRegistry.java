@@ -89,7 +89,7 @@ public class MetricRegistry implements MetricSet {
     public <T extends Metric> T register(String name, T metric) throws IllegalArgumentException {
 
         if (metric == null) {
-            throw new IllegalArgumentException("metric variable must not be null !!!");
+            throw new NullPointerException("metric == null");
         }
 
         if (metric instanceof MetricRegistry) {
