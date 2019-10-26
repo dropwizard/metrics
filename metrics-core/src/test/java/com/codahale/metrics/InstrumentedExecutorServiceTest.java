@@ -130,8 +130,12 @@ public class InstrumentedExecutorServiceTest {
         assertThat(idle.getCount()).isEqualTo(0);
 
         Collection<Callable<Void>> tasks = new ArrayList<>();
-        tasks.add(() -> { return null; });
-        tasks.add(() -> { return null; });
+        tasks.add(() -> {
+            return null; 
+        });
+        tasks.add(() -> {
+            return null; 
+        });
         List<Future<Void>> fs = instrumentedExecutorService.invokeAll(tasks, 1, TimeUnit.MINUTES);
 
         for (Future<Void> f : fs) {
@@ -157,8 +161,12 @@ public class InstrumentedExecutorServiceTest {
         assertThat(idle.getCount()).isEqualTo(0);
 
         Collection<Callable<Void>> tasks = new ArrayList<>();
-        tasks.add(() -> { return null; });
-        tasks.add(() -> { return null; });
+        tasks.add(() -> {
+            return null; 
+        });
+        tasks.add(() -> {
+            return null; 
+        });
         List<Future<Void>> fs = instrumentedExecutorService.invokeAll(tasks);
 
         for (Future<Void> f : fs) {
