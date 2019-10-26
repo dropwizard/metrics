@@ -1,5 +1,6 @@
 package com.codahale.metrics;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -567,5 +568,16 @@ public class MetricRegistryTest {
 
         assertThat(deepChildMetrics.size()).isEqualTo(1);
         assertThat(childMetrics.size()).isEqualTo(3);
+    }
+    
+    @Test
+    public void registerNullMetric() {
+        MetricRegistry registry = new MetricRegistry();   
+        try {
+            registry.register("any_name", null);
+            Assert.fail("NullPointerException must be thrown !!!");
+        } catch (NullPointerException e) {
+            Assert.assertEquals("metric == null", e.getMessage());
+        }
     }
 }

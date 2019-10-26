@@ -83,10 +83,15 @@ public class MetricRegistry implements MetricSet {
      * @param metric the metric
      * @param <T>    the type of the metric
      * @return {@code metric}
-     * @throws IllegalArgumentException if the name is already registered
+     * @throws IllegalArgumentException if the name is already registered or metric variable is null
      */
     @SuppressWarnings("unchecked")
     public <T extends Metric> T register(String name, T metric) throws IllegalArgumentException {
+
+        if (metric == null) {
+            throw new NullPointerException("metric == null");
+        }
+
         if (metric instanceof MetricRegistry) {
             final MetricRegistry childRegistry = (MetricRegistry)metric;
             final String childName = name;
