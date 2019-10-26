@@ -1,6 +1,7 @@
 package com.codahale.metrics;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,6 +64,22 @@ public class ScheduledReporterTest {
         externalExecutor.shutdown();
         reporter.stop();
         reporterWithNullExecutor.stop();
+    }
+
+    @Test
+    public void createWithNullMetricRegistry() {
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        DummyReporter r = null;
+        try {
+            r = new DummyReporter(null, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor);
+            Assert.fail("NullPointerException must be thrown !!!");
+        } catch (NullPointerException e) {
+            Assert.assertEquals("registry == null", e.getMessage());
+        } finally {
+            if (r != null) {
+                r.close();
+            }
+        }
     }
 
     @Test
