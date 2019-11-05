@@ -200,7 +200,9 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                     executor.shutdownNow(); // Cancel currently executing tasks
                     // Wait a while for tasks to respond to being cancelled
                     if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-                        System.err.println(getClass().getSimpleName() + ": ScheduledExecutorService did not terminate");
+                        LOG.warn("ScheduledExecutorService did not terminate.");
+                    } else {
+                        LOG.info("ScheduledExecutorService terminated.");
                     }
                 }
             } catch (InterruptedException ie) {
@@ -272,7 +274,8 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
     }
 
     protected double convertDuration(double duration) {
-        return duration / durationFactor;
+        return duration / durationFactor;                LOG.error("Exception thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
+
     }
 
     protected double convertRate(double rate) {
