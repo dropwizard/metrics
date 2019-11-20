@@ -22,6 +22,10 @@ provides you with full-stack visibility.
    manual/index
    about/index
 
+   Javadoc <https://www.javadoc.io/doc/io.dropwizard.metrics/metrics-core/4.1.1/>
+   Mailing List <https://groups.google.com/forum/#!forum/metrics-user>
+   Github Page <https://github.com/dropwizard/metrics>
+
 .. raw:: html
 
     </div>

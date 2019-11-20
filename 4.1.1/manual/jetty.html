@@ -1,67 +1,91 @@
 
+
 <!DOCTYPE html>
-<html lang="en">
-
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-    <meta charset="utf-8">
-    <title>Instrumenting Jetty | Metrics</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css"/>
-    <link rel="stylesheet" href="../_static/metrics.css" type="text/css"/>
-    <link rel="top" title="Metrics" href="../index.html"/>
-    <link rel="up" title="User Manual" href="index.html"/>
-    <link rel="next" title="Instrumenting Log4j" href="log4j.html"/>
-    <link rel="prev" title="Instrumenting Jersey 2.x" href="jersey.html"/>
-    <style lang="text/css">
-        #top-bar, #top-bar small, #top-bar a {
-            text-shadow: 0px -1px 0px #cf2c0f;
-            color: #fff;
-        }
-        
-        #top-bar {
-            background-color: #ED4A2D;
-            background-image: -moz-linear-gradient(top, #ff684b, #cf2c0f);
-            background-image: -ms-linear-gradient(top, #ff684b, #cf2c0f);
-            background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ff684b), to(#cf2c0f));
-            background-image: -webkit-linear-gradient(top, #ff684b, #cf2c0f);
-            background-image: -o-linear-gradient(top, #ff684b, #cf2c0f);
-            background-image: linear-gradient(top, #ff684b, #cf2c0f);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ff684b', endColorstr = '#cf2c0f', GradientType = 0);
-            -webkit-border-radius: 0;
-            -moz-border-radius: 0;
-            border-radius: 0;
-        }
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Instrumenting Jetty &mdash; Metrics</title>
+  
 
+  
+  
+  
+  
 
-        .hero-unit {
-            background-image: url("../_static/metrics-hat.png") !important;
-            background-repeat: no-repeat !important;
-            background-position: 30px 50px;
-        }
+  
 
-        .hero-unit div.section {
-            padding-left: 200px !important;
-        }
-    </style>
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Instrumenting Log4j" href="log4j.html" />
+    <link rel="prev" title="Instrumenting Jersey 2.x" href="jersey.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
 </head>
-<body>
-    <a href="https://github.com/dropwizard/metrics">
-        <img style="position: absolute; top: 0; right: 0; border: 0;"
-             src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"
-             alt="Fork me on GitHub"></a>
-    <div class="navbar">
-        <div class="navbar-inner container-fluid" id="top-bar">
-            <header class="row-fluid">
-                <h1 class="span12" id="title"><img class="logo" src="../_static/metrics-logo.png" alt="Logo"/>
-                    <a href="../index.html">Metrics</a>
-                    <small>Mind the gap.</small>
-                </h1>
-            </header>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Metrics
+          
+
+          
+            
+            <img src="../_static/metrics-logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                4.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
         </div>
-    </div>
-    <div class="container-fluid">
-        <div class="row-fluid">
-            <div class="span3" id="sidebar">
-                <ul class="current">
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">User Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="core.html">Metrics Core</a></li>
@@ -83,16 +107,75 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../about/index.html">About Metrics</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.javadoc.io/doc/io.dropwizard.metrics/metrics-core/4.1.1/">Javadoc</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://groups.google.com/forum/#!forum/metrics-user">Mailing List</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/dropwizard/metrics">Github Page</a></li>
 </ul>
 
-                <hr/>
-                <ul>
-                    <li><a href="https://www.javadoc.io/doc/io.dropwizard.metrics/metrics-core/4.1.1/">Javadoc</a></li>
-                    <li><a href="https://groups.google.com/forum/#!forum/metrics-user">Mailing List</a></li>
-                </ul>
-            </div>
-            <div class="span9" id="body">
-                
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Metrics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">User Manual</a> &raquo;</li>
+        
+      <li>Instrumenting Jetty</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/manual/jetty.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
   <div class="section" id="instrumenting-jetty">
 <span id="manual-jetty"></span><h1>Instrumenting Jetty</h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">metrics-jetty9``(Jetty</span> <span class="pre">9.3</span> <span class="pre">and</span> <span class="pre">higher)</span> <span class="pre">modules</span> <span class="pre">provides</span> <span class="pre">a</span> <span class="pre">set</span> <span class="pre">of</span> <span class="pre">instrumented</span> <span class="pre">equivalents</span> <span class="pre">of</span> <span class="pre">Jetty_</span> <span class="pre">classes:</span>
@@ -112,18 +195,61 @@ overall response rates. Finally, it includes meters for requests by the HTTP met
 </div>
 
 
-            </div></div>
-        <hr/>
-        <footer>
-            <p style="float: left">
-            &copy; Copyright 2010-2014, Coda Hale, Yammer Inc., 2014-2017 Dropwizard Team.
-            Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
-            1.8.2.
-            </p>
-            <p style="float: right">Dropwizard Metrics v4.1.1</p>
-        </footer>
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="log4j.html" class="btn btn-neutral float-right" title="Instrumenting Log4j" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="jersey.html" class="btn btn-neutral" title="Instrumenting Jersey 2.x" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2010-2014, Coda Hale, Yammer Inc., 2014-2019 Dropwizard Team
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
 </body>
 </html>
-
-
