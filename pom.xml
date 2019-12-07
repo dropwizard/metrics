@@ -10,7 +10,7 @@
     <description>
         The Metrics library.
     </description>
-    <url>http://metrics.dropwizard.io</url>
+    <url>https://metrics.dropwizard.io</url>
 
     <modules>
         <module>docs</module>
@@ -79,7 +79,7 @@
     <licenses>
         <license>
             <name>Apache License 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.html</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -87,7 +87,7 @@
     <scm>
         <connection>scm:git:git://github.com/dropwizard/metrics.git</connection>
         <developerConnection>scm:git:git@github.com:dropwizard/metrics.git</developerConnection>
-        <url>http://github.com/dropwizard/metrics/</url>
+        <url>https://github.com/dropwizard/metrics/</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -100,12 +100,12 @@
         <snapshotRepository>
             <id>sonatype-nexus-snapshots</id>
             <name>Sonatype Nexus Snapshots</name>
-            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
             <id>sonatype-nexus-staging</id>
             <name>Nexus Release Repository</name>
-            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
 
