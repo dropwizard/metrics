@@ -19,24 +19,24 @@
         <module>metrics-benchmarks</module>
         <module>metrics-core</module>
         <module>metrics-collectd</module>
-        <module>metrics-healthchecks</module>
         <module>metrics-ehcache</module>
         <module>metrics-graphite</module>
+        <module>metrics-healthchecks</module>
         <module>metrics-httpclient</module>
         <module>metrics-httpasyncclient</module>
         <module>metrics-jcache</module>
+        <module>metrics-jcstress</module>
         <module>metrics-jdbi</module>
         <module>metrics-jdbi3</module>
         <module>metrics-jersey2</module>
         <module>metrics-jetty9</module>
+        <module>metrics-jmx</module>
         <module>metrics-json</module>
         <module>metrics-jvm</module>
         <module>metrics-log4j2</module>
         <module>metrics-logback</module>
         <module>metrics-servlet</module>
         <module>metrics-servlets</module>
-        <module>metrics-jcstress</module>
-        <module>metrics-jmx</module>
     </modules>
 
     <properties>
