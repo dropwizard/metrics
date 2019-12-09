@@ -273,7 +273,6 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
 
     protected double convertDuration(double duration) {
         return duration / durationFactor;
-
     }
 
     protected double convertRate(double rate) {
