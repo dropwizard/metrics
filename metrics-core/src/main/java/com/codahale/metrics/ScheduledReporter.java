@@ -272,7 +272,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
     }
 
     protected double convertDuration(double duration) {
-        return duration / durationFactor;                LOG.error("Exception thrown from {}#report. Exception was suppressed.", ScheduledReporter.this.getClass().getSimpleName(), ex);
+        return duration / durationFactor;
 
     }
 
