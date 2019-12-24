@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.jetty9</javaModuleName>
-        <jetty9.version>9.4.24.v20191120</jetty9.version>
+        <jetty9.version>9.4.25.v20191220</jetty9.version>
     </properties>
 
     <dependencyManagement>
