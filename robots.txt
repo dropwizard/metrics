@@ -1,0 +1,15 @@
+User-agent: *
+Sitemap: /sitemap.xml
+Disallow: /2.2.0
+Disallow: /3.0.2
+Disallow: /3.1.0
+Disallow: /3.2.0
+Disallow: /3.2.1
+Disallow: /3.2.2
+Disallow: /3.2.3
+Disallow: /4.0.0
+Disallow: /4.0.5
+Disallow: /4.0.6
+Disallow: /4.1.0
+Disallow: /4.1.1
+Disallow: /5.0.0-rc3
