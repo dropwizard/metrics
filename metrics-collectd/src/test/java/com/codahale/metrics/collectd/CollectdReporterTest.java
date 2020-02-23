@@ -1,7 +1,6 @@
 package com.codahale.metrics.collectd;
 
 import com.codahale.metrics.Counter;
-import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricAttribute;
@@ -13,8 +12,10 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -70,7 +71,7 @@ public class CollectdReporterTest {
 
     private <T extends Number> void reportsGauges(T value) throws Exception {
         reporter.report(
-                map("gauge", (Gauge) () -> value),
+                map("gauge", () -> value),
                 map(),
                 map(),
                 map(),
@@ -82,7 +83,7 @@ public class CollectdReporterTest {
     @Test
     public void reportsBooleanGauges() throws Exception {
         reporter.report(
-                map("gauge", (Gauge) () -> true),
+                map("gauge", () -> true),
                 map(),
                 map(),
                 map(),
@@ -91,7 +92,7 @@ public class CollectdReporterTest {
         assertThat(nextValues(receiver)).containsExactly(1d);
 
         reporter.report(
-                map("gauge", (Gauge) () -> false),
+                map("gauge", () -> false),
                 map(),
                 map(),
                 map(),
@@ -103,7 +104,7 @@ public class CollectdReporterTest {
     @Test
     public void doesNotReportStringGauges() throws Exception {
         reporter.report(
-                map("unsupported", (Gauge) () -> "value"),
+                map("unsupported", () -> "value"),
                 map(),
                 map(),
                 map(),
@@ -267,17 +268,17 @@ public class CollectdReporterTest {
     }
 
     private <T> SortedMap<String, T> map() {
-        return new TreeMap<>();
+        return Collections.emptySortedMap();
     }
 
     private <T> SortedMap<String, T> map(String name, T metric) {
-        final SortedMap<String, T> map = map();
-        map.put(name, metric);
-        return map;
+        final Map<String, T> map = Collections.singletonMap(name, metric);
+        return new TreeMap<>(map);
     }
 
     private List<Number> nextValues(Receiver receiver) throws Exception {
-        return receiver.next().getValues();
+        final ValueList valueList = receiver.next();
+        return valueList == null ? Collections.emptyList() : valueList.getValues();
     }
 }
 
