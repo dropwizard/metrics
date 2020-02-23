@@ -23,7 +23,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        java_version: [8, 11, 13]
+        java_version: [8, 11]
         os: [ubuntu-latest, macOS-latest]
     env:
       JAVA_OPTS: "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
