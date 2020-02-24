@@ -29,6 +29,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -136,14 +137,14 @@ public class InstrumentedHttpAsyncClientsTest {
                     fail();
                 }
             });
-
-            countDownLatch.await(1, TimeUnit.SECONDS);
-            responseFuture.get(1, TimeUnit.SECONDS);
+            countDownLatch.await(5, TimeUnit.SECONDS);
+            responseFuture.get(5, TimeUnit.SECONDS);
 
             fail();
         } catch (ExecutionException e) {
             assertThat(e).hasCauseInstanceOf(ConnectionClosedException.class);
-            assertThat(metricRegistry.getMeters()).containsKey("exception");
+            await().atMost(5, TimeUnit.SECONDS)
+                    .untilAsserted(() -> assertThat(metricRegistry.getMeters()).containsKey("exception"));
         }
     }
 }
