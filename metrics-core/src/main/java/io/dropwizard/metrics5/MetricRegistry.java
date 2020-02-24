@@ -76,7 +76,6 @@ public class MetricRegistry implements MetricSet {
         return register(MetricName.build(name), metric);
     }
 
-
     /**
      * Given a {@link Metric}, registers it under the given name.
      *
@@ -84,12 +83,69 @@ public class MetricRegistry implements MetricSet {
      * @param metric the metric
      * @param <T>    the type of the metric
      * @return {@code metric}
-     * @throws IllegalArgumentException if the name is already registered
+     * @throws IllegalArgumentException if the name is already registered or metric variable is null
      */
     @SuppressWarnings("unchecked")
     public <T extends Metric> T register(MetricName name, T metric) throws IllegalArgumentException {
+        if (metric == null) {
+            throw new NullPointerException("metric == null");
+        }
 
-        if (metric instanceof MetricSet) {
+        if (metric instanceof MetricRegistry) {
+            final MetricRegistry childRegistry = (MetricRegistry)metric;
+            final MetricName childName = name;
+            childRegistry.addListener(new MetricRegistryListener() {
+                @Override
+                public void onGaugeAdded(MetricName name, Gauge<?> gauge) {
+                    register(childName.append(name), gauge);
+                }
+
+                @Override
+                public void onGaugeRemoved(MetricName name) {
+                    remove(childName.append(name));
+                }
+
+                @Override
+                public void onCounterAdded(MetricName name, Counter counter) {
+                    register(childName.append(name), counter);
+                }
+
+                @Override
+                public void onCounterRemoved(MetricName name) {
+                    remove(childName.append(name));
+                }
+
+                @Override
+                public void onHistogramAdded(MetricName name, Histogram histogram) {
+                    register(childName.append(name), histogram);
+                }
+
+                @Override
+                public void onHistogramRemoved(MetricName name) {
+                    remove(childName.append(name));
+                }
+
+                @Override
+                public void onMeterAdded(MetricName name, Meter meter) {
+                    register(childName.append(name), meter);
+                }
+
+                @Override
+                public void onMeterRemoved(MetricName name) {
+                    remove(childName.append(name));
+                }
+
+                @Override
+                public void onTimerAdded(MetricName name, Timer timer) {
+                    register(childName.append(name), timer);
+                }
+
+                @Override
+                public void onTimerRemoved(MetricName name) {
+                    remove(childName.append(name));
+                }
+            });
+        } else if (metric instanceof MetricSet) {
             registerAll(name, (MetricSet) metric);
         } else {
             final Metric existing = metrics.putIfAbsent(name, metric);

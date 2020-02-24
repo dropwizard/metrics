@@ -18,8 +18,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.jetty9</javaModuleName>
-        <jetty9.version>9.4.18.v20190429</jetty9.version>
-
+        <jetty9.version>9.4.26.v20200117</jetty9.version>
     </properties>
 
     <dependencyManagement>

@@ -5,9 +5,12 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.dropwizard.metrics5.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -41,6 +44,7 @@ public class MetricRegistryTest {
     private final Histogram histogram = mock(Histogram.class);
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
+
     @Before
     public void setUp() {
         registry.addListener(listener);
@@ -463,5 +467,150 @@ public class MetricRegistryTest {
 
         verify(listener).onTimerRemoved(timer1);
         verify(listener).onHistogramRemoved(histogram1);
+    }
+
+    @Test
+    public void addingChildMetricAfterRegister() {
+        MetricRegistry parent = new MetricRegistry();
+        MetricRegistry child = new MetricRegistry();
+
+        child.counter("test-1");
+        parent.register("child", child);
+        child.counter("test-2");
+
+        Set<MetricName> parentMetrics = parent.getMetrics().keySet();
+        Set<MetricName> childMetrics = child.getMetrics().keySet();
+
+        assertThat(parentMetrics)
+                .isEqualTo(childMetrics.stream().map(m -> MetricName.build("child", m.getKey())).collect(Collectors.toSet()));
+    }
+
+    @Test
+    public void addingMultipleChildMetricsAfterRegister() {
+        MetricRegistry parent = new MetricRegistry();
+        MetricRegistry child = new MetricRegistry();
+
+        child.counter("test-1");
+        child.counter("test-2");
+        parent.register("child", child);
+        child.counter("test-3");
+        child.counter("test-4");
+
+        Set<MetricName> parentMetrics = parent.getMetrics().keySet();
+        Set<MetricName> childMetrics = child.getMetrics().keySet();
+
+        assertThat(parentMetrics)
+                .isEqualTo(childMetrics.stream().map(m -> MetricName.build("child", m.getKey())).collect(Collectors.toSet()));
+    }
+
+    @Test
+    public void addingDeepChildMetricsAfterRegister() {
+        MetricRegistry parent = new MetricRegistry();
+        MetricRegistry child = new MetricRegistry();
+        MetricRegistry deepChild = new MetricRegistry();
+
+        deepChild.counter("test-1");
+        child.register("deep-child", deepChild);
+        deepChild.counter("test-2");
+
+        child.counter("test-3");
+        parent.register("child", child);
+        child.counter("test-4");
+
+        deepChild.counter("test-5");
+        Set<MetricName> parentMetrics = parent.getMetrics().keySet();
+        Set<MetricName> childMetrics = child.getMetrics().keySet();
+        Set<MetricName> deepChildMetrics = deepChild.getMetrics().keySet();
+
+        assertThat(parentMetrics)
+                .isEqualTo(childMetrics.stream().map(m -> MetricName.build("child", m.getKey())).collect(Collectors.toSet()));
+
+        assertThat(childMetrics)
+                .containsAll(deepChildMetrics.stream().map(m -> MetricName.build("deep-child", m.getKey())).collect(Collectors.toSet()));
+
+        assertThat(deepChildMetrics.size()).isEqualTo(3);
+        assertThat(childMetrics.size()).isEqualTo(5);
+    }
+
+    @Test
+    public void removingChildMetricAfterRegister() {
+        MetricRegistry parent = new MetricRegistry();
+        MetricRegistry child = new MetricRegistry();
+
+        child.counter("test-1");
+        parent.register("child", child);
+        child.counter("test-2");
+
+        child.remove(MetricName.build("test-1"));
+
+        Set<MetricName> parentMetrics = parent.getMetrics().keySet();
+        Set<MetricName> childMetrics = child.getMetrics().keySet();
+
+        assertThat(parentMetrics)
+                .isEqualTo(childMetrics.stream().map(m -> MetricName.build("child", m.getKey())).collect(Collectors.toSet()));
+
+        assertThat(childMetrics).doesNotContain(MetricName.build("test-1"));
+    }
+
+    @Test
+    public void removingMultipleChildMetricsAfterRegister() {
+        MetricRegistry parent = new MetricRegistry();
+        MetricRegistry child = new MetricRegistry();
+
+        child.counter("test-1");
+        child.counter("test-2");
+        parent.register("child", child);
+        child.counter("test-3");
+        child.counter("test-4");
+
+        child.remove(MetricName.build("test-1"));
+        child.remove(MetricName.build("test-3"));
+
+        Set<MetricName> parentMetrics = parent.getMetrics().keySet();
+        Set<MetricName> childMetrics = child.getMetrics().keySet();
+
+        assertThat(parentMetrics)
+                .isEqualTo(childMetrics.stream().map(m -> MetricName.build("child", m.getKey())).collect(Collectors.toSet()));
+
+        assertThat(childMetrics).doesNotContain(MetricName.build("test-1"), MetricName.build("test-3"));
+    }
+
+    @Test
+    public void removingDeepChildMetricsAfterRegister() {
+        MetricRegistry parent = new MetricRegistry();
+        MetricRegistry child = new MetricRegistry();
+        MetricRegistry deepChild = new MetricRegistry();
+
+        deepChild.counter("test-1");
+        child.register("deep-child", deepChild);
+        deepChild.counter("test-2");
+
+        child.counter("test-3");
+        parent.register("child", child);
+        child.counter("test-4");
+
+        deepChild.remove(MetricName.build("test-2"));
+
+        Set<MetricName> parentMetrics = parent.getMetrics().keySet();
+        Set<MetricName> childMetrics = child.getMetrics().keySet();
+        Set<MetricName> deepChildMetrics = deepChild.getMetrics().keySet();
+
+        assertThat(parentMetrics)
+                .isEqualTo(childMetrics.stream().map(m -> MetricName.build("child", m.getKey())).collect(Collectors.toSet()));
+
+        assertThat(childMetrics)
+                .containsAll(deepChildMetrics.stream().map(m -> MetricName.build("deep-child", m.getKey())).collect(Collectors.toSet()));
+
+        assertThat(deepChildMetrics).doesNotContain(MetricName.build("test-2"));
+
+        assertThat(deepChildMetrics.size()).isEqualTo(1);
+        assertThat(childMetrics.size()).isEqualTo(3);
+    }
+
+    @Test
+    public void registerNullMetric() {
+        MetricRegistry registry = new MetricRegistry();
+        assertThatThrownBy(() -> registry.register("any_name", null))
+                .hasMessage("metric == null");
     }
 }

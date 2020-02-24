@@ -16,7 +16,7 @@
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.logback</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5.logback</javaModuleName>
         <logback.version>1.2.3</logback.version>
     </properties>
 

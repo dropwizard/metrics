@@ -45,7 +45,7 @@ public final class Receiver extends ExternalResource {
     }
 
     public ValueList next() throws InterruptedException {
-        return queue.poll(1, TimeUnit.SECONDS);
+        return queue.poll(2, TimeUnit.SECONDS);
     }
 
     @Override

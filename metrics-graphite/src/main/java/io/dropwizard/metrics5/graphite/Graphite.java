@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.InetSocketAddress;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -114,16 +115,16 @@ public class Graphite implements GraphiteSender {
             throw new IllegalStateException("Already connected");
         }
         InetSocketAddress address = this.address;
-        if (address == null) {
-            address = new InetSocketAddress(hostname, port);
+        // the previous dns retry logic did not work, as address.getAddress would always return the cached value
+        // this version of the simplified logic will always cause a dns request if hostname has been supplied.
+        // InetAddress.getByName forces the dns lookup
+        // if an InetSocketAddress was supplied at create time that will take precedence.
+        if (address == null || hostname != null) {
+            address = new InetSocketAddress(InetAddress.getByName(hostname), port);
         }
-        if (address.getAddress() == null) {
-            // retry lookup, just in case the DNS changed
-            address = new InetSocketAddress(address.getHostName(), address.getPort());
 
-            if (address.getAddress() == null) {
-                throw new UnknownHostException(address.getHostName());
-            }
+        if (address.getAddress() == null) {
+            throw new UnknownHostException(address.getHostName());
         }
 
         this.socket = socketFactory.createSocket(address.getAddress(), address.getPort());

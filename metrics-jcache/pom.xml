@@ -19,8 +19,7 @@
     <properties>
         <javaModuleName>io.dropwizard.metrics5.jcache</javaModuleName>
         <cache-api.version>1.1.1</cache-api.version>
-        <ehcache3.version>3.4.0</ehcache3.version>
-
+        <ehcache3.version>3.8.1</ehcache3.version>
     </properties>
 
     <dependencyManagement>
@@ -58,6 +57,10 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-runtime</artifactId>
                 </exclusion>
             </exclusions>
             <scope>test</scope>

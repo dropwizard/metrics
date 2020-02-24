@@ -18,7 +18,6 @@
     <properties>
         <javaModuleName>io.dropwizard.metrics5.jdbi</javaModuleName>
         <jdbi2.version>2.78</jdbi2.version>
-
     </properties>
 
     <dependencyManagement>

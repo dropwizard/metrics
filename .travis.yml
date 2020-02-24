@@ -1,10 +1,8 @@
 language: java
 dist: trusty
 
-install: echo "I trust Maven."
-
 # don't just run the tests, also run error-prone
-script: mvn verify
+script: ./mvnw -B verify
 
 jdk:
 - openjdk8

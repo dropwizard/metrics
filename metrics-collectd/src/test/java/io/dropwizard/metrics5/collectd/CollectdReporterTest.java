@@ -1,13 +1,22 @@
 package io.dropwizard.metrics5.collectd;
 
-import io.dropwizard.metrics5.*;
+import io.dropwizard.metrics5.Counter;
+import io.dropwizard.metrics5.Histogram;
+import io.dropwizard.metrics5.Meter;
+import io.dropwizard.metrics5.MetricAttribute;
+import io.dropwizard.metrics5.MetricName;
+import io.dropwizard.metrics5.MetricRegistry;
+import io.dropwizard.metrics5.Snapshot;
+import io.dropwizard.metrics5.Timer;
 import org.collectd.api.ValueList;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -64,7 +73,7 @@ public class CollectdReporterTest {
 
     private <T extends Number> void reportsGauges(T value) throws Exception {
         reporter.report(
-                map("gauge", (Gauge) () -> value),
+                map(MetricName.build("gauge"), () -> value),
                 map(),
                 map(),
                 map(),
@@ -76,7 +85,7 @@ public class CollectdReporterTest {
     @Test
     public void reportsBooleanGauges() throws Exception {
         reporter.report(
-                map("gauge", (Gauge) () -> true),
+                map(MetricName.build("gauge"), () -> true),
                 map(),
                 map(),
                 map(),
@@ -85,7 +94,7 @@ public class CollectdReporterTest {
         assertThat(nextValues(receiver)).containsExactly(1d);
 
         reporter.report(
-                map("gauge", (Gauge) () -> false),
+                map(MetricName.build("gauge"), () -> false),
                 map(),
                 map(),
                 map(),
@@ -97,7 +106,7 @@ public class CollectdReporterTest {
     @Test
     public void doesNotReportStringGauges() throws Exception {
         reporter.report(
-                map("unsupported", (Gauge) () -> "value"),
+                map(MetricName.build("unsupported"), () -> "value"),
                 map(),
                 map(),
                 map(),
@@ -113,7 +122,7 @@ public class CollectdReporterTest {
 
         reporter.report(
                 map(),
-                map("api.rest.requests.count", counter),
+                map(MetricName.build("api", "rest", "requests", "count"), counter),
                 map(),
                 map(),
                 map());
@@ -134,7 +143,7 @@ public class CollectdReporterTest {
                 map(),
                 map(),
                 map(),
-                map("api.rest.requests", meter),
+                map(MetricName.build("api", "rest", "requests"), meter),
                 map());
 
         assertThat(nextValues(receiver)).containsExactly(1d);
@@ -164,7 +173,7 @@ public class CollectdReporterTest {
         reporter.report(
                 map(),
                 map(),
-                map("histogram", histogram),
+                map(MetricName.build("histogram"), histogram),
                 map(),
                 map());
 
@@ -200,7 +209,7 @@ public class CollectdReporterTest {
                 map(),
                 map(),
                 map(),
-                map("timer", timer));
+                map(MetricName.build("timer"), timer));
 
         assertThat(nextValues(receiver)).containsExactly(1d);
         assertThat(nextValues(receiver)).containsExactly(100d);
@@ -238,9 +247,9 @@ public class CollectdReporterTest {
 
         reporter.report(
                 map(),
-                map("counter", counter),
+                map(MetricName.build("counter"), counter),
                 map(),
-                map("meter", meter),
+                map(MetricName.build("meter"), meter),
                 map());
 
         assertThat(nextValues(receiver)).containsExactly(11d);
@@ -262,7 +271,7 @@ public class CollectdReporterTest {
 
     @Test
     public void testUnableSetSecurityLevelToSignWithoutUsername() {
-        assertThatIllegalArgumentException().isThrownBy(()->
+        assertThatIllegalArgumentException().isThrownBy(() ->
                 CollectdReporter.forRegistry(registry)
                         .withHostName("eddie")
                         .withSecurityLevel(SecurityLevel.SIGN)
@@ -273,7 +282,7 @@ public class CollectdReporterTest {
 
     @Test
     public void testUnableSetSecurityLevelToSignWithoutPassword() {
-        assertThatIllegalArgumentException().isThrownBy(()->
+        assertThatIllegalArgumentException().isThrownBy(() ->
                 CollectdReporter.forRegistry(registry)
                         .withHostName("eddie")
                         .withSecurityLevel(SecurityLevel.SIGN)
@@ -283,18 +292,16 @@ public class CollectdReporterTest {
     }
 
     private <T> SortedMap<MetricName, T> map() {
-        return new TreeMap<>();
+        return Collections.emptySortedMap();
     }
 
-    private <T> SortedMap<MetricName, T> map(String name, T metric) {
-        final SortedMap<MetricName, T> map = map();
-        map.put(MetricName.build(name), metric);
-        return map;
+    private <T> SortedMap<MetricName, T> map(MetricName name, T metric) {
+        final Map<MetricName, T> map = Collections.singletonMap(name, metric);
+        return new TreeMap<>(map);
     }
 
     private List<Number> nextValues(Receiver receiver) throws Exception {
-        return receiver.next().getValues();
+        final ValueList valueList = receiver.next();
+        return valueList == null ? Collections.emptyList() : valueList.getValues();
     }
 }
-
-
