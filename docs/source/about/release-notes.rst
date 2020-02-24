@@ -4,6 +4,7 @@
 Release Notes
 #############
 
+Please refer to the `GitHub releases <https://github.com/dropwizard/metrics/releases>`_ for the latest releases of Dropwizard Metrics. 
 
 .. _rel-4.0.0:
 
