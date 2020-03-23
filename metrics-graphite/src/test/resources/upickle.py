@@ -5,5 +5,5 @@ import struct
 format = '!L'
 headerLength = struct.calcsize(format)
 payloadLength, = struct.unpack(format, payload[:headerLength])
-batchLength = headerLength + payloadLength.intValue()
+batchLength = headerLength + payloadLength
 metrics = cPickle.loads(payload[headerLength:batchLength])
