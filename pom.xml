@@ -136,7 +136,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.4</version>
+                        <version>1.5</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -146,9 +146,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                        <configuration>
-                            <keyname>840C3C96</keyname>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
