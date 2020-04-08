@@ -13,7 +13,7 @@
     <description>
         The Metrics library.
     </description>
-    <url>http://metrics.codahale.com/</url>
+    <url>https://metrics.dropwizard.io/</url>
 
     <modules>
         <module>metrics-annotation</module>
@@ -63,15 +63,15 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git://github.com/codahale/metrics.git</connection>
-        <developerConnection>scm:git:git@github.com:codahale/metrics.git</developerConnection>
-        <url>http://github.com/codahale/metrics/</url>
+        <connection>scm:git:git://github.com/dropwizard/metrics.git</connection>
+        <developerConnection>scm:git:git@github.com:dropwizard/metrics.git</developerConnection>
+        <url>http://github.com/dropwizard/metrics/</url>
         <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
         <system>github</system>
-        <url>http://github.com/codahale/metrics/issues#issue/</url>
+        <url>http://github.com/dropwizard/metrics/issues#issue/</url>
     </issueManagement>
 
     <distributionManagement>
