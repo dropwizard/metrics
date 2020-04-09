@@ -9,19 +9,17 @@ import java.lang.management.OperatingSystemMXBean;
  * A gauge for the ratio of used to total file descriptors.
  */
 public class FileDescriptorRatioGauge extends RatioGauge {
-    private static final boolean unixOperatingSystemMXBeanExists;
+    private static boolean unixOperatingSystemMXBeanExists = false;
 
     private final OperatingSystemMXBean os;
 
     static {
-        boolean exists = false;
         try {
             Class.forName("com.sun.management.UnixOperatingSystemMXBean");
-            exists = true;
+            unixOperatingSystemMXBeanExists = true;
         } catch (ClassNotFoundException e) {
             // do nothing
         }
-        unixOperatingSystemMXBeanExists = exists;
     }
 
     /**

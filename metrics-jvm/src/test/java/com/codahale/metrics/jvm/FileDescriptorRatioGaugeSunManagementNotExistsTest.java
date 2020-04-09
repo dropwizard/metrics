@@ -2,10 +2,17 @@ package com.codahale.metrics.jvm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.PermissionCollection;
 import java.security.Permissions;
+import java.security.PrivilegedAction;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,10 +44,42 @@ public class FileDescriptorRatioGaugeSunManagementNotExistsTest {
     }
 
     public static class SunManagementNotExistsClassLoader extends URLClassLoader {
+        private static final URL[] CLASSPATH_ENTRY_URLS;
         private static final PermissionCollection NO_PERMS = new Permissions();
 
+        static {
+            String[] classpathEntries = AccessController.doPrivileged(new PrivilegedAction<String>() {
+                @Override
+                public String run() {
+                    return System.getProperty("java.class.path");
+                }
+            }).split(File.pathSeparator);
+            CLASSPATH_ENTRY_URLS = getClasspathEntryUrls(classpathEntries);
+        }
+
+        private static URL[] getClasspathEntryUrls(String... classpathEntries) {
+            Set<URL> classpathEntryUrls = new LinkedHashSet<>(classpathEntries.length, 1);
+            for (String classpathEntry : classpathEntries) {
+                try {
+                    URL classpathEntryUrl;
+                    if (classpathEntry.endsWith(".jar")) {
+                        classpathEntryUrl = new URL("file:jar:" + classpathEntry);
+                    } else {
+                        if (!classpathEntry.endsWith("/")) {
+                            classpathEntry = classpathEntry + "/";
+                        }
+                        classpathEntryUrl = new URL("file:" + classpathEntry);
+                    }
+                    classpathEntryUrls.add(classpathEntryUrl);
+                } catch (MalformedURLException mue) {
+                    // do nothing
+                }
+            }
+            return classpathEntryUrls.toArray(new URL[classpathEntryUrls.size()]);
+        }
+
         public SunManagementNotExistsClassLoader(ClassLoader parent) {
-            super(((URLClassLoader) getSystemClassLoader()).getURLs(), parent);
+            super(CLASSPATH_ENTRY_URLS, parent);
         }
 
         @Override
@@ -52,13 +91,17 @@ public class FileDescriptorRatioGaugeSunManagementNotExistsTest {
                 throw new ClassNotFoundException(name);
             }
             if (name.startsWith("com.codahale.metrics.")) {
-                Class<?> ret = findLoadedClass(name);
-                if (ret != null) {
-                    return ret;
-                }
-                return findClass(name);
+                return loadMetricsClasses(name);
             }
             return super.loadClass(name, resolve);
+        }
+
+        private Class<?> loadMetricsClasses(String name) throws ClassNotFoundException {
+            Class<?> ret = findLoadedClass(name);
+            if (ret != null) {
+                return ret;
+            }
+            return findClass(name);
         }
 
         @Override
