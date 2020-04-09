@@ -11,6 +11,7 @@ import java.security.CodeSource;
 import java.security.PermissionCollection;
 import java.security.Permissions;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -60,22 +61,27 @@ public class FileDescriptorRatioGaugeSunManagementNotExistsTest {
         private static URL[] getClasspathEntryUrls(String... classpathEntries) {
             Set<URL> classpathEntryUrls = new LinkedHashSet<>(classpathEntries.length, 1);
             for (String classpathEntry : classpathEntries) {
-                try {
-                    URL classpathEntryUrl;
-                    if (classpathEntry.endsWith(".jar")) {
-                        classpathEntryUrl = new URL("file:jar:" + classpathEntry);
-                    } else {
-                        if (!classpathEntry.endsWith("/")) {
-                            classpathEntry = classpathEntry + "/";
-                        }
-                        classpathEntryUrl = new URL("file:" + classpathEntry);
-                    }
+                URL classpathEntryUrl = getClasspathEntryUrl(classpathEntry);
+                if (classpathEntryUrl != null) {
                     classpathEntryUrls.add(classpathEntryUrl);
-                } catch (MalformedURLException mue) {
-                    // do nothing
                 }
             }
             return classpathEntryUrls.toArray(new URL[classpathEntryUrls.size()]);
+        }
+
+        private static URL getClasspathEntryUrl(String classpathEntry) {
+            try {
+                if (classpathEntry.endsWith(".jar")) {
+                    return new URL("file:jar:" + classpathEntry);
+                }
+                if (!classpathEntry.endsWith("/")) {
+                    classpathEntry = classpathEntry + "/";
+                }
+                return new URL("file:" + classpathEntry);
+            } catch (MalformedURLException mue) {
+                // do nothing
+            }
+            return null;
         }
 
         public SunManagementNotExistsClassLoader(ClassLoader parent) {
@@ -90,7 +96,7 @@ public class FileDescriptorRatioGaugeSunManagementNotExistsTest {
             if (name.startsWith("com.sun.management.")) {
                 throw new ClassNotFoundException(name);
             }
-            if (name.startsWith("com.codahale.metrics.")) {
+            if (name.startsWith("com.codahale.metrics.jvm.")) {
                 return loadMetricsClasses(name);
             }
             return super.loadClass(name, resolve);
