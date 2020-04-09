@@ -1,7 +1,6 @@
 package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.RatioGauge;
-import com.sun.management.UnixOperatingSystemMXBean;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
@@ -10,7 +9,20 @@ import java.lang.management.OperatingSystemMXBean;
  * A gauge for the ratio of used to total file descriptors.
  */
 public class FileDescriptorRatioGauge extends RatioGauge {
+    private static final boolean unixOperatingSystemMXBeanExists;
+
     private final OperatingSystemMXBean os;
+
+    static {
+        boolean exists = false;
+        try {
+            Class.forName("com.sun.management.UnixOperatingSystemMXBean");
+            exists = true;
+        } catch (ClassNotFoundException e) {
+            // do nothing
+        }
+        unixOperatingSystemMXBeanExists = exists;
+    }
 
     /**
      * Creates a new gauge using the platform OS bean.
@@ -30,8 +42,8 @@ public class FileDescriptorRatioGauge extends RatioGauge {
 
     @Override
     protected Ratio getRatio() {
-        if (os instanceof UnixOperatingSystemMXBean) {
-            final UnixOperatingSystemMXBean unixOs = (UnixOperatingSystemMXBean) os;
+        if (unixOperatingSystemMXBeanExists && os instanceof com.sun.management.UnixOperatingSystemMXBean) {
+            final com.sun.management.UnixOperatingSystemMXBean unixOs = (com.sun.management.UnixOperatingSystemMXBean) os;
             return Ratio.of(unixOs.getOpenFileDescriptorCount(), unixOs.getMaxFileDescriptorCount());
         } else {
             return Ratio.of(Double.NaN, Double.NaN);
