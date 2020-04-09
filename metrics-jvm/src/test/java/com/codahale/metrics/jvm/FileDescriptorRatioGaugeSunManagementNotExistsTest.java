@@ -11,7 +11,6 @@ import java.security.CodeSource;
 import java.security.PermissionCollection;
 import java.security.Permissions;
 import java.security.PrivilegedAction;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
