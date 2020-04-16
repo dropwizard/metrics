@@ -2,6 +2,7 @@ package com.codahale.metrics;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A {@link Gauge} implementation which caches its value for a period of time.
@@ -12,8 +13,7 @@ public abstract class CachedGauge<T> implements Gauge<T> {
     private final Clock clock;
     private final AtomicLong reloadAt;
     private final long timeoutNS;
-
-    private volatile T value;
+    private final AtomicReference<T> value;
 
     /**
      * Creates a new cached gauge with the given timeout period.
@@ -36,6 +36,7 @@ public abstract class CachedGauge<T> implements Gauge<T> {
         this.clock = clock;
         this.reloadAt = new AtomicLong(0);
         this.timeoutNS = timeoutUnit.toNanos(timeout);
+        this.value = new AtomicReference<>();
     }
 
     /**
@@ -47,10 +48,15 @@ public abstract class CachedGauge<T> implements Gauge<T> {
 
     @Override
     public T getValue() {
-        if (shouldLoad()) {
-            this.value = loadValue();
+        T currentValue = this.value.get();
+        if (shouldLoad() || currentValue == null) {
+            T newValue = loadValue();
+            if (!this.value.compareAndSet(currentValue, newValue)) {
+                return this.value.get();
+            }
+            return newValue;
         }
-        return value;
+        return currentValue;
     }
 
     private boolean shouldLoad() {
