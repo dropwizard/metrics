@@ -6,7 +6,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,38 +65,29 @@ public class CachedGaugeTest {
     public void multipleThreadAccessReturnsConsistentResults() throws Exception {
         List<Future<Boolean>> futures = new ArrayList<>(THREAD_COUNT);
         long runningTimeMillis = TimeUnit.SECONDS.toMillis(10);
-
         for (int i = 0; i < THREAD_COUNT; i++) {
             Future<Boolean> future = executor.submit(() -> {
                 long startTime = System.currentTimeMillis();
                 int lastValue = 0;
-
                 do {
                     Integer newValue = shortTimeoutGauge.getValue();
-
                     if (newValue == null) {
                         LOGGER.warn("Cached gauge returned null value");
                         return false;
                     }
-
                     if (newValue < lastValue) {
                         LOGGER.error("Cached gauge returned stale value, last: {}, new: {}", lastValue, newValue);
                         return false;
                     }
-
                     lastValue = newValue;
                 } while (System.currentTimeMillis() - startTime <= runningTimeMillis);
-
                 return true;
             });
-
             futures.add(future);
         }
-
         for (int i = 0; i < futures.size(); i++) {
             assertTrue("Future " + i + " failed", futures.get(i).get());
         }
-
         executor.shutdown();
         executor.awaitTermination(1, TimeUnit.SECONDS);
     }
