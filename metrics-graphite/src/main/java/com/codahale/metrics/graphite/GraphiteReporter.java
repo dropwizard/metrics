@@ -71,6 +71,7 @@ public class GraphiteReporter extends ScheduledReporter {
         private ScheduledExecutorService executor;
         private boolean shutdownExecutorOnStop;
         private Set<MetricAttribute> disabledMetricAttributes;
+        private boolean addMetricAttributesAsTags;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -82,6 +83,7 @@ public class GraphiteReporter extends ScheduledReporter {
             this.executor = null;
             this.shutdownExecutorOnStop = true;
             this.disabledMetricAttributes = Collections.emptySet();
+            this.addMetricAttributesAsTags = false;
         }
 
         /**
@@ -177,6 +179,24 @@ public class GraphiteReporter extends ScheduledReporter {
             return this;
         }
 
+
+        /**
+         * Specifies whether or not metric attributes (e.g. "p999", "stddev" or "m15") should be reported in the traditional dot delimited format or in the tag based format.
+         * Without tags (default): `my.metric.p99`
+         * With tags: `my.metric;metricattribute=p99`
+         *
+         * Note that this setting only modifies the metric attribute, and will not convert any other portion of the metric name to use tags.
+         * For mor information on Graphite tag support see https://graphite.readthedocs.io/en/latest/tags.html
+         * See {@link MetricAttribute}.
+         *
+         * @param addMetricAttributesAsTags if true, then metric attributes will be added as tags
+         * @return {@code this}
+         */
+        public Builder addMetricAttributesAsTags(boolean addMetricAttributesAsTags) {
+            this.addMetricAttributesAsTags = addMetricAttributesAsTags;
+            return this;
+        }
+
         /**
          * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
          * given {@link GraphiteSender}.
@@ -207,7 +227,8 @@ public class GraphiteReporter extends ScheduledReporter {
                     filter,
                     executor,
                     shutdownExecutorOnStop,
-                    disabledMetricAttributes);
+                    disabledMetricAttributes,
+                    addMetricAttributesAsTags);
         }
     }
 
@@ -216,6 +237,7 @@ public class GraphiteReporter extends ScheduledReporter {
     private final GraphiteSender graphite;
     private final Clock clock;
     private final String prefix;
+    private final boolean addMetricAttributesAsTags;
 
     /**
      * Creates a new {@link GraphiteReporter} instance.
@@ -241,12 +263,14 @@ public class GraphiteReporter extends ScheduledReporter {
                                MetricFilter filter,
                                ScheduledExecutorService executor,
                                boolean shutdownExecutorOnStop,
-                               Set<MetricAttribute> disabledMetricAttributes) {
+                               Set<MetricAttribute> disabledMetricAttributes,
+                               boolean addMetricAttributesAsTags) {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
                 disabledMetricAttributes);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
+        this.addMetricAttributesAsTags = addMetricAttributesAsTags;
     }
 
     @Override
@@ -348,18 +372,18 @@ public class GraphiteReporter extends ScheduledReporter {
         if (getDisabledMetricAttributes().contains(type)) {
             return;
         }
-        graphite.send(prefix(name, type.getCode()), format(value), timestamp);
+        graphite.send(prefix(appendMetricAttribute(name, type.getCode())), format(value), timestamp);
     }
 
     private void sendIfEnabled(MetricAttribute type, String name, long value, long timestamp) throws IOException {
         if (getDisabledMetricAttributes().contains(type)) {
             return;
         }
-        graphite.send(prefix(name, type.getCode()), format(value), timestamp);
+        graphite.send(prefix(appendMetricAttribute(name, type.getCode())), format(value), timestamp);
     }
 
     private void reportCounter(String name, Counter counter, long timestamp) throws IOException {
-        graphite.send(prefix(name, COUNT.getCode()), format(counter.getCount()), timestamp);
+        graphite.send(prefix(appendMetricAttribute(name, COUNT.getCode())), format(counter.getCount()), timestamp);
     }
 
     private void reportGauge(String name, Gauge<?> gauge, long timestamp) throws IOException {
@@ -390,8 +414,15 @@ public class GraphiteReporter extends ScheduledReporter {
         return null;
     }
 
-    private String prefix(String... components) {
-        return MetricRegistry.name(prefix, components);
+    private String prefix(String name) {
+        return MetricRegistry.name(prefix, name);
+    }
+
+    private String appendMetricAttribute(String name, String metricAttribute){
+        if (addMetricAttributesAsTags){
+            return name + ";metricattribute=" + metricAttribute;
+        }
+        return name + "." + metricAttribute;
     }
 
     private String format(long n) {

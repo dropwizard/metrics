@@ -464,15 +464,48 @@ public class GraphiteReporterTest {
         verifyNoMoreInteractions(graphite);
     }
 
+    @Test
+    public void sendsMetricAttributesAsTagsIfEnabled() throws Exception {
+        final Counter counter = mock(Counter.class);
+        when(counter.getCount()).thenReturn(100L);
+
+        getReporterThatSendsMetricAttributesAsTags().report(map(),
+                map("counter", counter),
+                map(),
+                map(),
+                map());
+
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send("prefix.counter;metricattribute=count", "100", timestamp);
+        inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
+
+        verifyNoMoreInteractions(graphite);
+    }
+
     private GraphiteReporter getReporterWithCustomFormat() {
         return new GraphiteReporter(registry, graphite, clock, "prefix",
             TimeUnit.SECONDS, TimeUnit.MICROSECONDS, MetricFilter.ALL, null, false,
-            Collections.emptySet()) {
+            Collections.emptySet(), false) {
             @Override
             protected String format(double v) {
                 return String.format(Locale.US, "%4.4f", v);
             }
         };
+    }
+
+
+    private GraphiteReporter getReporterThatSendsMetricAttributesAsTags() {
+        return GraphiteReporter.forRegistry(registry)
+                .withClock(clock)
+                .prefixedWith("prefix")
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .filter(MetricFilter.ALL)
+                .disabledMetricAttributes(Collections.emptySet())
+                .addMetricAttributesAsTags(true)
+                .build(graphite);
     }
 
     private <T> SortedMap<String, T> map() {
