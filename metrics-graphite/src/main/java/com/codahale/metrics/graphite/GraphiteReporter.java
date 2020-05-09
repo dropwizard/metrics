@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.DoubleFunction;
 
 import static com.codahale.metrics.MetricAttribute.COUNT;
 import static com.codahale.metrics.MetricAttribute.M15_RATE;
@@ -72,6 +73,7 @@ public class GraphiteReporter extends ScheduledReporter {
         private boolean shutdownExecutorOnStop;
         private Set<MetricAttribute> disabledMetricAttributes;
         private boolean addMetricAttributesAsTags;
+        private DoubleFunction<String> floatingPointFormatter;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -84,6 +86,7 @@ public class GraphiteReporter extends ScheduledReporter {
             this.shutdownExecutorOnStop = true;
             this.disabledMetricAttributes = Collections.emptySet();
             this.addMetricAttributesAsTags = false;
+            this.floatingPointFormatter = DEFAULT_FP_FORMATTER;
         }
 
         /**
@@ -198,6 +201,17 @@ public class GraphiteReporter extends ScheduledReporter {
         }
 
         /**
+         * Use custom floating point formatter.
+         *
+         * @param floatingPointFormatter a custom formatter for floating point values
+         * @return {@code this}
+         */
+        public Builder withFloatingPointFormatter(DoubleFunction<String> floatingPointFormatter) {
+            this.floatingPointFormatter = floatingPointFormatter;
+            return this;
+        }
+
+        /**
          * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
          * given {@link GraphiteSender}.
          * <p>
@@ -228,31 +242,69 @@ public class GraphiteReporter extends ScheduledReporter {
                     executor,
                     shutdownExecutorOnStop,
                     disabledMetricAttributes,
-                    addMetricAttributesAsTags);
+                    addMetricAttributesAsTags,
+                    floatingPointFormatter);
         }
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphiteReporter.class);
+    // the Carbon plaintext format is pretty underspecified, but it seems like it just wants US-formatted digits
+    private static final DoubleFunction<String> DEFAULT_FP_FORMATTER = fp -> String.format(Locale.US, "%2.2f", fp);
 
     private final GraphiteSender graphite;
     private final Clock clock;
     private final String prefix;
     private final boolean addMetricAttributesAsTags;
+    private final DoubleFunction<String> floatingPointFormatter;
+  
+  
+    /**
+     * Creates a new {@link GraphiteReporter} instance.
+     *
+     * @param registry                  the {@link MetricRegistry} containing the metrics this
+     *                                  reporter will report
+     * @param graphite                  the {@link GraphiteSender} which is responsible for sending metrics to a Carbon server
+     *                                  via a transport protocol
+     * @param clock                     the instance of the time. Use {@link Clock#defaultClock()} for the default
+     * @param prefix                    the prefix of all metric names (may be null)
+     * @param rateUnit                  the time unit of in which rates will be converted
+     * @param durationUnit              the time unit of in which durations will be converted
+     * @param filter                    the filter for which metrics to report
+     * @param executor                  the executor to use while scheduling reporting of metrics (may be null).
+     * @param shutdownExecutorOnStop    if true, then executor will be stopped in same time with this reporter
+     * @param disabledMetricAttributes  do not report specific metric attributes
+     */
+    protected GraphiteReporter(MetricRegistry registry,
+                               GraphiteSender graphite,
+                               Clock clock,
+                               String prefix,
+                               TimeUnit rateUnit,
+                               TimeUnit durationUnit,
+                               MetricFilter filter,
+                               ScheduledExecutorService executor,
+                               boolean shutdownExecutorOnStop,
+                               Set<MetricAttribute> disabledMetricAttributes) {
+        this(registry, graphite, clock, prefix, rateUnit, durationUnit, filter, executor, shutdownExecutorOnStop,
+                disabledMetricAttributes, false);
+    }
+
 
     /**
      * Creates a new {@link GraphiteReporter} instance.
      *
-     * @param registry               the {@link MetricRegistry} containing the metrics this
-     *                               reporter will report
-     * @param graphite               the {@link GraphiteSender} which is responsible for sending metrics to a Carbon server
-     *                               via a transport protocol
-     * @param clock                  the instance of the time. Use {@link Clock#defaultClock()} for the default
-     * @param prefix                 the prefix of all metric names (may be null)
-     * @param rateUnit               the time unit of in which rates will be converted
-     * @param durationUnit           the time unit of in which durations will be converted
-     * @param filter                 the filter for which metrics to report
-     * @param executor               the executor to use while scheduling reporting of metrics (may be null).
-     * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
+     * @param registry                  the {@link MetricRegistry} containing the metrics this
+     *                                  reporter will report
+     * @param graphite                  the {@link GraphiteSender} which is responsible for sending metrics to a Carbon server
+     *                                  via a transport protocol
+     * @param clock                     the instance of the time. Use {@link Clock#defaultClock()} for the default
+     * @param prefix                    the prefix of all metric names (may be null)
+     * @param rateUnit                  the time unit of in which rates will be converted
+     * @param durationUnit              the time unit of in which durations will be converted
+     * @param filter                    the filter for which metrics to report
+     * @param executor                  the executor to use while scheduling reporting of metrics (may be null).
+     * @param shutdownExecutorOnStop    if true, then executor will be stopped in same time with this reporter
+     * @param disabledMetricAttributes  do not report specific metric attributes
+     * @param addMetricAttributesAsTags if true, then add metric attributes as tags instead of suffixes
      */
     protected GraphiteReporter(MetricRegistry registry,
                                GraphiteSender graphite,
@@ -265,12 +317,47 @@ public class GraphiteReporter extends ScheduledReporter {
                                boolean shutdownExecutorOnStop,
                                Set<MetricAttribute> disabledMetricAttributes,
                                boolean addMetricAttributesAsTags) {
+        this(registry, graphite, clock, prefix, rateUnit, durationUnit, filter, executor, shutdownExecutorOnStop,
+                disabledMetricAttributes, addMetricAttributesAsTags, DEFAULT_FP_FORMATTER);
+    }
+
+    /**
+     * Creates a new {@link GraphiteReporter} instance.
+     *
+     * @param registry                  the {@link MetricRegistry} containing the metrics this
+     *                                  reporter will report
+     * @param graphite                  the {@link GraphiteSender} which is responsible for sending metrics to a Carbon server
+     *                                  via a transport protocol
+     * @param clock                     the instance of the time. Use {@link Clock#defaultClock()} for the default
+     * @param prefix                    the prefix of all metric names (may be null)
+     * @param rateUnit                  the time unit of in which rates will be converted
+     * @param durationUnit              the time unit of in which durations will be converted
+     * @param filter                    the filter for which metrics to report
+     * @param executor                  the executor to use while scheduling reporting of metrics (may be null).
+     * @param shutdownExecutorOnStop    if true, then executor will be stopped in same time with this reporter
+     * @param disabledMetricAttributes  do not report specific metric attributes
+     * @param addMetricAttributesAsTags if true, then add metric attributes as tags instead of suffixes
+     * @param floatingPointFormatter    custom floating point formatter
+     */
+    protected GraphiteReporter(MetricRegistry registry,
+                               GraphiteSender graphite,
+                               Clock clock,
+                               String prefix,
+                               TimeUnit rateUnit,
+                               TimeUnit durationUnit,
+                               MetricFilter filter,
+                               ScheduledExecutorService executor,
+                               boolean shutdownExecutorOnStop,
+                               Set<MetricAttribute> disabledMetricAttributes,
+                               boolean addMetricAttributesAsTags,
+                               DoubleFunction<String> floatingPointFormatter) {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
                 disabledMetricAttributes);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
         this.addMetricAttributesAsTags = addMetricAttributesAsTags;
+        this.floatingPointFormatter = floatingPointFormatter;
     }
 
     @Override
@@ -430,8 +517,6 @@ public class GraphiteReporter extends ScheduledReporter {
     }
 
     protected String format(double v) {
-        // the Carbon plaintext format is pretty underspecified, but it seems like it just wants
-        // US-formatted digits
-        return String.format(Locale.US, "%2.2f", v);
+        return floatingPointFormatter.apply(v);
     }
 }
