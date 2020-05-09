@@ -28,6 +28,8 @@ public class SlidingTimeWindowReservoirTest {
     @Test
     public void boundsMeasurementsToATimeWindow() {
         final Clock clock = mock(Clock.class);
+        when(clock.getTick()).thenReturn(0L);
+
         final SlidingTimeWindowReservoir reservoir = new SlidingTimeWindowReservoir(10, NANOSECONDS, clock);
 
         when(clock.getTick()).thenReturn(0L);
@@ -61,13 +63,14 @@ public class SlidingTimeWindowReservoirTest {
             for (int updatesPerTick : Arrays.asList(1, 2, 127, 128, 129, 255, 256, 257)) {
                 //logger.info("Executing test: threshold={}, updatesPerTick={}", threshold, updatesPerTick);
 
-                // Set the clock to overflow in (2*window+1)ns
                 final ManualClock clock = new ManualClock();
-                clock.addNanos(Long.MAX_VALUE / 256 - 2 * window - clock.getTick());
-                assertThat(clock.getTick() * 256).isGreaterThan(0);
 
                 // Create the reservoir
                 final SlidingTimeWindowReservoir reservoir = new SlidingTimeWindowReservoir(window, NANOSECONDS, clock);
+
+                // Set the clock to overflow in (2*window+1)ns
+                clock.addNanos(Long.MAX_VALUE / 256 - 2 * window - clock.getTick());
+                assertThat(clock.getTick() * 256).isGreaterThan(0);
 
                 int updatesAfterThreshold = 0;
                 while (true) {
