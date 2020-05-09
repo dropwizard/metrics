@@ -72,6 +72,7 @@ public class GraphiteReporter extends ScheduledReporter {
         private ScheduledExecutorService executor;
         private boolean shutdownExecutorOnStop;
         private Set<MetricAttribute> disabledMetricAttributes;
+        private boolean addMetricAttributesAsTags;
         private DoubleFunction<String> floatingPointFormatter;
 
         private Builder(MetricRegistry registry) {
@@ -84,6 +85,7 @@ public class GraphiteReporter extends ScheduledReporter {
             this.executor = null;
             this.shutdownExecutorOnStop = true;
             this.disabledMetricAttributes = Collections.emptySet();
+            this.addMetricAttributesAsTags = false;
             this.floatingPointFormatter = DEFAULT_FP_FORMATTER;
         }
 
@@ -180,6 +182,24 @@ public class GraphiteReporter extends ScheduledReporter {
             return this;
         }
 
+
+        /**
+         * Specifies whether or not metric attributes (e.g. "p999", "stddev" or "m15") should be reported in the traditional dot delimited format or in the tag based format.
+         * Without tags (default): `my.metric.p99`
+         * With tags: `my.metric;metricattribute=p99`
+         *
+         * Note that this setting only modifies the metric attribute, and will not convert any other portion of the metric name to use tags.
+         * For mor information on Graphite tag support see https://graphite.readthedocs.io/en/latest/tags.html
+         * See {@link MetricAttribute}.
+         *
+         * @param addMetricAttributesAsTags if true, then metric attributes will be added as tags
+         * @return {@code this}
+         */
+        public Builder addMetricAttributesAsTags(boolean addMetricAttributesAsTags) {
+            this.addMetricAttributesAsTags = addMetricAttributesAsTags;
+            return this;
+        }
+
         /**
          * Use custom floating point formatter.
          *
@@ -222,6 +242,7 @@ public class GraphiteReporter extends ScheduledReporter {
                     executor,
                     shutdownExecutorOnStop,
                     disabledMetricAttributes,
+                    addMetricAttributesAsTags,
                     floatingPointFormatter);
         }
     }
@@ -233,8 +254,10 @@ public class GraphiteReporter extends ScheduledReporter {
     private final GraphiteSender graphite;
     private final Clock clock;
     private final String prefix;
+    private final boolean addMetricAttributesAsTags;
     private final DoubleFunction<String> floatingPointFormatter;
-
+  
+  
     /**
      * Creates a new {@link GraphiteReporter} instance.
      *
@@ -262,7 +285,40 @@ public class GraphiteReporter extends ScheduledReporter {
                                boolean shutdownExecutorOnStop,
                                Set<MetricAttribute> disabledMetricAttributes) {
         this(registry, graphite, clock, prefix, rateUnit, durationUnit, filter, executor, shutdownExecutorOnStop,
-                disabledMetricAttributes, DEFAULT_FP_FORMATTER);
+                disabledMetricAttributes, false);
+    }
+
+
+    /**
+     * Creates a new {@link GraphiteReporter} instance.
+     *
+     * @param registry                  the {@link MetricRegistry} containing the metrics this
+     *                                  reporter will report
+     * @param graphite                  the {@link GraphiteSender} which is responsible for sending metrics to a Carbon server
+     *                                  via a transport protocol
+     * @param clock                     the instance of the time. Use {@link Clock#defaultClock()} for the default
+     * @param prefix                    the prefix of all metric names (may be null)
+     * @param rateUnit                  the time unit of in which rates will be converted
+     * @param durationUnit              the time unit of in which durations will be converted
+     * @param filter                    the filter for which metrics to report
+     * @param executor                  the executor to use while scheduling reporting of metrics (may be null).
+     * @param shutdownExecutorOnStop    if true, then executor will be stopped in same time with this reporter
+     * @param disabledMetricAttributes  do not report specific metric attributes
+     * @param addMetricAttributesAsTags if true, then add metric attributes as tags instead of suffixes
+     */
+    protected GraphiteReporter(MetricRegistry registry,
+                               GraphiteSender graphite,
+                               Clock clock,
+                               String prefix,
+                               TimeUnit rateUnit,
+                               TimeUnit durationUnit,
+                               MetricFilter filter,
+                               ScheduledExecutorService executor,
+                               boolean shutdownExecutorOnStop,
+                               Set<MetricAttribute> disabledMetricAttributes,
+                               boolean addMetricAttributesAsTags) {
+        this(registry, graphite, clock, prefix, rateUnit, durationUnit, filter, executor, shutdownExecutorOnStop,
+                disabledMetricAttributes, addMetricAttributesAsTags, DEFAULT_FP_FORMATTER);
     }
 
     /**
@@ -280,6 +336,7 @@ public class GraphiteReporter extends ScheduledReporter {
      * @param executor                  the executor to use while scheduling reporting of metrics (may be null).
      * @param shutdownExecutorOnStop    if true, then executor will be stopped in same time with this reporter
      * @param disabledMetricAttributes  do not report specific metric attributes
+     * @param addMetricAttributesAsTags if true, then add metric attributes as tags instead of suffixes
      * @param floatingPointFormatter    custom floating point formatter
      */
     protected GraphiteReporter(MetricRegistry registry,
@@ -292,12 +349,14 @@ public class GraphiteReporter extends ScheduledReporter {
                                ScheduledExecutorService executor,
                                boolean shutdownExecutorOnStop,
                                Set<MetricAttribute> disabledMetricAttributes,
+                               boolean addMetricAttributesAsTags,
                                DoubleFunction<String> floatingPointFormatter) {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
                 disabledMetricAttributes);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
+        this.addMetricAttributesAsTags = addMetricAttributesAsTags;
         this.floatingPointFormatter = floatingPointFormatter;
     }
 
@@ -400,18 +459,18 @@ public class GraphiteReporter extends ScheduledReporter {
         if (getDisabledMetricAttributes().contains(type)) {
             return;
         }
-        graphite.send(prefix(name, type.getCode()), format(value), timestamp);
+        graphite.send(prefix(appendMetricAttribute(name, type.getCode())), format(value), timestamp);
     }
 
     private void sendIfEnabled(MetricAttribute type, String name, long value, long timestamp) throws IOException {
         if (getDisabledMetricAttributes().contains(type)) {
             return;
         }
-        graphite.send(prefix(name, type.getCode()), format(value), timestamp);
+        graphite.send(prefix(appendMetricAttribute(name, type.getCode())), format(value), timestamp);
     }
 
     private void reportCounter(String name, Counter counter, long timestamp) throws IOException {
-        graphite.send(prefix(name, COUNT.getCode()), format(counter.getCount()), timestamp);
+        graphite.send(prefix(appendMetricAttribute(name, COUNT.getCode())), format(counter.getCount()), timestamp);
     }
 
     private void reportGauge(String name, Gauge<?> gauge, long timestamp) throws IOException {
@@ -442,8 +501,15 @@ public class GraphiteReporter extends ScheduledReporter {
         return null;
     }
 
-    private String prefix(String... components) {
-        return MetricRegistry.name(prefix, components);
+    private String prefix(String name) {
+        return MetricRegistry.name(prefix, name);
+    }
+
+    private String appendMetricAttribute(String name, String metricAttribute){
+        if (addMetricAttributesAsTags){
+            return name + ";metricattribute=" + metricAttribute;
+        }
+        return name + "." + metricAttribute;
     }
 
     private String format(long n) {
