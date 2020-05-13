@@ -207,6 +207,27 @@ public class ScheduledReporterTest {
         assertEquals(2.0E-5, reporter.convertDuration(20), 0.0);
     }
 
+    @Test
+    public void shouldReportMetricsOnShutdown() throws Exception {
+        CountDownLatch latch = new CountDownLatch(1);
+        reporterWithNullExecutor.start(0, 10, TimeUnit.SECONDS, () -> {
+            if (latch.getCount() > 0) {
+                reporterWithNullExecutor.report();
+                latch.countDown();
+            }
+        });
+        latch.await(5, TimeUnit.SECONDS);
+        reporterWithNullExecutor.stop();
+
+        verify(reporterWithNullExecutor, times(2)).report(
+                map("gauge", gauge),
+                map("counter", counter),
+                map("histogram", histogram),
+                map("meter", meter),
+                map("timer", timer)
+        );
+    }
+
     private <T> SortedMap<String, T> map(String name, T value) {
         final SortedMap<String, T> map = new TreeMap<>();
         map.put(name, value);
