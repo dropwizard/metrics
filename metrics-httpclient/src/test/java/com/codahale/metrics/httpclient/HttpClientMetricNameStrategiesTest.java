@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 
 import static com.codahale.metrics.httpclient.HttpClientMetricNameStrategies.HOST_AND_METHOD;
 import static com.codahale.metrics.httpclient.HttpClientMetricNameStrategies.METHOD_ONLY;
+import static com.codahale.metrics.httpclient.HttpClientMetricNameStrategies.PATH_AND_METHOD;
 import static com.codahale.metrics.httpclient.HttpClientMetricNameStrategies.QUERYLESS_URL_AND_METHOD;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -57,6 +58,32 @@ public class HttpClientMetricNameStrategiesTest {
 
         assertThat(HOST_AND_METHOD.getNameFor(null, request),
                 is("org.apache.http.client.HttpClient.my.host.com.post-requests"));
+    }
+
+    @Test
+    public void pathAndMethodWithName() {
+        assertThat(PATH_AND_METHOD.getNameFor("some-service", new HttpPost("http://my.host.com/whatever/happens")),
+                is("org.apache.http.client.HttpClient.some-service./whatever/happens.post-requests"));
+    }
+
+    @Test
+    public void pathAndMethodWithoutName() {
+        assertThat(PATH_AND_METHOD.getNameFor(null, new HttpPost("http://my.host.com/whatever/happens")),
+                is("org.apache.http.client.HttpClient./whatever/happens.post-requests"));
+    }
+
+    @Test
+    public void pathAndMethodWithNameInWrappedRequest() throws URISyntaxException {
+        HttpRequest request = rewriteRequestURI(new HttpPost("http://my.host.com/whatever/happens"));
+        assertThat(PATH_AND_METHOD.getNameFor("some-service", request),
+                is("org.apache.http.client.HttpClient.some-service./whatever/happens.post-requests"));
+    }
+
+    @Test
+    public void pathAndMethodWithoutNameInWrappedRequest() throws URISyntaxException {
+        HttpRequest request = rewriteRequestURI(new HttpPost("http://my.host.com/whatever/happens"));
+        assertThat(PATH_AND_METHOD.getNameFor(null, request),
+                is("org.apache.http.client.HttpClient./whatever/happens.post-requests"));
     }
 
     @Test
