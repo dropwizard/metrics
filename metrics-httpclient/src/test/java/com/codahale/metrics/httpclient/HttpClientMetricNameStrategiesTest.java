@@ -59,28 +59,28 @@ public class HttpClientMetricNameStrategiesTest {
 
     @Test
     public void pathAndMethodWithName() {
-        assertThat(PATH_AND_METHOD.getNameFor("some-service", new HttpPost("http://my.host.com/whatever/path")),
-                is("org.apache.http.client.HttpClient.some-service./whatever/path.post-requests"));
+        assertThat(PATH_AND_METHOD.getNameFor("some-service", new HttpPost("http://my.host.com/whatever/happens")),
+                is("org.apache.http.client.HttpClient.some-service./whatever/happens.post-requests"));
     }
 
     @Test
     public void pathAndMethodWithoutName() {
-        assertThat(PATH_AND_METHOD.getNameFor(null, new HttpPost("http://my.host.com/whatever/path")),
-                is("org.apache.http.client.HttpClient./whatever/path.post-requests"));
+        assertThat(PATH_AND_METHOD.getNameFor(null, new HttpPost("http://my.host.com/whatever/happens")),
+                is("org.apache.http.client.HttpClient./whatever/happens.post-requests"));
     }
 
     @Test
     public void pathAndMethodWithNameInWrappedRequest() throws URISyntaxException {
-        HttpRequest request = rewriteRequestURI(new HttpPost("http://my.host.com/whatever/path"));
+        HttpRequest request = rewriteRequestURI(new HttpPost("http://my.host.com/whatever/happens"));
         assertThat(PATH_AND_METHOD.getNameFor("some-service", request),
-                is("org.apache.http.client.HttpClient.some-service./whatever/path.post-requests"));
+                is("org.apache.http.client.HttpClient.some-service./whatever/happens.post-requests"));
     }
 
     @Test
     public void pathAndMethodWithoutNameInWrappedRequest() throws URISyntaxException {
-        HttpRequest request = rewriteRequestURI(new HttpPost("http://my.host.com/whatever/path"));
+        HttpRequest request = rewriteRequestURI(new HttpPost("http://my.host.com/whatever/happens"));
         assertThat(PATH_AND_METHOD.getNameFor(null, request),
-                is("org.apache.http.client.HttpClient./whatever/path.post-requests"));
+                is("org.apache.http.client.HttpClient./whatever/happens.post-requests"));
     }
 
     @Test
