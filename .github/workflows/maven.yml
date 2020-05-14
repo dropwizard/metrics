@@ -2,14 +2,10 @@ name: Java CI
 on:
   pull_request:
     branches:
-    - 4.1-maintenance
-    - 4.1-development
-    - 5.0-development
+    - release/*
   push:
     branches:
-    - 4.1-maintenance
-    - 4.1-development
-    - 5.0-development
+    - release/*
 jobs:
   build:
     runs-on: ${{ matrix.os }}
