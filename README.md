@@ -1,3 +1,5 @@
+# :warning: This branch is not maintained! :warning:
+
 Metrics [![Build Status](https://secure.travis-ci.org/dropwizard/metrics.png)](http://travis-ci.org/dropwizard/metrics)
 =======
 
