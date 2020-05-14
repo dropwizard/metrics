@@ -1,3 +1,5 @@
+# :warning: This branch is not maintained! :warning:
+
 Metrics ![Build Status](https://api.travis-ci.org/codahale/metrics.png)
 =======
 
