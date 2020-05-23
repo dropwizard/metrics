@@ -50,6 +50,7 @@ public class HealthCheckModule extends Module {
         private void serializeThrowable(JsonGenerator json, Throwable error, String name) throws IOException {
             if (error != null) {
                 json.writeObjectFieldStart(name);
+                json.writeStringField("type", error.getClass().getTypeName());
                 json.writeStringField("message", error.getMessage());
                 json.writeArrayFieldStart("stack");
                 for (StackTraceElement element : error.getStackTrace()) {
