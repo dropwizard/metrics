@@ -166,7 +166,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
             throw new IllegalArgumentException("Reporter already started");
         }
 
-        this.scheduledFuture = executor.scheduleAtFixedRate(runnable, initialDelay, period, unit);
+        this.scheduledFuture = executor.scheduleWithFixedDelay(runnable, initialDelay, period, unit);
     }
 
     /**
