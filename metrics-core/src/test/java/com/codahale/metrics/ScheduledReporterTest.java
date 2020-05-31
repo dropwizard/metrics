@@ -106,7 +106,7 @@ public class ScheduledReporterTest {
     public void shouldUsePeriodAsInitialDelayIfNotSpecifiedOtherwise() throws Exception {
         reporterWithCustomMockExecutor.start(200, TimeUnit.MILLISECONDS);
 
-        verify(mockExecutor, times(1)).scheduleAtFixedRate(
+        verify(mockExecutor, times(1)).scheduleWithFixedDelay(
             any(Runnable.class), eq(200L), eq(200L), eq(TimeUnit.MILLISECONDS)
         );
     }
@@ -115,7 +115,7 @@ public class ScheduledReporterTest {
     public void shouldStartWithSpecifiedInitialDelay() throws Exception {
         reporterWithCustomMockExecutor.start(350, 100, TimeUnit.MILLISECONDS);
 
-        verify(mockExecutor).scheduleAtFixedRate(
+        verify(mockExecutor).scheduleWithFixedDelay(
             any(Runnable.class), eq(350L), eq(100L), eq(TimeUnit.MILLISECONDS)
         );
     }
@@ -220,6 +220,30 @@ public class ScheduledReporterTest {
         reporterWithNullExecutor.stop();
 
         verify(reporterWithNullExecutor, times(2)).report(
+                map("gauge", gauge),
+                map("counter", counter),
+                map("histogram", histogram),
+                map("meter", meter),
+                map("timer", timer)
+        );
+    }
+
+    @Test
+    public void shouldRescheduleAfterReportFinish() throws Exception {
+        // the first report is triggered at T + 0.1 seconds and takes 0.8 seconds
+        // after the first report finishes at T + 0.9 seconds the next report is scheduled to run at T + 1.4 seconds
+        reporter.start(100, 500, TimeUnit.MILLISECONDS, () -> {
+            reporter.report();
+            try {
+                Thread.sleep(800);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        Thread.sleep(1_000);
+
+        verify(reporter, times(1)).report(
                 map("gauge", gauge),
                 map("counter", counter),
                 map("histogram", histogram),
