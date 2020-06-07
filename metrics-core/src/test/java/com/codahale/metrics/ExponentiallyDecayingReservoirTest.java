@@ -47,7 +47,7 @@ public class ExponentiallyDecayingReservoirTest {
     }
 
     @Test
-    public void aHeavilyBiasedReservoirOf100OutOf1000Elements() throws Exception {
+    public void aHeavilyBiasedReservoirOf100OutOf1000Elements() {
         final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(1000, 0.01);
         for (int i = 0; i < 100; i++) {
             reservoir.update(i);
@@ -68,7 +68,7 @@ public class ExponentiallyDecayingReservoirTest {
     @Test
     public void longPeriodsOfInactivityShouldNotCorruptSamplingState() {
         final ManualClock clock = new ManualClock();
-        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(10, 0.015, clock);
+        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(10, 0.15, clock);
 
         // add 1000 values at a rate of 10 values/second
         for (int i = 0; i < 1000; i++) {
@@ -80,14 +80,13 @@ public class ExponentiallyDecayingReservoirTest {
         assertAllValuesBetween(reservoir, 1000, 2000);
 
         // wait for 15 hours and add another value.
-        // this should trigger a rescale. Note that the number of samples will be reduced to 2
-        // because of the very small scaling factor that will make all existing priorities equal to
-        // zero after rescale.
+        // this should trigger a rescale. Note that the number of samples will be reduced to 1
+        // because scaling factor equal to zero will remove all existing entries after rescale.
         clock.addHours(15);
         reservoir.update(2000);
         assertThat(reservoir.getSnapshot().size())
                 .isEqualTo(1);
-        assertAllValuesBetween(reservoir, 1000, 3000);
+        assertAllValuesBetween(reservoir, 1000, 2001);
 
 
         // add 1000 values at a rate of 10 values/second
@@ -116,12 +115,10 @@ public class ExponentiallyDecayingReservoirTest {
                 .isEqualTo(10);
         assertAllValuesBetween(reservoir, 1000, 2000);
 
-        // wait for 15 hours and add another value.
-        // this should trigger a rescale. Note that the number of samples will be reduced to 2
-        // because of the very small scaling factor that will make all existing priorities equal to
-        // zero after rescale.
+        // wait for 20 hours and take snapshot.
+        // this should trigger a rescale. Note that the number of samples will be reduced to 0
+        // because scaling factor equal to zero will remove all existing entries after rescale.
         clock.addHours(20);
-
         Snapshot snapshot = reservoir.getSnapshot();
         assertThat(snapshot.getMax()).isEqualTo(0);
         assertThat(snapshot.getMean()).isEqualTo(0);
@@ -209,7 +206,7 @@ public class ExponentiallyDecayingReservoirTest {
             int sum = 0;
             int previous = -1;
             for (int i = 0; i < 100; i++) {
-                // Wait for 24 hours before attempting the next concurrent
+                // Wait for 15 hours before attempting the next concurrent
                 // update.  The delay here needs to be sufficiently long to
                 // overflow if an update attempt is allowed to add a value to
                 // the reservoir without rescaling.  Note that:
