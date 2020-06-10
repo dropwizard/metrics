@@ -310,10 +310,10 @@ public class MetricRegistry implements MetricSet {
      * @return a new or pre-existing {@link Gauge}
      */
     @SuppressWarnings("rawtypes")
-    public Gauge gauge(String name, final MetricSupplier<Gauge> supplier) {
-        return getOrAdd(name, new MetricBuilder<Gauge>() {
+    public <T extends  Gauge> T gauge(String name, final MetricSupplier<T> supplier) {
+        return getOrAdd(name, new MetricBuilder<T>() {
             @Override
-            public Gauge newMetric() {
+            public T newMetric() {
                 return supplier.newMetric();
             }
 
