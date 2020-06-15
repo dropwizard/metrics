@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.httpclient</javaModuleName>
-        <http-client.version>5.0</http-client.version>
+        <http-client.version>5.0.1</http-client.version>
     </properties>
 
     <dependencyManagement>
