@@ -3,15 +3,9 @@ package com.codahale.metrics;
 /**
  * <p>
  * Similar to {@link Gauge}, but metric value is updated via calling {@link #setValue(T)} instead.
- * Thread-safety is ensured via storing metric value as a volatile member variable.
  * </p>
  */
 public class SimpleSettableGauge<T> implements SettableGauge<T> {
-    /**
-     * Current value.
-     * Volatile so that assignment is thread-safe.
-     * <a href="http://docs.oracle.com/javase/specs/jls/se14/html/jls-17.html#jls-17.7">See 17.7</a>
-     */
     private volatile T value;
 
     /**
