@@ -15,7 +15,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.jdbi3</javaModuleName>
-        <jdbi3.version>3.13.0</jdbi3.version>
+        <jdbi3.version>3.14.1</jdbi3.version>
     </properties>
 
     <dependencyManagement>

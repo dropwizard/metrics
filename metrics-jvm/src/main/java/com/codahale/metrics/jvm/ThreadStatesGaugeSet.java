@@ -55,6 +55,8 @@ public class ThreadStatesGaugeSet implements MetricSet {
 
         gauges.put("count", (Gauge<Integer>) threads::getThreadCount);
         gauges.put("daemon.count", (Gauge<Integer>) threads::getDaemonThreadCount);
+        gauges.put("peak.count", (Gauge<Integer>) threads::getPeakThreadCount);
+        gauges.put("total_started.count", (Gauge<Long>) threads::getTotalStartedThreadCount);
         gauges.put("deadlock.count", (Gauge<Integer>) () -> deadlockDetector.getDeadlockedThreads().size());
         gauges.put("deadlocks", (Gauge<Set<String>>) deadlockDetector::getDeadlockedThreads);
 
