@@ -15,28 +15,39 @@
  */
 package com.codahale.metrics.caffeine;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import com.codahale.metrics.MetricRegistry;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * An example of exporting stats to Dropwizard Metrics (http://metrics.dropwizard.io).
  *
  * @author ben.manes@gmail.com (Ben Manes)
+ * @author John Karp
  */
 public final class MetricsStatsCounterTest {
 
-  @Test
-  public void metrics() {
-    // Use a registry that is exported using a Reporter (via console, JMX, Graphite, etc)
-    MetricRegistry registry = new MetricRegistry();
+  private static final String PREFIX = "foo";
 
-    // Create the cache with a dedicated, uniquely named stats counter
+  private MetricsStatsCounter stats;
+  private MetricRegistry registry;
+
+  @Before
+  public void setUp() {
+    registry = new MetricRegistry();
+    stats = new MetricsStatsCounter(registry, PREFIX);
+  }
+
+  @Test
+  public void basicUsage() {
     LoadingCache<Integer, Integer> cache = Caffeine.newBuilder()
-        .recordStats(() -> new MetricsStatsCounter(registry, "example"))
+        .recordStats(() -> new MetricsStatsCounter(registry, PREFIX))
         .build(key -> key);
 
     // Perform application work
@@ -44,8 +55,55 @@ public final class MetricsStatsCounterTest {
       cache.get(1);
     }
 
-    // Statistics can be queried and reported on
-    assertEquals(cache.stats().hitCount(), 3L);
-    assertEquals(registry.counter("example.hits").getCount(), 3L);
+    assertEquals(3L, cache.stats().hitCount());
+    assertEquals(3L, registry.counter(PREFIX + ".hits").getCount());
+  }
+
+  @Test
+  public void hit() {
+    stats.recordHits(2);
+    assertThat(registry.counter(PREFIX + ".hits").getCount()).isEqualTo(2);
+  }
+
+  @Test
+  public void miss() {
+    stats.recordMisses(2);
+    assertThat(registry.counter(PREFIX + ".misses").getCount()).isEqualTo(2);
+  }
+
+  @Test
+  public void loadSuccess() {
+    stats.recordLoadSuccess(256);
+    assertThat(registry.counter(PREFIX + ".loads-success").getCount()).isEqualTo(1);
+  }
+
+  @Test
+  public void loadFailure() {
+    stats.recordLoadFailure(256);
+    assertThat(registry.counter(PREFIX + ".loads-failure").getCount()).isEqualTo(1);
+  }
+
+  @Test
+  public void eviction() {
+    stats.recordEviction();
+    assertThat(registry.counter(PREFIX + ".evictions").getCount()).isEqualTo(1);
+    assertThat(registry.counter(PREFIX + ".evictions-weight").getCount()).isEqualTo(1);
+  }
+
+  @Test
+  public void evictionWithWeight() {
+    stats.recordEviction(3);
+    assertThat(registry.counter(PREFIX + ".evictions").getCount()).isEqualTo(1);
+    assertThat(registry.counter(PREFIX + ".evictions-weight").getCount()).isEqualTo(3);
+  }
+
+  @Test
+  public void evictionWithCause() {
+    // With JUnit 5, this would be better done with @ParameterizedTest + @EnumSource
+    for (RemovalCause cause : RemovalCause.values()) {
+      stats.recordEviction(3, cause);
+      assertThat(registry.counter(PREFIX + ".evictions." + cause.name()).getCount()).isEqualTo(1);
+      assertThat(registry.counter(PREFIX + ".evictions-weight." + cause.name()).getCount()).isEqualTo(3);
+    }
   }
 }
