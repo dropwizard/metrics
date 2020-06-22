@@ -17,13 +17,16 @@ package com.codahale.metrics.caffeine;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.EnumMap;
 import java.util.concurrent.TimeUnit;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.github.benmanes.caffeine.cache.stats.StatsCounter;
+import org.checkerframework.checker.index.qual.NonNegative;
 
 /**
  * A {@link StatsCounter} instrumented with Dropwizard Metrics.
@@ -38,6 +41,8 @@ public final class MetricsStatsCounter implements StatsCounter {
   private final Timer totalLoadTime;
   private final Counter evictionCount;
   private final Counter evictionWeight;
+  private final EnumMap<RemovalCause, Counter> evictionCountWithCause;
+  private final EnumMap<RemovalCause, Counter> evictionWeightWithCause;
 
   /**
    * Constructs an instance for use by a single cache.
@@ -54,6 +59,17 @@ public final class MetricsStatsCounter implements StatsCounter {
     loadFailureCount = registry.counter(MetricRegistry.name(metricsPrefix, "loads-failure"));
     evictionCount = registry.counter(MetricRegistry.name(metricsPrefix, "evictions"));
     evictionWeight = registry.counter(MetricRegistry.name(metricsPrefix, "evictions-weight"));
+
+    evictionCountWithCause = new EnumMap<>(RemovalCause.class);
+    evictionWeightWithCause = new EnumMap<>(RemovalCause.class);
+    for (RemovalCause cause : RemovalCause.values()) {
+      evictionCountWithCause.put(
+          cause,
+          registry.counter(MetricRegistry.name(metricsPrefix, "evictions", cause.name())));
+      evictionWeightWithCause.put(
+          cause,
+          registry.counter(MetricRegistry.name(metricsPrefix, "evictions-weight", cause.name())));
+    }
   }
 
   @Override
@@ -89,6 +105,13 @@ public final class MetricsStatsCounter implements StatsCounter {
   public void recordEviction(int weight) {
     evictionCount.inc();
     evictionWeight.inc(weight);
+  }
+
+  @Override
+  public void recordEviction(@NonNegative int weight, RemovalCause cause) {
+    evictionCountWithCause.get(cause).inc();
+    evictionWeightWithCause.get(cause).inc(weight);
+    recordEviction(weight);
   }
 
   @Override
