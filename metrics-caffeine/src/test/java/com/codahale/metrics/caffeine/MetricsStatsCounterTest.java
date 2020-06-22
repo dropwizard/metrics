@@ -74,26 +74,26 @@ public final class MetricsStatsCounterTest {
   @Test
   public void loadSuccess() {
     stats.recordLoadSuccess(256);
-    assertThat(registry.counter(PREFIX + ".loads-success").getCount()).isEqualTo(1);
+    assertThat(registry.timer(PREFIX + ".loads-success").getCount()).isEqualTo(1);
   }
 
   @Test
   public void loadFailure() {
     stats.recordLoadFailure(256);
-    assertThat(registry.counter(PREFIX + ".loads-failure").getCount()).isEqualTo(1);
+    assertThat(registry.timer(PREFIX + ".loads-failure").getCount()).isEqualTo(1);
   }
 
   @Test
   public void eviction() {
     stats.recordEviction();
-    assertThat(registry.counter(PREFIX + ".evictions").getCount()).isEqualTo(1);
+    assertThat(registry.histogram(PREFIX + ".evictions").getCount()).isEqualTo(1);
     assertThat(registry.counter(PREFIX + ".evictions-weight").getCount()).isEqualTo(1);
   }
 
   @Test
   public void evictionWithWeight() {
     stats.recordEviction(3);
-    assertThat(registry.counter(PREFIX + ".evictions").getCount()).isEqualTo(1);
+    assertThat(registry.histogram(PREFIX + ".evictions").getCount()).isEqualTo(1);
     assertThat(registry.counter(PREFIX + ".evictions-weight").getCount()).isEqualTo(3);
   }
 
@@ -102,8 +102,7 @@ public final class MetricsStatsCounterTest {
     // With JUnit 5, this would be better done with @ParameterizedTest + @EnumSource
     for (RemovalCause cause : RemovalCause.values()) {
       stats.recordEviction(3, cause);
-      assertThat(registry.counter(PREFIX + ".evictions." + cause.name()).getCount()).isEqualTo(1);
-      assertThat(registry.counter(PREFIX + ".evictions-weight." + cause.name()).getCount()).isEqualTo(3);
+      assertThat(registry.histogram(PREFIX + ".evictions." + cause.name()).getCount()).isEqualTo(1);
     }
   }
 }
