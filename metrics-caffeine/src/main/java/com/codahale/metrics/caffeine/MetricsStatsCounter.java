@@ -47,13 +47,13 @@ public final class MetricsStatsCounter implements StatsCounter {
    */
   public MetricsStatsCounter(MetricRegistry registry, String metricsPrefix) {
     requireNonNull(metricsPrefix);
-    hitCount = registry.counter(metricsPrefix + ".hits");
-    missCount = registry.counter(metricsPrefix + ".misses");
-    totalLoadTime = registry.timer(metricsPrefix + ".loads");
-    loadSuccessCount = registry.counter(metricsPrefix + ".loads-success");
-    loadFailureCount = registry.counter(metricsPrefix + ".loads-failure");
-    evictionCount = registry.counter(metricsPrefix + ".evictions");
-    evictionWeight = registry.counter(metricsPrefix + ".evictions-weight");
+    hitCount = registry.counter(MetricRegistry.name(metricsPrefix, "hits"));
+    missCount = registry.counter(MetricRegistry.name(metricsPrefix, "misses"));
+    totalLoadTime = registry.timer(MetricRegistry.name(metricsPrefix, "loads"));
+    loadSuccessCount = registry.counter(MetricRegistry.name(metricsPrefix, "loads-success"));
+    loadFailureCount = registry.counter(MetricRegistry.name(metricsPrefix, "loads-failure"));
+    evictionCount = registry.counter(MetricRegistry.name(metricsPrefix, "evictions"));
+    evictionWeight = registry.counter(MetricRegistry.name(metricsPrefix, "evictions-weight"));
   }
 
   @Override
