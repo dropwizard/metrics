@@ -20,7 +20,7 @@
         <javaModuleName>com.codahale.metrics.servlets</javaModuleName>
         <jetty9.version>9.4.30.v20200611</jetty9.version>
         <papertrail.profiler.version>1.1.1</papertrail.profiler.version>
-        <servlet.version>3.1.0</servlet.version>
+        <servlet.version>4.0.1</servlet.version>
         <jackson.version>2.9.10.5</jackson.version>
     </properties>
 

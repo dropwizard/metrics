@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.servlet</javaModuleName>
-        <servlet.version>3.1.0</servlet.version>
+        <servlet.version>4.0.1</servlet.version>
     </properties>
 
     <dependencyManagement>
