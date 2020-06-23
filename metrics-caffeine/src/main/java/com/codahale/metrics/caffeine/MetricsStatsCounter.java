@@ -19,6 +19,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.EnumMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.LongAdder;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Histogram;
@@ -40,10 +41,12 @@ public final class MetricsStatsCounter implements StatsCounter {
   private final Counter missCount;
   private final Timer loadSuccess;
   private final Timer loadFailure;
-  private final Timer totalLoadTime;
   private final Histogram evictions;
   private final Counter evictionWeight;
   private final EnumMap<RemovalCause, Histogram> evictionsWithCause;
+
+  // for implementing snapshot()
+  private final LongAdder totalLoadTime = new LongAdder();
 
   /**
    * Constructs an instance for use by a single cache.
@@ -55,7 +58,6 @@ public final class MetricsStatsCounter implements StatsCounter {
     requireNonNull(metricsPrefix);
     hitCount = registry.counter(MetricRegistry.name(metricsPrefix, "hits"));
     missCount = registry.counter(MetricRegistry.name(metricsPrefix, "misses"));
-    totalLoadTime = registry.timer(MetricRegistry.name(metricsPrefix, "loads"));
     loadSuccess = registry.timer(MetricRegistry.name(metricsPrefix, "loads-success"));
     loadFailure = registry.timer(MetricRegistry.name(metricsPrefix, "loads-failure"));
     evictions = registry.histogram(MetricRegistry.name(metricsPrefix, "evictions"));
@@ -82,13 +84,13 @@ public final class MetricsStatsCounter implements StatsCounter {
   @Override
   public void recordLoadSuccess(long loadTime) {
     loadSuccess.update(loadTime, TimeUnit.NANOSECONDS);
-    totalLoadTime.update(loadTime, TimeUnit.NANOSECONDS);
+    totalLoadTime.add(loadTime);
   }
 
   @Override
   public void recordLoadFailure(long loadTime) {
     loadFailure.update(loadTime, TimeUnit.NANOSECONDS);
-    totalLoadTime.update(loadTime, TimeUnit.NANOSECONDS);
+    totalLoadTime.add(loadTime);
   }
 
   @Override
@@ -117,7 +119,7 @@ public final class MetricsStatsCounter implements StatsCounter {
         missCount.getCount(),
         loadSuccess.getCount(),
         loadFailure.getCount(),
-        totalLoadTime.getCount(),
+        totalLoadTime.sum(),
         evictions.getCount(),
         evictionWeight.getCount());
   }
