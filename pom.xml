@@ -17,6 +17,7 @@
         <module>metrics-bom</module>
         <module>metrics-annotation</module>
         <module>metrics-benchmarks</module>
+        <module>metrics-caffeine</module>
         <module>metrics-core</module>
         <module>metrics-collectd</module>
         <module>metrics-ehcache</module>
