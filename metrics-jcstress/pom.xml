@@ -4,11 +4,11 @@
     <parent>
         <artifactId>metrics-parent</artifactId>
         <groupId>io.dropwizard.metrics</groupId>
-        <version>4.1.11-SNAPSHOT</version>
+        <version>4.1.10.1</version>
     </parent>
 
     <artifactId>metrics-jcstress</artifactId>
-    <version>4.1.11-SNAPSHOT</version>
+    <version>4.1.10.1</version>
     <packaging>jar</packaging>
 
     <name>Metrics JCStress tests</name>
