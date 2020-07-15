@@ -8,17 +8,16 @@
         <version>4.1.11-SNAPSHOT</version>
     </parent>
 
-    <artifactId>metrics-httpclient</artifactId>
-    <name>Metrics Integration for Apache HttpClient</name>
+    <artifactId>metrics-caffeine</artifactId>
+    <name>Metrics Integration for Caffeine</name>
     <packaging>bundle</packaging>
     <description>
-        An Apache HttpClient wrapper providing Metrics instrumentation of connection pools, request
-        durations and rates, and other useful information.
+        Metrics Integration for Caffeine.
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.httpclient</javaModuleName>
-        <http-client.version>4.5.12</http-client.version>
+        <javaModuleName>com.codahale.metrics.caffeine</javaModuleName>
+        <caffeine.version>2.8.5</caffeine.version>
     </properties>
 
     <dependencyManagement>
@@ -39,9 +38,9 @@
             <artifactId>metrics-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${http-client.version}</version>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>${caffeine.version}</version>
         </dependency>
     </dependencies>
 </project>

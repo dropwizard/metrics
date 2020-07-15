@@ -46,7 +46,9 @@ public class ThreadStatesGaugeSetTest {
         });
 
         when(threads.getThreadCount()).thenReturn(12);
-        when(threads.getDaemonThreadCount()).thenReturn(13);
+        when(threads.getDaemonThreadCount()).thenReturn(10);
+        when(threads.getPeakThreadCount()).thenReturn(30);
+        when(threads.getTotalStartedThreadCount()).thenReturn(42L);
 
         when(detector.getDeadlockedThreads()).thenReturn(deadlocks);
     }
@@ -63,7 +65,9 @@ public class ThreadStatesGaugeSetTest {
                 "waiting.count",
                 "daemon.count",
                 "runnable.count",
-                "deadlock.count");
+                "deadlock.count",
+                "total_started.count",
+                "peak.count");
     }
 
     @Test
@@ -96,7 +100,7 @@ public class ThreadStatesGaugeSetTest {
     @Test
     public void hasAGaugeForTheNumberOfDaemonThreads() {
         assertThat(((Gauge<?>) gauges.getMetrics().get("daemon.count")).getValue())
-            .isEqualTo(13);
+            .isEqualTo(10);
     }
 
     @Test
@@ -109,6 +113,18 @@ public class ThreadStatesGaugeSetTest {
     public void hasAGaugeForAnyDeadlockCount() {
         assertThat(((Gauge<?>) gauges.getMetrics().get("deadlock.count")).getValue())
             .isEqualTo(1);
+    }
+
+    @Test
+    public void hasAGaugeForPeakThreadCount() {
+        assertThat(((Gauge<?>) gauges.getMetrics().get("peak.count")).getValue())
+            .isEqualTo(30);
+    }
+
+    @Test
+    public void hasAGaugeForTotalStartedThreadsCount() {
+        assertThat(((Gauge<?>) gauges.getMetrics().get("total_started.count")).getValue())
+            .isEqualTo(42L);
     }
 
     @Test
