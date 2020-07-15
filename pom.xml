@@ -42,6 +42,7 @@
     </modules>
 
     <properties>
+        <project.build.outputTimestamp>2011-02-24T06:12:03Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <slf4j.version>1.7.30</slf4j.version>
@@ -249,6 +250,9 @@
                             *
                         ]]>
                         </Import-Package>
+                        <!-- https://stackoverflow.com/a/29853163/49505 -->
+                        <_removeheaders>Bnd-LastModified</_removeheaders>
+                        <_reproducible>true</_reproducible>
                     </instructions>
                 </configuration>
             </plugin>
@@ -304,6 +308,7 @@
                     <source>8</source>
                     <doclint>none</doclint>
                     <quiet>true</quiet>
+                    <notimestamp>true</notimestamp>
                 </configuration>
                 <executions>
                     <execution>
