@@ -252,6 +252,7 @@
                         </Import-Package>
                         <!-- https://stackoverflow.com/a/29853163/49505 -->
                         <_removeheaders>Bnd-LastModified</_removeheaders>
+                        <_reproducible>true</_reproducible>
                     </instructions>
                 </configuration>
             </plugin>
