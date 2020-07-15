@@ -42,11 +42,12 @@
     </modules>
 
     <properties>
+        <project.build.outputTimestamp>2011-02-24T06:12:03Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <slf4j.version>1.7.30</slf4j.version>
         <assertj.version>3.16.1</assertj.version>
-        <mockito.version>3.3.3</mockito.version>
+        <mockito.version>3.4.0</mockito.version>
         <junit.version>4.12</junit.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
@@ -237,7 +238,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>4.2.1</version>
+                <version>5.1.1</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -249,6 +250,9 @@
                             *
                         ]]>
                         </Import-Package>
+                        <!-- https://stackoverflow.com/a/29853163/49505 -->
+                        <_removeheaders>Bnd-LastModified</_removeheaders>
+                        <_reproducible>true</_reproducible>
                     </instructions>
                 </configuration>
             </plugin>
@@ -304,6 +308,7 @@
                     <source>8</source>
                     <doclint>none</doclint>
                     <quiet>true</quiet>
+                    <notimestamp>true</notimestamp>
                 </configuration>
                 <executions>
                     <execution>
