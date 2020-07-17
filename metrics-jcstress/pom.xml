@@ -50,6 +50,8 @@
         <uberjar.name>jcstress</uberjar.name>
 
         <javaModuleName>com.codahale.metrics.jcstress</javaModuleName>
+        <jar.skipIfEmpty>true</jar.skipIfEmpty>
+        <maven.install.skip>true</maven.install.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
