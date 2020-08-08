@@ -4,7 +4,7 @@
 
     <groupId>io.dropwizard.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>4.1.11-SNAPSHOT</version>
+    <version>4.1.12-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
@@ -47,7 +47,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <slf4j.version>1.7.30</slf4j.version>
         <assertj.version>3.16.1</assertj.version>
-        <mockito.version>3.4.0</mockito.version>
+        <mockito.version>3.4.6</mockito.version>
         <junit.version>4.12</junit.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
@@ -250,6 +250,7 @@
                             *
                         ]]>
                         </Import-Package>
+                        <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
                         <!-- https://stackoverflow.com/a/29853163/49505 -->
                         <_removeheaders>Bnd-LastModified</_removeheaders>
                         <_reproducible>true</_reproducible>

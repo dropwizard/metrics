@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.1.11-SNAPSHOT</version>
+        <version>4.1.12-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-jetty9</artifactId>
@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.jetty9</javaModuleName>
-        <jetty9.version>9.4.30.v20200611</jetty9.version>
+        <jetty9.version>9.4.31.v20200723</jetty9.version>
     </properties>
 
     <dependencyManagement>
