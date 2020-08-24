@@ -1,11 +1,10 @@
 package com.codahale.metrics;
 
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.Math.exp;
 import static java.lang.Math.min;
@@ -26,14 +25,14 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
     private static final double DEFAULT_ALPHA = 0.015;
     private static final long RESCALE_THRESHOLD = TimeUnit.HOURS.toNanos(1);
 
-    private final ConcurrentSkipListMap<Double, WeightedSample> values;
-    private final ReentrantReadWriteLock lock;
     private final double alpha;
     private final int size;
-    private final AtomicLong count;
-    private volatile long startTime;
     private final AtomicLong nextScaleTime;
     private final Clock clock;
+
+    private volatile State writerState;
+    private volatile State snapshotState;
+
 
     /**
      * Creates a new {@link ExponentiallyDecayingReservoir} of 1028 elements, which offers a 99.9%
@@ -64,19 +63,17 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
      * @param clock the clock used to timestamp samples and track rescaling
      */
     public ExponentiallyDecayingReservoir(int size, double alpha, Clock clock) {
-        this.values = new ConcurrentSkipListMap<>();
-        this.lock = new ReentrantReadWriteLock();
         this.alpha = alpha;
         this.size = size;
         this.clock = clock;
-        this.count = new AtomicLong(0);
-        this.startTime = currentTimeInSeconds();
+        this.writerState = new State(currentTimeInSeconds());
+        this.snapshotState = writerState;
         this.nextScaleTime = new AtomicLong(clock.getTick() + RESCALE_THRESHOLD);
     }
 
     @Override
     public int size() {
-        return (int) min(size, count.get());
+        return (int) min(size, writerState.count.get());
     }
 
     @Override
@@ -92,26 +89,11 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
      */
     public void update(long value, long timestamp) {
         rescaleIfNeeded();
-        lockForRegularUsage();
-        try {
-            final double itemWeight = weight(timestamp - startTime);
-            final WeightedSample sample = new WeightedSample(value, itemWeight);
-            final double priority = itemWeight / ThreadLocalRandom.current().nextDouble();
-
-            final long newCount = count.incrementAndGet();
-            if (newCount <= size || values.isEmpty()) {
-                values.put(priority, sample);
-            } else {
-                Double first = values.firstKey();
-                if (first < priority && values.putIfAbsent(priority, sample) == null) {
-                    // ensure we always remove an item
-                    while (values.remove(first) == null) {
-                        first = values.firstKey();
-                    }
-                }
-            }
-        } finally {
-            unlockForRegularUsage();
+        final State localState = this.writerState;
+        localState.update(value, timestamp);
+        final State newLocalState = this.writerState;
+        if (localState != newLocalState) {
+            newLocalState.backfill(localState);
         }
     }
 
@@ -126,12 +108,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
     @Override
     public Snapshot getSnapshot() {
         rescaleIfNeeded();
-        lockForRegularUsage();
-        try {
-            return new WeightedSnapshot(values.values());
-        } finally {
-            unlockForRegularUsage();
-        }
+        return new WeightedSnapshot(snapshotState.values.get().values());
     }
 
     private long currentTimeInSeconds() {
@@ -161,47 +138,73 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
      * a linear pass over whatever data structure is being used."
      */
     private void rescale(long now, long next) {
-        lockForRescale();
-        try {
-            if (nextScaleTime.compareAndSet(next, now + RESCALE_THRESHOLD)) {
-                final long oldStartTime = startTime;
-                this.startTime = currentTimeInSeconds();
-                final double scalingFactor = exp(-alpha * (startTime - oldStartTime));
-                if (Double.compare(scalingFactor, 0) == 0) {
-                    values.clear();
-                } else {
-                    final ArrayList<Double> keys = new ArrayList<>(values.keySet());
-                    for (Double key : keys) {
-                        final WeightedSample sample = values.remove(key);
-                        final WeightedSample newSample = new WeightedSample(sample.value, sample.weight * scalingFactor);
-                        if (Double.compare(newSample.weight, 0) == 0) {
-                            continue;
-                        }
-                        values.put(key * scalingFactor, newSample);
-                    }
-                }
+        if (nextScaleTime.compareAndSet(next, now + RESCALE_THRESHOLD)) {
+            State oldState = this.writerState;
+            State newState = new State(currentTimeInSeconds());
 
-                // make sure the counter is in sync with the number of stored samples.
-                count.set(values.size());
-            }
-        } finally {
-            unlockForRescale();
+            this.writerState = newState;
+            // Snapshot won't see new values until the backfill completes
+            newState.backfill(oldState);
+
+            this.snapshotState = newState;
         }
     }
 
-    private void unlockForRescale() {
-        lock.writeLock().unlock();
-    }
+    private class State {
 
-    private void lockForRescale() {
-        lock.writeLock().lock();
-    }
+        private final AtomicReference<ConcurrentSkipListMap<Double, WeightedSample>> values =
+                new AtomicReference<>(new ConcurrentSkipListMap<>());
 
-    private void lockForRegularUsage() {
-        lock.readLock().lock();
-    }
+        private final long startTime;
+        private final AtomicLong count = new AtomicLong();
 
-    private void unlockForRegularUsage() {
-        lock.readLock().unlock();
+        private State(long startTime) {
+            this.startTime = startTime;
+        }
+
+        private void backfill(State previous) {
+            final double scalingFactor = exp(-alpha * (startTime - previous.startTime));
+
+            final ConcurrentSkipListMap<Double, WeightedSample> oldValues = previous.values.getAndSet(new ConcurrentSkipListMap<>());
+            previous.count.addAndGet(-oldValues.size());
+
+            if (Double.compare(scalingFactor, 0) == 0) {
+                return;
+            }
+
+            // Slightly racy - calls to update() could add values while we iterate over it
+            // but it should not affect the overall statistical correctness
+            for (final WeightedSample sample : oldValues.values()) {
+                final double newWeight = sample.weight * scalingFactor;
+                if (Double.compare(newWeight, 0) != 0) {
+                    update(new WeightedSample(sample.value, newWeight), newWeight);
+                }
+            }
+
+        }
+
+        private void update(long value, long timestamp) {
+            final double itemWeight = weight(timestamp - startTime);
+            final WeightedSample sample = new WeightedSample(value, itemWeight);
+            final double priority = itemWeight / ThreadLocalRandom.current().nextDouble();
+
+            update(sample, priority);
+        }
+
+        private void update(WeightedSample sample, double priority) {
+            ConcurrentSkipListMap<Double, WeightedSample> map = values.get();
+            final long newCount = count.incrementAndGet();
+            if (newCount <= size) {
+                map.put(priority, sample);
+            } else {
+                Double first = map.firstKey();
+                if (first < priority && map.putIfAbsent(priority, sample) == null) {
+                    // ensure we always remove an item
+                    while (map.remove(first) == null) {
+                        first = map.firstKey();
+                    }
+                }
+            }
+        }
     }
 }
