@@ -1,0 +1,785 @@
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_01
+
+# Run progress: 0.00% complete, ETA 00:03:00
+# Fork: 1 of 1
+# Warmup Iteration   1: 8.874 ops/us
+# Warmup Iteration   2: 7.220 ops/us
+Iteration   1: 6.475 ops/us
+Iteration   2: 9.054 ops/us
+Iteration   3: 9.437 ops/us
+Iteration   4: 9.362 ops/us
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_01":
+  8.582 ±(99.9%) 9.140 ops/us [Average]
+  (min, avg, max) = (6.475, 8.582, 9.437), stdev = 1.414
+  CI (99.9%): [≈ 0, 17.722] (assumes normal distribution)
+
+
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 2 threads, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_02
+
+# Run progress: 6.67% complete, ETA 00:02:53
+# Fork: 1 of 1
+# Warmup Iteration   1: 13.198 ops/us
+# Warmup Iteration   2: 13.059 ops/us
+Iteration   1: 14.122 ops/us
+Iteration   2: 14.230 ops/us
+Iteration   3: 14.347 ops/us
+Iteration   4: 14.127 ops/us
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_02":
+  14.207 ±(99.9%) 0.686 ops/us [Average]
+  (min, avg, max) = (14.122, 14.207, 14.347), stdev = 0.106
+  CI (99.9%): [13.521, 14.892] (assumes normal distribution)
+
+
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 4 threads, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_04
+
+# Run progress: 13.33% complete, ETA 00:02:40
+# Fork: 1 of 1
+# Warmup Iteration   1: 19.426 ops/us
+# Warmup Iteration   2: 18.461 ops/us
+Iteration   1: 22.212 ops/us
+Iteration   2: 22.332 ops/us
+Iteration   3: 22.140 ops/us
+Iteration   4: 21.588 ops/us
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_04":
+  22.068 ±(99.9%) 2.130 ops/us [Average]
+  (min, avg, max) = (21.588, 22.068, 22.332), stdev = 0.330
+  CI (99.9%): [19.938, 24.198] (assumes normal distribution)
+
+
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 32 threads, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_32
+
+# Run progress: 20.00% complete, ETA 00:02:27
+# Fork: 1 of 1
+# Warmup Iteration   1: 14.968 ops/us
+# Warmup Iteration   2: 20.394 ops/us
+Iteration   1: 20.881 ops/us
+Iteration   2: 20.984 ops/us
+Iteration   3: 20.635 ops/us
+Iteration   4: 17.773 ops/us
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_32":
+  20.068 ±(99.9%) 9.934 ops/us [Average]
+  (min, avg, max) = (17.773, 20.068, 20.984), stdev = 1.537
+  CI (99.9%): [10.134, 30.002] (assumes normal distribution)
+
+
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 32 threads, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_64
+
+# Run progress: 26.67% complete, ETA 00:02:17
+# Fork: 1 of 1
+# Warmup Iteration   1: 17.892 ops/us
+# Warmup Iteration   2: 20.651 ops/us
+Iteration   1: 21.722 ops/us
+Iteration   2: 21.357 ops/us
+Iteration   3: 18.185 ops/us
+Iteration   4: 19.439 ops/us
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_64":
+  20.176 ±(99.9%) 10.743 ops/us [Average]
+  (min, avg, max) = (18.185, 20.176, 21.722), stdev = 1.663
+  CI (99.9%): [9.432, 30.919] (assumes normal distribution)
+
+
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_01
+
+# Run progress: 33.33% complete, ETA 00:02:07
+# Fork: 1 of 1
+# Warmup Iteration   1: 0.114 us/op
+# Warmup Iteration   2: 0.110 us/op
+Iteration   1: 0.111 us/op
+Iteration   2: 0.115 us/op
+Iteration   3: 0.115 us/op
+Iteration   4: 0.112 us/op
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_01":
+  0.114 ±(99.9%) 0.014 us/op [Average]
+  (min, avg, max) = (0.111, 0.114, 0.115), stdev = 0.002
+  CI (99.9%): [0.100, 0.127] (assumes normal distribution)
+
+
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 2 threads, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_02
+
+# Run progress: 40.00% complete, ETA 00:01:54
+# Fork: 1 of 1
+# Warmup Iteration   1: 0.159 us/op
+# Warmup Iteration   2: 0.163 us/op
+Iteration   1: 0.162 us/op
+Iteration   2: 0.178 us/op
+Iteration   3: 0.164 us/op
+Iteration   4: 0.170 us/op
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_02":
+  0.169 ±(99.9%) 0.047 us/op [Average]
+  (min, avg, max) = (0.162, 0.169, 0.178), stdev = 0.007
+  CI (99.9%): [0.121, 0.216] (assumes normal distribution)
+
+
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 4 threads, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_04
+
+# Run progress: 46.67% complete, ETA 00:01:40
+# Fork: 1 of 1
+# Warmup Iteration   1: 0.202 ±(99.9%) 0.006 us/op
+# Warmup Iteration   2: 0.182 ±(99.9%) 0.011 us/op
+Iteration   1: 0.205 ±(99.9%) 0.087 us/op
+Iteration   2: 0.186 ±(99.9%) 0.030 us/op
+Iteration   3: 0.179 ±(99.9%) 0.011 us/op
+Iteration   4: 0.180 ±(99.9%) 0.006 us/op
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_04":
+  0.187 ±(99.9%) 0.077 us/op [Average]
+  (min, avg, max) = (0.179, 0.187, 0.205), stdev = 0.012
+  CI (99.9%): [0.111, 0.264] (assumes normal distribution)
+
+
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 32 threads, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_32
+
+# Run progress: 53.33% complete, ETA 00:01:28
+# Fork: 1 of 1
+# Warmup Iteration   1: 1.951 ±(99.9%) 0.105 us/op
+# Warmup Iteration   2: 1.576 ±(99.9%) 0.095 us/op
+Iteration   1: 1.798 ±(99.9%) 0.118 us/op
+Iteration   2: 1.622 ±(99.9%) 0.092 us/op
+Iteration   3: 1.537 ±(99.9%) 0.111 us/op
+Iteration   4: 1.648 ±(99.9%) 0.108 us/op
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_32":
+  1.651 ±(99.9%) 0.702 us/op [Average]
+  (min, avg, max) = (1.537, 1.651, 1.798), stdev = 0.109
+  CI (99.9%): [0.950, 2.353] (assumes normal distribution)
+
+
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 32 threads, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_64
+
+# Run progress: 60.00% complete, ETA 00:01:16
+# Fork: 1 of 1
+# Warmup Iteration   1: 1.877 ±(99.9%) 0.106 us/op
+# Warmup Iteration   2: 1.905 ±(99.9%) 0.084 us/op
+Iteration   1: 1.631 ±(99.9%) 0.075 us/op
+Iteration   2: 1.604 ±(99.9%) 0.099 us/op
+Iteration   3: 1.936 ±(99.9%) 0.112 us/op
+Iteration   4: 1.996 ±(99.9%) 0.110 us/op
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_64":
+  1.792 ±(99.9%) 1.312 us/op [Average]
+  (min, avg, max) = (1.604, 1.792, 1.996), stdev = 0.203
+  CI (99.9%): [0.480, 3.104] (assumes normal distribution)
+
+
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Sampling time
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_01
+
+# Run progress: 66.67% complete, ETA 00:01:03
+# Fork: 1 of 1
+# Warmup Iteration   1: 1.639 ±(99.9%) 1.776 us/op
+# Warmup Iteration   2: 0.158 ±(99.9%) 0.009 us/op
+Iteration   1: 0.149 ±(99.9%) 0.005 us/op
+                 measureThreads_01·p0.00:   0.129 us/op
+                 measureThreads_01·p0.50:   0.136 us/op
+                 measureThreads_01·p0.90:   0.145 us/op
+                 measureThreads_01·p0.95:   0.148 us/op
+                 measureThreads_01·p0.99:   0.197 us/op
+                 measureThreads_01·p0.999:  1.210 us/op
+                 measureThreads_01·p0.9999: 22.083 us/op
+                 measureThreads_01·p1.00:   34.240 us/op
+
+Iteration   2: 0.147 ±(99.9%) 0.005 us/op
+                 measureThreads_01·p0.00:   0.129 us/op
+                 measureThreads_01·p0.50:   0.136 us/op
+                 measureThreads_01·p0.90:   0.145 us/op
+                 measureThreads_01·p0.95:   0.148 us/op
+                 measureThreads_01·p0.99:   0.208 us/op
+                 measureThreads_01·p0.999:  0.616 us/op
+                 measureThreads_01·p0.9999: 13.542 us/op
+                 measureThreads_01·p1.00:   59.328 us/op
+
+Iteration   3: 0.142 ±(99.9%) 0.003 us/op
+                 measureThreads_01·p0.00:   0.129 us/op
+                 measureThreads_01·p0.50:   0.136 us/op
+                 measureThreads_01·p0.90:   0.145 us/op
+                 measureThreads_01·p0.95:   0.145 us/op
+                 measureThreads_01·p0.99:   0.166 us/op
+                 measureThreads_01·p0.999:  0.465 us/op
+                 measureThreads_01·p0.9999: 12.888 us/op
+                 measureThreads_01·p1.00:   30.496 us/op
+
+Iteration   4: 0.143 ±(99.9%) 0.003 us/op
+                 measureThreads_01·p0.00:   0.129 us/op
+                 measureThreads_01·p0.50:   0.136 us/op
+                 measureThreads_01·p0.90:   0.146 us/op
+                 measureThreads_01·p0.95:   0.148 us/op
+                 measureThreads_01·p0.99:   0.170 us/op
+                 measureThreads_01·p0.999:  0.531 us/op
+                 measureThreads_01·p0.9999: 12.844 us/op
+                 measureThreads_01·p1.00:   30.400 us/op
+
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_01":
+  N = 271028
+  mean =      0.146 ±(99.9%) 0.002 us/op
+
+  Histogram, us/op:
+    [ 0.000,  5.000) = 270926 
+    [ 5.000, 10.000) = 34 
+    [10.000, 15.000) = 47 
+    [15.000, 20.000) = 4 
+    [20.000, 25.000) = 3 
+    [25.000, 30.000) = 5 
+    [30.000, 35.000) = 7 
+    [35.000, 40.000) = 0 
+    [40.000, 45.000) = 1 
+    [45.000, 50.000) = 0 
+    [50.000, 55.000) = 0 
+
+  Percentiles, us/op:
+      p(0.0000) =      0.129 us/op
+     p(50.0000) =      0.136 us/op
+     p(90.0000) =      0.145 us/op
+     p(95.0000) =      0.147 us/op
+     p(99.0000) =      0.179 us/op
+     p(99.9000) =      0.548 us/op
+     p(99.9900) =     13.374 us/op
+     p(99.9990) =     37.151 us/op
+     p(99.9999) =     59.328 us/op
+    p(100.0000) =     59.328 us/op
+
+
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 2 threads, will synchronize iterations
+# Benchmark mode: Sampling time
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_02
+
+# Run progress: 73.33% complete, ETA 00:00:50
+# Fork: 1 of 1
+# Warmup Iteration   1: 0.467 ±(99.9%) 0.114 us/op
+# Warmup Iteration   2: 0.646 ±(99.9%) 0.682 us/op
+Iteration   1: 0.208 ±(99.9%) 0.025 us/op
+                 measureThreads_02·p0.00:   0.136 us/op
+                 measureThreads_02·p0.50:   0.182 us/op
+                 measureThreads_02·p0.90:   0.202 us/op
+                 measureThreads_02·p0.95:   0.213 us/op
+                 measureThreads_02·p0.99:   0.232 us/op
+                 measureThreads_02·p0.999:  3.044 us/op
+                 measureThreads_02·p0.9999: 30.879 us/op
+                 measureThreads_02·p1.00:   675.840 us/op
+
+Iteration   2: 0.194 ±(99.9%) 0.004 us/op
+                 measureThreads_02·p0.00:   0.147 us/op
+                 measureThreads_02·p0.50:   0.182 us/op
+                 measureThreads_02·p0.90:   0.199 us/op
+                 measureThreads_02·p0.95:   0.211 us/op
+                 measureThreads_02·p0.99:   0.244 us/op
+                 measureThreads_02·p0.999:  0.858 us/op
+                 measureThreads_02·p0.9999: 13.632 us/op
+                 measureThreads_02·p1.00:   35.328 us/op
+
+Iteration   3: 0.210 ±(99.9%) 0.053 us/op
+                 measureThreads_02·p0.00:   0.146 us/op
+                 measureThreads_02·p0.50:   0.182 us/op
+                 measureThreads_02·p0.90:   0.199 us/op
+                 measureThreads_02·p0.95:   0.211 us/op
+                 measureThreads_02·p0.99:   0.246 us/op
+                 measureThreads_02·p0.999:  0.833 us/op
+                 measureThreads_02·p0.9999: 16.614 us/op
+                 measureThreads_02·p1.00:   1482.752 us/op
+
+Iteration   4: 0.210 ±(99.9%) 0.005 us/op
+                 measureThreads_02·p0.00:   0.136 us/op
+                 measureThreads_02·p0.50:   0.194 us/op
+                 measureThreads_02·p0.90:   0.229 us/op
+                 measureThreads_02·p0.95:   0.243 us/op
+                 measureThreads_02·p0.99:   0.320 us/op
+                 measureThreads_02·p0.999:  2.692 us/op
+                 measureThreads_02·p0.9999: 13.760 us/op
+                 measureThreads_02·p1.00:   69.248 us/op
+
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_02":
+  N = 363219
+  mean =      0.206 ±(99.9%) 0.015 us/op
+
+  Histogram, us/op:
+    [   0.000,  125.000) = 363217 
+    [ 125.000,  250.000) = 0 
+    [ 250.000,  375.000) = 0 
+    [ 375.000,  500.000) = 0 
+    [ 500.000,  625.000) = 0 
+    [ 625.000,  750.000) = 1 
+    [ 750.000,  875.000) = 0 
+    [ 875.000, 1000.000) = 0 
+    [1000.000, 1125.000) = 0 
+    [1125.000, 1250.000) = 0 
+    [1250.000, 1375.000) = 0 
+    [1375.000, 1500.000) = 1 
+    [1500.000, 1625.000) = 0 
+    [1625.000, 1750.000) = 0 
+    [1750.000, 1875.000) = 0 
+
+  Percentiles, us/op:
+      p(0.0000) =      0.136 us/op
+     p(50.0000) =      0.183 us/op
+     p(90.0000) =      0.213 us/op
+     p(95.0000) =      0.223 us/op
+     p(99.0000) =      0.271 us/op
+     p(99.9000) =      1.400 us/op
+     p(99.9900) =     16.514 us/op
+     p(99.9990) =     76.762 us/op
+     p(99.9999) =   1482.752 us/op
+    p(100.0000) =   1482.752 us/op
+
+
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 4 threads, will synchronize iterations
+# Benchmark mode: Sampling time
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_04
+
+# Run progress: 80.00% complete, ETA 00:00:38
+# Fork: 1 of 1
+# Warmup Iteration   1: 2.236 ±(99.9%) 0.832 us/op
+# Warmup Iteration   2: 0.525 ±(99.9%) 0.375 us/op
+Iteration   1: 0.339 ±(99.9%) 0.193 us/op
+                 measureThreads_04·p0.00:   0.141 us/op
+                 measureThreads_04·p0.50:   0.250 us/op
+                 measureThreads_04·p0.90:   0.273 us/op
+                 measureThreads_04·p0.95:   0.279 us/op
+                 measureThreads_04·p0.99:   0.298 us/op
+                 measureThreads_04·p0.999:  0.681 us/op
+                 measureThreads_04·p0.9999: 30.646 us/op
+                 measureThreads_04·p1.00:   16023.552 us/op
+
+Iteration   2: 0.364 ±(99.9%) 0.192 us/op
+                 measureThreads_04·p0.00:   0.135 us/op
+                 measureThreads_04·p0.50:   0.247 us/op
+                 measureThreads_04·p0.90:   0.270 us/op
+                 measureThreads_04·p0.95:   0.276 us/op
+                 measureThreads_04·p0.99:   0.296 us/op
+                 measureThreads_04·p0.999:  0.780 us/op
+                 measureThreads_04·p0.9999: 54.094 us/op
+                 measureThreads_04·p1.00:   14516.224 us/op
+
+Iteration   3: 0.351 ±(99.9%) 0.185 us/op
+                 measureThreads_04·p0.00:   0.154 us/op
+                 measureThreads_04·p0.50:   0.250 us/op
+                 measureThreads_04·p0.90:   0.272 us/op
+                 measureThreads_04·p0.95:   0.277 us/op
+                 measureThreads_04·p0.99:   0.296 us/op
+                 measureThreads_04·p0.999:  0.706 us/op
+                 measureThreads_04·p0.9999: 31.025 us/op
+                 measureThreads_04·p1.00:   15908.864 us/op
+
+Iteration   4: 0.462 ±(99.9%) 0.281 us/op
+                 measureThreads_04·p0.00:   0.149 us/op
+                 measureThreads_04·p0.50:   0.229 us/op
+                 measureThreads_04·p0.90:   0.282 us/op
+                 measureThreads_04·p0.95:   0.296 us/op
+                 measureThreads_04·p0.99:   0.422 us/op
+                 measureThreads_04·p0.999:  1.112 us/op
+                 measureThreads_04·p0.9999: 66.726 us/op
+                 measureThreads_04·p1.00:   11993.088 us/op
+
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_04":
+  N = 1155805
+  mean =      0.375 ±(99.9%) 0.105 us/op
+
+  Histogram, us/op:
+    [    0.000,  1250.000) = 1155786 
+    [ 1250.000,  2500.000) = 6 
+    [ 2500.000,  3750.000) = 1 
+    [ 3750.000,  5000.000) = 2 
+    [ 5000.000,  6250.000) = 2 
+    [ 6250.000,  7500.000) = 1 
+    [ 7500.000,  8750.000) = 1 
+    [ 8750.000, 10000.000) = 1 
+    [10000.000, 11250.000) = 0 
+    [11250.000, 12500.000) = 2 
+    [12500.000, 13750.000) = 0 
+    [13750.000, 15000.000) = 1 
+    [15000.000, 16250.000) = 2 
+    [16250.000, 17500.000) = 0 
+    [17500.000, 18750.000) = 0 
+
+  Percentiles, us/op:
+      p(0.0000) =      0.135 us/op
+     p(50.0000) =      0.244 us/op
+     p(90.0000) =      0.273 us/op
+     p(95.0000) =      0.281 us/op
+     p(99.0000) =      0.323 us/op
+     p(99.9000) =      0.777 us/op
+     p(99.9900) =     36.492 us/op
+     p(99.9990) =   4339.488 us/op
+     p(99.9999) =  16005.683 us/op
+    p(100.0000) =  16023.552 us/op
+
+
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 32 threads, will synchronize iterations
+# Benchmark mode: Sampling time
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_32
+
+# Run progress: 86.67% complete, ETA 00:00:25
+# Fork: 1 of 1
+# Warmup Iteration   1: 12.582 ±(99.9%) 1.758 us/op
+# Warmup Iteration   2: 5.133 ±(99.9%) 1.124 us/op
+Iteration   1: 4.799 ±(99.9%) 1.018 us/op
+                 measureThreads_32·p0.00:   0.138 us/op
+                 measureThreads_32·p0.50:   0.225 us/op
+                 measureThreads_32·p0.90:   0.257 us/op
+                 measureThreads_32·p0.95:   0.268 us/op
+                 measureThreads_32·p0.99:   0.496 us/op
+                 measureThreads_32·p0.999:  2.136 us/op
+                 measureThreads_32·p0.9999: 19988.480 us/op
+                 measureThreads_32·p1.00:   95944.704 us/op
+
+Iteration   2: 4.690 ±(99.9%) 1.031 us/op
+                 measureThreads_32·p0.00:   0.138 us/op
+                 measureThreads_32·p0.50:   0.225 us/op
+                 measureThreads_32·p0.90:   0.255 us/op
+                 measureThreads_32·p0.95:   0.264 us/op
+                 measureThreads_32·p0.99:   0.282 us/op
+                 measureThreads_32·p0.999:  0.558 us/op
+                 measureThreads_32·p0.9999: 19988.480 us/op
+                 measureThreads_32·p1.00:   163840.000 us/op
+
+Iteration   3: 6.142 ±(99.9%) 1.387 us/op
+                 measureThreads_32·p0.00:   0.135 us/op
+                 measureThreads_32·p0.50:   0.222 us/op
+                 measureThreads_32·p0.90:   0.261 us/op
+                 measureThreads_32·p0.95:   0.283 us/op
+                 measureThreads_32·p0.99:   0.410 us/op
+                 measureThreads_32·p0.999:  0.729 us/op
+                 measureThreads_32·p0.9999: 25509.921 us/op
+                 measureThreads_32·p1.00:   139984.896 us/op
+
+Iteration   4: 5.287 ±(99.9%) 1.166 us/op
+                 measureThreads_32·p0.00:   0.140 us/op
+                 measureThreads_32·p0.50:   0.240 us/op
+                 measureThreads_32·p0.90:   0.261 us/op
+                 measureThreads_32·p0.95:   0.270 us/op
+                 measureThreads_32·p0.99:   0.300 us/op
+                 measureThreads_32·p0.999:  0.585 us/op
+                 measureThreads_32·p0.9999: 23348.838 us/op
+                 measureThreads_32·p1.00:   103940.096 us/op
+
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_32":
+  N = 7949364
+  mean =      5.195 ±(99.9%) 0.572 us/op
+
+  Histogram, us/op:
+    [     0.000,  12500.000) = 7948397 
+    [ 12500.000,  25000.000) = 262 
+    [ 25000.000,  37500.000) = 316 
+    [ 37500.000,  50000.000) = 171 
+    [ 50000.000,  62500.000) = 97 
+    [ 62500.000,  75000.000) = 52 
+    [ 75000.000,  87500.000) = 32 
+    [ 87500.000, 100000.000) = 25 
+    [100000.000, 112500.000) = 5 
+    [112500.000, 125000.000) = 3 
+    [125000.000, 137500.000) = 1 
+    [137500.000, 150000.000) = 2 
+    [150000.000, 162500.000) = 0 
+    [162500.000, 175000.000) = 1 
+    [175000.000, 187500.000) = 0 
+
+  Percentiles, us/op:
+      p(0.0000) =      0.135 us/op
+     p(50.0000) =      0.227 us/op
+     p(90.0000) =      0.258 us/op
+     p(95.0000) =      0.269 us/op
+     p(99.0000) =      0.391 us/op
+     p(99.9000) =      0.831 us/op
+     p(99.9900) =  23533.666 us/op
+     p(99.9990) =  71958.528 us/op
+     p(99.9999) = 108408.175 us/op
+    p(100.0000) = 163840.000 us/op
+
+
+# JMH version: 1.23
+# VM version: JDK 1.8.0_221, Java HotSpot(TM) 64-Bit Server VM, 25.221-b11
+# VM invoker: /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+# VM options: <none>
+# Warmup: 2 iterations, 2 s each
+# Measurement: 4 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 32 threads, will synchronize iterations
+# Benchmark mode: Sampling time
+# Benchmark: com.codahale.metrics.BenchmarkNewEDR.measureThreads_64
+
+# Run progress: 93.33% complete, ETA 00:00:12
+# Fork: 1 of 1
+# Warmup Iteration   1: 13.392 ±(99.9%) 1.668 us/op
+# Warmup Iteration   2: 5.631 ±(99.9%) 1.210 us/op
+Iteration   1: 6.440 ±(99.9%) 1.283 us/op
+                 measureThreads_64·p0.00:   0.133 us/op
+                 measureThreads_64·p0.50:   0.263 us/op
+                 measureThreads_64·p0.90:   0.363 us/op
+                 measureThreads_64·p0.95:   0.389 us/op
+                 measureThreads_64·p0.99:   0.471 us/op
+                 measureThreads_64·p0.999:  0.907 us/op
+                 measureThreads_64·p0.9999: 27983.872 us/op
+                 measureThreads_64·p1.00:   108003.328 us/op
+
+Iteration   2: 6.948 ±(99.9%) 1.499 us/op
+                 measureThreads_64·p0.00:   0.142 us/op
+                 measureThreads_64·p0.50:   0.249 us/op
+                 measureThreads_64·p0.90:   0.344 us/op
+                 measureThreads_64·p0.95:   0.369 us/op
+                 measureThreads_64·p0.99:   0.457 us/op
+                 measureThreads_64·p0.999:  0.810 us/op
+                 measureThreads_64·p0.9999: 31981.568 us/op
+                 measureThreads_64·p1.00:   115998.720 us/op
+
+Iteration   3: 5.515 ±(99.9%) 1.116 us/op
+                 measureThreads_64·p0.00:   0.133 us/op
+                 measureThreads_64·p0.50:   0.260 us/op
+                 measureThreads_64·p0.90:   0.350 us/op
+                 measureThreads_64·p0.95:   0.369 us/op
+                 measureThreads_64·p0.99:   0.403 us/op
+                 measureThreads_64·p0.999:  0.643 us/op
+                 measureThreads_64·p0.9999: 23986.176 us/op
+                 measureThreads_64·p1.00:   103940.096 us/op
+
+Iteration   4: 5.965 ±(99.9%) 1.248 us/op
+                 measureThreads_64·p0.00:   0.137 us/op
+                 measureThreads_64·p0.50:   0.269 us/op
+                 measureThreads_64·p0.90:   0.348 us/op
+                 measureThreads_64·p0.95:   0.373 us/op
+                 measureThreads_64·p0.99:   0.417 us/op
+                 measureThreads_64·p0.999:  0.702 us/op
+                 measureThreads_64·p0.9999: 26724.631 us/op
+                 measureThreads_64·p1.00:   88997.888 us/op
+
+
+
+Result "com.codahale.metrics.BenchmarkNewEDR.measureThreads_64":
+  N = 7019706
+  mean =      6.203 ±(99.9%) 0.643 us/op
+
+  Histogram, us/op:
+    [     0.000,  12500.000) = 7018641 
+    [ 12500.000,  25000.000) = 310 
+    [ 25000.000,  37500.000) = 340 
+    [ 37500.000,  50000.000) = 193 
+    [ 50000.000,  62500.000) = 99 
+    [ 62500.000,  75000.000) = 69 
+    [ 75000.000,  87500.000) = 27 
+    [ 87500.000, 100000.000) = 17 
+    [100000.000, 112500.000) = 9 
+    [112500.000, 125000.000) = 1 
+    [125000.000, 137500.000) = 0 
+    [137500.000, 150000.000) = 0 
+    [150000.000, 162500.000) = 0 
+    [162500.000, 175000.000) = 0 
+    [175000.000, 187500.000) = 0 
+
+  Percentiles, us/op:
+      p(0.0000) =      0.133 us/op
+     p(50.0000) =      0.263 us/op
+     p(90.0000) =      0.352 us/op
+     p(95.0000) =      0.375 us/op
+     p(99.0000) =      0.433 us/op
+     p(99.9000) =      0.799 us/op
+     p(99.9900) =  27983.872 us/op
+     p(99.9990) =  69184.026 us/op
+     p(99.9999) = 103940.096 us/op
+    p(100.0000) = 115998.720 us/op
+
+
+# Run complete. Total time: 00:03:12
+
+REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
+why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
+experiments, perform baseline and negative tests that provide experimental control, make sure
+the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
+Do not assume the numbers tell you what you want them to tell.
+
+Benchmark                                                      Mode      Cnt       Score    Error   Units
+BenchmarkNewEDR.measureThreads_01                             thrpt        4       8.582 ±  9.140  ops/us
+BenchmarkNewEDR.measureThreads_02                             thrpt        4      14.207 ±  0.686  ops/us
+BenchmarkNewEDR.measureThreads_04                             thrpt        4      22.068 ±  2.130  ops/us
+BenchmarkNewEDR.measureThreads_32                             thrpt        4      20.068 ±  9.934  ops/us
+BenchmarkNewEDR.measureThreads_64                             thrpt        4      20.176 ± 10.743  ops/us
+BenchmarkNewEDR.measureThreads_01                              avgt        4       0.114 ±  0.014   us/op
+BenchmarkNewEDR.measureThreads_02                              avgt        4       0.169 ±  0.047   us/op
+BenchmarkNewEDR.measureThreads_04                              avgt        4       0.187 ±  0.077   us/op
+BenchmarkNewEDR.measureThreads_32                              avgt        4       1.651 ±  0.702   us/op
+BenchmarkNewEDR.measureThreads_64                              avgt        4       1.792 ±  1.312   us/op
+BenchmarkNewEDR.measureThreads_01                            sample   271028       0.146 ±  0.002   us/op
+BenchmarkNewEDR.measureThreads_01:measureThreads_01·p0.00    sample                0.129            us/op
+BenchmarkNewEDR.measureThreads_01:measureThreads_01·p0.50    sample                0.136            us/op
+BenchmarkNewEDR.measureThreads_01:measureThreads_01·p0.90    sample                0.145            us/op
+BenchmarkNewEDR.measureThreads_01:measureThreads_01·p0.95    sample                0.147            us/op
+BenchmarkNewEDR.measureThreads_01:measureThreads_01·p0.99    sample                0.179            us/op
+BenchmarkNewEDR.measureThreads_01:measureThreads_01·p0.999   sample                0.548            us/op
+BenchmarkNewEDR.measureThreads_01:measureThreads_01·p0.9999  sample               13.374            us/op
+BenchmarkNewEDR.measureThreads_01:measureThreads_01·p1.00    sample               59.328            us/op
+BenchmarkNewEDR.measureThreads_02                            sample   363219       0.206 ±  0.015   us/op
+BenchmarkNewEDR.measureThreads_02:measureThreads_02·p0.00    sample                0.136            us/op
+BenchmarkNewEDR.measureThreads_02:measureThreads_02·p0.50    sample                0.183            us/op
+BenchmarkNewEDR.measureThreads_02:measureThreads_02·p0.90    sample                0.213            us/op
+BenchmarkNewEDR.measureThreads_02:measureThreads_02·p0.95    sample                0.223            us/op
+BenchmarkNewEDR.measureThreads_02:measureThreads_02·p0.99    sample                0.271            us/op
+BenchmarkNewEDR.measureThreads_02:measureThreads_02·p0.999   sample                1.400            us/op
+BenchmarkNewEDR.measureThreads_02:measureThreads_02·p0.9999  sample               16.514            us/op
+BenchmarkNewEDR.measureThreads_02:measureThreads_02·p1.00    sample             1482.752            us/op
+BenchmarkNewEDR.measureThreads_04                            sample  1155805       0.375 ±  0.105   us/op
+BenchmarkNewEDR.measureThreads_04:measureThreads_04·p0.00    sample                0.135            us/op
+BenchmarkNewEDR.measureThreads_04:measureThreads_04·p0.50    sample                0.244            us/op
+BenchmarkNewEDR.measureThreads_04:measureThreads_04·p0.90    sample                0.273            us/op
+BenchmarkNewEDR.measureThreads_04:measureThreads_04·p0.95    sample                0.281            us/op
+BenchmarkNewEDR.measureThreads_04:measureThreads_04·p0.99    sample                0.323            us/op
+BenchmarkNewEDR.measureThreads_04:measureThreads_04·p0.999   sample                0.777            us/op
+BenchmarkNewEDR.measureThreads_04:measureThreads_04·p0.9999  sample               36.492            us/op
+BenchmarkNewEDR.measureThreads_04:measureThreads_04·p1.00    sample            16023.552            us/op
+BenchmarkNewEDR.measureThreads_32                            sample  7949364       5.195 ±  0.572   us/op
+BenchmarkNewEDR.measureThreads_32:measureThreads_32·p0.00    sample                0.135            us/op
+BenchmarkNewEDR.measureThreads_32:measureThreads_32·p0.50    sample                0.227            us/op
+BenchmarkNewEDR.measureThreads_32:measureThreads_32·p0.90    sample                0.258            us/op
+BenchmarkNewEDR.measureThreads_32:measureThreads_32·p0.95    sample                0.269            us/op
+BenchmarkNewEDR.measureThreads_32:measureThreads_32·p0.99    sample                0.391            us/op
+BenchmarkNewEDR.measureThreads_32:measureThreads_32·p0.999   sample                0.831            us/op
+BenchmarkNewEDR.measureThreads_32:measureThreads_32·p0.9999  sample            23533.666            us/op
+BenchmarkNewEDR.measureThreads_32:measureThreads_32·p1.00    sample           163840.000            us/op
+BenchmarkNewEDR.measureThreads_64                            sample  7019706       6.203 ±  0.643   us/op
+BenchmarkNewEDR.measureThreads_64:measureThreads_64·p0.00    sample                0.133            us/op
+BenchmarkNewEDR.measureThreads_64:measureThreads_64·p0.50    sample                0.263            us/op
+BenchmarkNewEDR.measureThreads_64:measureThreads_64·p0.90    sample                0.352            us/op
+BenchmarkNewEDR.measureThreads_64:measureThreads_64·p0.95    sample                0.375            us/op
+BenchmarkNewEDR.measureThreads_64:measureThreads_64·p0.99    sample                0.433            us/op
+BenchmarkNewEDR.measureThreads_64:measureThreads_64·p0.999   sample                0.799            us/op
+BenchmarkNewEDR.measureThreads_64:measureThreads_64·p0.9999  sample            27983.872            us/op
+BenchmarkNewEDR.measureThreads_64:measureThreads_64·p1.00    sample           115998.720            us/op

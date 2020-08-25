@@ -10,7 +10,7 @@
 
     <artifactId>metrics-core</artifactId>
     <name>Metrics Core</name>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <description>
         Metrics is a Java library which gives you unparalleled insight into what your code does in
         production. Metrics provides a powerful toolkit of ways to measure the behavior of critical
@@ -20,4 +20,5 @@
     <properties>
         <javaModuleName>com.codahale.metrics</javaModuleName>
     </properties>
+
 </project>
