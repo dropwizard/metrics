@@ -21,8 +21,12 @@ import com.codahale.metrics.health.HealthCheckRegistry;
 import com.codahale.metrics.json.HealthCheckModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HealthCheckServlet extends HttpServlet {
+    private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
+    
     public static abstract class ContextListener implements ServletContextListener {
         /**
          * @return the {@link HealthCheckRegistry} to inject into the servlet context.
@@ -55,7 +59,7 @@ public class HealthCheckServlet extends HttpServlet {
 
         @Override
         public void contextDestroyed(ServletContextEvent event) {
-            // no-op
+         // no-op
         }
     }
 
@@ -114,7 +118,7 @@ public class HealthCheckServlet extends HttpServlet {
         super.destroy();
         registry.shutdown();
     }
-
+    
     @Override
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse resp) throws ServletException, IOException {
@@ -122,11 +126,14 @@ public class HealthCheckServlet extends HttpServlet {
         resp.setContentType(CONTENT_TYPE);
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
         if (results.isEmpty()) {
+            LOG.error("No healthchecks implemented, return HTTP {}", HttpServletResponse.SC_NOT_IMPLEMENTED);
             resp.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
         } else {
             if (isAllHealthy(results)) {
+                LOG.debug("All health checks report state healthy: {}", results);
                 resp.setStatus(HttpServletResponse.SC_OK);
             } else {
+                LOG.warn("Healthcheck is unhealthy: {}", results);
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         }
@@ -152,11 +159,6 @@ public class HealthCheckServlet extends HttpServlet {
     }
 
     private static boolean isAllHealthy(Map<String, HealthCheck.Result> results) {
-        for (HealthCheck.Result result : results.values()) {
-            if (!result.isHealthy()) {
-                return false;
-            }
-        }
-        return true;
+        return results.values().stream().allMatch(HealthCheck.Result::isHealthy);
     }
 }
