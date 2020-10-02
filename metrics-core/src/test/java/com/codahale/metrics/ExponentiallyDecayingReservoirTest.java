@@ -330,6 +330,36 @@ public class ExponentiallyDecayingReservoirTest {
                 .isEqualTo(9999);
     }
 
+    @Test
+    public void clockWrapShouldNotRescale() {
+        // First verify the test works as expected given low values
+        testShortPeriodShouldNotRescale(0);
+        // Now revalidate using an edge case nanoTime value just prior to wrapping
+        testShortPeriodShouldNotRescale(Long.MAX_VALUE - TimeUnit.MINUTES.toNanos(30));
+    }
+
+    private void testShortPeriodShouldNotRescale(long startTimeNanos) {
+        final ManualClock clock = new ManualClock(startTimeNanos);
+        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(10,
+                1,
+                clock);
+
+        reservoir.update(1000);
+        assertThat(reservoir.getSnapshot().size()).isEqualTo(1);
+
+        assertAllValuesBetween(reservoir, 1000, 1001);
+
+        // wait for 10 millis and take snapshot.
+        // this should not trigger a rescale. Note that the number of samples will be reduced to 0
+        // because scaling factor equal to zero will remove all existing entries after rescale.
+        clock.addSeconds(20 * 60);
+        Snapshot snapshot = reservoir.getSnapshot();
+        assertThat(snapshot.getMax()).isEqualTo(1000);
+        assertThat(snapshot.getMean()).isEqualTo(1000);
+        assertThat(snapshot.getMedian()).isEqualTo(1000);
+        assertThat(snapshot.size()).isEqualTo(1);
+    }
+
     private static void assertAllValuesBetween(ExponentiallyDecayingReservoir reservoir,
                                                double min,
                                                double max) {
