@@ -39,10 +39,11 @@ import java.util.function.BiConsumer;
  */
 public final class LockFreeExponentiallyDecayingReservoir implements Reservoir {
 
+    private static final double SECONDS_PER_NANO = .000000001D;
     private static final AtomicReferenceFieldUpdater<LockFreeExponentiallyDecayingReservoir, State> stateUpdater =
             AtomicReferenceFieldUpdater.newUpdater(LockFreeExponentiallyDecayingReservoir.class, State.class, "state");
 
-    private final double alpha;
+    private final double alphaNanos;
     private final int size;
     private final long rescaleThresholdNanos;
     private final Clock clock;
@@ -99,8 +100,7 @@ public final class LockFreeExponentiallyDecayingReservoir implements Reservoir {
          */
         State rescale(long newTick) {
             long durationNanos = newTick - startTick;
-            double durationSeconds = durationNanos / 1_000_000_000D;
-            double scalingFactor = Math.exp(-alpha * durationSeconds);
+            double scalingFactor = Math.exp(-alphaNanos * durationNanos);
             final AtomicLong newCount;
             ConcurrentSkipListMap<Double, WeightedSample> newValues = new ConcurrentSkipListMap<>();
             if (Double.compare(scalingFactor, 0) != 0) {
@@ -139,7 +139,11 @@ public final class LockFreeExponentiallyDecayingReservoir implements Reservoir {
     }
 
     private LockFreeExponentiallyDecayingReservoir(int size, double alpha, Duration rescaleThreshold, Clock clock) {
-        this.alpha = alpha;
+        // Scale alpha to nanoseconds
+        this.alphaNanos = alpha * SECONDS_PER_NANO;
+        if (Double.compare(alphaNanos, 0) == 0) {
+            throw new IllegalArgumentException("Alpha value " + alpha + " is to small to be scaled to nanoseconds");
+        }
         this.size = size;
         this.clock = clock;
         this.rescaleThresholdNanos = rescaleThreshold.toNanos();
@@ -181,8 +185,7 @@ public final class LockFreeExponentiallyDecayingReservoir implements Reservoir {
     }
 
     private double weight(long durationNanos) {
-        double durationSeconds = durationNanos / 1_000_000_000D;
-        return Math.exp(alpha * durationSeconds);
+        return Math.exp(alphaNanos * durationNanos);
     }
 
     public static Builder builder() {
