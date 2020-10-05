@@ -66,9 +66,7 @@ public final class LockFreeExponentiallyDecayingReservoir implements Reservoir {
             double itemWeight = weight(timestampNanos - startTick);
             double priority = itemWeight / ThreadLocalRandom.current().nextDouble();
             long currentCount = count.get();
-            if (currentCount < size) {
-                addSample(priority, value, itemWeight);
-            } else if (values.firstKey() < priority) {
+            if (currentCount < size || values.firstKey() < priority) {
                 addSample(priority, value, itemWeight);
             }
         }
