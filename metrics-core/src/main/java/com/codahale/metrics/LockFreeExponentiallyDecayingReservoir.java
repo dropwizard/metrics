@@ -139,9 +139,6 @@ public final class LockFreeExponentiallyDecayingReservoir implements Reservoir {
     private LockFreeExponentiallyDecayingReservoir(int size, double alpha, Duration rescaleThreshold, Clock clock) {
         // Scale alpha to nanoseconds
         this.alphaNanos = alpha * SECONDS_PER_NANO;
-        if (Double.compare(alphaNanos, 0) == 0) {
-            throw new IllegalArgumentException("Alpha value " + alpha + " is to small to be scaled to nanoseconds");
-        }
         this.size = size;
         this.clock = clock;
         this.rescaleThresholdNanos = rescaleThreshold.toNanos();
