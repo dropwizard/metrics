@@ -1,3 +1,18 @@
-test_script:
-  - ./mvnw -B verify
+version: '{build}'
+image:
+- 'Visual Studio 2019'
+environment:
+  JAVA_OPTS: '-Xms512m -Xmx512m -XX:+TieredCompilation -XX:TieredStopAtLevel=1'
+cache:
+- '%USERPROFILE%\.m2\repository'
+- '%USERPROFILE%\.m2\wrapper'
+max_jobs: 4
+skip_tags: true
+shallow_clone: true
+branches:
+  except:
+    - gh-pages
 build: off
+deploy: off
+test_script:
+- cmd: mvnw.cmd -V -B -ntp -ff -T 1C verify
