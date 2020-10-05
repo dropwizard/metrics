@@ -63,15 +63,17 @@ public final class LockFreeExponentiallyDecayingReservoir implements Reservoir {
 
         private void update(long value, long timestampNanos) {
             double itemWeight = weight(timestampNanos - startTick);
-            WeightedSample sample = new WeightedSample(value, itemWeight);
             double priority = itemWeight / ThreadLocalRandom.current().nextDouble();
 
             long newCount = count.incrementAndGet();
             if (newCount <= size || values.isEmpty()) {
-                values.put(priority, sample);
+                values.put(priority, new WeightedSample(value, itemWeight));
             } else {
                 Double first = values.firstKey();
-                if (first < priority && values.putIfAbsent(priority, sample) == null) {
+                if (first < priority
+                        // Optimization: Avoid WeightedSample allocation in the hot path when priority is lower than
+                        // the existing minimum.
+                        && values.putIfAbsent(priority, new WeightedSample(value, itemWeight)) == null) {
                     // Always remove an item
                     while (values.remove(first) == null) {
                         first = values.firstKey();
