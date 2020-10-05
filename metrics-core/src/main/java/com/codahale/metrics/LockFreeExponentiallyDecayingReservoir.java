@@ -52,6 +52,7 @@ public final class LockFreeExponentiallyDecayingReservoir implements Reservoir {
 
     private final class State {
         private final long startTick;
+        // Count is updated after samples are successfully added to the map.
         private final AtomicLong count;
         private final ConcurrentSkipListMap<Double, WeightedSample> values;
 
@@ -64,21 +65,18 @@ public final class LockFreeExponentiallyDecayingReservoir implements Reservoir {
         private void update(long value, long timestampNanos) {
             double itemWeight = weight(timestampNanos - startTick);
             double priority = itemWeight / ThreadLocalRandom.current().nextDouble();
+            long currentCount = count.get();
+            if (currentCount < size) {
+                addSample(priority, value, itemWeight);
+            } else if (values.firstKey() < priority) {
+                addSample(priority, value, itemWeight);
+            }
+        }
 
-            long newCount = count.incrementAndGet();
-            if (newCount <= size || values.isEmpty()) {
-                values.put(priority, new WeightedSample(value, itemWeight));
-            } else {
-                Double first = values.firstKey();
-                if (first < priority
-                        // Optimization: Avoid WeightedSample allocation in the hot path when priority is lower than
-                        // the existing minimum.
-                        && values.putIfAbsent(priority, new WeightedSample(value, itemWeight)) == null) {
-                    // Always remove an item
-                    while (values.remove(first) == null) {
-                        first = values.firstKey();
-                    }
-                }
+        private void addSample(double priority, long value, double itemWeight) {
+            if (values.putIfAbsent(priority, new WeightedSample(value, itemWeight)) == null
+                    && count.incrementAndGet() > size) {
+                values.pollFirstEntry();
             }
         }
 
