@@ -209,6 +209,10 @@ public final class LockFreeExponentiallyDecayingReservoir implements Reservoir {
          * replaced (based on weight, with some amount of random jitter).
          */
         public Builder size(int value) {
+            if (value <= 0) {
+                throw new IllegalArgumentException(
+                        "LockFreeExponentiallyDecayingReservoir size must be positive: " + value);
+            }
             this.size = value;
             return this;
         }
