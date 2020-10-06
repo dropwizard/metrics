@@ -157,20 +157,25 @@ public final class LockFreeExponentiallyDecayingReservoir implements Reservoir {
     }
 
     private State rescaleIfNeeded(long currentTick) {
+        // This method is optimized for size so the check may be quickly inlined.
+        // Rescaling occurs substantially less frequently than the check itself.
         State stateSnapshot = this.state;
-        long lastScaleTick = stateSnapshot.startTick;
-        if (currentTick - lastScaleTick >= rescaleThresholdNanos) {
-            State newState = stateSnapshot.rescale(currentTick);
-            if (stateUpdater.compareAndSet(this, stateSnapshot, newState)) {
-                // newState successfully installed
-                return newState;
-            }
-            // Otherwise another thread has won the race and we can return the result of a volatile read.
-            // It's possible this has taken so long that another update is required, however that's unlikely
-            // and no worse than the standard race between a rescale and update.
-            return this.state;
+        if (currentTick - stateSnapshot.startTick >= rescaleThresholdNanos) {
+            return doRescale(currentTick, stateSnapshot);
         }
         return stateSnapshot;
+    }
+
+    private State doRescale(long currentTick, State stateSnapshot) {
+        State newState = stateSnapshot.rescale(currentTick);
+        if (stateUpdater.compareAndSet(this, stateSnapshot, newState)) {
+            // newState successfully installed
+            return newState;
+        }
+        // Otherwise another thread has won the race and we can return the result of a volatile read.
+        // It's possible this has taken so long that another update is required, however that's unlikely
+        // and no worse than the standard race between a rescale and update.
+        return this.state;
     }
 
     @Override
