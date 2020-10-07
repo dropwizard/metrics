@@ -111,15 +111,19 @@ public final class LockFreeExponentiallyDecayingReservoir implements Reservoir {
         State rescale(long newTick) {
             long durationNanos = newTick - startTick;
             double scalingFactor = Math.exp(-alphaNanos * durationNanos);
-            final int newCount;
+            int newCount = 0;
             ConcurrentSkipListMap<Double, WeightedSample> newValues = new ConcurrentSkipListMap<>();
             if (Double.compare(scalingFactor, 0) != 0) {
                 RescalingConsumer consumer = new RescalingConsumer(scalingFactor, newValues);
                 values.forEach(consumer);
                 // make sure the counter is in sync with the number of stored samples.
                 newCount = consumer.count;
-            } else {
-                newCount = 0;
+            }
+            // It's possible that more values were added while the map was scanned, those with the
+            // minimum priorities are removed.
+            while (newCount > size) {
+                newValues.pollFirstEntry();
+                newCount--;
             }
             return new State(alphaNanos, size, newTick, newCount, newValues);
         }
