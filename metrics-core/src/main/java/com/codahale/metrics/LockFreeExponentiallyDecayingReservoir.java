@@ -51,7 +51,8 @@ public final class LockFreeExponentiallyDecayingReservoir implements Reservoir {
 
     private static final class State {
 
-        private static final AtomicIntegerFieldUpdater<State> countUpdater = AtomicIntegerFieldUpdater.newUpdater(State.class, "count");
+        private static final AtomicIntegerFieldUpdater<State> countUpdater =
+                AtomicIntegerFieldUpdater.newUpdater(State.class, "count");
 
         private final double alphaNanos;
         private final int size;
