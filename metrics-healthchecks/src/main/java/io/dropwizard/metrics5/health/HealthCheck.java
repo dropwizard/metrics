@@ -237,7 +237,7 @@ public interface HealthCheck {
                     builder.append(", ");
                     builder.append(e.getKey())
                             .append("=")
-                            .append(String.valueOf(e.getValue()));
+                            .append(e.getValue());
                 }
             }
             builder.append('}');
