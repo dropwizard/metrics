@@ -205,7 +205,7 @@ public class CsvReporterTest {
 
         assertThat(fileContents("test.meter.csv"))
                 .isEqualTo(csv(
-                        "t,count,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit",
+                        "t|count|mean_rate|m1_rate|m5_rate|m15_rate|rate_unit",
                         "19910191|1|2.000000|3.000000|4.000000|5.000000|events/second"
                 ));
     }
