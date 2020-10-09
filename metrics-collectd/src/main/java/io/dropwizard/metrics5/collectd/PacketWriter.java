@@ -154,16 +154,16 @@ class PacketWriter {
      * Binary protocol - CollectD | Signature part</a>
      */
     private ByteBuffer signPacket(ByteBuffer packet) {
-        final byte[] signature = sign(password, (ByteBuffer) ByteBuffer.allocate(packet.remaining() + username.length)
+        final byte[] signature = sign(password, ByteBuffer.allocate(packet.remaining() + username.length)
                 .put(username)
                 .put(packet)
                 .flip());
-        return (ByteBuffer) ByteBuffer.allocate(BUFFER_SIZE)
+        return ByteBuffer.allocate(BUFFER_SIZE)
                 .putShort((short) TYPE_SIGN_SHA256)
                 .putShort((short) (username.length + SIGNATURE_LEN))
                 .put(signature)
                 .put(username)
-                .put((ByteBuffer) packet.flip())
+                .put(packet.flip())
                 .flip();
     }
 
@@ -186,12 +186,12 @@ class PacketWriter {
      * Binary protocol - CollectD | Encrypted part</a>
      */
     private ByteBuffer encryptPacket(ByteBuffer packet) {
-        final ByteBuffer payload = (ByteBuffer) ByteBuffer.allocate(SHA1_LENGTH + packet.remaining())
+        final ByteBuffer payload = ByteBuffer.allocate(SHA1_LENGTH + packet.remaining())
                 .put(sha1(packet))
-                .put((ByteBuffer) packet.flip())
+                .put(packet.flip())
                 .flip();
         final EncryptionResult er = encrypt(password, payload);
-        return (ByteBuffer) ByteBuffer.allocate(BUFFER_SIZE)
+        return ByteBuffer.allocate(BUFFER_SIZE)
                 .putShort((short) TYPE_ENCR_AES256)
                 .putShort((short) (ENCRYPT_DATA_LEN + username.length + er.output.remaining()))
                 .putShort((short) username.length)
@@ -236,7 +236,7 @@ class PacketWriter {
         } catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException e) {
             throw new RuntimeException(e);
         }
-        return new EncryptionResult(iv, (ByteBuffer) output.flip());
+        return new EncryptionResult(iv, output.flip());
     }
 
     private static byte[] sha256(byte[] input) {
