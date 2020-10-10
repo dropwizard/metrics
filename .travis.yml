@@ -1,15 +1,10 @@
 language: java
-dist: trusty
-
-# don't just run the tests, also run error-prone
-script: ./mvnw -B verify
-
+dist: focal
+script: ./mvnw -B -V -ntp -ff verify
 jdk:
 - openjdk8
 - openjdk11
-
-notifications:
-  email:
-    recipients:
-      - ryan@10e.us
-
+cache:
+  directories:
+  - .autoconf
+  - $HOME/.m2
