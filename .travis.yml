@@ -2,7 +2,6 @@ language: java
 dist: focal
 script: ./mvnw -B -V -ntp -ff verify
 jdk:
-- openjdk8
 - openjdk11
 cache:
   directories:
