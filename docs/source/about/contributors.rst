@@ -51,6 +51,7 @@ Many, many thanks to:
 * `Dan Everton <https://github.com/deverton>`_
 * `Dan Revel <https://github.com/nopolabs>`_
 * `Daniel James <https://github.com/dwhjames>`_
+* `DarkJenum <https://github.com/DarkJenum>`_
 * `David Hatanian <https://github.com/dhatanian>`_
 * `David M. Karr <https://github.com/davidmichaelkarr>`_
 * `David Pursehouse <https://github.com/dpursehouse>`_
