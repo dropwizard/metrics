@@ -24,14 +24,14 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: ${{ matrix.java_version }}
-    - uses: actions/cache@v2.1.1
+    - uses: actions/cache@v2.1.2
       with:
         path: ~/.m2
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
     - name: Cache SonarCloud packages
-      uses: actions/cache@v2.1.1
+      uses: actions/cache@v2.1.2
       if: matrix.java_version == '11'
       with:
         path: ~/.sonar/cache
