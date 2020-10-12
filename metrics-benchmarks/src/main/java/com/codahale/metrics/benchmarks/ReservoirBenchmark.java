@@ -66,7 +66,7 @@ public class ReservoirBenchmark {
     @Benchmark
     public Object perfLockFreeExponentiallyDecayingReservoir() {
         lockFreeExponential.update(nextValue);
-        return slidingTime;
+        return lockFreeExponential;
     }
 
     public static void main(String[] args) throws RunnerException {
