@@ -48,7 +48,7 @@
         <slf4j.version>1.7.30</slf4j.version>
         <assertj.version>3.17.2</assertj.version>
         <mockito.version>3.5.13</mockito.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
 
