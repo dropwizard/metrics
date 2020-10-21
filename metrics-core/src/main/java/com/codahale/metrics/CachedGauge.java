@@ -34,7 +34,7 @@ public abstract class CachedGauge<T> implements Gauge<T> {
      */
     protected CachedGauge(Clock clock, long timeout, TimeUnit timeoutUnit) {
         this.clock = clock;
-        this.reloadAt = new AtomicLong(0);
+        this.reloadAt = new AtomicLong(clock.getTick());
         this.timeoutNS = timeoutUnit.toNanos(timeout);
         this.value = new AtomicReference<>();
     }
