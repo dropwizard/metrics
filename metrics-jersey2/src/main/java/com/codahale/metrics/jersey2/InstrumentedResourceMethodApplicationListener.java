@@ -4,6 +4,7 @@ import com.codahale.metrics.Clock;
 import com.codahale.metrics.ExponentiallyDecayingReservoir;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Reservoir;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -49,13 +51,14 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     private static final String TOTAL = "total";
 
     private final MetricRegistry metrics;
-    private ConcurrentMap<EventTypeAndMethod, Timer> timers = new ConcurrentHashMap<>();
-    private ConcurrentMap<Method, Meter> meters = new ConcurrentHashMap<>();
-    private ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters = new ConcurrentHashMap<>();
-    private ConcurrentMap<Method, ResponseMeterMetric> responseMeters = new ConcurrentHashMap<>();
+    private final ConcurrentMap<EventTypeAndMethod, Timer> timers = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Method, Meter> meters = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Method, ResponseMeterMetric> responseMeters = new ConcurrentHashMap<>();
 
     private final Clock clock;
     private final boolean trackFilters;
+    private final Supplier<Reservoir> reservoirSupplier;
 
     /**
      * Construct an application event listener using the given metrics registry.
@@ -78,9 +81,24 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
      */
     public InstrumentedResourceMethodApplicationListener(final MetricRegistry metrics, final Clock clock,
                                                          final boolean trackFilters) {
+        this(metrics, clock, trackFilters, ExponentiallyDecayingReservoir::new);
+    }
+
+    /**
+     * Constructs a custom application listener.
+     *
+     * @param metrics           the metrics registry where the metrics will be stored
+     * @param clock             the {@link Clock} to track time (used mostly in testing) in timers
+     * @param trackFilters      whether the processing time for request and response filters should be tracked
+     * @param reservoirSupplier Supplier for creating the {@link Reservoir} for {@link Timer timers}.
+     */
+    public InstrumentedResourceMethodApplicationListener(final MetricRegistry metrics, final Clock clock,
+                                                         final boolean trackFilters,
+                                                         final Supplier<Reservoir> reservoirSupplier) {
         this.metrics = metrics;
         this.clock = clock;
         this.trackFilters = trackFilters;
+        this.reservoirSupplier = reservoirSupplier;
     }
 
     /**
@@ -425,7 +443,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                               final Timed timed,
                               final String... suffixes) {
         final String name = chooseName(timed.name(), timed.absolute(), method, suffixes);
-        return registry.timer(name, () -> new Timer(new ExponentiallyDecayingReservoir(), clock));
+        return registry.timer(name, () -> new Timer(reservoirSupplier.get(), clock));
     }
 
     private Meter meterMetric(final MetricRegistry registry,

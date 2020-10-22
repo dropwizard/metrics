@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -59,6 +60,34 @@ public class CachedGaugeTest {
                 .isEqualTo(2);
 
         assertThat(gauge.getValue())
+                .isEqualTo(2);
+    }
+
+    @Test
+    public void reloadsCachedValueInNegativeTime() throws Exception {
+        AtomicLong time = new AtomicLong(-2L);
+        Clock clock = new Clock() {
+            @Override
+            public long getTick() {
+                return time.get();
+            }
+        };
+        Gauge<Integer> clockGauge = new CachedGauge<Integer>(clock, 1, TimeUnit.NANOSECONDS) {
+            @Override
+            protected Integer loadValue() {
+                return value.incrementAndGet();
+            }
+        };
+        assertThat(clockGauge.getValue())
+                .isEqualTo(1);
+        assertThat(clockGauge.getValue())
+                .isEqualTo(1);
+
+        time.set(-1L);
+
+        assertThat(clockGauge.getValue())
+                .isEqualTo(2);
+        assertThat(clockGauge.getValue())
                 .isEqualTo(2);
     }
 
