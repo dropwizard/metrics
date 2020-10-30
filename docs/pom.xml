@@ -73,6 +73,7 @@
                 <configuration>
                     <sourceDirectory>${project.build.directory}/source</sourceDirectory>
                 </configuration>
+                <version>2.9.0</version>
             </plugin>
         </plugins>
     </reporting>
