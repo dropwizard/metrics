@@ -217,7 +217,7 @@ public class MetricRegistryTest {
     @Test
     @SuppressWarnings("rawtypes")
     public void accessingACustomGaugeRegistersAndReusesIt() {
-        final MetricRegistry.MetricSupplier<Gauge> supplier = () -> gauge;
+        final MetricRegistry.MetricSupplier<Gauge<String>> supplier = () -> gauge;
         final Gauge gauge1 = registry.gauge("thing", supplier);
         final Gauge gauge2 = registry.gauge("thing", supplier);
 
