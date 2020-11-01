@@ -5,12 +5,12 @@ jobs:
     environment:
       JAVA_TOOL_OPTIONS: -Xms512m -Xmx2g
     docker:
-      - image: circleci/openjdk:8u171-jdk
+      - image: circleci/openjdk:8-jdk-stretch
     steps:
       - checkout
       - restore_cache:
           key: metrics-{{ checksum "pom.xml" }}
-      - run: mvn test
+      - run: ./mvnw -B verify
       - run:
           name: Save test results
           command: |
