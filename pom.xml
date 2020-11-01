@@ -45,9 +45,11 @@
         <project.build.outputTimestamp>2011-02-24T06:12:03Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <jetty9.version>9.4.33.v20201020</jetty9.version>
         <slf4j.version>1.7.30</slf4j.version>
-        <assertj.version>3.17.2</assertj.version>
-        <mockito.version>3.5.15</mockito.version>
+        <assertj.version>3.18.0</assertj.version>
+        <mockito.version>3.6.0</mockito.version>
         <junit.version>4.12</junit.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
