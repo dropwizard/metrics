@@ -6,8 +6,10 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -64,7 +66,7 @@ public class CollectdReporterTest {
 
     private <T extends Number> void reportsGauges(T value) throws Exception {
         reporter.report(
-                map("gauge", (Gauge) () -> value),
+                map("gauge", () -> value),
                 map(),
                 map(),
                 map(),
@@ -76,7 +78,7 @@ public class CollectdReporterTest {
     @Test
     public void reportsBooleanGauges() throws Exception {
         reporter.report(
-                map("gauge", (Gauge) () -> true),
+                map("gauge", () -> true),
                 map(),
                 map(),
                 map(),
@@ -85,7 +87,7 @@ public class CollectdReporterTest {
         assertThat(nextValues(receiver)).containsExactly(1d);
 
         reporter.report(
-                map("gauge", (Gauge) () -> false),
+                map("gauge", () -> false),
                 map(),
                 map(),
                 map(),
@@ -97,7 +99,7 @@ public class CollectdReporterTest {
     @Test
     public void doesNotReportStringGauges() throws Exception {
         reporter.report(
-                map("unsupported", (Gauge) () -> "value"),
+                map("unsupported", () -> "value"),
                 map(),
                 map(),
                 map(),
@@ -260,28 +262,6 @@ public class CollectdReporterTest {
         assertThat(values.getPlugin()).isEqualTo("dash_illegal.slash_illegal");
     }
 
-    @Test
-    public void testUnableSetSecurityLevelToSignWithoutUsername() {
-        assertThatIllegalArgumentException().isThrownBy(()->
-                CollectdReporter.forRegistry(registry)
-                        .withHostName("eddie")
-                        .withSecurityLevel(SecurityLevel.SIGN)
-                        .withPassword("t1_g3r")
-                        .build(new Sender("localhost", 25826)))
-                .withMessage("username is required for securityLevel: SIGN");
-    }
-
-    @Test
-    public void testUnableSetSecurityLevelToSignWithoutPassword() {
-        assertThatIllegalArgumentException().isThrownBy(()->
-                CollectdReporter.forRegistry(registry)
-                        .withHostName("eddie")
-                        .withSecurityLevel(SecurityLevel.SIGN)
-                        .withUsername("scott")
-                        .build(new Sender("localhost", 25826)))
-                .withMessage("password is required for securityLevel: SIGN");
-    }
-
     private <T> SortedMap<MetricName, T> map() {
         return new TreeMap<>();
     }
@@ -293,7 +273,8 @@ public class CollectdReporterTest {
     }
 
     private List<Number> nextValues(Receiver receiver) throws Exception {
-        return receiver.next().getValues();
+        final ValueList valueList = receiver.next();
+        return valueList == null ? Collections.emptyList() : valueList.getValues();
     }
 }
 

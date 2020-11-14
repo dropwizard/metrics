@@ -106,7 +106,7 @@ public class ScheduledReporterTest {
     public void shouldUsePeriodAsInitialDelayIfNotSpecifiedOtherwise() throws Exception {
         reporterWithCustomMockExecutor.start(200, TimeUnit.MILLISECONDS);
 
-        verify(mockExecutor, times(1)).scheduleAtFixedRate(
+        verify(mockExecutor, times(1)).scheduleWithFixedDelay(
             any(Runnable.class), eq(200L), eq(200L), eq(TimeUnit.MILLISECONDS)
         );
     }
@@ -115,7 +115,7 @@ public class ScheduledReporterTest {
     public void shouldStartWithSpecifiedInitialDelay() throws Exception {
         reporterWithCustomMockExecutor.start(350, 100, TimeUnit.MILLISECONDS);
 
-        verify(mockExecutor).scheduleAtFixedRate(
+        verify(mockExecutor).scheduleWithFixedDelay(
             any(Runnable.class), eq(350L), eq(100L), eq(TimeUnit.MILLISECONDS)
         );
     }
@@ -207,6 +207,51 @@ public class ScheduledReporterTest {
         assertEquals(2.0E-5, reporter.convertDuration(20), 0.0);
     }
 
+    @Test
+    public void shouldReportMetricsOnShutdown() throws Exception {
+        CountDownLatch latch = new CountDownLatch(1);
+        reporterWithNullExecutor.start(0, 10, TimeUnit.SECONDS, () -> {
+            if (latch.getCount() > 0) {
+                reporterWithNullExecutor.report();
+                latch.countDown();
+            }
+        });
+        latch.await(5, TimeUnit.SECONDS);
+        reporterWithNullExecutor.stop();
+
+        verify(reporterWithNullExecutor, times(2)).report(
+                map(MetricName.build("gauge"), gauge),
+                map(MetricName.build("counter"), counter),
+                map(MetricName.build("histogram"), histogram),
+                map(MetricName.build("meter"), meter),
+                map(MetricName.build("timer"), timer)
+        );
+    }
+
+    @Test
+    public void shouldRescheduleAfterReportFinish() throws Exception {
+        // the first report is triggered at T + 0.1 seconds and takes 0.8 seconds
+        // after the first report finishes at T + 0.9 seconds the next report is scheduled to run at T + 1.4 seconds
+        reporter.start(100, 500, TimeUnit.MILLISECONDS, () -> {
+            reporter.report();
+            try {
+                Thread.sleep(800);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        Thread.sleep(1_000);
+
+        verify(reporter, times(1)).report(
+                map(MetricName.build("gauge"), gauge),
+                map(MetricName.build("counter"), counter),
+                map(MetricName.build("histogram"), histogram),
+                map(MetricName.build("meter"), meter),
+                map(MetricName.build("timer"), timer)
+        );
+    }
+
     private <T> SortedMap<MetricName, T> map(MetricName name, T value) {
         final SortedMap<MetricName, T> map = new TreeMap<>();
         map.put(name, value);
@@ -231,7 +276,7 @@ public class ScheduledReporterTest {
 
         @Override
         @SuppressWarnings("rawtypes")
-        public void report(SortedMap<MetricName, Gauge> gauges, SortedMap<MetricName, Counter> counters, SortedMap<MetricName, Histogram> histograms, SortedMap<MetricName, Meter> meters, SortedMap<MetricName, Timer> timers) {
+        public void report(SortedMap<MetricName, Gauge<?>> gauges, SortedMap<MetricName, Counter> counters, SortedMap<MetricName, Histogram> histograms, SortedMap<MetricName, Meter> meters, SortedMap<MetricName, Timer> timers) {
             executionCount.incrementAndGet();
             // nothing doing!
         }

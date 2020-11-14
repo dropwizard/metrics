@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.jersey2</javaModuleName>
-        <jersey.version>2.29</jersey.version>
+        <jersey.version>2.32</jersey.version>
 
     </properties>
 
@@ -37,6 +37,11 @@
                 <version>${jersey.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>1.3.5</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

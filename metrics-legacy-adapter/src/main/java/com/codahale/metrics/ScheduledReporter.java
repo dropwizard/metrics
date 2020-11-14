@@ -141,7 +141,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
         }
 
         @Override
-        public void report(SortedMap<MetricName, io.dropwizard.metrics5.Gauge> gauges, SortedMap<MetricName, io.dropwizard.metrics5.Counter> counters,
+        public void report(SortedMap<MetricName, io.dropwizard.metrics5.Gauge<?>> gauges, SortedMap<MetricName, io.dropwizard.metrics5.Counter> counters,
                            SortedMap<MetricName, io.dropwizard.metrics5.Histogram> histograms, SortedMap<MetricName, io.dropwizard.metrics5.Meter> meters,
                            SortedMap<MetricName, io.dropwizard.metrics5.Timer> timers) {
             delegate.report(MetricRegistry.adaptMetrics(gauges), MetricRegistry.adaptMetrics(counters),

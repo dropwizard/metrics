@@ -366,7 +366,7 @@ public class MetricRegistry implements MetricSet {
      * @return all the gauges in the registry
      */
     @SuppressWarnings("rawtypes")
-    public SortedMap<MetricName, Gauge> getGauges() {
+    public SortedMap<MetricName, Gauge<?>> getGauges() {
         return getGauges(MetricFilter.ALL);
     }
 
@@ -376,9 +376,15 @@ public class MetricRegistry implements MetricSet {
      * @param filter the metric filter to match
      * @return all the gauges in the registry
      */
-    @SuppressWarnings("rawtypes")
-    public SortedMap<MetricName, Gauge> getGauges(MetricFilter filter) {
-        return getMetrics(Gauge.class, filter);
+    public SortedMap<MetricName, Gauge<?>> getGauges(MetricFilter filter) {
+        final TreeMap<MetricName, Gauge<?>> timers = new TreeMap<>();
+        for (Map.Entry<MetricName, Metric> entry : metrics.entrySet()) {
+            if (entry.getValue() instanceof Gauge && filter.matches(entry.getKey(),
+                    entry.getValue())) {
+                timers.put(entry.getKey(), (Gauge<?>) entry.getValue());
+            }
+        }
+        return Collections.unmodifiableSortedMap(timers);
     }
 
     /**

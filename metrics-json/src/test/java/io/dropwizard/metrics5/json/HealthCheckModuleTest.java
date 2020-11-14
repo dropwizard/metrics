@@ -10,8 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class HealthCheckModuleTest {
     private final ObjectMapper mapper = new ObjectMapper().registerModule(new HealthCheckModule());
@@ -49,9 +47,8 @@ public class HealthCheckModuleTest {
 
     @Test
     public void serializesAnUnhealthyResultWithAnException() throws Exception {
-        final Throwable e = mock(Throwable.class);
-        when(e.getMessage()).thenReturn("oh no");
-        when(e.getStackTrace()).thenReturn(new StackTraceElement[]{
+        final RuntimeException e = new RuntimeException("oh no");
+        e.setStackTrace(new StackTraceElement[]{
             new StackTraceElement("Blah", "bloo", "Blah.java", 100)
         });
 
@@ -61,6 +58,7 @@ public class HealthCheckModuleTest {
                 "\"healthy\":false," +
                 "\"message\":\"oh no\"," +
                 "\"error\":{" +
+                "\"type\":\"java.lang.RuntimeException\"," +
                 "\"message\":\"oh no\"," +
                 "\"stack\":[\"Blah.bloo(Blah.java:100)\"]" +
                 "}," +
@@ -71,18 +69,15 @@ public class HealthCheckModuleTest {
 
     @Test
     public void serializesAnUnhealthyResultWithNestedExceptions() throws Exception {
-        final Throwable a = mock(Throwable.class);
-        when(a.getMessage()).thenReturn("oh no");
-        when(a.getStackTrace()).thenReturn(new StackTraceElement[]{
-            new StackTraceElement("Blah", "bloo", "Blah.java", 100)
+        final RuntimeException a = new RuntimeException("oh no");
+        a.setStackTrace(new StackTraceElement[]{
+                new StackTraceElement("Blah", "bloo", "Blah.java", 100)
         });
 
-        final Throwable b = mock(Throwable.class);
-        when(b.getMessage()).thenReturn("oh well");
-        when(b.getStackTrace()).thenReturn(new StackTraceElement[]{
-            new StackTraceElement("Blah", "blee", "Blah.java", 150)
+        final RuntimeException b = new RuntimeException("oh well", a);
+        b.setStackTrace(new StackTraceElement[]{
+                new StackTraceElement("Blah", "blee", "Blah.java", 150)
         });
-        when(b.getCause()).thenReturn(a);
 
         HealthCheck.Result result = HealthCheck.Result.unhealthy(b);
         assertThat(mapper.writeValueAsString(result))
@@ -90,9 +85,11 @@ public class HealthCheckModuleTest {
                 "\"healthy\":false," +
                 "\"message\":\"oh well\"," +
                 "\"error\":{" +
+                "\"type\":\"java.lang.RuntimeException\"," +
                 "\"message\":\"oh well\"," +
                 "\"stack\":[\"Blah.blee(Blah.java:150)\"]," +
                 "\"cause\":{" +
+                "\"type\":\"java.lang.RuntimeException\"," +
                 "\"message\":\"oh no\"," +
                 "\"stack\":[\"Blah.bloo(Blah.java:100)\"]" +
                 "}" +

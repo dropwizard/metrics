@@ -5,6 +5,7 @@ import io.dropwizard.metrics5.ExponentiallyDecayingReservoir;
 import io.dropwizard.metrics5.Meter;
 import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricRegistry;
+import io.dropwizard.metrics5.Reservoir;
 import io.dropwizard.metrics5.Timer;
 import io.dropwizard.metrics5.annotation.ExceptionMetered;
 import io.dropwizard.metrics5.annotation.Metered;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * An application event listener that listens for Jersey application initialization to
@@ -48,13 +50,14 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     private static final String TOTAL = "total";
 
     private final MetricRegistry metrics;
-    private ConcurrentMap<EventTypeAndMethod, Timer> timers = new ConcurrentHashMap<>();
-    private ConcurrentMap<Method, Meter> meters = new ConcurrentHashMap<>();
-    private ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters = new ConcurrentHashMap<>();
-    private ConcurrentMap<Method, ResponseMeterMetric> responseMeters = new ConcurrentHashMap<>();
+    private final ConcurrentMap<EventTypeAndMethod, Timer> timers = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Method, Meter> meters = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Method, ExceptionMeterMetric> exceptionMeters = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Method, ResponseMeterMetric> responseMeters = new ConcurrentHashMap<>();
 
     private final Clock clock;
     private final boolean trackFilters;
+    private final Supplier<Reservoir> reservoirSupplier;
 
     /**
      * Construct an application event listener using the given metrics registry.
@@ -77,9 +80,24 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
      */
     public InstrumentedResourceMethodApplicationListener(final MetricRegistry metrics, final Clock clock,
                                                          final boolean trackFilters) {
+        this(metrics, clock, trackFilters, ExponentiallyDecayingReservoir::new);
+    }
+
+    /**
+     * Constructs a custom application listener.
+     *
+     * @param metrics           the metrics registry where the metrics will be stored
+     * @param clock             the {@link Clock} to track time (used mostly in testing) in timers
+     * @param trackFilters      whether the processing time for request and response filters should be tracked
+     * @param reservoirSupplier Supplier for creating the {@link Reservoir} for {@link Timer timers}.
+     */
+    public InstrumentedResourceMethodApplicationListener(final MetricRegistry metrics, final Clock clock,
+                                                         final boolean trackFilters,
+                                                         final Supplier<Reservoir> reservoirSupplier) {
         this.metrics = metrics;
         this.clock = clock;
         this.trackFilters = trackFilters;
+        this.reservoirSupplier = reservoirSupplier;
     }
 
     /**
@@ -424,7 +442,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                               final Timed timed,
                               final String... suffixes) {
         final MetricName name = chooseName(timed.name(), timed.absolute(), method, suffixes);
-        return registry.timer(name, () -> new Timer(new ExponentiallyDecayingReservoir(), clock));
+        return registry.timer(name, () -> new Timer(reservoirSupplier.get(), clock));
     }
 
     private Meter meterMetric(final MetricRegistry registry,

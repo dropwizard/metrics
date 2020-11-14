@@ -192,14 +192,14 @@ public class CollectdReporter extends ScheduledReporter {
     }
 
     @Override
-    public void report(SortedMap<MetricName, Gauge> gauges, SortedMap<MetricName, Counter> counters,
+    public void report(SortedMap<MetricName, Gauge<?>> gauges, SortedMap<MetricName, Counter> counters,
                        SortedMap<MetricName, Histogram> histograms, SortedMap<MetricName, Meter> meters,
                        SortedMap<MetricName, Timer> timers) {
         MetaData.Builder metaData = new MetaData.Builder(hostName, clock.getTime() / 1000, period)
                 .type(COLLECTD_TYPE_GAUGE);
         try {
             connect(sender);
-            for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
+            for (Map.Entry<MetricName, Gauge<?>> entry : gauges.entrySet()) {
                 serializeGauge(metaData.plugin(entry.getKey().getKey()), entry.getValue());
             }
             for (Map.Entry<MetricName, Counter> entry : counters.entrySet()) {

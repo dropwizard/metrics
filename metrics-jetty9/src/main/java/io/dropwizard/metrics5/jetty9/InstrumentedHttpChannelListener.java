@@ -1,4 +1,4 @@
-package com.codahale.metrics.jetty9;
+package io.dropwizard.metrics5.jetty9;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

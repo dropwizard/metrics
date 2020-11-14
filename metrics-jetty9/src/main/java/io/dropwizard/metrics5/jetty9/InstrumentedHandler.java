@@ -26,6 +26,35 @@ import java.util.concurrent.TimeUnit;
  * instance.
  */
 public class InstrumentedHandler extends HandlerWrapper {
+    private static final String NAME_REQUESTS = "requests";
+    private static final String NAME_DISPATCHES = "dispatches";
+    private static final String NAME_ACTIVE_REQUESTS = "active-requests";
+    private static final String NAME_ACTIVE_DISPATCHES = "active-dispatches";
+    private static final String NAME_ACTIVE_SUSPENDED = "active-suspended";
+    private static final String NAME_ASYNC_DISPATCHES = "async-dispatches";
+    private static final String NAME_ASYNC_TIMEOUTS = "async-timeouts";
+    private static final String NAME_1XX_RESPONSES = "1xx-responses";
+    private static final String NAME_2XX_RESPONSES = "2xx-responses";
+    private static final String NAME_3XX_RESPONSES = "3xx-responses";
+    private static final String NAME_4XX_RESPONSES = "4xx-responses";
+    private static final String NAME_5XX_RESPONSES = "5xx-responses";
+    private static final String NAME_GET_REQUESTS = "get-requests";
+    private static final String NAME_POST_REQUESTS = "post-requests";
+    private static final String NAME_HEAD_REQUESTS = "head-requests";
+    private static final String NAME_PUT_REQUESTS = "put-requests";
+    private static final String NAME_DELETE_REQUESTS = "delete-requests";
+    private static final String NAME_OPTIONS_REQUESTS = "options-requests";
+    private static final String NAME_TRACE_REQUESTS = "trace-requests";
+    private static final String NAME_CONNECT_REQUESTS = "connect-requests";
+    private static final String NAME_MOVE_REQUESTS = "move-requests";
+    private static final String NAME_OTHER_REQUESTS = "other-requests";
+    private static final String NAME_PERCENT_4XX_1M = "percent-4xx-1m";
+    private static final String NAME_PERCENT_4XX_5M = "percent-4xx-5m";
+    private static final String NAME_PERCENT_4XX_15M = "percent-4xx-15m";
+    private static final String NAME_PERCENT_5XX_1M = "percent-5xx-1m";
+    private static final String NAME_PERCENT_5XX_5M = "percent-5xx-5m";
+    private static final String NAME_PERCENT_5XX_15M = "percent-5xx-15m";
+
     private final MetricRegistry metricRegistry;
 
     private String name;
@@ -90,8 +119,7 @@ public class InstrumentedHandler extends HandlerWrapper {
 
         try {
             DISPATCHED_HACK = HttpChannelState.State.valueOf("HANDLING");
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             DISPATCHED_HACK = HttpChannelState.State.valueOf("DISPATCHED");
         }
     }
@@ -108,38 +136,38 @@ public class InstrumentedHandler extends HandlerWrapper {
     protected void doStart() throws Exception {
         super.doStart();
 
-        final MetricName prefix = this.prefix == null ? MetricRegistry.name(getHandler().getClass(), name) : MetricRegistry.name(this.prefix, name);
+        final MetricName prefix = getMetricPrefix();
 
-        this.requests = metricRegistry.timer(prefix.resolve("requests"));
-        this.dispatches = metricRegistry.timer(prefix.resolve("dispatches"));
+        this.requests = metricRegistry.timer(prefix.resolve(NAME_REQUESTS));
+        this.dispatches = metricRegistry.timer(prefix.resolve(NAME_DISPATCHES));
 
-        this.activeRequests = metricRegistry.counter(prefix.resolve("active-requests"));
-        this.activeDispatches = metricRegistry.counter(prefix.resolve("active-dispatches"));
-        this.activeSuspended = metricRegistry.counter(prefix.resolve("active-suspended"));
+        this.activeRequests = metricRegistry.counter(prefix.resolve(NAME_ACTIVE_REQUESTS));
+        this.activeDispatches = metricRegistry.counter(prefix.resolve(NAME_ACTIVE_DISPATCHES));
+        this.activeSuspended = metricRegistry.counter(prefix.resolve(NAME_ACTIVE_SUSPENDED));
 
-        this.asyncDispatches = metricRegistry.meter(prefix.resolve("async-dispatches"));
-        this.asyncTimeouts = metricRegistry.meter(prefix.resolve("async-timeouts"));
+        this.asyncDispatches = metricRegistry.meter(prefix.resolve(NAME_ASYNC_DISPATCHES));
+        this.asyncTimeouts = metricRegistry.meter(prefix.resolve(NAME_ASYNC_TIMEOUTS));
 
         this.responses = new Meter[]{
-                metricRegistry.meter(prefix.resolve("1xx-responses")), // 1xx
-                metricRegistry.meter(prefix.resolve("2xx-responses")), // 2xx
-                metricRegistry.meter(prefix.resolve("3xx-responses")), // 3xx
-                metricRegistry.meter(prefix.resolve("4xx-responses")), // 4xx
-                metricRegistry.meter(prefix.resolve("5xx-responses"))  // 5xx
+                metricRegistry.meter(prefix.resolve(NAME_1XX_RESPONSES)), // 1xx
+                metricRegistry.meter(prefix.resolve(NAME_2XX_RESPONSES)), // 2xx
+                metricRegistry.meter(prefix.resolve(NAME_3XX_RESPONSES)), // 3xx
+                metricRegistry.meter(prefix.resolve(NAME_4XX_RESPONSES)), // 4xx
+                metricRegistry.meter(prefix.resolve(NAME_5XX_RESPONSES))  // 5xx
         };
 
-        this.getRequests = metricRegistry.timer(prefix.resolve("get-requests"));
-        this.postRequests = metricRegistry.timer(prefix.resolve("post-requests"));
-        this.headRequests = metricRegistry.timer(prefix.resolve("head-requests"));
-        this.putRequests = metricRegistry.timer(prefix.resolve("put-requests"));
-        this.deleteRequests = metricRegistry.timer(prefix.resolve("delete-requests"));
-        this.optionsRequests = metricRegistry.timer(prefix.resolve("options-requests"));
-        this.traceRequests = metricRegistry.timer(prefix.resolve("trace-requests"));
-        this.connectRequests = metricRegistry.timer(prefix.resolve("connect-requests"));
-        this.moveRequests = metricRegistry.timer(prefix.resolve("move-requests"));
-        this.otherRequests = metricRegistry.timer(prefix.resolve("other-requests"));
+        this.getRequests = metricRegistry.timer(prefix.resolve(NAME_GET_REQUESTS));
+        this.postRequests = metricRegistry.timer(prefix.resolve(NAME_POST_REQUESTS));
+        this.headRequests = metricRegistry.timer(prefix.resolve(NAME_HEAD_REQUESTS));
+        this.putRequests = metricRegistry.timer(prefix.resolve(NAME_PUT_REQUESTS));
+        this.deleteRequests = metricRegistry.timer(prefix.resolve(NAME_DELETE_REQUESTS));
+        this.optionsRequests = metricRegistry.timer(prefix.resolve(NAME_OPTIONS_REQUESTS));
+        this.traceRequests = metricRegistry.timer(prefix.resolve(NAME_TRACE_REQUESTS));
+        this.connectRequests = metricRegistry.timer(prefix.resolve(NAME_CONNECT_REQUESTS));
+        this.moveRequests = metricRegistry.timer(prefix.resolve(NAME_MOVE_REQUESTS));
+        this.otherRequests = metricRegistry.timer(prefix.resolve(NAME_OTHER_REQUESTS));
 
-        metricRegistry.register(prefix.resolve("percent-4xx-1m"), new RatioGauge() {
+        metricRegistry.register(prefix.resolve(NAME_PERCENT_4XX_1M), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[3].getOneMinuteRate(),
@@ -147,7 +175,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        metricRegistry.register(prefix.resolve("percent-4xx-5m"), new RatioGauge() {
+        metricRegistry.register(prefix.resolve(NAME_PERCENT_4XX_5M), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[3].getFiveMinuteRate(),
@@ -155,7 +183,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        metricRegistry.register(prefix.resolve("percent-4xx-15m"), new RatioGauge() {
+        metricRegistry.register(prefix.resolve(NAME_PERCENT_4XX_15M), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[3].getFifteenMinuteRate(),
@@ -163,7 +191,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        metricRegistry.register(prefix.resolve("percent-5xx-1m"), new RatioGauge() {
+        metricRegistry.register(prefix.resolve(NAME_PERCENT_5XX_1M), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[4].getOneMinuteRate(),
@@ -171,7 +199,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        metricRegistry.register(prefix.resolve("percent-5xx-5m"), new RatioGauge() {
+        metricRegistry.register(prefix.resolve(NAME_PERCENT_5XX_5M), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[4].getFiveMinuteRate(),
@@ -179,7 +207,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             }
         });
 
-        metricRegistry.register(prefix.resolve("percent-5xx-15m"), new RatioGauge() {
+        metricRegistry.register(prefix.resolve(NAME_PERCENT_5XX_15M), new RatioGauge() {
             @Override
             public Ratio getRatio() {
                 return Ratio.of(responses[4].getFifteenMinuteRate(),
@@ -218,6 +246,42 @@ public class InstrumentedHandler extends HandlerWrapper {
                 }
             }
         };
+    }
+
+    @Override
+    protected void doStop() throws Exception {
+        MetricName prefix = getMetricPrefix();
+
+        metricRegistry.remove(prefix.resolve(NAME_REQUESTS));
+        metricRegistry.remove(prefix.resolve(NAME_DISPATCHES));
+        metricRegistry.remove(prefix.resolve(NAME_ACTIVE_REQUESTS));
+        metricRegistry.remove(prefix.resolve(NAME_ACTIVE_DISPATCHES));
+        metricRegistry.remove(prefix.resolve(NAME_ACTIVE_SUSPENDED));
+        metricRegistry.remove(prefix.resolve(NAME_ASYNC_DISPATCHES));
+        metricRegistry.remove(prefix.resolve(NAME_ASYNC_TIMEOUTS));
+        metricRegistry.remove(prefix.resolve(NAME_1XX_RESPONSES));
+        metricRegistry.remove(prefix.resolve(NAME_2XX_RESPONSES));
+        metricRegistry.remove(prefix.resolve(NAME_3XX_RESPONSES));
+        metricRegistry.remove(prefix.resolve(NAME_4XX_RESPONSES));
+        metricRegistry.remove(prefix.resolve(NAME_5XX_RESPONSES));
+        metricRegistry.remove(prefix.resolve(NAME_GET_REQUESTS));
+        metricRegistry.remove(prefix.resolve(NAME_POST_REQUESTS));
+        metricRegistry.remove(prefix.resolve(NAME_HEAD_REQUESTS));
+        metricRegistry.remove(prefix.resolve(NAME_PUT_REQUESTS));
+        metricRegistry.remove(prefix.resolve(NAME_DELETE_REQUESTS));
+        metricRegistry.remove(prefix.resolve(NAME_OPTIONS_REQUESTS));
+        metricRegistry.remove(prefix.resolve(NAME_TRACE_REQUESTS));
+        metricRegistry.remove(prefix.resolve(NAME_CONNECT_REQUESTS));
+        metricRegistry.remove(prefix.resolve(NAME_MOVE_REQUESTS));
+        metricRegistry.remove(prefix.resolve(NAME_OTHER_REQUESTS));
+        metricRegistry.remove(prefix.resolve(NAME_PERCENT_4XX_1M));
+        metricRegistry.remove(prefix.resolve(NAME_PERCENT_4XX_5M));
+        metricRegistry.remove(prefix.resolve(NAME_PERCENT_4XX_15M));
+        metricRegistry.remove(prefix.resolve(NAME_PERCENT_5XX_1M));
+        metricRegistry.remove(prefix.resolve(NAME_PERCENT_5XX_5M));
+        metricRegistry.remove(prefix.resolve(NAME_PERCENT_5XX_15M));
+
+        super.doStop();
     }
 
     @Override
@@ -306,5 +370,9 @@ public class InstrumentedHandler extends HandlerWrapper {
         final long elapsedTime = System.currentTimeMillis() - start;
         requests.update(elapsedTime, TimeUnit.MILLISECONDS);
         requestTimer(request.getMethod()).update(elapsedTime, TimeUnit.MILLISECONDS);
+    }
+
+    private MetricName getMetricPrefix() {
+        return this.prefix == null ? MetricRegistry.name(getHandler().getClass(), name) : MetricRegistry.name(this.prefix, name);
     }
 }

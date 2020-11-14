@@ -1,6 +1,8 @@
 package io.dropwizard.metrics5.benchmarks;
 
 import io.dropwizard.metrics5.ExponentiallyDecayingReservoir;
+import io.dropwizard.metrics5.LockFreeExponentiallyDecayingReservoir;
+import io.dropwizard.metrics5.Reservoir;
 import io.dropwizard.metrics5.SlidingTimeWindowArrayReservoir;
 import io.dropwizard.metrics5.SlidingTimeWindowReservoir;
 import io.dropwizard.metrics5.SlidingWindowReservoir;
@@ -23,6 +25,7 @@ public class ReservoirBenchmark {
 
     private final UniformReservoir uniform = new UniformReservoir();
     private final ExponentiallyDecayingReservoir exponential = new ExponentiallyDecayingReservoir();
+    private final Reservoir lockFreeExponential = LockFreeExponentiallyDecayingReservoir.builder().build();
     private final SlidingWindowReservoir sliding = new SlidingWindowReservoir(1000);
     private final SlidingTimeWindowReservoir slidingTime = new SlidingTimeWindowReservoir(200, TimeUnit.MILLISECONDS);
     private final SlidingTimeWindowArrayReservoir arrTime = new SlidingTimeWindowArrayReservoir(200, TimeUnit.MILLISECONDS);
@@ -58,6 +61,12 @@ public class ReservoirBenchmark {
     public Object perfSlidingTimeWindowReservoir() {
         slidingTime.update(nextValue);
         return slidingTime;
+    }
+
+    @Benchmark
+    public Object perfLockFreeExponentiallyDecayingReservoir() {
+        lockFreeExponential.update(nextValue);
+        return lockFreeExponential;
     }
 
     public static void main(String[] args) throws RunnerException {

@@ -58,7 +58,7 @@ abstract class GarbageFreeScheduledReporter extends ScheduledReporter {
     private static class RegistryMirror implements MetricRegistryListener {
 
         private final MetricFilter filter;
-        private final ConcurrentSkipListMap<MetricName, Gauge> gauges = new ConcurrentSkipListMap<>();
+        private final ConcurrentSkipListMap<MetricName, Gauge<?>> gauges = new ConcurrentSkipListMap<>();
         private final ConcurrentSkipListMap<MetricName, Counter> counters = new ConcurrentSkipListMap<>();
         private final ConcurrentSkipListMap<MetricName, Histogram> histograms = new ConcurrentSkipListMap<>();
         private final ConcurrentSkipListMap<MetricName, Meter> meters = new ConcurrentSkipListMap<>();
@@ -68,7 +68,7 @@ abstract class GarbageFreeScheduledReporter extends ScheduledReporter {
             this.filter = filter;
         }
 
-        SortedMap<MetricName, Gauge> gauges() {
+        SortedMap<MetricName, Gauge<?>> gauges() {
             return gauges;
         }
 

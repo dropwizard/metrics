@@ -16,6 +16,8 @@ import org.junit.Test;
 import org.mockito.InOrder;
 
 import java.net.UnknownHostException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Locale;
@@ -28,7 +30,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -187,20 +189,45 @@ public class GraphiteReporterTest {
     @Test
     public void reportsDoubleGaugeValuesWithCustomFormat() throws Exception {
         try (final GraphiteReporter graphiteReporter = getReporterWithCustomFormat()) {
-            graphiteReporter.report(map(GAUGE, gauge(1.13574)),
+            reportGaugeValue(graphiteReporter, 1.13574);
+            verifyGraphiteSentCorrectMetricValue("prefix.gauge", "1.1357", timestamp);
+            verifyNoMoreInteractions(graphite);
+        }
+    }
+
+    @Test
+    public void reportDoubleGaugeValuesUsingCustomFormatter() throws Exception {
+        DecimalFormat formatter = new DecimalFormat("##.##########", DecimalFormatSymbols.getInstance(Locale.US));
+
+        try (GraphiteReporter graphiteReporter = GraphiteReporter.forRegistry(registry)
+                .withClock(clock)
+                .prefixedWith("prefix")
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .filter(MetricFilter.ALL)
+                .disabledMetricAttributes(Collections.emptySet())
+                .withFloatingPointFormatter(formatter::format)
+                .build(graphite)) {
+            reportGaugeValue(graphiteReporter, 0.000045322);
+            verifyGraphiteSentCorrectMetricValue("prefix.gauge", "0.000045322", timestamp);
+            verifyNoMoreInteractions(graphite);
+        }
+    }
+
+    private void reportGaugeValue(GraphiteReporter graphiteReporter, double value) {
+        graphiteReporter.report(map(MetricName.build("gauge"), gauge(value)),
                 map(),
                 map(),
                 map(),
                 map());
+    }
 
-            final InOrder inOrder = inOrder(graphite);
-            inOrder.verify(graphite).connect();
-            inOrder.verify(graphite).send("prefix.gauge", "1.1357", timestamp);
-            inOrder.verify(graphite).flush();
-            inOrder.verify(graphite).close();
-
-            verifyNoMoreInteractions(graphite);
-        }
+    private void verifyGraphiteSentCorrectMetricValue(String metricName, String value, long timestamp) throws Exception {
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send(metricName, value, timestamp);
+        inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
     }
 
     @Test
@@ -433,7 +460,10 @@ public class GraphiteReporterTest {
     public void closesConnectionOnReporterStop() throws Exception {
         reporter.stop();
 
-        verify(graphite).close();
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).flush();
+        inOrder.verify(graphite, times(2)).close();
 
         verifyNoMoreInteractions(graphite);
     }
@@ -479,15 +509,47 @@ public class GraphiteReporterTest {
         verifyNoMoreInteractions(graphite);
     }
 
+    @Test
+    public void sendsMetricAttributesAsTagsIfEnabled() throws Exception {
+        final Counter counter = mock(Counter.class);
+        when(counter.getCount()).thenReturn(100L);
+
+        getReporterThatSendsMetricAttributesAsTags().report(map(),
+                map(COUNTER, counter),
+                map(),
+                map(),
+                map());
+
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send("prefix.counter;metricattribute=count", "100", timestamp);
+        inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
+
+        verifyNoMoreInteractions(graphite);
+    }
+
     private GraphiteReporter getReporterWithCustomFormat() {
         return new GraphiteReporter(registry, graphite, clock, "prefix",
             TimeUnit.SECONDS, TimeUnit.MICROSECONDS, MetricFilter.ALL, null, false,
-            Collections.emptySet()) {
+            Collections.emptySet(), false) {
             @Override
             protected String format(double v) {
                 return String.format(Locale.US, "%4.4f", v);
             }
         };
+    }
+
+    private GraphiteReporter getReporterThatSendsMetricAttributesAsTags() {
+        return GraphiteReporter.forRegistry(registry)
+                .withClock(clock)
+                .prefixedWith("prefix")
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .filter(MetricFilter.ALL)
+                .disabledMetricAttributes(Collections.emptySet())
+                .addMetricAttributesAsTags(true)
+                .build(graphite);
     }
 
     private <T> SortedMap<MetricName, T> map() {

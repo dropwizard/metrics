@@ -37,7 +37,7 @@
         <!--
             jcstress version to use with this project.
           -->
-        <jcstress.version>0.5</jcstress.version>
+        <jcstress.version>0.7</jcstress.version>
 
         <!--
             Java source/target to use for compilation.
@@ -50,24 +50,17 @@
         <uberjar.name>jcstress</uberjar.name>
 
         <javaModuleName>com.codahale.metrics.jcstress</javaModuleName>
+        <jar.skipIfEmpty>true</jar.skipIfEmpty>
+        <maven.install.skip>true</maven.install.skip>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <build>
         <plugins>
             <plugin>
-                <!-- don't deploy this -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.2</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
+                <version>3.2.4</version>
                 <executions>
                     <execution>
                         <id>main</id>

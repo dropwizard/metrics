@@ -408,8 +408,6 @@ public class InfluxDbReporterTest {
         reporter.stop();
 
         verify(sender).close();
-
-        verifyNoMoreInteractions(sender);
     }
 
     @Test

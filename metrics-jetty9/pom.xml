@@ -17,9 +17,7 @@
     </description>
 
     <properties>
-        <javaModuleName>io.dropwizard.metrics5.jetty9</javaModuleName>
-        <jetty9.version>9.4.18.v20190429</jetty9.version>
-
+        <javaModuleName>com.codahale.metrics.jetty9</javaModuleName>
     </properties>
 
     <dependencyManagement>
@@ -28,6 +26,13 @@
                 <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-bom</artifactId>
                 <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-bom</artifactId>
+                <version>${jetty9.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -43,12 +48,10 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>${jetty9.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-client</artifactId>
-            <version>${jetty9.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
