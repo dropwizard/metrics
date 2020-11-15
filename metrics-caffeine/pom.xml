@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-caffeine</artifactId>
-    <name>Metrics Integration for Caffeine</name>
+    <name>Metrics5 Integration for Caffeine</name>
     <packaging>bundle</packaging>
     <description>
         Metrics Integration for Caffeine.

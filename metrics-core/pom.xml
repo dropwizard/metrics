@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-core</artifactId>
-    <name>Metrics Core</name>
+    <name>Metrics5 Core</name>
     <packaging>bundle</packaging>
     <description>
         Metrics is a Java library which gives you unparalleled insight into what your code does in

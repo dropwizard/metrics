@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-log4j2</artifactId>
-    <name>Metrics Integration for Log4j 2.x</name>
+    <name>Metrics5 Integration for Log4j 2.x</name>
     <packaging>bundle</packaging>
     <description>
         An instrumented appender for Log4j 2.x.

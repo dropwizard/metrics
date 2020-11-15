@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-jdbi3</artifactId>
-    <name>Metrics Integration for JDBI3</name>
+    <name>Metrics5 Integration for JDBI3</name>
     <packaging>bundle</packaging>
     <description>Provides instrumentation of Jdbi3 data access objects</description>
 

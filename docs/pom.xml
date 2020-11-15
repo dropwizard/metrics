@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>docs</artifactId>
-    <name>Metrics Documentation</name>
+    <name>Metrics5 Documentation</name>
 
     <properties>
         <jar.skipIfEmpty>true</jar.skipIfEmpty>

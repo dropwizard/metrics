@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-influxdb</artifactId>
-    <name>InfluxDB integration for Metrics</name>
+    <name>InfluxDB integration for Metrics5 </name>
     <packaging>bundle</packaging>
     <description>
         A reporter for Metrics which announces measurements to an InfluxDB server.

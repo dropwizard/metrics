@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-httpclient5</artifactId>
-    <name>Metrics Integration for Apache HttpClient 5.x</name>
+    <name>Metrics5 Integration for Apache HttpClient 5.x</name>
     <packaging>bundle</packaging>
     <description>
         An Apache HttpClient 5.x wrapper providing Metrics instrumentation of connection pools, request

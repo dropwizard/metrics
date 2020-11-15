@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-healthchecks</artifactId>
-    <name>Metrics Health Checks</name>
+    <name>Metrics5 Health Checks</name>
     <packaging>bundle</packaging>
     <description>
         An addition to Metrics which provides the ability to run application-specific health checks,

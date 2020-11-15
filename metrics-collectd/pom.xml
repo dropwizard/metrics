@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-collectd</artifactId>
-    <name>Metrics Integration for Collectd</name>
+    <name>Metrics5 Integration for Collectd</name>
     <packaging>bundle</packaging>
     <description>
         A reporter for Metrics which announces measurements to Collectd.

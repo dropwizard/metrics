@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-benchmarks</artifactId>
-    <name>Benchmarks for Metrics</name>
+    <name>Benchmarks for Metrics5 </name>
     <description>
         A development module for performance benchmarks of Metrics classes.
     </description>

@@ -7,7 +7,7 @@
     </parent>
 
     <artifactId>metrics-legacy-adapter</artifactId>
-    <name>Metrics Adapter to Metrics 3/4 API</name>
+    <name>Metrics5 Adapter to Metrics 3/4 API</name>
 
     <properties>
         <javaModuleName>com.codahale.metrics</javaModuleName>

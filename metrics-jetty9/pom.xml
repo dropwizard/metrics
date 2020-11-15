@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-jetty9</artifactId>
-    <name>Metrics Integration for Jetty 9.3 and higher</name>
+    <name>Metrics5 Integration for Jetty 9.3 and higher</name>
     <packaging>bundle</packaging>
     <description>
         A set of extensions for Jetty 9.3 and higher which provide instrumentation of thread pools, connector

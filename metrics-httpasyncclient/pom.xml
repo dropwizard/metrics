@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-httpasyncclient</artifactId>
-    <name>Metrics Integration for Apache HttpAsyncClient</name>
+    <name>Metrics5 Integration for Apache HttpAsyncClient</name>
     <packaging>bundle</packaging>
     <description>
         An Apache HttpAsyncClient wrapper providing Metrics instrumentation of connection pools, request

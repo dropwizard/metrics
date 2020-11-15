@@ -11,7 +11,7 @@
     <version>5.0.0-rc4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Metrics JCStress tests</name>
+    <name>Metrics5 JCStress tests</name>
 
     <!--
        This is the demo/sample template build script for building concurrency tests with JCStress.

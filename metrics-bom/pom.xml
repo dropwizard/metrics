@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-bom</artifactId>
-    <name>Metrics BOM</name>
+    <name>Metrics5 BOM</name>
     <packaging>pom</packaging>
     <description>Bill of Materials for Metrics</description>
 

@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-logback</artifactId>
-    <name>Metrics Integration for Logback</name>
+    <name>Metrics5 Integration for Logback</name>
     <packaging>bundle</packaging>
     <description>
         An instrumented appender for Logback.
