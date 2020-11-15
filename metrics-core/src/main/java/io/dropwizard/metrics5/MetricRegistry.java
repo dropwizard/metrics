@@ -69,7 +69,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * @see #register(MetricName, Metric)
+     * See {@link #register(MetricName, Metric)}
      */
     public <T extends Metric> T register(String name, T metric) throws IllegalArgumentException {
         return register(MetricName.build(name), metric);
@@ -113,7 +113,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * @see #counter(MetricName)
+     * See {@link #counter(MetricName)}
      */
     public Counter counter(String name) {
         return getOrAdd(MetricName.build(name), MetricBuilder.COUNTERS);
@@ -131,7 +131,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * @see #histogram(MetricName)
+     * See {@link #histogram(MetricName)}
      */
     public Histogram histogram(String name) {
         return getOrAdd(MetricName.build(name), MetricBuilder.HISTOGRAMS);
@@ -171,7 +171,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * @see #meter(MetricName)
+     * See {@link #meter(MetricName)}
      */
     public Meter meter(String name) {
         return getOrAdd(MetricName.build(name), MetricBuilder.METERS);
@@ -211,7 +211,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * @see #timer(MetricName)
+     * See {@link #timer(MetricName)}
      */
     public Timer timer(String name) {
         return getOrAdd(MetricName.build(name), MetricBuilder.TIMERS);
