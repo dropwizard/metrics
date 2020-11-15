@@ -71,7 +71,6 @@ public class MetricRegistry implements MetricSet {
     /**
      * @see #register(MetricName, Metric)
      */
-    @SuppressWarnings("unchecked")
     public <T extends Metric> T register(String name, T metric) throws IllegalArgumentException {
         return register(MetricName.build(name), metric);
     }
@@ -86,7 +85,6 @@ public class MetricRegistry implements MetricSet {
      * @return {@code metric}
      * @throws IllegalArgumentException if the name is already registered or metric variable is null
      */
-    @SuppressWarnings("unchecked")
     public <T extends Metric> T register(MetricName name, T metric) throws IllegalArgumentException {
         if (metric == null) {
             throw new NullPointerException("metric == null");
@@ -365,7 +363,6 @@ public class MetricRegistry implements MetricSet {
      *
      * @return all the gauges in the registry
      */
-    @SuppressWarnings("rawtypes")
     public SortedMap<MetricName, Gauge<?>> getGauges() {
         return getGauges(MetricFilter.ALL);
     }
