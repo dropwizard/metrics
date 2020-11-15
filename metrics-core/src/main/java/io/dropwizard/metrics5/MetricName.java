@@ -22,6 +22,7 @@ public class MetricName implements Comparable<MetricName> {
 
     /**
      * Returns an empty metric name.
+     *
      * @return an empty metric name.
      */
     public static MetricName empty() {
@@ -42,6 +43,7 @@ public class MetricName implements Comparable<MetricName> {
 
     /**
      * Returns the tags, sorted by key.
+     *
      * @return the tags (immutable), sorted by key.
      */
     public Map<String, String> getTags() {
@@ -140,8 +142,12 @@ public class MetricName implements Comparable<MetricName> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof MetricName)) {
+            return false;
+        }
         MetricName that = (MetricName) o;
         return Objects.equals(key, that.key) &&
                 Objects.equals(tags, that.tags);
@@ -195,7 +201,7 @@ public class MetricName implements Comparable<MetricName> {
         }
     }
 
-    private static <K extends Comparable<K>,V> Map<K, V> unmodifiableSortedCopy(Map<K, V> map) {
+    private static <K extends Comparable<K>, V> Map<K, V> unmodifiableSortedCopy(Map<K, V> map) {
         LinkedHashMap<K, V> sorted = new LinkedHashMap<>();
         map.entrySet()
                 .stream()
