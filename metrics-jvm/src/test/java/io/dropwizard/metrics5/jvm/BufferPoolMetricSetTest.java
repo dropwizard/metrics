@@ -61,7 +61,7 @@ public class BufferPoolMetricSetTest {
 
     @Test
     public void includesAGaugeForDirectCount() throws Exception {
-        final Gauge gauge = (Gauge) buffers.getMetrics().get(DIRECT_COUNT);
+        final Gauge<Integer> gauge = (Gauge<Integer>) buffers.getMetrics().get(DIRECT_COUNT);
 
         when(mBeanServer.getAttribute(direct, "Count")).thenReturn(100);
 
@@ -71,7 +71,7 @@ public class BufferPoolMetricSetTest {
 
     @Test
     public void includesAGaugeForDirectMemoryUsed() throws Exception {
-        final Gauge gauge = (Gauge) buffers.getMetrics().get(DIRECT_USED);
+        final Gauge<Integer> gauge = (Gauge<Integer>) buffers.getMetrics().get(DIRECT_USED);
 
         when(mBeanServer.getAttribute(direct, "MemoryUsed")).thenReturn(100);
 
@@ -81,7 +81,7 @@ public class BufferPoolMetricSetTest {
 
     @Test
     public void includesAGaugeForDirectCapacity() throws Exception {
-        final Gauge gauge = (Gauge) buffers.getMetrics().get(DIRECT_CAPACITY);
+        final Gauge<Integer> gauge = (Gauge<Integer>) buffers.getMetrics().get(DIRECT_CAPACITY);
 
         when(mBeanServer.getAttribute(direct, "TotalCapacity")).thenReturn(100);
 
@@ -91,7 +91,7 @@ public class BufferPoolMetricSetTest {
 
     @Test
     public void includesAGaugeForMappedCount() throws Exception {
-        final Gauge gauge = (Gauge) buffers.getMetrics().get(MAPPED_COUNT);
+        final Gauge<Integer> gauge = (Gauge<Integer>) buffers.getMetrics().get(MAPPED_COUNT);
 
         when(mBeanServer.getAttribute(mapped, "Count")).thenReturn(100);
 
@@ -101,7 +101,7 @@ public class BufferPoolMetricSetTest {
 
     @Test
     public void includesAGaugeForMappedMemoryUsed() throws Exception {
-        final Gauge gauge = (Gauge) buffers.getMetrics().get(MAPPED_USED);
+        final Gauge<Integer> gauge = (Gauge<Integer>) buffers.getMetrics().get(MAPPED_USED);
 
         when(mBeanServer.getAttribute(mapped, "MemoryUsed")).thenReturn(100);
 
@@ -111,7 +111,7 @@ public class BufferPoolMetricSetTest {
 
     @Test
     public void includesAGaugeForMappedCapacity() throws Exception {
-        final Gauge gauge = (Gauge) buffers.getMetrics().get(MAPPED_CAPACITY);
+        final Gauge<Integer> gauge = (Gauge<Integer>) buffers.getMetrics().get(MAPPED_CAPACITY);
 
         when(mBeanServer.getAttribute(mapped, "TotalCapacity")).thenReturn(100);
 

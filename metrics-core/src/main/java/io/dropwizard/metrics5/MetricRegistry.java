@@ -282,11 +282,11 @@ public class MetricRegistry implements MetricSet {
      * @param supplier a MetricSupplier that can be used to manufacture a Gauge
      * @return a new or pre-existing {@link Gauge}
      */
-    @SuppressWarnings("rawtypes")
-    public Gauge gauge(MetricName name, final MetricSupplier<Gauge> supplier) {
+    @SuppressWarnings("unchecked")
+    public <T> Gauge<T> gauge(MetricName name, final MetricSupplier<Gauge<T>> supplier) {
         return getOrAdd(name, new MetricBuilder<Gauge>() {
             @Override
-            public Gauge newMetric() {
+            public Gauge<T> newMetric() {
                 return supplier.newMetric();
             }
 
