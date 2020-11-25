@@ -373,7 +373,7 @@ public class MetricRegistry implements MetricSet {
      * @return all the gauges in the registry
      */
     public SortedMap<MetricName, Gauge<?>> getGauges(MetricFilter filter) {
-        final TreeMap<MetricName, Gauge<?>> timers = new TreeMap<>();
+        final SortedMap<MetricName, Gauge<?>> timers = new TreeMap<>();
         for (Map.Entry<MetricName, Metric> entry : metrics.entrySet()) {
             if (entry.getValue() instanceof Gauge && filter.matches(entry.getKey(),
                     entry.getValue())) {
@@ -481,7 +481,7 @@ public class MetricRegistry implements MetricSet {
 
     @SuppressWarnings("unchecked")
     private <T extends Metric> SortedMap<MetricName, T> getMetrics(Class<T> klass, MetricFilter filter) {
-        final TreeMap<MetricName, T> timers = new TreeMap<>();
+        final SortedMap<MetricName, T> timers = new TreeMap<>();
         for (Map.Entry<MetricName, Metric> entry : metrics.entrySet()) {
             if (klass.isInstance(entry.getValue()) && filter.matches(entry.getKey(),
                     entry.getValue())) {
