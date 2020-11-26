@@ -4,7 +4,7 @@
 
     <groupId>io.dropwizard.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>4.1.15-SNAPSHOT</version>
+    <version>4.1.16-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
@@ -46,10 +46,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <jetty9.version>9.4.34.v20201102</jetty9.version>
+        <jetty9.version>9.4.35.v20201120</jetty9.version>
         <slf4j.version>1.7.30</slf4j.version>
         <assertj.version>3.18.1</assertj.version>
-        <mockito.version>3.6.0</mockito.version>
+        <mockito.version>3.6.28</mockito.version>
         <junit.version>4.12</junit.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
