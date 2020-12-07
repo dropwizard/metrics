@@ -124,6 +124,7 @@ public class Graphite implements GraphiteSender {
         }
 
         if (address.getAddress() == null) {
+            address = null;
             throw new UnknownHostException(address.getHostName());
         }
 
