@@ -119,12 +119,11 @@ public class Graphite implements GraphiteSender {
         // this version of the simplified logic will always cause a dns request if hostname has been supplied.
         // InetAddress.getByName forces the dns lookup
         // if an InetSocketAddress was supplied at create time that will take precedence.
-        if (address == null || hostname != null) {
+        if (address == null || hostname != null || address.getHostName() == null) {
             address = new InetSocketAddress(InetAddress.getByName(hostname), port);
         }
 
         if (address.getAddress() == null) {
-            address = null;
             throw new UnknownHostException(address.getHostName());
         }
 
