@@ -97,8 +97,6 @@ public class InstrumentedHandler extends HandlerWrapper {
 
     private AsyncListener listener;
 
-    private HttpChannelState.State DISPATCHED_HACK;
-
     /**
      * Create a new instrumented handler using a given metrics registry.
      *
@@ -117,12 +115,6 @@ public class InstrumentedHandler extends HandlerWrapper {
     public InstrumentedHandler(MetricRegistry registry, String prefix) {
         this.metricRegistry = registry;
         this.prefix = prefix;
-
-        try {
-            DISPATCHED_HACK = HttpChannelState.State.valueOf("HANDLING");
-        } catch (IllegalArgumentException e) {
-            DISPATCHED_HACK = HttpChannelState.State.valueOf("DISPATCHED");
-        }
     }
 
     public String getName() {
@@ -241,7 +233,7 @@ public class InstrumentedHandler extends HandlerWrapper {
                 final HttpServletRequest request = (HttpServletRequest) state.getRequest();
                 final HttpServletResponse response = (HttpServletResponse) state.getResponse();
                 updateResponses(request, response, startTime, true);
-                if (state.getHttpChannelState().getState() != DISPATCHED_HACK &&
+                if (state.getHttpChannelState().getState() != HttpChannelState.State.HANDLING &&
                         state.getHttpChannelState().isSuspended()) {
                     activeSuspended.dec();
                 }
@@ -304,7 +296,7 @@ public class InstrumentedHandler extends HandlerWrapper {
             // resumed request
             start = System.currentTimeMillis();
             activeSuspended.dec();
-            if (state.getState() == DISPATCHED_HACK) {
+            if (state.getState() == HttpChannelState.State.HANDLING) {
                 asyncDispatches.mark();
             }
         }
