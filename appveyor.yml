@@ -1,3 +1,16 @@
-test_script:
-  - ./mvnw -B verify
+matrix:
+  fast_finish: true
+environment:
+  JAVA_OPTS: '-Xms512m -Xmx2g -XX:+TieredCompilation -XX:TieredStopAtLevel=1'
+  matrix:
+  - JAVA_HOME: 'C:\Program Files\Java\jdk11'
+    PATH: '%JAVA_HOME%\bin;%PATH%'
+image:
+- 'Visual Studio 2019'
+cache:
+- '%USERPROFILE%\.m2\repository'
+install:
+- cmd: 'java -version'
 build: off
+test_script:
+- mvnw.cmd -B -V -ff -ntp -Dmaven.javadoc.skip=true -Dmaven.source.skip=true verify

@@ -33,6 +33,8 @@
         <module>metrics-jersey2</module>
         <module>metrics-jersey3</module>
         <module>metrics-jetty9</module>
+        <module>metrics-jetty10</module>
+        <module>metrics-jetty11</module>
         <module>metrics-jmx</module>
         <module>metrics-json</module>
         <module>metrics-jvm</module>
@@ -48,6 +50,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <jetty9.version>9.4.35.v20201120</jetty9.version>
+        <jetty10.version>10.0.0</jetty10.version>
+        <jetty11.version>11.0.0</jetty11.version>
         <slf4j.version>1.7.30</slf4j.version>
         <assertj.version>3.18.1</assertj.version>
         <mockito.version>3.6.28</mockito.version>
