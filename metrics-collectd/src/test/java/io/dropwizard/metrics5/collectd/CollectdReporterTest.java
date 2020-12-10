@@ -262,6 +262,22 @@ public class CollectdReporterTest {
         assertThat(values.getPlugin()).isEqualTo("dash_illegal.slash_illegal");
     }
 
+    @Test
+    public void sanitizesMetricNameWithCustomMaxLength() throws Exception {
+        CollectdReporter customReporter = CollectdReporter.forRegistry(registry)
+                .withHostName("eddie")
+                .withMaxLength(20)
+                .build(new Sender("localhost", 25826));
+
+        Counter counter = registry.counter("dash-illegal.slash/illegal");
+        counter.inc();
+
+        customReporter.report();
+
+        ValueList values = receiver.next();
+        assertThat(values.getPlugin()).isEqualTo("dash_illegal.slash_i");
+    }
+
     private <T> SortedMap<MetricName, T> map() {
         return new TreeMap<>();
     }
