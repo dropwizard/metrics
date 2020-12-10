@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.dropwizard.metrics</groupId>
+        <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.1.17-SNAPSHOT</version>
+        <version>5.0.0-rc4-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-jersey3</artifactId>
@@ -17,14 +17,14 @@
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.jersey3</javaModuleName>
+        <javaModuleName>com.codahale.metrics5.jersey3</javaModuleName>
         <jersey.version>3.0.0</jersey.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.dropwizard.metrics</groupId>
+                <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-bom</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
@@ -52,11 +52,11 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
+            <groupId>io.dropwizard.metrics5</groupId>
             <artifactId>metrics-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
+            <groupId>io.dropwizard.metrics5</groupId>
             <artifactId>metrics-annotation</artifactId>
         </dependency>
         <dependency>

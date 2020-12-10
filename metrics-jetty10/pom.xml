@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.dropwizard.metrics</groupId>
+        <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.1.17-SNAPSHOT</version>
+        <version>5.0.0-rc4-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-jetty10</artifactId>
@@ -17,7 +17,7 @@
     </description>
 
     <properties>
-        <javaModuleName>io.dropwizard.metrics.jetty10</javaModuleName>
+        <javaModuleName>io.dropwizard.metrics5.jetty10</javaModuleName>
 
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
@@ -28,7 +28,7 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.dropwizard.metrics</groupId>
+                <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-bom</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
@@ -51,7 +51,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
+            <groupId>io.dropwizard.metrics5</groupId>
             <artifactId>metrics-core</artifactId>
             <version>${project.version}</version>
         </dependency>

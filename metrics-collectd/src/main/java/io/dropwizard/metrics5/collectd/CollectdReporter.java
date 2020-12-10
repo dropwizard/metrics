@@ -1,6 +1,17 @@
 package io.dropwizard.metrics5.collectd;
 
-import io.dropwizard.metrics5.*;
+import io.dropwizard.metrics5.Clock;
+import io.dropwizard.metrics5.Counter;
+import io.dropwizard.metrics5.Gauge;
+import io.dropwizard.metrics5.Histogram;
+import io.dropwizard.metrics5.Meter;
+import io.dropwizard.metrics5.MetricAttribute;
+import io.dropwizard.metrics5.MetricFilter;
+import io.dropwizard.metrics5.MetricName;
+import io.dropwizard.metrics5.MetricRegistry;
+import io.dropwizard.metrics5.ScheduledReporter;
+import io.dropwizard.metrics5.Snapshot;
+import io.dropwizard.metrics5.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,7 +214,7 @@ public class CollectdReporter extends ScheduledReporter {
     public void report(SortedMap<MetricName, Gauge<?>> gauges, SortedMap<MetricName, Counter> counters,
                        SortedMap<MetricName, Histogram> histograms, SortedMap<MetricName, Meter> meters,
                        SortedMap<MetricName, Timer> timers) {
-        MetaData.Builder metaData = new MetaData.Builder(hostName, clock.getTime() / 1000, period)
+        MetaData.Builder metaData = new MetaData.Builder(sanitize, hostName, clock.getTime() / 1000, period)
                 .type(COLLECTD_TYPE_GAUGE);
         try {
             connect(sender);
