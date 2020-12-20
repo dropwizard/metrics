@@ -26,7 +26,7 @@ jobs:
         java-version: ${{ matrix.java_version }}
     - uses: actions/cache@v2.1.3
       with:
-        path: ~/.m2
+        path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
@@ -40,10 +40,10 @@ jobs:
         key: ${{ runner.os }}-sonar
         restore-keys: ${{ runner.os }}-sonar
     - name: Build
-      run: ./mvnw -B -V -ff -s .github/settings.xml -ntp install
+      run: ./mvnw -B -V -ff -ntp install
     - name: Analyze with SonarCloud
       if: ${{ env.SONAR_TOKEN != null && env.SONAR_TOKEN != '' && matrix.java_version == '11' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./mvnw -B -ff -s .github/settings.xml -ntp org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+      run: ./mvnw -B -ff -ntp org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
