@@ -39,6 +39,7 @@ public class CpuProfileServlet extends HttpServlet {
         if (req.getParameter("frequency") != null) {
             try {
                 frequency = Integer.parseInt(req.getParameter("frequency"));
+                frequency = Math.min(Math.max(frequency, 1), 1000);
             } catch (NumberFormatException e) {
                 frequency = 100;
             }

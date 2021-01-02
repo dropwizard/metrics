@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.1.13-SNAPSHOT</version>
+        <version>4.1.17-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-benchmarks</artifactId>
@@ -15,7 +15,7 @@
     </description>
 
     <properties>
-        <jmh.version>1.24</jmh.version>
+        <jmh.version>1.26</jmh.version>
         <javaModuleName>com.codahale.metrics.benchmarks</javaModuleName>
         <jar.skipIfEmpty>true</jar.skipIfEmpty>
         <maven.install.skip>true</maven.install.skip>

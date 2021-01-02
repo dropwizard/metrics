@@ -11,6 +11,12 @@ import java.util.concurrent.BlockingQueue;
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
+    private static final String NAME_UTILIZATION = "utilization";
+    private static final String NAME_UTILIZATION_MAX = "utilization-max";
+    private static final String NAME_SIZE = "size";
+    private static final String NAME_JOBS = "jobs";
+    private static final String NAME_JOBS_QUEUE_UTILIZATION = "jobs-queue-utilization";
+
     private final MetricRegistry metricRegistry;
     private String prefix;
 
@@ -67,32 +73,49 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
     protected void doStart() throws Exception {
         super.doStart();
 
-        final String prefix = this.prefix == null ? name(QueuedThreadPool.class, getName()) : name(this.prefix, getName());
+        final String prefix = getMetricPrefix();
 
-        metricRegistry.register(name(prefix, "utilization"), new RatioGauge() {
+        metricRegistry.register(name(prefix, NAME_UTILIZATION), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(getThreads() - getIdleThreads(), getThreads());
             }
         });
-        metricRegistry.register(name(prefix, "utilization-max"), new RatioGauge() {
+        metricRegistry.register(name(prefix, NAME_UTILIZATION_MAX), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(getThreads() - getIdleThreads(), getMaxThreads());
             }
         });
-        metricRegistry.register(name(prefix, "size"), (Gauge<Integer>) this::getThreads);
-        metricRegistry.register(name(prefix, "jobs"), (Gauge<Integer>) () -> {
+        metricRegistry.register(name(prefix, NAME_SIZE), (Gauge<Integer>) this::getThreads);
+        metricRegistry.register(name(prefix, NAME_JOBS), (Gauge<Integer>) () -> {
             // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
             // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.
             return getQueue().size();
         });
-        metricRegistry.register(name(prefix, "jobs-queue-utilization"), new RatioGauge() {
+        metricRegistry.register(name(prefix, NAME_JOBS_QUEUE_UTILIZATION), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 BlockingQueue<Runnable> queue = getQueue();
                 return Ratio.of(queue.size(), queue.size() + queue.remainingCapacity());
             }
         });
+    }
+
+    @Override
+    protected void doStop() throws Exception {
+        final String prefix = getMetricPrefix();
+
+        metricRegistry.remove(name(prefix, NAME_UTILIZATION));
+        metricRegistry.remove(name(prefix, NAME_UTILIZATION_MAX));
+        metricRegistry.remove(name(prefix, NAME_SIZE));
+        metricRegistry.remove(name(prefix, NAME_JOBS));
+        metricRegistry.remove(name(prefix, NAME_JOBS_QUEUE_UTILIZATION));
+
+        super.doStop();
+    }
+
+    private String getMetricPrefix() {
+        return this.prefix == null ? name(QueuedThreadPool.class, getName()) : name(this.prefix, getName());
     }
 }

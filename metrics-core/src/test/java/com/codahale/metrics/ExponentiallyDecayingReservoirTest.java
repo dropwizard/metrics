@@ -2,17 +2,63 @@ package com.codahale.metrics;
 
 import com.codahale.metrics.Timer.Context;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@RunWith(Parameterized.class)
 public class ExponentiallyDecayingReservoirTest {
+
+    public enum ReservoirFactory {
+        EXPONENTIALLY_DECAYING() {
+            @Override
+            Reservoir create(int size, double alpha, Clock clock) {
+                return new ExponentiallyDecayingReservoir(size, alpha, clock);
+            }
+        },
+
+        LOCK_FREE_EXPONENTIALLY_DECAYING() {
+            @Override
+            Reservoir create(int size, double alpha, Clock clock) {
+                return LockFreeExponentiallyDecayingReservoir.builder()
+                        .size(size)
+                        .alpha(alpha)
+                        .clock(clock)
+                        .build();
+            }
+        };
+
+        abstract Reservoir create(int size, double alpha, Clock clock);
+
+        Reservoir create(int size, double alpha) {
+            return create(size, alpha, Clock.defaultClock());
+        }
+    }
+
+    @Parameterized.Parameters(name = "{index}: {0}")
+    public static Collection<Object[]> reservoirs() {
+        return Arrays.stream(ReservoirFactory.values())
+                .map(value -> new Object[] {value})
+                .collect(Collectors.toList());
+    }
+
+    private final ReservoirFactory reservoirFactory;
+
+    public ExponentiallyDecayingReservoirTest(ReservoirFactory reservoirFactory) {
+        this.reservoirFactory = reservoirFactory;
+    }
+
     @Test
     public void aReservoirOf100OutOf1000Elements() {
-        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(100, 0.99);
+        final Reservoir reservoir = reservoirFactory.create(100, 0.99);
         for (int i = 0; i < 1000; i++) {
             reservoir.update(i);
         }
@@ -30,7 +76,7 @@ public class ExponentiallyDecayingReservoirTest {
 
     @Test
     public void aReservoirOf100OutOf10Elements() {
-        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(100, 0.99);
+        final Reservoir reservoir = reservoirFactory.create(100, 0.99);
         for (int i = 0; i < 10; i++) {
             reservoir.update(i);
         }
@@ -48,7 +94,7 @@ public class ExponentiallyDecayingReservoirTest {
 
     @Test
     public void aHeavilyBiasedReservoirOf100OutOf1000Elements() {
-        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(1000, 0.01);
+        final Reservoir reservoir = reservoirFactory.create(1000, 0.01);
         for (int i = 0; i < 100; i++) {
             reservoir.update(i);
         }
@@ -68,7 +114,7 @@ public class ExponentiallyDecayingReservoirTest {
     @Test
     public void longPeriodsOfInactivityShouldNotCorruptSamplingState() {
         final ManualClock clock = new ManualClock();
-        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(10, 0.15, clock);
+        final Reservoir reservoir = reservoirFactory.create(10, 0.15, clock);
 
         // add 1000 values at a rate of 10 values/second
         for (int i = 0; i < 1000; i++) {
@@ -102,7 +148,7 @@ public class ExponentiallyDecayingReservoirTest {
     @Test
     public void longPeriodsOfInactivity_fetchShouldResample() {
         final ManualClock clock = new ManualClock();
-        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(10,
+        final Reservoir reservoir = reservoirFactory.create(10,
                 0.015,
                 clock);
 
@@ -128,7 +174,7 @@ public class ExponentiallyDecayingReservoirTest {
 
     @Test
     public void emptyReservoirSnapshot_shouldReturnZeroForAllValues() {
-        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(100, 0.015,
+        final Reservoir reservoir = reservoirFactory.create(100, 0.015,
                 new ManualClock());
 
         Snapshot snapshot = reservoir.getSnapshot();
@@ -141,7 +187,7 @@ public class ExponentiallyDecayingReservoirTest {
     @Test
     public void removeZeroWeightsInSamplesToPreventNaNInMeanValues() {
         final ManualClock clock = new ManualClock();
-        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(1028, 0.015, clock);
+        final Reservoir reservoir = reservoirFactory.create(1028, 0.015, clock);
         Timer timer = new Timer(reservoir, clock);
 
         Context context = timer.time();
@@ -168,7 +214,7 @@ public class ExponentiallyDecayingReservoirTest {
         // Run the test several times.
         for (int attempt = 0; attempt < 10; attempt++) {
             final ManualClock clock = new ManualClock();
-            final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(10,
+            final Reservoir reservoir = reservoirFactory.create(10,
                     0.015,
                     clock);
 
@@ -253,7 +299,7 @@ public class ExponentiallyDecayingReservoirTest {
     @Test
     public void spotLift() {
         final ManualClock clock = new ManualClock();
-        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(1000,
+        final Reservoir reservoir = reservoirFactory.create(1000,
                 0.015,
                 clock);
 
@@ -279,7 +325,7 @@ public class ExponentiallyDecayingReservoirTest {
     @Test
     public void spotFall() {
         final ManualClock clock = new ManualClock();
-        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(1000,
+        final Reservoir reservoir = reservoirFactory.create(1000,
                 0.015,
                 clock);
 
@@ -305,7 +351,7 @@ public class ExponentiallyDecayingReservoirTest {
     @Test
     public void quantiliesShouldBeBasedOnWeights() {
         final ManualClock clock = new ManualClock();
-        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(1000,
+        final Reservoir reservoir = reservoirFactory.create(1000,
                 0.015,
                 clock);
         for (int i = 0; i < 40; i++) {
@@ -330,7 +376,35 @@ public class ExponentiallyDecayingReservoirTest {
                 .isEqualTo(9999);
     }
 
-    private static void assertAllValuesBetween(ExponentiallyDecayingReservoir reservoir,
+    @Test
+    public void clockWrapShouldNotRescale() {
+        // First verify the test works as expected given low values
+        testShortPeriodShouldNotRescale(0);
+        // Now revalidate using an edge case nanoTime value just prior to wrapping
+        testShortPeriodShouldNotRescale(Long.MAX_VALUE - TimeUnit.MINUTES.toNanos(30));
+    }
+
+    private void testShortPeriodShouldNotRescale(long startTimeNanos) {
+        final ManualClock clock = new ManualClock(startTimeNanos);
+        final Reservoir reservoir = reservoirFactory.create(10, 1, clock);
+
+        reservoir.update(1000);
+        assertThat(reservoir.getSnapshot().size()).isEqualTo(1);
+
+        assertAllValuesBetween(reservoir, 1000, 1001);
+
+        // wait for 10 millis and take snapshot.
+        // this should not trigger a rescale. Note that the number of samples will be reduced to 0
+        // because scaling factor equal to zero will remove all existing entries after rescale.
+        clock.addSeconds(20 * 60);
+        Snapshot snapshot = reservoir.getSnapshot();
+        assertThat(snapshot.getMax()).isEqualTo(1000);
+        assertThat(snapshot.getMean()).isEqualTo(1000);
+        assertThat(snapshot.getMedian()).isEqualTo(1000);
+        assertThat(snapshot.size()).isEqualTo(1);
+    }
+
+    private static void assertAllValuesBetween(Reservoir reservoir,
                                                double min,
                                                double max) {
         for (double i : reservoir.getSnapshot().getValues()) {

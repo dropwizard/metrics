@@ -1,11 +1,14 @@
 package com.codahale.metrics.jersey2;
 
 import com.codahale.metrics.Clock;
+import com.codahale.metrics.ExponentiallyDecayingReservoir;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Reservoir;
 import com.codahale.metrics.SharedMetricRegistries;
 
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
+import java.util.function.Supplier;
 
 /**
  * A {@link Feature} which registers a {@link InstrumentedResourceMethodApplicationListener}
@@ -16,19 +19,51 @@ public class MetricsFeature implements Feature {
     private final MetricRegistry registry;
     private final Clock clock;
     private final boolean trackFilters;
+    private final Supplier<Reservoir> reservoirSupplier;
 
+    /*
+     * @param registry          the metrics registry where the metrics will be stored
+     */
     public MetricsFeature(MetricRegistry registry) {
         this(registry, Clock.defaultClock());
     }
 
+    /*
+     * @param registry          the metrics registry where the metrics will be stored
+     * @param reservoirSupplier Supplier for creating the {@link Reservoir} for {@link Timer timers}.
+     */
+    public MetricsFeature(MetricRegistry registry, Supplier<Reservoir> reservoirSupplier) {
+        this(registry, Clock.defaultClock(), false, reservoirSupplier);
+    }
+
+    /*
+     * @param registry          the metrics registry where the metrics will be stored
+     * @param clock             the {@link Clock} to track time (used mostly in testing) in timers
+     */
     public MetricsFeature(MetricRegistry registry, Clock clock) {
         this(registry, clock, false);
     }
 
+    /*
+     * @param registry          the metrics registry where the metrics will be stored
+     * @param clock             the {@link Clock} to track time (used mostly in testing) in timers
+     * @param trackFilters      whether the processing time for request and response filters should be tracked
+     */
     public MetricsFeature(MetricRegistry registry, Clock clock, boolean trackFilters) {
+        this(registry, clock, trackFilters, ExponentiallyDecayingReservoir::new);
+    }
+
+    /*
+     * @param registry          the metrics registry where the metrics will be stored
+     * @param clock             the {@link Clock} to track time (used mostly in testing) in timers
+     * @param trackFilters      whether the processing time for request and response filters should be tracked
+     * @param reservoirSupplier Supplier for creating the {@link Reservoir} for {@link Timer timers}.
+     */
+    public MetricsFeature(MetricRegistry registry, Clock clock, boolean trackFilters, Supplier<Reservoir> reservoirSupplier) {
         this.registry = registry;
         this.clock = clock;
         this.trackFilters = trackFilters;
+        this.reservoirSupplier = reservoirSupplier;
     }
 
     public MetricsFeature(String registryName) {
@@ -56,7 +91,7 @@ public class MetricsFeature implements Feature {
      */
     @Override
     public boolean configure(FeatureContext context) {
-        context.register(new InstrumentedResourceMethodApplicationListener(registry, clock, trackFilters));
+        context.register(new InstrumentedResourceMethodApplicationListener(registry, clock, trackFilters, reservoirSupplier));
         return true;
     }
 }

@@ -3,7 +3,17 @@ package com.codahale.metrics;
 import java.util.concurrent.TimeUnit;
 
 public class ManualClock extends Clock {
-    long ticksInNanos = 0;
+    private final long initialTicksInNanos;
+    long ticksInNanos;
+
+    public ManualClock(long initialTicksInNanos) {
+        this.initialTicksInNanos = initialTicksInNanos;
+        this.ticksInNanos = initialTicksInNanos;
+    }
+
+    public ManualClock() {
+        this(0L);
+    }
 
     public synchronized void addNanos(long nanos) {
         ticksInNanos += nanos;
@@ -28,7 +38,7 @@ public class ManualClock extends Clock {
 
     @Override
     public synchronized long getTime() {
-        return TimeUnit.NANOSECONDS.toMillis(ticksInNanos);
+        return TimeUnit.NANOSECONDS.toMillis(ticksInNanos - initialTicksInNanos);
     }
 
 }
