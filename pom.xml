@@ -50,7 +50,7 @@
         <jetty9.version>9.4.35.v20201120</jetty9.version>
         <slf4j.version>1.7.30</slf4j.version>
         <assertj.version>3.18.1</assertj.version>
-        <mockito.version>3.6.28</mockito.version>
+        <mockito.version>3.7.0</mockito.version>
         <junit.version>4.12</junit.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
