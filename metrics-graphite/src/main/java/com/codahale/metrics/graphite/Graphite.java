@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.InetSocketAddress;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A client to a Carbon server via TCP.
@@ -66,11 +66,19 @@ public class Graphite implements GraphiteSender {
      * @param charset       the character set used by the server
      */
     public Graphite(String hostname, int port, SocketFactory socketFactory, Charset charset) {
+        if (hostname == null || hostname.isEmpty()) {
+            throw new IllegalArgumentException("hostname must not be null or empty");
+        }
+
+        if (port < 0 || port > 65535) {
+            throw new IllegalArgumentException("port must be a valid IP port (0-65535)");
+        }
+
         this.hostname = hostname;
         this.port = port;
         this.address = null;
-        this.socketFactory = socketFactory;
-        this.charset = charset;
+        this.socketFactory = requireNonNull(socketFactory, "socketFactory must not be null");
+        this.charset = requireNonNull(charset, "charset must not be null");
     }
 
     /**
@@ -104,9 +112,9 @@ public class Graphite implements GraphiteSender {
     public Graphite(InetSocketAddress address, SocketFactory socketFactory, Charset charset) {
         this.hostname = null;
         this.port = -1;
-        this.address = address;
-        this.socketFactory = socketFactory;
-        this.charset = charset;
+        this.address = requireNonNull(address, "address must not be null");
+        this.socketFactory = requireNonNull(socketFactory, "socketFactory must not be null");
+        this.charset = requireNonNull(charset, "charset must not be null");
     }
 
     @Override
@@ -119,8 +127,8 @@ public class Graphite implements GraphiteSender {
         // this version of the simplified logic will always cause a dns request if hostname has been supplied.
         // InetAddress.getByName forces the dns lookup
         // if an InetSocketAddress was supplied at create time that will take precedence.
-        if (address == null || hostname != null) {
-            address = new InetSocketAddress(InetAddress.getByName(hostname), port);
+        if (address == null || address.getHostName() == null && hostname != null) {
+            address = new InetSocketAddress(hostname, port);
         }
 
         if (address.getAddress() == null) {
