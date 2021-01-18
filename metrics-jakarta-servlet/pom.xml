@@ -8,16 +8,16 @@
         <version>5.0.0-rc5-SNAPSHOT</version>
     </parent>
 
-    <artifactId>metrics-caffeine</artifactId>
-    <name>Metrics5 Integration for Caffeine</name>
+    <artifactId>metrics-jakarta-servlet</artifactId>
+    <name>Metrics5 Integration for Jakarta Servlets</name>
     <packaging>bundle</packaging>
     <description>
-        Metrics Integration for Caffeine.
+        An instrumented filter for servlet environments.
     </description>
 
     <properties>
-        <javaModuleName>io.dropwizard.metrics5.caffeine</javaModuleName>
-        <caffeine.version>2.8.7</caffeine.version>
+        <javaModuleName>io.dropwizard.metrics5.servlet</javaModuleName>
+        <servlet.version>5.0.0</servlet.version>
     </properties>
 
     <dependencyManagement>
@@ -38,9 +38,10 @@
             <artifactId>metrics-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-            <version>${caffeine.version}</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${servlet.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

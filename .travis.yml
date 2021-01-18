@@ -1,9 +1,0 @@
-language: java
-dist: focal
-script: ./mvnw -B -V -ntp -ff verify
-jdk:
-- openjdk11
-cache:
-  directories:
-  - .autoconf
-  - $HOME/.m2

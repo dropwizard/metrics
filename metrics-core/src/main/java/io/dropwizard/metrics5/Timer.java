@@ -20,7 +20,7 @@ public class Timer implements Metered, Sampling {
         private final Clock clock;
         private final long startTime;
 
-        private Context(Timer timer, Clock clock) {
+        Context(Timer timer, Clock clock) {
             this.timer = timer;
             this.clock = clock;
             this.startTime = clock.getTick();

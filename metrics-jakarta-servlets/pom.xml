@@ -8,8 +8,8 @@
         <version>5.0.0-rc5-SNAPSHOT</version>
     </parent>
 
-    <artifactId>metrics-servlets</artifactId>
-    <name>Metrics5 Utility Servlets</name>
+    <artifactId>metrics-jakarta-servlets</artifactId>
+    <name>Metrics5 Utility Jakarta Servlets</name>
     <packaging>bundle</packaging>
     <description>
         A set of utility servlets for Metrics, allowing you to expose valuable information about
@@ -19,8 +19,9 @@
     <properties>
         <javaModuleName>io.dropwizard.metrics5.servlets</javaModuleName>
         <papertrail.profiler.version>1.1.1</papertrail.profiler.version>
-        <servlet.version>3.1.0</servlet.version>
+        <servlet.version>5.0.0</servlet.version>
         <jackson.version>2.12.0</jackson.version>
+        <slf4j.version>2.0.0-alpha1</slf4j.version>
     </properties>
 
     <dependencyManagement>
@@ -32,6 +33,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-bom</artifactId>
+                <version>${jetty11.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -39,18 +47,42 @@
         <dependency>
             <groupId>io.dropwizard.metrics5</groupId>
             <artifactId>metrics-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.dropwizard.metrics5</groupId>
             <artifactId>metrics-healthchecks</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.dropwizard.metrics5</groupId>
             <artifactId>metrics-json</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.dropwizard.metrics5</groupId>
             <artifactId>metrics-jvm</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.helger</groupId>
@@ -58,8 +90,8 @@
             <version>${papertrail.profiler.version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <version>${servlet.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -69,28 +101,30 @@
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>${jetty9.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-http</artifactId>
-            <classifier>tests</classifier>
-            <version>${jetty9.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-            <classifier>tests</classifier>
-            <version>${jetty9.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.dropwizard.metrics5</groupId>
-            <artifactId>metrics-jetty9</artifactId>
+            <artifactId>metrics-jetty11</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
