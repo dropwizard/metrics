@@ -18,10 +18,8 @@ package io.dropwizard.metrics.caffeine3;
 import static java.util.Objects.requireNonNull;
 
 import java.util.EnumMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
-import java.util.stream.Collectors;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Histogram;
