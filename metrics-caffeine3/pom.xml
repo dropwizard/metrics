@@ -8,16 +8,20 @@
         <version>4.2.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>metrics-caffeine</artifactId>
-    <name>Metrics Integration for Caffeine 2.x</name>
+    <artifactId>metrics-caffeine3</artifactId>
+    <name>Metrics Integration for Caffeine 3.x</name>
     <packaging>bundle</packaging>
     <description>
-        Metrics Integration for Caffeine 2.x.
+        Metrics Integration for Caffeine 3.x.
     </description>
 
     <properties>
-        <javaModuleName>com.codahale.metrics.caffeine</javaModuleName>
-        <caffeine.version>2.9.0</caffeine.version>
+        <javaModuleName>io.dropwizard.metrics.caffeine3</javaModuleName>
+
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+
+        <caffeine.version>3.0.0</caffeine.version>
     </properties>
 
     <dependencyManagement>
