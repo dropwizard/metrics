@@ -9,7 +9,7 @@ import java.util.Map;
  * <pre>{@code
  * <filter>
  *     <filter-name>instrumentedFilter</filter-name>
- *     <filter-class>io.dropwizard.metrics.servlet.InstrumentedFilter</filter-class>
+ *     <filter-class>io.dropwizard.metrics5.servlet.InstrumentedFilter</filter-class>
  * </filter>
  * <filter-mapping>
  *     <filter-name>instrumentedFilter</filter-name>

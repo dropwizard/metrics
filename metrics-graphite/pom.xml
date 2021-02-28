@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-graphite</artifactId>
-    <name>Graphite Integration for Metrics5 </name>
+    <name>Graphite Integration for Metrics5</name>
     <packaging>bundle</packaging>
     <description>
         A reporter for Metrics which announces measurements to a Graphite server.
@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.graphite</javaModuleName>
-        <rabbitmq.version>5.10.0</rabbitmq.version>
+        <rabbitmq.version>5.11.0</rabbitmq.version>
     </properties>
 
     <dependencyManagement>

@@ -8,16 +8,20 @@
         <version>5.0.0-rc5-SNAPSHOT</version>
     </parent>
 
-    <artifactId>metrics-caffeine</artifactId>
-    <name>Metrics5 Integration for Caffeine 2.x</name>
+    <artifactId>metrics-caffeine3</artifactId>
+    <name>Metrics5 Integration for Caffeine 3.x</name>
     <packaging>bundle</packaging>
     <description>
-        Metrics Integration for Caffeine 2.x.
+        Metrics5 Integration for Caffeine 3.x.
     </description>
 
     <properties>
-        <javaModuleName>io.dropwizard.metrics5.caffeine</javaModuleName>
-        <caffeine.version>2.9.0</caffeine.version>
+        <javaModuleName>io.dropwizard.metrics5.caffeine3</javaModuleName>
+
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+
+        <caffeine.version>3.0.0</caffeine.version>
     </properties>
 
     <dependencyManagement>
