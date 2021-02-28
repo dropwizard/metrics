@@ -4,9 +4,9 @@
 
     <groupId>io.dropwizard.metrics5</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>5.0.0-rc4-SNAPSHOT</version>
+    <version>5.0.0-rc5-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Metrics Parent</name>
+    <name>Metrics5 Parent</name>
     <description>
         The Metrics library.
     </description>
@@ -17,6 +17,7 @@
         <module>metrics-bom</module>
         <module>metrics-annotation</module>
         <module>metrics-benchmarks</module>
+        <module>metrics-caffeine</module>
         <module>metrics-core</module>
         <module>metrics-collectd</module>
         <module>metrics-ehcache</module>
@@ -26,31 +27,48 @@
         <module>metrics-httpclient</module>
         <module>metrics-httpclient5</module>
         <module>metrics-httpasyncclient</module>
+        <module>metrics-jakarta-servlet</module>
+        <module>metrics-jakarta-servlets</module>
         <module>metrics-jcache</module>
-        <module>metrics-jcstress</module>
         <module>metrics-jdbi</module>
         <module>metrics-jdbi3</module>
         <module>metrics-jersey2</module>
+        <module>metrics-jersey3</module>
         <module>metrics-jetty9</module>
-        <module>metrics-jmx</module>
+        <module>metrics-jetty10</module>
+        <module>metrics-jetty11</module>
         <module>metrics-json</module>
         <module>metrics-jvm</module>
         <module>metrics-log4j2</module>
         <module>metrics-logback</module>
         <module>metrics-servlet</module>
         <module>metrics-servlets</module>
+        <module>metrics-jcstress</module>
+        <module>metrics-jmx</module>
         <module>metrics-legacy-adapter</module>
         <module>metrics-legacy-adapter-healthchecks</module>
     </modules>
 
     <properties>
+        <project.build.outputTimestamp>2011-02-24T06:12:03Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <jackson.version>2.12.1</jackson.version>
+        <jetty9.version>9.4.35.v20201120</jetty9.version>
+        <jetty10.version>10.0.0</jetty10.version>
+        <jetty11.version>11.0.0</jetty11.version>
         <slf4j.version>1.7.30</slf4j.version>
-        <assertj.version>3.15.0</assertj.version>
-        <mockito.version>3.3.0</mockito.version>
+        <assertj.version>3.18.1</assertj.version>
+        <mockito.version>3.7.0</mockito.version>
         <junit.version>4.12</junit.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
+
+        <sonar.projectKey>dropwizard_metrics</sonar.projectKey>
+        <sonar.organization>dropwizard</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
     </properties>
 
     <developers>
@@ -102,12 +120,12 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
+            <id>ossrh</id>
             <name>Sonatype Nexus Snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
-            <id>sonatype-nexus-staging</id>
+            <id>ossrh</id>
             <name>Nexus Release Repository</name>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
@@ -165,8 +183,9 @@
                             <source>1.8</source>
                             <target>1.8</target>
                             <fork>true</fork>
-                            <compilerArgs>
+                            <compilerArgs combine.children="append">
                                 <arg>-XepExcludedPaths:.*/target/generated-sources/.*</arg>
+                                <arg>-J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${errorprone.javac.version}/javac-${errorprone.javac.version}.jar</arg>
                             </compilerArgs>
                         </configuration>
                         <dependencies>
@@ -216,15 +235,51 @@
                     <value>true</value>
                 </property>
             </activation>
+            <properties>
+                <gpg.keyname>EDA86E9FB607B5FC9223FB767D4868B53E31E7AD</gpg.keyname>
+            </properties>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.2.0</version>
+                        <configuration>
+                            <source>8</source>
+                            <doclint>none</doclint>
+                            <quiet>true</quiet>
+                            <notimestamp>true</notimestamp>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>1.6</version>
                         <configuration>
                             <gpgArguments>
-                                <argument>--no-tty</argument>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
                             </gpgArguments>
                         </configuration>
                         <executions>
@@ -237,27 +292,58 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.8</version>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>nexus-deploy</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>deploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
-
     </profiles>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <showWarnings>true</showWarnings>
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                        <arg>-XDcompilePolicy=simple</arg>
+                        <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.*</arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>2.4.0</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>4.2.1</version>
+                <version>5.1.1</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -269,6 +355,10 @@
                             *
                         ]]>
                         </Import-Package>
+                        <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
+                        <!-- https://stackoverflow.com/a/29853163/49505 -->
+                        <_removeheaders>Bnd-LastModified</_removeheaders>
+                        <_reproducible>true</_reproducible>
                     </instructions>
                 </configuration>
             </plugin>
@@ -279,19 +369,6 @@
                 <configuration>
                     <argLine>-Djava.net.preferIPv4Stack=true</argLine>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -314,25 +391,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.1</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <source>8</source>
-                    <doclint>none</doclint>
-                    <quiet>true</quiet>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <version>3.1.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -372,12 +431,31 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.8.2</version>
+                <version>3.9.1</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.6</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

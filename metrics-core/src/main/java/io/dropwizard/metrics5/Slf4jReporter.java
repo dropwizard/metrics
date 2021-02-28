@@ -247,14 +247,14 @@ public class Slf4jReporter extends ScheduledReporter {
 
     @Override
     @SuppressWarnings("rawtypes")
-    public void report(SortedMap<MetricName, Gauge> gauges,
+    public void report(SortedMap<MetricName, Gauge<?>> gauges,
                        SortedMap<MetricName, Counter> counters,
                        SortedMap<MetricName, Histogram> histograms,
                        SortedMap<MetricName, Meter> meters,
                        SortedMap<MetricName, Timer> timers) {
         if (loggerProxy.isEnabled(marker)) {
             StringBuilder b = new StringBuilder();
-            for (Entry<MetricName, Gauge> entry : gauges.entrySet()) {
+            for (Entry<MetricName, Gauge<?>> entry : gauges.entrySet()) {
                 logGauge(b, entry.getKey(), entry.getValue());
             }
 

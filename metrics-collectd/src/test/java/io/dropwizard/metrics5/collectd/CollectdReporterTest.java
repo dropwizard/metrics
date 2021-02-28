@@ -300,6 +300,22 @@ public class CollectdReporterTest {
         return new TreeMap<>(map);
     }
 
+    @Test
+    public void sanitizesMetricNameWithCustomMaxLength() throws Exception {
+        CollectdReporter customReporter = CollectdReporter.forRegistry(registry)
+                .withHostName("eddie")
+                .withMaxLength(20)
+                .build(new Sender("localhost", 25826));
+
+        Counter counter = registry.counter("dash-illegal.slash/illegal");
+        counter.inc();
+
+        customReporter.report();
+
+        ValueList values = receiver.next();
+        assertThat(values.getPlugin()).isEqualTo("dash_illegal.slash_i");
+    }
+
     private List<Number> nextValues(Receiver receiver) throws Exception {
         final ValueList valueList = receiver.next();
         return valueList == null ? Collections.emptyList() : valueList.getValues();

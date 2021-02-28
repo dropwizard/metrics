@@ -93,36 +93,36 @@ public class InstrumentedHttpChannelListener
 
         MetricName prefix = (pref == null) ? MetricName.build(getClass().getName()) : pref;
 
-        this.requests = metricRegistry.timer(prefix.append(MetricName.build("requests")));
-        this.dispatches = metricRegistry.timer(prefix.append(MetricName.build("dispatches")));
+        this.requests = metricRegistry.timer(prefix.resolve("requests"));
+        this.dispatches = metricRegistry.timer(prefix.resolve("dispatches"));
 
-        this.activeRequests = metricRegistry.counter(prefix.append(MetricName.build("active-requests")));
-        this.activeDispatches = metricRegistry.counter(prefix.append(MetricName.build("active-dispatches")));
-        this.activeSuspended = metricRegistry.counter(prefix.append(MetricName.build("active-suspended")));
+        this.activeRequests = metricRegistry.counter(prefix.resolve("active-requests"));
+        this.activeDispatches = metricRegistry.counter(prefix.resolve("active-dispatches"));
+        this.activeSuspended = metricRegistry.counter(prefix.resolve("active-suspended"));
 
-        this.asyncDispatches = metricRegistry.meter(prefix.append(MetricName.build("async-dispatches")));
-        this.asyncTimeouts = metricRegistry.meter(prefix.append(MetricName.build("async-timeouts")));
+        this.asyncDispatches = metricRegistry.meter(prefix.resolve("async-dispatches"));
+        this.asyncTimeouts = metricRegistry.meter(prefix.resolve("async-timeouts"));
 
         this.responses = new Meter[]{
-            metricRegistry.meter(prefix.append(MetricName.build("1xx-responses"))), // 1xx
-            metricRegistry.meter(prefix.append(MetricName.build("2xx-responses"))), // 2xx
-            metricRegistry.meter(prefix.append(MetricName.build("3xx-responses"))), // 3xx
-            metricRegistry.meter(prefix.append(MetricName.build("4xx-responses"))), // 4xx
-            metricRegistry.meter(prefix.append(MetricName.build("5xx-responses")))  // 5xx
+            metricRegistry.meter(prefix.resolve("1xx-responses")), // 1xx
+            metricRegistry.meter(prefix.resolve("2xx-responses")), // 2xx
+            metricRegistry.meter(prefix.resolve("3xx-responses")), // 3xx
+            metricRegistry.meter(prefix.resolve("4xx-responses")), // 4xx
+            metricRegistry.meter(prefix.resolve("5xx-responses"))  // 5xx
         };
 
-        this.getRequests = metricRegistry.timer(prefix.append(MetricName.build("get-requests")));
-        this.postRequests = metricRegistry.timer(prefix.append(MetricName.build("post-requests")));
-        this.headRequests = metricRegistry.timer(prefix.append(MetricName.build("head-requests")));
-        this.putRequests = metricRegistry.timer(prefix.append(MetricName.build("put-requests")));
-        this.deleteRequests = metricRegistry.timer(prefix.append(MetricName.build("delete-requests")));
-        this.optionsRequests = metricRegistry.timer(prefix.append(MetricName.build("options-requests")));
-        this.traceRequests = metricRegistry.timer(prefix.append(MetricName.build("trace-requests")));
-        this.connectRequests = metricRegistry.timer(prefix.append(MetricName.build("connect-requests")));
-        this.moveRequests = metricRegistry.timer(prefix.append(MetricName.build("move-requests")));
-        this.otherRequests = metricRegistry.timer(prefix.append(MetricName.build("other-requests")));
+        this.getRequests = metricRegistry.timer(prefix.resolve("get-requests"));
+        this.postRequests = metricRegistry.timer(prefix.resolve("post-requests"));
+        this.headRequests = metricRegistry.timer(prefix.resolve("head-requests"));
+        this.putRequests = metricRegistry.timer(prefix.resolve("put-requests"));
+        this.deleteRequests = metricRegistry.timer(prefix.resolve("delete-requests"));
+        this.optionsRequests = metricRegistry.timer(prefix.resolve("options-requests"));
+        this.traceRequests = metricRegistry.timer(prefix.resolve("trace-requests"));
+        this.connectRequests = metricRegistry.timer(prefix.resolve("connect-requests"));
+        this.moveRequests = metricRegistry.timer(prefix.resolve("move-requests"));
+        this.otherRequests = metricRegistry.timer(prefix.resolve("other-requests"));
 
-        metricRegistry.register(prefix.append(MetricName.build("percent-4xx-1m")), new RatioGauge() {
+        metricRegistry.register(prefix.resolve("percent-4xx-1m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[3].getOneMinuteRate(),
@@ -130,7 +130,7 @@ public class InstrumentedHttpChannelListener
             }
         });
 
-        metricRegistry.register(prefix.append(MetricName.build("percent-4xx-5m")), new RatioGauge() {
+        metricRegistry.register(prefix.resolve("percent-4xx-5m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[3].getFiveMinuteRate(),
@@ -138,7 +138,7 @@ public class InstrumentedHttpChannelListener
             }
         });
 
-        metricRegistry.register(prefix.append(MetricName.build("percent-4xx-15m")), new RatioGauge() {
+        metricRegistry.register(prefix.resolve("percent-4xx-15m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[3].getFifteenMinuteRate(),
@@ -146,7 +146,7 @@ public class InstrumentedHttpChannelListener
             }
         });
 
-        metricRegistry.register(prefix.append(MetricName.build("percent-5xx-1m")), new RatioGauge() {
+        metricRegistry.register(prefix.resolve("percent-5xx-1m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[4].getOneMinuteRate(),
@@ -154,7 +154,7 @@ public class InstrumentedHttpChannelListener
             }
         });
 
-        metricRegistry.register(prefix.append(MetricName.build("percent-5xx-5m")), new RatioGauge() {
+        metricRegistry.register(prefix.resolve("percent-5xx-5m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(responses[4].getFiveMinuteRate(),
@@ -162,9 +162,9 @@ public class InstrumentedHttpChannelListener
             }
         });
 
-        metricRegistry.register(prefix.append(MetricName.build("percent-5xx-15m")), new RatioGauge() {
+        metricRegistry.register(prefix.resolve("percent-5xx-15m"), new RatioGauge() {
             @Override
-            public Ratio getRatio() {
+            public RatioGauge.Ratio getRatio() {
                 return Ratio.of(responses[4].getFifteenMinuteRate(),
                     requests.getFifteenMinuteRate());
             }

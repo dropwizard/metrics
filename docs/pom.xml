@@ -5,15 +5,16 @@
     <parent>
         <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>5.0.0-rc4-SNAPSHOT</version>
+        <version>5.0.0-rc5-SNAPSHOT</version>
     </parent>
 
     <artifactId>docs</artifactId>
-    <name>Metrics Documentation</name>
+    <name>Metrics5 Documentation</name>
 
     <properties>
         <jar.skipIfEmpty>true</jar.skipIfEmpty>
         <mpir.skip>true</mpir.skip>
+        <maven.install.skip>true</maven.install.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
         <javaModuleName>io.dropwizard.metrics5.docs</javaModuleName>
     </properties>
@@ -29,7 +30,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>parse-version</id>
@@ -43,7 +44,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>process-resources</id>
@@ -72,6 +73,7 @@
                 <configuration>
                     <sourceDirectory>${project.build.directory}/source</sourceDirectory>
                 </configuration>
+                <version>2.9.0</version>
             </plugin>
         </plugins>
     </reporting>

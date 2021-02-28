@@ -33,7 +33,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
     private final int size;
     private final AtomicLong count;
     private volatile long startTime;
-    private final AtomicLong nextScaleTime;
+    private final AtomicLong lastScaleTick;
     private final Clock clock;
 
     /**
@@ -72,7 +72,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
         this.clock = clock;
         this.count = new AtomicLong(0);
         this.startTime = currentTimeInSeconds();
-        this.nextScaleTime = new AtomicLong(clock.getTick() + RESCALE_THRESHOLD);
+        this.lastScaleTick = new AtomicLong(clock.getTick());
     }
 
     @Override
@@ -118,9 +118,9 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
 
     private void rescaleIfNeeded() {
         final long now = clock.getTick();
-        final long next = nextScaleTime.get();
-        if (now >= next) {
-            rescale(now, next);
+        final long lastScaleTickSnapshot = lastScaleTick.get();
+        if (now - lastScaleTickSnapshot >= RESCALE_THRESHOLD) {
+            rescale(now, lastScaleTickSnapshot);
         }
     }
 
@@ -161,10 +161,10 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
      * landmark L′ (and then use this new L′ at query time). This can be done with
      * a linear pass over whatever data structure is being used."
      */
-    private void rescale(long now, long next) {
+    private void rescale(long now, long lastTick) {
         lockForRescale();
         try {
-            if (nextScaleTime.compareAndSet(next, now + RESCALE_THRESHOLD)) {
+            if (lastScaleTick.compareAndSet(lastTick, now)) {
                 final long oldStartTime = startTime;
                 this.startTime = currentTimeInSeconds();
                 final double scalingFactor = exp(-alpha * (startTime - oldStartTime));

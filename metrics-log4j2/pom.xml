@@ -5,11 +5,11 @@
     <parent>
         <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>5.0.0-rc4-SNAPSHOT</version>
+        <version>5.0.0-rc5-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-log4j2</artifactId>
-    <name>Metrics Integration for Log4j 2.x</name>
+    <name>Metrics5 Integration for Log4j 2.x</name>
     <packaging>bundle</packaging>
     <description>
         An instrumented appender for Log4j 2.x.
@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.log4j2</javaModuleName>
-        <log4j2.version>2.13.0</log4j2.version>
+        <log4j2.version>2.14.0</log4j2.version>
     </properties>
 
     <build>

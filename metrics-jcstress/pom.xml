@@ -2,16 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>5.0.0-rc4-SNAPSHOT</version>
+        <groupId>io.dropwizard.metrics5</groupId>
+        <version>5.0.0-rc5-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-jcstress</artifactId>
-    <version>5.0.0-rc4-SNAPSHOT</version>
+    <version>5.0.0-rc5-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Metrics JCStress tests</name>
+    <name>Metrics5 JCStress tests</name>
 
     <!--
        This is the demo/sample template build script for building concurrency tests with JCStress.
@@ -37,7 +37,7 @@
         <!--
             jcstress version to use with this project.
           -->
-        <jcstress.version>0.5</jcstress.version>
+        <jcstress.version>0.7</jcstress.version>
 
         <!--
             Java source/target to use for compilation.
@@ -50,6 +50,8 @@
         <uberjar.name>jcstress</uberjar.name>
 
         <javaModuleName>io.dropwizard.metrics5.jcstress</javaModuleName>
+        <jar.skipIfEmpty>true</jar.skipIfEmpty>
+        <maven.install.skip>true</maven.install.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
@@ -58,7 +60,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.2.4</version>
                 <executions>
                     <execution>
                         <id>main</id>

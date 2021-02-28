@@ -5,17 +5,17 @@
     <parent>
         <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>5.0.0-rc4-SNAPSHOT</version>
+        <version>5.0.0-rc5-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-jdbi3</artifactId>
-    <name>Metrics Integration for JDBI3</name>
+    <name>Metrics5 Integration for JDBI3</name>
     <packaging>bundle</packaging>
     <description>Provides instrumentation of Jdbi3 data access objects</description>
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.jdbi3</javaModuleName>
-        <jdbi3.version>3.12.2</jdbi3.version>
+        <jdbi3.version>3.18.0</jdbi3.version>
     </properties>
 
     <dependencyManagement>

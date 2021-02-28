@@ -69,9 +69,8 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * @see #register(MetricName, Metric)
+     * See {@link #register(MetricName, Metric)}
      */
-    @SuppressWarnings("unchecked")
     public <T extends Metric> T register(String name, T metric) throws IllegalArgumentException {
         return register(MetricName.build(name), metric);
     }
@@ -169,7 +168,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * @see #counter(MetricName)
+     * See {@link #counter(MetricName)}
      */
     public Counter counter(String name) {
         return getOrAdd(MetricName.build(name), MetricBuilder.COUNTERS);
@@ -187,7 +186,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * @see #histogram(MetricName)
+     * See {@link #histogram(MetricName)}
      */
     public Histogram histogram(String name) {
         return getOrAdd(MetricName.build(name), MetricBuilder.HISTOGRAMS);
@@ -227,7 +226,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * @see #meter(MetricName)
+     * See {@link #meter(MetricName)}
      */
     public Meter meter(String name) {
         return getOrAdd(MetricName.build(name), MetricBuilder.METERS);
@@ -267,7 +266,7 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * @see #timer(MetricName)
+     * See {@link #timer(MetricName)}
      */
     public Timer timer(String name) {
         return getOrAdd(MetricName.build(name), MetricBuilder.TIMERS);
@@ -336,11 +335,10 @@ public class MetricRegistry implements MetricSet {
      * @param supplier a MetricSupplier that can be used to manufacture a Gauge
      * @return a new or pre-existing {@link Gauge}
      */
-    @SuppressWarnings("rawtypes")
-    public Gauge gauge(MetricName name, final MetricSupplier<Gauge> supplier) {
-        return getOrAdd(name, new MetricBuilder<Gauge>() {
+    public <T> Gauge<T> gauge(MetricName name, final MetricSupplier<Gauge<T>> supplier) {
+        return getOrAdd(name, new MetricBuilder<Gauge<T>>() {
             @Override
-            public Gauge newMetric() {
+            public Gauge<T> newMetric() {
                 return supplier.newMetric();
             }
 
@@ -419,8 +417,7 @@ public class MetricRegistry implements MetricSet {
      *
      * @return all the gauges in the registry
      */
-    @SuppressWarnings("rawtypes")
-    public SortedMap<MetricName, Gauge> getGauges() {
+    public SortedMap<MetricName, Gauge<?>> getGauges() {
         return getGauges(MetricFilter.ALL);
     }
 
@@ -430,9 +427,15 @@ public class MetricRegistry implements MetricSet {
      * @param filter the metric filter to match
      * @return all the gauges in the registry
      */
-    @SuppressWarnings("rawtypes")
-    public SortedMap<MetricName, Gauge> getGauges(MetricFilter filter) {
-        return getMetrics(Gauge.class, filter);
+    public SortedMap<MetricName, Gauge<?>> getGauges(MetricFilter filter) {
+        final SortedMap<MetricName, Gauge<?>> timers = new TreeMap<>();
+        for (Map.Entry<MetricName, Metric> entry : metrics.entrySet()) {
+            if (entry.getValue() instanceof Gauge && filter.matches(entry.getKey(),
+                    entry.getValue())) {
+                timers.put(entry.getKey(), (Gauge<?>) entry.getValue());
+            }
+        }
+        return Collections.unmodifiableSortedMap(timers);
     }
 
     /**
@@ -533,7 +536,7 @@ public class MetricRegistry implements MetricSet {
 
     @SuppressWarnings("unchecked")
     private <T extends Metric> SortedMap<MetricName, T> getMetrics(Class<T> klass, MetricFilter filter) {
-        final TreeMap<MetricName, T> timers = new TreeMap<>();
+        final SortedMap<MetricName, T> timers = new TreeMap<>();
         for (Map.Entry<MetricName, Metric> entry : metrics.entrySet()) {
             if (klass.isInstance(entry.getValue()) && filter.matches(entry.getKey(),
                     entry.getValue())) {

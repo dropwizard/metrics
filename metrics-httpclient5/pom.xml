@@ -5,11 +5,11 @@
     <parent>
         <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>5.0.0-rc4-SNAPSHOT</version>
+        <version>5.0.0-rc5-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-httpclient5</artifactId>
-    <name>Metrics Integration for Apache HttpClient 5.x</name>
+    <name>Metrics5 Integration for Apache HttpClient 5.x</name>
     <packaging>bundle</packaging>
     <description>
         An Apache HttpClient 5.x wrapper providing Metrics instrumentation of connection pools, request
@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.httpclient5</javaModuleName>
-        <http-client.version>5.0</http-client.version>
+        <http-client.version>5.0.3</http-client.version>
     </properties>
 
     <dependencyManagement>
@@ -52,7 +52,7 @@
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
-            <version>4.0.2</version>
+            <version>4.0.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

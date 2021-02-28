@@ -11,13 +11,11 @@ import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.Snapshot;
 import io.dropwizard.metrics5.Timer;
-
-import java.io.IOException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,16 +27,15 @@ import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.times;
 
 public class InfluxDbReporterTest {
     private static final MetricName GAUGE = MetricName.build("gauge");
@@ -408,8 +405,6 @@ public class InfluxDbReporterTest {
         reporter.stop();
 
         verify(sender).close();
-
-        verifyNoMoreInteractions(sender);
     }
 
     @Test
@@ -457,7 +452,7 @@ public class InfluxDbReporterTest {
     }
 
     private <K, V> SortedMap<K, V> map(K key, V value) {
-        final TreeMap<K, V> map = new TreeMap<>();
+        final SortedMap<K, V> map = new TreeMap<>();
         map.put(key, value);
         return map;
     }

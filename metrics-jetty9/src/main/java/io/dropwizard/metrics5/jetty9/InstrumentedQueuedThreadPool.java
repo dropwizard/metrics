@@ -10,6 +10,12 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import java.util.concurrent.BlockingQueue;
 
 public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
+    private static final String NAME_UTILIZATION = "utilization";
+    private static final String NAME_UTILIZATION_MAX = "utilization-max";
+    private static final String NAME_SIZE = "size";
+    private static final String NAME_JOBS = "jobs";
+    private static final String NAME_JOBS_QUEUE_UTILIZATION = "jobs-queue-utilization";
+
     private final MetricRegistry metricRegistry;
     private String prefix;
 
@@ -66,7 +72,7 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
     protected void doStart() throws Exception {
         super.doStart();
 
-        final MetricName prefix = this.prefix == null ? MetricRegistry.name(QueuedThreadPool.class, getName()) : MetricRegistry.name(this.prefix, getName());
+        final MetricName prefix = getMetricPrefix();
 
         metricRegistry.register(prefix.resolve("utilization"), new RatioGauge() {
             @Override
@@ -93,5 +99,22 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
                 return Ratio.of(queue.size(), queue.size() + queue.remainingCapacity());
             }
         });
+    }
+
+    @Override
+    protected void doStop() throws Exception {
+        final MetricName prefix = getMetricPrefix();
+
+        metricRegistry.remove(prefix.resolve(NAME_UTILIZATION));
+        metricRegistry.remove(prefix.resolve(NAME_UTILIZATION_MAX));
+        metricRegistry.remove(prefix.resolve(NAME_SIZE));
+        metricRegistry.remove(prefix.resolve(NAME_JOBS));
+        metricRegistry.remove(prefix.resolve(NAME_JOBS_QUEUE_UTILIZATION));
+
+        super.doStop();
+    }
+
+    private MetricName getMetricPrefix() {
+        return this.prefix == null ? MetricRegistry.name(QueuedThreadPool.class, getName()) : MetricRegistry.name(this.prefix, getName());
     }
 }

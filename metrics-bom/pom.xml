@@ -5,11 +5,11 @@
     <parent>
         <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>5.0.0-rc4-SNAPSHOT</version>
+        <version>5.0.0-rc5-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-bom</artifactId>
-    <name>Metrics BOM</name>
+    <name>Metrics5 BOM</name>
     <packaging>pom</packaging>
     <description>Bill of Materials for Metrics</description>
 
@@ -22,52 +22,32 @@
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-caffeine</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics5</groupId>
-                <artifactId>metrics-jvm</artifactId>
+                <artifactId>metrics-collectd</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics5</groupId>
-                <artifactId>metrics-jmx</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.dropwizard.metrics5</groupId>
-                <artifactId>metrics-healthchecks</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.dropwizard.metrics5</groupId>
-                <artifactId>metrics-jetty9</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.dropwizard.metrics5</groupId>
-                <artifactId>metrics-jersey2</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.dropwizard.metrics5</groupId>
-                <artifactId>metrics-json</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.dropwizard.metrics5</groupId>
-                <artifactId>metrics-servlets</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.dropwizard.metrics5</groupId>
-                <artifactId>metrics-servlet</artifactId>
+                <artifactId>metrics-ehcache</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-graphite</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-healthchecks</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -82,12 +62,17 @@
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics5</groupId>
-                <artifactId>metrics-jcache</artifactId>
+                <artifactId>metrics-jakarta-servlet</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics5</groupId>
-                <artifactId>metrics-ehcache</artifactId>
+                <artifactId>metrics-jakarta-servlets</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-jcache</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -102,12 +87,62 @@
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-jersey2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-jetty9</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-jetty10</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-jetty11</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-jmx</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-json</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-jvm</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-log4j2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-logback</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-log4j2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-servlet</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-servlets</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

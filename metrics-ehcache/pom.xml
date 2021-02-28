@@ -5,11 +5,11 @@
     <parent>
         <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>5.0.0-rc4-SNAPSHOT</version>
+        <version>5.0.0-rc5-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-ehcache</artifactId>
-    <name>Metrics Integration for Ehcache</name>
+    <name>Metrics5 Integration for Ehcache</name>
     <packaging>bundle</packaging>
     <description>
         An Ehcache wrapper providing Metrics instrumentation of caches.

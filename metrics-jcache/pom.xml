@@ -5,11 +5,11 @@
     <parent>
         <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>5.0.0-rc4-SNAPSHOT</version>
+        <version>5.0.0-rc5-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-jcache</artifactId>
-    <name>Metrics Integration for JCache</name>
+    <name>Metrics5 Integration for JCache</name>
     <packaging>bundle</packaging>
     <description>
         Metrics Integration for JCache, JSR 107 standard for caching.
@@ -19,7 +19,7 @@
     <properties>
         <javaModuleName>io.dropwizard.metrics5.jcache</javaModuleName>
         <cache-api.version>1.1.1</cache-api.version>
-        <ehcache3.version>3.8.1</ehcache3.version>
+        <ehcache3.version>3.9.0</ehcache3.version>
     </properties>
 
     <dependencyManagement>
@@ -74,7 +74,7 @@
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-            <version>2.3.2</version>
+            <version>2.3.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>

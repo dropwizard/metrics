@@ -27,6 +27,7 @@ import javax.script.SimpleBindings;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -163,7 +164,7 @@ public class PickledGraphiteTest {
             bindings.put("payload", payload.substring(nextIndex));
             unpickleScript.eval(bindings);
             result.addAll(result.size(), (PyList) bindings.get("metrics"));
-            nextIndex += (Integer) bindings.get("batchLength");
+            nextIndex += ((BigInteger) bindings.get("batchLength")).intValue();
         }
 
         for (Object aResult : result) {

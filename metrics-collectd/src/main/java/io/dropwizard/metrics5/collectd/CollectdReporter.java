@@ -1,6 +1,17 @@
 package io.dropwizard.metrics5.collectd;
 
-import io.dropwizard.metrics5.*;
+import io.dropwizard.metrics5.Clock;
+import io.dropwizard.metrics5.Counter;
+import io.dropwizard.metrics5.Gauge;
+import io.dropwizard.metrics5.Histogram;
+import io.dropwizard.metrics5.Meter;
+import io.dropwizard.metrics5.MetricAttribute;
+import io.dropwizard.metrics5.MetricFilter;
+import io.dropwizard.metrics5.MetricName;
+import io.dropwizard.metrics5.MetricRegistry;
+import io.dropwizard.metrics5.ScheduledReporter;
+import io.dropwizard.metrics5.Snapshot;
+import io.dropwizard.metrics5.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +83,7 @@ public class CollectdReporter extends ScheduledReporter {
         private String username = "";
         private String password = "";
         private Set<MetricAttribute> disabledMetricAttributes = Collections.emptySet();
+        private int maxLength = Sanitize.DEFAULT_MAX_LENGTH;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -132,6 +144,11 @@ public class CollectdReporter extends ScheduledReporter {
             return this;
         }
 
+        public Builder withMaxLength(int maxLength) {
+            this.maxLength = maxLength;
+            return this;
+        }
+
         public CollectdReporter build(Sender sender) {
             if (securityLevel != SecurityLevel.NONE) {
                 if (username.isEmpty()) {
@@ -146,7 +163,7 @@ public class CollectdReporter extends ScheduledReporter {
                     executor, shutdownExecutorOnStop,
                     clock, rateUnit, durationUnit,
                     filter, disabledMetricAttributes,
-                    username, password, securityLevel);
+                    username, password, securityLevel, new Sanitize(maxLength));
         }
     }
 
@@ -160,19 +177,21 @@ public class CollectdReporter extends ScheduledReporter {
     private final Clock clock;
     private long period;
     private final PacketWriter writer;
+    private final Sanitize sanitize;
 
     private CollectdReporter(MetricRegistry registry,
-            String hostname, Sender sender,
-            ScheduledExecutorService executor, boolean shutdownExecutorOnStop,
-            Clock clock, TimeUnit rateUnit, TimeUnit durationUnit,
-            MetricFilter filter, Set<MetricAttribute> disabledMetricAttributes,
-            String username, String password,
-            SecurityLevel securityLevel) {
+                             String hostname, Sender sender,
+                             ScheduledExecutorService executor, boolean shutdownExecutorOnStop,
+                             Clock clock, TimeUnit rateUnit, TimeUnit durationUnit,
+                             MetricFilter filter, Set<MetricAttribute> disabledMetricAttributes,
+                             String username, String password,
+                             SecurityLevel securityLevel, Sanitize sanitize) {
         super(registry, REPORTER_NAME, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
                 disabledMetricAttributes);
         this.hostName = (hostname != null) ? hostname : resolveHostName();
         this.sender = sender;
         this.clock = clock;
+        this.sanitize = sanitize;
         writer = new PacketWriter(sender, username, password, securityLevel);
     }
 
@@ -192,14 +211,14 @@ public class CollectdReporter extends ScheduledReporter {
     }
 
     @Override
-    public void report(SortedMap<MetricName, Gauge> gauges, SortedMap<MetricName, Counter> counters,
+    public void report(SortedMap<MetricName, Gauge<?>> gauges, SortedMap<MetricName, Counter> counters,
                        SortedMap<MetricName, Histogram> histograms, SortedMap<MetricName, Meter> meters,
                        SortedMap<MetricName, Timer> timers) {
-        MetaData.Builder metaData = new MetaData.Builder(hostName, clock.getTime() / 1000, period)
+        MetaData.Builder metaData = new MetaData.Builder(sanitize, hostName, clock.getTime() / 1000, period)
                 .type(COLLECTD_TYPE_GAUGE);
         try {
             connect(sender);
-            for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
+            for (Map.Entry<MetricName, Gauge<?>> entry : gauges.entrySet()) {
                 serializeGauge(metaData.plugin(entry.getKey().getKey()), entry.getValue());
             }
             for (Map.Entry<MetricName, Counter> entry : counters.entrySet()) {

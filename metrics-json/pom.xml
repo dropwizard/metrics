@@ -5,11 +5,11 @@
     <parent>
         <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>5.0.0-rc4-SNAPSHOT</version>
+        <version>5.0.0-rc5-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-json</artifactId>
-    <name>Jackson Integration for Metrics</name>
+    <name>Jackson Integration for Metrics5 </name>
     <packaging>bundle</packaging>
     <description>
         A set of Jackson modules which provide serializers for most Metrics classes.
@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.json</javaModuleName>
-        <jackson.version>2.9.10.1</jackson.version>
+        <jackson.version>2.12.0</jackson.version>
     </properties>
 
     <dependencyManagement>

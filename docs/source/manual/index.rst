@@ -14,6 +14,7 @@ User Manual
     core
     healthchecks
     ehcache
+    caffeine
     collectd
     graphite
     httpclient

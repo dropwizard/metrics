@@ -5,11 +5,11 @@
     <parent>
         <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>5.0.0-rc4-SNAPSHOT</version>
+        <version>5.0.0-rc5-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-core</artifactId>
-    <name>Metrics Core</name>
+    <name>Metrics5 Core</name>
     <packaging>bundle</packaging>
     <description>
         Metrics is a Java library which gives you unparalleled insight into what your code does in

@@ -223,7 +223,7 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
 
     @Override
     @SuppressWarnings("rawtypes")
-    public void report(SortedMap<MetricName, Gauge> gauges,
+    public void report(SortedMap<MetricName, Gauge<?>> gauges,
                        SortedMap<MetricName, Counter> counters,
                        SortedMap<MetricName, Histogram> histograms,
                        SortedMap<MetricName, Meter> meters,
@@ -234,7 +234,7 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
         try {
             sender.connect();
 
-            for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
+            for (Map.Entry<MetricName, Gauge<?>> entry : gauges.entrySet()) {
                 reportGauge(entry.getKey(), entry.getValue(), timestamp);
             }
 

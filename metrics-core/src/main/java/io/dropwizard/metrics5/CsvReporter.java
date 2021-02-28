@@ -192,6 +192,10 @@ public class CsvReporter extends ScheduledReporter {
     private final String meterFormat;
     private final String timerFormat;
 
+    private final String timerHeader;
+    private final String meterHeader;
+    private final String histogramHeader;
+
     private CsvReporter(MetricRegistry registry,
                         File directory,
                         Locale locale,
@@ -213,18 +217,22 @@ public class CsvReporter extends ScheduledReporter {
         this.histogramFormat = String.join(separator, "%d", "%d", "%d", "%f", "%d", "%f", "%f", "%f", "%f", "%f", "%f", "%f");
         this.meterFormat = String.join(separator, "%d", "%d", "%f", "%f", "%f", "%f", "events/%s");
         this.timerFormat = String.join(separator, "%d", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "calls/%s", "%s");
+
+        this.timerHeader = String.join(separator, "count", "sum", "max", "mean", "min", "stddev", "p50", "p75", "p95", "p98", "p99", "p999", "mean_rate", "m1_rate", "m5_rate", "m15_rate", "rate_unit", "duration_unit");
+        this.meterHeader = String.join(separator, "count", "sum", "mean_rate", "m1_rate", "m5_rate", "m15_rate", "rate_unit");
+        this.histogramHeader = String.join(separator, "count", "sum", "max", "mean", "min", "stddev", "p50", "p75", "p95", "p98", "p99", "p999");
     }
 
     @Override
     @SuppressWarnings("rawtypes")
-    public void report(SortedMap<MetricName, Gauge> gauges,
+    public void report(SortedMap<MetricName, Gauge<?>> gauges,
                        SortedMap<MetricName, Counter> counters,
                        SortedMap<MetricName, Histogram> histograms,
                        SortedMap<MetricName, Meter> meters,
                        SortedMap<MetricName, Timer> timers) {
         final long timestamp = TimeUnit.MILLISECONDS.toSeconds(clock.getTime());
 
-        for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
+        for (Map.Entry<MetricName, Gauge<?>> entry : gauges.entrySet()) {
             reportGauge(timestamp, entry.getKey(), entry.getValue());
         }
 
@@ -250,7 +258,7 @@ public class CsvReporter extends ScheduledReporter {
 
         report(timestamp,
                 name,
-                "count,sum,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit",
+                timerHeader,
                 timerFormat,
                 timer.getCount(),
                 convertDuration(timer.getSum()),
@@ -275,7 +283,7 @@ public class CsvReporter extends ScheduledReporter {
     private void reportMeter(long timestamp, MetricName name, Meter meter) {
         report(timestamp,
                 name,
-                "count,sum,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit",
+                meterHeader,
                 meterFormat,
                 meter.getCount(),
                 meter.getSum(),
@@ -291,7 +299,7 @@ public class CsvReporter extends ScheduledReporter {
 
         report(timestamp,
                 name,
-                "count,sum,max,mean,min,stddev,p50,p75,p95,p98,p99,p999",
+                histogramHeader,
                 histogramFormat,
                 histogram.getCount(),
                 histogram.getSum(),
@@ -323,7 +331,7 @@ public class CsvReporter extends ScheduledReporter {
                 try (PrintWriter out = new PrintWriter(new OutputStreamWriter(
                         new FileOutputStream(file, true), UTF_8))) {
                     if (!fileAlreadyExists) {
-                        out.println("t," + header);
+                        out.println("t" + separator + header);
                     }
                     out.printf(locale, String.format(locale, "%d" + separator + "%s%n", timestamp, line), values);
                 }

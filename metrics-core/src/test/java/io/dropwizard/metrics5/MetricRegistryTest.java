@@ -243,11 +243,10 @@ public class MetricRegistryTest {
     }
 
     @Test
-    @SuppressWarnings("rawtypes")
     public void accessingACustomGaugeRegistersAndReusesIt() {
-        final MetricRegistry.MetricSupplier<Gauge> supplier = () -> gauge;
-        final Gauge gauge1 = registry.gauge(THING, supplier);
-        final Gauge gauge2 = registry.gauge(THING, supplier);
+        final MetricRegistry.MetricSupplier<Gauge<String>> supplier = () -> gauge;
+        final Gauge<String> gauge1 = registry.gauge(THING, supplier);
+        final Gauge<String> gauge2 = registry.gauge(THING, supplier);
 
         assertThat(gauge1)
                 .isSameAs(gauge2);

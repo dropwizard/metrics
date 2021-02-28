@@ -166,7 +166,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
             throw new IllegalArgumentException("Reporter already started");
         }
 
-        this.scheduledFuture = executor.scheduleAtFixedRate(runnable, initialDelay, period, unit);
+        this.scheduledFuture = executor.scheduleWithFixedDelay(runnable, initialDelay, period, unit);
     }
 
     /**
@@ -194,6 +194,15 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
     public void stop() {
         if (shutdownExecutorOnStop) {
             executor.shutdown(); // Disable new tasks from being submitted
+        }
+
+        try {
+            report(); // Report metrics one last time
+        } catch (Exception e) {
+            LOG.warn("Final reporting of metrics failed.", e);
+        }
+
+        if (shutdownExecutorOnStop) {
             try {
                 // Wait a while for existing tasks to terminate
                 if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
@@ -210,20 +219,22 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                 Thread.currentThread().interrupt();
             }
         } else {
-            // The external manager(like JEE container) responsible for lifecycle of executor
-            synchronized (this) {
-                if (this.scheduledFuture == null) {
-                    // was never started
-                    return;
-                }
-                if (this.scheduledFuture.isCancelled()) {
-                    // already cancelled
-                    return;
-                }
-                // just cancel the scheduledFuture and exit
-                this.scheduledFuture.cancel(false);
-            }
+            // The external manager (like JEE container) responsible for lifecycle of executor
+            cancelScheduledFuture();
         }
+    }
+
+    private synchronized void cancelScheduledFuture() {
+        if (this.scheduledFuture == null) {
+            // was never started
+            return;
+        }
+        if (this.scheduledFuture.isCancelled()) {
+            // already cancelled
+            return;
+        }
+        // just cancel the scheduledFuture and exit
+        this.scheduledFuture.cancel(false);
     }
 
     /**
@@ -257,7 +268,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * @param timers     all of the timers in the registry
      */
     @SuppressWarnings("rawtypes")
-    public abstract void report(SortedMap<MetricName, Gauge> gauges,
+    public abstract void report(SortedMap<MetricName, Gauge<?>> gauges,
                                 SortedMap<MetricName, Counter> counters,
                                 SortedMap<MetricName, Histogram> histograms,
                                 SortedMap<MetricName, Meter> meters,

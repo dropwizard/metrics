@@ -17,9 +17,9 @@ import static io.dropwizard.metrics5.MetricAttribute.MIN;
 import static io.dropwizard.metrics5.MetricAttribute.P50;
 import static io.dropwizard.metrics5.MetricAttribute.P999;
 import static io.dropwizard.metrics5.MetricAttribute.STDDEV;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class Slf4jReporterTest {
 
@@ -354,7 +354,7 @@ public class Slf4jReporterTest {
     }
 
     private <T> SortedMap<MetricName, T> map(String name, T metric) {
-        final TreeMap<MetricName, T> map = new TreeMap<>();
+        final SortedMap<MetricName, T> map = new TreeMap<>();
         map.put(MetricName.build(name), metric);
         return map;
     }
