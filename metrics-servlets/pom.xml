@@ -19,7 +19,7 @@
     <properties>
         <javaModuleName>com.codahale.metrics.servlets</javaModuleName>
         <papertrail.profiler.version>1.1.1</papertrail.profiler.version>
-        <servlet.version>3.1.0</servlet.version>
+        <servlet.version>4.0.1</servlet.version>
     </properties>
 
     <dependencyManagement>
