@@ -93,14 +93,17 @@ public final class MetricsStatsCounter implements StatsCounter {
     totalLoadTime.add(loadTime);
   }
 
-  @Override
+  // @Override -- Caffeine 2.x
+  @Deprecated
   @SuppressWarnings("deprecation")
   public void recordEviction() {
     // This method is scheduled for removal in version 3.0 in favor of recordEviction(weight)
     recordEviction(1);
   }
 
-  @Override
+  // @Override -- Caffeine 2.x
+  @Deprecated
+  @SuppressWarnings("deprecation")
   public void recordEviction(int weight) {
     evictions.update(weight);
     evictionWeight.inc(weight);
@@ -114,7 +117,7 @@ public final class MetricsStatsCounter implements StatsCounter {
 
   @Override
   public CacheStats snapshot() {
-    return new CacheStats(
+    return CacheStats.of(
         hitCount.getCount(),
         missCount.getCount(),
         loadSuccess.getCount(),
