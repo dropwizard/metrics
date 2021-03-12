@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.caffeine</javaModuleName>
-        <caffeine.version>2.9.0</caffeine.version>
+        <caffeine.version>3.0.0</caffeine.version>
     </properties>
 
     <dependencyManagement>
