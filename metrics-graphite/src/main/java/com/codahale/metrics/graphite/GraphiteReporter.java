@@ -2,6 +2,8 @@ package com.codahale.metrics.graphite;
 
 import com.codahale.metrics.Clock;
 import com.codahale.metrics.Counter;
+import com.codahale.metrics.DoubleHistogram;
+import com.codahale.metrics.DoubleSnapshot;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
@@ -367,6 +369,16 @@ public class GraphiteReporter extends ScheduledReporter {
                        SortedMap<String, Histogram> histograms,
                        SortedMap<String, Meter> meters,
                        SortedMap<String, Timer> timers) {
+        report(gauges, counters, histograms, Collections.emptySortedMap(), meters, timers);
+    }
+    @Override
+    @SuppressWarnings("rawtypes")
+    public void report(SortedMap<String, Gauge> gauges,
+                       SortedMap<String, Counter> counters,
+                       SortedMap<String, Histogram> histograms,
+                       SortedMap<String, DoubleHistogram> doubleHistograms,
+                       SortedMap<String, Meter> meters,
+                       SortedMap<String, Timer> timers) {
         final long timestamp = clock.getTime() / 1000;
 
         // oh it'd be lovely to use Java 7 here
@@ -383,6 +395,10 @@ public class GraphiteReporter extends ScheduledReporter {
 
             for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
                 reportHistogram(entry.getKey(), entry.getValue(), timestamp);
+            }
+
+            for (Map.Entry<String, DoubleHistogram> entry : doubleHistograms.entrySet()) {
+                reportDoubleHistogram(entry.getKey(), entry.getValue(), timestamp);
             }
 
             for (Map.Entry<String, Meter> entry : meters.entrySet()) {
@@ -442,6 +458,21 @@ public class GraphiteReporter extends ScheduledReporter {
 
     private void reportHistogram(String name, Histogram histogram, long timestamp) throws IOException {
         final Snapshot snapshot = histogram.getSnapshot();
+        sendIfEnabled(COUNT, name, histogram.getCount(), timestamp);
+        sendIfEnabled(MAX, name, snapshot.getMax(), timestamp);
+        sendIfEnabled(MEAN, name, snapshot.getMean(), timestamp);
+        sendIfEnabled(MIN, name, snapshot.getMin(), timestamp);
+        sendIfEnabled(STDDEV, name, snapshot.getStdDev(), timestamp);
+        sendIfEnabled(P50, name, snapshot.getMedian(), timestamp);
+        sendIfEnabled(P75, name, snapshot.get75thPercentile(), timestamp);
+        sendIfEnabled(P95, name, snapshot.get95thPercentile(), timestamp);
+        sendIfEnabled(P98, name, snapshot.get98thPercentile(), timestamp);
+        sendIfEnabled(P99, name, snapshot.get99thPercentile(), timestamp);
+        sendIfEnabled(P999, name, snapshot.get999thPercentile(), timestamp);
+    }
+
+    private void reportDoubleHistogram(String name, DoubleHistogram histogram, long timestamp) throws IOException {
+        final DoubleSnapshot snapshot = histogram.getSnapshot();
         sendIfEnabled(COUNT, name, histogram.getCount(), timestamp);
         sendIfEnabled(MAX, name, snapshot.getMax(), timestamp);
         sendIfEnabled(MEAN, name, snapshot.getMean(), timestamp);

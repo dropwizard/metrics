@@ -23,6 +23,7 @@ public class MetricRegistryTest {
     private final SettableGauge<String> settableGauge = new DefaultSettableGauge<>("");
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
+    private final DoubleHistogram doubleHistogram = mock(DoubleHistogram.class);
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
 
@@ -130,6 +131,47 @@ public class MetricRegistryTest {
                 .isTrue();
 
         verify(listener).onHistogramRemoved("thing");
+    }
+
+    @Test
+    public void registeringADoubleHistogramTriggersANotification() {
+        assertThat(registry.register("thing", doubleHistogram))
+                .isEqualTo(doubleHistogram);
+
+        verify(listener).onDoubleHistogramAdded("thing", doubleHistogram);
+    }
+
+    @Test
+    public void accessingADoubleHistogramRegistersAndReusesIt() {
+        final DoubleHistogram histogram1 = registry.doubleHistogram("thing");
+        final DoubleHistogram histogram2 = registry.doubleHistogram("thing");
+
+        assertThat(histogram1)
+                .isSameAs(histogram2);
+
+        verify(listener).onDoubleHistogramAdded("thing", histogram1);
+    }
+
+    @Test
+    public void accessingACustomDoubleHistogramRegistersAndReusesIt() {
+        final MetricRegistry.MetricSupplier<DoubleHistogram> supplier = () -> doubleHistogram;
+        final DoubleHistogram histogram1 = registry.doubleHistogram("thing", supplier);
+        final DoubleHistogram histogram2 = registry.doubleHistogram("thing", supplier);
+
+        assertThat(histogram1)
+                .isSameAs(histogram2);
+
+        verify(listener).onDoubleHistogramAdded("thing", histogram1);
+    }
+
+    @Test
+    public void removingADoubleHistogramTriggersANotification() {
+        registry.register("thing", doubleHistogram);
+
+        assertThat(registry.remove("thing"))
+                .isTrue();
+
+        verify(listener).onDoubleHistogramRemoved("thing");
     }
 
     @Test
@@ -245,6 +287,7 @@ public class MetricRegistryTest {
         registry.register("gauge", gauge);
         registry.register("counter", counter);
         registry.register("histogram", histogram);
+        registry.register("doubleHistogram", doubleHistogram);
         registry.register("meter", meter);
         registry.register("timer", timer);
 
@@ -254,6 +297,7 @@ public class MetricRegistryTest {
         verify(other).onGaugeAdded("gauge", gauge);
         verify(other).onCounterAdded("counter", counter);
         verify(other).onHistogramAdded("histogram", histogram);
+        verify(other).onDoubleHistogramAdded("doubleHistogram", doubleHistogram);
         verify(other).onMeterAdded("meter", meter);
         verify(other).onTimerAdded("timer", timer);
     }
@@ -284,11 +328,11 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void hasAMapOfRegisteredHistograms() {
-        registry.register("histogram", histogram);
+    public void hasAMapOfRegisteredDoubleHistograms() {
+        registry.register("histogram", doubleHistogram);
 
-        assertThat(registry.getHistograms())
-                .contains(entry("histogram", histogram));
+        assertThat(registry.getDoubleHistograms())
+                .contains(entry("histogram", doubleHistogram));
     }
 
     @Test
@@ -312,11 +356,12 @@ public class MetricRegistryTest {
         registry.register("gauge", gauge);
         registry.register("counter", counter);
         registry.register("histogram", histogram);
+        registry.register("doubleHistogram", doubleHistogram);
         registry.register("meter", meter);
         registry.register("timer", timer);
 
         assertThat(registry.getNames())
-                .containsOnly("gauge", "counter", "histogram", "meter", "timer");
+                .containsOnly("gauge", "counter", "histogram", "doubleHistogram", "meter", "timer");
     }
 
     @Test
@@ -428,19 +473,21 @@ public class MetricRegistryTest {
         registry.timer("timer-1");
         registry.timer("timer-2");
         registry.histogram("histogram-1");
+        registry.doubleHistogram("double-histogram-1");
 
         assertThat(registry.getNames())
-                .contains("timer-1", "timer-2", "histogram-1");
+                .contains("timer-1", "timer-2", "histogram-1", "double-histogram-1");
 
         registry.removeMatching((name, metric) -> name.endsWith("1"));
 
         assertThat(registry.getNames())
-                .doesNotContain("timer-1", "histogram-1");
+                .doesNotContain("timer-1", "histogram-1", "double-histogram-1");
         assertThat(registry.getNames())
                 .contains("timer-2");
 
         verify(listener).onTimerRemoved("timer-1");
         verify(listener).onHistogramRemoved("histogram-1");
+        verify(listener).onDoubleHistogramRemoved("double-histogram-1");
     }
 
     @Test

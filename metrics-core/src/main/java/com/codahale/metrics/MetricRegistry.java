@@ -127,6 +127,16 @@ public class MetricRegistry implements MetricSet {
                 }
 
                 @Override
+                public void onDoubleHistogramAdded(String name, DoubleHistogram histogram) {
+                    register(name(childName, name), histogram);
+                }
+
+                @Override
+                public void onDoubleHistogramRemoved(String name) {
+                    remove(name(childName, name));
+                }
+
+                @Override
                 public void onMeterAdded(String name, Meter meter) {
                     register(name(childName, name), meter);
                 }
@@ -231,6 +241,40 @@ public class MetricRegistry implements MetricSet {
             @Override
             public boolean isInstance(Metric metric) {
                 return Histogram.class.isInstance(metric);
+            }
+        });
+    }
+
+
+    /**
+     * Return the {@link DoubleHistogram} registered under this name; or create and register
+     * a new {@link DoubleHistogram} if none is registered.
+     *
+     * @param name the name of the metric
+     * @return a new or pre-existing {@link DoubleHistogram}
+     */
+    public DoubleHistogram doubleHistogram(String name) {
+        return getOrAdd(name, MetricBuilder.DOUBLE_HISTOGRAMS);
+    }
+
+    /**
+     * Return the {@link Histogram} registered under this name; or create and register
+     * a new {@link Histogram} using the provided MetricSupplier if none is registered.
+     *
+     * @param name     the name of the metric
+     * @param supplier a MetricSupplier that can be used to manufacture a histogram
+     * @return a new or pre-existing {@link Histogram}
+     */
+    public DoubleHistogram doubleHistogram(String name, final MetricSupplier<DoubleHistogram> supplier) {
+        return getOrAdd(name, new MetricBuilder<DoubleHistogram>() {
+            @Override
+            public DoubleHistogram newMetric() {
+                return supplier.newMetric();
+            }
+
+            @Override
+            public boolean isInstance(Metric metric) {
+                return DoubleHistogram.class.isInstance(metric);
             }
         });
     }
@@ -449,6 +493,26 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
+     * Returns a map of all the histograms in the registry and their names.
+     *
+     * @return all the histograms in the registry
+     */
+    public SortedMap<String, DoubleHistogram> getDoubleHistograms() {
+        return getDoubleHistograms(MetricFilter.ALL);
+    }
+
+    /**
+     * Returns a map of all the double histograms in the registry and their names which match the given
+     * filter.
+     *
+     * @param filter the metric filter to match
+     * @return all the double histograms in the registry
+     */
+    public SortedMap<String, DoubleHistogram> getDoubleHistograms(MetricFilter filter) {
+        return getMetrics(DoubleHistogram.class, filter);
+    }
+
+    /**
      * Returns a map of all the meters in the registry and their names.
      *
      * @return all the meters in the registry
@@ -529,6 +593,8 @@ public class MetricRegistry implements MetricSet {
             listener.onCounterAdded(name, (Counter) metric);
         } else if (metric instanceof Histogram) {
             listener.onHistogramAdded(name, (Histogram) metric);
+        } else if (metric instanceof DoubleHistogram) {
+            listener.onDoubleHistogramAdded(name, (DoubleHistogram) metric);
         } else if (metric instanceof Meter) {
             listener.onMeterAdded(name, (Meter) metric);
         } else if (metric instanceof Timer) {
@@ -551,6 +617,8 @@ public class MetricRegistry implements MetricSet {
             listener.onCounterRemoved(name);
         } else if (metric instanceof Histogram) {
             listener.onHistogramRemoved(name);
+        } else if (metric instanceof DoubleHistogram) {
+            listener.onDoubleHistogramRemoved(name);
         } else if (metric instanceof Meter) {
             listener.onMeterRemoved(name);
         } else if (metric instanceof Timer) {
@@ -612,6 +680,18 @@ public class MetricRegistry implements MetricSet {
             @Override
             public boolean isInstance(Metric metric) {
                 return Histogram.class.isInstance(metric);
+            }
+        };
+
+        MetricBuilder<DoubleHistogram> DOUBLE_HISTOGRAMS = new MetricBuilder<DoubleHistogram>() {
+            @Override
+            public DoubleHistogram newMetric() {
+                return new DoubleHistogram(new ExponentiallyDecayingDoubleReservoir());
+            }
+
+            @Override
+            public boolean isInstance(Metric metric) {
+                return DoubleHistogram.class.isInstance(metric);
             }
         };
 

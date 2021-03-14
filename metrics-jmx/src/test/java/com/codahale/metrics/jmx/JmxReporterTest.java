@@ -1,6 +1,8 @@
 package com.codahale.metrics.jmx;
 
 import com.codahale.metrics.Counter;
+import com.codahale.metrics.DoubleHistogram;
+import com.codahale.metrics.DoubleSnapshot;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
@@ -26,8 +28,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -51,6 +53,7 @@ public class JmxReporterTest {
     private final Gauge gauge = mock(Gauge.class);
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
+    private final DoubleHistogram doubleHistogram = mock(DoubleHistogram.class);
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
     private final ObjectNameFactory mockObjectNameFactory = mock(ObjectNameFactory.class);
@@ -59,9 +62,7 @@ public class JmxReporterTest {
     @Before
     public void setUp() throws Exception {
         when(gauge.getValue()).thenReturn(1);
-
         when(counter.getCount()).thenReturn(100L);
-
         when(histogram.getCount()).thenReturn(1L);
 
         final Snapshot hSnapshot = mock(Snapshot.class);
@@ -78,6 +79,23 @@ public class JmxReporterTest {
         when(hSnapshot.size()).thenReturn(1);
 
         when(histogram.getSnapshot()).thenReturn(hSnapshot);
+
+        when(doubleHistogram.getCount()).thenReturn(1L);
+
+        final DoubleSnapshot dSnapshot = mock(DoubleSnapshot.class);
+        when(dSnapshot.getMax()).thenReturn(10.5D);
+        when(dSnapshot.getMean()).thenReturn(3.0);
+        when(dSnapshot.getMin()).thenReturn(4.2D);
+        when(dSnapshot.getStdDev()).thenReturn(5.0);
+        when(dSnapshot.getMedian()).thenReturn(6.0);
+        when(dSnapshot.get75thPercentile()).thenReturn(7.0);
+        when(dSnapshot.get95thPercentile()).thenReturn(8.0);
+        when(dSnapshot.get98thPercentile()).thenReturn(9.0);
+        when(dSnapshot.get99thPercentile()).thenReturn(10.0);
+        when(dSnapshot.get999thPercentile()).thenReturn(11.0);
+        when(dSnapshot.size()).thenReturn(1);
+
+        when(doubleHistogram.getSnapshot()).thenReturn(dSnapshot);
 
         when(meter.getCount()).thenReturn(1L);
         when(meter.getMeanRate()).thenReturn(2.0);
@@ -109,6 +127,7 @@ public class JmxReporterTest {
         registry.register("gauge", gauge);
         registry.register("test.counter", counter);
         registry.register("test.histogram", histogram);
+        registry.register("test.double-histogram", doubleHistogram);
         registry.register("test.meter", meter);
         registry.register("test.another.timer", timer);
 
@@ -194,6 +213,37 @@ public class JmxReporterTest {
     }
 
     @Test
+    public void registersMBeansForDoubleHistograms() throws Exception {
+        final AttributeList attributes = getAttributes("double_histograms", "test.double-histogram",
+                "Count",
+                "Max",
+                "Mean",
+                "Min",
+                "StdDev",
+                "50thPercentile",
+                "75thPercentile",
+                "95thPercentile",
+                "98thPercentile",
+                "99thPercentile",
+                "999thPercentile",
+                "SnapshotSize");
+
+        assertThat(values(attributes))
+                .contains(entry("Count", 1L))
+                .contains(entry("Max", 10.5D))
+                .contains(entry("Mean", 3.0))
+                .contains(entry("Min", 4.2D))
+                .contains(entry("StdDev", 5.0))
+                .contains(entry("50thPercentile", 6.0))
+                .contains(entry("75thPercentile", 7.0))
+                .contains(entry("95thPercentile", 8.0))
+                .contains(entry("98thPercentile", 9.0))
+                .contains(entry("99thPercentile", 10.0))
+                .contains(entry("999thPercentile", 11.0))
+                .contains(entry("SnapshotSize", 1L));
+    }
+
+    @Test
     public void registersMBeansForMeters() throws Exception {
         final AttributeList attributes = getAttributes("meters", "test.meter",
                 "Count",
@@ -257,12 +307,8 @@ public class JmxReporterTest {
     public void cleansUpAfterItselfWhenStopped() throws Exception {
         reporter.stop();
 
-        try {
-            getAttributes("gauges", "gauge", "Value", "Number");
-            failBecauseExceptionWasNotThrown(InstanceNotFoundException.class);
-        } catch (InstanceNotFoundException e) {
-
-        }
+        assertThatThrownBy(() -> getAttributes("gauges", "gauge", "Value", "Number"))
+                .isInstanceOf(InstanceNotFoundException.class);
     }
 
     @Test

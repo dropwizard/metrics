@@ -1,6 +1,8 @@
 package com.codahale.metrics.collectd;
 
 import com.codahale.metrics.Counter;
+import com.codahale.metrics.DoubleHistogram;
+import com.codahale.metrics.DoubleSnapshot;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricAttribute;
@@ -169,6 +171,36 @@ public class CollectdReporterTest {
         when(snapshot.get999thPercentile()).thenReturn(11.0);
 
         reporter.report(
+                map(),
+                map(),
+                map("histogram", histogram),
+                map(),
+                map());
+
+        for (int i = 1; i <= 11; i++) {
+            assertThat(nextValues(receiver)).containsExactly((double) i);
+        }
+    }
+
+    @Test
+    public void reportsDoubleHistograms() throws Exception {
+        DoubleHistogram histogram = mock(DoubleHistogram.class);
+        DoubleSnapshot snapshot = mock(DoubleSnapshot.class);
+        when(histogram.getCount()).thenReturn(1L);
+        when(histogram.getSnapshot()).thenReturn(snapshot);
+        when(snapshot.getMax()).thenReturn(2.0);
+        when(snapshot.getMean()).thenReturn(3.0);
+        when(snapshot.getMin()).thenReturn(4.0);
+        when(snapshot.getStdDev()).thenReturn(5.0);
+        when(snapshot.getMedian()).thenReturn(6.0);
+        when(snapshot.get75thPercentile()).thenReturn(7.0);
+        when(snapshot.get95thPercentile()).thenReturn(8.0);
+        when(snapshot.get98thPercentile()).thenReturn(9.0);
+        when(snapshot.get99thPercentile()).thenReturn(10.0);
+        when(snapshot.get999thPercentile()).thenReturn(11.0);
+
+        reporter.report(
+                map(),
                 map(),
                 map(),
                 map("histogram", histogram),

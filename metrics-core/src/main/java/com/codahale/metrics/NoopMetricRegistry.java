@@ -80,6 +80,16 @@ public final class NoopMetricRegistry extends MetricRegistry {
         return NoopHistogram.INSTANCE;
     }
 
+    @Override
+    public DoubleHistogram doubleHistogram(String name) {
+        return NoopDoubleHistogram.INSTANCE;
+    }
+
+    @Override
+    public DoubleHistogram doubleHistogram(String name, MetricSupplier<DoubleHistogram> supplier) {
+        return NoopDoubleHistogram.INSTANCE;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -211,6 +221,16 @@ public final class NoopMetricRegistry extends MetricRegistry {
         return Collections.emptySortedMap();
     }
 
+    @Override
+    public SortedMap<String, DoubleHistogram> getDoubleHistograms() {
+        return Collections.emptySortedMap();
+    }
+
+    @Override
+    public SortedMap<String, DoubleHistogram> getDoubleHistograms(MetricFilter filter) {
+        return Collections.emptySortedMap();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -321,6 +341,75 @@ public final class NoopMetricRegistry extends MetricRegistry {
         @Override
         public long getMin() {
             return 0L;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double getStdDev() {
+            return 0D;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void dump(OutputStream output) {
+            // NOP
+        }
+    }
+
+    private static final class EmptyDoubleSnapshot extends DoubleSnapshot {
+        private static final EmptyDoubleSnapshot INSTANCE = new EmptyDoubleSnapshot();
+        private static final double[] EMPTY_DOUBLE_ARRAY = new double[0];
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double getValue(double quantile) {
+            return 0D;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double[] getValues() {
+            return EMPTY_DOUBLE_ARRAY;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double getMax() {
+            return 0D;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double getMean() {
+            return 0D;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double getMin() {
+            return 0D;
         }
 
         /**
@@ -543,6 +632,71 @@ public final class NoopMetricRegistry extends MetricRegistry {
         @Override
         public Snapshot getSnapshot() {
             return EmptySnapshot.INSTANCE;
+        }
+    }
+
+    static final class NoopDoubleHistogram extends DoubleHistogram {
+        private static final NoopDoubleHistogram INSTANCE = new NoopDoubleHistogram();
+        private static final DoubleReservoir EMPTY_RESERVOIR = new DoubleReservoir() {
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public int size() {
+                return 0;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public void update(double value) {
+                // NOP
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public DoubleSnapshot getSnapshot() {
+                return EmptyDoubleSnapshot.INSTANCE;
+            }
+        };
+
+        private NoopDoubleHistogram() {
+            super(EMPTY_RESERVOIR);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void update(int value) {
+            // NOP
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void update(long value) {
+            // NOP
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public long getCount() {
+            return 0L;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public DoubleSnapshot getSnapshot() {
+            return EmptyDoubleSnapshot.INSTANCE;
         }
     }
 

@@ -35,6 +35,14 @@ public interface MetricRegistryListener extends EventListener {
         }
 
         @Override
+        public void onDoubleHistogramAdded(String name, DoubleHistogram histogram) {
+        }
+
+        @Override
+        public void onDoubleHistogramRemoved(String name) {
+        }
+
+        @Override
         public void onMeterAdded(String name, Meter meter) {
         }
 
@@ -95,6 +103,21 @@ public interface MetricRegistryListener extends EventListener {
      * @param name the histogram's name
      */
     void onHistogramRemoved(String name);
+
+    /**
+     * Called when a {@link DoubleHistogram} is added to the registry.
+     *
+     * @param name      the histogram's name
+     * @param histogram the histogram
+     */
+    void onDoubleHistogramAdded(String name, DoubleHistogram histogram);
+
+    /**
+     * Called when a {@link Histogram} is removed from the registry.
+     *
+     * @param name the histogram's name
+     */
+    void onDoubleHistogramRemoved(String name);
 
     /**
      * Called when a {@link Meter} is added to the registry.

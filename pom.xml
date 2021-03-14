@@ -332,7 +332,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
-                    <argLine>-Djava.net.preferIPv4Stack=true</argLine>
+                    <argLine>-Djava.net.preferIPv4Stack=true -Duser.language=en -Duser.region=US -Duser.timezone=UTC</argLine>
                 </configuration>
             </plugin>
             <plugin>

@@ -1,6 +1,7 @@
 package com.codahale.metrics.jmx;
 
 import com.codahale.metrics.Counter;
+import com.codahale.metrics.DoubleHistogram;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
@@ -336,6 +337,115 @@ public class JmxReporter implements Reporter, Closeable {
     }
 
     @SuppressWarnings("UnusedDeclaration")
+    public interface JmxDoubleHistogramMBean extends MetricMBean {
+        long getCount();
+
+        double getMin();
+
+        double getMax();
+
+        double getMean();
+
+        double getStdDev();
+
+        double get50thPercentile();
+
+        double get75thPercentile();
+
+        double get95thPercentile();
+
+        double get98thPercentile();
+
+        double get99thPercentile();
+
+        double get999thPercentile();
+
+        double[] values();
+
+        long getSnapshotSize();
+    }
+
+    private static class JmxDoubleHistogram implements JmxDoubleHistogramMBean {
+        private final ObjectName objectName;
+        private final DoubleHistogram metric;
+
+        private JmxDoubleHistogram(DoubleHistogram metric, ObjectName objectName) {
+            this.metric = metric;
+            this.objectName = objectName;
+        }
+
+        @Override
+        public ObjectName objectName() {
+            return objectName;
+        }
+
+        @Override
+        public double get50thPercentile() {
+            return metric.getSnapshot().getMedian();
+        }
+
+        @Override
+        public long getCount() {
+            return metric.getCount();
+        }
+
+        @Override
+        public double getMin() {
+            return metric.getSnapshot().getMin();
+        }
+
+        @Override
+        public double getMax() {
+            return metric.getSnapshot().getMax();
+        }
+
+        @Override
+        public double getMean() {
+            return metric.getSnapshot().getMean();
+        }
+
+        @Override
+        public double getStdDev() {
+            return metric.getSnapshot().getStdDev();
+        }
+
+        @Override
+        public double get75thPercentile() {
+            return metric.getSnapshot().get75thPercentile();
+        }
+
+        @Override
+        public double get95thPercentile() {
+            return metric.getSnapshot().get95thPercentile();
+        }
+
+        @Override
+        public double get98thPercentile() {
+            return metric.getSnapshot().get98thPercentile();
+        }
+
+        @Override
+        public double get99thPercentile() {
+            return metric.getSnapshot().get99thPercentile();
+        }
+
+        @Override
+        public double get999thPercentile() {
+            return metric.getSnapshot().get999thPercentile();
+        }
+
+        @Override
+        public double[] values() {
+            return metric.getSnapshot().getValues();
+        }
+
+        @Override
+        public long getSnapshotSize() {
+            return metric.getSnapshot().size();
+        }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
     public interface JmxMeterMBean extends MetricMBean {
         long getCount();
 
@@ -609,6 +719,32 @@ public class JmxReporter implements Reporter, Closeable {
         public void onHistogramRemoved(String name) {
             try {
                 final ObjectName objectName = createName("histograms", name);
+                unregisterMBean(objectName);
+            } catch (InstanceNotFoundException e) {
+                LOGGER.debug("Unable to unregister histogram", e);
+            } catch (MBeanRegistrationException e) {
+                LOGGER.warn("Unable to unregister histogram", e);
+            }
+        }
+
+        @Override
+        public void onDoubleHistogramAdded(String name, DoubleHistogram histogram) {
+            try {
+                if (filter.matches(name, histogram)) {
+                    final ObjectName objectName = createName("double_histograms", name);
+                    registerMBean(new JmxDoubleHistogram(histogram, objectName), objectName);
+                }
+            } catch (InstanceAlreadyExistsException e) {
+                LOGGER.debug("Unable to register histogram", e);
+            } catch (JMException e) {
+                LOGGER.warn("Unable to register histogram", e);
+            }
+        }
+
+        @Override
+        public void onDoubleHistogramRemoved(String name) {
+            try {
+                final ObjectName objectName = createName("double_histograms", name);
                 unregisterMBean(objectName);
             } catch (InstanceNotFoundException e) {
                 LOGGER.debug("Unable to unregister histogram", e);

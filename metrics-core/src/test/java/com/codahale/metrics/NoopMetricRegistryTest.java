@@ -19,6 +19,7 @@ public class NoopMetricRegistryTest {
     private final Gauge<String> gauge = () -> "";
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
+    private final DoubleHistogram doubleHistogram = mock(DoubleHistogram.class);
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
 
@@ -124,6 +125,47 @@ public class NoopMetricRegistryTest {
         assertThat(registry.remove("thing")).isFalse();
 
         verify(listener, never()).onHistogramRemoved("thing");
+    }
+
+    @Test
+    public void registeringADoubleHistogramTriggersNoNotification() {
+        assertThat(registry.register("thing", doubleHistogram)).isEqualTo(doubleHistogram);
+
+        verify(listener, never()).onDoubleHistogramAdded("thing", doubleHistogram);
+    }
+
+    @Test
+    public void accessingADoubleHistogramRegistersAndReusesIt() {
+        final DoubleHistogram histogram1 = registry.doubleHistogram("thing");
+        final DoubleHistogram histogram2 = registry.doubleHistogram("thing");
+
+        assertThat(histogram1).isExactlyInstanceOf(NoopMetricRegistry.NoopDoubleHistogram.class);
+        assertThat(histogram2).isExactlyInstanceOf(NoopMetricRegistry.NoopDoubleHistogram.class);
+        assertThat(histogram1).isSameAs(histogram2);
+
+        verify(listener, never()).onDoubleHistogramAdded("thing", histogram1);
+    }
+
+    @Test
+    public void accessingACustomDoubleHistogramRegistersAndReusesIt() {
+        final MetricRegistry.MetricSupplier<DoubleHistogram> supplier = () -> doubleHistogram;
+        final DoubleHistogram histogram1 = registry.doubleHistogram("thing", supplier);
+        final DoubleHistogram histogram2 = registry.doubleHistogram("thing", supplier);
+
+        assertThat(histogram1).isExactlyInstanceOf(NoopMetricRegistry.NoopDoubleHistogram.class);
+        assertThat(histogram2).isExactlyInstanceOf(NoopMetricRegistry.NoopDoubleHistogram.class);
+        assertThat(histogram1).isSameAs(histogram2);
+
+        verify(listener, never()).onDoubleHistogramAdded("thing", histogram1);
+    }
+
+    @Test
+    public void removingADoubleHistogramTriggersNoNotification() {
+        registry.register("thing", doubleHistogram);
+
+        assertThat(registry.remove("thing")).isFalse();
+
+        verify(listener, never()).onDoubleHistogramRemoved("thing");
     }
 
     @Test
@@ -358,6 +400,7 @@ public class NoopMetricRegistryTest {
         registry.timer("timer-1");
         registry.timer("timer-2");
         registry.histogram("histogram-1");
+        registry.doubleHistogram("double-histogram-1");
 
         assertThat(registry.getNames()).isEmpty();
 
@@ -367,6 +410,7 @@ public class NoopMetricRegistryTest {
 
         verify(listener, never()).onTimerRemoved("timer-1");
         verify(listener, never()).onHistogramRemoved("histogram-1");
+        verify(listener, never()).onHistogramRemoved("double-histogram-1");
     }
 
     @Test
