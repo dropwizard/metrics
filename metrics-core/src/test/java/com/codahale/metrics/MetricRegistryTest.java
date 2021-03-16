@@ -216,6 +216,18 @@ public class MetricRegistryTest {
     }
 
     @Test
+    public void accessingASettableGaugeRegistersAndReusesIt() {
+        final SettableGauge<String> gauge1 = registry.gauge("thing");
+        gauge1.setValue("Test");
+        final SettableGauge<String> gauge2 = registry.gauge("thing");
+
+        assertThat(gauge1).isSameAs(gauge2);
+        assertThat(gauge2.getValue()).isEqualTo("Test");
+
+        verify(listener).onGaugeAdded("thing", gauge1);
+    }
+
+    @Test
     @SuppressWarnings("rawtypes")
     public void accessingACustomGaugeRegistersAndReusesIt() {
         final MetricRegistry.MetricSupplier<Gauge> supplier = () -> gauge;
