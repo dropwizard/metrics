@@ -124,6 +124,17 @@ public final class NoopMetricRegistry extends MetricRegistry {
 
     /**
      * {@inheritDoc}
+     *
+     * @since 4.2
+     */
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public <T extends Gauge> T gauge(String name) {
+        return (T) NoopGauge.INSTANCE;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
