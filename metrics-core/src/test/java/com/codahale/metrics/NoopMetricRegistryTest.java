@@ -210,12 +210,12 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void accessingASettableGaugeRegistersAndReusesIt() {
-        final SettableGauge<Void> gauge1 = registry.gauge("thing");
-        final SettableGauge<Void> gauge2 = registry.gauge("thing");
+    public void accessingAGaugeRegistersAndReusesIt() {
+        final Gauge<Void> gauge1 = registry.gauge("thing");
+        final Gauge<Void> gauge2 = registry.gauge("thing");
 
-        assertThat(gauge1).isExactlyInstanceOf(NoopMetricRegistry.NoopSettableGauge.class);
-        assertThat(gauge2).isExactlyInstanceOf(NoopMetricRegistry.NoopSettableGauge.class);
+        assertThat(gauge1).isExactlyInstanceOf(NoopMetricRegistry.NoopGauge.class);
+        assertThat(gauge2).isExactlyInstanceOf(NoopMetricRegistry.NoopGauge.class);
         assertThat(gauge1).isSameAs(gauge2);
 
         verify(listener, never()).onGaugeAdded("thing", gauge1);

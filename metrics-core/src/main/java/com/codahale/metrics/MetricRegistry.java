@@ -306,12 +306,12 @@ public class MetricRegistry implements MetricSet {
      * a new {@link SettableGauge} if none is registered.
      *
      * @param name the name of the metric
-     * @return a new or pre-existing {@link SettableGauge}
+     * @return a pre-existing {@link Gauge} or a new {@link SettableGauge}
      * @since 4.2
      */
-    @SuppressWarnings("unchecked")
-    public <T> SettableGauge<T> gauge(String name) {
-        return getOrAdd(name, MetricBuilder.GAUGES);
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public <T extends Gauge> T gauge(String name) {
+        return (T) getOrAdd(name, MetricBuilder.GAUGES);
     }
 
     /**
@@ -653,15 +653,15 @@ public class MetricRegistry implements MetricSet {
         };
 
         @SuppressWarnings("rawtypes")
-        MetricBuilder<SettableGauge> GAUGES = new MetricBuilder<SettableGauge>() {
+        MetricBuilder<Gauge> GAUGES = new MetricBuilder<Gauge>() {
             @Override
-            public SettableGauge newMetric() {
+            public Gauge newMetric() {
                 return new DefaultSettableGauge<>();
             }
 
             @Override
             public boolean isInstance(Metric metric) {
-                return SettableGauge.class.isInstance(metric);
+                return Gauge.class.isInstance(metric);
             }
         };
 

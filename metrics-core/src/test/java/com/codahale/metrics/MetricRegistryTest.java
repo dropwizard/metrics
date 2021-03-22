@@ -219,10 +219,21 @@ public class MetricRegistryTest {
     public void accessingASettableGaugeRegistersAndReusesIt() {
         final SettableGauge<String> gauge1 = registry.gauge("thing");
         gauge1.setValue("Test");
-        final SettableGauge<String> gauge2 = registry.gauge("thing");
+        final Gauge<String> gauge2 = registry.gauge("thing");
 
         assertThat(gauge1).isSameAs(gauge2);
         assertThat(gauge2.getValue()).isEqualTo("Test");
+
+        verify(listener).onGaugeAdded("thing", gauge1);
+    }
+
+    @Test
+    public void accessingAnExistingGaugeReusesIt() {
+        final Gauge<String> gauge1 = registry.gauge("thing", () -> () -> "string-gauge");
+        final Gauge<String> gauge2 = registry.gauge("thing", () -> new DefaultSettableGauge<>("settable-gauge"));
+
+        assertThat(gauge1).isSameAs(gauge2);
+        assertThat(gauge2.getValue()).isEqualTo("string-gauge");
 
         verify(listener).onGaugeAdded("thing", gauge1);
     }

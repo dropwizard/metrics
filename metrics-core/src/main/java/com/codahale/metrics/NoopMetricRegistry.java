@@ -118,9 +118,9 @@ public final class NoopMetricRegistry extends MetricRegistry {
      * @since 4.2
      */
     @Override
-    @SuppressWarnings("unchecked")
-    public <T> SettableGauge<T> gauge(String name) {
-        return (SettableGauge<T>) NoopSettableGauge.INSTANCE;
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public <T extends Gauge> T gauge(String name) {
+        return (T) NoopGauge.INSTANCE;
     }
 
     /**
@@ -279,26 +279,6 @@ public final class NoopMetricRegistry extends MetricRegistry {
         @Override
         public T getValue() {
             return null;
-        }
-    }
-
-    static final class NoopSettableGauge<T> implements SettableGauge<T> {
-        private static final NoopSettableGauge<?> INSTANCE = new NoopSettableGauge<>();
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public T getValue() {
-            return null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void setValue(T value) {
-            // NOP
         }
     }
 
