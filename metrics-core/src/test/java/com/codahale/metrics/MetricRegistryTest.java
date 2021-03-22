@@ -216,6 +216,40 @@ public class MetricRegistryTest {
     }
 
     @Test
+    public void accessingASettableGaugeRegistersAndReusesIt() {
+        final SettableGauge<String> gauge1 = registry.gauge("thing");
+        gauge1.setValue("Test");
+        final Gauge<String> gauge2 = registry.gauge("thing");
+
+        assertThat(gauge1).isSameAs(gauge2);
+        assertThat(gauge2.getValue()).isEqualTo("Test");
+
+        verify(listener).onGaugeAdded("thing", gauge1);
+    }
+
+    @Test
+    public void accessingAnExistingGaugeReusesIt() {
+        final Gauge<String> gauge1 = registry.gauge("thing", () -> () -> "string-gauge");
+        final Gauge<String> gauge2 = registry.gauge("thing", () -> new DefaultSettableGauge<>("settable-gauge"));
+
+        assertThat(gauge1).isSameAs(gauge2);
+        assertThat(gauge2.getValue()).isEqualTo("string-gauge");
+
+        verify(listener).onGaugeAdded("thing", gauge1);
+    }
+
+    @Test
+    public void accessingAnExistingSettableGaugeReusesIt() {
+        final Gauge<String> gauge1 = registry.gauge("thing", () -> new DefaultSettableGauge<>("settable-gauge"));
+        final Gauge<String> gauge2 = registry.gauge("thing");
+
+        assertThat(gauge1).isSameAs(gauge2);
+        assertThat(gauge2.getValue()).isEqualTo("settable-gauge");
+
+        verify(listener).onGaugeAdded("thing", gauge1);
+    }
+
+    @Test
     @SuppressWarnings("rawtypes")
     public void accessingACustomGaugeRegistersAndReusesIt() {
         final MetricRegistry.MetricSupplier<Gauge> supplier = () -> gauge;

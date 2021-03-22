@@ -303,6 +303,19 @@ public class MetricRegistry implements MetricSet {
 
     /**
      * Return the {@link Gauge} registered under this name; or create and register
+     * a new {@link SettableGauge} if none is registered.
+     *
+     * @param name the name of the metric
+     * @return a pre-existing {@link Gauge} or a new {@link SettableGauge}
+     * @since 4.2
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public <T extends Gauge> T gauge(String name) {
+        return (T) getOrAdd(name, MetricBuilder.GAUGES);
+    }
+
+    /**
+     * Return the {@link Gauge} registered under this name; or create and register
      * a new {@link Gauge} using the provided MetricSupplier if none is registered.
      *
      * @param name     the name of the metric
@@ -636,6 +649,19 @@ public class MetricRegistry implements MetricSet {
             @Override
             public boolean isInstance(Metric metric) {
                 return Timer.class.isInstance(metric);
+            }
+        };
+
+        @SuppressWarnings("rawtypes")
+        MetricBuilder<Gauge> GAUGES = new MetricBuilder<Gauge>() {
+            @Override
+            public Gauge newMetric() {
+                return new DefaultSettableGauge<>();
+            }
+
+            @Override
+            public boolean isInstance(Metric metric) {
+                return Gauge.class.isInstance(metric);
             }
         };
 
