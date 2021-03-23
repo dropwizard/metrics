@@ -124,7 +124,8 @@ public class HealthCheckServlet extends HttpServlet {
         if (results.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
         } else {
-            if (isAllHealthy(results)) {
+            final boolean alwaysOk = Boolean.parseBoolean(req.getParameter("alwaysOk"));
+            if (alwaysOk || isAllHealthy(results)) {
                 resp.setStatus(HttpServletResponse.SC_OK);
             } else {
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
