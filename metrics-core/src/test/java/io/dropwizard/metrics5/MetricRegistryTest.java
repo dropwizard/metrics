@@ -36,10 +36,12 @@ public class MetricRegistryTest {
     private static final MetricName COUNTER2 = MetricName.build("counter2");
     private static final MetricName GAUGE = MetricName.build("gauge");
     private static final MetricName GAUGE2 = MetricName.build("gauge2");
+    private static final MetricName SETTABLE_GAUGE = MetricName.build("settable-gauge");
     private static final MetricName THING = MetricName.build("thing");
     private final MetricRegistryListener listener = mock(MetricRegistryListener.class);
     private final MetricRegistry registry = new MetricRegistry();
     private final Gauge<String> gauge = () -> "";
+    private final SettableGauge<String> settableGauge = new DefaultSettableGauge<>("");
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
     private final Meter meter = mock(Meter.class);
@@ -254,10 +256,56 @@ public class MetricRegistryTest {
         verify(listener).onGaugeAdded(THING, gauge1);
     }
 
+    @Test
+    public void accessingASettableGaugeRegistersAndReusesIt() {
+        final SettableGauge<String> gauge1 = registry.gauge(THING);
+        gauge1.setValue("Test");
+        final Gauge<String> gauge2 = registry.gauge(THING);
+
+        assertThat(gauge1).isSameAs(gauge2);
+        assertThat(gauge2.getValue()).isEqualTo("Test");
+
+        verify(listener).onGaugeAdded(THING, gauge1);
+    }
+
+    @Test
+    public void accessingAnExistingGaugeReusesIt() {
+        final Gauge<String> gauge1 = registry.gauge(THING, () -> () -> "string-gauge");
+        final Gauge<String> gauge2 = registry.gauge(THING, () -> new DefaultSettableGauge<>("settable-gauge"));
+
+        assertThat(gauge1).isSameAs(gauge2);
+        assertThat(gauge2.getValue()).isEqualTo("string-gauge");
+
+        verify(listener).onGaugeAdded(THING, gauge1);
+    }
+
+    @Test
+    public void accessingAnExistingSettableGaugeReusesIt() {
+        final Gauge<String> gauge1 = registry.gauge(THING, () -> new DefaultSettableGauge<>("settable-gauge"));
+        final Gauge<String> gauge2 = registry.gauge(THING);
+
+        assertThat(gauge1).isSameAs(gauge2);
+        assertThat(gauge2.getValue()).isEqualTo("settable-gauge");
+
+        verify(listener).onGaugeAdded(THING, gauge1);
+    }
+
+    @Test
+    public void settableGaugeIsTreatedLikeAGauge() {
+        final MetricRegistry.MetricSupplier<SettableGauge<String>> supplier = () -> settableGauge;
+        final SettableGauge<String> gauge1 = registry.gauge(THING, supplier);
+        final SettableGauge<String> gauge2 = registry.gauge(THING, supplier);
+
+        assertThat(gauge1)
+                .isSameAs(gauge2);
+
+        verify(listener).onGaugeAdded(THING, gauge1);
+    }
 
     @Test
     public void addingAListenerWithExistingMetricsCatchesItUp() {
         registry.register(GAUGE2, gauge);
+        registry.register(SETTABLE_GAUGE, settableGauge);
         registry.register(COUNTER2, counter);
         registry.register(HISTOGRAM2, histogram);
         registry.register(METER2, meter);
@@ -267,6 +315,7 @@ public class MetricRegistryTest {
         registry.addListener(other);
 
         verify(other).onGaugeAdded(GAUGE2, gauge);
+        verify(other).onGaugeAdded(SETTABLE_GAUGE, settableGauge);
         verify(other).onCounterAdded(COUNTER2, counter);
         verify(other).onHistogramAdded(HISTOGRAM2, histogram);
         verify(other).onMeterAdded(METER2, meter);
@@ -285,9 +334,11 @@ public class MetricRegistryTest {
     @Test
     public void hasAMapOfRegisteredGauges() {
         registry.register(GAUGE2, gauge);
+        registry.register(SETTABLE_GAUGE, settableGauge);
 
         assertThat(registry.getGauges())
-                .contains(entry(GAUGE2, gauge));
+                .containsEntry(GAUGE2, gauge)
+                .containsEntry(SETTABLE_GAUGE, settableGauge);
     }
 
     @Test
@@ -325,13 +376,14 @@ public class MetricRegistryTest {
     @Test
     public void hasASetOfRegisteredMetricNames() {
         registry.register(GAUGE2, gauge);
+        registry.register(SETTABLE_GAUGE, settableGauge);
         registry.register(COUNTER2, counter);
         registry.register(HISTOGRAM2, histogram);
         registry.register(METER2, meter);
         registry.register(TIMER2, timer);
 
         assertThat(registry.getNames())
-                .containsOnly(GAUGE2, COUNTER2, HISTOGRAM2, METER2, TIMER2);
+                .containsOnly(GAUGE2, SETTABLE_GAUGE, COUNTER2, HISTOGRAM2, METER2, TIMER2);
     }
 
     @Test

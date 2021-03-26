@@ -329,16 +329,30 @@ public class MetricRegistry implements MetricSet {
 
     /**
      * Return the {@link Gauge} registered under this name; or create and register
+     * a new {@link SettableGauge} if none is registered.
+     *
+     * @param name the name of the metric
+     * @return a pre-existing {@link Gauge} or a new {@link SettableGauge}
+     * @since 4.2
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public <T extends Gauge> T gauge(MetricName name) {
+        return (T) getOrAdd(name, MetricBuilder.GAUGES);
+    }
+
+    /**
+     * Return the {@link Gauge} registered under this name; or create and register
      * a new {@link Gauge} using the provided MetricSupplier if none is registered.
      *
      * @param name     the name of the metric
      * @param supplier a MetricSupplier that can be used to manufacture a Gauge
      * @return a new or pre-existing {@link Gauge}
      */
-    public <T> Gauge<T> gauge(MetricName name, final MetricSupplier<Gauge<T>> supplier) {
-        return getOrAdd(name, new MetricBuilder<Gauge<T>>() {
+    @SuppressWarnings("rawtypes")
+    public <T extends Gauge> T gauge(MetricName name, final MetricSupplier<T> supplier) {
+        return getOrAdd(name, new MetricBuilder<T>() {
             @Override
-            public Gauge<T> newMetric() {
+            public T newMetric() {
                 return supplier.newMetric();
             }
 
@@ -663,6 +677,19 @@ public class MetricRegistry implements MetricSet {
             @Override
             public boolean isInstance(Metric metric) {
                 return Timer.class.isInstance(metric);
+            }
+        };
+
+        @SuppressWarnings("rawtypes")
+        MetricBuilder<Gauge> GAUGES = new MetricBuilder<Gauge>() {
+            @Override
+            public Gauge newMetric() {
+                return new DefaultSettableGauge<>();
+            }
+
+            @Override
+            public boolean isInstance(Metric metric) {
+                return Gauge.class.isInstance(metric);
             }
         };
 

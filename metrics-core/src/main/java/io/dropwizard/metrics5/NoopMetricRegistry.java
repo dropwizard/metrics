@@ -142,6 +142,17 @@ public final class NoopMetricRegistry extends MetricRegistry {
 
     /**
      * {@inheritDoc}
+     *
+     * @since 4.2
+     */
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public <T extends Gauge> T gauge(MetricName name) {
+        return (T) NoopGauge.INSTANCE;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Timer timer(MetricName name, MetricSupplier<Timer> supplier) {
@@ -152,8 +163,8 @@ public final class NoopMetricRegistry extends MetricRegistry {
      * {@inheritDoc}
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public <T> Gauge<T> gauge(MetricName name, final MetricSupplier<Gauge<T>> supplier) {
-        return (Gauge<T>) NoopGauge.INSTANCE;
+    public <T extends Gauge> T gauge(MetricName name, final MetricSupplier<T> supplier) {
+        return (T) NoopGauge.INSTANCE;
     }
 
     /**
@@ -200,7 +211,6 @@ public final class NoopMetricRegistry extends MetricRegistry {
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("rawtypes")
     public SortedMap<MetricName, Gauge<?>> getGauges() {
         return Collections.emptySortedMap();
     }
@@ -209,7 +219,6 @@ public final class NoopMetricRegistry extends MetricRegistry {
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("rawtypes")
     public SortedMap<MetricName, Gauge<?>> getGauges(MetricFilter filter) {
         return Collections.emptySortedMap();
     }

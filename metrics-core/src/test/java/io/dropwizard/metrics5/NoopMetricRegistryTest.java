@@ -1,6 +1,5 @@
 package io.dropwizard.metrics5;
 
-import io.dropwizard.metrics5.NoopMetricRegistry;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,6 +14,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 public class NoopMetricRegistryTest {
+    private static final MetricName METRIC_THING = MetricName.build("thing");
+
     private final MetricRegistryListener listener = mock(MetricRegistryListener.class);
     private final NoopMetricRegistry registry = new NoopMetricRegistry();
     private final Gauge<String> gauge = () -> "";
@@ -30,198 +31,210 @@ public class NoopMetricRegistryTest {
 
     @Test
     public void registeringAGaugeTriggersNoNotification() {
-        assertThat(registry.register(MetricName.build("thing"), gauge)).isEqualTo(gauge);
+        assertThat(registry.register(METRIC_THING, gauge)).isEqualTo(gauge);
 
-        verify(listener, never()).onGaugeAdded(MetricName.build("thing"), gauge);
+        verify(listener, never()).onGaugeAdded(METRIC_THING, gauge);
     }
 
     @Test
     public void removingAGaugeTriggersNoNotification() {
-        registry.register(MetricName.build("thing"), gauge);
+        registry.register(METRIC_THING, gauge);
 
-        assertThat(registry.remove(MetricName.build("thing"))).isFalse();
+        assertThat(registry.remove(METRIC_THING)).isFalse();
 
-        verify(listener, never()).onGaugeRemoved(MetricName.build("thing"));
+        verify(listener, never()).onGaugeRemoved(METRIC_THING);
     }
 
     @Test
     public void registeringACounterTriggersNoNotification() {
-        assertThat(registry.register(MetricName.build("thing"), counter)).isEqualTo(counter);
+        assertThat(registry.register(METRIC_THING, counter)).isEqualTo(counter);
 
-        verify(listener, never()).onCounterAdded(MetricName.build("thing"), counter);
+        verify(listener, never()).onCounterAdded(METRIC_THING, counter);
     }
 
     @Test
     public void accessingACounterRegistersAndReusesTheCounter() {
-        final Counter counter1 = registry.counter(MetricName.build("thing"));
-        final Counter counter2 = registry.counter(MetricName.build("thing"));
+        final Counter counter1 = registry.counter(METRIC_THING);
+        final Counter counter2 = registry.counter(METRIC_THING);
 
         assertThat(counter1).isExactlyInstanceOf(NoopMetricRegistry.NoopCounter.class);
         assertThat(counter2).isExactlyInstanceOf(NoopMetricRegistry.NoopCounter.class);
         assertThat(counter1).isSameAs(counter2);
 
-        verify(listener, never()).onCounterAdded(MetricName.build("thing"), counter1);
+        verify(listener, never()).onCounterAdded(METRIC_THING, counter1);
     }
 
     @Test
     public void accessingACustomCounterRegistersAndReusesTheCounter() {
         final MetricRegistry.MetricSupplier<Counter> supplier = () -> counter;
-        final Counter counter1 = registry.counter(MetricName.build("thing"), supplier);
-        final Counter counter2 = registry.counter(MetricName.build("thing"), supplier);
+        final Counter counter1 = registry.counter(METRIC_THING, supplier);
+        final Counter counter2 = registry.counter(METRIC_THING, supplier);
 
         assertThat(counter1).isExactlyInstanceOf(NoopMetricRegistry.NoopCounter.class);
         assertThat(counter2).isExactlyInstanceOf(NoopMetricRegistry.NoopCounter.class);
         assertThat(counter1).isSameAs(counter2);
 
-        verify(listener, never()).onCounterAdded(MetricName.build("thing"), counter1);
+        verify(listener, never()).onCounterAdded(METRIC_THING, counter1);
     }
 
 
     @Test
     public void removingACounterTriggersNoNotification() {
-        registry.register(MetricName.build("thing"), counter);
+        registry.register(METRIC_THING, counter);
 
-        assertThat(registry.remove(MetricName.build("thing"))).isFalse();
+        assertThat(registry.remove(METRIC_THING)).isFalse();
 
-        verify(listener, never()).onCounterRemoved(MetricName.build("thing"));
+        verify(listener, never()).onCounterRemoved(METRIC_THING);
     }
 
     @Test
     public void registeringAHistogramTriggersNoNotification() {
-        assertThat(registry.register(MetricName.build("thing"), histogram)).isEqualTo(histogram);
+        assertThat(registry.register(METRIC_THING, histogram)).isEqualTo(histogram);
 
-        verify(listener, never()).onHistogramAdded(MetricName.build("thing"), histogram);
+        verify(listener, never()).onHistogramAdded(METRIC_THING, histogram);
     }
 
     @Test
     public void accessingAHistogramRegistersAndReusesIt() {
-        final Histogram histogram1 = registry.histogram(MetricName.build("thing"));
-        final Histogram histogram2 = registry.histogram(MetricName.build("thing"));
+        final Histogram histogram1 = registry.histogram(METRIC_THING);
+        final Histogram histogram2 = registry.histogram(METRIC_THING);
 
         assertThat(histogram1).isExactlyInstanceOf(NoopMetricRegistry.NoopHistogram.class);
         assertThat(histogram2).isExactlyInstanceOf(NoopMetricRegistry.NoopHistogram.class);
         assertThat(histogram1).isSameAs(histogram2);
 
-        verify(listener, never()).onHistogramAdded(MetricName.build("thing"), histogram1);
+        verify(listener, never()).onHistogramAdded(METRIC_THING, histogram1);
     }
 
     @Test
     public void accessingACustomHistogramRegistersAndReusesIt() {
         final MetricRegistry.MetricSupplier<Histogram> supplier = () -> histogram;
-        final Histogram histogram1 = registry.histogram(MetricName.build("thing"), supplier);
-        final Histogram histogram2 = registry.histogram(MetricName.build("thing"), supplier);
+        final Histogram histogram1 = registry.histogram(METRIC_THING, supplier);
+        final Histogram histogram2 = registry.histogram(METRIC_THING, supplier);
 
         assertThat(histogram1).isExactlyInstanceOf(NoopMetricRegistry.NoopHistogram.class);
         assertThat(histogram2).isExactlyInstanceOf(NoopMetricRegistry.NoopHistogram.class);
         assertThat(histogram1).isSameAs(histogram2);
 
-        verify(listener, never()).onHistogramAdded(MetricName.build("thing"), histogram1);
+        verify(listener, never()).onHistogramAdded(METRIC_THING, histogram1);
     }
 
     @Test
     public void removingAHistogramTriggersNoNotification() {
-        registry.register(MetricName.build("thing"), histogram);
+        registry.register(METRIC_THING, histogram);
 
-        assertThat(registry.remove(MetricName.build("thing"))).isFalse();
+        assertThat(registry.remove(METRIC_THING)).isFalse();
 
-        verify(listener, never()).onHistogramRemoved(MetricName.build("thing"));
+        verify(listener, never()).onHistogramRemoved(METRIC_THING);
     }
 
     @Test
     public void registeringAMeterTriggersNoNotification() {
-        assertThat(registry.register(MetricName.build("thing"), meter)).isEqualTo(meter);
+        assertThat(registry.register(METRIC_THING, meter)).isEqualTo(meter);
 
-        verify(listener, never()).onMeterAdded(MetricName.build("thing"), meter);
+        verify(listener, never()).onMeterAdded(METRIC_THING, meter);
     }
 
     @Test
     public void accessingAMeterRegistersAndReusesIt() {
-        final Meter meter1 = registry.meter(MetricName.build("thing"));
-        final Meter meter2 = registry.meter(MetricName.build("thing"));
+        final Meter meter1 = registry.meter(METRIC_THING);
+        final Meter meter2 = registry.meter(METRIC_THING);
 
         assertThat(meter1).isExactlyInstanceOf(NoopMetricRegistry.NoopMeter.class);
         assertThat(meter2).isExactlyInstanceOf(NoopMetricRegistry.NoopMeter.class);
         assertThat(meter1).isSameAs(meter2);
 
-        verify(listener, never()).onMeterAdded(MetricName.build("thing"), meter1);
+        verify(listener, never()).onMeterAdded(METRIC_THING, meter1);
     }
 
     @Test
     public void accessingACustomMeterRegistersAndReusesIt() {
         final MetricRegistry.MetricSupplier<Meter> supplier = () -> meter;
-        final Meter meter1 = registry.meter(MetricName.build("thing"), supplier);
-        final Meter meter2 = registry.meter(MetricName.build("thing"), supplier);
+        final Meter meter1 = registry.meter(METRIC_THING, supplier);
+        final Meter meter2 = registry.meter(METRIC_THING, supplier);
 
         assertThat(meter1).isExactlyInstanceOf(NoopMetricRegistry.NoopMeter.class);
         assertThat(meter2).isExactlyInstanceOf(NoopMetricRegistry.NoopMeter.class);
         assertThat(meter1).isSameAs(meter2);
 
-        verify(listener, never()).onMeterAdded(MetricName.build("thing"), meter1);
+        verify(listener, never()).onMeterAdded(METRIC_THING, meter1);
     }
 
     @Test
     public void removingAMeterTriggersNoNotification() {
-        registry.register(MetricName.build("thing"), meter);
+        registry.register(METRIC_THING, meter);
 
-        assertThat(registry.remove(MetricName.build("thing"))).isFalse();
+        assertThat(registry.remove(METRIC_THING)).isFalse();
 
-        verify(listener, never()).onMeterRemoved(MetricName.build("thing"));
+        verify(listener, never()).onMeterRemoved(METRIC_THING);
     }
 
     @Test
     public void registeringATimerTriggersNoNotification() {
-        assertThat(registry.register(MetricName.build("thing"), timer)).isEqualTo(timer);
+        assertThat(registry.register(METRIC_THING, timer)).isEqualTo(timer);
 
-        verify(listener, never()).onTimerAdded(MetricName.build("thing"), timer);
+        verify(listener, never()).onTimerAdded(METRIC_THING, timer);
     }
 
     @Test
     public void accessingATimerRegistersAndReusesIt() {
-        final Timer timer1 = registry.timer(MetricName.build("thing"));
-        final Timer timer2 = registry.timer(MetricName.build("thing"));
+        final Timer timer1 = registry.timer(METRIC_THING);
+        final Timer timer2 = registry.timer(METRIC_THING);
 
         assertThat(timer1).isExactlyInstanceOf(NoopMetricRegistry.NoopTimer.class);
         assertThat(timer2).isExactlyInstanceOf(NoopMetricRegistry.NoopTimer.class);
         assertThat(timer1).isSameAs(timer2);
 
-        verify(listener, never()).onTimerAdded(MetricName.build("thing"), timer1);
+        verify(listener, never()).onTimerAdded(METRIC_THING, timer1);
     }
 
     @Test
     public void accessingACustomTimerRegistersAndReusesIt() {
         final MetricRegistry.MetricSupplier<Timer> supplier = () -> timer;
-        final Timer timer1 = registry.timer(MetricName.build("thing"), supplier);
-        final Timer timer2 = registry.timer(MetricName.build("thing"), supplier);
+        final Timer timer1 = registry.timer(METRIC_THING, supplier);
+        final Timer timer2 = registry.timer(METRIC_THING, supplier);
 
         assertThat(timer1).isExactlyInstanceOf(NoopMetricRegistry.NoopTimer.class);
         assertThat(timer2).isExactlyInstanceOf(NoopMetricRegistry.NoopTimer.class);
         assertThat(timer1).isSameAs(timer2);
 
-        verify(listener, never()).onTimerAdded(MetricName.build("thing"), timer1);
+        verify(listener, never()).onTimerAdded(METRIC_THING, timer1);
     }
 
 
     @Test
     public void removingATimerTriggersNoNotification() {
-        registry.register(MetricName.build("thing"), timer);
+        registry.register(METRIC_THING, timer);
 
-        assertThat(registry.remove(MetricName.build("thing"))).isFalse();
+        assertThat(registry.remove(METRIC_THING)).isFalse();
 
-        verify(listener, never()).onTimerRemoved(MetricName.build("thing"));
+        verify(listener, never()).onTimerRemoved(METRIC_THING);
+    }
+
+    @Test
+    public void accessingAGaugeRegistersAndReusesIt() {
+        final Gauge<Void> gauge1 = registry.gauge(METRIC_THING);
+        final Gauge<Void> gauge2 = registry.gauge(METRIC_THING);
+
+        assertThat(gauge1).isExactlyInstanceOf(NoopMetricRegistry.NoopGauge.class);
+        assertThat(gauge2).isExactlyInstanceOf(NoopMetricRegistry.NoopGauge.class);
+        assertThat(gauge1).isSameAs(gauge2);
+
+        verify(listener, never()).onGaugeAdded(METRIC_THING, gauge1);
     }
 
     @Test
     @SuppressWarnings("rawtypes")
     public void accessingACustomGaugeRegistersAndReusesIt() {
         final MetricRegistry.MetricSupplier<Gauge<String>> supplier = () -> gauge;
-        final Gauge gauge1 = registry.gauge(MetricName.build("thing"), supplier);
-        final Gauge gauge2 = registry.gauge(MetricName.build("thing"), supplier);
+        final Gauge gauge1 = registry.gauge(METRIC_THING, supplier);
+        final Gauge gauge2 = registry.gauge(METRIC_THING, supplier);
 
         assertThat(gauge1).isExactlyInstanceOf(NoopMetricRegistry.NoopGauge.class);
         assertThat(gauge2).isExactlyInstanceOf(NoopMetricRegistry.NoopGauge.class);
         assertThat(gauge1).isSameAs(gauge2);
 
-        verify(listener, never()).onGaugeAdded(MetricName.build("thing"), gauge1);
+        verify(listener, never()).onGaugeAdded(METRIC_THING, gauge1);
     }
 
 
