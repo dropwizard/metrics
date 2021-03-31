@@ -56,9 +56,9 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <jackson.version>2.12.1</jackson.version>
-        <jetty9.version>9.4.38.v20210224</jetty9.version>
-        <jetty10.version>10.0.1</jetty10.version>
-        <jetty11.version>11.0.1</jetty11.version>
+        <jetty9.version>9.4.39.v20210325</jetty9.version>
+        <jetty10.version>10.0.2</jetty10.version>
+        <jetty11.version>11.0.2</jetty11.version>
         <slf4j.version>1.7.30</slf4j.version>
         <assertj.version>3.19.0</assertj.version>
         <mockito.version>3.8.0</mockito.version>
@@ -344,7 +344,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>5.1.1</version>
+                <version>5.1.2</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
