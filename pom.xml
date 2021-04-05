@@ -300,7 +300,7 @@
                         <path>
                             <groupId>com.google.errorprone</groupId>
                             <artifactId>error_prone_core</artifactId>
-                            <version>2.5.1</version>
+                            <version>2.6.0</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
