@@ -15,6 +15,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v2
       with:
+        distribution: 'zulu'
         java-version: '8'
         server-id: ossrh
         server-username: CI_DEPLOY_USERNAME
