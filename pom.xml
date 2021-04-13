@@ -46,7 +46,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <jackson.version>2.9.10.8</jackson.version>
+        <jackson.version>2.12.3</jackson.version>
         <jetty9.version>9.4.39.v20210325</jetty9.version>
         <slf4j.version>1.7.30</slf4j.version>
         <assertj.version>3.19.0</assertj.version>
