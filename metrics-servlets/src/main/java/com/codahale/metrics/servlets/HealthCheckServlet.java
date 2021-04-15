@@ -187,4 +187,9 @@ public class HealthCheckServlet extends HttpServlet {
         }
         return true;
     }
+
+    // visible for testing
+    ObjectMapper getMapper() {
+        return mapper;
+    }
 }

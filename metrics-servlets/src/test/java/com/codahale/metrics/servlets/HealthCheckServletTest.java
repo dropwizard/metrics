@@ -189,7 +189,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
         healthCheckServlet.init(servletConfig);
 
         verify(servletConfig, times(1)).getServletContext();
-        verify(servletContext, never()).getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY));
+        verify(servletContext, never()).getAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY);
     }
 
     @Test
@@ -198,14 +198,14 @@ public class HealthCheckServletTest extends AbstractServletTest {
         final ServletContext servletContext = mock(ServletContext.class);
         final ServletConfig servletConfig = mock(ServletConfig.class);
         when(servletConfig.getServletContext()).thenReturn(servletContext);
-        when(servletContext.getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY)))
+        when(servletContext.getAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY))
                 .thenReturn(healthCheckRegistry);
 
         final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
         healthCheckServlet.init(servletConfig);
 
         verify(servletConfig, times(1)).getServletContext();
-        verify(servletContext, times(1)).getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY));
+        verify(servletContext, times(1)).getAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY);
     }
 
     @Test(expected = ServletException.class)
@@ -213,7 +213,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
         final ServletContext servletContext = mock(ServletContext.class);
         final ServletConfig servletConfig = mock(ServletConfig.class);
         when(servletConfig.getServletContext()).thenReturn(servletContext);
-        when(servletContext.getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY)))
+        when(servletContext.getAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY))
                 .thenReturn("IRELLEVANT_STRING");
 
         final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
@@ -225,11 +225,15 @@ public class HealthCheckServletTest extends AbstractServletTest {
         final ServletContext servletContext = mock(ServletContext.class);
         final ServletConfig servletConfig = mock(ServletConfig.class);
         when(servletConfig.getServletContext()).thenReturn(servletContext);
-        when(servletContext.getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_REGISTRY))).thenReturn(registry);
-        when(servletContext.getAttribute(eq(HealthCheckServlet.HEALTH_CHECK_MAPPER))).thenReturn("IRELLEVANT_STRING");
+        when(servletContext.getAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY)).thenReturn(registry);
+        when(servletContext.getAttribute(HealthCheckServlet.HEALTH_CHECK_MAPPER)).thenReturn("IRELLEVANT_STRING");
 
         final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
         healthCheckServlet.init(servletConfig);
+
+        assertThat(healthCheckServlet.getMapper())
+                .isNotNull()
+                .isInstanceOf(ObjectMapper.class);
     }
 
     static class TestHealthCheck extends HealthCheck {
