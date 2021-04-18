@@ -1,6 +1,8 @@
 package io.dropwizard.metrics5;
 
+import io.dropwizard.metrics5.WeightedSnapshot.WeightedSample;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -8,6 +10,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -100,10 +103,12 @@ public class WeightedSnapshotTest {
 
     @Test
     public void worksWithUnderestimatedCollections() {
-        final List<WeightedSnapshot.WeightedSample> items = spy(weightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2}));
-        when(items.size()).thenReturn(4, 5);
+        final List<WeightedSample> originalItems = weightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2});
+        final List<WeightedSample> spyItems = spy(originalItems);
+        doReturn(originalItems.toArray(new WeightedSample[]{})).when(spyItems).toArray(ArgumentMatchers.any(WeightedSample[].class));
+        when(spyItems.size()).thenReturn(4, 5);
 
-        final Snapshot other = new WeightedSnapshot(items);
+        final Snapshot other = new WeightedSnapshot(spyItems);
 
         assertThat(other.getValues())
                 .containsOnly(1, 2, 3, 4, 5);
@@ -111,10 +116,12 @@ public class WeightedSnapshotTest {
 
     @Test
     public void worksWithOverestimatedCollections() {
-        final List<WeightedSnapshot.WeightedSample> items = spy(weightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2}));
-        when(items.size()).thenReturn(6, 5);
+        final List<WeightedSample> originalItems = weightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2});
+        final List<WeightedSample> spyItems = spy(originalItems);
+        doReturn(originalItems.toArray(new WeightedSample[]{})).when(spyItems).toArray(ArgumentMatchers.any(WeightedSample[].class));
+        when(spyItems.size()).thenReturn(6, 5);
 
-        final Snapshot other = new WeightedSnapshot(items);
+        final Snapshot other = new WeightedSnapshot(spyItems);
 
         assertThat(other.getValues())
                 .containsOnly(1, 2, 3, 4, 5);
@@ -218,5 +225,4 @@ public class WeightedSnapshotTest {
                 weightedArray(new long[]{1, 2, 3}, new double[]{0, 0, 0}));
         assertThat(weightedSnapshot.getMean()).isEqualTo(0);
     }
-
 }

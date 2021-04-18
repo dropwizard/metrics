@@ -31,7 +31,7 @@ public class GraphiteTest {
     private final InetSocketAddress address = new InetSocketAddress(host, port);
 
     private final Socket socket = mock(Socket.class);
-    private final ByteArrayOutputStream output = spy(new ByteArrayOutputStream());
+    private final ByteArrayOutputStream output = spy(ByteArrayOutputStream.class);
 
     @Before
     public void setUp() throws Exception {
