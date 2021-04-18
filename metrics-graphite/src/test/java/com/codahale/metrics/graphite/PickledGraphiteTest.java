@@ -1,16 +1,5 @@
 package com.codahale.metrics.graphite;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Fail.failBecauseExceptionWasNotThrown;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.python.core.PyList;
@@ -23,7 +12,6 @@ import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.SimpleBindings;
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,13 +21,24 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.failBecauseExceptionWasNotThrown;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 public class PickledGraphiteTest {
     private final SocketFactory socketFactory = mock(SocketFactory.class);
     private final InetSocketAddress address = new InetSocketAddress("example.com", 1234);
     private final PickledGraphite graphite = new PickledGraphite(address, socketFactory, UTF_8, 2);
 
     private final Socket socket = mock(Socket.class);
-    private final ByteArrayOutputStream output = spy(new ByteArrayOutputStream());
+    private final ByteArrayOutputStream output = spy(ByteArrayOutputStream.class);
 
     private CompiledScript unpickleScript;
 

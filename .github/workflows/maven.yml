@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        java_version: [11, 15]
+        java_version: [11, 16]
         os:
         - ubuntu-latest
     env:
@@ -21,17 +21,18 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up JDK
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
+        distribution: 'zulu'
         java-version: ${{ matrix.java_version }}
-    - uses: actions/cache@v2.1.4
+    - uses: actions/cache@v2.1.5
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
     - name: Cache SonarCloud packages
-      uses: actions/cache@v2.1.4
+      uses: actions/cache@v2.1.5
       if: ${{ env.SONAR_TOKEN != null && env.SONAR_TOKEN != '' && matrix.java_version == '11' }}
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
