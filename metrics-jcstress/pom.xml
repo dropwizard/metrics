@@ -37,7 +37,7 @@
         <!--
             jcstress version to use with this project.
           -->
-        <jcstress.version>0.8</jcstress.version>
+        <jcstress.version>0.9</jcstress.version>
 
         <!--
             Java source/target to use for compilation.
