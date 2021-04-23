@@ -2,6 +2,7 @@ package com.codahale.metrics;
 
 import com.codahale.metrics.WeightedDoubleSnapshot.WeightedDoubleSample;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -101,10 +103,12 @@ public class WeightedDoubleSnapshotTest {
 
     @Test
     public void worksWithUnderestimatedCollections() {
-        final List<WeightedDoubleSample> items = spy(weightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2}));
-        when(items.size()).thenReturn(4, 5);
+        final List<WeightedDoubleSample> originalItems = weightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2});
+        final List<WeightedDoubleSample> spyItems = spy(originalItems);
+        doReturn(originalItems.toArray(new WeightedDoubleSample[]{})).when(spyItems).toArray(ArgumentMatchers.any(WeightedDoubleSample[].class));
+        when(spyItems.size()).thenReturn(4, 5);
 
-        final DoubleSnapshot other = new WeightedDoubleSnapshot(items);
+        final DoubleSnapshot other = new WeightedDoubleSnapshot(spyItems);
 
         assertThat(other.getValues())
                 .containsOnly(1, 2, 3, 4, 5);
@@ -112,10 +116,12 @@ public class WeightedDoubleSnapshotTest {
 
     @Test
     public void worksWithOverestimatedCollections() {
-        final List<WeightedDoubleSample> items = spy(weightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2}));
-        when(items.size()).thenReturn(6, 5);
+        final List<WeightedDoubleSample> originalItems = weightedArray(new long[]{5, 1, 2, 3, 4}, new double[]{1, 2, 3, 2, 2});
+        final List<WeightedDoubleSample> spyItems = spy(originalItems);
+        doReturn(originalItems.toArray(new WeightedDoubleSample[]{})).when(spyItems).toArray(ArgumentMatchers.any(WeightedDoubleSample[].class));
+        when(spyItems.size()).thenReturn(6, 5);
 
-        final DoubleSnapshot other = new WeightedDoubleSnapshot(items);
+        final DoubleSnapshot other = new WeightedDoubleSnapshot(spyItems);
 
         assertThat(other.getValues())
                 .containsOnly(1, 2, 3, 4, 5);
