@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.ehcache</javaModuleName>
-        <ehcache2.version>2.10.6</ehcache2.version>
+        <ehcache2.version>2.10.9.2</ehcache2.version>
     </properties>
 
     <dependencyManagement>
