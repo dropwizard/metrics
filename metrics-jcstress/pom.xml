@@ -8,7 +8,6 @@
     </parent>
 
     <artifactId>metrics-jcstress</artifactId>
-    <version>4.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Metrics JCStress tests</name>
@@ -37,7 +36,7 @@
         <!--
             jcstress version to use with this project.
           -->
-        <jcstress.version>0.9</jcstress.version>
+        <jcstress.version>0.10</jcstress.version>
 
         <!--
             Java source/target to use for compilation.
