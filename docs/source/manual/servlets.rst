@@ -11,10 +11,17 @@ The ``metrics-servlets`` module provides a handful of useful servlets:
 HealthCheckServlet
 ==================
 
-``HealthCheckServlet`` responds to ``GET`` requests by running all the [health checks](#health-checks)
-and returning ``501 Not Implemented`` if no health checks are registered, ``200 OK`` if all pass, or
-``500 Internal Service Error`` if one or more fail. The results are returned as a human-readable
-``application/json`` entity.
+``HealthCheckServlet`` responds to ``GET`` requests by running all the currently-registered
+[health checks](#health-checks). The results are returned as a human-readable JSON entity.
+
+HTTP Status Codes
+-----------------
+
+* ``501 Not Implemented``: If no health checks are registered
+* ``200 OK``: If all checks pass, or if ``httpStatusIndicator`` is set to ``"false"`` and one or more
+  health checks fail (see below for more information on this setting)
+* ``500 Internal Service Error``: If ``httpStatusIndicator`` is set to ``"true"`` and one or more
+  health checks fail (see below for more information on this setting)
 
 Configuration
 -------------
@@ -48,14 +55,14 @@ Initialization Parameters
 
 * ``com.codahale.metrics.servlets.HealthCheckServlet.httpStatusIndicator``: Provides the
 default setting that determines whether the HTTP status code is used to determine whether the
-application is healthy. If not provided, it defaults to ``"true"``
+application is healthy; if not provided, it defaults to ``"true"``
 
 Query Parameters
 ~~~~~~~~~~~~~~~~
 
 ``HealthCheckServlet`` supports the following query parameters:
 
-* ``httpStatusIndicator`` (`Boolean``): Determines whether the HTTP status code is used to
+* ``httpStatusIndicator`` (``Boolean``): Determines whether the HTTP status code is used to
   determine whether the application is healthy; if not provided, it defaults to the value from the
   initialization parameter
 * ``pretty`` (``Boolean``): Indicates whether the JSON response should be formatted; if
