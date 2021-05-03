@@ -115,19 +115,19 @@ Initialization Parameters
 ``MetricsServlet`` supports the following initialization parameters:
 
 * ``com.codahale.metrics.servlets.MetricsServlet.allowedOrigin``: Provides a value for the
-response header ``Access-Control-Allow-Origin``; if no value is provided, the header is not used
+  response header ``Access-Control-Allow-Origin``; if no value is provided, the header is not used
 * ``com.codahale.metrics.servlets.MetricsServlet.jsonpCalblack``: Specifies a request parameter
-name to use as the callback when returning the metrics as JSON-P; if no value is provided, the response is
-returned as JSON. This also requires a query parameter with the same name as the value to enable a JSON-P
-response.
+  name to use as the callback when returning the metrics as JSON-P; if no value is provided, the response is
+  returned as JSON. This also requires a query parameter with the same name as the value to enable a JSON-P
+  response.
 * ``com.codahale.metrics.servlets.MetricsServlet.rateUnit``: Provides a value for the
-rate unit used for metrics output; if none is provided, the default is ``SECONDS`` (see ``TimeUnit`` for
-acceptable values)
+  rate unit used for metrics output; if none is provided, the default is ``SECONDS`` (see ``TimeUnit`` for
+  acceptable values)
 * ``com.codahale.metrics.servlets.MetricsServlet.durationUnit``: Provides a value for the
-duration unit used for metrics output; if none is provided, the default is ``SECONDS`` (see ``TimeUnit`` for
-acceptable values)
+  duration unit used for metrics output; if none is provided, the default is ``SECONDS`` (see ``TimeUnit`` for
+  acceptable values)
 * ``com.codahale.metrics.servlets.MetricsServlet.showSamples``: Controls whether sample data is
-included in the output for histograms and timers; if no value is provided, the sample data will be omitted.
+  included in the output for histograms and timers; if no value is provided, the sample data will be omitted.
 
 Query Parameters
 ~~~~~~~~~~~~~~~~
@@ -135,7 +135,7 @@ Query Parameters
 ``MetricsServlet`` supports the following query parameters:
 
 * ``pretty`` (``Boolean``): Determines whether the results are formatted; if not provided, this
-parameter defaults to ``"false"``.
+  parameter defaults to ``"false"``.
 
 .. _man-servlet-ping:
 
@@ -164,12 +164,12 @@ Query Parameters
 ``CpuProfileServlet`` supports the following query parameters:
 
 * ``duration`` (``Integer``): Determines the amount of time in seconds for which the CPU
-profiling will occur; the default is 10 seconds.
+  profiling will occur; the default is 10 seconds.
 * ``frequency`` (``Integer``)Determines the frequency in Hz at which the CPU
-profiling sample; the default is 100 Hz (100 times per second).
+  profiling sample; the default is 100 Hz (100 times per second).
 * ``state`` (``String``): Determines which threads will be profiled. If the value provided
-is ``"blocked"``, only blocked threads will be profiled; otherwise, all runnable threads will be
-profiled.
+  is ``"blocked"``, only blocked threads will be profiled; otherwise, all runnable threads will be
+  profiled.
 
 .. _man-servlet-admin:
 
@@ -258,18 +258,18 @@ Initialization Parameters
 ``AdminServlet`` supports the following initialization parameters:
 
 * ``metrics-enabled``: Determines whether the ``MetricsServlet`` is enabled and
-routable; if ``"false"``, the servlet endpoint will not be available via this servlet
+  routable; if ``"false"``, the servlet endpoint will not be available via this servlet
 * ``metrics-uri``: Specifies the URI for the ``MetricsServlet``; if omitted, the default
-(``/metrics``) will be used
+  (``/metrics``) will be used
 * ``ping-enabled``: Determines whether the ``PingServlet`` is enabled and routable; if
-``"false"``, the servlet endpoint will not be available via this servlet
+  ``"false"``, the servlet endpoint will not be available via this servlet
 * ``ping-uri``: Specifies the URI for the ``PingServlet``; if omitted, the default
-(``/ping``) will be used
+  (``/ping``) will be used
 * ``threads-enabled``: Determines whether the ``ThreadDumpServlet`` is enabled
-and routable; if ``"false"``, the servlet endpoint will not be available via this servlet
+  and routable; if ``"false"``, the servlet endpoint will not be available via this servlet
 * ``threads-uri``: Specifies the URI for the ``ThreadDumpServlet``; if omitted, the default
-(``/threads``) will be used
+  (``/threads``) will be used
 * ``cpu-profile-enabled``: Determines whether the ``CpuProfileServlet`` is enabled and routable;
-if ``"false"``, the servlet endpoints will not be available via this servlet
+  if ``"false"``, the servlet endpoints will not be available via this servlet
 * ``cpu-profile-uri``: Specifies the URIs for the ``CpuProfileServlet``; if omitted, the default
-(``/pprof``) will be used
+  (``/pprof``) will be used
