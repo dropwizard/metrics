@@ -17,6 +17,10 @@ HealthCheckServlet
 HTTP Status Codes
 -----------------
 
+``HealthCheckServlet`` responds with one of the following status codes (depending on configuration).
+If reporting health via HTTP status is disabled, callers will have to introspect the JSON to
+determine application health.
+
 * ``501 Not Implemented``: If no health checks are registered
 * ``200 OK``: If all checks pass, or if ``httpStatusIndicator`` is set to ``"false"`` and one or more
   health checks fail (see below for more information on this setting)
