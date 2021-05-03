@@ -19,31 +19,46 @@ and returning ``501 Not Implemented`` if no health checks are registered, ``200 
 Configuration
 -------------
 
+``HealthCheckServlet`` supports the following configuration items.
+
 Servlet Context
 ~~~~~~~~~~~~~~~
 
 ``HealthCheckServlet`` requires that the servlet context has a ``HealthCheckRegistry`` named
 ``com.codahale.metrics.servlets.HealthCheckServlet.registry``. You can subclass
-``MetricsServletContextListener``, which will add a specific ``HealthCheckRegistry`` to the servlet
-context.
+``HealthCheckServlet.ContextListener``, which will add a specific ``HealthCheckRegistry`` to the
+servlet context.
+
+An instance of ``ExecutorService`` can be provided via the servlet context using the name
+``com.codahale.metrics.servlets.HealthCheckServlet.executor``; by default, no thread pool is used to
+execute the health checks.
+
+An instance of ``HealthCheckFilter`` can be provided via the servlet context using the name
+``com.codahale.metrics.servlets.HealthCheckServlet.healthCheckFilter``; by default, no filtering is
+enabled. The filter is used to determine which health checks to include in the health status.
+
+An instance of ``ObjectMapper`` can be provided via the servlet context using the name
+``com.codahale.metrics.servlets.HealthCheckServlet.mapper``; if none is provided, a default instance
+will be used to convert the health check results to JSON.
 
 Initialization Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``HealthCheckServlet`` takes an initialization parameter named
-``com.codahale.metrics.servlets.HealthCheckServlet.httpStatusIndicator``. This parameter provides the
+``HealthCheckServlet`` supports the following initialization parameters:
+
+* ``com.codahale.metrics.servlets.HealthCheckServlet.httpStatusIndicator``: Provides the
 default setting that determines whether the HTTP status code is used to determine whether the
-application is healthy. If not provided, it defaults to ``"true"``.
+application is healthy. If not provided, it defaults to ``"true"``
 
 Query Parameters
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
-``HealthCheckServlet`` takes the following query parameters:
+``HealthCheckServlet`` supports the following query parameters:
 
-* ``httpStatusIndicator``: This Boolean parameter determines whether the HTTP status code is used to
+* ``httpStatusIndicator`` (`Boolean``): Determines whether the HTTP status code is used to
   determine whether the application is healthy; if not provided, it defaults to the value from the
   initialization parameter
-* ``pretty``: This Boolean parameter indicates whether the JSON response should be formatted; if
+* ``pretty`` (``Boolean``): Indicates whether the JSON response should be formatted; if
   ``"true"``, the JSON response will be formatted instead of condensed
 
 .. _man-servlet-threaddump:
@@ -58,11 +73,16 @@ waiting for.
 Configuration
 -------------
 
-``ThreadDumpServlet`` takes the following query parameters:
+``ThreadDumpServlet`` supports the following configuration items.
 
-* ``monitors``: This Boolean parameter determines whether locked monitors are included; if not provided,
+Query Parameters
+~~~~~~~~~~~~~~~~
+
+``ThreadDumpServlet`` supports the following query parameters:
+
+* ``monitors`` (``Boolean``): Determines whether locked monitors are included; if not provided,
   it defaults to ``"true"``
-* ``synchronizers``: This Boolean parameter determines whether locked ownable synchronizers are included;
+* ``synchronizers`` (``Boolean``): Determines whether locked ownable synchronizers are included;
   if not provided, it defaults to ``"true"``
 
 .. _man-servlet-metrics:
@@ -72,13 +92,50 @@ MetricsServlet
 
 ``MetricsServlet`` exposes the state of the metrics in a particular registry as a JSON object.
 
+Configuration
+-------------
+
+``MetricsServlet`` supports the following configuration items.
+
+Servlet Context
+~~~~~~~~~~~~~~~
+
 ``MetricsServlet`` requires that the servlet context has a ``MetricRegistry`` named
 ``com.codahale.metrics.servlets.MetricsServlet.registry``. You can subclass
-``MetricsServletContextListener``, which will add a specific ``MetricRegistry`` to the servlet
+``MetricsServlet.ContextListener``, which will add a specific ``MetricRegistry`` to the servlet
 context.
 
-``MetricsServlet`` takes an initialization parameter, ``show-jvm-metrics``, which if ``"false"`` will
-disable the outputting of JVM-level information in the JSON object.
+An instance of ``MetricFilter`` can be provided via the servlet context using the name
+``com.codahale.metrics.servlets.MetricsServlet.metricFilter``; by default, no filtering is
+enabled. The filter is used to determine which metrics to include in the JSON output.
+
+Initialization Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``MetricsServlet`` supports the following initialization parameters:
+
+* ``com.codahale.metrics.servlets.MetricsServlet.allowedOrigin``: Provides a value for the
+response header ``Access-Control-Allow-Origin``; if no value is provided, the header is not used
+* ``com.codahale.metrics.servlets.MetricsServlet.jsonpCalblack``: Specifies a request parameter
+name to use as the callback when returning the metrics as JSON-P; if no value is provided, the response is
+returned as JSON. This also requires a query parameter with the same name as the value to enable a JSON-P
+response.
+* ``com.codahale.metrics.servlets.MetricsServlet.rateUnit``: Provides a value for the
+rate unit used for metrics output; if none is provided, the default is ``SECONDS`` (see ``TimeUnit`` for
+acceptable values)
+* ``com.codahale.metrics.servlets.MetricsServlet.durationUnit``: Provides a value for the
+duration unit used for metrics output; if none is provided, the default is ``SECONDS`` (see ``TimeUnit`` for
+acceptable values)
+* ``com.codahale.metrics.servlets.MetricsServlet.showSamples``: Controls whether sample data is
+included in the output for histograms and timers; if no value is provided, the sample data will be omitted.
+
+Query Parameters
+~~~~~~~~~~~~~~~~
+
+``MetricsServlet`` supports the following query parameters:
+
+* ``pretty`` (``Boolean``): Determines whether the results are formatted; if not provided, this
+parameter defaults to ``"false"``.
 
 .. _man-servlet-ping:
 
@@ -91,10 +148,28 @@ useful for determining liveness for load balancers, etc.
 .. _man-servlet-cpu-profile:
 
 CpuProfileServlet
-===========
+=================
 
-``CpuProfileServlet`` responds to ``GET`` requests with a ``pprof/raw``/``200 OK`` response containing the results of a
-CPU profile.
+``CpuProfileServlet`` responds to ``GET`` requests with a ``pprof/raw``/``200 OK`` response containing the
+results of CPU profiling.
+
+Configuration
+-------------
+
+``CpuProfileServlet`` supports the following configuration items.
+
+Query Parameters
+~~~~~~~~~~~~~~~~
+
+``CpuProfileServlet`` supports the following query parameters:
+
+* ``duration`` (``Integer``): Determines the amount of time in seconds for which the CPU
+profiling will occur; the default is 10 seconds.
+* ``frequency`` (``Integer``)Determines the frequency in Hz at which the CPU
+profiling sample; the default is 100 Hz (100 times per second).
+* ``state`` (``String``): Determines which threads will be profiled. If the value provided
+is ``"blocked"``, only blocked threads will be profiled; otherwise, all runnable threads will be
+profiled.
 
 .. _man-servlet-admin:
 
@@ -147,7 +222,8 @@ And by extending ``HealthCheckServlet.ContextListener`` for HealthCheckRegistry:
 
     }
 
-Then you will need to register servlet context listeners either in you ``web.xml`` or annotating the class with ``@WebListener`` if you are in servlet 3.0 environment. In ``web.xml``:
+Then you will need to register servlet context listeners either in you ``web.xml`` or annotating the class
+with ``@WebListener`` if you are in servlet 3.0 environment. In ``web.xml``:
 
 .. code-block:: xml
 
@@ -171,4 +247,29 @@ You will also need to register ``AdminServlet`` in ``web.xml``:
 		<url-pattern>/metrics/*</url-pattern>
 	</servlet-mapping>
 
+Configuration
+-------------
 
+``AdminServlet`` supports the following configuration items.
+
+Initialization Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``AdminServlet`` supports the following initialization parameters:
+
+* ``metrics-enabled``: Determines whether the ``MetricsServlet`` is enabled and
+routable; if ``"false"``, the servlet endpoint will not be available via this servlet
+* ``metrics-uri``: Specifies the URI for the ``MetricsServlet``; if omitted, the default
+(``/metrics``) will be used
+* ``ping-enabled``: Determines whether the ``PingServlet`` is enabled and routable; if
+``"false"``, the servlet endpoint will not be available via this servlet
+* ``ping-uri``: Specifies the URI for the ``PingServlet``; if omitted, the default
+(``/ping``) will be used
+* ``threads-enabled``: Determines whether the ``ThreadDumpServlet`` is enabled
+and routable; if ``"false"``, the servlet endpoint will not be available via this servlet
+* ``threads-uri``: Specifies the URI for the ``ThreadDumpServlet``; if omitted, the default
+(``/threads``) will be used
+* ``cpu-profile-enabled``: Determines whether the ``CpuProfileServlet`` is enabled and routable;
+if ``"false"``, the servlet endpoints will not be available via this servlet
+* ``cpu-profile-uri``: Specifies the URIs for the ``CpuProfileServlet``; if omitted, the default
+(``/pprof``) will be used
