@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
@@ -189,12 +190,14 @@ public class CsvReporter extends ScheduledReporter {
     private final CsvFileProvider csvFileProvider;
 
     private final String histogramFormat;
+    private final String doubleHistogramFormat;
     private final String meterFormat;
     private final String timerFormat;
 
     private final String timerHeader;
     private final String meterHeader;
     private final String histogramHeader;
+    private final String doubleHistogramHeader;
 
     private CsvReporter(MetricRegistry registry,
                         File directory,
@@ -215,12 +218,14 @@ public class CsvReporter extends ScheduledReporter {
         this.csvFileProvider = csvFileProvider;
 
         this.histogramFormat = String.join(separator, "%d", "%d", "%f", "%d", "%f", "%f", "%f", "%f", "%f", "%f", "%f");
+        this.doubleHistogramFormat = String.join(separator, "%d", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f");
         this.meterFormat = String.join(separator, "%d", "%f", "%f", "%f", "%f", "events/%s");
         this.timerFormat = String.join(separator, "%d", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "%f", "calls/%s", "%s");
 
         this.timerHeader = String.join(separator, "count", "max", "mean", "min", "stddev", "p50", "p75", "p95", "p98", "p99", "p999", "mean_rate", "m1_rate", "m5_rate", "m15_rate", "rate_unit", "duration_unit");
         this.meterHeader = String.join(separator, "count", "mean_rate", "m1_rate", "m5_rate", "m15_rate", "rate_unit");
         this.histogramHeader = String.join(separator, "count", "max", "mean", "min", "stddev", "p50", "p75", "p95", "p98", "p99", "p999");
+        this.doubleHistogramHeader = String.join(separator, "count", "max", "mean", "min", "stddev", "p50", "p75", "p95", "p98", "p99", "p999");
     }
 
     @Override
@@ -228,6 +233,16 @@ public class CsvReporter extends ScheduledReporter {
     public void report(SortedMap<String, Gauge> gauges,
                        SortedMap<String, Counter> counters,
                        SortedMap<String, Histogram> histograms,
+                       SortedMap<String, Meter> meters,
+                       SortedMap<String, Timer> timers) {
+        report(gauges, counters, histograms, Collections.emptySortedMap(), meters, timers);
+    }
+    @Override
+    @SuppressWarnings("rawtypes")
+    public void report(SortedMap<String, Gauge> gauges,
+                       SortedMap<String, Counter> counters,
+                       SortedMap<String, Histogram> histograms,
+                       SortedMap<String, DoubleHistogram> doubleHistograms,
                        SortedMap<String, Meter> meters,
                        SortedMap<String, Timer> timers) {
         final long timestamp = TimeUnit.MILLISECONDS.toSeconds(clock.getTime());
@@ -242,6 +257,10 @@ public class CsvReporter extends ScheduledReporter {
 
         for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
             reportHistogram(timestamp, entry.getKey(), entry.getValue());
+        }
+
+        for (Map.Entry<String, DoubleHistogram> entry : doubleHistograms.entrySet()) {
+            reportDoubleHistogram(timestamp, entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<String, Meter> entry : meters.entrySet()) {
@@ -299,6 +318,26 @@ public class CsvReporter extends ScheduledReporter {
                 name,
                 histogramHeader,
                 histogramFormat,
+                histogram.getCount(),
+                snapshot.getMax(),
+                snapshot.getMean(),
+                snapshot.getMin(),
+                snapshot.getStdDev(),
+                snapshot.getMedian(),
+                snapshot.get75thPercentile(),
+                snapshot.get95thPercentile(),
+                snapshot.get98thPercentile(),
+                snapshot.get99thPercentile(),
+                snapshot.get999thPercentile());
+    }
+
+    private void reportDoubleHistogram(long timestamp, String name, DoubleHistogram histogram) {
+        final DoubleSnapshot snapshot = histogram.getSnapshot();
+
+        report(timestamp,
+                name,
+                doubleHistogramHeader,
+                doubleHistogramFormat,
                 histogram.getCount(),
                 snapshot.getMax(),
                 snapshot.getMean(),

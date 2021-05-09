@@ -1,10 +1,10 @@
 package com.codahale.metrics;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -29,6 +30,7 @@ public class ScheduledReporterTest {
     private final Gauge<String> gauge = () -> "";
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
+    private final DoubleHistogram doubleHistogram = mock(DoubleHistogram.class);
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
 
@@ -54,6 +56,7 @@ public class ScheduledReporterTest {
         registry.register("gauge", gauge);
         registry.register("counter", counter);
         registry.register("histogram", histogram);
+        registry.register("double-histogram", doubleHistogram);
         registry.register("meter", meter);
         registry.register("timer", timer);
     }
@@ -69,17 +72,9 @@ public class ScheduledReporterTest {
     @Test
     public void createWithNullMetricRegistry() {
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        DummyReporter r = null;
-        try {
-            r = new DummyReporter(null, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor);
-            Assert.fail("NullPointerException must be thrown !!!");
-        } catch (NullPointerException e) {
-            Assert.assertEquals("registry == null", e.getMessage());
-        } finally {
-            if (r != null) {
-                r.close();
-            }
-        }
+        assertThatNullPointerException()
+                .isThrownBy(() -> new DummyReporter(null, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor))
+                .withMessage("registry == null");
     }
 
     @Test
@@ -97,6 +92,7 @@ public class ScheduledReporterTest {
                 map("gauge", gauge),
                 map("counter", counter),
                 map("histogram", histogram),
+                map("double-histogram", doubleHistogram),
                 map("meter", meter),
                 map("timer", timer)
         );
@@ -134,6 +130,7 @@ public class ScheduledReporterTest {
                 map("gauge", gauge),
                 map("counter", counter),
                 map("histogram", histogram),
+                map("double-histogram", doubleHistogram),
                 map("meter", meter),
                 map("timer", timer)
         );
@@ -223,6 +220,7 @@ public class ScheduledReporterTest {
                 map("gauge", gauge),
                 map("counter", counter),
                 map("histogram", histogram),
+                map("double-histogram", doubleHistogram),
                 map("meter", meter),
                 map("timer", timer)
         );
@@ -247,6 +245,7 @@ public class ScheduledReporterTest {
                 map("gauge", gauge),
                 map("counter", counter),
                 map("histogram", histogram),
+                map("double-histogram", doubleHistogram),
                 map("meter", meter),
                 map("timer", timer)
         );
@@ -260,7 +259,7 @@ public class ScheduledReporterTest {
 
     private static class DummyReporter extends ScheduledReporter {
 
-        private AtomicInteger executionCount = new AtomicInteger();
+        private final AtomicInteger executionCount = new AtomicInteger();
 
         DummyReporter(MetricRegistry registry, String name, MetricFilter filter, TimeUnit rateUnit, TimeUnit durationUnit) {
             super(registry, name, filter, rateUnit, durationUnit);
@@ -277,6 +276,12 @@ public class ScheduledReporterTest {
         @Override
         @SuppressWarnings("rawtypes")
         public void report(SortedMap<String, Gauge> gauges, SortedMap<String, Counter> counters, SortedMap<String, Histogram> histograms, SortedMap<String, Meter> meters, SortedMap<String, Timer> timers) {
+            report(gauges, counters, histograms, Collections.emptySortedMap(), meters, timers);
+        }
+
+        @Override
+        @SuppressWarnings("rawtypes")
+        public void report(SortedMap<String, Gauge> gauges, SortedMap<String, Counter> counters, SortedMap<String, Histogram> histograms, SortedMap<String, DoubleHistogram> doubleHistograms, SortedMap<String, Meter> meters, SortedMap<String, Timer> timers) {
             executionCount.incrementAndGet();
             // nothing doing!
         }

@@ -253,6 +253,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
             report(registry.getGauges(filter),
                     registry.getCounters(filter),
                     registry.getHistograms(filter),
+                    registry.getDoubleHistograms(filter),
                     registry.getMeters(filter),
                     registry.getTimers(filter));
         }
@@ -266,13 +267,37 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * @param histograms all of the histograms in the registry
      * @param meters     all of the meters in the registry
      * @param timers     all of the timers in the registry
+     * @deprecated Use {@link #report(SortedMap, SortedMap, SortedMap, SortedMap, SortedMap, SortedMap)}
      */
     @SuppressWarnings("rawtypes")
-    public abstract void report(SortedMap<String, Gauge> gauges,
+    public void report(SortedMap<String, Gauge> gauges,
                                 SortedMap<String, Counter> counters,
                                 SortedMap<String, Histogram> histograms,
                                 SortedMap<String, Meter> meters,
-                                SortedMap<String, Timer> timers);
+                                SortedMap<String, Timer> timers) {
+        // NOP
+    }
+
+    /**
+     * Called periodically by the polling thread. Subclasses should report all the given metrics.
+     *
+     * @param gauges     all of the gauges in the registry
+     * @param counters   all of the counters in the registry
+     * @param histograms all of the histograms in the registry
+     * @param doubleHistograms all of the double histograms in the registry
+     * @param meters     all of the meters in the registry
+     * @param timers     all of the timers in the registry
+     */
+    @SuppressWarnings("rawtypes")
+    public void report(SortedMap<String, Gauge> gauges,
+                       SortedMap<String, Counter> counters,
+                       SortedMap<String, Histogram> histograms,
+                       SortedMap<String, DoubleHistogram> doubleHistograms,
+                       SortedMap<String, Meter> meters,
+                       SortedMap<String, Timer> timers) {
+        LOG.debug("{}#report(...) doesn't support double histograms.", this.getClass());
+        report(gauges, counters, histograms, meters, timers);
+    }
 
     protected String getRateUnit() {
         return rateUnit;

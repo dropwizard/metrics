@@ -252,6 +252,16 @@ public class Slf4jReporter extends ScheduledReporter {
                        SortedMap<String, Histogram> histograms,
                        SortedMap<String, Meter> meters,
                        SortedMap<String, Timer> timers) {
+        report(gauges, counters, histograms, Collections.emptySortedMap(), meters, timers);
+    }
+    @Override
+    @SuppressWarnings("rawtypes")
+    public void report(SortedMap<String, Gauge> gauges,
+                       SortedMap<String, Counter> counters,
+                       SortedMap<String, Histogram> histograms,
+                       SortedMap<String, DoubleHistogram> doubleHistograms,
+                       SortedMap<String, Meter> meters,
+                       SortedMap<String, Timer> timers) {
         if (loggerProxy.isEnabled(marker)) {
             StringBuilder b = new StringBuilder();
             for (Entry<String, Gauge> entry : gauges.entrySet()) {
@@ -264,6 +274,10 @@ public class Slf4jReporter extends ScheduledReporter {
 
             for (Entry<String, Histogram> entry : histograms.entrySet()) {
                 logHistogram(b, entry.getKey(), entry.getValue());
+            }
+
+            for (Entry<String, DoubleHistogram> entry : doubleHistograms.entrySet()) {
+                logDoubleHistogram(b, entry.getKey(), entry.getValue());
             }
 
             for (Entry<String, Meter> entry : meters.entrySet()) {
@@ -316,6 +330,25 @@ public class Slf4jReporter extends ScheduledReporter {
         appendCountIfEnabled(b, histogram);
         appendLongIfEnabled(b, MIN, snapshot::getMin);
         appendLongIfEnabled(b, MAX, snapshot::getMax);
+        appendDoubleIfEnabled(b, MEAN, snapshot::getMean);
+        appendDoubleIfEnabled(b, STDDEV, snapshot::getStdDev);
+        appendDoubleIfEnabled(b, P50, snapshot::getMedian);
+        appendDoubleIfEnabled(b, P75, snapshot::get75thPercentile);
+        appendDoubleIfEnabled(b, P95, snapshot::get95thPercentile);
+        appendDoubleIfEnabled(b, P98, snapshot::get98thPercentile);
+        appendDoubleIfEnabled(b, P99, snapshot::get99thPercentile);
+        appendDoubleIfEnabled(b, P999, snapshot::get999thPercentile);
+        loggerProxy.log(marker, b.toString());
+    }
+
+    private void logDoubleHistogram(StringBuilder b, String name, DoubleHistogram histogram) {
+        final DoubleSnapshot snapshot = histogram.getSnapshot();
+        b.setLength(0);
+        b.append("type=DOUBLE_HISTOGRAM");
+        append(b, "name", prefix(name));
+        appendCountIfEnabled(b, histogram);
+        appendDoubleIfEnabled(b, MIN, snapshot::getMin);
+        appendDoubleIfEnabled(b, MAX, snapshot::getMax);
         appendDoubleIfEnabled(b, MEAN, snapshot::getMean);
         appendDoubleIfEnabled(b, STDDEV, snapshot::getStdDev);
         appendDoubleIfEnabled(b, P50, snapshot::getMedian);

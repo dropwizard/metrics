@@ -131,6 +131,26 @@ public class Slf4jReporterTest {
         return histogram;
     }
 
+    private DoubleHistogram doubleHistogram() {
+        final DoubleHistogram histogram = mock(DoubleHistogram.class);
+        when(histogram.getCount()).thenReturn(1L);
+
+        final DoubleSnapshot snapshot = mock(DoubleSnapshot.class);
+        when(snapshot.getMax()).thenReturn(23.0D);
+        when(snapshot.getMean()).thenReturn(3.0);
+        when(snapshot.getMin()).thenReturn(4.2D);
+        when(snapshot.getStdDev()).thenReturn(5.0);
+        when(snapshot.getMedian()).thenReturn(6.0);
+        when(snapshot.get75thPercentile()).thenReturn(7.0);
+        when(snapshot.get95thPercentile()).thenReturn(8.0);
+        when(snapshot.get98thPercentile()).thenReturn(9.0);
+        when(snapshot.get99thPercentile()).thenReturn(10.0);
+        when(snapshot.get999thPercentile()).thenReturn(11.0);
+
+        when(histogram.getSnapshot()).thenReturn(snapshot);
+        return histogram;
+    }
+
     private Meter meter() {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
@@ -198,6 +218,27 @@ public class Slf4jReporterTest {
     }
 
     @Test
+    public void reportsDoubleHistogramValuesAtErrorWithDisabledMetricAttributes() {
+        disabledMetricAttributes = EnumSet.of(COUNT, MIN, P50);
+        reportsDoubleHistogramValuesAtError("type=DOUBLE_HISTOGRAM, name=test.histogram, max=23.0, mean=3.0, " +
+                "stddev=5.0, p75=7.0, p95=8.0, p98=9.0, p99=10.0, p999=11.0");
+    }
+
+    private void reportsDoubleHistogramValuesAtError(final String expectedLog) {
+        final DoubleHistogram histogram = doubleHistogram();
+        when(logger.isErrorEnabled(marker)).thenReturn(true);
+
+        errorReporter().report(map(),
+                map(),
+                map(),
+                map("test.histogram", histogram),
+                map(),
+                map());
+
+        verify(logger).error(marker, expectedLog);
+    }
+
+    @Test
     public void reportsMeterValuesAtErrorDefault() {
         reportsMeterValuesAtError("type=METER, name=test.meter, count=1, m1_rate=3.0, m5_rate=4.0, " +
                 "m15_rate=5.0, mean_rate=2.0, rate_unit=events/second");
@@ -222,7 +263,6 @@ public class Slf4jReporterTest {
 
         verify(logger).error(marker, expectedLog);
     }
-
 
     @Test
     public void reportsTimerValuesAtErrorDefault() {
@@ -266,7 +306,6 @@ public class Slf4jReporterTest {
         verify(logger).info(marker, "type=GAUGE, name=prefix.gauge, value=value");
     }
 
-
     @Test
     public void reportsCounterValuesDefault() {
         final Counter counter = counter();
@@ -293,6 +332,22 @@ public class Slf4jReporterTest {
                 map());
 
         verify(logger).info(marker, "type=HISTOGRAM, name=prefix.test.histogram, count=1, min=4, max=2, mean=3.0, " +
+                "stddev=5.0, p50=6.0, p75=7.0, p95=8.0, p98=9.0, p99=10.0, p999=11.0");
+    }
+
+    @Test
+    public void reportsDoubleHistogramValuesDefault() {
+        final DoubleHistogram histogram = doubleHistogram();
+        when(logger.isInfoEnabled(marker)).thenReturn(true);
+
+        infoReporter().report(map(),
+                map(),
+                map(),
+                map("test.histogram", histogram),
+                map(),
+                map());
+
+        verify(logger).info(marker, "type=DOUBLE_HISTOGRAM, name=prefix.test.histogram, count=1, min=4.2, max=23.0, mean=3.0, " +
                 "stddev=5.0, p50=6.0, p75=7.0, p95=8.0, p98=9.0, p99=10.0, p999=11.0");
     }
 
@@ -327,7 +382,6 @@ public class Slf4jReporterTest {
                 " m1_rate=3.0, m5_rate=4.0, m15_rate=5.0, mean_rate=2.0, rate_unit=events/second, duration_unit=milliseconds");
     }
 
-
     @Test
     public void reportsAllMetricsDefault() {
         when(logger.isInfoEnabled(marker)).thenReturn(true);
@@ -335,12 +389,15 @@ public class Slf4jReporterTest {
         infoReporter().report(map("test.gauge", () -> "value"),
                 map("test.counter", counter()),
                 map("test.histogram", histogram()),
+                map("test.double-histogram", doubleHistogram()),
                 map("test.meter", meter()),
                 map("test.timer", timer()));
 
         verify(logger).info(marker, "type=GAUGE, name=prefix.test.gauge, value=value");
         verify(logger).info(marker, "type=COUNTER, name=prefix.test.counter, count=100");
         verify(logger).info(marker, "type=HISTOGRAM, name=prefix.test.histogram, count=1, min=4, max=2, mean=3.0, " +
+                "stddev=5.0, p50=6.0, p75=7.0, p95=8.0, p98=9.0, p99=10.0, p999=11.0");
+        verify(logger).info(marker, "type=DOUBLE_HISTOGRAM, name=prefix.test.double-histogram, count=1, min=4.2, max=23.0, mean=3.0, " +
                 "stddev=5.0, p50=6.0, p75=7.0, p95=8.0, p98=9.0, p99=10.0, p999=11.0");
         verify(logger).info(marker, "type=METER, name=prefix.test.meter, count=1, m1_rate=3.0, m5_rate=4.0, " +
                 "m15_rate=5.0, mean_rate=2.0, rate_unit=events/second");

@@ -112,6 +112,39 @@ public class CsvReporterTest {
     }
 
     @Test
+    public void reportsDoubleHistogramValues() throws Exception {
+        final DoubleHistogram histogram = mock(DoubleHistogram.class);
+        when(histogram.getCount()).thenReturn(1L);
+
+        final DoubleSnapshot snapshot = mock(DoubleSnapshot.class);
+        when(snapshot.getMax()).thenReturn(23.0D);
+        when(snapshot.getMean()).thenReturn(3.0);
+        when(snapshot.getMin()).thenReturn(4.2D);
+        when(snapshot.getStdDev()).thenReturn(5.0);
+        when(snapshot.getMedian()).thenReturn(6.0);
+        when(snapshot.get75thPercentile()).thenReturn(7.0);
+        when(snapshot.get95thPercentile()).thenReturn(8.0);
+        when(snapshot.get98thPercentile()).thenReturn(9.0);
+        when(snapshot.get99thPercentile()).thenReturn(10.0);
+        when(snapshot.get999thPercentile()).thenReturn(11.0);
+
+        when(histogram.getSnapshot()).thenReturn(snapshot);
+
+        reporter.report(map(),
+                map(),
+                map(),
+                map("test.histogram", histogram),
+                map(),
+                map());
+
+        assertThat(fileContents("test.histogram.csv"))
+                .isEqualTo(csv(
+                        "t,count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999",
+                        "19910191,1,23.000000,3.000000,4.200000,5.000000,6.000000,7.000000,8.000000,9.000000,10.000000,11.000000"
+                ));
+    }
+
+    @Test
     public void reportsMeterValues() throws Exception {
         final Meter meter = mockMeter();
 

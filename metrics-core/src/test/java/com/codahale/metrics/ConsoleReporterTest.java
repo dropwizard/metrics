@@ -140,6 +140,54 @@ public class ConsoleReporterTest {
     }
 
     @Test
+    public void reportsDoubleHistogramValues() throws Exception {
+        final DoubleHistogram histogram = mock(DoubleHistogram.class);
+        when(histogram.getCount()).thenReturn(1L);
+
+        final DoubleSnapshot snapshot = mock(DoubleSnapshot.class);
+        when(snapshot.getMax()).thenReturn(23.0D);
+        when(snapshot.getMean()).thenReturn(3.0);
+        when(snapshot.getMin()).thenReturn(4.2D);
+        when(snapshot.getStdDev()).thenReturn(5.0);
+        when(snapshot.getMedian()).thenReturn(6.0);
+        when(snapshot.get75thPercentile()).thenReturn(7.0);
+        when(snapshot.get95thPercentile()).thenReturn(8.0);
+        when(snapshot.get98thPercentile()).thenReturn(9.0);
+        when(snapshot.get99thPercentile()).thenReturn(10.0);
+        when(snapshot.get999thPercentile()).thenReturn(11.0);
+
+        when(histogram.getSnapshot()).thenReturn(snapshot);
+
+        reporter.report(map(),
+                map(),
+                map(),
+                map("test.histogram", histogram),
+                map(),
+                map());
+
+        assertThat(consoleOutput())
+                .isEqualTo(lines(
+                        dateHeader,
+                        "",
+                        "-- Double Histograms -----------------------------------------------------------",
+                        "test.histogram",
+                        "             count = 1",
+                        "               min = 4.200000",
+                        "               max = 23.000000",
+                        "              mean = 3.00",
+                        "            stddev = 5.00",
+                        "            median = 6.00",
+                        "              75% <= 7.00",
+                        "              95% <= 8.00",
+                        "              98% <= 9.00",
+                        "              99% <= 10.00",
+                        "            99.9% <= 11.00",
+                        "",
+                        ""
+                ));
+    }
+
+    @Test
     public void reportsMeterValues() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);

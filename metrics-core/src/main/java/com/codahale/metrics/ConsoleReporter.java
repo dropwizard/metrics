@@ -228,6 +228,17 @@ public class ConsoleReporter extends ScheduledReporter {
                        SortedMap<String, Histogram> histograms,
                        SortedMap<String, Meter> meters,
                        SortedMap<String, Timer> timers) {
+        report(gauges, counters, histograms, Collections.emptySortedMap(), meters, timers);
+    }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public void report(SortedMap<String, Gauge> gauges,
+                       SortedMap<String, Counter> counters,
+                       SortedMap<String, Histogram> histograms,
+                       SortedMap<String, DoubleHistogram> doubleHistograms,
+                       SortedMap<String, Meter> meters,
+                       SortedMap<String, Timer> timers) {
         final String dateTime = dateFormat.format(new Date(clock.getTime()));
         printWithBanner(dateTime, '=');
         output.println();
@@ -255,6 +266,15 @@ public class ConsoleReporter extends ScheduledReporter {
             for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
                 output.println(entry.getKey());
                 printHistogram(entry.getValue());
+            }
+            output.println();
+        }
+
+        if (!doubleHistograms.isEmpty()) {
+            printWithBanner("-- Double Histograms", '-');
+            for (Map.Entry<String, DoubleHistogram> entry : doubleHistograms.entrySet()) {
+                output.println(entry.getKey());
+                printDoubleHistogram(entry.getValue());
             }
             output.println();
         }
@@ -302,6 +322,21 @@ public class ConsoleReporter extends ScheduledReporter {
         Snapshot snapshot = histogram.getSnapshot();
         printIfEnabled(MetricAttribute.MIN, String.format(locale, "               min = %d", snapshot.getMin()));
         printIfEnabled(MetricAttribute.MAX, String.format(locale, "               max = %d", snapshot.getMax()));
+        printIfEnabled(MetricAttribute.MEAN, String.format(locale, "              mean = %2.2f", snapshot.getMean()));
+        printIfEnabled(MetricAttribute.STDDEV, String.format(locale, "            stddev = %2.2f", snapshot.getStdDev()));
+        printIfEnabled(MetricAttribute.P50, String.format(locale, "            median = %2.2f", snapshot.getMedian()));
+        printIfEnabled(MetricAttribute.P75, String.format(locale, "              75%% <= %2.2f", snapshot.get75thPercentile()));
+        printIfEnabled(MetricAttribute.P95, String.format(locale, "              95%% <= %2.2f", snapshot.get95thPercentile()));
+        printIfEnabled(MetricAttribute.P98, String.format(locale, "              98%% <= %2.2f", snapshot.get98thPercentile()));
+        printIfEnabled(MetricAttribute.P99, String.format(locale, "              99%% <= %2.2f", snapshot.get99thPercentile()));
+        printIfEnabled(MetricAttribute.P999, String.format(locale, "            99.9%% <= %2.2f", snapshot.get999thPercentile()));
+    }
+
+    private void printDoubleHistogram(DoubleHistogram histogram) {
+        printIfEnabled(MetricAttribute.COUNT, String.format(locale, "             count = %d", histogram.getCount()));
+        DoubleSnapshot snapshot = histogram.getSnapshot();
+        printIfEnabled(MetricAttribute.MIN, String.format(locale, "               min = %f", snapshot.getMin()));
+        printIfEnabled(MetricAttribute.MAX, String.format(locale, "               max = %f", snapshot.getMax()));
         printIfEnabled(MetricAttribute.MEAN, String.format(locale, "              mean = %2.2f", snapshot.getMean()));
         printIfEnabled(MetricAttribute.STDDEV, String.format(locale, "            stddev = %2.2f", snapshot.getStdDev()));
         printIfEnabled(MetricAttribute.P50, String.format(locale, "            median = %2.2f", snapshot.getMedian()));

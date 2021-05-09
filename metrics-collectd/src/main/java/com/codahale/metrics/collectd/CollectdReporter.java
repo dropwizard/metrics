@@ -2,6 +2,8 @@ package com.codahale.metrics.collectd;
 
 import com.codahale.metrics.Clock;
 import com.codahale.metrics.Counter;
+import com.codahale.metrics.DoubleHistogram;
+import com.codahale.metrics.DoubleSnapshot;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
@@ -211,8 +213,21 @@ public class CollectdReporter extends ScheduledReporter {
 
     @Override
     @SuppressWarnings("rawtypes")
-    public void report(SortedMap<String, Gauge> gauges, SortedMap<String, Counter> counters,
-            SortedMap<String, Histogram> histograms, SortedMap<String, Meter> meters, SortedMap<String, Timer> timers) {
+    public void report(SortedMap<String, Gauge> gauges,
+                       SortedMap<String, Counter> counters,
+                       SortedMap<String, Histogram> histograms,
+                       SortedMap<String, Meter> meters,
+                       SortedMap<String, Timer> timers) {
+        report(gauges, counters, histograms, Collections.emptySortedMap(), meters, timers);
+    }
+    @Override
+    @SuppressWarnings("rawtypes")
+    public void report(SortedMap<String, Gauge> gauges,
+                       SortedMap<String, Counter> counters,
+                       SortedMap<String, Histogram> histograms,
+                       SortedMap<String, DoubleHistogram> doubleHistograms,
+                       SortedMap<String, Meter> meters,
+                       SortedMap<String, Timer> timers) {
         MetaData.Builder metaData = new MetaData.Builder(sanitize, hostName, clock.getTime() / 1000, period)
                 .type(COLLECTD_TYPE_GAUGE);
         try {
@@ -225,6 +240,9 @@ public class CollectdReporter extends ScheduledReporter {
             }
             for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
                 serializeHistogram(metaData.plugin(entry.getKey()), entry.getValue());
+            }
+            for (Map.Entry<String, DoubleHistogram> entry : doubleHistograms.entrySet()) {
+                serializeDoubleHistogram(metaData.plugin(entry.getKey()), entry.getValue());
             }
             for (Map.Entry<String, Meter> entry : meters.entrySet()) {
                 serializeMeter(metaData.plugin(entry.getKey()), entry.getValue());
@@ -307,6 +325,21 @@ public class CollectdReporter extends ScheduledReporter {
         writeValue(metaData, MAX, (double) snapshot.getMax());
         writeValue(metaData, MEAN, snapshot.getMean());
         writeValue(metaData, MIN, (double) snapshot.getMin());
+        writeValue(metaData, STDDEV, snapshot.getStdDev());
+        writeValue(metaData, P50, snapshot.getMedian());
+        writeValue(metaData, P75, snapshot.get75thPercentile());
+        writeValue(metaData, P95, snapshot.get95thPercentile());
+        writeValue(metaData, P98, snapshot.get98thPercentile());
+        writeValue(metaData, P99, snapshot.get99thPercentile());
+        writeValue(metaData, P999, snapshot.get999thPercentile());
+    }
+
+    private void serializeDoubleHistogram(MetaData.Builder metaData, DoubleHistogram metric) {
+        final DoubleSnapshot snapshot = metric.getSnapshot();
+        writeValue(metaData, COUNT, (double) metric.getCount());
+        writeValue(metaData, MAX, snapshot.getMax());
+        writeValue(metaData, MEAN, snapshot.getMean());
+        writeValue(metaData, MIN, snapshot.getMin());
         writeValue(metaData, STDDEV, snapshot.getStdDev());
         writeValue(metaData, P50, snapshot.getMedian());
         writeValue(metaData, P75, snapshot.get75thPercentile());

@@ -2,6 +2,8 @@ package com.codahale.metrics.graphite;
 
 import com.codahale.metrics.Clock;
 import com.codahale.metrics.Counter;
+import com.codahale.metrics.DoubleHistogram;
+import com.codahale.metrics.DoubleSnapshot;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
@@ -13,6 +15,7 @@ import com.codahale.metrics.Timer;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.mockito.verification.VerificationMode;
 
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
@@ -28,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -302,6 +306,52 @@ public class GraphiteReporterTest {
         inOrder.verify(graphite).send("prefix.histogram.max", "2", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.mean", "3.00", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.min", "4", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.stddev", "5.00", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p50", "6.00", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p75", "7.00", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p95", "8.00", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p98", "9.00", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p99", "10.00", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.p999", "11.00", timestamp);
+        inOrder.verify(graphite).flush();
+        inOrder.verify(graphite).close();
+
+        verifyNoMoreInteractions(graphite);
+    }
+
+
+    @Test
+    public void reportsDoubleHistograms() throws Exception {
+        final DoubleHistogram histogram = mock(DoubleHistogram.class);
+        when(histogram.getCount()).thenReturn(1L);
+
+        final DoubleSnapshot snapshot = mock(DoubleSnapshot.class);
+        when(snapshot.getMax()).thenReturn(23.0D);
+        when(snapshot.getMean()).thenReturn(3.0);
+        when(snapshot.getMin()).thenReturn(4.2D);
+        when(snapshot.getStdDev()).thenReturn(5.0);
+        when(snapshot.getMedian()).thenReturn(6.0);
+        when(snapshot.get75thPercentile()).thenReturn(7.0);
+        when(snapshot.get95thPercentile()).thenReturn(8.0);
+        when(snapshot.get98thPercentile()).thenReturn(9.0);
+        when(snapshot.get99thPercentile()).thenReturn(10.0);
+        when(snapshot.get999thPercentile()).thenReturn(11.0);
+
+        when(histogram.getSnapshot()).thenReturn(snapshot);
+
+        reporter.report(map(),
+                map(),
+                map(),
+                map("histogram", histogram),
+                map(),
+                map());
+
+        final InOrder inOrder = inOrder(graphite);
+        inOrder.verify(graphite).connect();
+        inOrder.verify(graphite).send("prefix.histogram.count", "1", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.max", "23.00", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.mean", "3.00", timestamp);
+        inOrder.verify(graphite).send("prefix.histogram.min", "4.20", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.stddev", "5.00", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.p50", "6.00", timestamp);
         inOrder.verify(graphite).send("prefix.histogram.p75", "7.00", timestamp);
