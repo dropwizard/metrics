@@ -162,7 +162,7 @@ public class InstrumentedHttpAsyncClientsTest {
         client.start();
 
         final SimpleHttpRequest request = SimpleHttpRequests.get("http://localhost:" + httpServer.getAddress().getPort() + "/");
-        final String metricName = "some.made.up.metric.name";
+        final MetricName metricName = MetricName.build("some.made.up.metric.name");
 
         httpServer.createContext("/", exchange -> {
             exchange.sendResponseHeaders(200, 0L);
