@@ -373,7 +373,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
-                    <argLine>-Djava.net.preferIPv4Stack=true</argLine>
+                    <argLine>@{argLine} -Djava.net.preferIPv4Stack=true</argLine>
                 </configuration>
             </plugin>
             <plugin>
