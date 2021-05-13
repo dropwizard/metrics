@@ -122,13 +122,13 @@ public class InstrumentedExecutorServiceTest {
         completed = registry.meter("tp.completed");
         duration = registry.timer("tp.duration");
         idle = registry.timer("tp.idle");
-        final Gauge<Integer> poolSize = (Gauge<Integer>) registry.getGauges().get("tp.pool.size");
-        final Gauge<Integer> poolCoreSize = (Gauge<Integer>) registry.getGauges().get("tp.pool.core");
-        final Gauge<Integer> poolMaxSize = (Gauge<Integer>) registry.getGauges().get("tp.pool.max");
-        final Gauge<Integer> tasksActive = (Gauge<Integer>) registry.getGauges().get("tp.tasks.active");
-        final Gauge<Long> tasksCompleted = (Gauge<Long>) registry.getGauges().get("tp.tasks.completed");
-        final Gauge<Integer> tasksQueued = (Gauge<Integer>) registry.getGauges().get("tp.tasks.queued");
-        final Gauge<Integer> tasksCapacityRemaining = (Gauge<Integer>) registry.getGauges().get("tp.tasks.capacity");
+        final Gauge<Integer> poolSize = (Gauge<Integer>) registry.getGauges().get(MetricName.build("tp", "pool", "size"));
+        final Gauge<Integer> poolCoreSize = (Gauge<Integer>) registry.getGauges().get(MetricName.build("tp", "pool", "core"));
+        final Gauge<Integer> poolMaxSize = (Gauge<Integer>) registry.getGauges().get(MetricName.build("tp", "pool", "max"));
+        final Gauge<Integer> tasksActive = (Gauge<Integer>) registry.getGauges().get(MetricName.build("tp", "tasks", "active"));
+        final Gauge<Long> tasksCompleted = (Gauge<Long>) registry.getGauges().get(MetricName.build("tp", "tasks", "completed"));
+        final Gauge<Integer> tasksQueued = (Gauge<Integer>) registry.getGauges().get(MetricName.build("tp", "tasks", "queued"));
+        final Gauge<Integer> tasksCapacityRemaining = (Gauge<Integer>) registry.getGauges().get(MetricName.build("tp", "tasks", "capacity"));
 
         assertThat(submitted.getCount()).isEqualTo(0);
         assertThat(running.getCount()).isEqualTo(0);
@@ -177,10 +177,10 @@ public class InstrumentedExecutorServiceTest {
         completed = registry.meter("fjp.completed");
         duration = registry.timer("fjp.duration");
         idle = registry.timer("fjp.idle");
-        final Gauge<Long> tasksStolen = (Gauge<Long>) registry.getGauges().get("fjp.tasks.stolen");
-        final Gauge<Long> tasksQueued = (Gauge<Long>) registry.getGauges().get("fjp.tasks.queued");
-        final Gauge<Integer> threadsActive = (Gauge<Integer>) registry.getGauges().get("fjp.threads.active");
-        final Gauge<Integer> threadsRunning = (Gauge<Integer>) registry.getGauges().get("fjp.threads.running");
+        final Gauge<Long> tasksStolen = (Gauge<Long>) registry.getGauges().get(MetricName.build("fjp", "tasks", "stolen"));
+        final Gauge<Long> tasksQueued = (Gauge<Long>) registry.getGauges().get(MetricName.build("fjp", "tasks", "queued"));
+        final Gauge<Integer> threadsActive = (Gauge<Integer>) registry.getGauges().get(MetricName.build("fjp", "threads", "active"));
+        final Gauge<Integer> threadsRunning = (Gauge<Integer>) registry.getGauges().get(MetricName.build("fjp", "threads", "running"));
 
         assertThat(submitted.getCount()).isEqualTo(0);
         assertThat(running.getCount()).isEqualTo(0);
