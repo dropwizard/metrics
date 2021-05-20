@@ -1,99 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/index.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/index.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/about/release-notes.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/about/release-notes.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/about/index.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/about/index.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/about/contributors.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/about/contributors.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/jersey.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/jersey.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/jdbi.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/jdbi.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/index.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/index.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/healthchecks.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/healthchecks.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/json.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/json.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/jetty.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/jetty.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/core.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/core.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/graphite.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/graphite.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/jvm.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/jvm.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/servlets.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/servlets.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/httpclient.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/httpclient.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/ehcache.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/ehcache.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/third-party.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/third-party.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/collectd.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/collectd.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/logback.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/logback.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/servlet.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/servlet.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/manual/log4j.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/manual/log4j.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/getting-started.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/getting-started.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/genindex.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/genindex.html</loc>
     <changefreq>never</changefreq>
   </url>
   <url>
-    <loc>https://metrics.dropwizard.io/4.1.22/search.html</loc>
+    <loc>https://metrics.dropwizard.io/4.2.0/search.html</loc>
     <changefreq>never</changefreq>
   </url>
 </urlset>

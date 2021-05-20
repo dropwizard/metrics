@@ -1,0 +1,405 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Metrics Servlets | Metrics</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="../_static/metrics.css" type="text/css"/>
+    <link rel="top" title="Metrics" href="../index.html"/>
+    <link rel="up" title="User Manual" href="index.html"/>
+    <link rel="next" title="Instrumenting Web Applications" href="servlet.html"/>
+    <link rel="prev" title="JSON Support" href="json.html"/>
+    <style lang="text/css">
+        #top-bar, #top-bar small, #top-bar a {
+            text-shadow: 0px -1px 0px #cf2c0f;
+            color: #fff;
+        }
+        
+        #top-bar {
+            background-color: #ED4A2D;
+            background-image: -moz-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -ms-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ff684b), to(#cf2c0f));
+            background-image: -webkit-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: -o-linear-gradient(top, #ff684b, #cf2c0f);
+            background-image: linear-gradient(top, #ff684b, #cf2c0f);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ff684b', endColorstr = '#cf2c0f', GradientType = 0);
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0;
+        }
+
+
+        .hero-unit {
+            background-image: url("../_static/metrics-hat.png") !important;
+            background-repeat: no-repeat !important;
+            background-position: 30px 50px;
+        }
+
+        .hero-unit div.section {
+            padding-left: 200px !important;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://github.com/dropwizard/metrics">
+        <img style="position: absolute; top: 0; right: 0; border: 0;"
+             src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"
+             alt="Fork me on GitHub"></a>
+    <div class="navbar">
+        <div class="navbar-inner container-fluid" id="top-bar">
+            <header class="row-fluid">
+                <h1 class="span12" id="title"><img class="logo" src="../_static/metrics-logo.png" alt="Logo"/>
+                    <a href="../index.html">Metrics</a>
+                    <small>Mind the gap.</small>
+                </h1>
+            </header>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span3" id="sidebar">
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">User Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="core.html">Metrics Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="healthchecks.html">Health Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ehcache.html">Instrumenting Ehcache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caffeine.html">Instrumenting Caffeine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="collectd.html">Reporting to Collectd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graphite.html">Reporting to Graphite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="httpclient.html">Instrumenting Apache HttpClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jdbi.html">Instrumenting JDBI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jersey.html">Instrumenting Jersey 2.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jetty.html">Instrumenting Jetty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="log4j.html">Instrumenting Log4j</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logback.html">Instrumenting Logback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jvm.html">JVM Instrumentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="json.html">JSON Support</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Metrics Servlets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#healthcheckservlet">HealthCheckServlet</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#http-status-codes">HTTP Status Codes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#servlet-context">Servlet Context</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#initialization-parameters">Initialization Parameters</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#query-parameters">Query Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#threaddumpservlet">ThreadDumpServlet</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Configuration</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#id2">Query Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#metricsservlet">MetricsServlet</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Configuration</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#id4">Servlet Context</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#id5">Initialization Parameters</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#id6">Query Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pingservlet">PingServlet</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cpuprofileservlet">CpuProfileServlet</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id7">Configuration</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#id8">Query Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#adminservlet">AdminServlet</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id9">Configuration</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#id10">Initialization Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="servlet.html">Instrumenting Web Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="third-party.html">Third Party Libraries</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about/index.html">About Metrics</a></li>
+</ul>
+
+                <hr/>
+                <ul>
+                    <li><a href="https://www.javadoc.io/doc/io.dropwizard.metrics/metrics-core/4.2.0/">Javadoc</a></li>
+                    <li><a href="https://groups.google.com/forum/#!forum/metrics-user">Mailing List</a></li>
+                </ul>
+            </div>
+            <div class="span9" id="body">
+                
+  <div class="section" id="metrics-servlets">
+<span id="manual-servlets"></span><h1>Metrics Servlets</h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">metrics-servlets</span></code> module provides a handful of useful servlets:</p>
+<div class="section" id="healthcheckservlet">
+<span id="man-servlet-healthcheck"></span><h2>HealthCheckServlet</h2>
+<p><code class="docutils literal notranslate"><span class="pre">HealthCheckServlet</span></code> responds to <code class="docutils literal notranslate"><span class="pre">GET</span></code> requests by running all the currently-registered
+[health checks](#health-checks). The results are returned as a human-readable JSON entity.</p>
+<div class="section" id="http-status-codes">
+<h3>HTTP Status Codes</h3>
+<p><code class="docutils literal notranslate"><span class="pre">HealthCheckServlet</span></code> responds with one of the following status codes (depending on configuration).
+If reporting health via HTTP status is disabled, callers will have to introspect the JSON to
+determine application health.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">501</span> <span class="pre">Not</span> <span class="pre">Implemented</span></code>: If no health checks are registered</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>: If all checks pass, or if <code class="docutils literal notranslate"><span class="pre">httpStatusIndicator</span></code> is set to <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code> and one or more
+health checks fail (see below for more information on this setting)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Service</span> <span class="pre">Error</span></code>: If <code class="docutils literal notranslate"><span class="pre">httpStatusIndicator</span></code> is set to <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code> and one or more
+health checks fail (see below for more information on this setting)</p></li>
+</ul>
+</div>
+<div class="section" id="configuration">
+<h3>Configuration</h3>
+<p><code class="docutils literal notranslate"><span class="pre">HealthCheckServlet</span></code> supports the following configuration items.</p>
+<div class="section" id="servlet-context">
+<h4>Servlet Context</h4>
+<p><code class="docutils literal notranslate"><span class="pre">HealthCheckServlet</span></code> requires that the servlet context has a <code class="docutils literal notranslate"><span class="pre">HealthCheckRegistry</span></code> named
+<code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.HealthCheckServlet.registry</span></code>. You can subclass
+<code class="docutils literal notranslate"><span class="pre">HealthCheckServlet.ContextListener</span></code>, which will add a specific <code class="docutils literal notranslate"><span class="pre">HealthCheckRegistry</span></code> to the
+servlet context.</p>
+<p>An instance of <code class="docutils literal notranslate"><span class="pre">ExecutorService</span></code> can be provided via the servlet context using the name
+<code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.HealthCheckServlet.executor</span></code>; by default, no thread pool is used to
+execute the health checks.</p>
+<p>An instance of <code class="docutils literal notranslate"><span class="pre">HealthCheckFilter</span></code> can be provided via the servlet context using the name
+<code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.HealthCheckServlet.healthCheckFilter</span></code>; by default, no filtering is
+enabled. The filter is used to determine which health checks to include in the health status.</p>
+<p>An instance of <code class="docutils literal notranslate"><span class="pre">ObjectMapper</span></code> can be provided via the servlet context using the name
+<code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.HealthCheckServlet.mapper</span></code>; if none is provided, a default instance
+will be used to convert the health check results to JSON.</p>
+</div>
+<div class="section" id="initialization-parameters">
+<h4>Initialization Parameters</h4>
+<p><code class="docutils literal notranslate"><span class="pre">HealthCheckServlet</span></code> supports the following initialization parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.HealthCheckServlet.httpStatusIndicator</span></code>: Provides the</p></li>
+</ul>
+<p>default setting that determines whether the HTTP status code is used to determine whether the
+application is healthy; if not provided, it defaults to <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code></p>
+</div>
+<div class="section" id="query-parameters">
+<h4>Query Parameters</h4>
+<p><code class="docutils literal notranslate"><span class="pre">HealthCheckServlet</span></code> supports the following query parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">httpStatusIndicator</span></code> (<code class="docutils literal notranslate"><span class="pre">Boolean</span></code>): Determines whether the HTTP status code is used to
+determine whether the application is healthy; if not provided, it defaults to the value from the
+initialization parameter</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pretty</span></code> (<code class="docutils literal notranslate"><span class="pre">Boolean</span></code>): Indicates whether the JSON response should be formatted; if
+<code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code>, the JSON response will be formatted instead of condensed</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="threaddumpservlet">
+<span id="man-servlet-threaddump"></span><h2>ThreadDumpServlet</h2>
+<p><code class="docutils literal notranslate"><span class="pre">ThreadDumpServlet</span></code> responds to <code class="docutils literal notranslate"><span class="pre">GET</span></code> requests with a <code class="docutils literal notranslate"><span class="pre">text/plain</span></code> representation of all the live
+threads in the JVM, their states, their stack traces, and the state of any locks they may be
+waiting for.</p>
+<div class="section" id="id1">
+<h3>Configuration</h3>
+<p><code class="docutils literal notranslate"><span class="pre">ThreadDumpServlet</span></code> supports the following configuration items.</p>
+<div class="section" id="id2">
+<h4>Query Parameters</h4>
+<p><code class="docutils literal notranslate"><span class="pre">ThreadDumpServlet</span></code> supports the following query parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">monitors</span></code> (<code class="docutils literal notranslate"><span class="pre">Boolean</span></code>): Determines whether locked monitors are included; if not provided,
+it defaults to <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">synchronizers</span></code> (<code class="docutils literal notranslate"><span class="pre">Boolean</span></code>): Determines whether locked ownable synchronizers are included;
+if not provided, it defaults to <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code></p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="metricsservlet">
+<span id="man-servlet-metrics"></span><h2>MetricsServlet</h2>
+<p><code class="docutils literal notranslate"><span class="pre">MetricsServlet</span></code> exposes the state of the metrics in a particular registry as a JSON object.</p>
+<div class="section" id="id3">
+<h3>Configuration</h3>
+<p><code class="docutils literal notranslate"><span class="pre">MetricsServlet</span></code> supports the following configuration items.</p>
+<div class="section" id="id4">
+<h4>Servlet Context</h4>
+<p><code class="docutils literal notranslate"><span class="pre">MetricsServlet</span></code> requires that the servlet context has a <code class="docutils literal notranslate"><span class="pre">MetricRegistry</span></code> named
+<code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.MetricsServlet.registry</span></code>. You can subclass
+<code class="docutils literal notranslate"><span class="pre">MetricsServlet.ContextListener</span></code>, which will add a specific <code class="docutils literal notranslate"><span class="pre">MetricRegistry</span></code> to the servlet
+context.</p>
+<p>An instance of <code class="docutils literal notranslate"><span class="pre">MetricFilter</span></code> can be provided via the servlet context using the name
+<code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.MetricsServlet.metricFilter</span></code>; by default, no filtering is
+enabled. The filter is used to determine which metrics to include in the JSON output.</p>
+</div>
+<div class="section" id="id5">
+<h4>Initialization Parameters</h4>
+<p><code class="docutils literal notranslate"><span class="pre">MetricsServlet</span></code> supports the following initialization parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.MetricsServlet.allowedOrigin</span></code>: Provides a value for the
+response header <code class="docutils literal notranslate"><span class="pre">Access-Control-Allow-Origin</span></code>; if no value is provided, the header is not used</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.MetricsServlet.jsonpCalblack</span></code>: Specifies a request parameter
+name to use as the callback when returning the metrics as JSON-P; if no value is provided, the response is
+returned as JSON. This also requires a query parameter with the same name as the value to enable a JSON-P
+response.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.MetricsServlet.rateUnit</span></code>: Provides a value for the
+rate unit used for metrics output; if none is provided, the default is <code class="docutils literal notranslate"><span class="pre">SECONDS</span></code> (see <code class="docutils literal notranslate"><span class="pre">TimeUnit</span></code> for
+acceptable values)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.MetricsServlet.durationUnit</span></code>: Provides a value for the
+duration unit used for metrics output; if none is provided, the default is <code class="docutils literal notranslate"><span class="pre">SECONDS</span></code> (see <code class="docutils literal notranslate"><span class="pre">TimeUnit</span></code> for
+acceptable values)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.MetricsServlet.showSamples</span></code>: Controls whether sample data is
+included in the output for histograms and timers; if no value is provided, the sample data will be omitted.</p></li>
+</ul>
+</div>
+<div class="section" id="id6">
+<h4>Query Parameters</h4>
+<p><code class="docutils literal notranslate"><span class="pre">MetricsServlet</span></code> supports the following query parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pretty</span></code> (<code class="docutils literal notranslate"><span class="pre">Boolean</span></code>): Determines whether the results are formatted; if not provided, this
+parameter defaults to <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code>.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="pingservlet">
+<span id="man-servlet-ping"></span><h2>PingServlet</h2>
+<p><code class="docutils literal notranslate"><span class="pre">PingServlet</span></code> responds to <code class="docutils literal notranslate"><span class="pre">GET</span></code> requests with a <code class="docutils literal notranslate"><span class="pre">text/plain</span></code>/<code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> response of <code class="docutils literal notranslate"><span class="pre">pong</span></code>. This is
+useful for determining liveness for load balancers, etc.</p>
+</div>
+<div class="section" id="cpuprofileservlet">
+<span id="man-servlet-cpu-profile"></span><h2>CpuProfileServlet</h2>
+<p><code class="docutils literal notranslate"><span class="pre">CpuProfileServlet</span></code> responds to <code class="docutils literal notranslate"><span class="pre">GET</span></code> requests with a <code class="docutils literal notranslate"><span class="pre">pprof/raw</span></code>/<code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> response containing the
+results of CPU profiling.</p>
+<div class="section" id="id7">
+<h3>Configuration</h3>
+<p><code class="docutils literal notranslate"><span class="pre">CpuProfileServlet</span></code> supports the following configuration items.</p>
+<div class="section" id="id8">
+<h4>Query Parameters</h4>
+<p><code class="docutils literal notranslate"><span class="pre">CpuProfileServlet</span></code> supports the following query parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">duration</span></code> (<code class="docutils literal notranslate"><span class="pre">Integer</span></code>): Determines the amount of time in seconds for which the CPU
+profiling will occur; the default is 10 seconds.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frequency</span></code> (<code class="docutils literal notranslate"><span class="pre">Integer</span></code>)Determines the frequency in Hz at which the CPU
+profiling sample; the default is 100 Hz (100 times per second).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">state</span></code> (<code class="docutils literal notranslate"><span class="pre">String</span></code>): Determines which threads will be profiled. If the value provided
+is <code class="docutils literal notranslate"><span class="pre">&quot;blocked&quot;</span></code>, only blocked threads will be profiled; otherwise, all runnable threads will be
+profiled.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="adminservlet">
+<span id="man-servlet-admin"></span><h2>AdminServlet</h2>
+<p><code class="docutils literal notranslate"><span class="pre">AdminServlet</span></code> aggregates <code class="docutils literal notranslate"><span class="pre">HealthCheckServlet</span></code>, <code class="docutils literal notranslate"><span class="pre">ThreadDumpServlet</span></code>, <code class="docutils literal notranslate"><span class="pre">MetricsServlet</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">PingServlet</span></code> into a single, easy-to-use servlet which provides a set of URIs:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/</span></code>: an HTML admin menu with links to the following:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/metrics</span></code>: <code class="docutils literal notranslate"><span class="pre">MetricsServlet</span></code>
+* To change the URI, set the</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/ping</span></code>: <code class="docutils literal notranslate"><span class="pre">PingServlet</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/threads</span></code>: <code class="docutils literal notranslate"><span class="pre">ThreadDumpServlet</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/healthcheck</span></code>: <code class="docutils literal notranslate"><span class="pre">HealthCheckServlet</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/pprof</span></code>: <code class="docutils literal notranslate"><span class="pre">CpuProfileServlet</span></code>
+* There will be two links; one for the base profile and one for CPU contention</p></li>
+</ul>
+</li>
+</ul>
+<p>You will need to add your <code class="docutils literal notranslate"><span class="pre">MetricRegistry</span></code> and <code class="docutils literal notranslate"><span class="pre">HealthCheckRegistry</span></code> instances to the servlet
+context as attributes named <code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.MetricsServlet.registry</span></code> and
+<code class="docutils literal notranslate"><span class="pre">com.codahale.metrics.servlets.HealthCheckServlet.registry</span></code>, respectively. You can do this using
+the Servlet API by extending <code class="docutils literal notranslate"><span class="pre">MetricsServlet.ContextListener</span></code> for MetricRegistry:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyMetricsServletContextListener</span> <span class="kd">extends</span> <span class="n">MetricsServlet</span><span class="p">.</span><span class="na">ContextListener</span> <span class="p">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">MetricRegistry</span> <span class="n">METRIC_REGISTRY</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MetricRegistry</span><span class="p">();</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="n">MetricRegistry</span> <span class="nf">getMetricRegistry</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">METRIC_REGISTRY</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>And by extending <code class="docutils literal notranslate"><span class="pre">HealthCheckServlet.ContextListener</span></code> for HealthCheckRegistry:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyHealthCheckServletContextListener</span> <span class="kd">extends</span> <span class="n">HealthCheckServlet</span><span class="p">.</span><span class="na">ContextListener</span> <span class="p">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">HealthCheckRegistry</span> <span class="n">HEALTH_CHECK_REGISTRY</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HealthCheckRegistry</span><span class="p">();</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="n">HealthCheckRegistry</span> <span class="nf">getHealthCheckRegistry</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">HEALTH_CHECK_REGISTRY</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Then you will need to register servlet context listeners either in you <code class="docutils literal notranslate"><span class="pre">web.xml</span></code> or annotating the class
+with <code class="docutils literal notranslate"><span class="pre">&#64;WebListener</span></code> if you are in servlet 3.0 environment. In <code class="docutils literal notranslate"><span class="pre">web.xml</span></code>:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;listener&gt;</span>
+        <span class="nt">&lt;listener-class&gt;</span>com.example.MyMetricsServletContextListener<span class="nt">&lt;/listener-class&gt;</span>
+<span class="nt">&lt;/listener&gt;</span>
+<span class="nt">&lt;listener&gt;</span>
+        <span class="nt">&lt;listener-class&gt;</span>com.example.MyHealthCheckServletContextListener<span class="nt">&lt;/listener-class&gt;</span>
+<span class="nt">&lt;/listener&gt;</span>
+</pre></div>
+</div>
+<p>You will also need to register <code class="docutils literal notranslate"><span class="pre">AdminServlet</span></code> in <code class="docutils literal notranslate"><span class="pre">web.xml</span></code>:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;servlet&gt;</span>
+        <span class="nt">&lt;servlet-name&gt;</span>metrics<span class="nt">&lt;/servlet-name&gt;</span>
+        <span class="nt">&lt;servlet-class&gt;</span>com.codahale.metrics.servlets.AdminServlet<span class="nt">&lt;/servlet-class&gt;</span>
+<span class="nt">&lt;/servlet&gt;</span>
+<span class="nt">&lt;servlet-mapping&gt;</span>
+        <span class="nt">&lt;servlet-name&gt;</span>metrics<span class="nt">&lt;/servlet-name&gt;</span>
+        <span class="nt">&lt;url-pattern&gt;</span>/metrics/*<span class="nt">&lt;/url-pattern&gt;</span>
+<span class="nt">&lt;/servlet-mapping&gt;</span>
+</pre></div>
+</div>
+<div class="section" id="id9">
+<h3>Configuration</h3>
+<p><code class="docutils literal notranslate"><span class="pre">AdminServlet</span></code> supports the following configuration items.</p>
+<div class="section" id="id10">
+<h4>Initialization Parameters</h4>
+<p><code class="docutils literal notranslate"><span class="pre">AdminServlet</span></code> supports the following initialization parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics-enabled</span></code>: Determines whether the <code class="docutils literal notranslate"><span class="pre">MetricsServlet</span></code> is enabled and
+routable; if <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code>, the servlet endpoint will not be available via this servlet</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics-uri</span></code>: Specifies the URI for the <code class="docutils literal notranslate"><span class="pre">MetricsServlet</span></code>; if omitted, the default
+(<code class="docutils literal notranslate"><span class="pre">/metrics</span></code>) will be used</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ping-enabled</span></code>: Determines whether the <code class="docutils literal notranslate"><span class="pre">PingServlet</span></code> is enabled and routable; if
+<code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code>, the servlet endpoint will not be available via this servlet</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ping-uri</span></code>: Specifies the URI for the <code class="docutils literal notranslate"><span class="pre">PingServlet</span></code>; if omitted, the default
+(<code class="docutils literal notranslate"><span class="pre">/ping</span></code>) will be used</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">threads-enabled</span></code>: Determines whether the <code class="docutils literal notranslate"><span class="pre">ThreadDumpServlet</span></code> is enabled
+and routable; if <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code>, the servlet endpoint will not be available via this servlet</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">threads-uri</span></code>: Specifies the URI for the <code class="docutils literal notranslate"><span class="pre">ThreadDumpServlet</span></code>; if omitted, the default
+(<code class="docutils literal notranslate"><span class="pre">/threads</span></code>) will be used</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cpu-profile-enabled</span></code>: Determines whether the <code class="docutils literal notranslate"><span class="pre">CpuProfileServlet</span></code> is enabled and routable;
+if <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code>, the servlet endpoints will not be available via this servlet</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cpu-profile-uri</span></code>: Specifies the URIs for the <code class="docutils literal notranslate"><span class="pre">CpuProfileServlet</span></code>; if omitted, the default
+(<code class="docutils literal notranslate"><span class="pre">/pprof</span></code>) will be used</p></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+
+            </div></div>
+        <hr/>
+        <footer>
+            <p style="float: left">
+            &copy; Copyright 2010-2014, Coda Hale, Yammer Inc., 2014-2017 Dropwizard Team.
+            Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>
+            3.4.3.
+            </p>
+            <p style="float: right">Dropwizard Metrics v4.2.0</p>
+        </footer>
+    </div>
+</body>
+</html>
+
+
