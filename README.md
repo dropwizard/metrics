@@ -1,8 +1,8 @@
 Metrics
 ======= 
-[![Java CI](https://github.com/dropwizard/metrics/workflows/Java%20CI/badge.svg)](https://github.com/dropwizard/metrics/actions?query=workflow%3A%22Java+CI%22+branch%3Arelease%2F4.2.x)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.dropwizard.metrics/metrics-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.dropwizard.metrics/metrics-core/)
-[![Javadoc](http://javadoc-badge.appspot.com/io.dropwizard.metrics/metrics-core.svg)](http://www.javadoc.io/doc/io.dropwizard.metrics/metrics-core)
+[![Java CI](https://github.com/dropwizard/metrics/workflows/Java%20CI/badge.svg)](https://github.com/dropwizard/metrics/actions?query=workflow%3A%22Java+CI%22+branch%3Arelease%2F5.0.x)
+[![Maven Central](https://img.shields.io/maven-central/v/io.dropwizard.metrics5/metrics-core/5.0)](https://maven-badges.herokuapp.com/maven-central/io.dropwizard.metrics5/metrics-core/)
+[![Javadoc](http://javadoc-badge.appspot.com/io.dropwizard.metrics5/metrics-core.svg)](http://www.javadoc.io/doc/io.dropwizard.metrics5/metrics-core)
 
 *📈 Capturing JVM- and application-level metrics. So you know what's going on.*
 
