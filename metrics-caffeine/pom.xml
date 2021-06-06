@@ -17,7 +17,6 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.caffeine</javaModuleName>
-        <caffeine.version>2.9.1</caffeine.version>
     </properties>
 
     <dependencyManagement>
@@ -28,6 +27,16 @@
                 <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>2.9.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-qual</artifactId>
+                <version>3.14.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -40,12 +49,10 @@
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
-            <version>${caffeine.version}</version>
         </dependency>
         <dependency>
             <groupId>org.checkerframework</groupId>
             <artifactId>checker-qual</artifactId>
-            <version>3.10.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
