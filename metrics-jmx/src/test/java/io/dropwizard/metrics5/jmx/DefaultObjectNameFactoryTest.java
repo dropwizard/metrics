@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import javax.management.ObjectName;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DefaultObjectNameFactoryTest {
@@ -26,5 +27,15 @@ public class DefaultObjectNameFactoryTest {
         assertThat(on.getKeyProperty("foo")).isEqualTo("bar");
         assertThat(on.getKeyProperty("baz")).isEqualTo("biz");
 
+    }
+
+    @Test
+    public void createsObjectNameWithNameWithDisallowedUnquotedCharacters() {
+        DefaultObjectNameFactory f = new DefaultObjectNameFactory();
+        ObjectName on = f.createName("type", "com.domain", MetricName.build("something.with.quotes(\"ABcd\")").tagged("foo", "bar", "baz", "biz"));
+	assertThatCode(() -> new ObjectName(on.toString())).doesNotThrowAnyException();
+        assertThat(on.getKeyProperty("name")).isEqualTo("\"something.with.quotes(\\\"ABcd\\\")\"");
+        assertThat(on.getKeyProperty("foo")).isEqualTo("bar");
+        assertThat(on.getKeyProperty("baz")).isEqualTo("biz");
     }
 }
