@@ -199,9 +199,9 @@
             </build>
         </profile>
         <profile>
-            <id>jdk16</id>
+            <id>jdk17</id>
             <activation>
-                <jdk>16</jdk>
+                <jdk>[17,)</jdk>
             </activation>
             <build>
                 <plugins>
