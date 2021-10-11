@@ -3,7 +3,7 @@ package com.codahale.metrics;
 import org.junit.Test;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 public class MetricRegistryListenerTest {
     private final Counter counter = mock(Counter.class);
@@ -25,28 +25,28 @@ public class MetricRegistryListenerTest {
     public void noOpsOnCounterAdded() {
         listener.onCounterAdded("blah", counter);
 
-        verifyZeroInteractions(counter);
+        verifyNoInteractions(counter);
     }
 
     @Test
     public void noOpsOnHistogramAdded() {
         listener.onHistogramAdded("blah", histogram);
 
-        verifyZeroInteractions(histogram);
+        verifyNoInteractions(histogram);
     }
 
     @Test
     public void noOpsOnMeterAdded() {
         listener.onMeterAdded("blah", meter);
 
-        verifyZeroInteractions(meter);
+        verifyNoInteractions(meter);
     }
 
     @Test
     public void noOpsOnTimerAdded() {
         listener.onTimerAdded("blah", timer);
 
-        verifyZeroInteractions(timer);
+        verifyNoInteractions(timer);
     }
 
     @Test
