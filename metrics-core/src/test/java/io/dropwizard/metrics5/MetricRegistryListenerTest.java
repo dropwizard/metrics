@@ -3,7 +3,7 @@ package io.dropwizard.metrics5;
 import org.junit.Test;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 public class MetricRegistryListenerTest {
     private static final MetricName BLAH = MetricName.build("blah");
@@ -27,28 +27,28 @@ public class MetricRegistryListenerTest {
     public void noOpsOnCounterAdded() {
         listener.onCounterAdded(BLAH, counter);
 
-        verifyZeroInteractions(counter);
+        verifyNoInteractions(counter);
     }
 
     @Test
     public void noOpsOnHistogramAdded() {
         listener.onHistogramAdded(BLAH, histogram);
 
-        verifyZeroInteractions(histogram);
+        verifyNoInteractions(histogram);
     }
 
     @Test
     public void noOpsOnMeterAdded() {
         listener.onMeterAdded(BLAH, meter);
 
-        verifyZeroInteractions(meter);
+        verifyNoInteractions(meter);
     }
 
     @Test
     public void noOpsOnTimerAdded() {
         listener.onTimerAdded(BLAH, timer);
 
-        verifyZeroInteractions(timer);
+        verifyNoInteractions(timer);
     }
 
     @Test
