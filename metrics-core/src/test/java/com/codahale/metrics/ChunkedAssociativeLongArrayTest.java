@@ -1,8 +1,8 @@
 package com.codahale.metrics;
 
-import static org.assertj.core.api.BDDAssertions.then;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.assertj.core.api.BDDAssertions.then;
 
 public class ChunkedAssociativeLongArrayTest {
 

@@ -2,8 +2,8 @@ package io.dropwizard.metrics.servlets;
 
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.servlet.ServletTester;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,7 +14,7 @@ public class CpuProfileServletTest extends AbstractServletTest {
         tester.addServlet(CpuProfileServlet.class, "/pprof");
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         request.setMethod("GET");
         request.setURI("/pprof?duration=1");

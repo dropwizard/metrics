@@ -6,7 +6,7 @@ import com.codahale.metrics.jdbi.strategies.NameStrategies;
 import com.codahale.metrics.jdbi.strategies.ShortNameStrategy;
 import com.codahale.metrics.jdbi.strategies.SmartNameStrategy;
 import com.codahale.metrics.jdbi.strategies.StatementNameStrategy;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.skife.jdbi.v2.StatementContext;
 
 import java.util.concurrent.TimeUnit;

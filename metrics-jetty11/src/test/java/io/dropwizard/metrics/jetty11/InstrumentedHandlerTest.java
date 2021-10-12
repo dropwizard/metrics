@@ -1,23 +1,23 @@
 package io.dropwizard.metrics.jetty11;
 
 import com.codahale.metrics.MetricRegistry;
-import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.api.ContentResponse;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.api.ContentResponse;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +31,7 @@ public class InstrumentedHandlerTest {
     private final ServerConnector connector = new ServerConnector(server);
     private final InstrumentedHandler handler = new InstrumentedHandler(registry);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         handler.setName("handler");
         handler.setHandler(new TestHandler());
@@ -41,7 +41,7 @@ public class InstrumentedHandlerTest {
         client.start();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         server.stop();
         client.stop();
@@ -110,7 +110,7 @@ public class InstrumentedHandlerTest {
     }
 
     @Test
-    @Ignore("flaky on virtual machines")
+    @Disabled("flaky on virtual machines")
     public void responseTimesAreRecordedForAsyncResponses() throws Exception {
 
         final ContentResponse response = client.GET(uri("/async"));

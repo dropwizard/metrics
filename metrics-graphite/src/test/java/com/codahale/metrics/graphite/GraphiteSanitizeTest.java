@@ -1,7 +1,7 @@
 package com.codahale.metrics.graphite;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class GraphiteSanitizeTest {
     @Test

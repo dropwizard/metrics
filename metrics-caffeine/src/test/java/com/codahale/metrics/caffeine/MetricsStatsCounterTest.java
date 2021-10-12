@@ -15,15 +15,15 @@
  */
 package com.codahale.metrics.caffeine;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-
 import com.codahale.metrics.MetricRegistry;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * An example of exporting stats to Dropwizard Metrics (http://metrics.dropwizard.io).
@@ -38,7 +38,7 @@ public final class MetricsStatsCounterTest {
   private MetricsStatsCounter stats;
   private MetricRegistry registry;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     registry = new MetricRegistry();
     stats = new MetricsStatsCounter(registry, PREFIX);

@@ -1,37 +1,24 @@
 package com.codahale.metrics;
 
-import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
 
-@RunWith(value = Parameterized.class)
 public class MeterApproximationTest {
 
-    @Parameters
-    public static Collection<Object[]> ratesPerMinute() {
-        Object[][] data = new Object[][]{
-                {15}, {60}, {600}, {6000}
-        };
-        return Arrays.asList(data);
+    public static LongStream ratesPerMinute() {
+        return LongStream.of(15, 60, 600, 6000);
     }
 
-    private final long ratePerMinute;
-
-    public MeterApproximationTest(long ratePerMinute) {
-        this.ratePerMinute = ratePerMinute;
-    }
-
-    @Test
-    public void controlMeter1MinuteMeanApproximation() {
-        final Meter meter = simulateMetronome(
+    @ParameterizedTest
+    @MethodSource("ratesPerMinute")
+    public void controlMeter1MinuteMeanApproximation(long ratePerMinute) {
+        final Meter meter = simulateMetronome(ratePerMinute,
                 62934, TimeUnit.MILLISECONDS,
                 3, TimeUnit.MINUTES);
 
@@ -39,9 +26,10 @@ public class MeterApproximationTest {
                 .isEqualTo(ratePerMinute, offset(0.1 * ratePerMinute));
     }
 
-    @Test
-    public void controlMeter5MinuteMeanApproximation() {
-        final Meter meter = simulateMetronome(
+    @ParameterizedTest
+    @MethodSource("ratesPerMinute")
+    public void controlMeter5MinuteMeanApproximation(long ratePerMinute) {
+        final Meter meter = simulateMetronome(ratePerMinute,
                 62934, TimeUnit.MILLISECONDS,
                 13, TimeUnit.MINUTES);
 
@@ -49,9 +37,10 @@ public class MeterApproximationTest {
                 .isEqualTo(ratePerMinute, offset(0.1 * ratePerMinute));
     }
 
-    @Test
-    public void controlMeter15MinuteMeanApproximation() {
-        final Meter meter = simulateMetronome(
+    @ParameterizedTest
+    @MethodSource("ratesPerMinute")
+    public void controlMeter15MinuteMeanApproximation(long ratePerMinute) {
+        final Meter meter = simulateMetronome(ratePerMinute,
                 62934, TimeUnit.MILLISECONDS,
                 38, TimeUnit.MINUTES);
 
@@ -59,7 +48,7 @@ public class MeterApproximationTest {
                 .isEqualTo(ratePerMinute, offset(0.1 * ratePerMinute));
     }
 
-    private Meter simulateMetronome(
+    private Meter simulateMetronome(long ratePerMinute,
             long introDelay, TimeUnit introDelayUnit,
             long duration, TimeUnit durationUnit) {
 

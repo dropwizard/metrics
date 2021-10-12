@@ -1,24 +1,16 @@
 package com.codahale.metrics;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class FixedNameCsvFileProviderTest {
-    @Rule
-    public final TemporaryFolder folder = new TemporaryFolder();
 
-    private File dataDirectory;
-
-    @Before
-    public void setUp() throws Exception {
-        this.dataDirectory = folder.newFolder();
-    }
+    @TempDir
+    File dataDirectory;
 
     @Test
     public void testGetFile() {

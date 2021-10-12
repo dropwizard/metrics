@@ -8,9 +8,10 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
 import org.collectd.api.ValueList;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -26,14 +27,23 @@ import static org.mockito.Mockito.when;
 
 public class CollectdReporterTest {
 
-    @ClassRule
     public static Receiver receiver = new Receiver(25826);
 
     private final MetricRegistry registry = new MetricRegistry();
     private CollectdReporter reporter;
 
-    @Before
-    public void setUp() {
+    @BeforeAll
+    static void beforeAll() throws Throwable {
+        receiver.before();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        receiver.after();
+    }
+
+    @BeforeEach
+    public void setUp() throws Throwable {
         reporter = CollectdReporter.forRegistry(registry)
                 .withHostName("eddie")
                 .build(new Sender("localhost", 25826));

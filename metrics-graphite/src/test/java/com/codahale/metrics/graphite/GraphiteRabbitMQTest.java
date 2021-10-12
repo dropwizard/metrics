@@ -3,8 +3,8 @@ package com.codahale.metrics.graphite;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -32,7 +32,7 @@ public class GraphiteRabbitMQTest {
 
     private final GraphiteRabbitMQ graphite = new GraphiteRabbitMQ(connectionFactory, "graphite");
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(connectionFactory.newConnection()).thenReturn(connection);
         when(connection.createChannel()).thenReturn(channel);

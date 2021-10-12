@@ -1,6 +1,6 @@
 package com.codahale.metrics;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CachedGaugeTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(CachedGaugeTest.class);
@@ -123,7 +123,7 @@ public class CachedGaugeTest {
         }
 
         for (int i = 0; i < futures.size(); i++) {
-            assertTrue("Future " + i + " failed", futures.get(i).get());
+            assertTrue(futures.get(i).get(), "Future " + i + " failed");
         }
 
         executor.shutdown();

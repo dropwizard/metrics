@@ -13,13 +13,10 @@ import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.ConnectionClosedException;
 import org.apache.hc.core5.http.HttpRequest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -31,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -40,18 +37,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class InstrumentedHttpAsyncClientsTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Mock
-    private HttpClientMetricNameStrategy metricNameStrategy;
-    @Mock
-    private MetricRegistryListener registryListener;
+    private HttpClientMetricNameStrategy metricNameStrategy = Mockito.mock(HttpClientMetricNameStrategy.class);
+    private MetricRegistryListener registryListener = Mockito.mock(MetricRegistryListener.class);
     private HttpServer httpServer;
     private MetricRegistry metricRegistry;
     private CloseableHttpAsyncClient client;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         httpServer = HttpServer.create(new InetSocketAddress(0), 0);
 
@@ -59,7 +52,7 @@ public class InstrumentedHttpAsyncClientsTest {
         metricRegistry.addListener(registryListener);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws IOException {
         if (client != null) {
             client.close();

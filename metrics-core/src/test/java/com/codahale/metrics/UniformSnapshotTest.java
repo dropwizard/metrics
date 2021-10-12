@@ -1,6 +1,6 @@
 package com.codahale.metrics;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.offset;
 
 public class UniformSnapshotTest {
@@ -27,19 +28,19 @@ public class UniformSnapshotTest {
                 .isEqualTo(5, offset(0.1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void disallowsNotANumberQuantile() {
-        snapshot.getValue(Double.NaN);
+        assertThatIllegalArgumentException().isThrownBy(() ->  snapshot.getValue(Double.NaN));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void disallowsNegativeQuantile() {
-        snapshot.getValue(-0.5);
+        assertThatIllegalArgumentException().isThrownBy(() -> snapshot.getValue(-0.5));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void disallowsQuantileOverOne() {
-        snapshot.getValue(1.5);
+        assertThatIllegalArgumentException().isThrownBy(() -> snapshot.getValue(1.5));
     }
 
     @Test

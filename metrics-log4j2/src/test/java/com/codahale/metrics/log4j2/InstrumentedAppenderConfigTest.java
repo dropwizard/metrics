@@ -6,9 +6,9 @@ import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,13 +20,13 @@ public class InstrumentedAppenderConfigTest {
     private ConfigurationSource source;
     private LoggerContext context;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         source = new ConfigurationSource(this.getClass().getClassLoader().getResourceAsStream("log4j2-testconfig.xml"));
         context = Configurator.initialize(null, source);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         context.stop();
     }

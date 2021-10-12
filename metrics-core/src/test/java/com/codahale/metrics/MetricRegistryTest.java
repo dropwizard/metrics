@@ -1,8 +1,8 @@
 package com.codahale.metrics;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +26,7 @@ public class MetricRegistryTest {
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         registry.addListener(listener);
     }
@@ -621,9 +621,9 @@ public class MetricRegistryTest {
         MetricRegistry registry = new MetricRegistry();   
         try {
             registry.register("any_name", null);
-            Assert.fail("NullPointerException must be thrown !!!");
+            Assertions.fail("NullPointerException must be thrown !!!");
         } catch (NullPointerException e) {
-            Assert.assertEquals("metric == null", e.getMessage());
+            Assertions.assertEquals("metric == null", e.getMessage());
         }
     }
 }

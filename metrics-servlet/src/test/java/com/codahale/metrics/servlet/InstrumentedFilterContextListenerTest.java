@@ -1,7 +1,7 @@
 package com.codahale.metrics.servlet;
 
 import com.codahale.metrics.MetricRegistry;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;

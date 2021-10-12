@@ -1,14 +1,14 @@
 package com.codahale.metrics;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+
 import static com.codahale.metrics.SlidingTimeWindowMovingAverages.NUMBER_OF_BUCKETS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
-
-import java.time.Instant;
-
-import org.junit.Before;
-import org.junit.Test;
 
 public class SlidingTimeWindowMovingAveragesTest {
 
@@ -16,7 +16,7 @@ public class SlidingTimeWindowMovingAveragesTest {
     private SlidingTimeWindowMovingAverages movingAverages;
     private Meter meter;
 
-    @Before
+    @BeforeEach
     public void init() {
         clock = new ManualClock();
         movingAverages = new SlidingTimeWindowMovingAverages(clock);

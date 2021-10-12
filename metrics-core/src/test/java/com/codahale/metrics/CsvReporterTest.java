@@ -1,9 +1,8 @@
 package com.codahale.metrics;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,20 +19,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class CsvReporterTest {
-    @Rule
-    public final TemporaryFolder folder = new TemporaryFolder();
 
     private final MetricRegistry registry = mock(MetricRegistry.class);
     private final Clock clock = mock(Clock.class);
 
-    private File dataDirectory;
+    @TempDir
+    File dataDirectory;
+
     private CsvReporter reporter;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(clock.getTime()).thenReturn(19910191000L);
-
-        this.dataDirectory = folder.newFolder();
 
         this.reporter = CsvReporter.forRegistry(registry)
                 .formatFor(Locale.US)

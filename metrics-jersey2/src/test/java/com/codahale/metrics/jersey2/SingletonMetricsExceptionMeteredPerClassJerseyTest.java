@@ -6,7 +6,7 @@ import com.codahale.metrics.jersey2.resources.InstrumentedResourceExceptionMeter
 import com.codahale.metrics.jersey2.resources.InstrumentedSubResourceExceptionMeteredPerClass;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Application;

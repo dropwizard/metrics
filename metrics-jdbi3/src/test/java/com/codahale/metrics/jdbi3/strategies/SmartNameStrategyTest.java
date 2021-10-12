@@ -2,8 +2,8 @@ package com.codahale.metrics.jdbi3.strategies;
 
 import com.codahale.metrics.jdbi3.InstrumentedTimingCollector;
 import org.jdbi.v3.core.extension.ExtensionMethod;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
@@ -17,7 +17,7 @@ public class SmartNameStrategyTest extends AbstractStrategyTest {
     private StatementNameStrategy smartNameStrategy = new SmartNameStrategy();
     private InstrumentedTimingCollector collector;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

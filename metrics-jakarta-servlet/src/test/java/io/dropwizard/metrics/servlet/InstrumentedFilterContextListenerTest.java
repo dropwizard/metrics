@@ -3,7 +3,7 @@ package io.dropwizard.metrics.servlet;
 import com.codahale.metrics.MetricRegistry;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

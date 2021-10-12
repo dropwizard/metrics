@@ -8,8 +8,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.servlet.ServletTester;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -37,7 +38,7 @@ public class MetricsServletTest extends AbstractServletTest {
         tester.getContext().setInitParameter("com.codahale.metrics.servlets.MetricsServlet.allowedOrigin", "*");
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // provide ticks for the setup (calls getTick 6 times). The serialization in the tests themselves
         // will call getTick again several times and always get the same value (the last specified here)
@@ -249,15 +250,17 @@ public class MetricsServletTest extends AbstractServletTest {
         verify(servletContext, times(1)).getAttribute(eq(MetricsServlet.METRICS_REGISTRY));
     }
 
-    @Test(expected = ServletException.class)
-    public void constructorWithRegistryAsArgumentUsesServletConfigWhenNullButWrongTypeInContext() throws Exception {
-        final ServletContext servletContext = mock(ServletContext.class);
-        final ServletConfig servletConfig = mock(ServletConfig.class);
-        when(servletConfig.getServletContext()).thenReturn(servletContext);
-        when(servletContext.getAttribute(eq(MetricsServlet.METRICS_REGISTRY)))
-                .thenReturn("IRELLEVANT_STRING");
+    @Test
+    public void constructorWithRegistryAsArgumentUsesServletConfigWhenNullButWrongTypeInContext()  {
+        assertThatExceptionOfType(ServletException.class).isThrownBy( () -> {
+            final ServletContext servletContext = mock(ServletContext.class);
+            final ServletConfig servletConfig = mock(ServletConfig.class);
+            when(servletConfig.getServletContext()).thenReturn(servletContext);
+            when(servletContext.getAttribute(eq(MetricsServlet.METRICS_REGISTRY)))
+                    .thenReturn("IRELLEVANT_STRING");
 
-        final MetricsServlet metricsServlet = new MetricsServlet(null);
-        metricsServlet.init(servletConfig);
+            final MetricsServlet metricsServlet = new MetricsServlet(null);
+            metricsServlet.init(servletConfig);
+        });
     }
 }

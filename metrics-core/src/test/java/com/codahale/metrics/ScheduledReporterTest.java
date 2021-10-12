@@ -1,9 +1,9 @@
 package com.codahale.metrics;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -15,9 +15,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -48,7 +49,7 @@ public class ScheduledReporterTest {
     private final DummyReporter reporterWithExternallyManagedExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, externalExecutor, false);
     private final ScheduledReporter[] reporters = new ScheduledReporter[] {reporter, reporterWithCustomExecutor, reporterWithExternallyManagedExecutor};
 
-    @Before
+    @BeforeEach
     @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
         registry.register("gauge", gauge);
@@ -58,7 +59,7 @@ public class ScheduledReporterTest {
         registry.register("timer", timer);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         customExecutor.shutdown();
         externalExecutor.shutdown();
@@ -72,9 +73,9 @@ public class ScheduledReporterTest {
         DummyReporter r = null;
         try {
             r = new DummyReporter(null, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor);
-            Assert.fail("NullPointerException must be thrown !!!");
+            Assertions.fail("NullPointerException must be thrown !!!");
         } catch (NullPointerException e) {
-            Assert.assertEquals("registry == null", e.getMessage());
+            assertEquals("registry == null", e.getMessage());
         } finally {
             if (r != null) {
                 r.close();
@@ -139,22 +140,28 @@ public class ScheduledReporterTest {
         );
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldDisallowToStartReportingMultiple() throws Exception {
-        reporter.start(200, TimeUnit.MILLISECONDS);
-        reporter.start(200, TimeUnit.MILLISECONDS);
+    @Test
+    public void shouldDisallowToStartReportingMultiple() {
+        assertThatIllegalArgumentException().isThrownBy(() -> {
+            reporter.start(200, TimeUnit.MILLISECONDS);
+            reporter.start(200, TimeUnit.MILLISECONDS);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldDisallowToStartReportingMultipleTimesOnCustomExecutor() throws Exception {
-        reporterWithCustomExecutor.start(200, TimeUnit.MILLISECONDS);
-        reporterWithCustomExecutor.start(200, TimeUnit.MILLISECONDS);
+    @Test
+    public void shouldDisallowToStartReportingMultipleTimesOnCustomExecutor() {
+        assertThatIllegalArgumentException().isThrownBy(() -> {
+            reporterWithCustomExecutor.start(200, TimeUnit.MILLISECONDS);
+            reporterWithCustomExecutor.start(200, TimeUnit.MILLISECONDS);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldDisallowToStartReportingMultipleTimesOnExternallyManagedExecutor() throws Exception {
-        reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
-        reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
+    @Test
+    public void shouldDisallowToStartReportingMultipleTimesOnExternallyManagedExecutor() {
+        assertThatIllegalArgumentException().isThrownBy(() -> {
+            reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
+            reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
+        });
     }
 
     @Test

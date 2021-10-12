@@ -2,12 +2,11 @@ package com.codahale.metrics.log4j2;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SharedMetricRegistries;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -21,12 +20,12 @@ public class InstrumentedAppenderTest {
     private final InstrumentedAppender appender = new InstrumentedAppender(registry);
     private final LogEvent event = mock(LogEvent.class);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         appender.start();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         SharedMetricRegistries.clear();
     }

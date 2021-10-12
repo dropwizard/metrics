@@ -1,6 +1,6 @@
 package com.codahale.metrics.jvm;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -14,33 +14,17 @@ import java.security.PrivilegedAction;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
-import org.junit.runners.model.InitializationError;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(FileDescriptorRatioGaugeSunManagementNotExistsTest.SunManagementNotExistsTestRunner.class)
 public class FileDescriptorRatioGaugeSunManagementNotExistsTest {
 
     @Test
-    public void validateFileDescriptorRatioWhenSunManagementNotExists() {
-        assertThat(new FileDescriptorRatioGauge().getValue()).isNaN();
-    }
-
-    public static class SunManagementNotExistsTestRunner extends BlockJUnit4ClassRunner {
-
-        public SunManagementNotExistsTestRunner(Class<?> clazz) throws InitializationError {
-            super(getFromSunManagementNotExistsClassLoader(clazz));
-        }
-
-        private static Class<?> getFromSunManagementNotExistsClassLoader(Class<?> clazz) throws InitializationError {
-            try {
-                return Class.forName(clazz.getName(), true,
-                        new SunManagementNotExistsClassLoader(SunManagementNotExistsTestRunner.class.getClassLoader()));
-            } catch (ClassNotFoundException e) {
-                throw new InitializationError(e);
-            }
-        }
+    public void validateFileDescriptorRatioWhenSunManagementNotExists() throws Exception {
+        Class<?> fileDescriptorRatioGaugeClass = new SunManagementNotExistsClassLoader(getClass().getClassLoader())
+                .loadClass("com.codahale.metrics.jvm.FileDescriptorRatioGauge");
+        Double value = (Double) fileDescriptorRatioGaugeClass.getMethod("getValue").invoke(
+                fileDescriptorRatioGaugeClass.getDeclaredConstructor().newInstance());
+        assertThat(value).isNaN();
     }
 
     public static class SunManagementNotExistsClassLoader extends URLClassLoader {

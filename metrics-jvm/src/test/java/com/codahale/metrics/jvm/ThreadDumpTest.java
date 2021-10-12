@@ -1,7 +1,7 @@
 package com.codahale.metrics.jvm;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.management.LockInfo;
@@ -21,7 +21,7 @@ public class ThreadDumpTest {
 
     private final ThreadInfo runnable = mock(ThreadInfo.class);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final StackTraceElement rLine1 = new StackTraceElement("Blah", "blee", "Blah.java", 100);
 

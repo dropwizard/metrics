@@ -9,13 +9,13 @@ import org.apache.http.HttpRequest;
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.InetSocketAddress;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -31,7 +31,7 @@ public class InstrumentedHttpClientsTest {
     private final HttpClient client =
             InstrumentedHttpClients.custom(metricRegistry, metricNameStrategy).disableAutomaticRetries().build();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         metricRegistry.addListener(registryListener);
     }

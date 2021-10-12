@@ -4,10 +4,9 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SharedMetricRegistries;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -21,12 +20,12 @@ public class InstrumentedAppenderTest {
     private final InstrumentedAppender appender = new InstrumentedAppender(registry);
     private final ILoggingEvent event = mock(ILoggingEvent.class);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         appender.start();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         SharedMetricRegistries.clear();
     }

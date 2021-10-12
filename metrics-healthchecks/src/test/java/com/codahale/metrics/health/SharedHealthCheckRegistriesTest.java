@@ -1,20 +1,16 @@
 package com.codahale.metrics.health;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
 public class SharedHealthCheckRegistriesTest {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Before
+    @BeforeEach
     public void setUp() {
         SharedHealthCheckRegistries.setDefaultRegistryName(new AtomicReference<>());
         SharedHealthCheckRegistries.clear();
@@ -56,10 +52,8 @@ public class SharedHealthCheckRegistriesTest {
 
     @Test
     public void defaultRegistryIsNotSetByDefault() {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Default registry name has not been set.");
-
-        SharedHealthCheckRegistries.getDefault();
+        assertThatIllegalStateException().isThrownBy(SharedHealthCheckRegistries::getDefault)
+                .withMessage("Default registry name has not been set.");
     }
 
     @Test
@@ -79,19 +73,17 @@ public class SharedHealthCheckRegistriesTest {
 
     @Test
     public void unableToSetDefaultRegistryTwice() {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Default health check registry is already set.");
-
-        SharedHealthCheckRegistries.setDefault("default");
-        SharedHealthCheckRegistries.setDefault("default");
+        assertThatIllegalStateException().isThrownBy(() -> {
+            SharedHealthCheckRegistries.setDefault("default");
+            SharedHealthCheckRegistries.setDefault("default");
+        }).withMessage("Default health check registry is already set.");
     }
 
     @Test
     public void unableToSetCustomDefaultRegistryTwice() {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Default health check registry is already set.");
-
-        SharedHealthCheckRegistries.setDefault("default", new HealthCheckRegistry());
-        SharedHealthCheckRegistries.setDefault("default", new HealthCheckRegistry());
+        assertThatIllegalStateException().isThrownBy(() -> {
+            SharedHealthCheckRegistries.setDefault("default", new HealthCheckRegistry());
+            SharedHealthCheckRegistries.setDefault("default", new HealthCheckRegistry());
+        }).withMessage("Default health check registry is already set.");
     }
 }

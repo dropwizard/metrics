@@ -1,8 +1,8 @@
 package com.codahale.metrics;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +10,6 @@ import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -30,7 +29,7 @@ public class InstrumentedExecutorServiceTest {
     private Timer duration;
     private Timer idle;
 
-    @Before
+    @BeforeEach
     public void setup() {
         executor = Executors.newCachedThreadPool();
         registry = new MetricRegistry();
@@ -42,7 +41,7 @@ public class InstrumentedExecutorServiceTest {
         idle = registry.timer("xs.idle");
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         instrumentedExecutorService.shutdown();
         if (!instrumentedExecutorService.awaitTermination(2, TimeUnit.SECONDS)) {

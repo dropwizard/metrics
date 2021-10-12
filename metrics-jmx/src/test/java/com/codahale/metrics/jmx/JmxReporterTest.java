@@ -8,9 +8,9 @@ import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -56,7 +56,7 @@ public class JmxReporterTest {
     private final ObjectNameFactory mockObjectNameFactory = mock(ObjectNameFactory.class);
     private final ObjectNameFactory concreteObjectNameFactory = reporter.getObjectNameFactory();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(gauge.getValue()).thenReturn(1);
 
@@ -115,7 +115,7 @@ public class JmxReporterTest {
         reporter.start();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         reporter.stop();
     }

@@ -2,7 +2,7 @@ package com.codahale.metrics.health;
 
 import com.codahale.metrics.Clock;
 import com.codahale.metrics.health.annotation.Async;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -10,6 +10,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -40,34 +41,41 @@ public class AsyncHealthCheckDecoratorTest {
     @SuppressWarnings("rawtypes")
     private final ScheduledFuture mockFuture = mock(ScheduledFuture.class);
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void nullHealthCheckTriggersInstantiationFailure() {
-        new AsyncHealthCheckDecorator(null, mockExecutorService);
+        assertThatIllegalArgumentException().isThrownBy(() ->
+        new AsyncHealthCheckDecorator(null, mockExecutorService));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void nullExecutorServiceTriggersInstantiationFailure() {
-        new AsyncHealthCheckDecorator(mockHealthCheck, null);
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                new AsyncHealthCheckDecorator(mockHealthCheck, null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void nonAsyncHealthCheckTriggersInstantiationFailure() {
-        new AsyncHealthCheckDecorator(mockHealthCheck, mockExecutorService);
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                new AsyncHealthCheckDecorator(mockHealthCheck, mockExecutorService));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void negativePeriodTriggersInstantiationFailure() {
-        new AsyncHealthCheckDecorator(new NegativePeriodAsyncHealthCheck(), mockExecutorService);
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                new AsyncHealthCheckDecorator(new NegativePeriodAsyncHealthCheck(), mockExecutorService));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void zeroPeriodTriggersInstantiationFailure() {
-        new AsyncHealthCheckDecorator(new ZeroPeriodAsyncHealthCheck(), mockExecutorService);
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                new AsyncHealthCheckDecorator(new ZeroPeriodAsyncHealthCheck(), mockExecutorService));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void negativeInitialValueTriggersInstantiationFailure() {
-        new AsyncHealthCheckDecorator(new NegativeInitialDelayAsyncHealthCheck(), mockExecutorService);
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                new AsyncHealthCheckDecorator(new NegativeInitialDelayAsyncHealthCheck(), mockExecutorService)
+        );
     }
 
     @Test

@@ -2,7 +2,7 @@ package com.codahale.metrics.jdbi3.strategies;
 
 import com.codahale.metrics.annotation.Timed;
 import org.jdbi.v3.core.extension.ExtensionMethod;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;

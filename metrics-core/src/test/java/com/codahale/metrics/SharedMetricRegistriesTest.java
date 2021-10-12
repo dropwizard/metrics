@@ -1,19 +1,16 @@
 package com.codahale.metrics;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class SharedMetricRegistriesTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
-    @Before
+public class SharedMetricRegistriesTest {
+
+    @BeforeEach
     public void setUp() {
         SharedMetricRegistries.setDefaultRegistryName(new AtomicReference<>());
         SharedMetricRegistries.clear();
@@ -62,9 +59,8 @@ public class SharedMetricRegistriesTest {
 
     @Test
     public void errorsWhenDefaultUnset() {
-        exception.expect(IllegalStateException.class);
-        exception.expectMessage("Default registry name has not been set.");
-        SharedMetricRegistries.getDefault();
+        assertThatIllegalStateException().isThrownBy(SharedMetricRegistries::getDefault)
+                .withMessage("Default registry name has not been set.");
     }
 
     @Test
@@ -79,9 +75,8 @@ public class SharedMetricRegistriesTest {
     @Test
     public void errorsWhenDefaultAlreadySet() {
         SharedMetricRegistries.setDefault("foobah");
-        exception.expect(IllegalStateException.class);
-        exception.expectMessage("Default metric registry name is already set.");
-        SharedMetricRegistries.setDefault("borg");
+        assertThatIllegalStateException().isThrownBy(() -> SharedMetricRegistries.setDefault("borg"))
+                .withMessage("Default metric registry name is already set.");
     }
 
     @Test

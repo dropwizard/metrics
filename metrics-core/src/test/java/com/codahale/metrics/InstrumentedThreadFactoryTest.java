@@ -1,6 +1,6 @@
 package com.codahale.metrics;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class InstrumentedThreadFactoryTest {
     private static final int THREAD_COUNT = 10;

@@ -1,8 +1,8 @@
 package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.management.ClassLoadingMXBean;
 
@@ -16,7 +16,7 @@ public class ClassLoadingGaugeSetTest {
     private final ClassLoadingMXBean cl = mock(ClassLoadingMXBean.class);
     private final ClassLoadingGaugeSet gauges = new ClassLoadingGaugeSet(cl);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(cl.getTotalLoadedClassCount()).thenReturn(2L);
         when(cl.getUnloadedClassCount()).thenReturn(1L);

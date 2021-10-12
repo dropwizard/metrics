@@ -1,7 +1,7 @@
 package com.codahale.metrics;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -37,7 +37,7 @@ public class ConsoleReporterTest {
             .build();
     private String dateHeader;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(clock.getTime()).thenReturn(1363568676000L);
         // JDK9 has changed the java.text.DateFormat API implementation according to Unicode.

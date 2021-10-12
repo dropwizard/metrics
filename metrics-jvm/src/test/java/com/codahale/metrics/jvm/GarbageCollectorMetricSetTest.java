@@ -1,8 +1,8 @@
 package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.management.GarbageCollectorMXBean;
 import java.util.Collections;
@@ -16,7 +16,7 @@ public class GarbageCollectorMetricSetTest {
     private final GarbageCollectorMXBean gc = mock(GarbageCollectorMXBean.class);
     private final GarbageCollectorMetricSet metrics = new GarbageCollectorMetricSet(Collections.singletonList(gc));
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(gc.getName()).thenReturn("PS OldGen");
         when(gc.getCollectionCount()).thenReturn(1L);

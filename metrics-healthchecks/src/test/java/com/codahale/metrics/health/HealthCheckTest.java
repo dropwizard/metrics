@@ -1,7 +1,7 @@
 package com.codahale.metrics.health;
 
 import com.codahale.metrics.Clock;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;

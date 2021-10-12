@@ -1,8 +1,8 @@
 package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
@@ -20,7 +20,7 @@ public class BufferPoolMetricSetTest {
     private ObjectName mapped;
     private ObjectName direct;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.mapped = new ObjectName("java.nio:type=BufferPool,name=mapped");
         this.direct = new ObjectName("java.nio:type=BufferPool,name=direct");

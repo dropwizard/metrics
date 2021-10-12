@@ -1,8 +1,8 @@
 package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -28,7 +28,7 @@ public class ThreadStatesGaugeSetTest {
 
     private final Set<String> deadlocks = new HashSet<>();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         deadlocks.add("yay");
 

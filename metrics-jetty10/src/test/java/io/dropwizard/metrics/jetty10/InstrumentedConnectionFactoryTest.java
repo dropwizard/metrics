@@ -10,9 +10,9 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +31,7 @@ public class InstrumentedConnectionFactoryTest {
                     registry.counter("http.active-connections")));
     private final HttpClient client = new HttpClient();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         server.setHandler(new AbstractHandler() {
             @Override
@@ -51,7 +51,7 @@ public class InstrumentedConnectionFactoryTest {
         client.start();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         server.stop();
         client.stop();

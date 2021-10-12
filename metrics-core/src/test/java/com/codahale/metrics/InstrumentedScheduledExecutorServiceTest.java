@@ -1,7 +1,7 @@
 package com.codahale.metrics;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -294,7 +294,7 @@ public class InstrumentedScheduledExecutorServiceTest {
         assertThat(duration.getSnapshot().size()).isNotEqualTo(0);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         instrumentedScheduledExecutor.shutdown();
         if (!instrumentedScheduledExecutor.awaitTermination(2, TimeUnit.SECONDS)) {

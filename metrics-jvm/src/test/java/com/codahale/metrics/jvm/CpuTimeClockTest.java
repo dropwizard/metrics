@@ -1,6 +1,6 @@
 package com.codahale.metrics.jvm;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.management.ManagementFactory;
 

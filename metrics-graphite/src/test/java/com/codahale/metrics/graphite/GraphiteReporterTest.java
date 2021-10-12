@@ -10,8 +10,8 @@ import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 
 import java.net.UnknownHostException;
@@ -57,7 +57,7 @@ public class GraphiteReporterTest {
         .disabledMetricAttributes(Collections.emptySet())
         .build(graphite);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(clock.getTime()).thenReturn(timestamp * 1000);
     }

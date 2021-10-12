@@ -1,21 +1,21 @@
 package io.dropwizard.metrics.jetty11;
 
 import com.codahale.metrics.MetricRegistry;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import jakarta.servlet.AsyncContext;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.WriteListener;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -28,7 +28,7 @@ public class InstrumentedHttpChannelListenerTest {
     private final TestHandler handler = new TestHandler();
     private MetricRegistry registry;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         registry = new MetricRegistry();
         connector.addBean(new InstrumentedHttpChannelListener(registry, MetricRegistry.name(TestHandler.class, "handler")));
@@ -38,7 +38,7 @@ public class InstrumentedHttpChannelListenerTest {
         client.start();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         server.stop();
         client.stop();

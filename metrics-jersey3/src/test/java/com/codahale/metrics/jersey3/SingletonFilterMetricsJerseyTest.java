@@ -7,8 +7,8 @@ import com.codahale.metrics.jersey3.resources.TestRequestFilter;
 import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,7 +40,7 @@ public class SingletonFilterMetricsJerseyTest extends JerseyTest {
         return config;
     }
 
-    @Before
+    @BeforeEach
     public void resetClock() {
         testClock.tick = 0;
     }

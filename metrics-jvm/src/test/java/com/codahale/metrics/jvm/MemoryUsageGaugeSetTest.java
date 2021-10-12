@@ -1,8 +1,8 @@
 package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryPoolMXBean;
@@ -28,7 +28,7 @@ public class MemoryUsageGaugeSetTest {
             Arrays.asList(memoryPool,
                     weirdMemoryPool));
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(heap.getCommitted()).thenReturn(10L);
         when(heap.getInit()).thenReturn(20L);

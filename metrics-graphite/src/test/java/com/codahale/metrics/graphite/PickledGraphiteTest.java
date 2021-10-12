@@ -1,7 +1,7 @@
 package com.codahale.metrics.graphite;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.python.core.PyList;
 import org.python.core.PyTuple;
 
@@ -42,7 +42,7 @@ public class PickledGraphiteTest {
 
     private CompiledScript unpickleScript;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final AtomicBoolean connected = new AtomicBoolean(true);
         final AtomicBoolean closed = new AtomicBoolean(false);

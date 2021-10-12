@@ -6,14 +6,12 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
-import org.hamcrest.CoreMatchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assume.assumeThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class InstrumentedCacheDecoratorFactoryTest {
     private static final CacheManager MANAGER = CacheManager.create();
@@ -21,10 +19,10 @@ public class InstrumentedCacheDecoratorFactoryTest {
     private MetricRegistry registry;
     private Ehcache cache;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.cache = MANAGER.getEhcache("test-config");
-        assumeThat(cache, is(CoreMatchers.notNullValue()));
+        assumeTrue(cache != null);
 
         this.registry = SharedMetricRegistries.getOrCreate("cache-metrics");
     }

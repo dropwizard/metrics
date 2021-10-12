@@ -1,14 +1,9 @@
 package com.codahale.metrics.health;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import com.codahale.metrics.health.annotation.Async;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -18,11 +13,16 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-
-import com.codahale.metrics.health.annotation.Async;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class HealthCheckRegistryTest {
     private final ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
@@ -41,7 +41,7 @@ public class HealthCheckRegistryTest {
     @SuppressWarnings("rawtypes")
     private final ScheduledFuture af = mock(ScheduledFuture.class);
 
-    @Before
+    @BeforeEach
     @SuppressWarnings("unchecked")
     public void setUp() {
         registry.addListener(listener);
@@ -70,9 +70,9 @@ public class HealthCheckRegistryTest {
         verify(af).cancel(true);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void registeringHealthCheckTwiceThrowsException() {
-        registry.register("hc1", hc1);
+        assertThatIllegalArgumentException().isThrownBy(() -> registry.register("hc1", hc1));
     }
 
     @Test

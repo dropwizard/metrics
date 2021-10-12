@@ -1,7 +1,7 @@
 package com.codahale.metrics;
 
 import com.codahale.metrics.WeightedSnapshot.WeightedSample;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 
 import java.io.ByteArrayOutputStream;
@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.offset;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
@@ -44,19 +45,19 @@ public class WeightedSnapshotTest {
                 .isEqualTo(5.0, offset(0.1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void disallowsNotANumberQuantile() {
-        snapshot.getValue(Double.NaN);
+        assertThatIllegalArgumentException().isThrownBy(() -> snapshot.getValue(Double.NaN));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void disallowsNegativeQuantile() {
-        snapshot.getValue(-0.5);
+        assertThatIllegalArgumentException().isThrownBy(() -> snapshot.getValue(-0.5));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void disallowsQuantileOverOne() {
-        snapshot.getValue(1.5);
+        assertThatIllegalArgumentException().isThrownBy(() -> snapshot.getValue(1.5));
     }
 
     @Test

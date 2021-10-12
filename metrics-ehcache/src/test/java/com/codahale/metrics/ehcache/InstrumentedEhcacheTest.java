@@ -7,8 +7,8 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,7 +19,7 @@ public class InstrumentedEhcacheTest {
     private final MetricRegistry registry = new MetricRegistry();
     private Ehcache cache;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final Cache c = new Cache(new CacheConfiguration("test", 100));
         MANAGER.addCache(c);

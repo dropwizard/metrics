@@ -1,6 +1,6 @@
 package com.codahale.metrics;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
@@ -17,9 +17,9 @@ import static com.codahale.metrics.MetricAttribute.MIN;
 import static com.codahale.metrics.MetricAttribute.P50;
 import static com.codahale.metrics.MetricAttribute.P999;
 import static com.codahale.metrics.MetricAttribute.STDDEV;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class Slf4jReporterTest {
 

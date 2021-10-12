@@ -6,7 +6,7 @@ import org.apache.http.impl.nio.bootstrap.ServerBootstrap;
 import org.apache.http.nio.protocol.BasicAsyncRequestHandler;
 import org.apache.http.nio.reactor.ListenerEndpoint;
 import org.apache.http.protocol.HttpRequestHandler;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -62,7 +62,7 @@ public abstract class HttpClientTestBase {
         return new HttpHost("localhost", address.getPort(), "http");
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (server != null) {
             server.shutdown(5, TimeUnit.SECONDS);

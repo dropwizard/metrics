@@ -8,8 +8,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.servlet.ServletTester;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +49,7 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
         });
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // provide ticks for the setup (calls getTick 6 times). The serialization in the tests themselves
         // will call getTick again several times and always get the same value (the last specified here)

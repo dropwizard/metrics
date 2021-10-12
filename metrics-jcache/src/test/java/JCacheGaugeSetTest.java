@@ -1,9 +1,8 @@
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.jcache.JCacheGaugeSet;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.cache.Cache;
 import javax.cache.CacheManager;
@@ -19,7 +18,7 @@ public class JCacheGaugeSetTest {
     private Cache<Object, Object> myOtherCache;
     private CacheManager cacheManager;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         CachingProvider provider = Caching.getCachingProvider();
@@ -77,7 +76,7 @@ public class JCacheGaugeSetTest {
 
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         cacheManager.destroyCache("myCache");
         cacheManager.destroyCache("myOtherCache");

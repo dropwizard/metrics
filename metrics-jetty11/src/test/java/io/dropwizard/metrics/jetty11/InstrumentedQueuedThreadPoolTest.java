@@ -2,8 +2,8 @@ package io.dropwizard.metrics.jetty11;
 
 import com.codahale.metrics.MetricRegistry;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,7 +13,7 @@ public class InstrumentedQueuedThreadPoolTest {
     private MetricRegistry metricRegistry;
     private InstrumentedQueuedThreadPool iqtp;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         metricRegistry = new MetricRegistry();
         iqtp = new InstrumentedQueuedThreadPool(metricRegistry);

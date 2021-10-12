@@ -1,7 +1,7 @@
 package com.codahale.metrics.graphite;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.net.SocketFactory;
 import java.io.ByteArrayOutputStream;
@@ -33,7 +33,7 @@ public class GraphiteTest {
     private final Socket socket = mock(Socket.class);
     private final ByteArrayOutputStream output = spy(ByteArrayOutputStream.class);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final AtomicBoolean connected = new AtomicBoolean(true);
         final AtomicBoolean closed = new AtomicBoolean(false);

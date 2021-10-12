@@ -2,11 +2,12 @@ package com.codahale.metrics.servlets;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.servlet.ServletTester;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AdminServletUriTest extends AbstractServletTest {
     private final MetricRegistry registry = new MetricRegistry();
@@ -26,7 +27,7 @@ public class AdminServletUriTest extends AbstractServletTest {
         tester.addServlet(AdminServlet.class, "/admin");
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         request.setMethod("GET");
         request.setURI("/context/admin");

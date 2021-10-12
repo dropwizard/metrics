@@ -2,7 +2,7 @@ package com.codahale.metrics.health.jvm;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.jvm.ThreadDeadlockDetector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Set;

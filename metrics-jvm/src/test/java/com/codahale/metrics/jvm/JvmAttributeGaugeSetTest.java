@@ -1,8 +1,8 @@
 package com.codahale.metrics.jvm;
 
 import com.codahale.metrics.Gauge;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.management.RuntimeMXBean;
 
@@ -15,7 +15,7 @@ public class JvmAttributeGaugeSetTest {
     private final RuntimeMXBean runtime = mock(RuntimeMXBean.class);
     private final JvmAttributeGaugeSet gauges = new JvmAttributeGaugeSet(runtime);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(runtime.getName()).thenReturn("9928@example.com");
 

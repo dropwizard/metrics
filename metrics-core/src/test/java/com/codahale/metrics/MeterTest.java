@@ -1,7 +1,7 @@
 package com.codahale.metrics;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
@@ -14,7 +14,7 @@ public class MeterTest {
     private final Clock clock = mock(Clock.class);
     private final Meter meter = new Meter(clock);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(clock.getTick()).thenReturn(0L, TimeUnit.SECONDS.toNanos(10));
 

@@ -1,7 +1,7 @@
 package com.codahale.metrics.jdbi3.strategies;
 
 import org.jdbi.v3.core.extension.ExtensionMethod;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;

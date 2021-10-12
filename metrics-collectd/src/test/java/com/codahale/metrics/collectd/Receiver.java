@@ -4,7 +4,6 @@ import org.collectd.api.Notification;
 import org.collectd.api.ValueList;
 import org.collectd.protocol.Dispatcher;
 import org.collectd.protocol.UdpReceiver;
-import org.junit.rules.ExternalResource;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -13,7 +12,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public final class Receiver extends ExternalResource {
+public final class Receiver {
 
     private final int port;
 
@@ -25,8 +24,7 @@ public final class Receiver extends ExternalResource {
         this.port = port;
     }
 
-    @Override
-    protected void before() throws Throwable {
+    public void before() throws Throwable {
         socket = new DatagramSocket(null);
         socket.bind(new InetSocketAddress(InetAddress.getLoopbackAddress(), port));
 
@@ -55,8 +53,7 @@ public final class Receiver extends ExternalResource {
         return queue.poll(2, TimeUnit.SECONDS);
     }
 
-    @Override
-    protected void after() {
+    public void after() {
         receiver.shutdown();
         socket.close();
     }

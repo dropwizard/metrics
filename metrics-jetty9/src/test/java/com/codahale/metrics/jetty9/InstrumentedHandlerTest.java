@@ -7,10 +7,10 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -31,7 +31,7 @@ public class InstrumentedHandlerTest {
     private final ServerConnector connector = new ServerConnector(server);
     private final InstrumentedHandler handler = new InstrumentedHandler(registry);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         handler.setName("handler");
         handler.setHandler(new TestHandler());
@@ -41,7 +41,7 @@ public class InstrumentedHandlerTest {
         client.start();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         server.stop();
         client.stop();
@@ -110,7 +110,7 @@ public class InstrumentedHandlerTest {
     }
 
     @Test
-    @Ignore("flaky on virtual machines")
+    @Disabled("flaky on virtual machines")
     public void responseTimesAreRecordedForAsyncResponses() throws Exception {
 
         final ContentResponse response = client.GET(uri("/async"));

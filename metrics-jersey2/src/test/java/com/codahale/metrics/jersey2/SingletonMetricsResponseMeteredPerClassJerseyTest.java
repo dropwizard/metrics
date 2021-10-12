@@ -7,7 +7,7 @@ import com.codahale.metrics.jersey2.resources.InstrumentedResourceResponseMetere
 import com.codahale.metrics.jersey2.resources.InstrumentedSubResourceResponseMeteredPerClass;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.core.Application;
 import java.util.logging.Level;
