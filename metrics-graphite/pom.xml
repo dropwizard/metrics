@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.graphite</javaModuleName>
-        <rabbitmq.version>5.13.1</rabbitmq.version>
+        <rabbitmq.version>5.14.0</rabbitmq.version>
     </properties>
 
     <dependencyManagement>
