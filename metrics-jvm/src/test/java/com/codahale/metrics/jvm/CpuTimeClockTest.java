@@ -15,7 +15,7 @@ public class CpuTimeClockTest {
 
         assertThat((double) clock.getTime())
                 .isEqualTo(System.currentTimeMillis(),
-                        offset(200.0));
+                        offset(250D));
 
         assertThat((double) clock.getTick())
                 .isEqualTo(ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime(),
