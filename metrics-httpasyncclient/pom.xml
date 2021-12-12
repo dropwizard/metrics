@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.httpasyncclient</javaModuleName>
-        <http-async-client.version>4.1.4</http-async-client.version>
+        <http-async-client.version>4.1.5</http-async-client.version>
 
     </properties>
 
