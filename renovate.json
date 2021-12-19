@@ -8,7 +8,7 @@
   "packageRules": [
     {
       "matchPackagePrefixes": ["io.dropwizard.metrics"],
-      "allowedVersions": "<4.1.0"
+      "allowedVersions": "<4.2.0"
     },
     {
       "matchPackagePrefixes": ["com.fasterxml.jackson"],
