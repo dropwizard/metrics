@@ -11,3 +11,4 @@ bin
 jcstress.*
 metrics-jcstress/results/
 TODO.md
+.mvn/wrapper/maven-wrapper.jar
