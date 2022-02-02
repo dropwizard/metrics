@@ -217,36 +217,7 @@ public class InstrumentedHandler extends HandlerWrapper {
         });
 
 
-        this.listener = new AsyncListener() {
-            private long startTime;
-
-            @Override
-            public void onTimeout(AsyncEvent event) throws IOException {
-                asyncTimeouts.mark();
-            }
-
-            @Override
-            public void onStartAsync(AsyncEvent event) throws IOException {
-                startTime = System.currentTimeMillis();
-                event.getAsyncContext().addListener(this);
-            }
-
-            @Override
-            public void onError(AsyncEvent event) throws IOException {
-            }
-
-            @Override
-            public void onComplete(AsyncEvent event) throws IOException {
-                final AsyncContextState state = (AsyncContextState) event.getAsyncContext();
-                final HttpServletRequest request = (HttpServletRequest) state.getRequest();
-                final HttpServletResponse response = (HttpServletResponse) state.getResponse();
-                updateResponses(request, response, startTime, true);
-                if (state.getHttpChannelState().getState() != DISPATCHED_HACK &&
-                        state.getHttpChannelState().isSuspended()) {
-                    activeSuspended.dec();
-                }
-            }
-        };
+        this.listener = new AsyncAttachingListener();
     }
 
     @Override
@@ -375,5 +346,54 @@ public class InstrumentedHandler extends HandlerWrapper {
 
     private String getMetricPrefix() {
         return this.prefix == null ? name(getHandler().getClass(), name) : name(this.prefix, name);
+    }
+
+    private class AsyncAttachingListener implements AsyncListener {
+
+        @Override
+        public void onTimeout(AsyncEvent event) throws IOException {}
+
+        @Override
+        public void onStartAsync(AsyncEvent event) throws IOException {
+            event.getAsyncContext().addListener(new InstrumentedAsyncListener());
+        }
+
+        @Override
+        public void onError(AsyncEvent event) throws IOException {}
+
+        @Override
+        public void onComplete(AsyncEvent event) throws IOException {}
+    };
+
+    private class InstrumentedAsyncListener implements AsyncListener {
+        private final long startTime;
+
+        InstrumentedAsyncListener() {
+            this.startTime = System.currentTimeMillis();
+        }
+
+        @Override
+        public void onTimeout(AsyncEvent event) throws IOException {
+            asyncTimeouts.mark();
+        }
+
+        @Override
+        public void onStartAsync(AsyncEvent event) throws IOException {
+        }
+
+        @Override
+        public void onError(AsyncEvent event) throws IOException {
+        }
+
+        @Override
+        public void onComplete(AsyncEvent event) throws IOException {
+            final AsyncContextState state = (AsyncContextState) event.getAsyncContext();
+            final HttpServletRequest request = (HttpServletRequest) state.getRequest();
+            final HttpServletResponse response = (HttpServletResponse) state.getResponse();
+            updateResponses(request, response, startTime, true);
+            if (!state.getHttpChannelState().isSuspended()) {
+                activeSuspended.dec();
+            }
+        }
     }
 }
