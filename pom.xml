@@ -59,7 +59,7 @@
         <jetty9.version>9.4.45.v20220203</jetty9.version>
         <jetty10.version>10.0.8</jetty10.version>
         <jetty11.version>11.0.8</jetty11.version>
-        <slf4j.version>1.7.35</slf4j.version>
+        <slf4j.version>1.7.36</slf4j.version>
         <assertj.version>3.22.0</assertj.version>
         <mockito.version>4.3.1</mockito.version>
         <junit.version>4.13.1</junit.version>
