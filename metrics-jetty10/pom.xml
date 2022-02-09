@@ -22,7 +22,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
 
-        <slf4j.version>2.0.0-alpha5</slf4j.version>
+        <slf4j.version>2.0.0-alpha6</slf4j.version>
     </properties>
 
     <dependencyManagement>
