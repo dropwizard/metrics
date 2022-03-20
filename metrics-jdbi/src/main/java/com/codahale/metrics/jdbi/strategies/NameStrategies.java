@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.codahale.metrics.MetricRegistry.name;
+import static com.codahale.metrics.NameUtility.name;
 
 public final class NameStrategies {
     public static final StatementNameStrategy CHECK_EMPTY = new CheckEmptyStrategy();

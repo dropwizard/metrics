@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 
-import static com.codahale.metrics.MetricRegistry.name;
+import static com.codahale.metrics.NameUtility.name;
 
 /**
  * A Jetty {@link org.eclipse.jetty.server.HttpChannel.Listener} implementation which records various metrics about

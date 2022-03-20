@@ -20,7 +20,7 @@ import org.eclipse.jetty.server.HttpChannel.Listener;
 import org.eclipse.jetty.server.HttpChannelState;
 import org.eclipse.jetty.server.Request;
 
-import static com.codahale.metrics.MetricRegistry.name;
+import static com.codahale.metrics.NameUtility.name;
 
 /**
  * A Jetty {@link org.eclipse.jetty.server.HttpChannel.Listener} implementation which records various metrics about

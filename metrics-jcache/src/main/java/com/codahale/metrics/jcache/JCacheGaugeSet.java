@@ -22,7 +22,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
-import static com.codahale.metrics.MetricRegistry.name;
+import static com.codahale.metrics.NameUtility.name;
 
 /**
  * Gauge set retrieving JCache JMX attributes

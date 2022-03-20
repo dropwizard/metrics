@@ -18,7 +18,7 @@ import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
 import org.apache.hc.core5.pool.PoolReusePolicy;
 import org.apache.hc.core5.util.TimeValue;
 
-import static com.codahale.metrics.MetricRegistry.name;
+import static com.codahale.metrics.NameUtility.name;
 import static java.util.Objects.requireNonNull;
 
 /**

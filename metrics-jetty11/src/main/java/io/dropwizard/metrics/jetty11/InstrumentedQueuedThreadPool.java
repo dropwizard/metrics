@@ -8,7 +8,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import java.util.concurrent.BlockingQueue;
 
-import static com.codahale.metrics.MetricRegistry.name;
+import static com.codahale.metrics.NameUtility.name;
 
 public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
     private static final String NAME_UTILIZATION = "utilization";

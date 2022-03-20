@@ -11,7 +11,7 @@ import net.sf.ehcache.statistics.StatisticsGateway;
 
 import java.io.Serializable;
 
-import static com.codahale.metrics.MetricRegistry.name;
+import static com.codahale.metrics.NameUtility.name;
 
 /**
  * An instrumented {@link Ehcache} instance.

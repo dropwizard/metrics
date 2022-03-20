@@ -1,17 +1,12 @@
 package com.codahale.metrics.graphite;
 
-import com.codahale.metrics.Clock;
-import com.codahale.metrics.Counter;
+import com.codahale.metrics.*;
 import com.codahale.metrics.Gauge;
-import com.codahale.metrics.Histogram;
-import com.codahale.metrics.Meter;
 import com.codahale.metrics.Metered;
 import com.codahale.metrics.MetricAttribute;
 import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ScheduledReporter;
 import com.codahale.metrics.Snapshot;
-import com.codahale.metrics.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +35,7 @@ import static com.codahale.metrics.MetricAttribute.P98;
 import static com.codahale.metrics.MetricAttribute.P99;
 import static com.codahale.metrics.MetricAttribute.P999;
 import static com.codahale.metrics.MetricAttribute.STDDEV;
-
+import com.codahale.metrics.NameUtility;
 /**
  * A reporter which publishes metric values to a Graphite server.
  *
@@ -502,7 +497,7 @@ public class GraphiteReporter extends ScheduledReporter {
     }
 
     private String prefix(String name) {
-        return MetricRegistry.name(prefix, name);
+        return NameUtility.name(prefix, name);
     }
 
     private String appendMetricAttribute(String name, String metricAttribute){

@@ -9,7 +9,7 @@ public class ClockTest {
 
     @Test
     public void userTimeClock() {
-        final Clock.UserTimeClock clock = new Clock.UserTimeClock();
+        final UserTimeClock clock = new UserTimeClock();
 
         assertThat((double) clock.getTime())
                 .isEqualTo(System.currentTimeMillis(),
@@ -23,6 +23,6 @@ public class ClockTest {
     @Test
     public void defaultsToUserTime() {
         assertThat(Clock.defaultClock())
-                .isInstanceOf(Clock.UserTimeClock.class);
+                .isInstanceOf(UserTimeClock.class);
     }
 }

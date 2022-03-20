@@ -14,7 +14,7 @@ import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 
 import java.io.Serializable;
 
-import static com.codahale.metrics.MetricRegistry.name;
+import static com.codahale.metrics.NameUtility.name;
 
 /**
  * A Log4J 2.x {@link Appender} which has seven meters, one for each logging level and one for the total

@@ -1,8 +1,11 @@
 package com.codahale.metrics.jdbi3.strategies;
 
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.NameUtility;
 import org.jdbi.v3.core.extension.ExtensionMethod;
 import org.jdbi.v3.core.statement.StatementContext;
+import com.codahale.metrics.NameUtility;
+
 
 /**
  * Default strategies which build a basis of more complex strategies
@@ -30,7 +33,7 @@ public enum DefaultNameStrategy implements StatementNameStrategy {
         public String getStatementName(StatementContext statementContext) {
             ExtensionMethod extensionMethod = statementContext.getExtensionMethod();
             if (extensionMethod != null) {
-                return MetricRegistry.name(extensionMethod.getType(), extensionMethod.getMethod().getName());
+                return NameUtility.name(extensionMethod.getType(), extensionMethod.getMethod().getName());
             }
             return null;
         }

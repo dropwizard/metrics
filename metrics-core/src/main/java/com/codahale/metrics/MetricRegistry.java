@@ -15,44 +15,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * A registry of metric instances.
  */
 public class MetricRegistry implements MetricSet {
-    /**
-     * Concatenates elements to form a dotted name, eliding any null values or empty strings.
-     *
-     * @param name  the first element of the name
-     * @param names the remaining elements of the name
-     * @return {@code name} and {@code names} concatenated by periods
-     */
-    public static String name(String name, String... names) {
-        final StringBuilder builder = new StringBuilder();
-        append(builder, name);
-        if (names != null) {
-            for (String s : names) {
-                append(builder, s);
-            }
-        }
-        return builder.toString();
-    }
-
-    /**
-     * Concatenates a class name and elements to form a dotted name, eliding any null values or
-     * empty strings.
-     *
-     * @param klass the first element of the name
-     * @param names the remaining elements of the name
-     * @return {@code klass} and {@code names} concatenated by periods
-     */
-    public static String name(Class<?> klass, String... names) {
-        return name(klass.getName(), names);
-    }
-
-    private static void append(StringBuilder builder, String part) {
-        if (part != null && !part.isEmpty()) {
-            if (builder.length() > 0) {
-                builder.append('.');
-            }
-            builder.append(part);
-        }
-    }
 
     private final ConcurrentMap<String, Metric> metrics;
     private final List<MetricRegistryListener> listeners;
@@ -98,52 +60,52 @@ public class MetricRegistry implements MetricSet {
             childRegistry.addListener(new MetricRegistryListener() {
                 @Override
                 public void onGaugeAdded(String name, Gauge<?> gauge) {
-                    register(name(childName, name), gauge);
+                    register(NameUtility.name(childName, name), gauge);
                 }
 
                 @Override
                 public void onGaugeRemoved(String name) {
-                    remove(name(childName, name));
+                    remove(NameUtility.name(childName, name));
                 }
 
                 @Override
                 public void onCounterAdded(String name, Counter counter) {
-                    register(name(childName, name), counter);
+                    register(NameUtility.name(childName, name), counter);
                 }
 
                 @Override
                 public void onCounterRemoved(String name) {
-                    remove(name(childName, name));
+                    remove(NameUtility.name(childName, name));
                 }
 
                 @Override
                 public void onHistogramAdded(String name, Histogram histogram) {
-                    register(name(childName, name), histogram);
+                    register(NameUtility.name(childName, name), histogram);
                 }
 
                 @Override
                 public void onHistogramRemoved(String name) {
-                    remove(name(childName, name));
+                    remove(NameUtility.name(childName, name));
                 }
 
                 @Override
                 public void onMeterAdded(String name, Meter meter) {
-                    register(name(childName, name), meter);
+                    register(NameUtility.name(childName, name), meter);
                 }
 
                 @Override
                 public void onMeterRemoved(String name) {
-                    remove(name(childName, name));
+                    remove(NameUtility.name(childName, name));
                 }
 
                 @Override
                 public void onTimerAdded(String name, Timer timer) {
-                    register(name(childName, name), timer);
+                    register(NameUtility.name(childName, name), timer);
                 }
 
                 @Override
                 public void onTimerRemoved(String name) {
-                    remove(name(childName, name));
+                    remove(NameUtility.name(childName, name));
                 }
             });
         } else if (metric instanceof MetricSet) {
@@ -583,9 +545,9 @@ public class MetricRegistry implements MetricSet {
     public void registerAll(String prefix, MetricSet metrics) throws IllegalArgumentException {
         for (Map.Entry<String, Metric> entry : metrics.getMetrics().entrySet()) {
             if (entry.getValue() instanceof MetricSet) {
-                registerAll(name(prefix, entry.getKey()), (MetricSet) entry.getValue());
+                registerAll(NameUtility.name(prefix, entry.getKey()), (MetricSet) entry.getValue());
             } else {
-                register(name(prefix, entry.getKey()), entry.getValue());
+                register(NameUtility.name(prefix, entry.getKey()), entry.getValue());
             }
         }
     }

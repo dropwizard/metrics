@@ -255,7 +255,8 @@ public class MetricsModule extends Module {
     }
 
     private static String calculateRateUnit(TimeUnit unit, String name) {
-        final String s = unit.toString().toLowerCase(Locale.US);
-        return name + '/' + s.substring(0, s.length() - 1);
+        //-- Rename variable refactoring -----
+        final String timeUnitInUsLocale = unit.toString().toLowerCase(Locale.US);
+        return name + '/' + timeUnitInUsLocale.substring(0, timeUnitInUsLocale.length() - 1);
     }
 }

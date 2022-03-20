@@ -2,6 +2,7 @@ package io.dropwizard.metrics.jetty11;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.NameUtility;
 import com.codahale.metrics.Timer;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -67,7 +68,7 @@ public class InstrumentedConnectionFactoryTest {
 
         Thread.sleep(100); // make sure the connection is closed
 
-        final Timer timer = registry.timer(MetricRegistry.name("http.connections"));
+        final Timer timer = registry.timer(NameUtility.name("http.connections"));
         assertThat(timer.getCount())
                 .isEqualTo(1);
     }

@@ -412,7 +412,7 @@ public class Slf4jReporter extends ScheduledReporter {
     }
 
     private String prefix(String... components) {
-        return MetricRegistry.name(prefix, components);
+        return NameUtility.name(prefix, components);
     }
 
     /* private class to allow logger configuration */

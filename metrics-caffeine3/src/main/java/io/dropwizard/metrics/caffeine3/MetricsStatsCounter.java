@@ -29,6 +29,7 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.github.benmanes.caffeine.cache.stats.StatsCounter;
 import org.checkerframework.checker.index.qual.NonNegative;
+import com.codahale.metrics.NameUtility;
 
 /**
  * A {@link StatsCounter} instrumented with Dropwizard Metrics.
@@ -55,17 +56,17 @@ public final class MetricsStatsCounter implements StatsCounter {
    */
   public MetricsStatsCounter(MetricRegistry registry, String metricsPrefix) {
     requireNonNull(metricsPrefix);
-    hitCount = registry.counter(MetricRegistry.name(metricsPrefix, "hits"));
-    missCount = registry.counter(MetricRegistry.name(metricsPrefix, "misses"));
-    loadSuccess = registry.timer(MetricRegistry.name(metricsPrefix, "loads-success"));
-    loadFailure = registry.timer(MetricRegistry.name(metricsPrefix, "loads-failure"));
-    evictionWeight = registry.counter(MetricRegistry.name(metricsPrefix, "evictions-weight"));
+    hitCount = registry.counter(NameUtility.name(metricsPrefix, "hits"));
+    missCount = registry.counter(NameUtility.name(metricsPrefix, "misses"));
+    loadSuccess = registry.timer(NameUtility.name(metricsPrefix, "loads-success"));
+    loadFailure = registry.timer(NameUtility.name(metricsPrefix, "loads-failure"));
+    evictionWeight = registry.counter(NameUtility.name(metricsPrefix, "evictions-weight"));
 
     evictionsWithCause = new EnumMap<>(RemovalCause.class);
     for (RemovalCause cause : RemovalCause.values()) {
       evictionsWithCause.put(
           cause,
-          registry.histogram(MetricRegistry.name(metricsPrefix, "evictions", cause.name())));
+          registry.histogram(NameUtility.name(metricsPrefix, "evictions", cause.name())));
     }
   }
 

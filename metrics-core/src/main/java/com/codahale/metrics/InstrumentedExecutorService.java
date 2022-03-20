@@ -50,38 +50,38 @@ public class InstrumentedExecutorService implements ExecutorService {
      */
     public InstrumentedExecutorService(ExecutorService delegate, MetricRegistry registry, String name) {
         this.delegate = delegate;
-        this.submitted = registry.meter(MetricRegistry.name(name, "submitted"));
-        this.running = registry.counter(MetricRegistry.name(name, "running"));
-        this.completed = registry.meter(MetricRegistry.name(name, "completed"));
-        this.idle = registry.timer(MetricRegistry.name(name, "idle"));
-        this.duration = registry.timer(MetricRegistry.name(name, "duration"));
+        this.submitted = registry.meter(NameUtility.name(name, "submitted"));
+        this.running = registry.counter(NameUtility.name(name, "running"));
+        this.completed = registry.meter(NameUtility.name(name, "completed"));
+        this.idle = registry.timer(NameUtility.name(name, "idle"));
+        this.duration = registry.timer(NameUtility.name(name, "duration"));
 
         if (delegate instanceof ThreadPoolExecutor) {
             ThreadPoolExecutor executor = (ThreadPoolExecutor) delegate;
-            registry.register(MetricRegistry.name(name, "pool.size"),
+            registry.register(NameUtility.name(name, "pool.size"),
                     (Gauge<Integer>) executor::getPoolSize);
-            registry.register(MetricRegistry.name(name, "pool.core"),
+            registry.register(NameUtility.name(name, "pool.core"),
                     (Gauge<Integer>) executor::getCorePoolSize);
-            registry.register(MetricRegistry.name(name, "pool.max"),
+            registry.register(NameUtility.name(name, "pool.max"),
                     (Gauge<Integer>) executor::getMaximumPoolSize);
             final BlockingQueue<Runnable> queue = executor.getQueue();
-            registry.register(MetricRegistry.name(name, "tasks.active"),
+            registry.register(NameUtility.name(name, "tasks.active"),
                     (Gauge<Integer>) executor::getActiveCount);
-            registry.register(MetricRegistry.name(name, "tasks.completed"),
+            registry.register(NameUtility.name(name, "tasks.completed"),
                     (Gauge<Long>) executor::getCompletedTaskCount);
-            registry.register(MetricRegistry.name(name, "tasks.queued"),
+            registry.register(NameUtility.name(name, "tasks.queued"),
                     (Gauge<Integer>) queue::size);
-            registry.register(MetricRegistry.name(name, "tasks.capacity"),
+            registry.register(NameUtility.name(name, "tasks.capacity"),
                     (Gauge<Integer>) queue::remainingCapacity);
         } else if (delegate instanceof ForkJoinPool) {
             ForkJoinPool forkJoinPool = (ForkJoinPool) delegate;
-            registry.register(MetricRegistry.name(name, "tasks.stolen"),
+            registry.register(NameUtility.name(name, "tasks.stolen"),
                     (Gauge<Long>) forkJoinPool::getStealCount);
-            registry.register(MetricRegistry.name(name, "tasks.queued"),
+            registry.register(NameUtility.name(name, "tasks.queued"),
                     (Gauge<Long>) forkJoinPool::getQueuedTaskCount);
-            registry.register(MetricRegistry.name(name, "threads.active"),
+            registry.register(NameUtility.name(name, "threads.active"),
                     (Gauge<Integer>) forkJoinPool::getActiveThreadCount);
-            registry.register(MetricRegistry.name(name, "threads.running"),
+            registry.register(NameUtility.name(name, "threads.running"),
                     (Gauge<Integer>) forkJoinPool::getRunningThreadCount);
         }
     }

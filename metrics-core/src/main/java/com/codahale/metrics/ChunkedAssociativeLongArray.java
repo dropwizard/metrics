@@ -76,6 +76,12 @@ class ChunkedAssociativeLongArray {
             return EMPTY;
         }
 
+        //-- Extract method to a new method---
+        return chunksCopy(chunks, valuesSize);
+    }
+
+    private long[] chunksCopy(Deque<Chunk> chunks, int valuesSize)
+    {
         final long[] values = new long[valuesSize];
         int valuesIndex = 0;
         for (Chunk chunk : chunks) {

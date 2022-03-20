@@ -1,6 +1,7 @@
 package com.codahale.metrics.jetty9;
 
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.NameUtility;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.server.Request;
@@ -32,7 +33,7 @@ public class InstrumentedHttpChannelListenerTest {
     @Before
     public void setUp() throws Exception {
         registry = new MetricRegistry();
-        connector.addBean(new InstrumentedHttpChannelListener(registry, MetricRegistry.name(TestHandler.class, "handler")));
+        connector.addBean(new InstrumentedHttpChannelListener(registry, NameUtility.name(TestHandler.class, "handler")));
         server.addConnector(connector);
         server.setHandler(handler);
         server.start();
@@ -132,7 +133,7 @@ public class InstrumentedHttpChannelListenerTest {
     }
 
     private String metricName(String metricName) {
-        return MetricRegistry.name(TestHandler.class.getName(), "handler", metricName);
+        return NameUtility.name(TestHandler.class.getName(), "handler", metricName);
     }
 
     /**

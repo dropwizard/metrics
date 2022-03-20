@@ -7,7 +7,7 @@ import org.apache.hc.core5.net.URIBuilder;
 import java.net.URISyntaxException;
 import java.util.Locale;
 
-import static com.codahale.metrics.MetricRegistry.name;
+import static com.codahale.metrics.NameUtility.name;
 
 public class HttpClientMetricNameStrategies {
 

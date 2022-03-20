@@ -30,17 +30,4 @@ public abstract class Clock {
         return UserTimeClockHolder.DEFAULT;
     }
 
-    /**
-     * A clock implementation which returns the current time in epoch nanoseconds.
-     */
-    public static class UserTimeClock extends Clock {
-        @Override
-        public long getTick() {
-            return System.nanoTime();
-        }
-    }
-
-    private static class UserTimeClockHolder {
-        private static final Clock DEFAULT = new UserTimeClock();
-    }
 }

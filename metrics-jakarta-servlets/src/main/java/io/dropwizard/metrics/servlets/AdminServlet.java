@@ -150,35 +150,32 @@ public class AdminServlet extends HttpServlet {
         if (uri == null || uri.equals("/")) {
             super.service(req, resp);
         } else if (uri.equals(healthcheckUri)) {
-            if (healthcheckEnabled) {
-                healthCheckServlet.service(req, resp);
-            } else {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-            }
+            callServletService(healthCheckServlet,healthcheckEnabled, req,resp);
         } else if (uri.startsWith(metricsUri)) {
-            if (metricsEnabled) {
-                metricsServlet.service(req, resp);
-            } else {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-            }
+            callServletService(metricsServlet,metricsEnabled,req,resp);
         } else if (uri.equals(pingUri)) {
-            if (pingEnabled) {
-                pingServlet.service(req, resp);
-            } else {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-            }
+            callServletService(pingServlet,pingEnabled,req,resp);
         } else if (uri.equals(threadsUri)) {
-            if (threadsEnabled) {
-                threadDumpServlet.service(req, resp);
-            } else {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-            }
+            callServletService(threadDumpServlet,threadsEnabled,req,resp);
         } else if (uri.equals(cpuProfileUri)) {
-            if (cpuProfileEnabled) {
-                cpuProfileServlet.service(req, resp);
-            } else {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-            }
+            callServletService(cpuProfileServlet,cpuProfileEnabled,req,resp);
+        } else {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    /**
+     *
+     * @param httpServlet
+     * @param enabled
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     */
+    private void callServletService(HttpServlet httpServlet, Boolean enabled, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (enabled) {
+            httpServlet.service(req, resp);
         } else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         }

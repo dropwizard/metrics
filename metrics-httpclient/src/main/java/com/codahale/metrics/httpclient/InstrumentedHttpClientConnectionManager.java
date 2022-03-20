@@ -20,7 +20,7 @@ import org.apache.http.impl.conn.SystemDefaultDnsResolver;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.codahale.metrics.MetricRegistry.name;
+import static com.codahale.metrics.NameUtility.name;
 
 /**
  * A {@link HttpClientConnectionManager} which monitors the number of open connections.

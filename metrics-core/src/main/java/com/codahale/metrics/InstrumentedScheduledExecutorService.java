@@ -54,16 +54,16 @@ public class InstrumentedScheduledExecutorService implements ScheduledExecutorSe
     public InstrumentedScheduledExecutorService(ScheduledExecutorService delegate, MetricRegistry registry, String name) {
         this.delegate = delegate;
 
-        this.submitted = registry.meter(MetricRegistry.name(name, "submitted"));
+        this.submitted = registry.meter(NameUtility.name(name, "submitted"));
 
-        this.running = registry.counter(MetricRegistry.name(name, "running"));
-        this.completed = registry.meter(MetricRegistry.name(name, "completed"));
-        this.duration = registry.timer(MetricRegistry.name(name, "duration"));
+        this.running = registry.counter(NameUtility.name(name, "running"));
+        this.completed = registry.meter(NameUtility.name(name, "completed"));
+        this.duration = registry.timer(NameUtility.name(name, "duration"));
 
-        this.scheduledOnce = registry.meter(MetricRegistry.name(name, "scheduled.once"));
-        this.scheduledRepetitively = registry.meter(MetricRegistry.name(name, "scheduled.repetitively"));
-        this.scheduledOverrun = registry.counter(MetricRegistry.name(name, "scheduled.overrun"));
-        this.percentOfPeriod = registry.histogram(MetricRegistry.name(name, "scheduled.percent-of-period"));
+        this.scheduledOnce = registry.meter(NameUtility.name(name, "scheduled.once"));
+        this.scheduledRepetitively = registry.meter(NameUtility.name(name, "scheduled.repetitively"));
+        this.scheduledOverrun = registry.counter(NameUtility.name(name, "scheduled.overrun"));
+        this.percentOfPeriod = registry.histogram(NameUtility.name(name, "scheduled.percent-of-period"));
     }
 
     /**
