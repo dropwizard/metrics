@@ -181,7 +181,7 @@ returned by a search:
 
 .. code-block:: java
 
-    final Histogram resultCounts = registry.histogram(name(ProductDAO.class, "result-counts");
+    final Histogram resultCounts = registry.histogram(name(ProductDAO.class, "result-counts"));
     resultCounts.update(results.size());
 
 ``Histogram`` metrics allow you to measure not just easy things like the min, mean, max, and
