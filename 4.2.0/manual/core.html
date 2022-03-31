@@ -256,7 +256,7 @@ is only called internally to reload the cache value.</p>
 <span id="man-core-histograms"></span><h2>Histograms</h2>
 <p>A <code class="docutils literal notranslate"><span class="pre">Histogram</span></code> measures the distribution of values in a stream of data: e.g., the number of results
 returned by a search:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">final</span> <span class="n">Histogram</span> <span class="n">resultCounts</span> <span class="o">=</span> <span class="n">registry</span><span class="p">.</span><span class="na">histogram</span><span class="p">(</span><span class="n">name</span><span class="p">(</span><span class="n">ProductDAO</span><span class="p">.</span><span class="na">class</span><span class="p">,</span> <span class="s">&quot;result-counts&quot;</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">final</span> <span class="n">Histogram</span> <span class="n">resultCounts</span> <span class="o">=</span> <span class="n">registry</span><span class="p">.</span><span class="na">histogram</span><span class="p">(</span><span class="n">name</span><span class="p">(</span><span class="n">ProductDAO</span><span class="p">.</span><span class="na">class</span><span class="p">,</span> <span class="s">&quot;result-counts&quot;</span><span class="p">));</span>
 <span class="n">resultCounts</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">results</span><span class="p">.</span><span class="na">size</span><span class="p">());</span>
 </pre></div>
 </div>
