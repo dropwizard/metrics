@@ -20,7 +20,7 @@
         <javaModuleName>io.dropwizard.metrics5.servlets</javaModuleName>
         <papertrail.profiler.version>1.1.1</papertrail.profiler.version>
         <servlet.version>5.0.0</servlet.version>
-        <slf4j.version>2.0.0-alpha5</slf4j.version>
+        <slf4j.version>2.0.0-alpha6</slf4j.version>
     </properties>
 
     <dependencyManagement>
