@@ -49,6 +49,7 @@ public class AdminServletTest extends AbstractServletTest {
                                 "    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n" +
                                 "    <li><a href=\"/context/admin/ping\">Ping</a></li>%n" +
                                 "    <li><a href=\"/context/admin/threads\">Threads</a></li>%n" +
+                                "    <li><a href=\"/context/admin/heapdump\">Heap dump</a></li>%n" +
                                 "    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n" +
                                 "    <li><a href=\"/context/admin/pprof\">CPU Profile</a></li>%n" +
                                 "    <li><a href=\"/context/admin/pprof?state=blocked\">CPU Contention</a></li>%n" +

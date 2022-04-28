@@ -16,6 +16,7 @@ public class AdminServlet extends HttpServlet {
     public static final String DEFAULT_METRICS_URI = "/metrics";
     public static final String DEFAULT_PING_URI = "/ping";
     public static final String DEFAULT_THREADS_URI = "/threads";
+    public static final String DEFAULT_HEAP_DUMP_URI = "/heapdump";
     public static final String DEFAULT_CPU_PROFILE_URI = "/pprof";
 
     public static final String METRICS_ENABLED_PARAM_KEY = "metrics-enabled";
@@ -24,6 +25,8 @@ public class AdminServlet extends HttpServlet {
     public static final String PING_URI_PARAM_KEY = "ping-uri";
     public static final String THREADS_ENABLED_PARAM_KEY = "threads-enabled";
     public static final String THREADS_URI_PARAM_KEY = "threads-uri";
+    public static final String HEAP_DUMP_ENABLED_PARAM_KEY = "heapdump-enabled";
+    public static final String HEAP_DUMP_URI_PARAM_KEY = "heapdump-uri";
     public static final String HEALTHCHECK_ENABLED_PARAM_KEY = "healthcheck-enabled";
     public static final String HEALTHCHECK_URI_PARAM_KEY = "healthcheck-uri";
     public static final String SERVICE_NAME_PARAM_KEY = "service-name";
@@ -35,10 +38,10 @@ public class AdminServlet extends HttpServlet {
                     "        \"http://www.w3.org/TR/html4/loose.dtd\">%n" +
                     "<html>%n" +
                     "<head>%n" +
-                    "  <title>Metrics{10}</title>%n" +
+                    "  <title>Metrics{12}</title>%n" +
                     "</head>%n" +
                     "<body>%n" +
-                    "  <h1>Operational Menu{10}</h1>%n" +
+                    "  <h1>Operational Menu{12}</h1>%n" +
                     "  <ul>%n" +
                     "%s" +
                     "  </ul>%n" +
@@ -47,10 +50,10 @@ public class AdminServlet extends HttpServlet {
     private static final String METRICS_LINK = "    <li><a href=\"{0}{1}?pretty=true\">Metrics</a></li>%n";
     private static final String PING_LINK = "    <li><a href=\"{2}{3}\">Ping</a></li>%n" ;
     private static final String THREADS_LINK = "    <li><a href=\"{4}{5}\">Threads</a></li>%n" ;
-    private static final String HEALTHCHECK_LINK = "    <li><a href=\"{6}{7}?pretty=true\">Healthcheck</a></li>%n" ;
-    private static final String CPU_PROFILE_LINK = "    <li><a href=\"{8}{9}\">CPU Profile</a></li>%n" +
-            "    <li><a href=\"{8}{9}?state=blocked\">CPU Contention</a></li>%n";
-
+    private static final String HEAP_DUMP_LINK = "    <li><a href=\"{6}{7}\">Heap dump</a></li>%n" ;
+    private static final String HEALTHCHECK_LINK = "    <li><a href=\"{8}{9}?pretty=true\">Healthcheck</a></li>%n" ;
+    private static final String CPU_PROFILE_LINK = "    <li><a href=\"{10}{11}\">CPU Profile</a></li>%n" +
+            "    <li><a href=\"{10}{11}?state=blocked\">CPU Contention</a></li>%n";
 
     private static final String CONTENT_TYPE = "text/html";
     private static final long serialVersionUID = -2850794040708785318L;
@@ -59,6 +62,7 @@ public class AdminServlet extends HttpServlet {
     private transient MetricsServlet metricsServlet;
     private transient PingServlet pingServlet;
     private transient ThreadDumpServlet threadDumpServlet;
+    private transient HeapDumpServlet heapDumpServlet;
     private transient CpuProfileServlet cpuProfileServlet;
     private transient boolean metricsEnabled;
     private transient String metricsUri;
@@ -66,6 +70,8 @@ public class AdminServlet extends HttpServlet {
     private transient String pingUri;
     private transient boolean threadsEnabled;
     private transient String threadsUri;
+    private transient boolean heapDumpEnabled;
+    private transient String heapDumpUri;
     private transient boolean healthcheckEnabled;
     private transient String healthcheckUri;
     private transient boolean cpuProfileEnabled;
@@ -104,6 +110,14 @@ public class AdminServlet extends HttpServlet {
         this.threadDumpServlet = new ThreadDumpServlet();
         threadDumpServlet.init(config);
 
+        this.heapDumpEnabled  =
+                Boolean.parseBoolean(getParam(context.getInitParameter(HEAP_DUMP_ENABLED_PARAM_KEY), "true"));
+        if (this.heapDumpEnabled) {
+            servletLinks.append(HEAP_DUMP_LINK);
+        }
+        this.heapDumpServlet = new HeapDumpServlet();
+        heapDumpServlet.init(config);
+
         this.healthcheckEnabled =
                 Boolean.parseBoolean(getParam(context.getInitParameter(HEALTHCHECK_ENABLED_PARAM_KEY), "true"));
         if (this.healthcheckEnabled) {
@@ -125,6 +139,7 @@ public class AdminServlet extends HttpServlet {
         this.metricsUri = getParam(context.getInitParameter(METRICS_URI_PARAM_KEY), DEFAULT_METRICS_URI);
         this.pingUri = getParam(context.getInitParameter(PING_URI_PARAM_KEY), DEFAULT_PING_URI);
         this.threadsUri = getParam(context.getInitParameter(THREADS_URI_PARAM_KEY), DEFAULT_THREADS_URI);
+        this.heapDumpUri = getParam(context.getInitParameter(HEAP_DUMP_URI_PARAM_KEY), DEFAULT_HEAP_DUMP_URI);
         this.healthcheckUri = getParam(context.getInitParameter(HEALTHCHECK_URI_PARAM_KEY), DEFAULT_HEALTHCHECK_URI);
         this.cpuProfileUri = getParam(context.getInitParameter(CPU_PROFILE_URI_PARAM_KEY), DEFAULT_CPU_PROFILE_URI);
         this.serviceName = getParam(context.getInitParameter(SERVICE_NAME_PARAM_KEY), null);
@@ -139,7 +154,7 @@ public class AdminServlet extends HttpServlet {
         resp.setContentType(CONTENT_TYPE);
         try (PrintWriter writer = resp.getWriter()) {
             writer.println(MessageFormat.format(pageContentTemplate, path, metricsUri, path, pingUri, path,
-                    threadsUri, path, healthcheckUri, path, cpuProfileUri,
+                    threadsUri, path, heapDumpUri, path, healthcheckUri, path, cpuProfileUri,
                     serviceName == null ? "" : " (" + serviceName + ")"));
         }
     }
@@ -170,6 +185,12 @@ public class AdminServlet extends HttpServlet {
         } else if (uri.equals(threadsUri)) {
             if (threadsEnabled) {
                 threadDumpServlet.service(req, resp);
+            } else {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            }
+        } else if (uri.equals(heapDumpUri)) {
+            if (heapDumpEnabled) {
+                heapDumpServlet.service(req, resp);
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }

@@ -21,6 +21,7 @@ public class AdminServletUriTest extends AbstractServletTest {
         tester.setInitParameter("metrics-uri", "/metrics-test");
         tester.setInitParameter("ping-uri", "/ping-test");
         tester.setInitParameter("threads-uri", "/threads-test");
+        tester.setInitParameter("heapdump-uri", "/heapdump-test");
         tester.setInitParameter("healthcheck-uri", "/healthcheck-test");
         tester.setInitParameter("cpu-profile-uri", "/pprof-test");
         tester.addServlet(AdminServlet.class, "/admin");
@@ -53,6 +54,7 @@ public class AdminServletUriTest extends AbstractServletTest {
                                 "    <li><a href=\"/context/admin/metrics-test?pretty=true\">Metrics</a></li>%n" +
                                 "    <li><a href=\"/context/admin/ping-test\">Ping</a></li>%n" +
                                 "    <li><a href=\"/context/admin/threads-test\">Threads</a></li>%n" +
+                                "    <li><a href=\"/context/admin/heapdump-test\">Heap dump</a></li>%n" +
                                 "    <li><a href=\"/context/admin/healthcheck-test?pretty=true\">Healthcheck</a></li>%n" +
                                 "    <li><a href=\"/context/admin/pprof-test\">CPU Profile</a></li>%n" +
                                 "    <li><a href=\"/context/admin/pprof-test?state=blocked\">CPU Contention</a></li>%n" +

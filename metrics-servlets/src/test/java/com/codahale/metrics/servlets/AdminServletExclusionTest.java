@@ -49,6 +49,7 @@ public class AdminServletExclusionTest extends AbstractServletTest {
                                 "  <ul>%n" +
                                 "    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n" +
                                 "    <li><a href=\"/context/admin/ping\">Ping</a></li>%n" +
+                                "    <li><a href=\"/context/admin/heapdump\">Heap dump</a></li>%n" +
                                 "    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n" +
                                 "  </ul>%n" +
                                 "</body>%n" +
