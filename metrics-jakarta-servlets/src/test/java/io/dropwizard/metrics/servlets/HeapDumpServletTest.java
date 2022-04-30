@@ -3,6 +3,7 @@ package io.dropwizard.metrics.servlets;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -80,6 +81,7 @@ public class HeapDumpServletTest extends AbstractServletTest {
     }
 
     @Test
+    @Ignore
     public void deleteAfterDownloadFalseKeepsHeapDumpFile() throws Exception {
         final File tempFile = new File(temporaryFolder.getRoot(), "heapdump.hprof");
         request.setURI("/heapdump?outputFile=" + tempFile + "&download=true&deleteAfterDownload=false");
