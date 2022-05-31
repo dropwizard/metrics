@@ -3,6 +3,7 @@ Metrics
 [![Java CI](https://github.com/dropwizard/metrics/workflows/Java%20CI/badge.svg)](https://github.com/dropwizard/metrics/actions?query=workflow%3A%22Java+CI%22+branch%3Arelease%2F4.2.x)
 [![Maven Central](https://img.shields.io/maven-central/v/io.dropwizard.metrics/metrics-core/4.2)](https://maven-badges.herokuapp.com/maven-central/io.dropwizard.metrics/metrics-core/)
 [![Javadoc](http://javadoc-badge.appspot.com/io.dropwizard.metrics/metrics-core.svg)](http://www.javadoc.io/doc/io.dropwizard.metrics/metrics-core)
+[![Contribute with Gitpod](https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod)](https://gitpod.io/#https://github.com/dropwizard/metrics/tree/release/4.2.x)
 
 *📈 Capturing JVM- and application-level metrics. So you know what's going on.*
 
