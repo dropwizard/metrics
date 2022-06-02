@@ -1,6 +1,5 @@
 package com.codahale.metrics.httpclient;
 
-import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -104,26 +103,18 @@ public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientCo
         this.metricsRegistry = metricsRegistry;
         this.name = name;
 
-        metricsRegistry.register(name(HttpClientConnectionManager.class, name, "available-connections"),
-            (Gauge<Integer>) () -> {
-                // this acquires a lock on the connection pool; remove if contention sucks
-                return getTotalStats().getAvailable();
-            });
-        metricsRegistry.register(name(HttpClientConnectionManager.class, name, "leased-connections"),
-            (Gauge<Integer>) () -> {
-                // this acquires a lock on the connection pool; remove if contention sucks
-                return getTotalStats().getLeased();
-            });
-        metricsRegistry.register(name(HttpClientConnectionManager.class, name, "max-connections"),
-            (Gauge<Integer>) () -> {
-                // this acquires a lock on the connection pool; remove if contention sucks
-                return getTotalStats().getMax();
-            });
-        metricsRegistry.register(name(HttpClientConnectionManager.class, name, "pending-connections"),
-            (Gauge<Integer>) () -> {
-                // this acquires a lock on the connection pool; remove if contention sucks
-                return getTotalStats().getPending();
-            });
+        // this acquires a lock on the connection pool; remove if contention sucks
+        metricsRegistry.registerGauge(name(HttpClientConnectionManager.class, name, "available-connections"),
+                () -> getTotalStats().getAvailable());
+        // this acquires a lock on the connection pool; remove if contention sucks
+        metricsRegistry.registerGauge(name(HttpClientConnectionManager.class, name, "leased-connections"),
+                () -> getTotalStats().getLeased());
+        // this acquires a lock on the connection pool; remove if contention sucks
+        metricsRegistry.registerGauge(name(HttpClientConnectionManager.class, name, "max-connections"),
+                () -> getTotalStats().getMax());
+        // this acquires a lock on the connection pool; remove if contention sucks
+        metricsRegistry.registerGauge(name(HttpClientConnectionManager.class, name, "pending-connections"),
+                () -> getTotalStats().getPending());
     }
 
     @Override

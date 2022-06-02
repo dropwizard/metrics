@@ -1,6 +1,5 @@
 package com.codahale.metrics.ehcache;
 
-import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import net.sf.ehcache.CacheException;
@@ -118,56 +117,56 @@ public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
     public static Ehcache instrument(MetricRegistry registry, final Ehcache cache) {
 
         final String prefix = name(cache.getClass(), cache.getName());
-        registry.register(name(prefix, "hits"),
-                (Gauge<Long>) () -> cache.getStatistics().cacheHitCount());
+        registry.registerGauge(name(prefix, "hits"),
+                () -> cache.getStatistics().cacheHitCount());
 
-        registry.register(name(prefix, "in-memory-hits"),
-                (Gauge<Long>) () -> cache.getStatistics().localHeapHitCount());
+        registry.registerGauge(name(prefix, "in-memory-hits"),
+                () -> cache.getStatistics().localHeapHitCount());
 
-        registry.register(name(prefix, "off-heap-hits"),
-                (Gauge<Long>) () -> cache.getStatistics().localOffHeapHitCount());
+        registry.registerGauge(name(prefix, "off-heap-hits"),
+                () -> cache.getStatistics().localOffHeapHitCount());
 
-        registry.register(name(prefix, "on-disk-hits"),
-                (Gauge<Long>) () -> cache.getStatistics().localDiskHitCount());
+        registry.registerGauge(name(prefix, "on-disk-hits"),
+                () -> cache.getStatistics().localDiskHitCount());
 
-        registry.register(name(prefix, "misses"),
-                (Gauge<Long>) () -> cache.getStatistics().cacheMissCount());
+        registry.registerGauge(name(prefix, "misses"),
+                () -> cache.getStatistics().cacheMissCount());
 
-        registry.register(name(prefix, "in-memory-misses"),
-                (Gauge<Long>) () -> cache.getStatistics().localHeapMissCount());
+        registry.registerGauge(name(prefix, "in-memory-misses"),
+                () -> cache.getStatistics().localHeapMissCount());
 
-        registry.register(name(prefix, "off-heap-misses"),
-                (Gauge<Long>) () -> cache.getStatistics().localOffHeapMissCount());
+        registry.registerGauge(name(prefix, "off-heap-misses"),
+                () -> cache.getStatistics().localOffHeapMissCount());
 
-        registry.register(name(prefix, "on-disk-misses"),
-                (Gauge<Long>) () -> cache.getStatistics().localDiskMissCount());
+        registry.registerGauge(name(prefix, "on-disk-misses"),
+                () -> cache.getStatistics().localDiskMissCount());
 
-        registry.register(name(prefix, "objects"),
-                (Gauge<Long>) () -> cache.getStatistics().getSize());
+        registry.registerGauge(name(prefix, "objects"),
+                () -> cache.getStatistics().getSize());
 
-        registry.register(name(prefix, "in-memory-objects"),
-                (Gauge<Long>) () -> cache.getStatistics().getLocalHeapSize());
+        registry.registerGauge(name(prefix, "in-memory-objects"),
+                () -> cache.getStatistics().getLocalHeapSize());
 
-        registry.register(name(prefix, "off-heap-objects"),
-                (Gauge<Long>) () -> cache.getStatistics().getLocalOffHeapSize());
+        registry.registerGauge(name(prefix, "off-heap-objects"),
+                () -> cache.getStatistics().getLocalOffHeapSize());
 
-        registry.register(name(prefix, "on-disk-objects"),
-                (Gauge<Long>) () -> cache.getStatistics().getLocalDiskSize());
+        registry.registerGauge(name(prefix, "on-disk-objects"),
+                () -> cache.getStatistics().getLocalDiskSize());
 
-        registry.register(name(prefix, "mean-get-time"),
-                (Gauge<Double>) () -> cache.getStatistics().cacheGetOperation().latency().average().value());
+        registry.registerGauge(name(prefix, "mean-get-time"),
+                () -> cache.getStatistics().cacheGetOperation().latency().average().value());
 
-        registry.register(name(prefix, "mean-search-time"),
-                (Gauge<Double>) () -> cache.getStatistics().cacheSearchOperation().latency().average().value());
+        registry.registerGauge(name(prefix, "mean-search-time"),
+                () -> cache.getStatistics().cacheSearchOperation().latency().average().value());
 
-        registry.register(name(prefix, "eviction-count"),
-                (Gauge<Long>) () -> cache.getStatistics().cacheEvictionOperation().count().value());
+        registry.registerGauge(name(prefix, "eviction-count"),
+                () -> cache.getStatistics().cacheEvictionOperation().count().value());
 
-        registry.register(name(prefix, "searches-per-second"),
-                (Gauge<Double>) () -> cache.getStatistics().cacheSearchOperation().rate().value());
+        registry.registerGauge(name(prefix, "searches-per-second"),
+                () -> cache.getStatistics().cacheSearchOperation().rate().value());
 
-        registry.register(name(prefix, "writer-queue-size"),
-                (Gauge<Long>) () -> cache.getStatistics().getWriterQueueLength());
+        registry.registerGauge(name(prefix, "writer-queue-size"),
+                () -> cache.getStatistics().getWriterQueueLength());
 
         return new InstrumentedEhcache(registry, cache);
     }

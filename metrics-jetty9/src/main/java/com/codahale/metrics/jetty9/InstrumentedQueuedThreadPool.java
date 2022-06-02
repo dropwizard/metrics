@@ -1,6 +1,5 @@
 package com.codahale.metrics.jetty9;
 
-import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.RatioGauge;
 import org.eclipse.jetty.util.annotation.Name;
@@ -87,12 +86,10 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
                 return Ratio.of(getThreads() - getIdleThreads(), getMaxThreads());
             }
         });
-        metricRegistry.register(name(prefix, NAME_SIZE), (Gauge<Integer>) this::getThreads);
-        metricRegistry.register(name(prefix, NAME_JOBS), (Gauge<Integer>) () -> {
-            // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
-            // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.
-            return getQueue().size();
-        });
+        metricRegistry.registerGauge(name(prefix, NAME_SIZE), this::getThreads);
+        // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
+        // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.
+        metricRegistry.registerGauge(name(prefix, NAME_JOBS), () -> getQueue().size());
         metricRegistry.register(name(prefix, NAME_JOBS_QUEUE_UTILIZATION), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
