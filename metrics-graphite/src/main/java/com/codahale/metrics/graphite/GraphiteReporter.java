@@ -477,7 +477,7 @@ public class GraphiteReporter extends ScheduledReporter {
         Object value = gauge.getValue();
         String finalMetricName;
         String finalValue;
-        if(value instanceof String) {
+        if (value instanceof String) {
             finalMetricName = MetricRegistry.name(prefix, name, (String) value);
             finalValue = format(1);
         } else {

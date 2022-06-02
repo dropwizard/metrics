@@ -63,23 +63,6 @@ public class GraphiteReporterTest {
     }
 
     @Test
-    public void doesNotReportStringGaugeValues() throws Exception {
-        reporter.report(map("gauge", gauge("value")),
-            map(),
-            map(),
-            map(),
-            map());
-
-        final InOrder inOrder = inOrder(graphite);
-        inOrder.verify(graphite).connect();
-        inOrder.verify(graphite, never()).send("prefix.gauge", "value", timestamp);
-        inOrder.verify(graphite).flush();
-        inOrder.verify(graphite).close();
-
-        verifyNoMoreInteractions(graphite);
-    }
-
-    @Test
     public void reportsByteGaugeValues() throws Exception {
         reporter.report(map("gauge", gauge((byte) 1)),
             map(),
