@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.jersey3</javaModuleName>
-        <jersey.version>3.0.4</jersey.version>
+        <jersey.version>3.0.5</jersey.version>
     </properties>
 
     <dependencyManagement>
@@ -41,6 +41,11 @@
                 <groupId>jakarta.annotation</groupId>
                 <artifactId>jakarta.annotation-api</artifactId>
                 <version>2.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.inject</groupId>
+                <artifactId>jakarta.inject-api</artifactId>
+                <version>2.0.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
