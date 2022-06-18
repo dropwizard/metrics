@@ -615,15 +615,29 @@ public class MetricRegistryTest {
         assertThat(deepChildMetrics.size()).isEqualTo(1);
         assertThat(childMetrics.size()).isEqualTo(3);
     }
-    
+
     @Test
     public void registerNullMetric() {
-        MetricRegistry registry = new MetricRegistry();   
+        MetricRegistry registry = new MetricRegistry();
         try {
             registry.register("any_name", null);
             Assert.fail("NullPointerException must be thrown !!!");
         } catch (NullPointerException e) {
             Assert.assertEquals("metric == null", e.getMessage());
         }
+    }
+
+    @Test
+    public void infersGaugeType() {
+        Gauge<Long> gauge = registry.registerGauge("gauge", () -> 10_000_000_000L);
+
+        assertThat(gauge.getValue()).isEqualTo(10_000_000_000L);
+    }
+
+    @Test
+    public void registersGaugeAsLambda() {
+        registry.registerGauge("gauge", () -> 3.14);
+
+        assertThat(registry.gauge("gauge").getValue()).isEqualTo(3.14);
     }
 }

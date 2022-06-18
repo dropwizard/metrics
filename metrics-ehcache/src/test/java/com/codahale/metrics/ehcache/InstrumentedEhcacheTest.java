@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 public class InstrumentedEhcacheTest {
     private static final CacheManager MANAGER = CacheManager.create();
@@ -24,6 +25,27 @@ public class InstrumentedEhcacheTest {
         final Cache c = new Cache(new CacheConfiguration("test", 100));
         MANAGER.addCache(c);
         this.cache = InstrumentedEhcache.instrument(registry, c);
+        assertThat(registry.getGauges().entrySet().stream()
+                .map(e -> entry(e.getKey(), e.getValue().getValue())))
+                .containsOnly(
+                        entry("net.sf.ehcache.Cache.test.eviction-count", 0L),
+                        entry("net.sf.ehcache.Cache.test.hits", 0L),
+                        entry("net.sf.ehcache.Cache.test.in-memory-hits", 0L),
+                        entry("net.sf.ehcache.Cache.test.in-memory-misses", 0L),
+                        entry("net.sf.ehcache.Cache.test.in-memory-objects", 0L),
+                        entry("net.sf.ehcache.Cache.test.mean-get-time", Double.NaN),
+                        entry("net.sf.ehcache.Cache.test.mean-search-time", Double.NaN),
+                        entry("net.sf.ehcache.Cache.test.misses", 0L),
+                        entry("net.sf.ehcache.Cache.test.objects", 0L),
+                        entry("net.sf.ehcache.Cache.test.off-heap-hits", 0L),
+                        entry("net.sf.ehcache.Cache.test.off-heap-misses", 0L),
+                        entry("net.sf.ehcache.Cache.test.off-heap-objects", 0L),
+                        entry("net.sf.ehcache.Cache.test.on-disk-hits", 0L),
+                        entry("net.sf.ehcache.Cache.test.on-disk-misses", 0L),
+                        entry("net.sf.ehcache.Cache.test.on-disk-objects", 0L),
+                        entry("net.sf.ehcache.Cache.test.searches-per-second", 0.0),
+                        entry("net.sf.ehcache.Cache.test.writer-queue-size", 0L)
+                );
     }
 
     @Test
