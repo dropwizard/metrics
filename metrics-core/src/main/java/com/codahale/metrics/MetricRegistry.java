@@ -82,6 +82,7 @@ public class MetricRegistry implements MetricSet {
      * @param name the name of the gauge
      * @param <T>  the type of the gauge's value
      * @return the registered {@link Gauge}
+     * @since 4.2.10
      */
     public <T> Gauge<T> registerGauge(String name, Gauge<T> metric) throws IllegalArgumentException {
         return register(name, metric);
