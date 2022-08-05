@@ -41,6 +41,7 @@ public class MetricRegistryTest {
 
     @Test
     public void testCreateCustomGauge() {
+        @SuppressWarnings("rawtypes")
         Gauge gauge = metricRegistry.gauge("test-gauge-supplier", () -> () -> 42);
         assertThat(gauge.getValue()).isEqualTo(42);
     }
@@ -337,7 +338,7 @@ public class MetricRegistryTest {
                 return "eu" + value;
             }
         });
-
+        @SuppressWarnings("rawtypes")
         SortedMap<String, Gauge> gauges = metricRegistry.getGauges();
         assertThat(gauges).containsOnlyKeys("test-gauge", "test-text-gauge-1", "test-text-gauge-2");
     }

@@ -19,6 +19,7 @@ public class InstrumentedScheduledExecutorServiceTest {
         executorService.shutdown();
     }
 
+    @SuppressWarnings("FutureReturnValueIgnored")
     @Test
     public void testCreate() throws Exception {
         MetricRegistry registry = new MetricRegistry();

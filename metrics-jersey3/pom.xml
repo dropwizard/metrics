@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-jersey3</artifactId>
-    <name>Metrics Integration for Jersey 3.x</name>
+    <name>Metrics5 Integration for Jersey 3.x</name>
     <packaging>bundle</packaging>
     <description>
         A set of class providing Metrics integration for Jersey, the reference JAX-RS

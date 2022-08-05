@@ -1,6 +1,5 @@
 package com.codahale.metrics;
 
-import org.junit.After;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
@@ -14,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class InstrumentedExecutorServiceTest {
 
 
+    @SuppressWarnings("FutureReturnValueIgnored")
     @Test
     public void testCreate() throws Exception {
         ExecutorService executorService = Executors.newSingleThreadExecutor();

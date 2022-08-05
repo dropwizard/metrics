@@ -17,7 +17,7 @@ public class InstrumentedThreadFactoryTest {
                 "test-instrumented-thread-factory");
         CountDownLatch latch = new CountDownLatch(4);
         for (int i = 0; i < 4; i++) {
-            threadFactory.newThread(latch::countDown).run();
+            threadFactory.newThread(latch::countDown).start();
         }
         latch.await(5, TimeUnit.SECONDS);
         assertThat(registry.meter("test-instrumented-thread-factory.created").getCount()).isEqualTo(4);

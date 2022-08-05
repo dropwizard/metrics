@@ -1,5 +1,6 @@
 package io.dropwizard.metrics5;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,25 +11,12 @@ import java.util.stream.Collectors;
 
 import static io.dropwizard.metrics5.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 public class MetricRegistryTest {
-
-    private static class CustomCounter extends Counter {
-
-        CustomCounter() {
-            super();
-        }
-
-        public void incTheAnswer() {
-            inc(42);
-        }
-    }
-
     private static final MetricName TIMER2 = MetricName.build("timer");
     private static final MetricName METER2 = MetricName.build("meter");
     private static final MetricName HISTOGRAM2 = MetricName.build("histogram");
@@ -101,14 +89,6 @@ public class MetricRegistryTest {
         verify(listener).onCounterAdded(THING, counter1);
     }
 
-    @Test
-    public void createsTypesafeCustomCounter() {
-        MetricName name = MetricName.build("custom-counter");
-        final CustomCounter customCounter = registry.counter(name, CustomCounter::new);
-        customCounter.incTheAnswer();
-
-        assertThat(registry.counter(name).getCount()).isEqualTo(42);
-    }
 
     @Test
     public void removingACounterTriggersANotification() {
@@ -245,18 +225,6 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void accessingACustomGaugeRegistersAndReusesIt() {
-        final MetricRegistry.MetricSupplier<Gauge<String>> supplier = () -> gauge;
-        final Gauge<String> gauge1 = registry.gauge(THING, supplier);
-        final Gauge<String> gauge2 = registry.gauge(THING, supplier);
-
-        assertThat(gauge1)
-                .isSameAs(gauge2);
-
-        verify(listener).onGaugeAdded(THING, gauge1);
-    }
-
-    @Test
     public void accessingASettableGaugeRegistersAndReusesIt() {
         final SettableGauge<String> gauge1 = registry.gauge(THING);
         gauge1.setValue("Test");
@@ -286,6 +254,19 @@ public class MetricRegistryTest {
 
         assertThat(gauge1).isSameAs(gauge2);
         assertThat(gauge2.getValue()).isEqualTo("settable-gauge");
+
+        verify(listener).onGaugeAdded(THING, gauge1);
+    }
+
+    @Test
+    @SuppressWarnings("rawtypes")
+    public void accessingACustomGaugeRegistersAndReusesIt() {
+        final MetricRegistry.MetricSupplier<Gauge> supplier = () -> gauge;
+        final Gauge gauge1 = registry.gauge(THING, supplier);
+        final Gauge gauge2 = registry.gauge(THING, supplier);
+
+        assertThat(gauge1)
+                .isSameAs(gauge2);
 
         verify(listener).onGaugeAdded(THING, gauge1);
     }
@@ -661,7 +642,25 @@ public class MetricRegistryTest {
     @Test
     public void registerNullMetric() {
         MetricRegistry registry = new MetricRegistry();
-        assertThatThrownBy(() -> registry.register("any_name", null))
-                .hasMessage("metric == null");
+        try {
+            registry.register("any_name", null);
+            Assert.fail("NullPointerException must be thrown !!!");
+        } catch (NullPointerException e) {
+            Assert.assertEquals("metric == null", e.getMessage());
+        }
+    }
+
+    @Test
+    public void infersGaugeType() {
+        Gauge<Long> gauge = registry.registerGauge(GAUGE, () -> 10_000_000_000L);
+
+        assertThat(gauge.getValue()).isEqualTo(10_000_000_000L);
+    }
+
+    @Test
+    public void registersGaugeAsLambda() {
+        registry.registerGauge(GAUGE, () -> 3.14);
+
+        assertThat(registry.gauge(GAUGE).getValue()).isEqualTo(3.14);
     }
 }

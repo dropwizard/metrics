@@ -26,46 +26,55 @@ public class Slf4jReporter extends ScheduledReporter {
             this.delegate = requireNonNull(delegate);
         }
 
+        @SuppressWarnings("CanIgnoreReturnValueSuggester")
         public Slf4jReporter.Builder shutdownExecutorOnStop(boolean shutdownExecutorOnStop) {
             delegate.shutdownExecutorOnStop(shutdownExecutorOnStop);
             return this;
         }
 
+        @SuppressWarnings("CanIgnoreReturnValueSuggester")
         public Slf4jReporter.Builder scheduleOn(ScheduledExecutorService executor) {
             delegate.scheduleOn(executor);
             return this;
         }
 
+        @SuppressWarnings("CanIgnoreReturnValueSuggester")
         public Slf4jReporter.Builder outputTo(Logger logger) {
             delegate.outputTo(logger);
             return this;
         }
 
+        @SuppressWarnings("CanIgnoreReturnValueSuggester")
         public Slf4jReporter.Builder markWith(Marker marker) {
             delegate.markWith(marker);
             return this;
         }
 
+        @SuppressWarnings("CanIgnoreReturnValueSuggester")
         public Slf4jReporter.Builder prefixedWith(String prefix) {
             delegate.prefixedWith(prefix);
             return this;
         }
 
+        @SuppressWarnings("CanIgnoreReturnValueSuggester")
         public Slf4jReporter.Builder convertRatesTo(TimeUnit rateUnit) {
             delegate.convertRatesTo(rateUnit);
             return this;
         }
 
+        @SuppressWarnings("CanIgnoreReturnValueSuggester")
         public Slf4jReporter.Builder convertDurationsTo(TimeUnit durationUnit) {
             delegate.convertDurationsTo(durationUnit);
             return this;
         }
 
+        @SuppressWarnings("CanIgnoreReturnValueSuggester")
         public Slf4jReporter.Builder filter(MetricFilter filter) {
             delegate.filter(filter.transform());
             return this;
         }
 
+        @SuppressWarnings("CanIgnoreReturnValueSuggester")
         public Slf4jReporter.Builder withLoggingLevel(LoggingLevel loggingLevel) {
             delegate.withLoggingLevel(io.dropwizard.metrics5.Slf4jReporter.LoggingLevel.valueOf(loggingLevel.name()));
             return this;
