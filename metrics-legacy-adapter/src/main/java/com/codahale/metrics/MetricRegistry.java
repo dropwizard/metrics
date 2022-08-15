@@ -35,6 +35,11 @@ public class MetricRegistry implements MetricSet {
         this.delegate = requireNonNull(delegate);
     }
 
+    public <T> Gauge<T> registerGauge(String name, Gauge<T> metric) throws IllegalArgumentException {
+        delegate.registerGauge(MetricName.build(name), metric.getDelegate());
+        return metric;
+    }
+
     public <T extends Metric> T register(String name, T metric) throws IllegalArgumentException {
         delegate.register(MetricName.build(name), metric.getDelegate());
         return metric;

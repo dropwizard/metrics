@@ -8,6 +8,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 
 
@@ -17,7 +19,12 @@ public class InstrumentedHttpClientConnectionManagerTest {
     @Test
     public void shouldRemoveGauges() {
         final InstrumentedHttpClientConnectionManager instrumentedHttpClientConnectionManager = InstrumentedHttpClientConnectionManager.builder(metricRegistry).build();
-        Assert.assertEquals(4, metricRegistry.getGauges().size());
+        assertThat(metricRegistry.getGauges().entrySet().stream()
+                .map(e -> entry(e.getKey().getKey(), (Integer) e.getValue().getValue())))
+                .containsOnly(entry("org.apache.http.conn.HttpClientConnectionManager.available-connections", 0),
+                        entry("org.apache.http.conn.HttpClientConnectionManager.leased-connections", 0),
+                        entry("org.apache.http.conn.HttpClientConnectionManager.max-connections", 20),
+                        entry("org.apache.http.conn.HttpClientConnectionManager.pending-connections", 0));
 
         instrumentedHttpClientConnectionManager.close();
         Assert.assertEquals(0, metricRegistry.getGauges().size());
@@ -37,7 +44,7 @@ public class InstrumentedHttpClientConnectionManagerTest {
                 .close();
 
         ArgumentCaptor<MetricName> argumentCaptor = ArgumentCaptor.forClass(MetricName.class);
-        Mockito.verify(registry, Mockito.atLeast(1)).register(argumentCaptor.capture(), any());
+        Mockito.verify(registry, Mockito.atLeast(1)).registerGauge(argumentCaptor.capture(), any());
         assertTrue(argumentCaptor.getValue().getKey().contains("some-other-name"));
     }
 }
