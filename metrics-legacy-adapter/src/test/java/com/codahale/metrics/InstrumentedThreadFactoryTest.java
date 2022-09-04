@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class InstrumentedThreadFactoryTest {
 
     @Test
+    @SuppressWarnings("DoNotCall")
     public void testFactory() throws Exception {
         MetricRegistry registry = new MetricRegistry();
         InstrumentedThreadFactory threadFactory = new InstrumentedThreadFactory(Thread::new, registry,
