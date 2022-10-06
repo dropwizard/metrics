@@ -25,7 +25,7 @@ jobs:
         server-password: CI_DEPLOY_PASSWORD
         gpg-passphrase: GPG_PASSPHRASE
         gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-    - uses: actions/cache@ac8075791e805656e71b4ba23325ace9e3421120 # tag=v3.0.9
+    - uses: actions/cache@56461b9eb0f8438fd15c7a9968e3c9ebb18ceff1 # tag=v3.0.10
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
