@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.json</javaModuleName>
-        <jackson.version>2.12.7</jackson.version>
+        <jackson.version>2.12.7.20221012</jackson.version>
     </properties>
 
     <dependencyManagement>
