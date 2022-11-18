@@ -130,15 +130,12 @@ public class JmxReporterTest {
         try {
             String widgetName = "something";
             when(mockObjectNameFactory.createName(any(String.class), any(String.class), any(MetricName.class))).thenReturn(n);
-            Gauge aGauge = mock(Gauge.class);
-            when(aGauge.getValue()).thenReturn(1);
-
             JmxReporter reporter = JmxReporter.forRegistry(registry)
                     .registerWith(mBeanServer)
                     .inDomain(name)
                     .createsObjectNamesWith(mockObjectNameFactory)
                     .build();
-            registry.register(widgetName, aGauge);
+            registry.registerGauge(widgetName, () -> 1);
             reporter.start();
             verify(mockObjectNameFactory).createName(eq("gauges"), any(String.class), eq(MetricName.build("something")));
             //verifyNoMoreInteractions(mockObjectNameFactory);

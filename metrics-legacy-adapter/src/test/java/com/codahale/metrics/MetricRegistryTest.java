@@ -40,6 +40,12 @@ public class MetricRegistryTest {
     }
 
     @Test
+    public void testRegisterGauge() {
+        metricRegistry.registerGauge("test-gauge", () -> 42);
+        assertThat(metricRegistry.getGauges().get("test-gauge").getValue()).isEqualTo(42);
+    }
+
+    @Test
     public void testCreateCustomGauge() {
         Gauge gauge = metricRegistry.gauge("test-gauge-supplier", () -> () -> 42);
         assertThat(gauge.getValue()).isEqualTo(42);

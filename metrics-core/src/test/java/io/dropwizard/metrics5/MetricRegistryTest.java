@@ -664,4 +664,18 @@ public class MetricRegistryTest {
         assertThatThrownBy(() -> registry.register("any_name", null))
                 .hasMessage("metric == null");
     }
+
+    @Test
+    public void infersGaugeType() {
+        Gauge<Long> gauge = registry.registerGauge(GAUGE, () -> 10_000_000_000L);
+
+        assertThat(gauge.getValue()).isEqualTo(10_000_000_000L);
+    }
+
+    @Test
+    public void registersGaugeAsLambda() {
+        registry.registerGauge(GAUGE, () -> 3.14);
+
+        assertThat(registry.gauge(GAUGE).getValue()).isEqualTo(3.14);
+    }
 }

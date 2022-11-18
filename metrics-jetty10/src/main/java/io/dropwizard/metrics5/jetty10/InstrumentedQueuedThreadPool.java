@@ -1,6 +1,5 @@
 package io.dropwizard.metrics5.jetty10;
 
-import io.dropwizard.metrics5.Gauge;
 import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.RatioGauge;
@@ -88,13 +87,11 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
                 return Ratio.of(getThreads() - getIdleThreads(), getMaxThreads());
             }
         });
-        metricRegistry.register(prefix.resolve("size"), (Gauge<Integer>) this::getThreads);
-        metricRegistry.register(prefix.resolve("jobs"), (Gauge<Integer>) () -> {
-            // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
-            // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.
-            return getQueue().size();
-        });
-        metricRegistry.register(prefix.resolve("jobs-queue-utilization"), new RatioGauge() {
+        // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
+        // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.
+        metricRegistry.registerGauge(prefix.resolve(NAME_SIZE), this::getThreads);
+        metricRegistry.registerGauge(prefix.resolve(NAME_JOBS), () -> getQueue().size());
+        metricRegistry.register(prefix.resolve(NAME_JOBS_QUEUE_UTILIZATION), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 BlockingQueue<Runnable> queue = getQueue();
