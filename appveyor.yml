@@ -1,3 +1,0 @@
-test_script:
-  - ./mvnw -B verify
-build: off
