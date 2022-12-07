@@ -21,6 +21,7 @@
       "allowedVersions": "<2.10.0"
     }
   ],
+  "platformAutomerge": true,
   "reviewers": ["team:committers", "team:metrics"],
   "schedule": [
     "before 2am"
