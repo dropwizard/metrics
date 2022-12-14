@@ -14,7 +14,7 @@ jobs:
     env:
       JAVA_OPTS: "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
     steps:
-    - uses: actions/checkout@7dd9e2a3dc350cf687eb1b2a4fadfee8c8e49675 # v3
+    - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3
     - name: Set up JDK
       uses: actions/setup-java@c3ac5dd0ed8db40fedb61c32fbe677e6b355e94c # v3
       with:
