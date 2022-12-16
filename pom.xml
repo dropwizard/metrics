@@ -57,7 +57,7 @@
         <jackson.version>2.12.3</jackson.version>
         <jetty9.version>9.4.50.v20221201</jetty9.version>
         <jetty10.version>10.0.13</jetty10.version>
-        <jetty11.version>11.0.12</jetty11.version>
+        <jetty11.version>11.0.13</jetty11.version>
         <slf4j.version>1.7.36</slf4j.version>
         <assertj.version>3.23.1</assertj.version>
         <mockito.version>4.6.1</mockito.version>
