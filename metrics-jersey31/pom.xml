@@ -8,17 +8,17 @@
         <version>5.0.0-rc14-SNAPSHOT</version>
     </parent>
 
-    <artifactId>metrics-jersey3</artifactId>
-    <name>Metrics Integration for Jersey 3.0.x</name>
+    <artifactId>metrics-jersey31</artifactId>
+    <name>Metrics Integration for Jersey 3.1.x</name>
     <packaging>bundle</packaging>
     <description>
-        A set of class providing Metrics integration for Jersey 3.0.x, the reference JAX-RS
+        A set of class providing Metrics integration for Jersey 3.1.x, the reference JAX-RS
         implementation.
     </description>
 
     <properties>
-        <javaModuleName>io.dropwizard.metrics5.jersey3</javaModuleName>
-        <jersey.version>3.0.8</jersey.version>
+        <javaModuleName>io.dropwizard.metrics5.jersey31</javaModuleName>
+        <jersey.version>3.1.0</jersey.version>
     </properties>
 
     <dependencyManagement>
@@ -66,7 +66,7 @@
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
-            <version>3.0.0</version>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
