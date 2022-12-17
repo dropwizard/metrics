@@ -35,6 +35,7 @@
         <module>metrics-jdbi3</module>
         <module>metrics-jersey2</module>
         <module>metrics-jersey3</module>
+        <module>metrics-jersey31</module>
         <module>metrics-jetty9</module>
         <module>metrics-jetty10</module>
         <module>metrics-jetty11</module>
