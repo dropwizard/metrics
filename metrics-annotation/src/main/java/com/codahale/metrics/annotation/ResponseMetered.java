@@ -18,8 +18,9 @@ import java.lang.annotation.Target;
  *     }
  * </code></pre>
  * <p>
- * A meter for the defining class with the name {@code fancyName} will be created for 1xx/2xx/3xx/4xx/5xx responses
- * and each time the {@code #fancyName(String)} method is invoked, the appropriate response meter will be marked.
+ * A meter for the defining class with the name {@code fancyName} will be created for every response code
+ * in addition to 1xx/2xx/3xx/4xx/5xx responses. Each time the {@code #fancyName(String)} method is invoked,
+ * the appropriate response meter will be marked.
  */
 @Inherited
 @Documented

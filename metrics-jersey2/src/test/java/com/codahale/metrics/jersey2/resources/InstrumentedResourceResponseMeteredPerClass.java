@@ -22,14 +22,14 @@ public class InstrumentedResourceResponseMeteredPerClass {
 
     @GET
     @Path("/responseMetered4xxPerClass")
-    public Response responseMetered4xxPerClass() {
-        return Response.status(Response.Status.BAD_REQUEST).build();
+    public Response responseMetered4xxPerClass(@QueryParam("status_code") @DefaultValue("400") int statusCode) {
+        return Response.status(Response.Status.fromStatusCode(statusCode)).build();
     }
 
     @GET
     @Path("/responseMetered5xxPerClass")
-    public Response responseMetered5xxPerClass() {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    public Response responseMetered5xxPerClass(@QueryParam("status_code") @DefaultValue("500") int statusCode) {
+        return Response.status(Response.Status.fromStatusCode(statusCode)).build();
     }
 
     @GET

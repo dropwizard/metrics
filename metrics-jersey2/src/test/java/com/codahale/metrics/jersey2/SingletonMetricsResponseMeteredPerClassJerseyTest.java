@@ -62,6 +62,11 @@ public class SingletonMetricsResponseMeteredPerClassJerseyTest extends JerseyTes
                 .request()
                 .get().getStatus())
                 .isEqualTo(400);
+        assertThat(target("responseMetered4xxPerClass")
+                .queryParam("status_code", 401)
+                .request()
+                .get().getStatus())
+                .isEqualTo(401);
         assertThat(target("responseMeteredBadRequestPerClass")
                 .request()
                 .get().getStatus())
@@ -70,11 +75,15 @@ public class SingletonMetricsResponseMeteredPerClassJerseyTest extends JerseyTes
         final Meter meter4xx = registry.meter(name(InstrumentedResourceResponseMeteredPerClass.class,
                 "responseMetered4xxPerClass",
                 "4xx-responses"));
+        final Meter meter401 = registry.meter(name(InstrumentedResourceResponseMeteredPerClass.class,
+                "responseMetered4xxPerClass",
+                "401-responses"));
         final Meter meterException4xx = registry.meter(name(InstrumentedResourceResponseMeteredPerClass.class,
                 "responseMeteredBadRequestPerClass",
                 "4xx-responses"));
 
-        assertThat(meter4xx.getCount()).isEqualTo(1);
+        assertThat(meter4xx.getCount()).isEqualTo(2);
+        assertThat(meter401.getCount()).isEqualTo(1);
         assertThat(meterException4xx.getCount()).isEqualTo(1);
     }
 
@@ -84,12 +93,22 @@ public class SingletonMetricsResponseMeteredPerClassJerseyTest extends JerseyTes
                 .request()
                 .get().getStatus())
                 .isEqualTo(500);
+        assertThat(target("responseMetered5xxPerClass")
+                .queryParam("status_code", 503)
+                .request()
+                .get().getStatus())
+                .isEqualTo(503);
 
         final Meter meter5xx = registry.meter(name(InstrumentedResourceResponseMeteredPerClass.class,
                 "responseMetered5xxPerClass",
                 "5xx-responses"));
 
-        assertThat(meter5xx.getCount()).isEqualTo(1);
+        final Meter meter503 = registry.meter(name(InstrumentedResourceResponseMeteredPerClass.class,
+                "responseMetered5xxPerClass",
+                "503-responses"));
+
+        assertThat(meter5xx.getCount()).isEqualTo(2);
+        assertThat(meter503.getCount()).isEqualTo(1);
     }
 
     @Test

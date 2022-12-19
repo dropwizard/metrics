@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -127,11 +128,14 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
      */
     private static class ResponseMeterMetric {
         public final List<Meter> meters;
+        private final ConcurrentMap<Integer, Meter> responseCodeMeters = new ConcurrentHashMap<>();
+        private final MetricRegistry metricRegistry;
+        private final String metricName;
 
         public ResponseMeterMetric(final MetricRegistry registry,
                                    final ResourceMethod method,
                                    final ResponseMetered responseMetered) {
-            final String metricName = chooseName(responseMetered.name(), responseMetered.absolute(), method);
+            this.metricName = chooseName(responseMetered.name(), responseMetered.absolute(), method);
             this.meters = Collections.unmodifiableList(Arrays.asList(
                     registry.meter(name(metricName, "1xx-responses")), // 1xx
                     registry.meter(name(metricName, "2xx-responses")), // 2xx
@@ -139,6 +143,13 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                     registry.meter(name(metricName, "4xx-responses")), // 4xx
                     registry.meter(name(metricName, "5xx-responses"))  // 5xx
             ));
+            this.metricRegistry = registry;
+        }
+
+        public Meter getResponseCodeMeter(int statusCode) {
+            return responseCodeMeters
+                    .computeIfAbsent(statusCode, sc -> metricRegistry
+                            .meter(name(metricName, String.format("%d-responses", sc))));
         }
     }
 
@@ -273,11 +284,13 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                     if (containerResponse == null) {
                         if (event.getException() != null) {
                             metric.meters.get(4).mark();
+                            metric.getResponseCodeMeter(500).mark();
                         }
                     } else {
                         final int responseStatus = containerResponse.getStatus() / 100;
                         if (responseStatus >= 1 && responseStatus <= 5) {
                             metric.meters.get(responseStatus - 1).mark();
+                            metric.getResponseCodeMeter(containerResponse.getStatus()).mark();
                         }
                     }
                 }

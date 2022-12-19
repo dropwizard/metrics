@@ -99,12 +99,27 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
         final Meter meter2xx = registry.meter(name(InstrumentedResource.class,
                 "response2xxMetered",
                 "2xx-responses"));
+        final Meter meter200 = registry.meter(name(InstrumentedResource.class,
+                "response2xxMetered",
+                "200-responses"));
         final Meter meter4xx = registry.meter(name(InstrumentedResource.class,
                 "response4xxMetered",
                 "4xx-responses"));
+        final Meter meter400 = registry.meter(name(InstrumentedResource.class,
+                "response4xxMetered",
+                "400-responses"));
+        final Meter meter401 = registry.meter(name(InstrumentedResource.class,
+                "response4xxMetered",
+                "401-responses"));
         final Meter meter5xx = registry.meter(name(InstrumentedResource.class,
                 "response5xxMetered",
                 "5xx-responses"));
+        final Meter meter500 = registry.meter(name(InstrumentedResource.class,
+                "response5xxMetered",
+                "500-responses"));
+        final Meter meter503 = registry.meter(name(InstrumentedResource.class,
+                "response5xxMetered",
+                "503-responses"));
 
         assertThat(meter2xx.getCount()).isZero();
         assertThat(target("response-2xx-metered")
@@ -118,15 +133,31 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
                 .get().getStatus())
                 .isEqualTo(400);
 
+        assertThat(target("response-4xx-metered")
+                .queryParam("status_code", 401)
+                .request()
+                .get().getStatus())
+                .isEqualTo(401);
+
         assertThat(meter5xx.getCount()).isZero();
         assertThat(target("response-5xx-metered")
                 .request()
                 .get().getStatus())
                 .isEqualTo(500);
+        assertThat(target("response-5xx-metered")
+                .queryParam("status_code", 503)
+                .request()
+                .get().getStatus())
+                .isEqualTo(503);
 
         assertThat(meter2xx.getCount()).isEqualTo(1);
-        assertThat(meter4xx.getCount()).isEqualTo(1);
-        assertThat(meter5xx.getCount()).isEqualTo(1);
+        assertThat(meter4xx.getCount()).isEqualTo(2);
+        assertThat(meter5xx.getCount()).isEqualTo(2);
+        assertThat(meter200.getCount()).isEqualTo(1);
+        assertThat(meter400.getCount()).isEqualTo(1);
+        assertThat(meter401.getCount()).isEqualTo(1);
+        assertThat(meter500.getCount()).isEqualTo(1);
+        assertThat(meter503.getCount()).isEqualTo(1);
     }
 
     @Test

@@ -51,15 +51,15 @@ public class InstrumentedResource {
     @GET
     @ResponseMetered
     @Path("/response-4xx-metered")
-    public Response response4xxMetered() {
-        return Response.status(Response.Status.BAD_REQUEST).build();
+    public Response response4xxMetered(@QueryParam("status_code") @DefaultValue("400") int statusCode) {
+        return Response.status(Response.Status.fromStatusCode(statusCode)).build();
     }
 
     @GET
     @ResponseMetered
     @Path("/response-5xx-metered")
-    public Response response5xxMetered() {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    public Response response5xxMetered(@QueryParam("status_code") @DefaultValue("500") int statusCode) {
+        return Response.status(Response.Status.fromStatusCode(statusCode)).build();
     }
 
     @Path("/subresource")
