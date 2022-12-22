@@ -14,6 +14,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 
+import static com.codahale.metrics.annotation.ResponseMeteredLevel.COARSE;
+import static com.codahale.metrics.annotation.ResponseMeteredLevel.DETAILED;
+import static com.codahale.metrics.annotation.ResponseMeteredLevel.ALL;
+
 @Path("/")
 @Produces(MediaType.TEXT_PLAIN)
 public class InstrumentedResource {
@@ -42,23 +46,23 @@ public class InstrumentedResource {
     }
 
     @GET
-    @ResponseMetered
-    @Path("/response-2xx-metered")
-    public Response response2xxMetered() {
-        return Response.ok().build();
-    }
-
-    @GET
-    @ResponseMetered
-    @Path("/response-4xx-metered")
-    public Response response4xxMetered(@QueryParam("status_code") @DefaultValue("400") int statusCode) {
+    @ResponseMetered(level = DETAILED)
+    @Path("/response-metered-detailed")
+    public Response responseMeteredDetailed(@QueryParam("status_code") @DefaultValue("200") int statusCode) {
         return Response.status(Response.Status.fromStatusCode(statusCode)).build();
     }
 
     @GET
-    @ResponseMetered
-    @Path("/response-5xx-metered")
-    public Response response5xxMetered(@QueryParam("status_code") @DefaultValue("500") int statusCode) {
+    @ResponseMetered(level = COARSE)
+    @Path("/response-metered-coarse")
+    public Response responseMeteredCoarse(@QueryParam("status_code") @DefaultValue("200") int statusCode) {
+        return Response.status(Response.Status.fromStatusCode(statusCode)).build();
+    }
+
+    @GET
+    @ResponseMetered(level = ALL)
+    @Path("/response-metered-all")
+    public Response responseMeteredAll(@QueryParam("status_code") @DefaultValue("200") int statusCode) {
         return Response.status(Response.Status.fromStatusCode(statusCode)).build();
     }
 
