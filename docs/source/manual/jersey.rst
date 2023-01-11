@@ -56,7 +56,7 @@ application's ``ResourceConfig`` as a singleton provider for this to work.
         }
 
         @GET
-        @ResponseMetered
+        @ResponseMetered(level = ResponseMeteredLevel.ALL)
         @Path("/response-metered")
         public Response responseMetered(@QueryParam("invalid") @DefaultValue("false") boolean invalid) {
             if (invalid) {
@@ -74,6 +74,6 @@ If the annotation is placed on the class, it will apply to all its resource meth
 
 * ``@Timed`` adds a timer and measures time spent in that method.
 * ``@Metered`` adds a meter and measures the rate at which the resource method is accessed.
-* ``@ResponseMetered`` adds a meter and measures rate for each class of response codes (1xx/2xx/3xx/4xx/5xx).
+* ``@ResponseMetered`` adds meters and measures rate for response codes based on the selected level.
 * ``@ExceptionMetered`` adds a meter and measures how often the specified exception occurs when processing the resource.
   If the ``cause`` is not specified, the default is ``Exception.class``.

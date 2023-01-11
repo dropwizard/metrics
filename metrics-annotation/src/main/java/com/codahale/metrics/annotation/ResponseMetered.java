@@ -12,14 +12,15 @@ import java.lang.annotation.Target;
  * <p>
  * Given a method like this:
  * <pre><code>
- *     {@literal @}ResponseMetered(name = "fancyName")
+ *     {@literal @}ResponseMetered(name = "fancyName", level = ResponseMeteredLevel.ALL)
  *     public String fancyName(String name) {
  *         return "Sir Captain " + name;
  *     }
  * </code></pre>
  * <p>
- * A meter for the defining class with the name {@code fancyName} will be created for 1xx/2xx/3xx/4xx/5xx responses
- * and each time the {@code #fancyName(String)} method is invoked, the appropriate response meter will be marked.
+ * Meters for the defining class with the name {@code fancyName} will be created for response codes
+ * based on the ResponseMeteredLevel selected. Each time the {@code #fancyName(String)} method is invoked,
+ * the appropriate response meter will be marked.
  */
 @Inherited
 @Documented
@@ -36,4 +37,9 @@ public @interface ResponseMetered {
      * relative to the annotated class. When annotating a class, this must be {@code false}.
      */
     boolean absolute() default false;
+
+    /**
+     * @return the ResponseMeteredLevel which decides which response code meters are marked.
+     */
+    ResponseMeteredLevel level() default ResponseMeteredLevel.COARSE;
 }
