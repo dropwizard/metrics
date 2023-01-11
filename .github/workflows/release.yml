@@ -14,7 +14,7 @@ jobs:
     env:
       JAVA_OPTS: "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
     steps:
-    - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3
+    - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3
     - name: Set up JDK
       uses: actions/setup-java@1df8dbefe2a8cbc99770194893dd902763bee34b # v3
       with:
@@ -25,7 +25,7 @@ jobs:
         server-password: CI_DEPLOY_PASSWORD
         gpg-passphrase: GPG_PASSPHRASE
         gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-    - uses: actions/cache@4723a57e26efda3a62cbde1812113b730952852d # v3.2.2
+    - uses: actions/cache@58c146cc91c5b9e778e71775dfe9bf1442ad9a12 # v3.2.3
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
