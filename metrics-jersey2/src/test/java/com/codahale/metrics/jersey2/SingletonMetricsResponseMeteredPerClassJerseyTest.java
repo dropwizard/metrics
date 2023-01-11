@@ -129,18 +129,18 @@ public class SingletonMetricsResponseMeteredPerClassJerseyTest extends JerseyTes
         final Meter meter2xx = registry.meter(name(InstrumentedSubResourceResponseMeteredPerClass.class,
                 "responseMeteredPerClass",
                 "2xx-responses"));
-        final Meter meter201 = registry.meter(name(InstrumentedSubResourceResponseMeteredPerClass.class,
+        final Meter meter200 = registry.meter(name(InstrumentedSubResourceResponseMeteredPerClass.class,
                 "responseMeteredPerClass",
                 "200-responses"));
 
         assertThat(meter2xx.getCount()).isZero();
-        assertThat(meter2xx.getCount()).isZero();
+        assertThat(meter200.getCount()).isZero();
         assertThat(target("subresource/responseMeteredPerClass")
                 .request()
                 .get().getStatus())
                 .isEqualTo(200);
 
         assertThat(meter2xx.getCount()).isOne();
-        assertThat(meter2xx.getCount()).isOne();
+        assertThat(meter200.getCount()).isOne();
     }
 }

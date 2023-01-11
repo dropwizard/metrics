@@ -135,7 +135,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     private static class ResponseMeterMetric {
         private static final Set<ResponseMeteredLevel> COARSE_METER_LEVELS = EnumSet.of(COARSE, ALL);
         private static final Set<ResponseMeteredLevel> DETAILED_METER_LEVELS = EnumSet.of(DETAILED, ALL);
-        public final List<Meter> meters;
+        private final List<Meter> meters;
         private final Map<Integer, Meter> responseCodeMeters;
         private final MetricRegistry metricRegistry;
         private final String metricName;
@@ -171,7 +171,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
             }
         }
 
-        public Meter getResponseCodeMeter(int statusCode) {
+        private Meter getResponseCodeMeter(int statusCode) {
             return responseCodeMeters
                     .computeIfAbsent(statusCode, sc -> metricRegistry
                             .meter(name(metricName, String.format("%d-responses", sc))));
