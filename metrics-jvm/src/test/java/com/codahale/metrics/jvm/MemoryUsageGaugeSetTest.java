@@ -131,6 +131,16 @@ public class MemoryUsageGaugeSetTest {
     }
 
     @Test
+    public void hasAGaugeForTotalMaxWhenNonHeapMaxUndefined() {
+        when(nonHeap.getMax()).thenReturn(-1L);
+
+        final Gauge gauge = (Gauge) gauges.getMetrics().get("total.max");
+
+        assertThat(gauge.getValue())
+                .isEqualTo(-1L);
+    }
+
+    @Test
     public void hasAGaugeForHeapCommitted() {
         final Gauge gauge = (Gauge) gauges.getMetrics().get("heap.committed");
 
@@ -208,6 +218,15 @@ public class MemoryUsageGaugeSetTest {
 
         assertThat(gauge.getValue())
                 .isEqualTo(0.75);
+    }
+
+    @Test
+    public void hasAGaugeForNonHeapUsageWhenNonHeapMaxUndefined() {
+        when(nonHeap.getMax()).thenReturn(-1L);
+        final Gauge gauge = (Gauge) gauges.getMetrics().get("non-heap.usage");
+
+        assertThat(gauge.getValue())
+                .isEqualTo(3.0);
     }
 
     @Test
