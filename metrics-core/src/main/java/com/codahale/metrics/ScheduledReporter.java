@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -166,7 +167,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
             throw new IllegalArgumentException("Reporter already started");
         }
 
-        this.scheduledFuture = getScheduledFuture(initialDelay, period, unit, runnable);
+        this.scheduledFuture = getScheduledFuture(initialDelay, period, unit, runnable, executor);
     }
 
 
@@ -177,7 +178,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      *
      * Overriding this in a subclass to revert to the old behavior is permitted.
      */
-    protected ScheduledFuture<?> getScheduledFuture(long initialDelay, long period, TimeUnit unit, Runnable runnable) {
+    protected ScheduledFuture<?> getScheduledFuture(long initialDelay, long period, TimeUnit unit, Runnable runnable, ScheduledExecutorService executor) {
         return executor.scheduleWithFixedDelay(runnable, initialDelay, period, unit);
     }
 
