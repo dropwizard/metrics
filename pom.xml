@@ -34,7 +34,6 @@
         <module>metrics-jersey2</module>
         <module>metrics-jersey3</module>
         <module>metrics-jersey31</module>
-        <module>metrics-jetty9</module>
         <module>metrics-jetty10</module>
         <module>metrics-jetty11</module>
         <module>metrics-json</module>
@@ -57,10 +56,9 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <jackson.version>2.14.2</jackson.version>
-        <jetty9.version>9.4.50.v20221201</jetty9.version>
         <jetty10.version>10.0.13</jetty10.version>
         <jetty11.version>11.0.13</jetty11.version>
-        <slf4j.version>1.7.36</slf4j.version>
+        <slf4j.version>2.0.6</slf4j.version>
         <assertj.version>3.23.1</assertj.version>
         <mockito.version>4.6.1</mockito.version>
         <junit.version>4.13.1</junit.version>

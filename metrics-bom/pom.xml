@@ -87,11 +87,6 @@
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics5</groupId>
-                <artifactId>metrics-jetty9</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-jetty10</artifactId>
                 <version>${project.version}</version>
             </dependency>

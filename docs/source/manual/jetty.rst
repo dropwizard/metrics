@@ -4,7 +4,7 @@
 Instrumenting Jetty
 ###################
 
-The ``metrics-jetty9`` (Jetty 9.3 and higher) modules provides a set of instrumented equivalents of Jetty_ classes:
+The ``metrics-jetty10`` and ``metrics-jetty11`` modules provides a set of instrumented equivalents of Jetty_ classes:
 ``InstrumentedBlockingChannelConnector``, ``InstrumentedHandler``, ``InstrumentedQueuedThreadPool``,
 ``InstrumentedSelectChannelConnector``, and ``InstrumentedSocketConnector``.
 
