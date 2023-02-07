@@ -1,12 +1,12 @@
 .. _manual-caffeine:
 
-#####################
-Instrumenting Caffeine
-#####################
+##########################
+Instrumenting Caffeine 3.x
+##########################
 
 .. highlight:: text
 
-.. rubric:: The ``metrics-caffeine`` module provides ``MetricsStatsCounter``, a metrics listener for
+.. rubric:: The ``metrics-caffeine3`` module provides ``MetricsStatsCounter``, a metrics listener for
             Caffeine_ caches:
 
 .. _Caffeine: https://github.com/ben-manes/caffeine
