@@ -40,6 +40,11 @@
                 <artifactId>httpcore5</artifactId>
                 <version>5.2.1</version>
             </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
