@@ -22,11 +22,6 @@
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics5</groupId>
-                <artifactId>metrics-caffeine</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-caffeine3</artifactId>
                 <version>${project.version}</version>
             </dependency>
