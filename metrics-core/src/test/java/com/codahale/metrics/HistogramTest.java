@@ -23,6 +23,17 @@ public class HistogramTest {
     }
 
     @Test
+    public void updatesTheSumOnUpdates() {
+        assertThat(histogram.getSum())
+                .isZero();
+
+        histogram.update(5);
+
+        assertThat(histogram.getSum())
+                .isEqualTo(5);
+    }
+
+    @Test
     public void returnsTheSnapshotFromTheReservoir() {
         final Snapshot snapshot = mock(Snapshot.class);
         when(reservoir.getSnapshot()).thenReturn(snapshot);
