@@ -41,9 +41,14 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-bom</artifactId>
-                <version>${jetty9.version}</version>
+                <version>${jetty10.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -116,13 +121,6 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-http</artifactId>
-            <classifier>tests</classifier>
-            <version>${jetty9.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
             <scope>test</scope>
         </dependency>
@@ -132,15 +130,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-            <classifier>tests</classifier>
-            <version>${jetty9.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>io.dropwizard.metrics5</groupId>
-            <artifactId>metrics-jetty9</artifactId>
+            <artifactId>metrics-jetty10</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
