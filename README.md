@@ -19,7 +19,7 @@ For more information, please see [the documentation](https://metrics.dropwizard.
 | 3.1.x   | [release/3.1.x branch](https://github.com/dropwizard/metrics/tree/release/3.1.x) | [Docs](https://metrics.dropwizard.io/3.1.0/)  | 🔴 unmaintained   |
 | 3.2.x   | [release/3.2.x branch](https://github.com/dropwizard/metrics/tree/release/3.2.x) | [Docs](https://metrics.dropwizard.io/3.2.3/)  | 🔴 unmaintained   |
 | 4.0.x   | [release/4.0.x branch](https://github.com/dropwizard/metrics/tree/release/4.0.x) | [Docs](https://metrics.dropwizard.io/4.0.6/)  | 🔴 unmaintained   |
-| 4.1.x   | [release/4.1.x branch](https://github.com/dropwizard/metrics/tree/release/4.1.x) | [Docs](https://metrics.dropwizard.io/4.1.22/) | 🟢 maintained     |
+| 4.1.x   | [release/4.1.x branch](https://github.com/dropwizard/metrics/tree/release/4.1.x) | [Docs](https://metrics.dropwizard.io/4.1.22/) | 🔴 unmaintained   |
 | 4.2.x   | [release/4.2.x branch](https://github.com/dropwizard/metrics/tree/release/4.2.x) | [Docs](https://metrics.dropwizard.io/4.2.0/)  | 🟢 maintained     |
 | 5.0.x   | [release/5.0.x branch](https://github.com/dropwizard/metrics/tree/release/5.0.x) | -                                             | 🟡 on pause       |
 
