@@ -4,8 +4,8 @@
 Instrumenting Logback
 #####################
 
-The ``metrics-logback`` module provides ``InstrumentedAppender``, a Logback_ ``Appender``
-implementation which records the rate of logged events by their logging level.
+The ``metrics-logback13`` and ``metrics-logback14`` modules provide ``InstrumentedAppender``,
+a Logback_ ``Appender`` implementation which records the rate of logged events by their logging level.
 
 .. _Logback: https://logback.qos.ch/
 
