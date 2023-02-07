@@ -39,7 +39,6 @@
         <module>metrics-json</module>
         <module>metrics-jvm</module>
         <module>metrics-log4j2</module>
-        <module>metrics-logback</module>
         <module>metrics-logback13</module>
         <module>metrics-logback14</module>
         <module>metrics-servlet</module>
