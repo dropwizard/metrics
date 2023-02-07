@@ -47,6 +47,11 @@
                 <artifactId>jakarta.inject-api</artifactId>
                 <version>2.0.1</version>
             </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
