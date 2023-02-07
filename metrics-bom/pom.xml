@@ -82,11 +82,6 @@
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics5</groupId>
-                <artifactId>metrics-jdbi</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-jdbi3</artifactId>
                 <version>${project.version}</version>
             </dependency>

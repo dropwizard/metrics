@@ -31,7 +31,6 @@
         <module>metrics-jakarta-servlet</module>
         <module>metrics-jakarta-servlets</module>
         <module>metrics-jcache</module>
-        <module>metrics-jdbi</module>
         <module>metrics-jdbi3</module>
         <module>metrics-jersey2</module>
         <module>metrics-jersey3</module>

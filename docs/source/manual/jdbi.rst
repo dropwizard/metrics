@@ -4,10 +4,10 @@
 Instrumenting JDBI
 ##################
 
-The ``metrics-jdbi`` and ``metrics-jdbi3`` modules provide a ``TimingCollector`` implementation for JDBI_, an SQL
+The ``metrics-jdbi3`` module provide a ``TimingCollector`` implementation for JDBI_, an SQL
 convenience library.
 
-.. _JDBI: http://jdbi.org/
+.. _JDBI: https://jdbi.org/
 
 To use it, just add a ``InstrumentedTimingCollector`` instance to your ``DBI``:
 
