@@ -1,6 +1,6 @@
 package com.codahale.metrics;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -8,11 +8,11 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class InstrumentedThreadFactoryTest {
+class InstrumentedThreadFactoryTest {
 
     @Test
     @SuppressWarnings("DoNotCall")
-    public void testFactory() throws Exception {
+    void testFactory() throws Exception {
         MetricRegistry registry = new MetricRegistry();
         InstrumentedThreadFactory threadFactory = new InstrumentedThreadFactory(Thread::new, registry,
                 "test-instrumented-thread-factory");

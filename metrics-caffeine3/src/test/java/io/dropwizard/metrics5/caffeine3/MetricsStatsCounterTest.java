@@ -19,11 +19,11 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import io.dropwizard.metrics5.MetricRegistry;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * An example of exporting stats to Dropwizard Metrics (http://metrics.dropwizard.io).
@@ -31,21 +31,21 @@ import static org.junit.Assert.assertEquals;
  * @author ben.manes@gmail.com (Ben Manes)
  * @author John Karp
  */
-public final class MetricsStatsCounterTest {
+final class MetricsStatsCounterTest {
 
   private static final String PREFIX = "foo";
 
   private MetricsStatsCounter stats;
   private MetricRegistry registry;
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     registry = new MetricRegistry();
     stats = new MetricsStatsCounter(registry, PREFIX);
   }
 
   @Test
-  public void basicUsage() {
+  void basicUsage() {
     LoadingCache<Integer, Integer> cache = Caffeine.newBuilder()
         .recordStats(() -> new MetricsStatsCounter(registry, PREFIX))
         .build(key -> key);
@@ -60,31 +60,31 @@ public final class MetricsStatsCounterTest {
   }
 
   @Test
-  public void hit() {
+  void hit() {
     stats.recordHits(2);
     assertThat(registry.counter(PREFIX + ".hits").getCount()).isEqualTo(2);
   }
 
   @Test
-  public void miss() {
+  void miss() {
     stats.recordMisses(2);
     assertThat(registry.counter(PREFIX + ".misses").getCount()).isEqualTo(2);
   }
 
   @Test
-  public void loadSuccess() {
+  void loadSuccess() {
     stats.recordLoadSuccess(256);
     assertThat(registry.timer(PREFIX + ".loads-success").getCount()).isEqualTo(1);
   }
 
   @Test
-  public void loadFailure() {
+  void loadFailure() {
     stats.recordLoadFailure(256);
     assertThat(registry.timer(PREFIX + ".loads-failure").getCount()).isEqualTo(1);
   }
 
   @Test
-  public void evictionWithCause() {
+  void evictionWithCause() {
     // With JUnit 5, this would be better done with @ParameterizedTest + @EnumSource
     for (RemovalCause cause : RemovalCause.values()) {
       stats.recordEviction(3, cause);

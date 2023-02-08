@@ -12,24 +12,24 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("deprecation")
-public class ConsoleReporterTest {
+class ConsoleReporterTest {
 
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private final String dateHeader = System.getProperty("java.version").startsWith("1.8") ?
             "3/18/13 1:04:36 AM =============================================================" :
             "3/18/13, 1:04:36 AM ============================================================";
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         executor.shutdownNow();
     }
 
     @Test
-    public void testCreateConsoleReporter() throws Exception {
+    void testCreateConsoleReporter() throws Exception {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         MetricRegistry metricRegistry = new MetricRegistry();

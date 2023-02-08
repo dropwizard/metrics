@@ -1,6 +1,6 @@
 package io.dropwizard.metrics5.graphite;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.net.InetSocketAddress;
@@ -10,7 +10,7 @@ import java.nio.channels.DatagramChannel;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
-public class GraphiteUDPTest {
+class GraphiteUDPTest {
 
     private final String host = "example.com";
     private final int port = 1234;
@@ -18,7 +18,7 @@ public class GraphiteUDPTest {
     private GraphiteUDP graphiteUDP;
 
     @Test
-    public void connects() throws Exception {
+    void connects() throws Exception {
         graphiteUDP = new GraphiteUDP(host, port);
         graphiteUDP.connect();
 
@@ -29,7 +29,7 @@ public class GraphiteUDPTest {
     }
 
     @Test
-    public void writesValue() throws Exception {
+    void writesValue() throws Exception {
         graphiteUDP = new GraphiteUDP(host, port);
         DatagramChannel mockDatagramChannel = Mockito.mock(DatagramChannel.class);
         graphiteUDP.setDatagramChannel(mockDatagramChannel);
@@ -37,7 +37,7 @@ public class GraphiteUDPTest {
 
         graphiteUDP.send("name woo", "value", 100);
         verify(mockDatagramChannel).send(ByteBuffer.wrap("name-woo value 100\n".getBytes("UTF-8")),
-                new InetSocketAddress(host, port));
+            new InetSocketAddress(host, port));
     }
 
 }

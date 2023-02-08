@@ -1,11 +1,11 @@
 package io.dropwizard.metrics5.graphite;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class GraphiteSanitizeTest {
+class GraphiteSanitizeTest {
     @Test
-    public void sanitizeGraphiteValues() {
+    void sanitizeGraphiteValues() {
         SoftAssertions softly = new SoftAssertions();
 
         softly.assertThat(GraphiteSanitize.sanitize("Foo Bar")).isEqualTo("Foo-Bar");

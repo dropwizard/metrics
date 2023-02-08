@@ -8,9 +8,9 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletOutputStream;
@@ -22,15 +22,15 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class InstrumentedHttpChannelListenerTest {
+class InstrumentedHttpChannelListenerTest {
     private final HttpClient client = new HttpClient();
     private final Server server = new Server();
     private final ServerConnector connector = new ServerConnector(server);
     private final TestHandler handler = new TestHandler();
     private MetricRegistry registry;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         registry = new MetricRegistry();
         connector.addBean(new InstrumentedHttpChannelListener(registry, MetricRegistry.name(TestHandler.class, "handler")));
         server.addConnector(connector);
@@ -39,14 +39,14 @@ public class InstrumentedHttpChannelListenerTest {
         client.start();
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         server.stop();
         client.stop();
     }
 
     @Test
-    public void createsMetricsForTheHandler() throws Exception {
+    void createsMetricsForTheHandler() throws Exception {
         final ContentResponse response = client.GET(uri("/hello"));
 
         assertThat(response.getStatus())
@@ -87,7 +87,7 @@ public class InstrumentedHttpChannelListenerTest {
 
 
     @Test
-    public void responseTimesAreRecordedForBlockingResponses() throws Exception {
+    void responseTimesAreRecordedForBlockingResponses() throws Exception {
 
         final ContentResponse response = client.GET(uri("/blocking"));
 
@@ -99,7 +99,7 @@ public class InstrumentedHttpChannelListenerTest {
     }
 
     @Test
-    public void responseTimesAreRecordedForAsyncResponses() throws Exception {
+    void responseTimesAreRecordedForAsyncResponses() throws Exception {
 
         final ContentResponse response = client.GET(uri("/async"));
 

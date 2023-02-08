@@ -2,7 +2,7 @@ package io.dropwizard.metrics5.health;
 
 import io.dropwizard.metrics5.Clock;
 import io.dropwizard.metrics5.health.annotation.Async;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -10,6 +10,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -18,10 +19,10 @@ import static org.mockito.Mockito.*;
 /**
  * Unit tests for {@link AsyncHealthCheckDecorator}.
  */
-public class AsyncHealthCheckDecoratorTest {
+class AsyncHealthCheckDecoratorTest {
 
     private static final long CURRENT_TIME = 1551002401000L;
-    
+
     private static final Clock FIXED_CLOCK = clockWithFixedTime(CURRENT_TIME);
 
     private static final HealthCheck.Result EXPECTED_EXPIRED_RESULT = HealthCheck.Result
@@ -30,45 +31,57 @@ public class AsyncHealthCheckDecoratorTest {
             .unhealthy()
             .withMessage("Result was healthy but it expired 1 milliseconds ago")
             .build();
-    
+
     private final HealthCheck mockHealthCheck = mock(HealthCheck.class);
     private final ScheduledExecutorService mockExecutorService = mock(ScheduledExecutorService.class);
 
     @SuppressWarnings("rawtypes")
     private final ScheduledFuture mockFuture = mock(ScheduledFuture.class);
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullHealthCheckTriggersInstantiationFailure() {
-        new AsyncHealthCheckDecorator(null, mockExecutorService);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullExecutorServiceTriggersInstantiationFailure() {
-        new AsyncHealthCheckDecorator(mockHealthCheck, null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nonAsyncHealthCheckTriggersInstantiationFailure() {
-        new AsyncHealthCheckDecorator(mockHealthCheck, mockExecutorService);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void negativePeriodTriggersInstantiationFailure() {
-        new AsyncHealthCheckDecorator(new NegativePeriodAsyncHealthCheck(), mockExecutorService);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void zeroPeriodTriggersInstantiationFailure() {
-        new AsyncHealthCheckDecorator(new ZeroPeriodAsyncHealthCheck(), mockExecutorService);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void negativeInitialValueTriggersInstantiationFailure() {
-        new AsyncHealthCheckDecorator(new NegativeInitialDelayAsyncHealthCheck(), mockExecutorService);
+    @Test
+    void nullHealthCheckTriggersInstantiationFailure() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new AsyncHealthCheckDecorator(null, mockExecutorService);
+        });
     }
 
     @Test
-    public void defaultAsyncHealthCheckTriggersSuccessfulInstantiationWithFixedRateAndHealthyState() throws Exception {
+    void nullExecutorServiceTriggersInstantiationFailure() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new AsyncHealthCheckDecorator(mockHealthCheck, null);
+        });
+    }
+
+    @Test
+    void nonAsyncHealthCheckTriggersInstantiationFailure() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new AsyncHealthCheckDecorator(mockHealthCheck, mockExecutorService);
+        });
+    }
+
+    @Test
+    void negativePeriodTriggersInstantiationFailure() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new AsyncHealthCheckDecorator(new NegativePeriodAsyncHealthCheck(), mockExecutorService);
+        });
+    }
+
+    @Test
+    void zeroPeriodTriggersInstantiationFailure() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new AsyncHealthCheckDecorator(new ZeroPeriodAsyncHealthCheck(), mockExecutorService);
+        });
+    }
+
+    @Test
+    void negativeInitialValueTriggersInstantiationFailure() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new AsyncHealthCheckDecorator(new NegativeInitialDelayAsyncHealthCheck(), mockExecutorService);
+        });
+    }
+
+    @Test
+    void defaultAsyncHealthCheckTriggersSuccessfulInstantiationWithFixedRateAndHealthyState() throws Exception {
         HealthCheck asyncHealthCheck = new DefaultAsyncHealthCheck();
         AsyncHealthCheckDecorator asyncDecorator = new AsyncHealthCheckDecorator(asyncHealthCheck, mockExecutorService);
 
@@ -79,7 +92,7 @@ public class AsyncHealthCheckDecoratorTest {
     }
 
     @Test
-    public void fixedDelayAsyncHealthCheckTriggersSuccessfulInstantiationWithFixedDelay() throws Exception {
+    void fixedDelayAsyncHealthCheckTriggersSuccessfulInstantiationWithFixedDelay() throws Exception {
         HealthCheck asyncHealthCheck = new FixedDelayAsyncHealthCheck();
         AsyncHealthCheckDecorator asyncDecorator = new AsyncHealthCheckDecorator(asyncHealthCheck, mockExecutorService);
 
@@ -89,7 +102,7 @@ public class AsyncHealthCheckDecoratorTest {
     }
 
     @Test
-    public void unhealthyAsyncHealthCheckTriggersSuccessfulInstantiationWithUnhealthyState() throws Exception {
+    void unhealthyAsyncHealthCheckTriggersSuccessfulInstantiationWithUnhealthyState() throws Exception {
         HealthCheck asyncHealthCheck = new UnhealthyAsyncHealthCheck();
         AsyncHealthCheckDecorator asyncDecorator = new AsyncHealthCheckDecorator(asyncHealthCheck, mockExecutorService);
 
@@ -98,7 +111,7 @@ public class AsyncHealthCheckDecoratorTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void tearDownTriggersCancellation() throws Exception {
+    void tearDownTriggersCancellation() throws Exception {
         when(mockExecutorService.scheduleAtFixedRate(any(Runnable.class), eq(0L), eq(1L), eq(TimeUnit.SECONDS))).
                 thenReturn(mockFuture);
         when(mockFuture.cancel(true)).thenReturn(true);
@@ -113,7 +126,7 @@ public class AsyncHealthCheckDecoratorTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void afterFirstExecutionDecoratedHealthCheckResultIsProvided() throws Exception {
+    void afterFirstExecutionDecoratedHealthCheckResultIsProvided() throws Exception {
         HealthCheck.Result expectedResult = HealthCheck.Result.healthy("AsyncHealthCheckTest");
         when(mockExecutorService.scheduleAtFixedRate(any(Runnable.class), eq(0L), eq(1L), eq(TimeUnit.SECONDS)))
                 .thenReturn(mockFuture);
@@ -135,7 +148,7 @@ public class AsyncHealthCheckDecoratorTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void exceptionInDecoratedHealthCheckWontAffectAsyncDecorator() throws Exception {
+    void exceptionInDecoratedHealthCheckWontAffectAsyncDecorator() throws Exception {
         Exception exception = new Exception("TestException");
         when(mockExecutorService.scheduleAtFixedRate(any(Runnable.class), eq(0L), eq(1L), eq(TimeUnit.SECONDS)))
                 .thenReturn(mockFuture);
@@ -155,10 +168,10 @@ public class AsyncHealthCheckDecoratorTest {
     }
 
     @Test
-    public void returnUnhealthyIfPreviousResultIsExpiredBasedOnTtl() throws Exception {
+    void returnUnhealthyIfPreviousResultIsExpiredBasedOnTtl() throws Exception {
         HealthCheck healthCheck = new HealthyAsyncHealthCheckWithExpiredExplicitTtlInMilliseconds();
         AsyncHealthCheckDecorator asyncDecorator = new AsyncHealthCheckDecorator(healthCheck, mockExecutorService, FIXED_CLOCK);
-        
+
         ArgumentCaptor<Runnable> runnableCaptor = forClass(Runnable.class);
         verify(mockExecutorService, times(1)).scheduleAtFixedRate(runnableCaptor.capture(),
                 eq(0L), eq(1000L), eq(TimeUnit.MILLISECONDS));
@@ -171,7 +184,7 @@ public class AsyncHealthCheckDecoratorTest {
     }
 
     @Test
-    public void returnUnhealthyIfPreviousResultIsExpiredBasedOnPeriod() throws Exception {
+    void returnUnhealthyIfPreviousResultIsExpiredBasedOnPeriod() throws Exception {
         HealthCheck healthCheck = new HealthyAsyncHealthCheckWithExpiredTtlInMillisecondsBasedOnPeriod();
         AsyncHealthCheckDecorator asyncDecorator = new AsyncHealthCheckDecorator(healthCheck, mockExecutorService, FIXED_CLOCK);
 
@@ -187,7 +200,7 @@ public class AsyncHealthCheckDecoratorTest {
     }
 
     @Test
-    public void convertTtlToMillisecondsWhenCheckingExpiration() throws Exception {
+    void convertTtlToMillisecondsWhenCheckingExpiration() throws Exception {
         HealthCheck healthCheck = new HealthyAsyncHealthCheckWithExpiredExplicitTtlInSeconds();
         AsyncHealthCheckDecorator asyncDecorator = new AsyncHealthCheckDecorator(healthCheck, mockExecutorService, FIXED_CLOCK);
 

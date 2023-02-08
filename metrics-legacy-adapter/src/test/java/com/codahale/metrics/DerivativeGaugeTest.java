@@ -1,14 +1,14 @@
 package com.codahale.metrics;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class DerivativeGaugeTest {
+class DerivativeGaugeTest {
 
     @Test
-    public void testCalculate() {
+    void testCalculate() {
         DerivativeGauge<String, Integer> derivativeGauge = new DerivativeGauge<String, Integer>(() -> "23") {
             @Override
             protected Integer transform(String value) {

@@ -8,24 +8,24 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.time.Instant;
 
 import io.dropwizard.metrics5.SlidingTimeWindowMovingAverages;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class SlidingTimeWindowMovingAveragesTest {
+class SlidingTimeWindowMovingAveragesTest {
 
     private ManualClock clock;
     private SlidingTimeWindowMovingAverages movingAverages;
     private Meter meter;
 
-    @Before
-    public void init() {
+    @BeforeEach
+    void init() {
         clock = new ManualClock();
         movingAverages = new SlidingTimeWindowMovingAverages(clock);
         meter = new Meter(movingAverages, clock);
     }
 
     @Test
-    public void normalizeIndex() {
+    void normalizeIndex() {
 
         SlidingTimeWindowMovingAverages stwm = new SlidingTimeWindowMovingAverages();
 
@@ -42,7 +42,7 @@ public class SlidingTimeWindowMovingAveragesTest {
     }
 
     @Test
-    public void calculateIndexOfTick() {
+    void calculateIndexOfTick() {
 
         SlidingTimeWindowMovingAverages stwm = new SlidingTimeWindowMovingAverages(clock);
 
@@ -51,7 +51,7 @@ public class SlidingTimeWindowMovingAveragesTest {
     }
 
     @Test
-    public void mark_max_without_cleanup() {
+    void mark_max_without_cleanup() {
 
         int markCount = NUMBER_OF_BUCKETS;
 
@@ -72,7 +72,7 @@ public class SlidingTimeWindowMovingAveragesTest {
     }
 
     @Test
-    public void mark_first_cleanup() {
+    void mark_first_cleanup() {
 
         int markCount = NUMBER_OF_BUCKETS + 1;
 
@@ -93,7 +93,7 @@ public class SlidingTimeWindowMovingAveragesTest {
     }
 
     @Test
-    public void mark_10_values() {
+    void mark_10_values() {
 
         // compensate the first addSeconds in the loop; first tick should be at zero
         clock.addSeconds(-1);
@@ -110,7 +110,7 @@ public class SlidingTimeWindowMovingAveragesTest {
     }
 
     @Test
-    public void mark_1000_values() {
+    void mark_1000_values() {
 
         for (int i = 0; i < 1000; i++) {
             clock.addSeconds(1);
@@ -124,7 +124,7 @@ public class SlidingTimeWindowMovingAveragesTest {
     }
 
     @Test
-    public void cleanup_pause_shorter_than_window() {
+    void cleanup_pause_shorter_than_window() {
 
         meter.mark(10);
 
@@ -136,7 +136,7 @@ public class SlidingTimeWindowMovingAveragesTest {
     }
 
     @Test
-    public void cleanup_window_wrap_around() {
+    void cleanup_window_wrap_around() {
 
         // mark at 14:40 minutes of the 15 minute window...
         clock.addSeconds(880);
@@ -156,7 +156,7 @@ public class SlidingTimeWindowMovingAveragesTest {
     }
 
     @Test
-    public void cleanup_pause_longer_than_two_windows() {
+    void cleanup_pause_longer_than_two_windows() {
 
         meter.mark(10);
 

@@ -1,6 +1,6 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -10,9 +10,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SlidingTimeWindowReservoirTest {
+class SlidingTimeWindowReservoirTest {
     @Test
-    public void storesMeasurementsWithDuplicateTicks() {
+    void storesMeasurementsWithDuplicateTicks() {
         final Clock clock = mock(Clock.class);
         final SlidingTimeWindowReservoir reservoir = new SlidingTimeWindowReservoir(10, NANOSECONDS, clock);
 
@@ -26,7 +26,7 @@ public class SlidingTimeWindowReservoirTest {
     }
 
     @Test
-    public void boundsMeasurementsToATimeWindow() {
+    void boundsMeasurementsToATimeWindow() {
         final Clock clock = mock(Clock.class);
         when(clock.getTick()).thenReturn(0L);
 
@@ -52,7 +52,7 @@ public class SlidingTimeWindowReservoirTest {
     }
 
     @Test
-    public void testGetTickOverflow() {
+    void testGetTickOverflow() {
         final Random random = new Random(0);
         final int window = 128;
 

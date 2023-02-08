@@ -1,17 +1,17 @@
 package com.codahale.metrics;
 
 import org.assertj.core.data.Offset;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class SlidingTimeWindowArrayReservoirTest {
+class SlidingTimeWindowArrayReservoirTest {
 
     @Test
-    public void testCreateWithWindow() {
+    void testCreateWithWindow() {
         SlidingTimeWindowArrayReservoir reservoir = new SlidingTimeWindowArrayReservoir(1, TimeUnit.HOURS);
         reservoir.update(100);
         reservoir.update(200);
@@ -22,7 +22,7 @@ public class SlidingTimeWindowArrayReservoirTest {
     }
 
     @Test
-    public void testCreateWithWindowAndClock() {
+    void testCreateWithWindowAndClock() {
         SlidingTimeWindowArrayReservoir reservoir = new SlidingTimeWindowArrayReservoir(1, TimeUnit.HOURS,
                 new Clock.UserTimeClock());
         reservoir.update(400);

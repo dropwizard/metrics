@@ -1,6 +1,6 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class Slf4jReporterTest {
+class Slf4jReporterTest {
 
     private final Logger logger = mock(Logger.class);
     private final Marker marker = mock(Marker.class);
@@ -63,12 +63,12 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsGaugeValuesAtErrorDefault() {
+    void reportsGaugeValuesAtErrorDefault() {
         reportsGaugeValuesAtError();
     }
 
     @Test
-    public void reportsGaugeValuesAtErrorAllDisabled() {
+    void reportsGaugeValuesAtErrorAllDisabled() {
         disabledMetricAttributes = EnumSet.allOf(MetricAttribute.class); // has no effect
         reportsGaugeValuesAtError();
     }
@@ -148,12 +148,12 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsCounterValuesAtErrorDefault() {
+    void reportsCounterValuesAtErrorDefault() {
         reportsCounterValuesAtError();
     }
 
     @Test
-    public void reportsCounterValuesAtErrorAllDisabled() {
+    void reportsCounterValuesAtErrorAllDisabled() {
         disabledMetricAttributes = EnumSet.allOf(MetricAttribute.class); // has no effect
         reportsCounterValuesAtError();
     }
@@ -172,13 +172,13 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsHistogramValuesAtErrorDefault() {
+    void reportsHistogramValuesAtErrorDefault() {
         reportsHistogramValuesAtError("type=HISTOGRAM, name=test.histogram, count=1, min=4, " +
                 "max=2, mean=3.0, stddev=5.0, p50=6.0, p75=7.0, p95=8.0, p98=9.0, p99=10.0, p999=11.0");
     }
 
     @Test
-    public void reportsHistogramValuesAtErrorWithDisabledMetricAttributes() {
+    void reportsHistogramValuesAtErrorWithDisabledMetricAttributes() {
         disabledMetricAttributes = EnumSet.of(COUNT, MIN, P50);
         reportsHistogramValuesAtError("type=HISTOGRAM, name=test.histogram, max=2, mean=3.0, " +
                 "stddev=5.0, p75=7.0, p95=8.0, p98=9.0, p99=10.0, p999=11.0");
@@ -198,13 +198,13 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsMeterValuesAtErrorDefault() {
+    void reportsMeterValuesAtErrorDefault() {
         reportsMeterValuesAtError("type=METER, name=test.meter, count=1, m1_rate=3.0, m5_rate=4.0, " +
                 "m15_rate=5.0, mean_rate=2.0, rate_unit=events/second");
     }
 
     @Test
-    public void reportsMeterValuesAtErrorWithDisabledMetricAttributes() {
+    void reportsMeterValuesAtErrorWithDisabledMetricAttributes() {
         disabledMetricAttributes = EnumSet.of(MIN, P50, M1_RATE);
         reportsMeterValuesAtError("type=METER, name=test.meter, count=1, m5_rate=4.0, m15_rate=5.0, " +
                 "mean_rate=2.0, rate_unit=events/second");
@@ -225,7 +225,7 @@ public class Slf4jReporterTest {
 
 
     @Test
-    public void reportsTimerValuesAtErrorDefault() {
+    void reportsTimerValuesAtErrorDefault() {
         reportsTimerValuesAtError("type=TIMER, name=test.another.timer, count=1, min=300.0, max=100.0, " +
                 "mean=200.0, stddev=400.0, p50=500.0, p75=600.0, p95=700.0, p98=800.0, p99=900.0, p999=1000.0, " +
                 "m1_rate=3.0, m5_rate=4.0, m15_rate=5.0, mean_rate=2.0, rate_unit=events/second, " +
@@ -233,7 +233,7 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsTimerValuesAtErrorWithDisabledMetricAttributes() {
+    void reportsTimerValuesAtErrorWithDisabledMetricAttributes() {
         disabledMetricAttributes = EnumSet.of(MIN, STDDEV, P999, MEAN_RATE);
         reportsTimerValuesAtError("type=TIMER, name=test.another.timer, count=1, max=100.0, mean=200.0, " +
                 "p50=500.0, p75=600.0, p95=700.0, p98=800.0, p99=900.0, m1_rate=3.0, m5_rate=4.0, m15_rate=5.0, " +
@@ -255,7 +255,7 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsGaugeValuesDefault() {
+    void reportsGaugeValuesDefault() {
         when(logger.isInfoEnabled(marker)).thenReturn(true);
         infoReporter().report(map("gauge", () -> "value"),
                 map(),
@@ -268,7 +268,7 @@ public class Slf4jReporterTest {
 
 
     @Test
-    public void reportsCounterValuesDefault() {
+    void reportsCounterValuesDefault() {
         final Counter counter = counter();
         when(logger.isInfoEnabled(marker)).thenReturn(true);
 
@@ -282,7 +282,7 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsHistogramValuesDefault() {
+    void reportsHistogramValuesDefault() {
         final Histogram histogram = histogram();
         when(logger.isInfoEnabled(marker)).thenReturn(true);
 
@@ -297,7 +297,7 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsMeterValuesDefault() {
+    void reportsMeterValuesDefault() {
         final Meter meter = meter();
         when(logger.isInfoEnabled(marker)).thenReturn(true);
 
@@ -312,7 +312,7 @@ public class Slf4jReporterTest {
     }
 
     @Test
-    public void reportsTimerValuesDefault() {
+    void reportsTimerValuesDefault() {
         final Timer timer = timer();
         when(logger.isInfoEnabled(marker)).thenReturn(true);
 
@@ -329,7 +329,7 @@ public class Slf4jReporterTest {
 
 
     @Test
-    public void reportsAllMetricsDefault() {
+    void reportsAllMetricsDefault() {
         when(logger.isInfoEnabled(marker)).thenReturn(true);
 
         infoReporter().report(map("test.gauge", () -> "value"),

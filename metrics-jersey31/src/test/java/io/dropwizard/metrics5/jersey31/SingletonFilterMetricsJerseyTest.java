@@ -7,8 +7,8 @@ import io.dropwizard.metrics5.jersey31.resources.TestRequestFilter;
 import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests registering {@link InstrumentedResourceMethodApplicationListener} as a singleton
  * in a Jersey {@link ResourceConfig} with filter tracking
  */
-public class SingletonFilterMetricsJerseyTest extends JerseyTest {
+class SingletonFilterMetricsJerseyTest extends JerseyTest {
     static {
         Logger.getLogger("org.glassfish.jersey").setLevel(Level.OFF);
     }
@@ -40,17 +40,17 @@ public class SingletonFilterMetricsJerseyTest extends JerseyTest {
         return config;
     }
 
-    @Before
-    public void resetClock() {
+    @BeforeEach
+    void resetClock() {
         testClock.tick = 0;
     }
 
     @Test
-    public void timedMethodsAreTimed() {
+    void timedMethodsAreTimed() {
         assertThat(target("timed")
-                .request()
-                .get(String.class))
-                .isEqualTo("yay");
+        .request()
+        .get(String.class))
+        .isEqualTo("yay");
 
         final Timer timer = registry.timer(name(InstrumentedFilteredResource.class, "timed"));
 
@@ -59,11 +59,11 @@ public class SingletonFilterMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void explicitNamesAreTimed() {
+    void explicitNamesAreTimed() {
         assertThat(target("named")
-                .request()
-                .get(String.class))
-                .isEqualTo("fancy");
+        .request()
+        .get(String.class))
+        .isEqualTo("fancy");
 
         final Timer timer = registry.timer(name(InstrumentedFilteredResource.class, "fancyName"));
 
@@ -72,11 +72,11 @@ public class SingletonFilterMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void absoluteNamesAreTimed() {
+    void absoluteNamesAreTimed() {
         assertThat(target("absolute")
-                .request()
-                .get(String.class))
-                .isEqualTo("absolute");
+        .request()
+        .get(String.class))
+        .isEqualTo("absolute");
 
         final Timer timer = registry.timer("absolutelyFancy");
 
@@ -85,11 +85,11 @@ public class SingletonFilterMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void requestFiltersOfTimedMethodsAreTimed() {
+    void requestFiltersOfTimedMethodsAreTimed() {
         assertThat(target("timed")
-                .request()
-                .get(String.class))
-                .isEqualTo("yay");
+        .request()
+        .get(String.class))
+        .isEqualTo("yay");
 
         final Timer timer = registry.timer(name(InstrumentedFilteredResource.class, "timed", "request", "filtering"));
 
@@ -98,11 +98,11 @@ public class SingletonFilterMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void responseFiltersOfTimedMethodsAreTimed() {
+    void responseFiltersOfTimedMethodsAreTimed() {
         assertThat(target("timed")
-                .request()
-                .get(String.class))
-                .isEqualTo("yay");
+        .request()
+        .get(String.class))
+        .isEqualTo("yay");
 
         final Timer timer = registry.timer(name(InstrumentedFilteredResource.class, "timed", "response", "filtering"));
 
@@ -110,11 +110,11 @@ public class SingletonFilterMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void totalTimeOfTimedMethodsIsTimed() {
+    void totalTimeOfTimedMethodsIsTimed() {
         assertThat(target("timed")
-                .request()
-                .get(String.class))
-                .isEqualTo("yay");
+        .request()
+        .get(String.class))
+        .isEqualTo("yay");
 
         final Timer timer = registry.timer(name(InstrumentedFilteredResource.class, "timed", "total"));
 
@@ -123,11 +123,11 @@ public class SingletonFilterMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void requestFiltersOfNamedMethodsAreTimed() {
+    void requestFiltersOfNamedMethodsAreTimed() {
         assertThat(target("named")
-                .request()
-                .get(String.class))
-                .isEqualTo("fancy");
+        .request()
+        .get(String.class))
+        .isEqualTo("fancy");
 
         final Timer timer = registry.timer(name(InstrumentedFilteredResource.class, "fancyName", "request", "filtering"));
 
@@ -136,11 +136,11 @@ public class SingletonFilterMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void requestFiltersOfAbsoluteMethodsAreTimed() {
+    void requestFiltersOfAbsoluteMethodsAreTimed() {
         assertThat(target("absolute")
-                .request()
-                .get(String.class))
-                .isEqualTo("absolute");
+        .request()
+        .get(String.class))
+        .isEqualTo("absolute");
 
         final Timer timer = registry.timer(name("absolutelyFancy", "request", "filtering"));
         assertThat(timer.getCount()).isEqualTo(1);
@@ -148,14 +148,14 @@ public class SingletonFilterMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void subResourcesFromLocatorsRegisterMetrics() {
+    void subResourcesFromLocatorsRegisterMetrics() {
         assertThat(target("subresource/timed")
-                .request()
-                .get(String.class))
-                .isEqualTo("yay");
+        .request()
+        .get(String.class))
+        .isEqualTo("yay");
 
         final Timer timer = registry.timer(name(InstrumentedFilteredResource.InstrumentedFilteredSubResource.class,
-                "timed"));
+        "timed"));
         assertThat(timer.getCount()).isEqualTo(1);
 
     }

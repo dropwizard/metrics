@@ -14,13 +14,12 @@ import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.ConnectionClosedException;
 import org.apache.hc.core5.http.HttpRequest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -32,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -40,9 +39,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class InstrumentedHttpAsyncClientsTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+@ExtendWith(MockitoExtension.class)
+class InstrumentedHttpAsyncClientsTest {
 
     @Mock
     private HttpClientMetricNameStrategy metricNameStrategy;
@@ -52,16 +50,16 @@ public class InstrumentedHttpAsyncClientsTest {
     private MetricRegistry metricRegistry;
     private CloseableHttpAsyncClient client;
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeEach
+    void setUp() throws IOException {
         httpServer = HttpServer.create(new InetSocketAddress(0), 0);
 
         metricRegistry = new MetricRegistry();
         metricRegistry.addListener(registryListener);
     }
 
-    @After
-    public void tearDown() throws IOException {
+    @AfterEach
+    void tearDown() throws IOException {
         if (client != null) {
             client.close();
         }
@@ -71,7 +69,7 @@ public class InstrumentedHttpAsyncClientsTest {
     }
 
     @Test
-    public void registersExpectedMetricsGivenNameStrategy() throws Exception {
+    void registersExpectedMetricsGivenNameStrategy() throws Exception {
         client = InstrumentedHttpAsyncClients.custom(metricRegistry, metricNameStrategy).disableAutomaticRetries().build();
         client.start();
 
@@ -110,7 +108,7 @@ public class InstrumentedHttpAsyncClientsTest {
     }
 
     @Test
-    public void registersExpectedExceptionMetrics() throws Exception {
+    void registersExpectedExceptionMetrics() throws Exception {
         client = InstrumentedHttpAsyncClients.custom(metricRegistry, metricNameStrategy).disableAutomaticRetries().build();
         client.start();
 
@@ -156,43 +154,43 @@ public class InstrumentedHttpAsyncClientsTest {
     }
 
     @Test
-    public void usesCustomClientConnectionManager() throws Exception {
-        try(PoolingAsyncClientConnectionManager clientConnectionManager = spy(new PoolingAsyncClientConnectionManager())) {
-        client = InstrumentedHttpAsyncClients.custom(metricRegistry, metricNameStrategy, clientConnectionManager).disableAutomaticRetries().build();
-        client.start();
+    void usesCustomClientConnectionManager() throws Exception {
+        try (PoolingAsyncClientConnectionManager clientConnectionManager = spy(new PoolingAsyncClientConnectionManager())) {
+            client = InstrumentedHttpAsyncClients.custom(metricRegistry, metricNameStrategy, clientConnectionManager).disableAutomaticRetries().build();
+            client.start();
 
-        final SimpleHttpRequest request = SimpleHttpRequests.get("http://localhost:" + httpServer.getAddress().getPort() + "/");
-        final MetricName metricName = MetricName.build("some.made.up.metric.name");
+            final SimpleHttpRequest request = SimpleHttpRequests.get("http://localhost:" + httpServer.getAddress().getPort() + "/");
+            final MetricName metricName = MetricName.build("some.made.up.metric.name");
 
-        httpServer.createContext("/", exchange -> {
-            exchange.sendResponseHeaders(200, 0L);
-            exchange.setStreams(null, null);
-            exchange.getResponseBody().write("TEST".getBytes(StandardCharsets.US_ASCII));
-            exchange.close();
-        });
-        httpServer.start();
+            httpServer.createContext("/", exchange -> {
+                exchange.sendResponseHeaders(200, 0L);
+                exchange.setStreams(null, null);
+                exchange.getResponseBody().write("TEST".getBytes(StandardCharsets.US_ASCII));
+                exchange.close();
+            });
+            httpServer.start();
 
-        when(metricNameStrategy.getNameFor(any(), any(HttpRequest.class))).thenReturn(metricName);
+            when(metricNameStrategy.getNameFor(any(), any(HttpRequest.class))).thenReturn(metricName);
 
-        final Future<SimpleHttpResponse> responseFuture = client.execute(request, new FutureCallback<SimpleHttpResponse>() {
-            @Override
-            public void completed(SimpleHttpResponse result) {
-                assertThat(result.getCode()).isEqualTo(200);
-            }
+            final Future<SimpleHttpResponse> responseFuture = client.execute(request, new FutureCallback<SimpleHttpResponse>() {
+                @Override
+                public void completed(SimpleHttpResponse result) {
+                    assertThat(result.getCode()).isEqualTo(200);
+                }
 
-            @Override
-            public void failed(Exception ex) {
-                fail();
-            }
+                @Override
+                public void failed(Exception ex) {
+                    fail();
+                }
 
-            @Override
-            public void cancelled() {
-                fail();
-            }
-        });
-        responseFuture.get(1L, TimeUnit.SECONDS);
+                @Override
+                public void cancelled() {
+                    fail();
+                }
+            });
+            responseFuture.get(1L, TimeUnit.SECONDS);
 
-        verify(clientConnectionManager, atLeastOnce()).connect(any(), any(), any(), any(), any(), any());
+            verify(clientConnectionManager, atLeastOnce()).connect(any(), any(), any(), any(), any(), any());
         }
     }
 }

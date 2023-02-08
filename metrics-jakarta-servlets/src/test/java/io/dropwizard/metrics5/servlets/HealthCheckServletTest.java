@@ -10,9 +10,9 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.servlet.ServletTester;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,13 +21,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class HealthCheckServletTest extends AbstractServletTest {
+class HealthCheckServletTest extends AbstractServletTest {
 
     private static final ZonedDateTime FIXED_TIME = ZonedDateTime.now();
 
@@ -62,20 +63,20 @@ public class HealthCheckServletTest extends AbstractServletTest {
                 (HealthCheckFilter) (name, healthCheck) -> !"filtered".equals(name));
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         request.setMethod("GET");
         request.setURI("/healthchecks");
         request.setVersion("HTTP/1.0");
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         threadPool.shutdown();
     }
 
     @Test
-    public void returns501IfNoHealthChecksAreRegistered() throws Exception {
+    void returns501IfNoHealthChecksAreRegistered() throws Exception {
         processRequest();
 
         assertThat(response.getStatus()).isEqualTo(501);
@@ -84,7 +85,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void returnsA200IfAllHealthChecksAreHealthy() throws Exception {
+    void returnsA200IfAllHealthChecksAreHealthy() throws Exception {
         registry.register("fun", new TestHealthCheck(() -> healthyResultWithMessage("whee")));
 
         processRequest();
@@ -98,7 +99,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void returnsASubsetOfHealthChecksIfFiltered() throws Exception {
+    void returnsASubsetOfHealthChecksIfFiltered() throws Exception {
         registry.register("fun", new TestHealthCheck(() -> healthyResultWithMessage("whee")));
         registry.register("filtered", new TestHealthCheck(() -> unhealthyResultWithMessage("whee")));
 
@@ -113,7 +114,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void returnsA500IfAnyHealthChecksAreUnhealthy() throws Exception {
+    void returnsA500IfAnyHealthChecksAreUnhealthy() throws Exception {
         registry.register("fun", new TestHealthCheck(() -> healthyResultWithMessage("whee")));
         registry.register("notFun", new TestHealthCheck(() -> unhealthyResultWithMessage("whee")));
 
@@ -122,12 +123,12 @@ public class HealthCheckServletTest extends AbstractServletTest {
         assertThat(response.getStatus()).isEqualTo(500);
         assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
         assertThat(response.getContent()).contains(
-                        "{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":0,\"timestamp\":\"" + EXPECTED_TIMESTAMP + "\"}",
-                        ",\"notFun\":{\"healthy\":false,\"message\":\"whee\",\"duration\":0,\"timestamp\":\"" + EXPECTED_TIMESTAMP + "\"}}");
+                "{\"fun\":{\"healthy\":true,\"message\":\"whee\",\"duration\":0,\"timestamp\":\"" + EXPECTED_TIMESTAMP + "\"}",
+                ",\"notFun\":{\"healthy\":false,\"message\":\"whee\",\"duration\":0,\"timestamp\":\"" + EXPECTED_TIMESTAMP + "\"}}");
     }
 
     @Test
-    public void returnsA200IfAnyHealthChecksAreUnhealthyAndHttpStatusIndicatorIsDisabled() throws Exception {
+    void returnsA200IfAnyHealthChecksAreUnhealthyAndHttpStatusIndicatorIsDisabled() throws Exception {
         registry.register("fun", new TestHealthCheck(() -> healthyResultWithMessage("whee")));
         registry.register("notFun", new TestHealthCheck(() -> unhealthyResultWithMessage("whee")));
         request.setURI("/healthchecks?httpStatusIndicator=false");
@@ -142,7 +143,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void optionallyPrettyPrintsTheJson() throws Exception {
+    void optionallyPrettyPrintsTheJson() throws Exception {
         registry.register("fun", new TestHealthCheck(() -> healthyResultWithMessage("foo bar 123")));
 
         request.setURI("/healthchecks?pretty=true");
@@ -178,7 +179,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
+    void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
         final HealthCheckRegistry healthCheckRegistry = mock(HealthCheckRegistry.class);
         final ServletContext servletContext = mock(ServletContext.class);
         final ServletConfig servletConfig = mock(ServletConfig.class);
@@ -192,7 +193,7 @@ public class HealthCheckServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void constructorWithRegistryAsArgumentUsesServletConfigWhenNull() throws Exception {
+    void constructorWithRegistryAsArgumentUsesServletConfigWhenNull() throws Exception {
         final HealthCheckRegistry healthCheckRegistry = mock(HealthCheckRegistry.class);
         final ServletContext servletContext = mock(ServletContext.class);
         final ServletConfig servletConfig = mock(ServletConfig.class);
@@ -207,20 +208,22 @@ public class HealthCheckServletTest extends AbstractServletTest {
         verify(servletContext, times(1)).getAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY);
     }
 
-    @Test(expected = ServletException.class)
-    public void constructorWithRegistryAsArgumentUsesServletConfigWhenNullButWrongTypeInContext() throws Exception {
-        final ServletContext servletContext = mock(ServletContext.class);
-        final ServletConfig servletConfig = mock(ServletConfig.class);
-        when(servletConfig.getServletContext()).thenReturn(servletContext);
-        when(servletContext.getAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY))
-                .thenReturn("IRELLEVANT_STRING");
+    @Test
+    void constructorWithRegistryAsArgumentUsesServletConfigWhenNullButWrongTypeInContext() throws Exception {
+        assertThrows(ServletException.class, () -> {
+            final ServletContext servletContext = mock(ServletContext.class);
+            final ServletConfig servletConfig = mock(ServletConfig.class);
+            when(servletConfig.getServletContext()).thenReturn(servletContext);
+            when(servletContext.getAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY))
+                    .thenReturn("IRELLEVANT_STRING");
 
-        final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
-        healthCheckServlet.init(servletConfig);
+            final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
+            healthCheckServlet.init(servletConfig);
+        });
     }
 
     @Test
-    public void constructorWithObjectMapperAsArgumentUsesServletConfigWhenNullButWrongTypeInContext() throws Exception {
+    void constructorWithObjectMapperAsArgumentUsesServletConfigWhenNullButWrongTypeInContext() throws Exception {
         final ServletContext servletContext = mock(ServletContext.class);
         final ServletConfig servletConfig = mock(ServletConfig.class);
         when(servletConfig.getServletContext()).thenReturn(servletContext);

@@ -7,7 +7,7 @@ import io.dropwizard.metrics5.jersey3.resources.InstrumentedSubResourceTimedPerC
 import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests registering {@link InstrumentedResourceMethodApplicationListener} as a singleton
  * in a Jersey {@link ResourceConfig}
  */
-public class SingletonMetricsTimedPerClassJerseyTest extends JerseyTest {
+class SingletonMetricsTimedPerClassJerseyTest extends JerseyTest {
     static {
         Logger.getLogger("org.glassfish.jersey").setLevel(Level.OFF);
     }
@@ -39,11 +39,11 @@ public class SingletonMetricsTimedPerClassJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void timedPerClassMethodsAreTimed() {
+    void timedPerClassMethodsAreTimed() {
         assertThat(target("timedPerClass")
-                .request()
-                .get(String.class))
-                .isEqualTo("yay");
+        .request()
+        .get(String.class))
+        .isEqualTo("yay");
 
         final Timer timer = registry.timer(name(InstrumentedResourceTimedPerClass.class, "timedPerClass"));
 
@@ -51,11 +51,11 @@ public class SingletonMetricsTimedPerClassJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void subresourcesFromLocatorsRegisterMetrics() {
+    void subresourcesFromLocatorsRegisterMetrics() {
         assertThat(target("subresource/timedPerClass")
-                .request()
-                .get(String.class))
-                .isEqualTo("yay");
+        .request()
+        .get(String.class))
+        .isEqualTo("yay");
 
         final Timer timer = registry.timer(name(InstrumentedSubResourceTimedPerClass.class, "timedPerClass"));
         assertThat(timer.getCount()).isEqualTo(1);

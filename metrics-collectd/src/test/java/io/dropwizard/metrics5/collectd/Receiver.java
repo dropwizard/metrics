@@ -4,7 +4,9 @@ import org.collectd.api.Notification;
 import org.collectd.api.ValueList;
 import org.collectd.protocol.Dispatcher;
 import org.collectd.protocol.UdpReceiver;
-import org.junit.rules.ExternalResource;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -13,20 +15,27 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public final class Receiver extends ExternalResource {
+public final class Receiver implements BeforeAllCallback, AfterAllCallback {
 
     private final int port;
 
     private UdpReceiver receiver;
     private DatagramSocket socket;
-    private BlockingQueue<ValueList> queue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<ValueList> queue = new LinkedBlockingQueue<>();
 
     public Receiver(int port) {
         this.port = port;
     }
 
+
     @Override
-    protected void before() throws Throwable {
+    public void afterAll(ExtensionContext context) throws Exception {
+        receiver.shutdown();
+        socket.close();
+    }
+
+    @Override
+    public void beforeAll(ExtensionContext context) throws Exception {
         socket = new DatagramSocket(null);
         socket.bind(new InetSocketAddress(InetAddress.getLoopbackAddress(), port));
 
@@ -53,11 +62,5 @@ public final class Receiver extends ExternalResource {
 
     public ValueList next() throws InterruptedException {
         return queue.poll(2, TimeUnit.SECONDS);
-    }
-
-    @Override
-    protected void after() {
-        receiver.shutdown();
-        socket.close();
     }
 }

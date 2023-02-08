@@ -1,13 +1,13 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class UniformReservoirTest {
+class UniformReservoirTest {
     @Test
     @SuppressWarnings("unchecked")
-    public void aReservoirOf100OutOf1000Elements() {
+    void aReservoirOf100OutOf1000Elements() {
         final UniformReservoir reservoir = new UniformReservoir(100);
         for (int i = 0; i < 1000; i++) {
             reservoir.update(i);

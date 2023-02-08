@@ -3,8 +3,8 @@ package io.dropwizard.metrics5.jdbi3.strategies;
 import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.jdbi3.InstrumentedTimingCollector;
 import org.jdbi.v3.core.extension.ExtensionMethod;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,12 +13,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
-public class SmartNameStrategyTest extends AbstractStrategyTest {
+class SmartNameStrategyTest extends AbstractStrategyTest {
 
-    private StatementNameStrategy smartNameStrategy = new SmartNameStrategy();
+    private final StatementNameStrategy smartNameStrategy = new SmartNameStrategy();
     private InstrumentedTimingCollector collector;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -26,19 +26,19 @@ public class SmartNameStrategyTest extends AbstractStrategyTest {
     }
 
     @Test
-    public void updatesTimerForSqlObjects() throws Exception {
+    void updatesTimerForSqlObjects() throws Exception {
         when(ctx.getExtensionMethod()).thenReturn(
-                new ExtensionMethod(getClass(), getClass().getMethod("updatesTimerForSqlObjects")));
+                new ExtensionMethod(getClass(), getClass().getMethod("someMethod")));
 
         collector.collect(TimeUnit.SECONDS.toNanos(1), ctx);
 
         MetricName name = smartNameStrategy.getStatementName(ctx);
-        assertThat(name).isEqualTo(name(getClass(), "updatesTimerForSqlObjects"));
+        assertThat(name).isEqualTo(name(getClass(), "someMethod"));
         assertThat(getTimerMaxValue(name)).isEqualTo(1000000000);
     }
 
     @Test
-    public void updatesTimerForRawSql() throws Exception {
+    void updatesTimerForRawSql() throws Exception {
         collector.collect(TimeUnit.SECONDS.toNanos(2), ctx);
 
         MetricName name = smartNameStrategy.getStatementName(ctx);
@@ -47,7 +47,7 @@ public class SmartNameStrategyTest extends AbstractStrategyTest {
     }
 
     @Test
-    public void updatesTimerForNoRawSql() throws Exception {
+    void updatesTimerForNoRawSql() throws Exception {
         reset(ctx);
 
         collector.collect(TimeUnit.SECONDS.toNanos(2), ctx);
@@ -58,13 +58,16 @@ public class SmartNameStrategyTest extends AbstractStrategyTest {
     }
 
     @Test
-    public void updatesTimerForContextClass() throws Exception {
+    void updatesTimerForContextClass() throws Exception {
         when(ctx.getExtensionMethod()).thenReturn(new ExtensionMethod(getClass(),
-                getClass().getMethod("updatesTimerForContextClass")));
+                getClass().getMethod("someMethod")));
         collector.collect(TimeUnit.SECONDS.toNanos(3), ctx);
 
         MetricName name = smartNameStrategy.getStatementName(ctx);
-        assertThat(name).isEqualTo(name(getClass(), "updatesTimerForContextClass"));
+        assertThat(name).isEqualTo(name(getClass(), "someMethod"));
         assertThat(getTimerMaxValue(name)).isEqualTo(3000000000L);
+    }
+
+    public void someMethod() {
     }
 }

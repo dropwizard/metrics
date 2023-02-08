@@ -8,10 +8,10 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -25,15 +25,15 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class InstrumentedHandlerTest {
+class InstrumentedHandlerTest {
     private final HttpClient client = new HttpClient();
     private final MetricRegistry registry = new MetricRegistry();
     private final Server server = new Server();
     private final ServerConnector connector = new ServerConnector(server);
     private final InstrumentedHandler handler = new InstrumentedHandler(registry);
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         handler.setName("handler");
         handler.setHandler(new TestHandler());
         server.addConnector(connector);
@@ -42,20 +42,20 @@ public class InstrumentedHandlerTest {
         client.start();
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         server.stop();
         client.stop();
     }
 
     @Test
-    public void hasAName() throws Exception {
+    void hasAName() throws Exception {
         assertThat(handler.getName())
                 .isEqualTo("handler");
     }
 
     @Test
-    public void createsAndRemovesMetricsForTheHandler() throws Exception {
+    void createsAndRemovesMetricsForTheHandler() throws Exception {
         final ContentResponse response = client.GET(uri("/hello"));
 
         assertThat(response.getStatus())
@@ -100,7 +100,7 @@ public class InstrumentedHandlerTest {
     }
 
     @Test
-    public void responseTimesAreRecordedForBlockingResponses() throws Exception {
+    void responseTimesAreRecordedForBlockingResponses() throws Exception {
 
         final ContentResponse response = client.GET(uri("/blocking"));
 
@@ -111,8 +111,8 @@ public class InstrumentedHandlerTest {
     }
 
     @Test
-    @Ignore("flaky on virtual machines")
-    public void responseTimesAreRecordedForAsyncResponses() throws Exception {
+    @Disabled("flaky on virtual machines")
+    void responseTimesAreRecordedForAsyncResponses() throws Exception {
 
         final ContentResponse response = client.GET(uri("/async"));
 

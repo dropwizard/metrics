@@ -2,12 +2,12 @@ package io.dropwizard.metrics5;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ChunkedAssociativeLongArrayTest {
+class ChunkedAssociativeLongArrayTest {
 
     @Test
-    public void testTrim() {
+    void testTrim() {
         ChunkedAssociativeLongArray array = new ChunkedAssociativeLongArray(3);
         array.put(-3, 3);
         array.put(-2, 1);

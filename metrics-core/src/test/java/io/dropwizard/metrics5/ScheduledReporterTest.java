@@ -1,9 +1,8 @@
 package io.dropwizard.metrics5;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -15,9 +14,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class ScheduledReporterTest {
+class ScheduledReporterTest {
     private final Gauge<String> gauge = () -> "";
     private final Counter counter = mock(Counter.class);
     private final Histogram histogram = mock(Histogram.class);
@@ -46,11 +47,11 @@ public class ScheduledReporterTest {
     private final ScheduledReporter reporterWithCustomMockExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, mockExecutor);
     private final ScheduledReporter reporterWithCustomExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, customExecutor);
     private final DummyReporter reporterWithExternallyManagedExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, externalExecutor, false);
-    private final ScheduledReporter[] reporters = new ScheduledReporter[] {reporter, reporterWithCustomExecutor, reporterWithExternallyManagedExecutor};
+    private final ScheduledReporter[] reporters = new ScheduledReporter[]{reporter, reporterWithCustomExecutor, reporterWithExternallyManagedExecutor};
 
-    @Before
+    @BeforeEach
     @SuppressWarnings("unchecked")
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         registry.register("gauge", gauge);
         registry.register("counter", counter);
         registry.register("histogram", histogram);
@@ -58,8 +59,8 @@ public class ScheduledReporterTest {
         registry.register("timer", timer);
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         customExecutor.shutdown();
         externalExecutor.shutdown();
         reporter.stop();
@@ -67,14 +68,14 @@ public class ScheduledReporterTest {
     }
 
     @Test
-    public void createWithNullMetricRegistry() {
+    void createWithNullMetricRegistry() {
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         DummyReporter r = null;
         try {
             r = new DummyReporter(null, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor);
-            Assert.fail("NullPointerException must be thrown !!!");
+            fail("NullPointerException must be thrown !!!");
         } catch (NullPointerException e) {
-            Assert.assertEquals("registry == null", e.getMessage());
+            assertEquals("registry == null", e.getMessage());
         } finally {
             if (r != null) {
                 r.close();
@@ -83,7 +84,7 @@ public class ScheduledReporterTest {
     }
 
     @Test
-    public void pollsPeriodically() throws Exception {
+    void pollsPeriodically() throws Exception {
         CountDownLatch latch = new CountDownLatch(2);
         reporter.start(100, 100, TimeUnit.MILLISECONDS, () -> {
             if (latch.getCount() > 0) {
@@ -103,25 +104,25 @@ public class ScheduledReporterTest {
     }
 
     @Test
-    public void shouldUsePeriodAsInitialDelayIfNotSpecifiedOtherwise() throws Exception {
+    void shouldUsePeriodAsInitialDelayIfNotSpecifiedOtherwise() throws Exception {
         reporterWithCustomMockExecutor.start(200, TimeUnit.MILLISECONDS);
 
         verify(mockExecutor, times(1)).scheduleWithFixedDelay(
-            any(Runnable.class), eq(200L), eq(200L), eq(TimeUnit.MILLISECONDS)
+                any(Runnable.class), eq(200L), eq(200L), eq(TimeUnit.MILLISECONDS)
         );
     }
 
     @Test
-    public void shouldStartWithSpecifiedInitialDelay() throws Exception {
+    void shouldStartWithSpecifiedInitialDelay() throws Exception {
         reporterWithCustomMockExecutor.start(350, 100, TimeUnit.MILLISECONDS);
 
         verify(mockExecutor).scheduleWithFixedDelay(
-            any(Runnable.class), eq(350L), eq(100L), eq(TimeUnit.MILLISECONDS)
+                any(Runnable.class), eq(350L), eq(100L), eq(TimeUnit.MILLISECONDS)
         );
     }
 
     @Test
-    public void shouldAutoCreateExecutorWhenItNull() throws Exception {
+    void shouldAutoCreateExecutorWhenItNull() throws Exception {
         CountDownLatch latch = new CountDownLatch(2);
         reporterWithNullExecutor.start(100, 100, TimeUnit.MILLISECONDS, () -> {
             if (latch.getCount() > 0) {
@@ -139,33 +140,39 @@ public class ScheduledReporterTest {
         );
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldDisallowToStartReportingMultiple() throws Exception {
-        reporter.start(200, TimeUnit.MILLISECONDS);
-        reporter.start(200, TimeUnit.MILLISECONDS);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldDisallowToStartReportingMultipleTimesOnCustomExecutor() throws Exception {
-        reporterWithCustomExecutor.start(200, TimeUnit.MILLISECONDS);
-        reporterWithCustomExecutor.start(200, TimeUnit.MILLISECONDS);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldDisallowToStartReportingMultipleTimesOnExternallyManagedExecutor() throws Exception {
-        reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
-        reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
+    @Test
+    void shouldDisallowToStartReportingMultiple() throws Exception {
+        assertThrows(IllegalArgumentException.class, () -> {
+            reporter.start(200, TimeUnit.MILLISECONDS);
+            reporter.start(200, TimeUnit.MILLISECONDS);
+        });
     }
 
     @Test
-    public void shouldNotFailOnStopIfReporterWasNotStared() {
+    void shouldDisallowToStartReportingMultipleTimesOnCustomExecutor() throws Exception {
+        assertThrows(IllegalArgumentException.class, () -> {
+            reporterWithCustomExecutor.start(200, TimeUnit.MILLISECONDS);
+            reporterWithCustomExecutor.start(200, TimeUnit.MILLISECONDS);
+        });
+    }
+
+    @Test
+    void shouldDisallowToStartReportingMultipleTimesOnExternallyManagedExecutor() throws Exception {
+        assertThrows(IllegalArgumentException.class, () -> {
+            reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
+            reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
+        });
+    }
+
+    @Test
+    void shouldNotFailOnStopIfReporterWasNotStared() {
         for (ScheduledReporter reporter : reporters) {
             reporter.stop();
         }
     }
 
     @Test
-    public void shouldNotFailWhenStoppingMultipleTimes() {
+    void shouldNotFailWhenStoppingMultipleTimes() {
         for (ScheduledReporter reporter : reporters) {
             reporter.start(200, TimeUnit.MILLISECONDS);
             reporter.stop();
@@ -175,14 +182,14 @@ public class ScheduledReporterTest {
     }
 
     @Test
-    public void shouldShutdownExecutorOnStopByDefault() {
+    void shouldShutdownExecutorOnStopByDefault() {
         reporterWithCustomExecutor.start(200, TimeUnit.MILLISECONDS);
         reporterWithCustomExecutor.stop();
         assertTrue(customExecutor.isTerminated());
     }
 
     @Test
-    public void shouldNotShutdownExternallyManagedExecutorOnStop() {
+    void shouldNotShutdownExternallyManagedExecutorOnStop() {
         reporterWithExternallyManagedExecutor.start(200, TimeUnit.MILLISECONDS);
         reporterWithExternallyManagedExecutor.stop();
         assertFalse(mockExecutor.isTerminated());
@@ -190,7 +197,7 @@ public class ScheduledReporterTest {
     }
 
     @Test
-    public void shouldCancelScheduledFutureWhenStoppingWithExternallyManagedExecutor() throws InterruptedException, ExecutionException, TimeoutException {
+    void shouldCancelScheduledFutureWhenStoppingWithExternallyManagedExecutor() throws InterruptedException, ExecutionException, TimeoutException {
         // configure very frequency rate of execution
         reporterWithExternallyManagedExecutor.start(1, TimeUnit.MILLISECONDS);
         reporterWithExternallyManagedExecutor.stop();
@@ -203,12 +210,12 @@ public class ScheduledReporterTest {
     }
 
     @Test
-    public void shouldConvertDurationToMillisecondsPrecisely() {
+    void shouldConvertDurationToMillisecondsPrecisely() {
         assertEquals(2.0E-5, reporter.convertDuration(20), 0.0);
     }
 
     @Test
-    public void shouldReportMetricsOnShutdown() throws Exception {
+    void shouldReportMetricsOnShutdown() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
         reporterWithNullExecutor.start(0, 10, TimeUnit.SECONDS, () -> {
             if (latch.getCount() > 0) {
@@ -229,7 +236,7 @@ public class ScheduledReporterTest {
     }
 
     @Test
-    public void shouldRescheduleAfterReportFinish() throws Exception {
+    void shouldRescheduleAfterReportFinish() throws Exception {
         // the first report is triggered at T + 0.1 seconds and takes 0.8 seconds
         // after the first report finishes at T + 0.9 seconds the next report is scheduled to run at T + 1.4 seconds
         reporter.start(100, 500, TimeUnit.MILLISECONDS, () -> {

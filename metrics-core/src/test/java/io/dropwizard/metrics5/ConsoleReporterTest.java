@@ -1,7 +1,7 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ConsoleReporterTest {
+class ConsoleReporterTest {
     private final Locale locale = Locale.US;
     private final TimeZone timeZone = TimeZone.getTimeZone("America/Los_Angeles");
 
@@ -37,8 +37,8 @@ public class ConsoleReporterTest {
             .build();
     private String dateHeader;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         when(clock.getTime()).thenReturn(1363568676000L);
         // JDK9 has changed the java.text.DateFormat API implementation according to Unicode.
         // See http://mail.openjdk.java.net/pipermail/jdk9-dev/2017-April/005732.html
@@ -48,7 +48,7 @@ public class ConsoleReporterTest {
     }
 
     @Test
-    public void reportsGaugeValues() throws Exception {
+    void reportsGaugeValues() throws Exception {
         final Gauge<Integer> gauge = () -> 1;
 
         reporter.report(map(MetricName.build("gauge"), gauge),
@@ -70,7 +70,7 @@ public class ConsoleReporterTest {
     }
 
     @Test
-    public void reportsCounterValues() throws Exception {
+    void reportsCounterValues() throws Exception {
         final Counter counter = mock(Counter.class);
         when(counter.getCount()).thenReturn(100L);
 
@@ -93,7 +93,7 @@ public class ConsoleReporterTest {
     }
 
     @Test
-    public void reportsHistogramValues() throws Exception {
+    void reportsHistogramValues() throws Exception {
         final Histogram histogram = mock(Histogram.class);
         when(histogram.getCount()).thenReturn(1L);
         when(histogram.getSum()).thenReturn(4L);
@@ -142,7 +142,7 @@ public class ConsoleReporterTest {
     }
 
     @Test
-    public void reportsMeterValues() throws Exception {
+    void reportsMeterValues() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
         when(meter.getSum()).thenReturn(3L);
@@ -175,7 +175,7 @@ public class ConsoleReporterTest {
     }
 
     @Test
-    public void reportsTimerValues() throws Exception {
+    void reportsTimerValues() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
         when(timer.getSum()).thenReturn(TimeUnit.MILLISECONDS.toNanos(5));
@@ -233,7 +233,7 @@ public class ConsoleReporterTest {
     }
 
     @Test
-    public void reportMeterWithDisabledAttributes() throws Exception {
+    void reportMeterWithDisabledAttributes() throws Exception {
         Set<MetricAttribute> disabledMetricAttributes = EnumSet.of(MetricAttribute.M15_RATE, MetricAttribute.M5_RATE, MetricAttribute.COUNT, MetricAttribute.SUM);
 
         final ConsoleReporter customReporter = ConsoleReporter.forRegistry(registry)
@@ -275,7 +275,7 @@ public class ConsoleReporterTest {
     }
 
     @Test
-    public void reportTimerWithDisabledAttributes() throws Exception {
+    void reportTimerWithDisabledAttributes() throws Exception {
         Set<MetricAttribute> disabledMetricAttributes = EnumSet.of(MetricAttribute.P50, MetricAttribute.P999, MetricAttribute.M5_RATE, MetricAttribute.MAX);
 
         final ConsoleReporter customReporter = ConsoleReporter.forRegistry(registry)
@@ -342,7 +342,7 @@ public class ConsoleReporterTest {
     }
 
     @Test
-    public void reportHistogramWithDisabledAttributes() throws Exception {
+    void reportHistogramWithDisabledAttributes() throws Exception {
         Set<MetricAttribute> disabledMetricAttributes = EnumSet.of(MetricAttribute.MIN, MetricAttribute.MAX, MetricAttribute.STDDEV, MetricAttribute.P95);
 
         final ConsoleReporter customReporter = ConsoleReporter.forRegistry(registry)

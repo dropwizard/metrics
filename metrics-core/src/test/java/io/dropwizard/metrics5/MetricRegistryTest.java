@@ -1,7 +1,7 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-public class MetricRegistryTest {
+class MetricRegistryTest {
 
     private static class CustomCounter extends Counter {
 
@@ -47,13 +47,13 @@ public class MetricRegistryTest {
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         registry.addListener(listener);
     }
 
     @Test
-    public void registeringAGaugeTriggersANotification() {
+    void registeringAGaugeTriggersANotification() {
         assertThat(registry.register(THING, gauge))
                 .isEqualTo(gauge);
 
@@ -61,7 +61,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void removingAGaugeTriggersANotification() {
+    void removingAGaugeTriggersANotification() {
         registry.register(THING, gauge);
 
         assertThat(registry.remove(THING))
@@ -71,7 +71,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void registeringACounterTriggersANotification() {
+    void registeringACounterTriggersANotification() {
         assertThat(registry.register(THING, counter))
                 .isEqualTo(counter);
 
@@ -79,7 +79,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void accessingACounterRegistersAndReusesTheCounter() {
+    void accessingACounterRegistersAndReusesTheCounter() {
         final Counter counter1 = registry.counter(THING);
         final Counter counter2 = registry.counter(THING);
 
@@ -90,7 +90,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void accessingACustomCounterRegistersAndReusesTheCounter() {
+    void accessingACustomCounterRegistersAndReusesTheCounter() {
         final MetricRegistry.MetricSupplier<Counter> supplier = () -> counter;
         final Counter counter1 = registry.counter(THING, supplier);
         final Counter counter2 = registry.counter(THING, supplier);
@@ -102,7 +102,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void createsTypesafeCustomCounter() {
+    void createsTypesafeCustomCounter() {
         MetricName name = MetricName.build("custom-counter");
         final CustomCounter customCounter = registry.counter(name, CustomCounter::new);
         customCounter.incTheAnswer();
@@ -111,7 +111,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void removingACounterTriggersANotification() {
+    void removingACounterTriggersANotification() {
         registry.register(THING, counter);
 
         assertThat(registry.remove(THING))
@@ -121,7 +121,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void registeringAHistogramTriggersANotification() {
+    void registeringAHistogramTriggersANotification() {
         assertThat(registry.register(THING, histogram))
                 .isEqualTo(histogram);
 
@@ -129,7 +129,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void accessingAHistogramRegistersAndReusesIt() {
+    void accessingAHistogramRegistersAndReusesIt() {
         final Histogram histogram1 = registry.histogram(THING);
         final Histogram histogram2 = registry.histogram(THING);
 
@@ -140,7 +140,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void accessingACustomHistogramRegistersAndReusesIt() {
+    void accessingACustomHistogramRegistersAndReusesIt() {
         final MetricRegistry.MetricSupplier<Histogram> supplier = () -> histogram;
         final Histogram histogram1 = registry.histogram(THING, supplier);
         final Histogram histogram2 = registry.histogram(THING, supplier);
@@ -152,7 +152,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void removingAHistogramTriggersANotification() {
+    void removingAHistogramTriggersANotification() {
         registry.register(THING, histogram);
 
         assertThat(registry.remove(THING))
@@ -162,7 +162,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void registeringAMeterTriggersANotification() {
+    void registeringAMeterTriggersANotification() {
         assertThat(registry.register(THING, meter))
                 .isEqualTo(meter);
 
@@ -170,7 +170,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void accessingAMeterRegistersAndReusesIt() {
+    void accessingAMeterRegistersAndReusesIt() {
         final Meter meter1 = registry.meter(THING);
         final Meter meter2 = registry.meter(THING);
 
@@ -181,7 +181,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void accessingACustomMeterRegistersAndReusesIt() {
+    void accessingACustomMeterRegistersAndReusesIt() {
         final MetricRegistry.MetricSupplier<Meter> supplier = () -> meter;
         final Meter meter1 = registry.meter(THING, supplier);
         final Meter meter2 = registry.meter(THING, supplier);
@@ -193,7 +193,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void removingAMeterTriggersANotification() {
+    void removingAMeterTriggersANotification() {
         registry.register(THING, meter);
 
         assertThat(registry.remove(THING))
@@ -203,7 +203,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void registeringATimerTriggersANotification() {
+    void registeringATimerTriggersANotification() {
         assertThat(registry.register(THING, timer))
                 .isEqualTo(timer);
 
@@ -211,7 +211,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void accessingATimerRegistersAndReusesIt() {
+    void accessingATimerRegistersAndReusesIt() {
         final Timer timer1 = registry.timer(THING);
         final Timer timer2 = registry.timer(THING);
 
@@ -222,7 +222,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void accessingACustomTimerRegistersAndReusesIt() {
+    void accessingACustomTimerRegistersAndReusesIt() {
         final MetricRegistry.MetricSupplier<Timer> supplier = () -> timer;
         final Timer timer1 = registry.timer(THING, supplier);
         final Timer timer2 = registry.timer(THING, supplier);
@@ -235,7 +235,7 @@ public class MetricRegistryTest {
 
 
     @Test
-    public void removingATimerTriggersANotification() {
+    void removingATimerTriggersANotification() {
         registry.register(THING, timer);
 
         assertThat(registry.remove(THING))
@@ -245,7 +245,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void accessingACustomGaugeRegistersAndReusesIt() {
+    void accessingACustomGaugeRegistersAndReusesIt() {
         final MetricRegistry.MetricSupplier<Gauge<String>> supplier = () -> gauge;
         final Gauge<String> gauge1 = registry.gauge(THING, supplier);
         final Gauge<String> gauge2 = registry.gauge(THING, supplier);
@@ -257,7 +257,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void accessingASettableGaugeRegistersAndReusesIt() {
+    void accessingASettableGaugeRegistersAndReusesIt() {
         final SettableGauge<String> gauge1 = registry.gauge(THING);
         gauge1.setValue("Test");
         final Gauge<String> gauge2 = registry.gauge(THING);
@@ -269,7 +269,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void accessingAnExistingGaugeReusesIt() {
+    void accessingAnExistingGaugeReusesIt() {
         final Gauge<String> gauge1 = registry.gauge(THING, () -> () -> "string-gauge");
         final Gauge<String> gauge2 = registry.gauge(THING, () -> new DefaultSettableGauge<>("settable-gauge"));
 
@@ -280,7 +280,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void accessingAnExistingSettableGaugeReusesIt() {
+    void accessingAnExistingSettableGaugeReusesIt() {
         final Gauge<String> gauge1 = registry.gauge(THING, () -> new DefaultSettableGauge<>("settable-gauge"));
         final Gauge<String> gauge2 = registry.gauge(THING);
 
@@ -291,7 +291,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void settableGaugeIsTreatedLikeAGauge() {
+    void settableGaugeIsTreatedLikeAGauge() {
         final MetricRegistry.MetricSupplier<SettableGauge<String>> supplier = () -> settableGauge;
         final SettableGauge<String> gauge1 = registry.gauge(THING, supplier);
         final SettableGauge<String> gauge2 = registry.gauge(THING, supplier);
@@ -303,7 +303,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void addingAListenerWithExistingMetricsCatchesItUp() {
+    void addingAListenerWithExistingMetricsCatchesItUp() {
         registry.register(GAUGE2, gauge);
         registry.register(SETTABLE_GAUGE, settableGauge);
         registry.register(COUNTER2, counter);
@@ -323,7 +323,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void aRemovedListenerDoesNotReceiveUpdates() {
+    void aRemovedListenerDoesNotReceiveUpdates() {
         registry.register(GAUGE, gauge);
         registry.removeListener(listener);
         registry.register(GAUGE2, gauge);
@@ -332,7 +332,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void hasAMapOfRegisteredGauges() {
+    void hasAMapOfRegisteredGauges() {
         registry.register(GAUGE2, gauge);
         registry.register(SETTABLE_GAUGE, settableGauge);
 
@@ -342,7 +342,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void hasAMapOfRegisteredCounters() {
+    void hasAMapOfRegisteredCounters() {
         registry.register(COUNTER2, counter);
 
         assertThat(registry.getCounters())
@@ -350,7 +350,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void hasAMapOfRegisteredHistograms() {
+    void hasAMapOfRegisteredHistograms() {
         registry.register(HISTOGRAM2, histogram);
 
         assertThat(registry.getHistograms())
@@ -358,7 +358,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void hasAMapOfRegisteredMeters() {
+    void hasAMapOfRegisteredMeters() {
         registry.register(METER2, meter);
 
         assertThat(registry.getMeters())
@@ -366,7 +366,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void hasAMapOfRegisteredTimers() {
+    void hasAMapOfRegisteredTimers() {
         registry.register(TIMER2, timer);
 
         assertThat(registry.getTimers())
@@ -374,7 +374,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void hasASetOfRegisteredMetricNames() {
+    void hasASetOfRegisteredMetricNames() {
         registry.register(GAUGE2, gauge);
         registry.register(SETTABLE_GAUGE, settableGauge);
         registry.register(COUNTER2, counter);
@@ -387,7 +387,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void registersMultipleMetrics() {
+    void registersMultipleMetrics() {
         final MetricSet metrics = () -> {
             final Map<MetricName, Metric> m = new HashMap<>();
             m.put(GAUGE2, gauge);
@@ -402,7 +402,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void registersMultipleMetricsWithAPrefix() {
+    void registersMultipleMetricsWithAPrefix() {
         final MetricName myCounter = MetricName.build("my.counter");
         final MetricName myGauge = MetricName.build("my.gauge");
 
@@ -420,7 +420,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void registersRecursiveMetricSets() {
+    void registersRecursiveMetricSets() {
         final MetricSet inner = () -> {
             final Map<MetricName, Metric> m = new HashMap<>();
             m.put(GAUGE, gauge);
@@ -444,7 +444,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void registersMetricsFromAnotherRegistry() {
+    void registersMetricsFromAnotherRegistry() {
         MetricRegistry other = new MetricRegistry();
         other.register(GAUGE, gauge);
         registry.register("nested", other);
@@ -452,44 +452,44 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void concatenatesStringsToFormADottedName() {
+    void concatenatesStringsToFormADottedName() {
         assertThat(name("one", "two", "three"))
                 .isEqualTo(MetricName.build("one.two.three"));
     }
 
     @Test
     @SuppressWarnings("NullArgumentToVariableArgMethod")
-    public void elidesNullValuesFromNamesWhenOnlyOneNullPassedIn() {
+    void elidesNullValuesFromNamesWhenOnlyOneNullPassedIn() {
         assertThat(name("one", (String) null))
                 .isEqualTo(MetricName.build("one"));
     }
 
     @Test
-    public void elidesNullValuesFromNamesWhenManyNullsPassedIn() {
+    void elidesNullValuesFromNamesWhenManyNullsPassedIn() {
         assertThat(name("one", null, null))
                 .isEqualTo(MetricName.build("one"));
     }
 
     @Test
-    public void elidesNullValuesFromNamesWhenNullAndNotNullPassedIn() {
+    void elidesNullValuesFromNamesWhenNullAndNotNullPassedIn() {
         assertThat(name("one", null, "three"))
                 .isEqualTo(MetricName.build("one.three"));
     }
 
     @Test
-    public void elidesEmptyStringsFromNames() {
+    void elidesEmptyStringsFromNames() {
         assertThat(name("one", "", "three"))
                 .isEqualTo(MetricName.build("one.three"));
     }
 
     @Test
-    public void concatenatesClassNamesWithStringsToFormADottedName() {
+    void concatenatesClassNamesWithStringsToFormADottedName() {
         assertThat(name(MetricRegistryTest.class, "one", "two"))
                 .isEqualTo(MetricName.build("io.dropwizard.metrics5.MetricRegistryTest.one.two"));
     }
 
     @Test
-    public void concatenatesClassesWithoutCanonicalNamesWithStrings() {
+    void concatenatesClassesWithoutCanonicalNamesWithStrings() {
         final Gauge<String> g = () -> null;
 
         assertThat(name(g.getClass(), "one", "two"))
@@ -497,7 +497,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void removesMetricsMatchingAFilter() {
+    void removesMetricsMatchingAFilter() {
         final MetricName timer1 = MetricName.build("timer-1");
         final MetricName timer2 = MetricName.build("timer-2");
         final MetricName histogram1 = MetricName.build("histogram-1");
@@ -521,7 +521,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void addingChildMetricAfterRegister() {
+    void addingChildMetricAfterRegister() {
         MetricRegistry parent = new MetricRegistry();
         MetricRegistry child = new MetricRegistry();
 
@@ -537,7 +537,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void addingMultipleChildMetricsAfterRegister() {
+    void addingMultipleChildMetricsAfterRegister() {
         MetricRegistry parent = new MetricRegistry();
         MetricRegistry child = new MetricRegistry();
 
@@ -555,7 +555,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void addingDeepChildMetricsAfterRegister() {
+    void addingDeepChildMetricsAfterRegister() {
         MetricRegistry parent = new MetricRegistry();
         MetricRegistry child = new MetricRegistry();
         MetricRegistry deepChild = new MetricRegistry();
@@ -584,7 +584,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void removingChildMetricAfterRegister() {
+    void removingChildMetricAfterRegister() {
         MetricRegistry parent = new MetricRegistry();
         MetricRegistry child = new MetricRegistry();
 
@@ -604,7 +604,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void removingMultipleChildMetricsAfterRegister() {
+    void removingMultipleChildMetricsAfterRegister() {
         MetricRegistry parent = new MetricRegistry();
         MetricRegistry child = new MetricRegistry();
 
@@ -627,7 +627,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void removingDeepChildMetricsAfterRegister() {
+    void removingDeepChildMetricsAfterRegister() {
         MetricRegistry parent = new MetricRegistry();
         MetricRegistry child = new MetricRegistry();
         MetricRegistry deepChild = new MetricRegistry();
@@ -659,21 +659,21 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void registerNullMetric() {
+    void registerNullMetric() {
         MetricRegistry registry = new MetricRegistry();
         assertThatThrownBy(() -> registry.register("any_name", null))
                 .hasMessage("metric == null");
     }
 
     @Test
-    public void infersGaugeType() {
+    void infersGaugeType() {
         Gauge<Long> gauge = registry.registerGauge(GAUGE, () -> 10_000_000_000L);
 
         assertThat(gauge.getValue()).isEqualTo(10_000_000_000L);
     }
 
     @Test
-    public void registersGaugeAsLambda() {
+    void registersGaugeAsLambda() {
         registry.registerGauge(GAUGE, () -> 3.14);
 
         assertThat(registry.gauge(GAUGE).getValue()).isEqualTo(3.14);

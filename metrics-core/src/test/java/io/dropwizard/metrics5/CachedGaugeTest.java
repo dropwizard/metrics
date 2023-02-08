@@ -1,6 +1,6 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +14,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CachedGaugeTest {
+class CachedGaugeTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(CachedGaugeTest.class);
     private static final int THREAD_COUNT = 10;
     private static final long RUNNING_TIME_MILLIS = TimeUnit.SECONDS.toMillis(10);
@@ -42,7 +42,7 @@ public class CachedGaugeTest {
     private final ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
 
     @Test
-    public void cachesTheValueForTheGivenPeriod() {
+    void cachesTheValueForTheGivenPeriod() {
         assertThat(gauge.getValue())
                 .isEqualTo(1);
         assertThat(gauge.getValue())
@@ -50,7 +50,7 @@ public class CachedGaugeTest {
     }
 
     @Test
-    public void reloadsTheCachedValueAfterTheGivenPeriod() throws Exception {
+    void reloadsTheCachedValueAfterTheGivenPeriod() throws Exception {
         assertThat(gauge.getValue())
                 .isEqualTo(1);
 
@@ -64,7 +64,7 @@ public class CachedGaugeTest {
     }
 
     @Test
-    public void reloadsCachedValueInNegativeTime() throws Exception {
+    void reloadsCachedValueInNegativeTime() throws Exception {
         AtomicLong time = new AtomicLong(-2L);
         Clock clock = new Clock() {
             @Override
@@ -92,7 +92,7 @@ public class CachedGaugeTest {
     }
 
     @Test
-    public void multipleThreadAccessReturnsConsistentResults() throws Exception {
+    void multipleThreadAccessReturnsConsistentResults() throws Exception {
         List<Future<Boolean>> futures = new ArrayList<>(THREAD_COUNT);
 
         for (int i = 0; i < THREAD_COUNT; i++) {
@@ -123,7 +123,7 @@ public class CachedGaugeTest {
         }
 
         for (int i = 0; i < futures.size(); i++) {
-            assertTrue("Future " + i + " failed", futures.get(i).get());
+            assertTrue(futures.get(i).get(), "Future " + i + " failed");
         }
 
         executor.shutdown();

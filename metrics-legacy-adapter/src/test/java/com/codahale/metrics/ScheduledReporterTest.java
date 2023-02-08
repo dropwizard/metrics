@@ -1,8 +1,8 @@
 package com.codahale.metrics;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.SortedMap;
 import java.util.concurrent.CountDownLatch;
@@ -11,13 +11,13 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class ScheduledReporterTest {
+class ScheduledReporterTest {
 
     private MetricRegistry metricRegistry = new MetricRegistry();
     private ScheduledReporter scheduledReporter;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         metricRegistry.register("sw-gauge", (Gauge<Integer>) () -> 28);
         metricRegistry.counter("sw-counter");
         metricRegistry.timer("sw-timer");
@@ -25,8 +25,8 @@ public class ScheduledReporterTest {
         metricRegistry.histogram("sw-histogram");
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         scheduledReporter.stop();
     }
 
@@ -36,8 +36,8 @@ public class ScheduledReporterTest {
             @Override
             @SuppressWarnings("rawtypes")
             public void report(SortedMap<String, Gauge> gauges, SortedMap<String, Counter> counters,
-                               SortedMap<String, Histogram> histograms, SortedMap<String, Meter> meters,
-                               SortedMap<String, Timer> timers) {
+                    SortedMap<String, Histogram> histograms, SortedMap<String, Meter> meters,
+                    SortedMap<String, Timer> timers) {
                 assertThat(gauges).containsOnlyKeys("sw-gauge");
                 assertThat(counters).containsOnlyKeys("sw-counter");
                 assertThat(histograms).containsOnlyKeys("sw-histogram");
@@ -49,7 +49,7 @@ public class ScheduledReporterTest {
     }
 
     @Test
-    public void testReport() throws Exception {
+    void testReport() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
         scheduledReporter = createScheduledReporter(latch);
         scheduledReporter.report();
@@ -59,7 +59,7 @@ public class ScheduledReporterTest {
     }
 
     @Test
-    public void testStart() throws Exception {
+    void testStart() throws Exception {
         CountDownLatch latch = new CountDownLatch(2);
         scheduledReporter = createScheduledReporter(latch);
         scheduledReporter.start(10, TimeUnit.MILLISECONDS);
@@ -69,7 +69,7 @@ public class ScheduledReporterTest {
     }
 
     @Test
-    public void testStartWithoutDelay() throws Exception {
+    void testStartWithoutDelay() throws Exception {
         CountDownLatch latch = new CountDownLatch(2);
         scheduledReporter = createScheduledReporter(latch);
         scheduledReporter.start(0, 10, TimeUnit.MILLISECONDS);

@@ -1,7 +1,7 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-public class NoopMetricRegistryTest {
+class NoopMetricRegistryTest {
     private static final MetricName METRIC_THING = MetricName.build("thing");
 
     private final MetricRegistryListener listener = mock(MetricRegistryListener.class);
@@ -24,20 +24,20 @@ public class NoopMetricRegistryTest {
     private final Meter meter = mock(Meter.class);
     private final Timer timer = mock(Timer.class);
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         registry.addListener(listener);
     }
 
     @Test
-    public void registeringAGaugeTriggersNoNotification() {
+    void registeringAGaugeTriggersNoNotification() {
         assertThat(registry.register(METRIC_THING, gauge)).isEqualTo(gauge);
 
         verify(listener, never()).onGaugeAdded(METRIC_THING, gauge);
     }
 
     @Test
-    public void removingAGaugeTriggersNoNotification() {
+    void removingAGaugeTriggersNoNotification() {
         registry.register(METRIC_THING, gauge);
 
         assertThat(registry.remove(METRIC_THING)).isFalse();
@@ -46,14 +46,14 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void registeringACounterTriggersNoNotification() {
+    void registeringACounterTriggersNoNotification() {
         assertThat(registry.register(METRIC_THING, counter)).isEqualTo(counter);
 
         verify(listener, never()).onCounterAdded(METRIC_THING, counter);
     }
 
     @Test
-    public void accessingACounterRegistersAndReusesTheCounter() {
+    void accessingACounterRegistersAndReusesTheCounter() {
         final Counter counter1 = registry.counter(METRIC_THING);
         final Counter counter2 = registry.counter(METRIC_THING);
 
@@ -65,7 +65,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void accessingACustomCounterRegistersAndReusesTheCounter() {
+    void accessingACustomCounterRegistersAndReusesTheCounter() {
         final MetricRegistry.MetricSupplier<Counter> supplier = () -> counter;
         final Counter counter1 = registry.counter(METRIC_THING, supplier);
         final Counter counter2 = registry.counter(METRIC_THING, supplier);
@@ -79,7 +79,7 @@ public class NoopMetricRegistryTest {
 
 
     @Test
-    public void removingACounterTriggersNoNotification() {
+    void removingACounterTriggersNoNotification() {
         registry.register(METRIC_THING, counter);
 
         assertThat(registry.remove(METRIC_THING)).isFalse();
@@ -88,14 +88,14 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void registeringAHistogramTriggersNoNotification() {
+    void registeringAHistogramTriggersNoNotification() {
         assertThat(registry.register(METRIC_THING, histogram)).isEqualTo(histogram);
 
         verify(listener, never()).onHistogramAdded(METRIC_THING, histogram);
     }
 
     @Test
-    public void accessingAHistogramRegistersAndReusesIt() {
+    void accessingAHistogramRegistersAndReusesIt() {
         final Histogram histogram1 = registry.histogram(METRIC_THING);
         final Histogram histogram2 = registry.histogram(METRIC_THING);
 
@@ -107,7 +107,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void accessingACustomHistogramRegistersAndReusesIt() {
+    void accessingACustomHistogramRegistersAndReusesIt() {
         final MetricRegistry.MetricSupplier<Histogram> supplier = () -> histogram;
         final Histogram histogram1 = registry.histogram(METRIC_THING, supplier);
         final Histogram histogram2 = registry.histogram(METRIC_THING, supplier);
@@ -120,7 +120,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void removingAHistogramTriggersNoNotification() {
+    void removingAHistogramTriggersNoNotification() {
         registry.register(METRIC_THING, histogram);
 
         assertThat(registry.remove(METRIC_THING)).isFalse();
@@ -129,14 +129,14 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void registeringAMeterTriggersNoNotification() {
+    void registeringAMeterTriggersNoNotification() {
         assertThat(registry.register(METRIC_THING, meter)).isEqualTo(meter);
 
         verify(listener, never()).onMeterAdded(METRIC_THING, meter);
     }
 
     @Test
-    public void accessingAMeterRegistersAndReusesIt() {
+    void accessingAMeterRegistersAndReusesIt() {
         final Meter meter1 = registry.meter(METRIC_THING);
         final Meter meter2 = registry.meter(METRIC_THING);
 
@@ -148,7 +148,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void accessingACustomMeterRegistersAndReusesIt() {
+    void accessingACustomMeterRegistersAndReusesIt() {
         final MetricRegistry.MetricSupplier<Meter> supplier = () -> meter;
         final Meter meter1 = registry.meter(METRIC_THING, supplier);
         final Meter meter2 = registry.meter(METRIC_THING, supplier);
@@ -161,7 +161,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void removingAMeterTriggersNoNotification() {
+    void removingAMeterTriggersNoNotification() {
         registry.register(METRIC_THING, meter);
 
         assertThat(registry.remove(METRIC_THING)).isFalse();
@@ -170,14 +170,14 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void registeringATimerTriggersNoNotification() {
+    void registeringATimerTriggersNoNotification() {
         assertThat(registry.register(METRIC_THING, timer)).isEqualTo(timer);
 
         verify(listener, never()).onTimerAdded(METRIC_THING, timer);
     }
 
     @Test
-    public void accessingATimerRegistersAndReusesIt() {
+    void accessingATimerRegistersAndReusesIt() {
         final Timer timer1 = registry.timer(METRIC_THING);
         final Timer timer2 = registry.timer(METRIC_THING);
 
@@ -189,7 +189,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void accessingACustomTimerRegistersAndReusesIt() {
+    void accessingACustomTimerRegistersAndReusesIt() {
         final MetricRegistry.MetricSupplier<Timer> supplier = () -> timer;
         final Timer timer1 = registry.timer(METRIC_THING, supplier);
         final Timer timer2 = registry.timer(METRIC_THING, supplier);
@@ -203,7 +203,7 @@ public class NoopMetricRegistryTest {
 
 
     @Test
-    public void removingATimerTriggersNoNotification() {
+    void removingATimerTriggersNoNotification() {
         registry.register(METRIC_THING, timer);
 
         assertThat(registry.remove(METRIC_THING)).isFalse();
@@ -212,7 +212,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void accessingAGaugeRegistersAndReusesIt() {
+    void accessingAGaugeRegistersAndReusesIt() {
         final Gauge<Void> gauge1 = registry.gauge(METRIC_THING);
         final Gauge<Void> gauge2 = registry.gauge(METRIC_THING);
 
@@ -225,7 +225,7 @@ public class NoopMetricRegistryTest {
 
     @Test
     @SuppressWarnings("rawtypes")
-    public void accessingACustomGaugeRegistersAndReusesIt() {
+    void accessingACustomGaugeRegistersAndReusesIt() {
         final MetricRegistry.MetricSupplier<Gauge<String>> supplier = () -> gauge;
         final Gauge gauge1 = registry.gauge(METRIC_THING, supplier);
         final Gauge gauge2 = registry.gauge(METRIC_THING, supplier);
@@ -239,7 +239,7 @@ public class NoopMetricRegistryTest {
 
 
     @Test
-    public void addingAListenerWithExistingMetricsDoesNotNotify() {
+    void addingAListenerWithExistingMetricsDoesNotNotify() {
         registry.register(MetricName.build("gauge"), gauge);
         registry.register(MetricName.build("counter"), counter);
         registry.register(MetricName.build("histogram"), histogram);
@@ -257,7 +257,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void aRemovedListenerDoesNotReceiveUpdates() {
+    void aRemovedListenerDoesNotReceiveUpdates() {
         registry.register(MetricName.build("gauge"), gauge);
         registry.removeListener(listener);
         registry.register("gauge2", gauge);
@@ -266,42 +266,42 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void hasAMapOfRegisteredGauges() {
+    void hasAMapOfRegisteredGauges() {
         registry.register(MetricName.build("gauge"), gauge);
 
         assertThat(registry.getGauges()).isEmpty();
     }
 
     @Test
-    public void hasAMapOfRegisteredCounters() {
+    void hasAMapOfRegisteredCounters() {
         registry.register(MetricName.build("counter"), counter);
 
         assertThat(registry.getCounters()).isEmpty();
     }
 
     @Test
-    public void hasAMapOfRegisteredHistograms() {
+    void hasAMapOfRegisteredHistograms() {
         registry.register(MetricName.build("histogram"), histogram);
 
         assertThat(registry.getHistograms()).isEmpty();
     }
 
     @Test
-    public void hasAMapOfRegisteredMeters() {
+    void hasAMapOfRegisteredMeters() {
         registry.register(MetricName.build("meter"), meter);
 
         assertThat(registry.getMeters()).isEmpty();
     }
 
     @Test
-    public void hasAMapOfRegisteredTimers() {
+    void hasAMapOfRegisteredTimers() {
         registry.register(MetricName.build("timer"), timer);
 
         assertThat(registry.getTimers()).isEmpty();
     }
 
     @Test
-    public void hasASetOfRegisteredMetricNames() {
+    void hasASetOfRegisteredMetricNames() {
         registry.register(MetricName.build("gauge"), gauge);
         registry.register(MetricName.build("counter"), counter);
         registry.register(MetricName.build("histogram"), histogram);
@@ -312,7 +312,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void doesNotRegisterMultipleMetrics() {
+    void doesNotRegisterMultipleMetrics() {
         final MetricSet metrics = () -> {
             final Map<MetricName, Metric> m = new HashMap<>();
             m.put(MetricName.build("gauge"), gauge);
@@ -326,7 +326,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void doesNotRegisterMultipleMetricsWithAPrefix() {
+    void doesNotRegisterMultipleMetricsWithAPrefix() {
         final MetricSet metrics = () -> {
             final Map<MetricName, Metric> m = new HashMap<>();
             m.put(MetricName.build("gauge"), gauge);
@@ -340,7 +340,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void doesNotRegisterRecursiveMetricSets() {
+    void doesNotRegisterRecursiveMetricSets() {
         final MetricSet inner = () -> {
             final Map<MetricName, Metric> m = new HashMap<>();
             m.put(MetricName.build("gauge"), gauge);
@@ -360,7 +360,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void doesNotRegisterMetricsFromAnotherRegistry() {
+    void doesNotRegisterMetricsFromAnotherRegistry() {
         MetricRegistry other = new MetricRegistry();
         other.register(MetricName.build("gauge"), gauge);
         registry.register("nested", other);
@@ -368,7 +368,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void removesMetricsMatchingAFilter() {
+    void removesMetricsMatchingAFilter() {
         registry.timer("timer-1");
         registry.timer("timer-2");
         registry.histogram("histogram-1");
@@ -384,7 +384,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void addingChildMetricAfterRegister() {
+    void addingChildMetricAfterRegister() {
         MetricRegistry parent = new NoopMetricRegistry();
         MetricRegistry child = new MetricRegistry();
 
@@ -396,7 +396,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void addingMultipleChildMetricsAfterRegister() {
+    void addingMultipleChildMetricsAfterRegister() {
         MetricRegistry parent = new NoopMetricRegistry();
         MetricRegistry child = new MetricRegistry();
 
@@ -410,7 +410,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void addingDeepChildMetricsAfterRegister() {
+    void addingDeepChildMetricsAfterRegister() {
         MetricRegistry parent = new NoopMetricRegistry();
         MetricRegistry child = new MetricRegistry();
         MetricRegistry deepChild = new MetricRegistry();
@@ -431,7 +431,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void removingChildMetricAfterRegister() {
+    void removingChildMetricAfterRegister() {
         MetricRegistry parent = new NoopMetricRegistry();
         MetricRegistry child = new MetricRegistry();
 
@@ -446,7 +446,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void removingMultipleChildMetricsAfterRegister() {
+    void removingMultipleChildMetricsAfterRegister() {
         MetricRegistry parent = new NoopMetricRegistry();
         MetricRegistry child = new MetricRegistry();
 
@@ -464,7 +464,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void removingDeepChildMetricsAfterRegister() {
+    void removingDeepChildMetricsAfterRegister() {
         MetricRegistry parent = new NoopMetricRegistry();
         MetricRegistry child = new MetricRegistry();
         MetricRegistry deepChild = new MetricRegistry();
@@ -488,7 +488,7 @@ public class NoopMetricRegistryTest {
     }
 
     @Test
-    public void registerNullMetric() {
+    void registerNullMetric() {
         MetricRegistry registry = new NoopMetricRegistry();
         assertThatNullPointerException()
                 .isThrownBy(() -> registry.register("any_name", null))

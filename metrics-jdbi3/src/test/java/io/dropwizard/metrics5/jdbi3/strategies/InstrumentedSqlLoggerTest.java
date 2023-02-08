@@ -6,7 +6,7 @@ import io.dropwizard.metrics5.Timer;
 import io.dropwizard.metrics5.jdbi3.InstrumentedSqlLogger;
 import io.dropwizard.metrics5.jdbi3.strategies.StatementNameStrategy;
 import org.jdbi.v3.core.statement.StatementContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 import java.time.temporal.ChronoUnit;
@@ -14,9 +14,9 @@ import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.*;
 
-public class InstrumentedSqlLoggerTest {
+class InstrumentedSqlLoggerTest {
     @Test
-    public void logsExecutionTime() {
+    void logsExecutionTime() {
         final MetricRegistry mockRegistry = mock(MetricRegistry.class);
         final StatementNameStrategy mockNameStrategy = mock(StatementNameStrategy.class);
         final InstrumentedSqlLogger logger = new InstrumentedSqlLogger(mockRegistry, mockNameStrategy);
@@ -38,7 +38,7 @@ public class InstrumentedSqlLoggerTest {
     }
 
     @Test
-    public void logsExceptionTime() {
+    void logsExceptionTime() {
         final MetricRegistry mockRegistry = mock(MetricRegistry.class);
         final StatementNameStrategy mockNameStrategy = mock(StatementNameStrategy.class);
         final InstrumentedSqlLogger logger = new InstrumentedSqlLogger(mockRegistry, mockNameStrategy);

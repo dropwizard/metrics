@@ -1,7 +1,7 @@
 package io.dropwizard.metrics5;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class InstrumentedScheduledExecutorServiceTest {
+class InstrumentedScheduledExecutorServiceTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(InstrumentedScheduledExecutorServiceTest.class);
 
     private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
@@ -33,7 +33,7 @@ public class InstrumentedScheduledExecutorServiceTest {
     private final Histogram percentOfPeriod = registry.histogram("xs.scheduled.percent-of-period");
 
     @Test
-    public void testSubmitRunnable() throws Exception {
+    void testSubmitRunnable() throws Exception {
         assertThat(submitted.getCount()).isZero();
 
         assertThat(running.getCount()).isZero();
@@ -74,7 +74,7 @@ public class InstrumentedScheduledExecutorServiceTest {
     }
 
     @Test
-    public void testScheduleRunnable() throws Exception {
+    void testScheduleRunnable() throws Exception {
         assertThat(submitted.getCount()).isZero();
 
         assertThat(running.getCount()).isZero();
@@ -115,7 +115,7 @@ public class InstrumentedScheduledExecutorServiceTest {
     }
 
     @Test
-    public void testSubmitCallable() throws Exception {
+    void testSubmitCallable() throws Exception {
         assertThat(submitted.getCount()).isZero();
 
         assertThat(running.getCount()).isZero();
@@ -160,7 +160,7 @@ public class InstrumentedScheduledExecutorServiceTest {
     }
 
     @Test
-    public void testScheduleCallable() throws Exception {
+    void testScheduleCallable() throws Exception {
         assertThat(submitted.getCount()).isZero();
 
         assertThat(running.getCount()).isZero();
@@ -205,7 +205,7 @@ public class InstrumentedScheduledExecutorServiceTest {
     }
 
     @Test
-    public void testScheduleFixedRateCallable() throws Exception {
+    void testScheduleFixedRateCallable() throws Exception {
         assertThat(submitted.getCount()).isZero();
 
         assertThat(running.getCount()).isZero();
@@ -252,7 +252,7 @@ public class InstrumentedScheduledExecutorServiceTest {
     }
 
     @Test
-    public void testScheduleFixedDelayCallable() throws Exception {
+    void testScheduleFixedDelayCallable() throws Exception {
         assertThat(submitted.getCount()).isZero();
 
         assertThat(running.getCount()).isZero();
@@ -294,8 +294,8 @@ public class InstrumentedScheduledExecutorServiceTest {
         assertThat(duration.getSnapshot().size()).isNotEqualTo(0);
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         instrumentedScheduledExecutor.shutdown();
         if (!instrumentedScheduledExecutor.awaitTermination(2, TimeUnit.SECONDS)) {
             LOGGER.error("InstrumentedScheduledExecutorService did not terminate.");

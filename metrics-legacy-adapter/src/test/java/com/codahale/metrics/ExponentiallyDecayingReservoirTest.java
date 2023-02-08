@@ -1,15 +1,15 @@
 package com.codahale.metrics;
 
 import org.assertj.core.data.Offset;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class ExponentiallyDecayingReservoirTest {
+class ExponentiallyDecayingReservoirTest {
 
     @Test
-    public void testCreateReservoir() {
+    void testCreateReservoir() {
         ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir();
         reservoir.update(120);
         reservoir.update(190);
@@ -31,7 +31,7 @@ public class ExponentiallyDecayingReservoirTest {
     }
 
     @Test
-    public void testCreateReservoirWithCustomSizeAndAlpha() {
+    void testCreateReservoirWithCustomSizeAndAlpha() {
         ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(512, 0.01);
         reservoir.update(100);
         assertThat(reservoir.size()).isEqualTo(1);
@@ -39,7 +39,7 @@ public class ExponentiallyDecayingReservoirTest {
 
 
     @Test
-    public void testCreateReservoirWithCustomSizeAlphaAndClock() {
+    void testCreateReservoirWithCustomSizeAlphaAndClock() {
         ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(512, 0.01,
                 new Clock() {
                     @Override

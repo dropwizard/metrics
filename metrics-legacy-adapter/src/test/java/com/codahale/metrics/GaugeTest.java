@@ -1,16 +1,16 @@
 package com.codahale.metrics;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class GaugeTest {
+class GaugeTest {
 
     private Gauge<Integer> gauge = () -> 83;
 
     @Test
-    public void testGetValue() {
+    void testGetValue() {
         assertThat(gauge.getValue()).isEqualTo(83);
     }
 }

@@ -1,16 +1,16 @@
 package com.codahale.metrics;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class CachedGaugeTest {
+class CachedGaugeTest {
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         CachedGauge<String> cachedGauge = new CachedGauge<String>(100, TimeUnit.MILLISECONDS) {
             @Override
             protected String loadValue() {
@@ -21,7 +21,7 @@ public class CachedGaugeTest {
     }
 
     @Test
-    public void testCreateWothClock() {
+    void testCreateWothClock() {
         CachedGauge<String> cachedGauge = new CachedGauge<String>(new Clock.UserTimeClock(), 100,
                 TimeUnit.MILLISECONDS) {
             @Override

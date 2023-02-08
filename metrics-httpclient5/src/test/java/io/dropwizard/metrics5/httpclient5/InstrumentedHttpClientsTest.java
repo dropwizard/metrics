@@ -10,20 +10,20 @@ import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.NoHttpResponseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.InetSocketAddress;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class InstrumentedHttpClientsTest {
+class InstrumentedHttpClientsTest {
     private final HttpClientMetricNameStrategy metricNameStrategy =
             mock(HttpClientMetricNameStrategy.class);
     private final MetricRegistryListener registryListener =
@@ -32,13 +32,13 @@ public class InstrumentedHttpClientsTest {
     private final HttpClient client =
             InstrumentedHttpClients.custom(metricRegistry, metricNameStrategy).disableAutomaticRetries().build();
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         metricRegistry.addListener(registryListener);
     }
 
     @Test
-    public void registersExpectedMetricsGivenNameStrategy() throws Exception {
+    void registersExpectedMetricsGivenNameStrategy() throws Exception {
         final HttpGet get = new HttpGet("http://example.com?q=anything");
         final MetricName metricName = MetricName.build("some.made.up.metric.name");
 
@@ -51,7 +51,7 @@ public class InstrumentedHttpClientsTest {
     }
 
     @Test
-    public void registersExpectedExceptionMetrics() throws Exception {
+    void registersExpectedExceptionMetrics() throws Exception {
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(0), 0);
 
         final HttpGet get = new HttpGet("http://localhost:" + httpServer.getAddress().getPort() + "/");

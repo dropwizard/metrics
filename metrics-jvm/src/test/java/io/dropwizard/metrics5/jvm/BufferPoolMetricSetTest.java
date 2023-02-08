@@ -2,8 +2,8 @@ package io.dropwizard.metrics5.jvm;
 
 import io.dropwizard.metrics5.Gauge;
 import io.dropwizard.metrics5.MetricName;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("rawtypes")
-public class BufferPoolMetricSetTest {
+class BufferPoolMetricSetTest {
 
     private static final MetricName DIRECT = MetricName.build("direct");
     private static final MetricName MAPPED = MetricName.build("mapped");
@@ -31,15 +31,15 @@ public class BufferPoolMetricSetTest {
     private ObjectName mapped;
     private ObjectName direct;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         this.mapped = new ObjectName("java.nio:type=BufferPool,name=mapped");
         this.direct = new ObjectName("java.nio:type=BufferPool,name=direct");
 
     }
 
     @Test
-    public void includesGaugesForDirectAndMappedPools() {
+    void includesGaugesForDirectAndMappedPools() {
         assertThat(buffers.getMetrics().keySet())
                 .containsOnly(DIRECT_COUNT,
                         DIRECT_USED,
@@ -50,7 +50,7 @@ public class BufferPoolMetricSetTest {
     }
 
     @Test
-    public void ignoresGaugesForObjectsWhichCannotBeFound() throws Exception {
+    void ignoresGaugesForObjectsWhichCannotBeFound() throws Exception {
         when(mBeanServer.getMBeanInfo(mapped)).thenThrow(new InstanceNotFoundException());
 
         assertThat(buffers.getMetrics().keySet())
@@ -60,7 +60,7 @@ public class BufferPoolMetricSetTest {
     }
 
     @Test
-    public void includesAGaugeForDirectCount() throws Exception {
+    void includesAGaugeForDirectCount() throws Exception {
         final Gauge<Integer> gauge = (Gauge<Integer>) buffers.getMetrics().get(DIRECT_COUNT);
 
         when(mBeanServer.getAttribute(direct, "Count")).thenReturn(100);
@@ -70,7 +70,7 @@ public class BufferPoolMetricSetTest {
     }
 
     @Test
-    public void includesAGaugeForDirectMemoryUsed() throws Exception {
+    void includesAGaugeForDirectMemoryUsed() throws Exception {
         final Gauge<Integer> gauge = (Gauge<Integer>) buffers.getMetrics().get(DIRECT_USED);
 
         when(mBeanServer.getAttribute(direct, "MemoryUsed")).thenReturn(100);
@@ -80,7 +80,7 @@ public class BufferPoolMetricSetTest {
     }
 
     @Test
-    public void includesAGaugeForDirectCapacity() throws Exception {
+    void includesAGaugeForDirectCapacity() throws Exception {
         final Gauge<Integer> gauge = (Gauge<Integer>) buffers.getMetrics().get(DIRECT_CAPACITY);
 
         when(mBeanServer.getAttribute(direct, "TotalCapacity")).thenReturn(100);
@@ -90,7 +90,7 @@ public class BufferPoolMetricSetTest {
     }
 
     @Test
-    public void includesAGaugeForMappedCount() throws Exception {
+    void includesAGaugeForMappedCount() throws Exception {
         final Gauge<Integer> gauge = (Gauge<Integer>) buffers.getMetrics().get(MAPPED_COUNT);
 
         when(mBeanServer.getAttribute(mapped, "Count")).thenReturn(100);
@@ -100,7 +100,7 @@ public class BufferPoolMetricSetTest {
     }
 
     @Test
-    public void includesAGaugeForMappedMemoryUsed() throws Exception {
+    void includesAGaugeForMappedMemoryUsed() throws Exception {
         final Gauge<Integer> gauge = (Gauge<Integer>) buffers.getMetrics().get(MAPPED_USED);
 
         when(mBeanServer.getAttribute(mapped, "MemoryUsed")).thenReturn(100);
@@ -110,7 +110,7 @@ public class BufferPoolMetricSetTest {
     }
 
     @Test
-    public void includesAGaugeForMappedCapacity() throws Exception {
+    void includesAGaugeForMappedCapacity() throws Exception {
         final Gauge<Integer> gauge = (Gauge<Integer>) buffers.getMetrics().get(MAPPED_CAPACITY);
 
         when(mBeanServer.getAttribute(mapped, "TotalCapacity")).thenReturn(100);

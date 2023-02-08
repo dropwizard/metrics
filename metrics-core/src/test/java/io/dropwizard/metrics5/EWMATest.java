@@ -1,15 +1,15 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
 
-public class EWMATest {
+class EWMATest {
     @Test
-    public void aOneMinuteEWMAWithAValueOfThree() {
+    void aOneMinuteEWMAWithAValueOfThree() {
         final EWMA ewma = EWMA.oneMinuteEWMA();
         ewma.update(3);
         ewma.tick();
@@ -78,7 +78,7 @@ public class EWMATest {
     }
 
     @Test
-    public void aFiveMinuteEWMAWithAValueOfThree() {
+    void aFiveMinuteEWMAWithAValueOfThree() {
         final EWMA ewma = EWMA.fiveMinuteEWMA();
         ewma.update(3);
         ewma.tick();
@@ -147,7 +147,7 @@ public class EWMATest {
     }
 
     @Test
-    public void aFifteenMinuteEWMAWithAValueOfThree() {
+    void aFifteenMinuteEWMAWithAValueOfThree() {
         final EWMA ewma = EWMA.fifteenMinuteEWMA();
         ewma.update(3);
         ewma.tick();

@@ -1,24 +1,24 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DefaultSettableGaugeTest {
+class DefaultSettableGaugeTest {
     @Test
-    public void newSettableGaugeWithoutDefaultReturnsNull() {
+    void newSettableGaugeWithoutDefaultReturnsNull() {
         DefaultSettableGauge<String> gauge = new DefaultSettableGauge<>();
         assertThat(gauge.getValue()).isNull();
     }
 
     @Test
-    public void newSettableGaugeWithDefaultReturnsDefault() {
+    void newSettableGaugeWithDefaultReturnsDefault() {
         DefaultSettableGauge<String> gauge = new DefaultSettableGauge<>("default");
         assertThat(gauge.getValue()).isEqualTo("default");
     }
 
     @Test
-    public void setValueOverwritesExistingValue() {
+    void setValueOverwritesExistingValue() {
         DefaultSettableGauge<String> gauge = new DefaultSettableGauge<>("default");
         gauge.setValue("test");
         assertThat(gauge.getValue()).isEqualTo("test");

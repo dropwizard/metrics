@@ -1,8 +1,7 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,16 +12,15 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(Parameterized.class)
 public class ExponentiallyDecayingReservoirTest {
 
     public enum ReservoirFactory {
         EXPONENTIALLY_DECAYING() {
-            @Override
-            Reservoir create(int size, double alpha, Clock clock) {
-                return new ExponentiallyDecayingReservoir(size, alpha, clock);
-            }
-        },
+        @Override
+        Reservoir create(int size, double alpha, Clock clock) {
+            return new ExponentiallyDecayingReservoir(size, alpha, clock);
+        }
+    },
 
         LOCK_FREE_EXPONENTIALLY_DECAYING() {
             @Override
@@ -42,21 +40,22 @@ public class ExponentiallyDecayingReservoirTest {
         }
     }
 
-    @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> reservoirs() {
         return Arrays.stream(ReservoirFactory.values())
-                .map(value -> new Object[] {value})
+                .map(value -> new Object[]{value})
                 .collect(Collectors.toList());
     }
 
-    private final ReservoirFactory reservoirFactory;
+    private ReservoirFactory reservoirFactory;
 
-    public ExponentiallyDecayingReservoirTest(ReservoirFactory reservoirFactory) {
+    public void initExponentiallyDecayingReservoirTest(ReservoirFactory reservoirFactory) {
         this.reservoirFactory = reservoirFactory;
     }
 
-    @Test
-    public void aReservoirOf100OutOf1000Elements() {
+    @MethodSource("reservoirs")
+    @ParameterizedTest(name = "{index}: {0}")
+    void aReservoirOf100OutOf1000Elements(ReservoirFactory reservoirFactory) {
+        initExponentiallyDecayingReservoirTest(reservoirFactory);
         final Reservoir reservoir = reservoirFactory.create(100, 0.99);
         for (int i = 0; i < 1000; i++) {
             reservoir.update(i);
@@ -73,8 +72,10 @@ public class ExponentiallyDecayingReservoirTest {
         assertAllValuesBetween(reservoir, 0, 1000);
     }
 
-    @Test
-    public void aReservoirOf100OutOf10Elements() {
+    @MethodSource("reservoirs")
+    @ParameterizedTest(name = "{index}: {0}")
+    void aReservoirOf100OutOf10Elements(ReservoirFactory reservoirFactory) {
+        initExponentiallyDecayingReservoirTest(reservoirFactory);
         final Reservoir reservoir = reservoirFactory.create(100, 0.99);
         for (int i = 0; i < 10; i++) {
             reservoir.update(i);
@@ -91,8 +92,10 @@ public class ExponentiallyDecayingReservoirTest {
         assertAllValuesBetween(reservoir, 0, 10);
     }
 
-    @Test
-    public void aHeavilyBiasedReservoirOf100OutOf1000Elements() {
+    @MethodSource("reservoirs")
+    @ParameterizedTest(name = "{index}: {0}")
+    void aHeavilyBiasedReservoirOf100OutOf1000Elements(ReservoirFactory reservoirFactory) {
+        initExponentiallyDecayingReservoirTest(reservoirFactory);
         final Reservoir reservoir = reservoirFactory.create(1000, 0.01);
         for (int i = 0; i < 100; i++) {
             reservoir.update(i);
@@ -110,8 +113,10 @@ public class ExponentiallyDecayingReservoirTest {
         assertAllValuesBetween(reservoir, 0, 100);
     }
 
-    @Test
-    public void longPeriodsOfInactivityShouldNotCorruptSamplingState() {
+    @MethodSource("reservoirs")
+    @ParameterizedTest(name = "{index}: {0}")
+    void longPeriodsOfInactivityShouldNotCorruptSamplingState(ReservoirFactory reservoirFactory) {
+        initExponentiallyDecayingReservoirTest(reservoirFactory);
         final ManualClock clock = new ManualClock();
         final Reservoir reservoir = reservoirFactory.create(10, 0.15, clock);
 
@@ -144,8 +149,10 @@ public class ExponentiallyDecayingReservoirTest {
         assertAllValuesBetween(reservoir, 3000, 4000);
     }
 
-    @Test
-    public void longPeriodsOfInactivity_fetchShouldResample() {
+    @MethodSource("reservoirs")
+    @ParameterizedTest(name = "{index}: {0}")
+    void longPeriodsOfInactivity_fetchShouldResample(ReservoirFactory reservoirFactory) {
+        initExponentiallyDecayingReservoirTest(reservoirFactory);
         final ManualClock clock = new ManualClock();
         final Reservoir reservoir = reservoirFactory.create(10,
                 0.015,
@@ -171,8 +178,10 @@ public class ExponentiallyDecayingReservoirTest {
         assertThat(snapshot.size()).isEqualTo(0);
     }
 
-    @Test
-    public void emptyReservoirSnapshot_shouldReturnZeroForAllValues() {
+    @MethodSource("reservoirs")
+    @ParameterizedTest(name = "{index}: {0}")
+    void emptyReservoirSnapshot_shouldReturnZeroForAllValues(ReservoirFactory reservoirFactory) {
+        initExponentiallyDecayingReservoirTest(reservoirFactory);
         final Reservoir reservoir = reservoirFactory.create(100, 0.015,
                 new ManualClock());
 
@@ -183,8 +192,10 @@ public class ExponentiallyDecayingReservoirTest {
         assertThat(snapshot.size()).isEqualTo(0);
     }
 
-    @Test
-    public void removeZeroWeightsInSamplesToPreventNaNInMeanValues() {
+    @MethodSource("reservoirs")
+    @ParameterizedTest(name = "{index}: {0}")
+    void removeZeroWeightsInSamplesToPreventNaNInMeanValues(ReservoirFactory reservoirFactory) {
+        initExponentiallyDecayingReservoirTest(reservoirFactory);
         final ManualClock clock = new ManualClock();
         final Reservoir reservoir = reservoirFactory.create(1028, 0.015, clock);
         Timer timer = new Timer(reservoir, clock);
@@ -199,8 +210,10 @@ public class ExponentiallyDecayingReservoirTest {
         }
     }
 
-    @Test
-    public void multipleUpdatesAfterlongPeriodsOfInactivityShouldNotCorruptSamplingState() throws Exception {
+    @MethodSource("reservoirs")
+    @ParameterizedTest(name = "{index}: {0}")
+    void multipleUpdatesAfterlongPeriodsOfInactivityShouldNotCorruptSamplingState(ReservoirFactory reservoirFactory) throws Exception {
+        initExponentiallyDecayingReservoirTest(reservoirFactory);
         // This test illustrates the potential race condition in rescale that
         // can lead to a corrupt state.  Note that while this test uses updates
         // exclusively to trigger the race condition, two concurrent updates
@@ -295,8 +308,10 @@ public class ExponentiallyDecayingReservoirTest {
         }
     }
 
-    @Test
-    public void spotLift() {
+    @MethodSource("reservoirs")
+    @ParameterizedTest(name = "{index}: {0}")
+    void spotLift(ReservoirFactory reservoirFactory) {
+        initExponentiallyDecayingReservoirTest(reservoirFactory);
         final ManualClock clock = new ManualClock();
         final Reservoir reservoir = reservoirFactory.create(1000,
                 0.015,
@@ -321,8 +336,10 @@ public class ExponentiallyDecayingReservoirTest {
                 .isEqualTo(9999);
     }
 
-    @Test
-    public void spotFall() {
+    @MethodSource("reservoirs")
+    @ParameterizedTest(name = "{index}: {0}")
+    void spotFall(ReservoirFactory reservoirFactory) {
+        initExponentiallyDecayingReservoirTest(reservoirFactory);
         final ManualClock clock = new ManualClock();
         final Reservoir reservoir = reservoirFactory.create(1000,
                 0.015,
@@ -347,8 +364,10 @@ public class ExponentiallyDecayingReservoirTest {
                 .isEqualTo(178);
     }
 
-    @Test
-    public void quantiliesShouldBeBasedOnWeights() {
+    @MethodSource("reservoirs")
+    @ParameterizedTest(name = "{index}: {0}")
+    void quantiliesShouldBeBasedOnWeights(ReservoirFactory reservoirFactory) {
+        initExponentiallyDecayingReservoirTest(reservoirFactory);
         final ManualClock clock = new ManualClock();
         final Reservoir reservoir = reservoirFactory.create(1000,
                 0.015,
@@ -375,8 +394,10 @@ public class ExponentiallyDecayingReservoirTest {
                 .isEqualTo(9999);
     }
 
-    @Test
-    public void clockWrapShouldNotRescale() {
+    @MethodSource("reservoirs")
+    @ParameterizedTest(name = "{index}: {0}")
+    void clockWrapShouldNotRescale(ReservoirFactory reservoirFactory) {
+        initExponentiallyDecayingReservoirTest(reservoirFactory);
         // First verify the test works as expected given low values
         testShortPeriodShouldNotRescale(0);
         // Now revalidate using an edge case nanoTime value just prior to wrapping
@@ -404,8 +425,8 @@ public class ExponentiallyDecayingReservoirTest {
     }
 
     private static void assertAllValuesBetween(Reservoir reservoir,
-                                               double min,
-                                               double max) {
+                                                double min,
+                                                double max) {
         for (double i : reservoir.getSnapshot().getValues()) {
             assertThat(i)
                     .isLessThan(max)

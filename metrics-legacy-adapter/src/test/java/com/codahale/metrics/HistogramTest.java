@@ -1,15 +1,15 @@
 package com.codahale.metrics;
 
 import org.assertj.core.data.Offset;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class HistogramTest {
+class HistogramTest {
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         Histogram histogram = new Histogram(new ExponentiallyDecayingReservoir());
         histogram.update(120);
         histogram.update(190);

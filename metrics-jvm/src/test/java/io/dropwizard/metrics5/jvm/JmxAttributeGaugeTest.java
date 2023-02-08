@@ -11,11 +11,11 @@ import javax.management.MBeanServer;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-public class JmxAttributeGaugeTest {
+class JmxAttributeGaugeTest {
 
     private static MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
 
@@ -32,14 +32,14 @@ public class JmxAttributeGaugeTest {
         }
     }
 
-    @BeforeClass
-    public static void setUp() throws Exception {
+    @BeforeAll
+    static void setUp() throws Exception {
         registerMBean(new ObjectName("JmxAttributeGaugeTest:type=test,name=test1"));
         registerMBean(new ObjectName("JmxAttributeGaugeTest:type=test,name=test2"));
     }
 
-    @AfterClass
-    public static void tearDown() {
+    @AfterAll
+    static void tearDown() {
         for (ObjectName objectName : registeredMBeans) {
             try {
                 mBeanServer.unregisterMBean(objectName);
@@ -50,7 +50,7 @@ public class JmxAttributeGaugeTest {
     }
 
     @Test
-    public void returnsJmxAttribute() throws Exception {
+    void returnsJmxAttribute() throws Exception {
         ObjectName objectName = new ObjectName("java.lang:type=ClassLoading");
         JmxAttributeGauge gauge = new JmxAttributeGauge(mBeanServer, objectName, "LoadedClassCount");
 
@@ -59,7 +59,7 @@ public class JmxAttributeGaugeTest {
     }
 
     @Test
-    public void returnsNullIfAttributeDoesNotExist() throws Exception {
+    void returnsNullIfAttributeDoesNotExist() throws Exception {
         ObjectName objectName = new ObjectName("java.lang:type=ClassLoading");
         JmxAttributeGauge gauge = new JmxAttributeGauge(mBeanServer, objectName, "DoesNotExist");
 
@@ -67,7 +67,7 @@ public class JmxAttributeGaugeTest {
     }
 
     @Test
-    public void returnsNullIfMBeanNotFound() throws Exception {
+    void returnsNullIfMBeanNotFound() throws Exception {
         ObjectName objectName = new ObjectName("foo.bar:type=NoSuchMBean");
         JmxAttributeGauge gauge = new JmxAttributeGauge(mBeanServer, objectName, "LoadedClassCount");
 
@@ -75,7 +75,7 @@ public class JmxAttributeGaugeTest {
     }
 
     @Test
-    public void returnsAttributeForObjectNamePattern() throws Exception {
+    void returnsAttributeForObjectNamePattern() throws Exception {
         ObjectName objectName = new ObjectName("JmxAttributeGaugeTest:name=test1,*");
         JmxAttributeGauge gauge = new JmxAttributeGauge(mBeanServer, objectName, "Value");
 
@@ -84,7 +84,7 @@ public class JmxAttributeGaugeTest {
     }
 
     @Test
-    public void returnsNullIfObjectNamePatternAmbiguous() throws Exception {
+    void returnsNullIfObjectNamePatternAmbiguous() throws Exception {
         ObjectName objectName = new ObjectName("JmxAttributeGaugeTest:type=test,*");
         JmxAttributeGauge gauge = new JmxAttributeGauge(mBeanServer, objectName, "Value");
 

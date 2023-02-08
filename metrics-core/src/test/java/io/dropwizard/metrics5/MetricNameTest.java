@@ -1,48 +1,49 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class MetricNameTest {
+class MetricNameTest {
     @Test
-    public void testEmpty() {
+    void testEmpty() {
         assertThat(MetricName.EMPTY.getTags()).isEmpty();
         assertThat(MetricName.EMPTY.getKey()).isEqualTo("");
 
         assertThat(MetricName.build()).isEqualTo(MetricName.EMPTY);
-        assertThat(MetricName.EMPTY.resolve((String)null)).isEqualTo(MetricName.EMPTY);
+        assertThat(MetricName.EMPTY.resolve((String) null)).isEqualTo(MetricName.EMPTY);
     }
 
     @Test
-    public void testEmptyResolve() {
+    void testEmptyResolve() {
         final MetricName name = MetricName.build();
         assertThat(name.resolve("foo")).isEqualTo(MetricName.build("foo"));
     }
 
     @Test
-    public void testResolveToEmpty() {
+    void testResolveToEmpty() {
         final MetricName name = MetricName.build("foo");
-        assertThat(name.resolve((String)null)).isEqualTo(MetricName.build("foo"));
+        assertThat(name.resolve((String) null)).isEqualTo(MetricName.build("foo"));
     }
 
     @Test
-    public void testResolve() {
+    void testResolve() {
         final MetricName name = MetricName.build("foo");
         assertThat(name.resolve("bar")).isEqualTo(MetricName.build("foo.bar"));
     }
 
     @Test
-    public void testResolveBothEmpty() {
+    void testResolveBothEmpty() {
         final MetricName name = MetricName.build();
-        assertThat(name.resolve((String)null)).isEqualTo(MetricName.EMPTY);
+        assertThat(name.resolve((String) null)).isEqualTo(MetricName.EMPTY);
     }
 
     @Test
-    public void testAddTagsVarious() {
+    void testAddTagsVarious() {
         final Map<String, String> refTags = new HashMap<String, String>();
         refTags.put("foo", "bar");
         final MetricName test = MetricName.EMPTY.tagged("foo", "bar");
@@ -56,25 +57,29 @@ public class MetricNameTest {
     }
 
     @Test
-    public void testTaggedMoreArguments() {
+    void testTaggedMoreArguments() {
         final Map<String, String> refTags = new HashMap<String, String>();
         refTags.put("foo", "bar");
         refTags.put("baz", "biz");
         assertThat(MetricName.EMPTY.tagged("foo", "bar", "baz", "biz").getTags()).isEqualTo(refTags);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testTaggedNotPairs() {
-        MetricName.EMPTY.tagged("foo");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testTaggedNotPairs2() {
-        MetricName.EMPTY.tagged("foo", "bar", "baz");
+    @Test
+    void testTaggedNotPairs() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            MetricName.EMPTY.tagged("foo");
+        });
     }
 
     @Test
-    public void testCompareTo() {
+    void testTaggedNotPairs2() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            MetricName.EMPTY.tagged("foo", "bar", "baz");
+        });
+    }
+
+    @Test
+    void testCompareTo() {
         final MetricName a = MetricName.EMPTY.tagged("foo", "bar");
         final MetricName b = MetricName.EMPTY.tagged("foo", "baz");
 
@@ -85,7 +90,7 @@ public class MetricNameTest {
     }
 
     @Test
-    public void testCompareTo2() {
+    void testCompareTo2() {
         final MetricName a = MetricName.EMPTY.tagged("a", "x");
         final MetricName b = MetricName.EMPTY.tagged("b", "x");
 

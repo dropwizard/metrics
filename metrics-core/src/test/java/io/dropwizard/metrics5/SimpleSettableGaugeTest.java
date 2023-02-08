@@ -1,21 +1,21 @@
 package io.dropwizard.metrics5;
 
 import io.dropwizard.metrics5.DefaultSettableGauge;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SimpleSettableGaugeTest {
+class SimpleSettableGaugeTest {
 
     @Test
-    public void defaultValue() {
+    void defaultValue() {
         DefaultSettableGauge<Integer> settable = new DefaultSettableGauge<>(1);
 
         assertThat(settable.getValue()).isEqualTo(1);
     }
 
     @Test
-    public void setValueAndThenGetValue() {
+    void setValueAndThenGetValue() {
         DefaultSettableGauge<String> settable = new DefaultSettableGauge<>("default");
 
         settable.setValue("first");

@@ -1,12 +1,12 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RatioGaugeTest {
+class RatioGaugeTest {
     @Test
-    public void ratiosAreHumanReadable() {
+    void ratiosAreHumanReadable() {
         final RatioGauge.Ratio ratio = RatioGauge.Ratio.of(100, 200);
 
         assertThat(ratio.toString())
@@ -14,7 +14,7 @@ public class RatioGaugeTest {
     }
 
     @Test
-    public void calculatesTheRatioOfTheNumeratorToTheDenominator() {
+    void calculatesTheRatioOfTheNumeratorToTheDenominator() {
         final RatioGauge regular = new RatioGauge() {
             @Override
             protected Ratio getRatio() {
@@ -27,7 +27,7 @@ public class RatioGaugeTest {
     }
 
     @Test
-    public void handlesDivideByZeroIssues() {
+    void handlesDivideByZeroIssues() {
         final RatioGauge divByZero = new RatioGauge() {
             @Override
             protected Ratio getRatio() {
@@ -40,7 +40,7 @@ public class RatioGaugeTest {
     }
 
     @Test
-    public void handlesInfiniteDenominators() {
+    void handlesInfiniteDenominators() {
         final RatioGauge infinite = new RatioGauge() {
             @Override
             protected Ratio getRatio() {
@@ -53,7 +53,7 @@ public class RatioGaugeTest {
     }
 
     @Test
-    public void handlesNaNDenominators() {
+    void handlesNaNDenominators() {
         final RatioGauge nan = new RatioGauge() {
             @Override
             protected Ratio getRatio() {

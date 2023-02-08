@@ -6,9 +6,9 @@ import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,21 +20,21 @@ public class InstrumentedAppenderConfigTest {
     private ConfigurationSource source;
     private LoggerContext context;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         source = new ConfigurationSource(this.getClass().getClassLoader().getResourceAsStream("log4j2-testconfig.xml"));
         context = Configurator.initialize(null, source);
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         context.stop();
     }
 
     // The biggest test is that we can initialize the log4j2 config at all.
 
     @Test
-    public void canRecordAll() {
+    void canRecordAll() {
         Logger logger = context.getLogger(this.getClass().getName());
 
         long initialAllCount = registry.meter(METRIC_NAME_PREFIX + ".all").getCount();
@@ -44,7 +44,7 @@ public class InstrumentedAppenderConfigTest {
     }
 
     @Test
-    public void canRecordError() {
+    void canRecordError() {
         Logger logger = context.getLogger(this.getClass().getName());
 
         long initialErrorCount = registry.meter(METRIC_NAME_PREFIX + ".error").getCount();
@@ -54,7 +54,7 @@ public class InstrumentedAppenderConfigTest {
     }
 
     @Test
-    public void noInvalidRecording() {
+    void noInvalidRecording() {
         Logger logger = context.getLogger(this.getClass().getName());
 
         long initialInfoCount = registry.meter(METRIC_NAME_PREFIX + ".info").getCount();

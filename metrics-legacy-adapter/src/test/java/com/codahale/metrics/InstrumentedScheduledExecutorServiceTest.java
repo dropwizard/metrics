@@ -1,7 +1,7 @@
 package com.codahale.metrics;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -11,16 +11,16 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class InstrumentedScheduledExecutorServiceTest {
+class InstrumentedScheduledExecutorServiceTest {
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         executorService.shutdown();
     }
 
     @Test
-    public void testCreate() throws Exception {
+    void testCreate() throws Exception {
         MetricRegistry registry = new MetricRegistry();
         InstrumentedScheduledExecutorService instrumentedExecutorService = new InstrumentedScheduledExecutorService(
                 executorService, registry, "test-scheduled-instrumented");

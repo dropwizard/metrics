@@ -1,6 +1,6 @@
 package com.codahale.metrics;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class TimerTest {
+class TimerTest {
 
     private static class ManualClock extends Clock {
 
@@ -27,7 +27,7 @@ public class TimerTest {
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         Timer timer = new Timer();
         timer.update(100, TimeUnit.MILLISECONDS);
         timer.update(200, TimeUnit.MILLISECONDS);
@@ -36,7 +36,7 @@ public class TimerTest {
     }
 
     @Test
-    public void testCreateWithCustomReservoir() {
+    void testCreateWithCustomReservoir() {
         Timer timer = new Timer(new SlidingWindowReservoir(100));
         timer.update(100, TimeUnit.MILLISECONDS);
         timer.update(200, TimeUnit.MILLISECONDS);
@@ -45,7 +45,7 @@ public class TimerTest {
     }
 
     @Test
-    public void testCreateWithCustomReservoirAndClock() {
+    void testCreateWithCustomReservoirAndClock() {
         Timer timer = new Timer(new SlidingWindowReservoir(100), new Clock.UserTimeClock());
         timer.update(100, TimeUnit.MILLISECONDS);
         timer.update(200, TimeUnit.MILLISECONDS);
@@ -54,7 +54,7 @@ public class TimerTest {
     }
 
     @Test
-    public void testTimerContext() {
+    void testTimerContext() {
         Timer timer = new Timer(new SlidingWindowReservoir(100), new ManualClock());
         timer.time().stop();
 
@@ -62,7 +62,7 @@ public class TimerTest {
     }
 
     @Test
-    public void testTimerRunnable() {
+    void testTimerRunnable() {
         Timer timer = new Timer(new SlidingWindowReservoir(100), new ManualClock());
 
         AtomicInteger counter = new AtomicInteger();
@@ -73,7 +73,7 @@ public class TimerTest {
     }
 
     @Test
-    public void testTimerCallable() throws Exception {
+    void testTimerCallable() throws Exception {
         Timer timer = new Timer(new SlidingWindowReservoir(100), new ManualClock());
 
         String message = timer.time(() -> "SUCCESS");
@@ -83,7 +83,7 @@ public class TimerTest {
     }
 
     @Test
-    public void testTimerSupplier() throws Exception {
+    void testTimerSupplier() throws Exception {
         Timer timer = new Timer(new SlidingWindowReservoir(100), new ManualClock());
 
         Integer result = timer.timeSupplier(() -> 42);
@@ -93,7 +93,7 @@ public class TimerTest {
     }
 
     @Test
-    public void testUpdateDuration() {
+    void testUpdateDuration() {
         Timer timer = new Timer();
         timer.update(Duration.ofMillis(100));
         timer.update(Duration.ofMillis(200));

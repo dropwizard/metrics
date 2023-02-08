@@ -2,7 +2,9 @@ package io.dropwizard.metrics5.influxdb;
 
 import java.io.IOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import org.mockito.Mockito;
 
 import java.net.SocketAddress;
@@ -13,14 +15,12 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Before;
-
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 
-public class InfluxDbUdpTest {
+class InfluxDbUdpTest {
 
     private final String host = "example.com";
     private final int port = 1234;
@@ -29,8 +29,8 @@ public class InfluxDbUdpTest {
     private final DatagramChannel datagramChannel = Mockito.mock(DatagramChannel.class);
     private final List<byte[]> sent = new ArrayList<>();
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeEach
+    void setUp() throws IOException {
         sent.clear();
         doAnswer(invocation -> {
             sent.add(toBytes(invocation.getArgument(0)));
@@ -41,7 +41,7 @@ public class InfluxDbUdpTest {
     }
 
     @Test
-    public void writesValue() throws Exception {
+    void writesValue() throws Exception {
         influxdbUdp.send(new StringBuilder("räksmörgås value=123 456000000000\n"));
         influxdbUdp.flush();
 
@@ -51,7 +51,7 @@ public class InfluxDbUdpTest {
     }
 
     @Test
-    public void batchesValues() throws Exception {
+    void batchesValues() throws Exception {
         influxdbUdp.send(new StringBuilder("name1 value=111 456000000000\n"));
         influxdbUdp.send(new StringBuilder("name2 value=222 456000000000\n"));
         influxdbUdp.flush();
@@ -63,7 +63,7 @@ public class InfluxDbUdpTest {
     }
 
     @Test
-    public void respectsMTU() throws Exception {
+    void respectsMTU() throws Exception {
         influxdbUdp.setMTU(40);
         influxdbUdp.send(new StringBuilder("name1 value=111 456000000000\n"));
         influxdbUdp.send(new StringBuilder("name2 value=222 456000000000\n"));

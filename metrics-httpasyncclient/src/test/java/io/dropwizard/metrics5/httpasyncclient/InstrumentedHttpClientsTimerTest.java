@@ -9,18 +9,18 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.nio.client.HttpAsyncClient;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -28,9 +28,9 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-@Ignore("The tests are flaky")
-public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
+@ExtendWith(MockitoExtension.class)
+@Disabled("The tests are flaky")
+class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
 
     private HttpAsyncClient asyncHttpClient;
 
@@ -41,10 +41,10 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
     private MetricRegistry metricRegistry;
 
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         CloseableHttpAsyncClient chac = new InstrumentedNHttpClientBuilder(metricRegistry,
-                (name, request) -> MetricName.build("test")).build();
+        (name, request) -> MetricName.build("test")).build();
         chac.start();
         asyncHttpClient = chac;
 
@@ -54,7 +54,7 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
     }
 
     @Test
-    public void timerIsStoppedCorrectly() throws Exception {
+    void timerIsStoppedCorrectly() throws Exception {
         HttpHost host = startServerWithGlobalRequestHandler(STATUS_OK);
         HttpGet get = new HttpGet("/?q=anything");
 
@@ -76,7 +76,7 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void timerIsStoppedCorrectlyWithProvidedFutureCallbackCompleted() throws Exception {
+    void timerIsStoppedCorrectlyWithProvidedFutureCallbackCompleted() throws Exception {
         HttpHost host = startServerWithGlobalRequestHandler(STATUS_OK);
         HttpGet get = new HttpGet("/?q=something");
 
@@ -103,7 +103,7 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void timerIsStoppedCorrectlyWithProvidedFutureCallbackFailed() throws Exception {
+    void timerIsStoppedCorrectlyWithProvidedFutureCallbackFailed() throws Exception {
         // There should be nothing listening on this port
         HttpHost host = HttpHost.create(String.format("http://127.0.0.1:%d", findAvailableLocalPort()));
         HttpGet get = new HttpGet("/?q=something");
