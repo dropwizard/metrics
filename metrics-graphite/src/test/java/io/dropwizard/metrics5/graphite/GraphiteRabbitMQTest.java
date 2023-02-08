@@ -3,8 +3,8 @@ package io.dropwizard.metrics5.graphite;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class GraphiteRabbitMQTest {
+class GraphiteRabbitMQTest {
     private final ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
     private final Connection connection = mock(Connection.class);
     private final Channel channel = mock(Channel.class);
@@ -32,8 +32,8 @@ public class GraphiteRabbitMQTest {
 
     private final GraphiteRabbitMQ graphite = new GraphiteRabbitMQ(connectionFactory, "graphite");
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         when(connectionFactory.newConnection()).thenReturn(connection);
         when(connection.createChannel()).thenReturn(channel);
         when(connection.isOpen()).thenReturn(true);
@@ -46,7 +46,7 @@ public class GraphiteRabbitMQTest {
     }
 
     @Test
-    public void shouldConnectToGraphiteServer() throws Exception {
+    void shouldConnectToGraphiteServer() throws Exception {
         graphite.connect();
 
         verify(connectionFactory, atMost(1)).newConnection();
@@ -55,7 +55,7 @@ public class GraphiteRabbitMQTest {
     }
 
     @Test
-    public void measuresFailures() throws Exception {
+    void measuresFailures() throws Exception {
         try (final GraphiteRabbitMQ graphite = new GraphiteRabbitMQ(bogusConnectionFactory, "graphite")) {
             graphite.connect();
             try {
@@ -68,7 +68,7 @@ public class GraphiteRabbitMQTest {
     }
 
     @Test
-    public void shouldDisconnectsFromGraphiteServer() throws Exception {
+    void shouldDisconnectsFromGraphiteServer() throws Exception {
         graphite.connect();
         graphite.close();
 
@@ -76,7 +76,7 @@ public class GraphiteRabbitMQTest {
     }
 
     @Test
-    public void shouldNotConnectToGraphiteServerMoreThenOnce() throws Exception {
+    void shouldNotConnectToGraphiteServerMoreThenOnce() throws Exception {
         graphite.connect();
         try {
             graphite.connect();
@@ -87,7 +87,7 @@ public class GraphiteRabbitMQTest {
     }
 
     @Test
-    public void shouldSendMetricsToGraphiteServer() throws Exception {
+    void shouldSendMetricsToGraphiteServer() throws Exception {
         graphite.connect();
         graphite.send("name", "value", 100);
 
@@ -100,7 +100,7 @@ public class GraphiteRabbitMQTest {
     }
 
     @Test
-    public void shouldSanitizeAndSendMetricsToGraphiteServer() throws Exception {
+    void shouldSanitizeAndSendMetricsToGraphiteServer() throws Exception {
         graphite.connect();
         graphite.send("name to sanitize", "value to sanitize", 100);
 
@@ -113,7 +113,7 @@ public class GraphiteRabbitMQTest {
     }
 
     @Test
-    public void shouldFailWhenGraphiteHostUnavailable() {
+    void shouldFailWhenGraphiteHostUnavailable() {
         ConnectionFactory connectionFactory = new ConnectionFactory();
         connectionFactory.setHost("some-unknown-host");
 

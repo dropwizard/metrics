@@ -1,7 +1,7 @@
 package io.dropwizard.metrics5.graphite;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.python.core.PyList;
 import org.python.core.PyTuple;
 
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class PickledGraphiteTest {
+class PickledGraphiteTest {
     private final SocketFactory socketFactory = mock(SocketFactory.class);
     private final InetSocketAddress address = new InetSocketAddress("example.com", 1234);
     private final PickledGraphite graphite = new PickledGraphite(address, socketFactory, UTF_8, 2);
@@ -42,8 +42,8 @@ public class PickledGraphiteTest {
 
     private CompiledScript unpickleScript;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         final AtomicBoolean connected = new AtomicBoolean(true);
         final AtomicBoolean closed = new AtomicBoolean(false);
 
@@ -77,7 +77,7 @@ public class PickledGraphiteTest {
     }
 
     @Test
-    public void disconnectsFromGraphite() throws Exception {
+    void disconnectsFromGraphite() throws Exception {
         graphite.connect();
         graphite.close();
 
@@ -85,7 +85,7 @@ public class PickledGraphiteTest {
     }
 
     @Test
-    public void writesValuesToGraphite() throws Exception {
+    void writesValuesToGraphite() throws Exception {
         graphite.connect();
         graphite.send("name", "value", 100);
         graphite.close();
@@ -95,7 +95,7 @@ public class PickledGraphiteTest {
     }
 
     @Test
-    public void writesFullBatch() throws Exception {
+    void writesFullBatch() throws Exception {
         graphite.connect();
         graphite.send("name", "value", 100);
         graphite.send("name", "value2", 100);
@@ -106,7 +106,7 @@ public class PickledGraphiteTest {
     }
 
     @Test
-    public void writesPastFullBatch() throws Exception {
+    void writesPastFullBatch() throws Exception {
         graphite.connect();
         graphite.send("name", "value", 100);
         graphite.send("name", "value2", 100);
@@ -118,7 +118,7 @@ public class PickledGraphiteTest {
     }
 
     @Test
-    public void sanitizesNames() throws Exception {
+    void sanitizesNames() throws Exception {
         graphite.connect();
         graphite.send("name woo", "value", 100);
         graphite.close();
@@ -128,7 +128,7 @@ public class PickledGraphiteTest {
     }
 
     @Test
-    public void sanitizesValues() throws Exception {
+    void sanitizesValues() throws Exception {
         graphite.connect();
         graphite.send("name", "value woo", 100);
         graphite.close();
@@ -138,14 +138,14 @@ public class PickledGraphiteTest {
     }
 
     @Test
-    public void doesNotAllowDoubleConnections() throws Exception {
+    void doesNotAllowDoubleConnections() throws Exception {
         graphite.connect();
         try {
             graphite.connect();
             failBecauseExceptionWasNotThrown(IllegalStateException.class);
         } catch (IllegalStateException e) {
             assertThat(e.getMessage())
-                    .isEqualTo("Already connected");
+                .isEqualTo("Already connected");
         }
     }
 

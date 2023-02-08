@@ -1,7 +1,7 @@
 package io.dropwizard.metrics5.health;
 
 import io.dropwizard.metrics5.Clock;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class HealthCheckTest {
+class HealthCheckTest {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
@@ -34,7 +34,7 @@ public class HealthCheckTest {
     private final HealthCheck healthCheck = new ExampleHealthCheck(underlying);
 
     @Test
-    public void canHaveHealthyResults() {
+    void canHaveHealthyResults() {
         final HealthCheck.Result result = HealthCheck.Result.healthy();
 
         assertThat(result.isHealthy())
@@ -48,7 +48,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveHealthyResultsWithMessages() {
+    void canHaveHealthyResultsWithMessages() {
         final HealthCheck.Result result = HealthCheck.Result.healthy("woo");
 
         assertThat(result.isHealthy())
@@ -62,7 +62,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveHealthyResultsWithFormattedMessages() {
+    void canHaveHealthyResultsWithFormattedMessages() {
         final HealthCheck.Result result = HealthCheck.Result.healthy("foo %s", "bar");
 
         assertThat(result.isHealthy())
@@ -76,7 +76,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveUnhealthyResults() {
+    void canHaveUnhealthyResults() {
         final HealthCheck.Result result = HealthCheck.Result.unhealthy("bad");
 
         assertThat(result.isHealthy())
@@ -90,7 +90,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveUnhealthyResultsWithFormattedMessages() {
+    void canHaveUnhealthyResultsWithFormattedMessages() {
         final HealthCheck.Result result = HealthCheck.Result.unhealthy("foo %s %d", "bar", 123);
 
         assertThat(result.isHealthy())
@@ -104,7 +104,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveUnhealthyResultsWithExceptions() {
+    void canHaveUnhealthyResultsWithExceptions() {
         final RuntimeException e = mock(RuntimeException.class);
         when(e.getMessage()).thenReturn("oh noes");
 
@@ -121,7 +121,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveHealthyBuilderWithFormattedMessage() {
+    void canHaveHealthyBuilderWithFormattedMessage() {
         final HealthCheck.Result result = HealthCheck.Result.builder()
                 .healthy()
                 .withMessage("There are %d %s in the %s", 42, "foos", "bar")
@@ -135,7 +135,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveHealthyBuilderWithDetail() {
+    void canHaveHealthyBuilderWithDetail() {
         final HealthCheck.Result result = HealthCheck.Result.builder()
                 .healthy()
                 .withDetail("detail", "value")
@@ -155,7 +155,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveUnHealthyBuilderWithDetail() {
+    void canHaveUnHealthyBuilderWithDetail() {
         final HealthCheck.Result result = HealthCheck.Result.builder()
                 .unhealthy()
                 .withDetail("detail", "value")
@@ -175,7 +175,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveUnHealthyBuilderWithDetailAndError() {
+    void canHaveUnHealthyBuilderWithDetailAndError() {
         final RuntimeException e = mock(RuntimeException.class);
         when(e.getMessage()).thenReturn("oh noes");
 
@@ -199,7 +199,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void returnsResultsWhenExecuted() {
+    void returnsResultsWhenExecuted() {
         final HealthCheck.Result result = mock(HealthCheck.Result.class);
         when(underlying.execute()).thenReturn(result);
 
@@ -210,7 +210,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void wrapsExceptionsWhenExecuted() {
+    void wrapsExceptionsWhenExecuted() {
         final RuntimeException e = mock(RuntimeException.class);
         when(e.getMessage()).thenReturn("oh noes");
 
@@ -230,7 +230,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void canHaveUserSuppliedClockForTimestamp() {
+    void canHaveUserSuppliedClockForTimestamp() {
         ZonedDateTime dateTime = ZonedDateTime.now().minusMinutes(10);
         Clock clock = clockWithFixedTime(dateTime);
 
@@ -248,7 +248,7 @@ public class HealthCheckTest {
     }
 
     @Test
-    public void toStringWorksEvenForNullAttributes() {
+    void toStringWorksEvenForNullAttributes() {
         ZonedDateTime dateTime = ZonedDateTime.now().minusMinutes(25);
         Clock clock = clockWithFixedTime(dateTime);
 

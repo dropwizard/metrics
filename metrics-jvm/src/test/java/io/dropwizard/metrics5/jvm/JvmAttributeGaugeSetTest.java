@@ -2,8 +2,8 @@ package io.dropwizard.metrics5.jvm;
 
 import io.dropwizard.metrics5.Gauge;
 import io.dropwizard.metrics5.MetricName;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.management.RuntimeMXBean;
 
@@ -12,12 +12,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("unchecked")
-public class JvmAttributeGaugeSetTest {
+class JvmAttributeGaugeSetTest {
     private final RuntimeMXBean runtime = mock(RuntimeMXBean.class);
     private final JvmAttributeGaugeSet gauges = new JvmAttributeGaugeSet(runtime);
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         when(runtime.getName()).thenReturn("9928@example.com");
 
         when(runtime.getVmVendor()).thenReturn("Oracle Corporation");
@@ -28,7 +28,7 @@ public class JvmAttributeGaugeSetTest {
     }
 
     @Test
-    public void hasASetOfGauges() {
+    void hasASetOfGauges() {
         assertThat(gauges.getMetrics().keySet())
                 .containsOnly(MetricName.build("vendor"),
                         MetricName.build("name"),
@@ -36,7 +36,7 @@ public class JvmAttributeGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForTheJVMName() {
+    void hasAGaugeForTheJVMName() {
         final Gauge<String> gauge = (Gauge<String>) gauges.getMetrics().get(MetricName.build("name"));
 
         assertThat(gauge.getValue())
@@ -44,7 +44,7 @@ public class JvmAttributeGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForTheJVMVendor() {
+    void hasAGaugeForTheJVMVendor() {
         final Gauge<String> gauge = (Gauge<String>) gauges.getMetrics().get(MetricName.build("vendor"));
 
         assertThat(gauge.getValue())
@@ -52,7 +52,7 @@ public class JvmAttributeGaugeSetTest {
     }
 
     @Test
-    public void hasAGaugeForTheJVMUptime() {
+    void hasAGaugeForTheJVMUptime() {
         final Gauge<Long> gauge = (Gauge<Long>) gauges.getMetrics().get(MetricName.build("uptime"));
 
         assertThat(gauge.getValue())
@@ -60,7 +60,7 @@ public class JvmAttributeGaugeSetTest {
     }
 
     @Test
-    public void autoDiscoversTheRuntimeBean() {
+    void autoDiscoversTheRuntimeBean() {
         final Gauge<Long> gauge = (Gauge<Long>) new JvmAttributeGaugeSet().getMetrics().get(MetricName.build("uptime"));
 
         assertThat(gauge.getValue()).isPositive();

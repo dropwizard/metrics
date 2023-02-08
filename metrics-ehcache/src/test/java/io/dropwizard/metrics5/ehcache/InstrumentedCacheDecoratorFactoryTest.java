@@ -6,30 +6,28 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
-import org.hamcrest.CoreMatchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assume.assumeThat;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
-public class InstrumentedCacheDecoratorFactoryTest {
+class InstrumentedCacheDecoratorFactoryTest {
     private static final CacheManager MANAGER = CacheManager.create();
 
     private MetricRegistry registry;
     private Ehcache cache;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.cache = MANAGER.getEhcache("test-config");
-        assumeThat(cache, is(CoreMatchers.notNullValue()));
+        assumeThat(cache).isNotNull();
 
         this.registry = SharedMetricRegistries.getOrCreate("cache-metrics");
     }
 
     @Test
-    public void measuresGets() {
+    void measuresGets() {
         cache.get("woo");
 
         assertThat(registry.timer(MetricRegistry.name(Cache.class, "test-config", "gets")).getCount())
@@ -38,7 +36,7 @@ public class InstrumentedCacheDecoratorFactoryTest {
     }
 
     @Test
-    public void measuresPuts() {
+    void measuresPuts() {
         cache.put(new Element("woo", "whee"));
 
         assertThat(registry.timer(MetricRegistry.name(Cache.class, "test-config", "puts")).getCount())

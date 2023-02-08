@@ -1,14 +1,14 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SlidingWindowReservoirTest {
+class SlidingWindowReservoirTest {
     private final SlidingWindowReservoir reservoir = new SlidingWindowReservoir(3);
 
     @Test
-    public void handlesSmallDataStreams() {
+    void handlesSmallDataStreams() {
         reservoir.update(1);
         reservoir.update(2);
 
@@ -17,7 +17,7 @@ public class SlidingWindowReservoirTest {
     }
 
     @Test
-    public void onlyKeepsTheMostRecentFromBigDataStreams() {
+    void onlyKeepsTheMostRecentFromBigDataStreams() {
         reservoir.update(1);
         reservoir.update(2);
         reservoir.update(3);

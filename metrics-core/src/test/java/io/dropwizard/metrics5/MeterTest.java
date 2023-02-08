@@ -1,7 +1,7 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,18 +10,18 @@ import static org.assertj.core.api.Assertions.offset;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MeterTest {
+class MeterTest {
     private final Clock clock = mock(Clock.class);
     private final Meter meter = new Meter(clock);
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         when(clock.getTick()).thenReturn(0L, TimeUnit.SECONDS.toNanos(10));
 
     }
 
     @Test
-    public void startsOutWithNoRatesOrCount() {
+    void startsOutWithNoRatesOrCount() {
         assertThat(meter.getCount())
                 .isZero();
 
@@ -42,7 +42,7 @@ public class MeterTest {
     }
 
     @Test
-    public void marksEventsAndUpdatesRatesAndCount() {
+    void marksEventsAndUpdatesRatesAndCount() {
         meter.mark();
         meter.mark(2);
 

@@ -3,25 +3,25 @@ package io.dropwizard.metrics5.jetty11;
 import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricRegistry;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class InstrumentedQueuedThreadPoolTest {
+class InstrumentedQueuedThreadPoolTest {
     private static final String PREFIX = "prefix";
 
     private MetricRegistry metricRegistry;
     private InstrumentedQueuedThreadPool iqtp;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         metricRegistry = new MetricRegistry();
         iqtp = new InstrumentedQueuedThreadPool(metricRegistry);
     }
 
     @Test
-    public void customMetricsPrefix() throws Exception {
+    void customMetricsPrefix() throws Exception {
         iqtp.setPrefix(PREFIX);
         iqtp.start();
 
@@ -37,7 +37,7 @@ public class InstrumentedQueuedThreadPoolTest {
     }
 
     @Test
-    public void metricsPrefixBackwardCompatible() throws Exception {
+    void metricsPrefixBackwardCompatible() throws Exception {
         iqtp.start();
         assertThat(metricRegistry.getNames())
                 .extracting(MetricName::getKey)

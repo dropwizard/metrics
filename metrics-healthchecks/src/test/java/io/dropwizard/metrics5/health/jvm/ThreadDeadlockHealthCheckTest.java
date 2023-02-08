@@ -3,7 +3,7 @@ package io.dropwizard.metrics5.health.jvm;
 import io.dropwizard.metrics5.health.HealthCheck;
 import io.dropwizard.metrics5.jvm.ThreadDeadlockDetector;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Set;
@@ -13,9 +13,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ThreadDeadlockHealthCheckTest {
+class ThreadDeadlockHealthCheckTest {
     @Test
-    public void isHealthyIfNoThreadsAreDeadlocked() {
+    void isHealthyIfNoThreadsAreDeadlocked() {
         final ThreadDeadlockDetector detector = mock(ThreadDeadlockDetector.class);
         final ThreadDeadlockHealthCheck healthCheck = new ThreadDeadlockHealthCheck(detector);
 
@@ -26,7 +26,7 @@ public class ThreadDeadlockHealthCheckTest {
     }
 
     @Test
-    public void isUnhealthyIfThreadsAreDeadlocked() {
+    void isUnhealthyIfThreadsAreDeadlocked() {
         final Set<String> threads = new TreeSet<>();
         threads.add("one");
         threads.add("two");
@@ -46,7 +46,7 @@ public class ThreadDeadlockHealthCheckTest {
     }
 
     @Test
-    public void automaticallyUsesThePlatformThreadBeans() {
+    void automaticallyUsesThePlatformThreadBeans() {
         final ThreadDeadlockHealthCheck healthCheck = new ThreadDeadlockHealthCheck();
         Assertions.assertThat(healthCheck.execute().isHealthy())
                 .isTrue();

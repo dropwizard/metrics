@@ -7,7 +7,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestWrapper;
 import org.apache.http.client.utils.URIUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,36 +17,36 @@ import static io.dropwizard.metrics5.httpclient.HttpClientMetricNameStrategies.M
 import static io.dropwizard.metrics5.httpclient.HttpClientMetricNameStrategies.PATH_AND_METHOD;
 import static io.dropwizard.metrics5.httpclient.HttpClientMetricNameStrategies.QUERYLESS_URL_AND_METHOD;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-public class HttpClientMetricNameStrategiesTest {
+class HttpClientMetricNameStrategiesTest {
 
     @Test
-    public void methodOnlyWithName() {
+    void methodOnlyWithName() {
         assertThat(METHOD_ONLY.getNameFor("some-service", new HttpGet("/whatever")),
                 is(MetricName.build("org.apache.http.client.HttpClient.some-service.get-requests")));
     }
 
     @Test
-    public void methodOnlyWithoutName() {
+    void methodOnlyWithoutName() {
         assertThat(METHOD_ONLY.getNameFor(null, new HttpGet("/whatever")),
                 is(MetricName.build("org.apache.http.client.HttpClient.get-requests")));
     }
 
     @Test
-    public void hostAndMethodWithName() {
+    void hostAndMethodWithName() {
         assertThat(HOST_AND_METHOD.getNameFor("some-service", new HttpPost("http://my.host.com/whatever")),
                 is(MetricName.build("org.apache.http.client.HttpClient.some-service.my.host.com.post-requests")));
     }
 
     @Test
-    public void hostAndMethodWithoutName() {
+    void hostAndMethodWithoutName() {
         assertThat(HOST_AND_METHOD.getNameFor(null, new HttpPost("http://my.host.com/whatever")),
                 is(MetricName.build("org.apache.http.client.HttpClient.my.host.com.post-requests")));
     }
 
     @Test
-    public void hostAndMethodWithNameInWrappedRequest() throws URISyntaxException {
+    void hostAndMethodWithNameInWrappedRequest() throws URISyntaxException {
         HttpRequest request = rewriteRequestURI(new HttpPost("http://my.host.com/whatever"));
 
         assertThat(HOST_AND_METHOD.getNameFor("some-service", request),
@@ -54,7 +54,7 @@ public class HttpClientMetricNameStrategiesTest {
     }
 
     @Test
-    public void hostAndMethodWithoutNameInWrappedRequest() throws URISyntaxException {
+    void hostAndMethodWithoutNameInWrappedRequest() throws URISyntaxException {
         HttpRequest request = rewriteRequestURI(new HttpPost("http://my.host.com/whatever"));
 
         assertThat(HOST_AND_METHOD.getNameFor(null, request),
@@ -62,45 +62,45 @@ public class HttpClientMetricNameStrategiesTest {
     }
 
     @Test
-    public void pathAndMethodWithName() {
+    void pathAndMethodWithName() {
         assertThat(PATH_AND_METHOD.getNameFor("some-service", new HttpPost("http://my.host.com/whatever/happens")),
                 is(MetricName.build("org.apache.http.client.HttpClient.some-service./whatever/happens.post-requests")));
     }
 
     @Test
-    public void pathAndMethodWithoutName() {
+    void pathAndMethodWithoutName() {
         assertThat(PATH_AND_METHOD.getNameFor(null, new HttpPost("http://my.host.com/whatever/happens")),
                 is(MetricName.build("org.apache.http.client.HttpClient./whatever/happens.post-requests")));
     }
 
     @Test
-    public void pathAndMethodWithNameInWrappedRequest() throws URISyntaxException {
+    void pathAndMethodWithNameInWrappedRequest() throws URISyntaxException {
         HttpRequest request = rewriteRequestURI(new HttpPost("http://my.host.com/whatever/happens"));
         assertThat(PATH_AND_METHOD.getNameFor("some-service", request),
                 is(MetricName.build("org.apache.http.client.HttpClient.some-service./whatever/happens.post-requests")));
     }
 
     @Test
-    public void pathAndMethodWithoutNameInWrappedRequest() throws URISyntaxException {
+    void pathAndMethodWithoutNameInWrappedRequest() throws URISyntaxException {
         HttpRequest request = rewriteRequestURI(new HttpPost("http://my.host.com/whatever/happens"));
         assertThat(PATH_AND_METHOD.getNameFor(null, request),
                 is(MetricName.build("org.apache.http.client.HttpClient./whatever/happens.post-requests")));
     }
 
     @Test
-    public void querylessUrlAndMethodWithName() {
+    void querylessUrlAndMethodWithName() {
         assertThat(QUERYLESS_URL_AND_METHOD.getNameFor(
-                "some-service",
-                new HttpPut("https://thing.com:8090/my/path?ignore=this&and=this")),
+                        "some-service",
+                        new HttpPut("https://thing.com:8090/my/path?ignore=this&and=this")),
                 is(MetricName.build("org.apache.http.client.HttpClient.some-service.https://thing.com:8090/my/path.put-requests")));
     }
 
     @Test
-    public void querylessUrlAndMethodWithNameInWrappedRequest() throws URISyntaxException {
+    void querylessUrlAndMethodWithNameInWrappedRequest() throws URISyntaxException {
         HttpRequest request = rewriteRequestURI(new HttpPut("https://thing.com:8090/my/path?ignore=this&and=this"));
         assertThat(QUERYLESS_URL_AND_METHOD.getNameFor(
-                "some-service",
-                request),
+                        "some-service",
+                        request),
                 is(MetricName.build("org.apache.http.client.HttpClient.some-service.https://thing.com:8090/my/path.put-requests")));
     }
 

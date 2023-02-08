@@ -61,7 +61,6 @@
         <assertj.version>3.24.2</assertj.version>
         <byte-buddy.version>1.12.23</byte-buddy.version>
         <mockito.version>5.1.1</mockito.version>
-        <junit.version>4.13.1</junit.version>
         <hamcrest.version>1.3</hamcrest.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <errorprone.version>2.18.0</errorprone.version>
@@ -71,6 +70,7 @@
         <sonar.organization>dropwizard</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
+        <junit5.version>5.9.2</junit5.version>
     </properties>
 
     <developers>
@@ -504,6 +504,23 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.openrewrite.maven</groupId>
+                <artifactId>rewrite-maven-plugin</artifactId>
+                <version>4.39.0</version>
+                <configuration>
+                    <activeRecipes>
+                        <recipe>org.openrewrite.java.testing.junit5.JUnit5BestPractices</recipe>
+                    </activeRecipes>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.openrewrite.recipe</groupId>
+                        <artifactId>rewrite-testing-frameworks</artifactId>
+                        <version>1.33.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

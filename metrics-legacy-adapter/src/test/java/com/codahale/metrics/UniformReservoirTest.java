@@ -1,15 +1,15 @@
 package com.codahale.metrics;
 
 import org.assertj.core.data.Offset;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class UniformReservoirTest {
+class UniformReservoirTest {
 
     @Test
-    public void testCreateReservoir() {
+    void testCreateReservoir() {
         UniformReservoir reservoir = new UniformReservoir();
         reservoir.update(120);
         reservoir.update(190);
@@ -31,7 +31,7 @@ public class UniformReservoirTest {
     }
 
     @Test
-    public void testCreateReservoirWithCustomSize() {
+    void testCreateReservoirWithCustomSize() {
         UniformReservoir reservoir = new UniformReservoir(128);
         reservoir.update(440);
         reservoir.update(250);

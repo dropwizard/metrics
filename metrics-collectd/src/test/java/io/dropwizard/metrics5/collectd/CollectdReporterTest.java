@@ -9,9 +9,9 @@ import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.Snapshot;
 import io.dropwizard.metrics5.Timer;
 import org.collectd.api.ValueList;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -27,47 +27,46 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class CollectdReporterTest {
-
-    @ClassRule
+    @RegisterExtension
     public static Receiver receiver = new Receiver(25826);
 
     private final MetricRegistry registry = new MetricRegistry();
     private CollectdReporter reporter;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         reporter = CollectdReporter.forRegistry(registry)
                 .withHostName("eddie")
                 .build(new Sender("localhost", 25826));
     }
 
     @Test
-    public void reportsByteGauges() throws Exception {
+    void reportsByteGauges() throws Exception {
         reportsGauges((byte) 128);
     }
 
     @Test
-    public void reportsShortGauges() throws Exception {
+    void reportsShortGauges() throws Exception {
         reportsGauges((short) 2048);
     }
 
     @Test
-    public void reportsIntegerGauges() throws Exception {
+    void reportsIntegerGauges() throws Exception {
         reportsGauges(42);
     }
 
     @Test
-    public void reportsLongGauges() throws Exception {
+    void reportsLongGauges() throws Exception {
         reportsGauges(Long.MAX_VALUE);
     }
 
     @Test
-    public void reportsFloatGauges() throws Exception {
+    void reportsFloatGauges() throws Exception {
         reportsGauges(0.25);
     }
 
     @Test
-    public void reportsDoubleGauges() throws Exception {
+    void reportsDoubleGauges() throws Exception {
         reportsGauges(0.125d);
     }
 
@@ -83,7 +82,7 @@ public class CollectdReporterTest {
     }
 
     @Test
-    public void reportsBooleanGauges() throws Exception {
+    void reportsBooleanGauges() throws Exception {
         reporter.report(
                 map(MetricName.build("gauge"), () -> true),
                 map(),
@@ -104,7 +103,7 @@ public class CollectdReporterTest {
     }
 
     @Test
-    public void doesNotReportStringGauges() throws Exception {
+    void doesNotReportStringGauges() throws Exception {
         reporter.report(
                 map(MetricName.build("unsupported"), () -> "value"),
                 map(),
@@ -116,7 +115,7 @@ public class CollectdReporterTest {
     }
 
     @Test
-    public void reportsCounters() throws Exception {
+    void reportsCounters() throws Exception {
         Counter counter = mock(Counter.class);
         when(counter.getCount()).thenReturn(42L);
 
@@ -131,7 +130,7 @@ public class CollectdReporterTest {
     }
 
     @Test
-    public void reportsMeters() throws Exception {
+    void reportsMeters() throws Exception {
         Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
         when(meter.getOneMinuteRate()).thenReturn(2.0);
@@ -154,7 +153,7 @@ public class CollectdReporterTest {
     }
 
     @Test
-    public void reportsHistograms() throws Exception {
+    void reportsHistograms() throws Exception {
         Histogram histogram = mock(Histogram.class);
         Snapshot snapshot = mock(Snapshot.class);
         when(histogram.getCount()).thenReturn(1L);
@@ -183,7 +182,7 @@ public class CollectdReporterTest {
     }
 
     @Test
-    public void reportsTimers() throws Exception {
+    void reportsTimers() throws Exception {
         Timer timer = mock(Timer.class);
         Snapshot snapshot = mock(Snapshot.class);
         when(timer.getSnapshot()).thenReturn(snapshot);
@@ -229,7 +228,7 @@ public class CollectdReporterTest {
     }
 
     @Test
-    public void doesNotReportDisabledMetricAttributes() throws Exception {
+    void doesNotReportDisabledMetricAttributes() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
         when(meter.getOneMinuteRate()).thenReturn(2.0);
@@ -259,7 +258,7 @@ public class CollectdReporterTest {
     }
 
     @Test
-    public void sanitizesMetricName() throws Exception {
+    void sanitizesMetricName() throws Exception {
         Counter counter = registry.counter("dash-illegal.slash/illegal");
         counter.inc();
 
@@ -270,7 +269,7 @@ public class CollectdReporterTest {
     }
 
     @Test
-    public void testUnableSetSecurityLevelToSignWithoutUsername() {
+    void testUnableSetSecurityLevelToSignWithoutUsername() {
         assertThatIllegalArgumentException().isThrownBy(() ->
                 CollectdReporter.forRegistry(registry)
                         .withHostName("eddie")
@@ -281,7 +280,7 @@ public class CollectdReporterTest {
     }
 
     @Test
-    public void testUnableSetSecurityLevelToSignWithoutPassword() {
+    void testUnableSetSecurityLevelToSignWithoutPassword() {
         assertThatIllegalArgumentException().isThrownBy(() ->
                 CollectdReporter.forRegistry(registry)
                         .withHostName("eddie")
@@ -301,7 +300,7 @@ public class CollectdReporterTest {
     }
 
     @Test
-    public void sanitizesMetricNameWithCustomMaxLength() throws Exception {
+    void sanitizesMetricNameWithCustomMaxLength() throws Exception {
         CollectdReporter customReporter = CollectdReporter.forRegistry(registry)
                 .withHostName("eddie")
                 .withMaxLength(20)

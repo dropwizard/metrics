@@ -10,9 +10,9 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +22,7 @@ import java.io.PrintWriter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class InstrumentedConnectionFactoryTest {
+class InstrumentedConnectionFactoryTest {
     private final MetricRegistry registry = new MetricRegistry();
     private final Server server = new Server();
     private final ServerConnector connector =
@@ -31,14 +31,14 @@ public class InstrumentedConnectionFactoryTest {
                     registry.counter("http.active-connections")));
     private final HttpClient client = new HttpClient();
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         server.setHandler(new AbstractHandler() {
             @Override
             public void handle(String target,
-                               Request baseRequest,
-                               HttpServletRequest request,
-                               HttpServletResponse response) throws IOException, ServletException {
+                    Request baseRequest,
+                    HttpServletRequest request,
+                    HttpServletResponse response) throws IOException, ServletException {
                 try (PrintWriter writer = response.getWriter()) {
                     writer.println("OK");
                 }
@@ -51,14 +51,14 @@ public class InstrumentedConnectionFactoryTest {
         client.start();
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         server.stop();
         client.stop();
     }
 
     @Test
-    public void instrumentsConnectionTimes() throws Exception {
+    void instrumentsConnectionTimes() throws Exception {
         final ContentResponse response = client.GET("http://localhost:" + connector.getLocalPort() + "/hello");
         assertThat(response.getStatus())
                 .isEqualTo(200);
@@ -73,7 +73,7 @@ public class InstrumentedConnectionFactoryTest {
     }
 
     @Test
-    public void instrumentsActiveConnections() throws Exception {
+    void instrumentsActiveConnections() throws Exception {
         final Counter counter = registry.counter("http.active-connections");
 
         final ContentResponse response = client.GET("http://localhost:" + connector.getLocalPort() + "/hello");

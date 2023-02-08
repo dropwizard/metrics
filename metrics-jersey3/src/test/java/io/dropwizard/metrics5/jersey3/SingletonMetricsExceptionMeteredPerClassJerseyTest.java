@@ -8,7 +8,7 @@ import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
  * Tests registering {@link InstrumentedResourceMethodApplicationListener} as a singleton
  * in a Jersey {@link ResourceConfig}
  */
-public class SingletonMetricsExceptionMeteredPerClassJerseyTest extends JerseyTest {
+class SingletonMetricsExceptionMeteredPerClassJerseyTest extends JerseyTest {
     static {
         Logger.getLogger("org.glassfish.jersey").setLevel(Level.OFF);
     }
@@ -42,23 +42,23 @@ public class SingletonMetricsExceptionMeteredPerClassJerseyTest extends JerseyTe
     }
 
     @Test
-    public void exceptionMeteredMethodsAreExceptionMetered() {
+    void exceptionMeteredMethodsAreExceptionMetered() {
         final Meter meter = registry.meter(name(InstrumentedResourceExceptionMeteredPerClass.class,
-                "exceptionMetered",
-                "exceptions"));
+        "exceptionMetered",
+        "exceptions"));
 
         assertThat(target("exception-metered")
-                .request()
-                .get(String.class))
-                .isEqualTo("fuh");
+        .request()
+        .get(String.class))
+        .isEqualTo("fuh");
 
         assertThat(meter.getCount()).isZero();
 
         try {
             target("exception-metered")
-                    .queryParam("splode", true)
-                    .request()
-                    .get(String.class);
+            .queryParam("splode", true)
+            .request()
+            .get(String.class);
 
             failBecauseExceptionWasNotThrown(ProcessingException.class);
         } catch (ProcessingException e) {
@@ -69,23 +69,23 @@ public class SingletonMetricsExceptionMeteredPerClassJerseyTest extends JerseyTe
     }
 
     @Test
-    public void subresourcesFromLocatorsRegisterMetrics() {
+    void subresourcesFromLocatorsRegisterMetrics() {
         final Meter meter = registry.meter(name(InstrumentedSubResourceExceptionMeteredPerClass.class,
-                "exceptionMetered",
-                "exceptions"));
+        "exceptionMetered",
+        "exceptions"));
 
         assertThat(target("subresource/exception-metered")
-                .request()
-                .get(String.class))
-                .isEqualTo("fuh");
+        .request()
+        .get(String.class))
+        .isEqualTo("fuh");
 
         assertThat(meter.getCount()).isZero();
 
         try {
             target("subresource/exception-metered")
-                    .queryParam("splode", true)
-                    .request()
-                    .get(String.class);
+            .queryParam("splode", true)
+            .request()
+            .get(String.class);
 
             failBecauseExceptionWasNotThrown(ProcessingException.class);
         } catch (ProcessingException e) {

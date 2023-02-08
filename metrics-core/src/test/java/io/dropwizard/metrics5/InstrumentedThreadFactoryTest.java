@@ -10,9 +10,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class InstrumentedThreadFactoryTest {
+class InstrumentedThreadFactoryTest {
     private static final int THREAD_COUNT = 10;
 
     private final ThreadFactory factory = Executors.defaultThreadFactory();
@@ -26,7 +26,7 @@ public class InstrumentedThreadFactoryTest {
      * TODO: Try not using real threads in a unit test?
      */
     @Test
-    public void reportsThreadInformation() throws Exception {
+    void reportsThreadInformation() throws Exception {
         final CountDownLatch allTasksAreCreated = new CountDownLatch(THREAD_COUNT);
         final CountDownLatch allTasksAreCounted = new CountDownLatch(1);
         final AtomicInteger interrupted = new AtomicInteger();

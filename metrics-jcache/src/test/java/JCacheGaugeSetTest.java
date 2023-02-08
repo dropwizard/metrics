@@ -1,9 +1,9 @@
 import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.jcache.JCacheGaugeSet;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.cache.Cache;
 import javax.cache.CacheManager;
@@ -12,15 +12,15 @@ import javax.cache.spi.CachingProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class JCacheGaugeSetTest {
+class JCacheGaugeSetTest {
 
     private MetricRegistry registry;
     private Cache<Object, Object> myCache;
     private Cache<Object, Object> myOtherCache;
     private CacheManager cacheManager;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
 
         CachingProvider provider = Caching.getCachingProvider();
         cacheManager = provider.getCacheManager(
@@ -35,7 +35,7 @@ public class JCacheGaugeSetTest {
     }
 
     @Test
-    public void measuresGauges() throws Exception {
+    void measuresGauges() throws Exception {
 
         myOtherCache.get("woo");
         assertThat(registry.getGauges().get(MetricName.build("jcache.statistics.myOtherCache.cache-misses"))
@@ -79,8 +79,8 @@ public class JCacheGaugeSetTest {
 
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         cacheManager.destroyCache("myCache");
         cacheManager.destroyCache("myOtherCache");
         cacheManager.close();

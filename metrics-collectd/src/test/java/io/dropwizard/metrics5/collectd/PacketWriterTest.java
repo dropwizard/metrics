@@ -1,7 +1,7 @@
 package io.dropwizard.metrics5.collectd;
 
 import io.dropwizard.metrics5.collectd.SecurityLevel;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -19,7 +19,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
 
-public class PacketWriterTest {
+class PacketWriterTest {
 
     private MetaData metaData = new MetaData.Builder("nw-1.alpine.example.com", 1520961345L, 100)
             .type("gauge")
@@ -29,7 +29,7 @@ public class PacketWriterTest {
     private String password = "t1_g$r";
 
     @Test
-    public void testSignRequest() throws Exception {
+    void testSignRequest() throws Exception {
         AtomicBoolean packetVerified = new AtomicBoolean();
         Sender sender = new Sender("localhost", 4009) {
             @Override
@@ -75,7 +75,7 @@ public class PacketWriterTest {
     }
 
     @Test
-    public void testEncryptRequest() throws Exception {
+    void testEncryptRequest() throws Exception {
         AtomicBoolean packetVerified = new AtomicBoolean();
         Sender sender = new Sender("localhost", 4009) {
             @Override

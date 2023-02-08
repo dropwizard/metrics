@@ -1,6 +1,6 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-public class TimerTest {
+class TimerTest {
     private final Reservoir reservoir = mock(Reservoir.class);
     private final Clock clock = new Clock() {
         // a mock clock that increments its ticker by 50msec per call
@@ -27,7 +27,7 @@ public class TimerTest {
     private final Timer timer = new Timer(reservoir, clock);
 
     @Test
-    public void hasRates() {
+    void hasRates() {
         assertThat(timer.getCount())
                 .isZero();
 
@@ -48,7 +48,7 @@ public class TimerTest {
     }
 
     @Test
-    public void updatesTheCountAndSumOnUpdates() {
+    void updatesTheCountAndSumOnUpdates() {
         assertThat(timer.getCount())
                 .isZero();
         assertThat(timer.getSum())
@@ -64,7 +64,7 @@ public class TimerTest {
     }
 
     @Test
-    public void timesCallableInstances() throws Exception {
+    void timesCallableInstances() throws Exception {
         final String value = timer.time(() -> "one");
 
         assertThat(timer.getCount())
@@ -79,7 +79,7 @@ public class TimerTest {
     }
 
     @Test
-    public void timesSuppliedInstances() {
+    void timesSuppliedInstances() {
         final String value = timer.timeSupplier(() -> "one");
 
         assertThat(timer.getCount())
@@ -92,7 +92,7 @@ public class TimerTest {
     }
 
     @Test
-    public void timesRunnableInstances() {
+    void timesRunnableInstances() {
         final AtomicBoolean called = new AtomicBoolean();
         timer.time(() -> called.set(true));
 
@@ -108,7 +108,7 @@ public class TimerTest {
     }
 
     @Test
-    public void timesContexts() {
+    void timesContexts() {
         timer.time().stop();
 
         assertThat(timer.getCount())
@@ -120,7 +120,7 @@ public class TimerTest {
     }
 
     @Test
-    public void returnsTheSnapshotFromTheReservoir() {
+    void returnsTheSnapshotFromTheReservoir() {
         final Snapshot snapshot = mock(Snapshot.class);
         when(reservoir.getSnapshot()).thenReturn(snapshot);
 
@@ -129,7 +129,7 @@ public class TimerTest {
     }
 
     @Test
-    public void ignoresNegativeValues() {
+    void ignoresNegativeValues() {
         timer.update(-1, TimeUnit.SECONDS);
 
         assertThat(timer.getCount())
@@ -141,7 +141,7 @@ public class TimerTest {
     }
 
     @Test
-    public void java8Duration() {
+    void java8Duration() {
         timer.update(Duration.ofSeconds(1234));
 
         assertThat(timer.getCount()).isEqualTo(1);
@@ -150,7 +150,7 @@ public class TimerTest {
     }
 
     @Test
-    public void java8NegativeDuration() {
+    void java8NegativeDuration() {
         timer.update(Duration.ofMillis(-5678));
 
         assertThat(timer.getCount()).isZero();
@@ -159,7 +159,7 @@ public class TimerTest {
     }
 
     @Test
-    public void tryWithResourcesWork() {
+    void tryWithResourcesWork() {
         assertThat(timer.getCount()).isZero();
         assertThat(timer.getSum()).isZero();
 

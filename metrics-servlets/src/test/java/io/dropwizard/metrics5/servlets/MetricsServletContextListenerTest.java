@@ -8,8 +8,8 @@ import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.Timer;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.servlet.ServletTester;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MetricsServletContextListenerTest extends AbstractServletTest {
+class MetricsServletContextListenerTest extends AbstractServletTest {
     private final Clock clock = mock(Clock.class);
     private final MetricRegistry registry = new MetricRegistry();
     private final String allowedOrigin = "some.other.origin";
@@ -49,8 +49,8 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
         });
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         // provide ticks for the setup (calls getTick 6 times). The serialization in the tests themselves
         // will call getTick again several times and always get the same value (the last specified here)
         when(clock.getTick()).thenReturn(100L, 100L, 200L, 300L, 300L, 400L);
@@ -68,7 +68,7 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
     }
 
     @Test
-    public void returnsA200() throws Exception {
+    void returnsA200() throws Exception {
         processRequest();
 
         assertThat(response.getStatus())
@@ -96,7 +96,7 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
     }
 
     @Test
-    public void optionallyPrettyPrintsTheJson() throws Exception {
+    void optionallyPrettyPrintsTheJson() throws Exception {
         request.setURI("/metrics?pretty=true");
 
         processRequest();

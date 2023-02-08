@@ -5,10 +5,10 @@ import io.dropwizard.metrics5.health.HealthCheckRegistry;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.servlet.ServletTester;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class AdminServletExclusionTest extends AbstractServletTest {
+class AdminServletExclusionTest extends AbstractServletTest {
     private final MetricRegistry registry = new MetricRegistry();
     private final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
 
@@ -23,15 +23,15 @@ public class AdminServletExclusionTest extends AbstractServletTest {
         tester.addServlet(AdminServlet.class, "/admin");
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         request.setMethod("GET");
         request.setURI("/context/admin");
         request.setVersion("HTTP/1.0");
     }
 
     @Test
-    public void returnsA200() throws Exception {
+    void returnsA200() throws Exception {
         processRequest();
 
         assertThat(response.getStatus())

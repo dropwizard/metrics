@@ -1,9 +1,8 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,8 +19,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class CsvReporterTest {
-    @Rule
-    public final TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public File folder;
 
     private final MetricRegistry registry = mock(MetricRegistry.class);
     private final Clock clock = mock(Clock.class);
@@ -29,11 +28,11 @@ public class CsvReporterTest {
     private File dataDirectory;
     private CsvReporter reporter;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         when(clock.getTime()).thenReturn(19910191000L);
 
-        this.dataDirectory = folder.newFolder();
+        this.dataDirectory = newFolder(folder, "junit");
 
         this.reporter = CsvReporter.forRegistry(registry)
                 .formatFor(Locale.US)
@@ -45,7 +44,7 @@ public class CsvReporterTest {
     }
 
     @Test
-    public void reportsGaugeValues() throws Exception {
+    void reportsGaugeValues() throws Exception {
         final Gauge<Integer> gauge = () -> 1;
 
         reporter.report(map(MetricName.build("gauge"), gauge),
@@ -62,7 +61,7 @@ public class CsvReporterTest {
     }
 
     @Test
-    public void reportsCounterValues() throws Exception {
+    void reportsCounterValues() throws Exception {
         final Counter counter = mock(Counter.class);
         when(counter.getCount()).thenReturn(100L);
 
@@ -80,7 +79,7 @@ public class CsvReporterTest {
     }
 
     @Test
-    public void reportsHistogramValues() throws Exception {
+    void reportsHistogramValues() throws Exception {
         final Histogram histogram = mock(Histogram.class);
         when(histogram.getCount()).thenReturn(1L);
         when(histogram.getSum()).thenReturn(12L);
@@ -113,7 +112,7 @@ public class CsvReporterTest {
     }
 
     @Test
-    public void reportsMeterValues() throws Exception {
+    void reportsMeterValues() throws Exception {
         final Meter meter = mockMeter();
 
         reporter.report(map(),
@@ -130,7 +129,7 @@ public class CsvReporterTest {
     }
 
     @Test
-    public void reportsTimerValues() throws Exception {
+    void reportsTimerValues() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
         when(timer.getSum()).thenReturn(TimeUnit.MILLISECONDS.toNanos(6));
@@ -167,7 +166,7 @@ public class CsvReporterTest {
     }
 
     @Test
-    public void testCsvFileProviderIsUsed() {
+    void testCsvFileProviderIsUsed() {
         CsvFileProvider fileProvider = mock(CsvFileProvider.class);
         when(fileProvider.getFile(dataDirectory, "gauge")).thenReturn(new File(dataDirectory, "guage.csv"));
 
@@ -187,7 +186,7 @@ public class CsvReporterTest {
     }
 
     @Test
-    public void itFormatsWithCustomSeparator() throws Exception {
+    void itFormatsWithCustomSeparator() throws Exception {
         final Meter meter = mockMeter();
 
         CsvReporter customSeparatorReporter = CsvReporter.forRegistry(registry)
@@ -244,5 +243,14 @@ public class CsvReporterTest {
         final TreeMap<MetricName, T> map = new TreeMap<>();
         map.put(name, metric);
         return map;
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
     }
 }

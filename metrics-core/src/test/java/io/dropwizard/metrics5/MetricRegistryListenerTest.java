@@ -1,11 +1,11 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-public class MetricRegistryListenerTest {
+class MetricRegistryListenerTest {
     private static final MetricName BLAH = MetricName.build("blah");
 
     private final Counter counter = mock(Counter.class);
@@ -17,42 +17,42 @@ public class MetricRegistryListenerTest {
     };
 
     @Test
-    public void noOpsOnGaugeAdded() {
+    void noOpsOnGaugeAdded() {
         listener.onGaugeAdded(BLAH, () -> {
             throw new RuntimeException("Should not be called");
         });
     }
 
     @Test
-    public void noOpsOnCounterAdded() {
+    void noOpsOnCounterAdded() {
         listener.onCounterAdded(BLAH, counter);
 
         verifyNoInteractions(counter);
     }
 
     @Test
-    public void noOpsOnHistogramAdded() {
+    void noOpsOnHistogramAdded() {
         listener.onHistogramAdded(BLAH, histogram);
 
         verifyNoInteractions(histogram);
     }
 
     @Test
-    public void noOpsOnMeterAdded() {
+    void noOpsOnMeterAdded() {
         listener.onMeterAdded(BLAH, meter);
 
         verifyNoInteractions(meter);
     }
 
     @Test
-    public void noOpsOnTimerAdded() {
+    void noOpsOnTimerAdded() {
         listener.onTimerAdded(BLAH, timer);
 
         verifyNoInteractions(timer);
     }
 
     @Test
-    public void doesNotExplodeWhenMetricsAreRemoved() {
+    void doesNotExplodeWhenMetricsAreRemoved() {
         listener.onGaugeRemoved(BLAH);
         listener.onCounterRemoved(BLAH);
         listener.onHistogramRemoved(BLAH);

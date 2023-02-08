@@ -8,8 +8,8 @@ import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.Timer;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.servlet.ServletTester;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -24,7 +25,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class MetricsServletTest extends AbstractServletTest {
+class MetricsServletTest extends AbstractServletTest {
     private final Clock clock = mock(Clock.class);
     private final MetricRegistry registry = new MetricRegistry();
     private ServletTester tester;
@@ -37,8 +38,8 @@ public class MetricsServletTest extends AbstractServletTest {
         tester.getContext().setInitParameter("io.dropwizard.metrics5.servlets.MetricsServlet.allowedOrigin", "*");
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         // provide ticks for the setup (calls getTick 6 times). The serialization in the tests themselves
         // will call getTick again several times and always get the same value (the last specified here)
         when(clock.getTick()).thenReturn(100L, 100L, 200L, 300L, 300L, 400L);
@@ -56,7 +57,7 @@ public class MetricsServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void returnsA200() throws Exception {
+    void returnsA200() throws Exception {
         processRequest();
 
         assertThat(response.getStatus())
@@ -84,7 +85,7 @@ public class MetricsServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void returnsJsonWhenJsonpInitParamNotSet() throws Exception {
+    void returnsJsonWhenJsonpInitParamNotSet() throws Exception {
         String callbackParamName = "callbackParam";
         String callbackParamVal = "callbackParamVal";
         request.setURI("/metrics?" + callbackParamName + "=" + callbackParamVal);
@@ -115,7 +116,7 @@ public class MetricsServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void returnsJsonpWhenInitParamSet() throws Exception {
+    void returnsJsonpWhenInitParamSet() throws Exception {
         String callbackParamName = "callbackParam";
         String callbackParamVal = "callbackParamVal";
         request.setURI("/metrics?" + callbackParamName + "=" + callbackParamVal);
@@ -146,7 +147,7 @@ public class MetricsServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void optionallyPrettyPrintsTheJson() throws Exception {
+    void optionallyPrettyPrintsTheJson() throws Exception {
         request.setURI("/metrics?pretty=true");
 
         processRequest();
@@ -220,7 +221,7 @@ public class MetricsServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
+    void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
         final MetricRegistry metricRegistry = mock(MetricRegistry.class);
         final ServletContext servletContext = mock(ServletContext.class);
         final ServletConfig servletConfig = mock(ServletConfig.class);
@@ -234,7 +235,7 @@ public class MetricsServletTest extends AbstractServletTest {
     }
 
     @Test
-    public void constructorWithRegistryAsArgumentUsesServletConfigWhenNull() throws Exception {
+    void constructorWithRegistryAsArgumentUsesServletConfigWhenNull() throws Exception {
         final MetricRegistry metricRegistry = mock(MetricRegistry.class);
         final ServletContext servletContext = mock(ServletContext.class);
         final ServletConfig servletConfig = mock(ServletConfig.class);
@@ -249,15 +250,17 @@ public class MetricsServletTest extends AbstractServletTest {
         verify(servletContext, times(1)).getAttribute(eq(MetricsServlet.METRICS_REGISTRY));
     }
 
-    @Test(expected = ServletException.class)
-    public void constructorWithRegistryAsArgumentUsesServletConfigWhenNullButWrongTypeInContext() throws Exception {
-        final ServletContext servletContext = mock(ServletContext.class);
-        final ServletConfig servletConfig = mock(ServletConfig.class);
-        when(servletConfig.getServletContext()).thenReturn(servletContext);
-        when(servletContext.getAttribute(eq(MetricsServlet.METRICS_REGISTRY)))
-                .thenReturn("IRELLEVANT_STRING");
+    @Test
+    void constructorWithRegistryAsArgumentUsesServletConfigWhenNullButWrongTypeInContext() throws Exception {
+        assertThrows(ServletException.class, () -> {
+            final ServletContext servletContext = mock(ServletContext.class);
+            final ServletConfig servletConfig = mock(ServletConfig.class);
+            when(servletConfig.getServletContext()).thenReturn(servletContext);
+            when(servletContext.getAttribute(eq(MetricsServlet.METRICS_REGISTRY)))
+                    .thenReturn("IRELLEVANT_STRING");
 
-        final MetricsServlet metricsServlet = new MetricsServlet(null);
-        metricsServlet.init(servletConfig);
+            final MetricsServlet metricsServlet = new MetricsServlet(null);
+            metricsServlet.init(servletConfig);
+        });
     }
 }

@@ -1,8 +1,8 @@
 package io.dropwizard.metrics5;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class InstrumentedExecutorServiceTest {
+class InstrumentedExecutorServiceTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InstrumentedExecutorServiceTest.class);
     private ExecutorService executor;
@@ -30,8 +30,8 @@ public class InstrumentedExecutorServiceTest {
     private Timer duration;
     private Timer idle;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         executor = Executors.newCachedThreadPool();
         registry = new MetricRegistry();
         instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "xs");
@@ -42,8 +42,8 @@ public class InstrumentedExecutorServiceTest {
         idle = registry.timer("xs.idle");
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         instrumentedExecutorService.shutdown();
         if (!instrumentedExecutorService.awaitTermination(2, TimeUnit.SECONDS)) {
             LOGGER.error("InstrumentedExecutorService did not terminate.");
@@ -51,7 +51,7 @@ public class InstrumentedExecutorServiceTest {
     }
 
     @Test
-    public void reportsTasksInformationForRunnable() throws Exception {
+    void reportsTasksInformationForRunnable() throws Exception {
 
         assertThat(submitted.getCount()).isEqualTo(0);
         assertThat(running.getCount()).isEqualTo(0);
@@ -81,7 +81,7 @@ public class InstrumentedExecutorServiceTest {
     }
 
     @Test
-    public void reportsTasksInformationForCallable() throws Exception {
+    void reportsTasksInformationForCallable() throws Exception {
 
         assertThat(submitted.getCount()).isEqualTo(0);
         assertThat(running.getCount()).isEqualTo(0);
@@ -113,7 +113,7 @@ public class InstrumentedExecutorServiceTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void reportsTasksInformationForThreadPoolExecutor() throws Exception {
+    void reportsTasksInformationForThreadPoolExecutor() throws Exception {
         executor = new ThreadPoolExecutor(4, 16,
                 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(32));
         instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "tp");
@@ -169,7 +169,7 @@ public class InstrumentedExecutorServiceTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void reportsTasksInformationForForkJoinPool() throws Exception {
+    void reportsTasksInformationForForkJoinPool() throws Exception {
         executor = Executors.newWorkStealingPool(4);
         instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "fjp");
         submitted = registry.meter("fjp.submitted");

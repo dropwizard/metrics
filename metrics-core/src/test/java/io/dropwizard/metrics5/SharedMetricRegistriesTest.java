@@ -1,26 +1,24 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class SharedMetricRegistriesTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
+class SharedMetricRegistriesTest {
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         SharedMetricRegistries.setDefaultRegistryName(new AtomicReference<>());
         SharedMetricRegistries.clear();
     }
 
     @Test
-    public void memorizesRegistriesByName() {
+    void memorizesRegistriesByName() {
         final MetricRegistry one = SharedMetricRegistries.getOrCreate("one");
         final MetricRegistry two = SharedMetricRegistries.getOrCreate("one");
 
@@ -29,7 +27,7 @@ public class SharedMetricRegistriesTest {
     }
 
     @Test
-    public void hasASetOfNames() {
+    void hasASetOfNames() {
         SharedMetricRegistries.getOrCreate("one");
 
         assertThat(SharedMetricRegistries.names())
@@ -37,7 +35,7 @@ public class SharedMetricRegistriesTest {
     }
 
     @Test
-    public void removesRegistries() {
+    void removesRegistries() {
         final MetricRegistry one = SharedMetricRegistries.getOrCreate("one");
         SharedMetricRegistries.remove("one");
 
@@ -50,7 +48,7 @@ public class SharedMetricRegistriesTest {
     }
 
     @Test
-    public void clearsRegistries() {
+    void clearsRegistries() {
         SharedMetricRegistries.getOrCreate("one");
         SharedMetricRegistries.getOrCreate("two");
 
@@ -61,14 +59,15 @@ public class SharedMetricRegistriesTest {
     }
 
     @Test
-    public void errorsWhenDefaultUnset() {
-        exception.expect(IllegalStateException.class);
-        exception.expectMessage("Default registry name has not been set.");
-        SharedMetricRegistries.getDefault();
+    void errorsWhenDefaultUnset() {
+        Throwable exception = assertThrows(IllegalStateException.class, () -> {
+            SharedMetricRegistries.getDefault();
+        });
+        assertTrue(exception.getMessage().contains("Default registry name has not been set."));
     }
 
     @Test
-    public void createsDefaultRegistries() {
+    void createsDefaultRegistries() {
         final String defaultName = "default";
         final MetricRegistry registry = SharedMetricRegistries.setDefault(defaultName);
         assertThat(registry).isNotNull();
@@ -77,15 +76,16 @@ public class SharedMetricRegistriesTest {
     }
 
     @Test
-    public void errorsWhenDefaultAlreadySet() {
-        SharedMetricRegistries.setDefault("foobah");
-        exception.expect(IllegalStateException.class);
-        exception.expectMessage("Default metric registry name is already set.");
-        SharedMetricRegistries.setDefault("borg");
+    void errorsWhenDefaultAlreadySet() {
+        Throwable exception = assertThrows(IllegalStateException.class, () -> {
+            SharedMetricRegistries.setDefault("foobah");
+            SharedMetricRegistries.setDefault("borg");
+        });
+        assertTrue(exception.getMessage().contains("Default metric registry name is already set."));
     }
 
     @Test
-    public void setsDefaultExistingRegistries() {
+    void setsDefaultExistingRegistries() {
         final String defaultName = "default";
         final MetricRegistry registry = new MetricRegistry();
         assertThat(SharedMetricRegistries.setDefault(defaultName, registry)).isEqualTo(registry);

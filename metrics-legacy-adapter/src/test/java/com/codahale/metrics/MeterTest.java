@@ -1,22 +1,22 @@
 package com.codahale.metrics;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class MeterTest {
+class MeterTest {
 
     @Test
-    public void testCreateMeteer() {
+    void testCreateMeteer() {
         Meter meter = new Meter();
         assertThat(meter.getCount()).isEqualTo(0);
     }
 
     @Test
-    public void testCreateMeterWithCustomClock() {
+    void testCreateMeterWithCustomClock() {
         Meter meter = new Meter(new Clock() {
             @Override
             public long getTick() {
@@ -27,7 +27,7 @@ public class MeterTest {
     }
 
     @Test
-    public void testMark() {
+    void testMark() {
         Meter meter = new Meter(new Clock() {
 
             private long start = System.nanoTime();

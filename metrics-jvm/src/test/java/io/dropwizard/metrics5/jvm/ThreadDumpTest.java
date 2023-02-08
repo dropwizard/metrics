@@ -1,7 +1,7 @@
 package io.dropwizard.metrics5.jvm;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.management.LockInfo;
@@ -15,14 +15,14 @@ import static org.mockito.Mockito.when;
 
 // TODO: 3/12/13 <coda> -- improve test coverage for ThreadDump
 
-public class ThreadDumpTest {
+class ThreadDumpTest {
     private final ThreadMXBean threadMXBean = mock(ThreadMXBean.class);
     private final ThreadDump threadDump = new ThreadDump(threadMXBean);
 
     private final ThreadInfo runnable = mock(ThreadInfo.class);
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         final StackTraceElement rLine1 = new StackTraceElement("Blah", "blee", "Blah.java", 100);
 
         when(runnable.getThreadName()).thenReturn("runnable");
@@ -33,19 +33,19 @@ public class ThreadDumpTest {
         when(runnable.getLockedSynchronizers()).thenReturn(new LockInfo[]{});
 
         when(threadMXBean.dumpAllThreads(true, true)).thenReturn(new ThreadInfo[]{
-            runnable
+                runnable
         });
     }
 
     @Test
-    public void dumpsAllThreads() {
+    void dumpsAllThreads() {
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         threadDump.dump(output);
 
         assertThat(output.toString())
-            .isEqualTo(String.format("\"runnable\" id=100 state=RUNNABLE%n" +
-                "    at Blah.blee(Blah.java:100)%n" +
-                "%n" +
-                "%n"));
+                .isEqualTo(String.format("\"runnable\" id=100 state=RUNNABLE%n" +
+                        "    at Blah.blee(Blah.java:100)%n" +
+                        "%n" +
+                        "%n"));
     }
 }

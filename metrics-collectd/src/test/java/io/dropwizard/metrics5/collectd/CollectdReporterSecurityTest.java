@@ -1,28 +1,28 @@
 package io.dropwizard.metrics5.collectd;
 
 import io.dropwizard.metrics5.MetricRegistry;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
-public class CollectdReporterSecurityTest {
+class CollectdReporterSecurityTest {
 
     private final MetricRegistry registry = new MetricRegistry();
 
     @Test
-    public void testUnableSetSecurityLevelToSignWithoutUsername() {
-        assertThatIllegalArgumentException().isThrownBy(()->
+    void testUnableSetSecurityLevelToSignWithoutUsername() {
+        assertThatIllegalArgumentException().isThrownBy(() ->
                 CollectdReporter.forRegistry(registry)
-                                .withHostName("eddie")
-                                .withSecurityLevel(SecurityLevel.SIGN)
-                                .withPassword("t1_g3r")
-                                .build(new Sender("localhost", 25826)))
+                        .withHostName("eddie")
+                        .withSecurityLevel(SecurityLevel.SIGN)
+                        .withPassword("t1_g3r")
+                        .build(new Sender("localhost", 25826)))
                 .withMessage("username is required for securityLevel: SIGN");
     }
 
     @Test
-    public void testUnableSetSecurityLevelToSignWithoutPassword() {
-        assertThatIllegalArgumentException().isThrownBy(()->
+    void testUnableSetSecurityLevelToSignWithoutPassword() {
+        assertThatIllegalArgumentException().isThrownBy(() ->
                 CollectdReporter.forRegistry(registry)
                         .withHostName("eddie")
                         .withSecurityLevel(SecurityLevel.SIGN)

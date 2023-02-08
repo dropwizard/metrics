@@ -2,17 +2,17 @@ package com.codahale.metrics;
 
 import io.dropwizard.metrics5.UniformSnapshot;
 import org.assertj.core.data.Offset;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class SnapshotTest {
+class SnapshotTest {
 
     @Test
-    public void testCreateSnapshot() throws Exception {
+    void testCreateSnapshot() throws Exception {
         Snapshot snapshot = Snapshot.of(new UniformSnapshot(new long[]{5, 1, 2, 3, 4}));
 
         assertThat(snapshot.getValues()).isEqualTo(new long[]{1, 2, 3, 4, 5});

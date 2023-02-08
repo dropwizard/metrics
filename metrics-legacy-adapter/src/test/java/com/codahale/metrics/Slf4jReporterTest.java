@@ -1,8 +1,8 @@
 package com.codahale.metrics;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
@@ -15,24 +15,24 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("deprecation")
-public class Slf4jReporterTest {
+class Slf4jReporterTest {
 
     private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private Logger logger = mock(Logger.class);
     private Marker marker = mock(Marker.class);
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         when(logger.isInfoEnabled(marker)).thenReturn(true);
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         executor.shutdownNow();
     }
 
     @Test
-    public void testReport() throws Exception {
+    void testReport() throws Exception {
         MetricRegistry metricRegistry = new MetricRegistry();
         metricRegistry.counter("test-counter").inc(100);
 

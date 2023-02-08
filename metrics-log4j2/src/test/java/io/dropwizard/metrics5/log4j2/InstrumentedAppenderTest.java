@@ -4,9 +4,9 @@ import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.SharedMetricRegistries;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -20,18 +20,18 @@ public class InstrumentedAppenderTest {
     private final InstrumentedAppender appender = new InstrumentedAppender(registry);
     private final LogEvent event = mock(LogEvent.class);
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         appender.start();
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         SharedMetricRegistries.clear();
     }
 
     @Test
-    public void metersTraceEvents() {
+    void metersTraceEvents() {
         when(event.getLevel()).thenReturn(Level.TRACE);
 
         appender.append(event);
@@ -44,7 +44,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void metersDebugEvents() {
+    void metersDebugEvents() {
         when(event.getLevel()).thenReturn(Level.DEBUG);
 
         appender.append(event);
@@ -57,7 +57,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void metersInfoEvents() {
+    void metersInfoEvents() {
         when(event.getLevel()).thenReturn(Level.INFO);
 
         appender.append(event);
@@ -70,7 +70,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void metersWarnEvents() {
+    void metersWarnEvents() {
         when(event.getLevel()).thenReturn(Level.WARN);
 
         appender.append(event);
@@ -83,7 +83,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void metersErrorEvents() {
+    void metersErrorEvents() {
         when(event.getLevel()).thenReturn(Level.ERROR);
 
         appender.append(event);
@@ -96,7 +96,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void metersFatalEvents() {
+    void metersFatalEvents() {
         when(event.getLevel()).thenReturn(Level.FATAL);
 
         appender.append(event);
@@ -109,7 +109,7 @@ public class InstrumentedAppenderTest {
     }
 
     @Test
-    public void usesSharedRegistries() {
+    void usesSharedRegistries() {
 
         String registryName = "registry";
 

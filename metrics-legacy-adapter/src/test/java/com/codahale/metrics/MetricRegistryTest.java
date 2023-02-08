@@ -1,6 +1,6 @@
 package com.codahale.metrics;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,19 +12,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
 
 @SuppressWarnings("deprecation")
-public class MetricRegistryTest {
+class MetricRegistryTest {
 
     private MetricRegistry metricRegistry = new MetricRegistry();
 
     @Test
-    public void testRegisterMetric() {
+    void testRegisterMetric() {
         Counter counter = metricRegistry.register("test-counter", new Counter());
         counter.inc(42);
         assertThat(metricRegistry.counter("test-counter").getCount()).isEqualTo(42);
     }
 
     @Test
-    public void testRegisterAll() {
+    void testRegisterAll() {
         metricRegistry.registerAll(() -> {
             Map<String, Metric> map = new HashMap<>();
             map.put("test-counter", new Counter());
@@ -40,26 +40,26 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testRegisterGauge() {
+    void testRegisterGauge() {
         metricRegistry.registerGauge("test-gauge", () -> 42);
         assertThat(metricRegistry.getGauges().get("test-gauge").getValue()).isEqualTo(42);
     }
 
     @Test
-    public void testCreateCustomGauge() {
+    void testCreateCustomGauge() {
         Gauge gauge = metricRegistry.gauge("test-gauge-supplier", () -> () -> 42);
         assertThat(gauge.getValue()).isEqualTo(42);
     }
 
     @Test
-    public void testCreateCounter() {
+    void testCreateCounter() {
         Counter counter = metricRegistry.counter("test-counter");
         counter.inc(42);
         assertThat(metricRegistry.counter("test-counter").getCount()).isEqualTo(42);
     }
 
     @Test
-    public void testCreateCustomCounter() {
+    void testCreateCustomCounter() {
         Counter counter = metricRegistry.counter("test-custom-counter", () -> {
             Counter c = new Counter();
             c.inc(8);
@@ -70,7 +70,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testCreateHistogram() {
+    void testCreateHistogram() {
         Histogram histogram = metricRegistry.histogram("test-histogram");
         histogram.update(100);
         histogram.update(200);
@@ -80,7 +80,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testCreateCustomHistogram() {
+    void testCreateCustomHistogram() {
         Histogram histogram = metricRegistry.histogram("test-custom-histogram",
                 () -> new Histogram(new SlidingWindowReservoir(2)));
         histogram.update(100);
@@ -91,7 +91,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testCreateMeter() {
+    void testCreateMeter() {
         Meter meter = metricRegistry.meter("test-meter");
         meter.mark();
         meter.mark(2);
@@ -100,7 +100,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testCreateCustomMeter() {
+    void testCreateCustomMeter() {
         Meter meter = metricRegistry.meter("test-custom-meter", () -> {
             Meter m = new Meter();
             m.mark(16);
@@ -112,7 +112,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testCreateTimer() {
+    void testCreateTimer() {
         Timer timer = metricRegistry.timer("test-timer");
         timer.update(100, TimeUnit.MILLISECONDS);
         timer.update(200, TimeUnit.MILLISECONDS);
@@ -122,7 +122,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testCreateCustomTimer() {
+    void testCreateCustomTimer() {
         Timer timer = metricRegistry.timer("custom-test-timer", () -> {
             Timer t = new Timer(new UniformReservoir());
             t.update(300, TimeUnit.MILLISECONDS);
@@ -135,7 +135,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testRemoveMetric() {
+    void testRemoveMetric() {
         metricRegistry.timer("test-timer");
         metricRegistry.counter("test-counter");
         metricRegistry.meter("test-meter");
@@ -146,7 +146,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testRemoveMatching() {
+    void testRemoveMatching() {
         metricRegistry.counter("test-counter");
         metricRegistry.timer("test-timer");
         metricRegistry.timer("test-custom-timer");
@@ -157,7 +157,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testAddListenerForGauge() throws Exception {
+    void testAddListenerForGauge() throws Exception {
         CountDownLatch gaugeAddedLatch = new CountDownLatch(1);
         CountDownLatch gaugeRemovedLatch = new CountDownLatch(1);
         metricRegistry.addListener(new MetricRegistryListener.Base() {
@@ -185,7 +185,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testAddListenerForCounter() throws Exception {
+    void testAddListenerForCounter() throws Exception {
         CountDownLatch counterAddedLatch = new CountDownLatch(1);
         CountDownLatch counterRemovedLatch = new CountDownLatch(1);
         metricRegistry.addListener(new MetricRegistryListener.Base() {
@@ -212,7 +212,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testAddListenerForHistogram() throws Exception {
+    void testAddListenerForHistogram() throws Exception {
         CountDownLatch histogramAddedLatch = new CountDownLatch(1);
         CountDownLatch histogramRemovedLatch = new CountDownLatch(1);
         metricRegistry.addListener(new MetricRegistryListener.Base() {
@@ -241,7 +241,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testAddListenerForMeter() throws Exception {
+    void testAddListenerForMeter() throws Exception {
         CountDownLatch meterAddedLatch = new CountDownLatch(1);
         CountDownLatch meterRemovedLatch = new CountDownLatch(1);
         metricRegistry.addListener(new MetricRegistryListener.Base() {
@@ -269,7 +269,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testAddListenerForTimer() throws Exception {
+    void testAddListenerForTimer() throws Exception {
         CountDownLatch timerAddedLatch = new CountDownLatch(1);
         CountDownLatch timerRemovedLatch = new CountDownLatch(1);
         metricRegistry.addListener(new MetricRegistryListener.Base() {
@@ -297,7 +297,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testRemoveListener() throws Exception {
+    void testRemoveListener() throws Exception {
         CountDownLatch gaugeAddedLatch = new CountDownLatch(1);
         MetricRegistryListener listener = new MetricRegistryListener.Base() {
             @Override
@@ -315,7 +315,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testGetNames() {
+    void testGetNames() {
         metricRegistry.counter("test-counter");
         metricRegistry.timer("test-timer");
         metricRegistry.timer("test-custom-timer");
@@ -326,7 +326,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testGetGauges() {
+    void testGetGauges() {
         metricRegistry.counter("test-counter");
         metricRegistry.timer("test-timer");
         metricRegistry.meter("test-meter");
@@ -349,7 +349,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testGetGaugesWithFilter() {
+    void testGetGaugesWithFilter() {
         metricRegistry.counter("test-counter");
         metricRegistry.timer("test-timer");
         metricRegistry.meter("test-meter");
@@ -372,7 +372,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testGetHistograms() {
+    void testGetHistograms() {
         metricRegistry.counter("test-counter");
         metricRegistry.timer("test-timer");
         metricRegistry.meter("test-meter");
@@ -385,7 +385,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testGetHistogramsWithFilter() {
+    void testGetHistogramsWithFilter() {
         metricRegistry.counter("sw-counter");
         metricRegistry.timer("sw-timer");
         metricRegistry.meter("sw-meter");
@@ -398,7 +398,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testGetCounters() {
+    void testGetCounters() {
         metricRegistry.histogram("test-histogram");
         metricRegistry.timer("test-timer");
         metricRegistry.meter("test-meter");
@@ -411,7 +411,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testGetCountersWithFilter() {
+    void testGetCountersWithFilter() {
         metricRegistry.histogram("test-histogram");
         metricRegistry.timer("test-timer");
         metricRegistry.meter("test-meter");
@@ -424,7 +424,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testGetMeters() {
+    void testGetMeters() {
         metricRegistry.register("test-gauge", (Gauge<Integer>) () -> 42);
         metricRegistry.histogram("test-histogram");
         metricRegistry.timer("test-timer");
@@ -437,7 +437,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testGetMetersWithFilter() {
+    void testGetMetersWithFilter() {
         metricRegistry.register("sw-gauge", (Gauge<Integer>) () -> 42);
         metricRegistry.histogram("sw-histogram");
         metricRegistry.timer("sw-timer");
@@ -450,7 +450,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testGetTimers() {
+    void testGetTimers() {
         metricRegistry.histogram("test-histogram");
         metricRegistry.meter("test-meter");
         metricRegistry.counter("test-counter");
@@ -462,7 +462,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testGetTimersWithFilter() {
+    void testGetTimersWithFilter() {
         metricRegistry.histogram("test-histogram-2");
         metricRegistry.meter("test-meter-2");
         metricRegistry.counter("test-counter-2");
@@ -474,7 +474,7 @@ public class MetricRegistryTest {
     }
 
     @Test
-    public void testGetMetrics() {
+    void testGetMetrics() {
         metricRegistry.register("test-text-gauge-2", new CachedGauge<String>(1, TimeUnit.MINUTES) {
             @Override
             protected String loadValue() {

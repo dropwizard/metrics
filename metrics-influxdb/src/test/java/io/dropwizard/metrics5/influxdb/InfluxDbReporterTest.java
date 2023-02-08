@@ -11,8 +11,9 @@ import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.Snapshot;
 import io.dropwizard.metrics5.Timer;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import org.mockito.InOrder;
 
 import java.io.IOException;
@@ -37,7 +38,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-public class InfluxDbReporterTest {
+class InfluxDbReporterTest {
     private static final MetricName GAUGE = MetricName.build("gauge");
     private static final MetricName METER = MetricName.build("meter");
     private static final MetricName COUNTER = MetricName.build("counter");
@@ -66,8 +67,8 @@ public class InfluxDbReporterTest {
             .disabledMetricAttributes(Collections.emptySet())
             .build(sender);
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeEach
+    void setUp() throws IOException {
         when(clock.getTime()).thenReturn(timestamp * 1000);
         send.clear();
         doAnswer(invocation -> send.add(invocation.getArgument(0).toString()))
@@ -75,7 +76,7 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void reportsStringGaugeValues() throws Exception {
+    void reportsStringGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge("value")),
                 map(),
                 map(),
@@ -93,7 +94,7 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void reportsByteGaugeValues() throws Exception {
+    void reportsByteGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge((byte) 1)),
                 map(),
                 map(),
@@ -111,7 +112,7 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void reportsShortGaugeValues() throws Exception {
+    void reportsShortGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge((short) 1)),
                 map(),
                 map(),
@@ -129,7 +130,7 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void reportsIntegerGaugeValues() throws Exception {
+    void reportsIntegerGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge(1)),
                 map(),
                 map(),
@@ -147,7 +148,7 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void reportsLongGaugeValues() throws Exception {
+    void reportsLongGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge(1L)),
                 map(),
                 map(),
@@ -165,7 +166,7 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void reportsFloatGaugeValues() throws Exception {
+    void reportsFloatGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge(1.5f)),
                 map(),
                 map(),
@@ -183,7 +184,7 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void reportsDoubleGaugeValues() throws Exception {
+    void reportsDoubleGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge(1.1)),
                 map(),
                 map(),
@@ -201,7 +202,7 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void reportsBooleanGaugeValues() throws Exception {
+    void reportsBooleanGaugeValues() throws Exception {
         reporter.report(map(GAUGE, gauge(true)),
                 map(),
                 map(),
@@ -231,7 +232,7 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void reportsCounters() throws Exception {
+    void reportsCounters() throws Exception {
         final Counter counter = mock(Counter.class);
         when(counter.getCount()).thenReturn(100L);
 
@@ -252,7 +253,7 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void reportsHistograms() throws Exception {
+    void reportsHistograms() throws Exception {
         final Histogram histogram = mock(Histogram.class);
         when(histogram.getCount()).thenReturn(1L);
         when(histogram.getSum()).thenReturn(12L);
@@ -289,7 +290,7 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void reportsMeters() throws Exception {
+    void reportsMeters() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
         when(meter.getSum()).thenReturn(6L);
@@ -315,7 +316,7 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void reportsMetersInMinutes() throws Exception {
+    void reportsMetersInMinutes() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
         when(meter.getSum()).thenReturn(6L);
@@ -341,7 +342,7 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void reportsTimers() throws Exception {
+    void reportsTimers() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
         when(timer.getSum()).thenReturn(6L);
@@ -384,7 +385,7 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void disconnectsIfSenderIsUnavailable() throws Exception {
+    void disconnectsIfSenderIsUnavailable() throws Exception {
         doThrow(new UnknownHostException("UNKNOWN-HOST")).when(sender).connect();
         reporter.report(map(GAUGE, gauge(1)),
                 map(),
@@ -401,14 +402,14 @@ public class InfluxDbReporterTest {
     }
 
     @Test
-    public void closesConnectionOnReporterStop() throws Exception {
+    void closesConnectionOnReporterStop() throws Exception {
         reporter.stop();
 
         verify(sender).close();
     }
 
     @Test
-    public void disabledMetricsAttribute() throws Exception {
+    void disabledMetricsAttribute() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
         when(meter.getSum()).thenReturn(6L);

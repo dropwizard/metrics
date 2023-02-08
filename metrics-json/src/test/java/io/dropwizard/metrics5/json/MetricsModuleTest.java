@@ -9,7 +9,7 @@ import io.dropwizard.metrics5.MetricFilter;
 import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.Snapshot;
 import io.dropwizard.metrics5.Timer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
@@ -17,12 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MetricsModuleTest {
+class MetricsModuleTest {
     private final ObjectMapper mapper = new ObjectMapper().registerModule(
             new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, false, MetricFilter.ALL));
 
     @Test
-    public void serializesGauges() throws Exception {
+    void serializesGauges() throws Exception {
         final Gauge<Integer> gauge = () -> 100;
 
         assertThat(mapper.writeValueAsString(gauge))
@@ -30,7 +30,7 @@ public class MetricsModuleTest {
     }
 
     @Test
-    public void serializesGaugesThatThrowExceptions() throws Exception {
+    void serializesGaugesThatThrowExceptions() throws Exception {
         final Gauge<Integer> gauge = () -> {
             throw new IllegalArgumentException("poops");
         };
@@ -40,7 +40,7 @@ public class MetricsModuleTest {
     }
 
     @Test
-    public void serializesCounters() throws Exception {
+    void serializesCounters() throws Exception {
         final Counter counter = mock(Counter.class);
         when(counter.getCount()).thenReturn(100L);
 
@@ -49,7 +49,7 @@ public class MetricsModuleTest {
     }
 
     @Test
-    public void serializesHistograms() throws Exception {
+    void serializesHistograms() throws Exception {
         final Histogram histogram = mock(Histogram.class);
         when(histogram.getCount()).thenReturn(1L);
 
@@ -102,7 +102,7 @@ public class MetricsModuleTest {
     }
 
     @Test
-    public void serializesMeters() throws Exception {
+    void serializesMeters() throws Exception {
         final Meter meter = mock(Meter.class);
         when(meter.getCount()).thenReturn(1L);
         when(meter.getMeanRate()).thenReturn(2.0);
@@ -121,7 +121,7 @@ public class MetricsModuleTest {
     }
 
     @Test
-    public void serializesTimers() throws Exception {
+    void serializesTimers() throws Exception {
         final Timer timer = mock(Timer.class);
         when(timer.getCount()).thenReturn(1L);
         when(timer.getMeanRate()).thenReturn(2.0);
@@ -195,7 +195,7 @@ public class MetricsModuleTest {
     }
 
     @Test
-    public void serializesMetricRegistries() throws Exception {
+    void serializesMetricRegistries() throws Exception {
         final MetricRegistry registry = new MetricRegistry();
 
         assertThat(mapper.writeValueAsString(registry))

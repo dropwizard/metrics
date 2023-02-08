@@ -1,26 +1,26 @@
 package com.codahale.metrics;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class ClockTest {
+class ClockTest {
 
     @Test
-    public void testDefaultClockCanBeUsed() {
+    void testDefaultClockCanBeUsed() {
         Clock clock = Clock.defaultClock();
         assertThat(clock.getTick()).isGreaterThan(0);
     }
 
     @Test
-    public void testUserTimeClockCanBeUsed() {
+    void testUserTimeClockCanBeUsed() {
         Clock clock = new Clock.UserTimeClock();
         assertThat(clock.getTick()).isGreaterThan(0);
     }
 
     @Test
-    public void testCustomTimeClockCanBeUsed() {
+    void testCustomTimeClockCanBeUsed() {
         Clock clock = new Clock() {
             @Override
             public long getTick() {

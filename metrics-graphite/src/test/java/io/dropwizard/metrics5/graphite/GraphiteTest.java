@@ -1,7 +1,7 @@
 package io.dropwizard.metrics5.graphite;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.net.SocketFactory;
 import java.io.ByteArrayOutputStream;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class GraphiteTest {
+class GraphiteTest {
     private final String host = "example.com";
     private final int port = 1234;
     private final SocketFactory socketFactory = mock(SocketFactory.class);
@@ -33,8 +33,8 @@ public class GraphiteTest {
     private final Socket socket = mock(Socket.class);
     private final ByteArrayOutputStream output = spy(ByteArrayOutputStream.class);
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         final AtomicBoolean connected = new AtomicBoolean(true);
         final AtomicBoolean closed = new AtomicBoolean(false);
 
@@ -61,7 +61,7 @@ public class GraphiteTest {
     }
 
     @Test
-    public void connectsToGraphiteWithInetSocketAddress() throws Exception {
+    void connectsToGraphiteWithInetSocketAddress() throws Exception {
         try (Graphite graphite = new Graphite(address, socketFactory)) {
             graphite.connect();
         }
@@ -69,7 +69,7 @@ public class GraphiteTest {
     }
 
     @Test
-    public void connectsToGraphiteWithHostAndPort() throws Exception {
+    void connectsToGraphiteWithHostAndPort() throws Exception {
         try (Graphite graphite = new Graphite(host, port, socketFactory)) {
             graphite.connect();
         }
@@ -77,14 +77,14 @@ public class GraphiteTest {
     }
 
     @Test
-    public void measuresFailures() throws IOException {
+    void measuresFailures() throws IOException {
         try (Graphite graphite = new Graphite(address, socketFactory)) {
             assertThat(graphite.getFailures()).isZero();
         }
     }
 
     @Test
-    public void disconnectsFromGraphite() throws Exception {
+    void disconnectsFromGraphite() throws Exception {
         try (Graphite graphite = new Graphite(address, socketFactory)) {
             graphite.connect();
         }
@@ -93,17 +93,17 @@ public class GraphiteTest {
     }
 
     @Test
-    public void doesNotAllowDoubleConnections() throws Exception {
+    void doesNotAllowDoubleConnections() throws Exception {
         try (Graphite graphite = new Graphite(address, socketFactory)) {
             assertThatNoException().isThrownBy(graphite::connect);
             assertThatThrownBy(graphite::connect)
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessage("Already connected");
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Already connected");
         }
     }
 
     @Test
-    public void writesValuesToGraphite() throws Exception {
+    void writesValuesToGraphite() throws Exception {
         try (Graphite graphite = new Graphite(address, socketFactory)) {
             graphite.connect();
             graphite.send("name", "value", 100);
@@ -112,7 +112,7 @@ public class GraphiteTest {
     }
 
     @Test
-    public void sanitizesNames() throws Exception {
+    void sanitizesNames() throws Exception {
         try (Graphite graphite = new Graphite(address, socketFactory)) {
             graphite.connect();
             graphite.send("name woo", "value", 100);
@@ -121,7 +121,7 @@ public class GraphiteTest {
     }
 
     @Test
-    public void sanitizesValues() throws Exception {
+    void sanitizesValues() throws Exception {
         try (Graphite graphite = new Graphite(address, socketFactory)) {
             graphite.connect();
             graphite.send("name", "value woo", 100);
@@ -130,14 +130,14 @@ public class GraphiteTest {
     }
 
     @Test
-    public void notifiesIfGraphiteIsUnavailable() throws IOException {
+    void notifiesIfGraphiteIsUnavailable() throws IOException {
         final String unavailableHost = "unknown-host-10el6m7yg56ge7dmcom";
         InetSocketAddress unavailableAddress = new InetSocketAddress(unavailableHost, 1234);
 
         try (Graphite unavailableGraphite = new Graphite(unavailableAddress, socketFactory)) {
             assertThatThrownBy(unavailableGraphite::connect)
-                    .isInstanceOf(UnknownHostException.class)
-                    .hasMessage(unavailableHost);
+                .isInstanceOf(UnknownHostException.class)
+                .hasMessage(unavailableHost);
         }
     }
 }

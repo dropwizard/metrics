@@ -9,9 +9,9 @@ import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.Snapshot;
 import io.dropwizard.metrics5.Timer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("rawtypes")
-public class JmxReporterTest {
+class JmxReporterTest {
     private final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
     private final String name = UUID.randomUUID().toString().replaceAll("[{\\-}]", "");
     private final MetricRegistry registry = new MetricRegistry();
@@ -57,8 +57,8 @@ public class JmxReporterTest {
     private final ObjectNameFactory mockObjectNameFactory = mock(ObjectNameFactory.class);
     private final ObjectNameFactory concreteObjectNameFactory = reporter.getObjectNameFactory();
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         when(gauge.getValue()).thenReturn(1);
 
         when(counter.getCount()).thenReturn(100L);
@@ -119,13 +119,13 @@ public class JmxReporterTest {
         reporter.start();
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         reporter.stop();
     }
 
     @Test
-    public void registersMBeansForMetricObjectsUsingProvidedObjectNameFactory() throws Exception {
+    void registersMBeansForMetricObjectsUsingProvidedObjectNameFactory() throws Exception {
         ObjectName n = new ObjectName(name + ":name=dummy");
         try {
             String widgetName = "something";
@@ -148,7 +148,7 @@ public class JmxReporterTest {
     }
 
     @Test
-    public void registersMBeansForGauges() throws Exception {
+    void registersMBeansForGauges() throws Exception {
         final AttributeList attributes = getAttributes("gauges", "gauge", "Value", "Number");
 
         assertThat(values(attributes))
@@ -156,7 +156,7 @@ public class JmxReporterTest {
     }
 
     @Test
-    public void registersMBeansForCounters() throws Exception {
+    void registersMBeansForCounters() throws Exception {
         final AttributeList attributes = getAttributes("counters", "test.counter", "Count");
 
         assertThat(values(attributes))
@@ -164,7 +164,7 @@ public class JmxReporterTest {
     }
 
     @Test
-    public void registersMBeansForHistograms() throws Exception {
+    void registersMBeansForHistograms() throws Exception {
         final AttributeList attributes = getAttributes("histograms", "test.histogram",
                 "Count",
                 "Sum",
@@ -197,7 +197,7 @@ public class JmxReporterTest {
     }
 
     @Test
-    public void registersMBeansForMeters() throws Exception {
+    void registersMBeansForMeters() throws Exception {
         final AttributeList attributes = getAttributes("meters", "test.meter",
                 "Count",
                 "Sum",
@@ -218,7 +218,7 @@ public class JmxReporterTest {
     }
 
     @Test
-    public void registersMBeansForTimers() throws Exception {
+    void registersMBeansForTimers() throws Exception {
         final AttributeList attributes = getAttributes("timers", "test.another.timer",
                 "Count",
                 "Sum",
@@ -261,7 +261,7 @@ public class JmxReporterTest {
     }
 
     @Test
-    public void cleansUpAfterItselfWhenStopped() throws Exception {
+    void cleansUpAfterItselfWhenStopped() throws Exception {
         reporter.stop();
 
         try {
@@ -273,7 +273,7 @@ public class JmxReporterTest {
     }
 
     @Test
-    public void objectNameModifyingMBeanServer() throws Exception {
+    void objectNameModifyingMBeanServer() throws Exception {
         MBeanServer mockedMBeanServer = mock(MBeanServer.class);
 
         // overwrite the objectName
@@ -298,7 +298,7 @@ public class JmxReporterTest {
     }
 
     @Test
-    public void testJmxMetricNameWithAsterisk() {
+    void testJmxMetricNameWithAsterisk() {
         MetricRegistry metricRegistry = new MetricRegistry();
         JmxReporter.forRegistry(metricRegistry).build().start();
         metricRegistry.counter("test*");

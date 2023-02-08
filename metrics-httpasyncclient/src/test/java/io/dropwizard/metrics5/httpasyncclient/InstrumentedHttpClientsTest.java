@@ -10,11 +10,11 @@ import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.nio.client.HttpAsyncClient;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -22,8 +22,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@RunWith(MockitoJUnitRunner.class)
-public class InstrumentedHttpClientsTest extends HttpClientTestBase {
+@ExtendWith(MockitoExtension.class)
+class InstrumentedHttpClientsTest extends HttpClientTestBase {
 
     private final MetricRegistry metricRegistry = new MetricRegistry();
 
@@ -35,21 +35,21 @@ public class InstrumentedHttpClientsTest extends HttpClientTestBase {
     private MetricRegistryListener registryListener;
 
     @Test
-    public void registersExpectedMetricsGivenNameStrategy() throws Exception {
+    void registersExpectedMetricsGivenNameStrategy() throws Exception {
         HttpHost host = startServerWithGlobalRequestHandler(STATUS_OK);
         final HttpGet get = new HttpGet("/q=anything");
         final MetricName metricName = MetricName.build("some.made.up.metric.name");
 
         when(metricNameStrategy.getNameFor(any(), any(HttpRequest.class)))
-                .thenReturn(metricName);
+        .thenReturn(metricName);
 
         asyncHttpClient.execute(host, get, null).get();
 
         verify(registryListener).onTimerAdded(eq(metricName), any(Timer.class));
     }
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         CloseableHttpAsyncClient chac = new InstrumentedNHttpClientBuilder(metricRegistry, metricNameStrategy).build();
         chac.start();
         asyncHttpClient = chac;

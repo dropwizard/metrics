@@ -6,7 +6,7 @@ import io.dropwizard.metrics5.jersey2.resources.InstrumentedResourceMeteredPerCl
 import io.dropwizard.metrics5.jersey2.resources.InstrumentedSubResourceMeteredPerClass;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.core.Application;
 import java.util.logging.Level;
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests registering {@link InstrumentedResourceMethodApplicationListener} as a singleton
  * in a Jersey {@link ResourceConfig}
  */
-public class SingletonMetricsMeteredPerClassJerseyTest extends JerseyTest {
+class SingletonMetricsMeteredPerClassJerseyTest extends JerseyTest {
     static {
         Logger.getLogger("org.glassfish.jersey").setLevel(Level.OFF);
     }
@@ -38,11 +38,11 @@ public class SingletonMetricsMeteredPerClassJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void meteredPerClassMethodsAreMetered() {
+    void meteredPerClassMethodsAreMetered() {
         assertThat(target("meteredPerClass")
-                .request()
-                .get(String.class))
-                .isEqualTo("yay");
+        .request()
+        .get(String.class))
+        .isEqualTo("yay");
 
         final Meter meter = registry.meter(MetricRegistry.name(InstrumentedResourceMeteredPerClass.class, "meteredPerClass"));
 
@@ -50,11 +50,11 @@ public class SingletonMetricsMeteredPerClassJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void subresourcesFromLocatorsRegisterMetrics() {
+    void subresourcesFromLocatorsRegisterMetrics() {
         assertThat(target("subresource/meteredPerClass")
-                .request()
-                .get(String.class))
-                .isEqualTo("yay");
+        .request()
+        .get(String.class))
+        .isEqualTo("yay");
 
         final Meter meter = registry.meter(MetricRegistry.name(InstrumentedSubResourceMeteredPerClass.class, "meteredPerClass"));
         assertThat(meter.getCount()).isEqualTo(1);

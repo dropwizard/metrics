@@ -1,14 +1,14 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
 
-public class ClockTest {
+class ClockTest {
 
     @Test
-    public void userTimeClock() {
+    void userTimeClock() {
         final Clock.UserTimeClock clock = new Clock.UserTimeClock();
 
         assertThat((double) clock.getTime())
@@ -21,7 +21,7 @@ public class ClockTest {
     }
 
     @Test
-    public void defaultsToUserTime() {
+    void defaultsToUserTime() {
         assertThat(Clock.defaultClock())
                 .isInstanceOf(Clock.UserTimeClock.class);
     }

@@ -1,21 +1,21 @@
 package com.codahale.metrics;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
 @SuppressWarnings("deprecation")
-public class SharedMetricRegistriesTest {
+class SharedMetricRegistriesTest {
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         SharedMetricRegistries.clear();
     }
 
     @Test
-    public void testGetOrCreateMetricRegistry() {
+    void testGetOrCreateMetricRegistry() {
         SharedMetricRegistries.getOrCreate("get-or-create").counter("test-counter");
 
         assertThat(SharedMetricRegistries.getOrCreate("get-or-create").getCounters())
@@ -23,7 +23,7 @@ public class SharedMetricRegistriesTest {
     }
 
     @Test
-    public void testAddMetricRegistry() {
+    void testAddMetricRegistry() {
         MetricRegistry metricRegistry = new MetricRegistry();
         metricRegistry.histogram("test-histogram");
         SharedMetricRegistries.add("add", metricRegistry);
@@ -33,7 +33,7 @@ public class SharedMetricRegistriesTest {
     }
 
     @Test
-    public void testNames() {
+    void testNames() {
         SharedMetricRegistries.add("registry-1", new MetricRegistry());
         SharedMetricRegistries.add("registry-2", new MetricRegistry());
         SharedMetricRegistries.add("registry-3", new MetricRegistry());
@@ -42,12 +42,12 @@ public class SharedMetricRegistriesTest {
     }
 
     @Test
-    public void testTryGetDefaultRegistry() {
+    void testTryGetDefaultRegistry() {
         assertThat(SharedMetricRegistries.tryGetDefault()).isNull();
     }
 
     @Test
-    public void testGetDefaultRegistry() {
+    void testGetDefaultRegistry() {
         assertThatIllegalStateException().isThrownBy(SharedMetricRegistries::getDefault);
     }
 }

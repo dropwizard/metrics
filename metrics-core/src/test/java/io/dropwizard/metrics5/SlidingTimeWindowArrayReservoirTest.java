@@ -5,7 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -13,10 +13,10 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 
 @SuppressWarnings("Duplicates")
-public class SlidingTimeWindowArrayReservoirTest {
+class SlidingTimeWindowArrayReservoirTest {
 
     @Test
-    public void storesMeasurementsWithDuplicateTicks() {
+    void storesMeasurementsWithDuplicateTicks() {
         final Clock clock = mock(Clock.class);
         final SlidingTimeWindowArrayReservoir reservoir = new SlidingTimeWindowArrayReservoir(10, NANOSECONDS, clock);
 
@@ -30,7 +30,7 @@ public class SlidingTimeWindowArrayReservoirTest {
     }
 
     @Test
-    public void boundsMeasurementsToATimeWindow() {
+    void boundsMeasurementsToATimeWindow() {
         final Clock clock = mock(Clock.class);
         final SlidingTimeWindowArrayReservoir reservoir = new SlidingTimeWindowArrayReservoir(10, NANOSECONDS, clock);
 
@@ -54,7 +54,7 @@ public class SlidingTimeWindowArrayReservoirTest {
     }
 
     @Test
-    public void comparisonResultsTest() {
+    void comparisonResultsTest() {
         int cycles = 1000000;
         long time = (Long.MAX_VALUE / 256) - (long) (cycles * 0.5);
         ManualClock manualClock = new ManualClock();
@@ -81,7 +81,7 @@ public class SlidingTimeWindowArrayReservoirTest {
     }
 
     @Test
-    public void testGetTickOverflow() {
+    void testGetTickOverflow() {
         final Random random = new Random(0);
         final int window = 128;
         AtomicLong counter = new AtomicLong(0L);

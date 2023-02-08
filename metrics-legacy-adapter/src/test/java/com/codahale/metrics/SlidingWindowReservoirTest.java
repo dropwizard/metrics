@@ -1,15 +1,15 @@
 package com.codahale.metrics;
 
 import org.assertj.core.data.Offset;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("deprecation")
-public class SlidingWindowReservoirTest {
+class SlidingWindowReservoirTest {
 
     @Test
-    public void testCreateWithBigWindow() {
+    void testCreateWithBigWindow() {
         SlidingWindowReservoir reservoir = new SlidingWindowReservoir(100);
         reservoir.update(100);
         reservoir.update(220);
@@ -20,7 +20,7 @@ public class SlidingWindowReservoirTest {
     }
 
     @Test
-    public void testCreateWithLowWindow() {
+    void testCreateWithLowWindow() {
         SlidingWindowReservoir reservoir = new SlidingWindowReservoir(3);
         reservoir.update(500);
         reservoir.update(220);

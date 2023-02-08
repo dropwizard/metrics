@@ -1,20 +1,20 @@
 package io.dropwizard.metrics5;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CounterTest {
+class CounterTest {
     private final Counter counter = new Counter();
 
     @Test
-    public void startsAtZero() {
+    void startsAtZero() {
         assertThat(counter.getCount())
                 .isZero();
     }
 
     @Test
-    public void incrementsByOne() {
+    void incrementsByOne() {
         counter.inc();
 
         assertThat(counter.getCount())
@@ -22,7 +22,7 @@ public class CounterTest {
     }
 
     @Test
-    public void incrementsByAnArbitraryDelta() {
+    void incrementsByAnArbitraryDelta() {
         counter.inc(12);
 
         assertThat(counter.getCount())
@@ -30,7 +30,7 @@ public class CounterTest {
     }
 
     @Test
-    public void decrementsByOne() {
+    void decrementsByOne() {
         counter.dec();
 
         assertThat(counter.getCount())
@@ -38,7 +38,7 @@ public class CounterTest {
     }
 
     @Test
-    public void decrementsByAnArbitraryDelta() {
+    void decrementsByAnArbitraryDelta() {
         counter.dec(12);
 
         assertThat(counter.getCount())
@@ -46,7 +46,7 @@ public class CounterTest {
     }
 
     @Test
-    public void incrementByNegativeDelta() {
+    void incrementByNegativeDelta() {
         counter.inc(-12);
 
         assertThat(counter.getCount())
@@ -54,7 +54,7 @@ public class CounterTest {
     }
 
     @Test
-    public void decrementByNegativeDelta() {
+    void decrementByNegativeDelta() {
         counter.dec(-12);
 
         assertThat(counter.getCount())
