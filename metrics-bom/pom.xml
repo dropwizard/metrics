@@ -107,6 +107,11 @@
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-jersey31</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-jetty9</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -143,6 +148,16 @@
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-logback</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-logback13</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-logback14</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

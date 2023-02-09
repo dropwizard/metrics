@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
+import static com.codahale.metrics.annotation.ResponseMeteredLevel.ALL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class InstrumentedHandlerTest {
@@ -29,7 +30,7 @@ public class InstrumentedHandlerTest {
     private final MetricRegistry registry = new MetricRegistry();
     private final Server server = new Server();
     private final ServerConnector connector = new ServerConnector(server);
-    private final InstrumentedHandler handler = new InstrumentedHandler(registry);
+    private final InstrumentedHandler handler = new InstrumentedHandler(registry, null, ALL);
 
     @Before
     public void setUp() throws Exception {
@@ -66,6 +67,7 @@ public class InstrumentedHandlerTest {
                 MetricRegistry.name(TestHandler.class, "handler.2xx-responses"),
                 MetricRegistry.name(TestHandler.class, "handler.3xx-responses"),
                 MetricRegistry.name(TestHandler.class, "handler.4xx-responses"),
+                MetricRegistry.name(TestHandler.class, "handler.404-responses"),
                 MetricRegistry.name(TestHandler.class, "handler.5xx-responses"),
                 MetricRegistry.name(TestHandler.class, "handler.percent-4xx-1m"),
                 MetricRegistry.name(TestHandler.class, "handler.percent-4xx-5m"),
@@ -124,6 +126,8 @@ public class InstrumentedHandlerTest {
     private void assertResponseTimesValid() {
         assertThat(registry.getMeters().get(metricName() + ".2xx-responses")
             .getCount()).isGreaterThan(0L);
+        assertThat(registry.getMeters().get(metricName() + ".200-responses")
+                .getCount()).isGreaterThan(0L);
 
 
         assertThat(registry.getTimers().get(metricName() + ".get-requests")

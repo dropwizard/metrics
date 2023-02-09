@@ -15,7 +15,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.jdbi3</javaModuleName>
-        <jdbi3.version>3.36.0</jdbi3.version>
+        <jdbi3.version>3.37.1</jdbi3.version>
     </properties>
 
     <dependencyManagement>
@@ -26,6 +26,11 @@
                 <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
