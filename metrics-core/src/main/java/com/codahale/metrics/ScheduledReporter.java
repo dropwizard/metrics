@@ -167,9 +167,20 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
             throw new IllegalArgumentException("Reporter already started");
         }
 
-        this.scheduledFuture = getScheduledFuture(initialDelay, period, unit, runnable, executor);
+        this.scheduledFuture = getScheduledFuture(initialDelay, period, unit, runnable);
     }
 
+
+    /**
+     * Schedule the task, and return a future.
+     *
+     * @deprecated Use {@link #getScheduledFuture(long, long, TimeUnit, Runnable, ScheduledExecutorService)} instead.
+     */
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    @Deprecated
+    protected ScheduledFuture<?> getScheduledFuture(long initialDelay, long period, TimeUnit unit, Runnable runnable) {
+        return getScheduledFuture(initialDelay, period, unit, runnable, this.executor);
+    }
 
     /**
      * Schedule the task, and return a future.
