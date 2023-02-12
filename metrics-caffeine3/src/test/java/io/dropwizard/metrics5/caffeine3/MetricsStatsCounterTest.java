@@ -18,6 +18,7 @@ package io.dropwizard.metrics5.caffeine3;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import io.dropwizard.metrics5.MetricRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ final class MetricsStatsCounterTest {
 
     // Perform application work
     for (int i = 0; i < 4; i++) {
-      cache.get(1);
+      Integer unused = cache.get(1);
     }
 
     assertEquals(3L, cache.stats().hitCount());
