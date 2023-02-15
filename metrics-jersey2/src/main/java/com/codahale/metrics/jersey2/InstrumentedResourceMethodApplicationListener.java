@@ -308,7 +308,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                     ContainerResponse containerResponse = event.getContainerResponse();
                     if (containerResponse == null && event.getException() != null) {
                         metric.mark(500);
-                    } else {
+                    } else if (containerResponse != null) {
                         metric.mark(containerResponse.getStatus());
                     }
                 }
