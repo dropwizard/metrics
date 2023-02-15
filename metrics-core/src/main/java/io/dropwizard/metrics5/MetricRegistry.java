@@ -88,13 +88,6 @@ public class MetricRegistry implements MetricSet {
     }
 
     /**
-     * See {@link #register(MetricName, Metric)}
-     */
-    public <T extends Metric> T register(String name, T metric) throws IllegalArgumentException {
-        return register(MetricName.build(name), metric);
-    }
-
-    /**
      * Given a {@link Metric}, registers it under the given name.
      *
      * @param name   the name of the metric
@@ -103,7 +96,6 @@ public class MetricRegistry implements MetricSet {
      * @return {@code metric}
      * @throws IllegalArgumentException if the name is already registered or metric variable is null
      */
-    @SuppressWarnings("unchecked")
     public <T extends Metric> T register(MetricName name, T metric) throws IllegalArgumentException {
         if (metric == null) {
             throw new NullPointerException("metric == null");

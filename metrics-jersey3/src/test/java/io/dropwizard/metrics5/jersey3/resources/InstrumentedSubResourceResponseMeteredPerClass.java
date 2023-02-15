@@ -7,7 +7,9 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@ResponseMetered
+import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.ALL;
+
+@ResponseMetered(level = ALL)
 @Produces(MediaType.TEXT_PLAIN)
 public class InstrumentedSubResourceResponseMeteredPerClass {
     @GET

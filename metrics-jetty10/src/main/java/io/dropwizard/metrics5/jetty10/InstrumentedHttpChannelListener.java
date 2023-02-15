@@ -6,6 +6,7 @@ import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.RatioGauge;
 import io.dropwizard.metrics5.Timer;
+import io.dropwizard.metrics5.annotation.ResponseMeteredLevel;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.server.AsyncContextState;
 import org.eclipse.jetty.server.HttpChannel.Listener;
@@ -18,7 +19,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
+import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.ALL;
+import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.COARSE;
+import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.DETAILED;
 
 /**
  * A Jetty {@link org.eclipse.jetty.server.HttpChannel.Listener} implementation which records various metrics about
@@ -30,6 +42,8 @@ import java.util.concurrent.TimeUnit;
 public class InstrumentedHttpChannelListener
         implements Listener {
     private static final String START_ATTR = InstrumentedHttpChannelListener.class.getName() + ".start";
+    private static final Set<ResponseMeteredLevel> COARSE_METER_LEVELS = EnumSet.of(COARSE, ALL);
+    private static final Set<ResponseMeteredLevel> DETAILED_METER_LEVELS = EnumSet.of(DETAILED, ALL);
 
     private final MetricRegistry metricRegistry;
 
@@ -54,8 +68,10 @@ public class InstrumentedHttpChannelListener
     // the number of requests that expired while suspended
     private final Meter asyncTimeouts;
 
-    private final Meter[] responses;
-
+    private final ResponseMeteredLevel responseMeteredLevel;
+    private final List<Meter> responses;
+    private final Map<Integer, Meter> responseCodeMeters;
+    private final MetricName prefix;
     private final Timer getRequests;
     private final Timer postRequests;
     private final Timer headRequests;
@@ -75,7 +91,7 @@ public class InstrumentedHttpChannelListener
      * @param registry the registry for the metrics
      */
     public InstrumentedHttpChannelListener(MetricRegistry registry) {
-        this(registry, null);
+        this(registry, null, COARSE);
     }
 
     /**
@@ -85,9 +101,20 @@ public class InstrumentedHttpChannelListener
      * @param pref     the prefix to use for the metrics names
      */
     public InstrumentedHttpChannelListener(MetricRegistry registry, MetricName pref) {
+        this(registry, pref, COARSE);
+    }
+
+    /**
+     * Create a new instrumented handler using a given metrics registry.
+     *
+     * @param registry the registry for the metrics
+     * @param pref     the prefix to use for the metrics names
+     * @param responseMeteredLevel the level to determine individual/aggregate response codes that are instrumented
+     */
+    public InstrumentedHttpChannelListener(MetricRegistry registry, MetricName pref, ResponseMeteredLevel responseMeteredLevel) {
         this.metricRegistry = registry;
 
-        MetricName prefix = (pref == null) ? MetricName.build(getClass().getName()) : pref;
+        this.prefix = (pref == null) ? MetricName.build(getClass().getName()) : pref;
 
         this.requests = metricRegistry.timer(prefix.resolve("requests"));
         this.dispatches = metricRegistry.timer(prefix.resolve("dispatches"));
@@ -99,13 +126,16 @@ public class InstrumentedHttpChannelListener
         this.asyncDispatches = metricRegistry.meter(prefix.resolve("async-dispatches"));
         this.asyncTimeouts = metricRegistry.meter(prefix.resolve("async-timeouts"));
 
-        this.responses = new Meter[]{
-                metricRegistry.meter(prefix.resolve("1xx-responses")), // 1xx
-                metricRegistry.meter(prefix.resolve("2xx-responses")), // 2xx
-                metricRegistry.meter(prefix.resolve("3xx-responses")), // 3xx
-                metricRegistry.meter(prefix.resolve("4xx-responses")), // 4xx
-                metricRegistry.meter(prefix.resolve("5xx-responses"))  // 5xx
-        };
+        this.responseMeteredLevel = responseMeteredLevel;
+        this.responseCodeMeters = DETAILED_METER_LEVELS.contains(responseMeteredLevel) ? new ConcurrentHashMap<>() : Collections.emptyMap();
+        this.responses = COARSE_METER_LEVELS.contains(responseMeteredLevel) ?
+                Collections.unmodifiableList(Arrays.asList(
+                        registry.meter(prefix.resolve("1xx-responses")), // 1xx
+                        registry.meter(prefix.resolve("2xx-responses")), // 2xx
+                        registry.meter(prefix.resolve("3xx-responses")), // 3xx
+                        registry.meter(prefix.resolve("4xx-responses")), // 4xx
+                        registry.meter(prefix.resolve("5xx-responses"))  // 5xx
+                )) : Collections.emptyList();
 
         this.getRequests = metricRegistry.timer(prefix.resolve("get-requests"));
         this.postRequests = metricRegistry.timer(prefix.resolve("post-requests"));
@@ -121,7 +151,7 @@ public class InstrumentedHttpChannelListener
         metricRegistry.register(prefix.resolve("percent-4xx-1m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
-                return Ratio.of(responses[3].getOneMinuteRate(),
+                return Ratio.of(responses.get(3).getOneMinuteRate(),
                         requests.getOneMinuteRate());
             }
         });
@@ -129,7 +159,7 @@ public class InstrumentedHttpChannelListener
         metricRegistry.register(prefix.resolve("percent-4xx-5m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
-                return Ratio.of(responses[3].getFiveMinuteRate(),
+                return Ratio.of(responses.get(3).getFiveMinuteRate(),
                         requests.getFiveMinuteRate());
             }
         });
@@ -137,7 +167,7 @@ public class InstrumentedHttpChannelListener
         metricRegistry.register(prefix.resolve("percent-4xx-15m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
-                return Ratio.of(responses[3].getFifteenMinuteRate(),
+                return Ratio.of(responses.get(3).getFifteenMinuteRate(),
                         requests.getFifteenMinuteRate());
             }
         });
@@ -145,7 +175,7 @@ public class InstrumentedHttpChannelListener
         metricRegistry.register(prefix.resolve("percent-5xx-1m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
-                return Ratio.of(responses[4].getOneMinuteRate(),
+                return Ratio.of(responses.get(4).getOneMinuteRate(),
                         requests.getOneMinuteRate());
             }
         });
@@ -153,7 +183,7 @@ public class InstrumentedHttpChannelListener
         metricRegistry.register(prefix.resolve("percent-5xx-5m"), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
-                return Ratio.of(responses[4].getFiveMinuteRate(),
+                return Ratio.of(responses.get(4).getFiveMinuteRate(),
                         requests.getFiveMinuteRate());
             }
         });
@@ -161,7 +191,7 @@ public class InstrumentedHttpChannelListener
         metricRegistry.register(prefix.resolve("percent-5xx-15m"), new RatioGauge() {
             @Override
             public RatioGauge.Ratio getRatio() {
-                return Ratio.of(responses[4].getFifteenMinuteRate(),
+                return Ratio.of(responses.get(4).getFifteenMinuteRate(),
                         requests.getFifteenMinuteRate());
             }
         });
@@ -283,19 +313,34 @@ public class InstrumentedHttpChannelListener
     }
 
     private void updateResponses(HttpServletRequest request, HttpServletResponse response, long start, boolean isHandled) {
-        final int responseStatus;
         if (isHandled) {
-            responseStatus = response.getStatus() / 100;
+            mark(response.getStatus());
         } else {
-            responseStatus = 4; // will end up with a 404 response sent by HttpChannel.handle
-        }
-        if (responseStatus >= 1 && responseStatus <= 5) {
-            responses[responseStatus - 1].mark();
+            mark(404); // will end up with a 404 response sent by HttpChannel.handle
         }
         activeRequests.dec();
         final long elapsedTime = System.currentTimeMillis() - start;
         requests.update(elapsedTime, TimeUnit.MILLISECONDS);
         requestTimer(request.getMethod()).update(elapsedTime, TimeUnit.MILLISECONDS);
+    }
+
+    private void mark(int statusCode) {
+        if (DETAILED_METER_LEVELS.contains(responseMeteredLevel)) {
+            getResponseCodeMeter(statusCode).mark();
+        }
+
+        if (COARSE_METER_LEVELS.contains(responseMeteredLevel)) {
+            final int responseStatus = statusCode / 100;
+            if (responseStatus >= 1 && responseStatus <= 5) {
+                responses.get(responseStatus - 1).mark();
+            }
+        }
+    }
+
+    private Meter getResponseCodeMeter(int statusCode) {
+        return responseCodeMeters
+                .computeIfAbsent(statusCode, sc -> metricRegistry
+                        .meter(prefix.resolve(String.format("%d-responses", sc))));
     }
 
     private Timer requestTimer(String method) {

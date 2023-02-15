@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * An example of exporting stats to Dropwizard Metrics (http://metrics.dropwizard.io).
+ * An example of exporting stats to  <a href="https://metrics.dropwizard.io">Dropwizard Metrics</a>.
  *
  * @author ben.manes@gmail.com (Ben Manes)
  * @author John Karp

@@ -31,7 +31,7 @@ class JCacheGaugeSetTest {
         myOtherCache = cacheManager.getCache("myOtherCache");
 
         registry = new MetricRegistry();
-        registry.register("jcache.statistics", new JCacheGaugeSet());
+        registry.register(MetricName.build("jcache.statistics"), new JCacheGaugeSet());
     }
 
     @Test

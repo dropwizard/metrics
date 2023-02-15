@@ -50,13 +50,12 @@ class ScheduledReporterTest {
     private final ScheduledReporter[] reporters = new ScheduledReporter[]{reporter, reporterWithCustomExecutor, reporterWithExternallyManagedExecutor};
 
     @BeforeEach
-    @SuppressWarnings("unchecked")
     void setUp() throws Exception {
-        registry.register("gauge", gauge);
-        registry.register("counter", counter);
-        registry.register("histogram", histogram);
-        registry.register("meter", meter);
-        registry.register("timer", timer);
+        registry.register(MetricRegistry.name("gauge"), gauge);
+        registry.register(MetricRegistry.name("counter"), counter);
+        registry.register(MetricRegistry.name("histogram"), histogram);
+        registry.register(MetricRegistry.name("meter"), meter);
+        registry.register(MetricRegistry.name("timer"), timer);
     }
 
     @AfterEach

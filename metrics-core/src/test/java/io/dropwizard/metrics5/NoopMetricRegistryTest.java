@@ -260,7 +260,7 @@ class NoopMetricRegistryTest {
     void aRemovedListenerDoesNotReceiveUpdates() {
         registry.register(MetricName.build("gauge"), gauge);
         registry.removeListener(listener);
-        registry.register("gauge2", gauge);
+        registry.register(MetricName.build("gauge2"), gauge);
 
         verify(listener, never()).onGaugeAdded(MetricName.build("gauge2"), gauge);
     }
@@ -334,7 +334,7 @@ class NoopMetricRegistryTest {
             return m;
         };
 
-        registry.register("my", metrics);
+        registry.register(MetricName.build("my"), metrics);
 
         assertThat(registry.getNames()).isEmpty();
     }
@@ -354,7 +354,7 @@ class NoopMetricRegistryTest {
             return m;
         };
 
-        registry.register("my", outer);
+        registry.register(MetricName.build("my"), outer);
 
         assertThat(registry.getNames()).isEmpty();
     }
@@ -363,7 +363,7 @@ class NoopMetricRegistryTest {
     void doesNotRegisterMetricsFromAnotherRegistry() {
         MetricRegistry other = new MetricRegistry();
         other.register(MetricName.build("gauge"), gauge);
-        registry.register("nested", other);
+        registry.register(MetricName.build("nested"), other);
         assertThat(registry.getNames()).isEmpty();
     }
 
@@ -416,7 +416,7 @@ class NoopMetricRegistryTest {
         MetricRegistry deepChild = new MetricRegistry();
 
         deepChild.counter(MetricName.build("test-1"));
-        child.register("deep-child", deepChild);
+        child.register(MetricName.build("deep-child"), deepChild);
         deepChild.counter(MetricName.build("test-2"));
 
         child.counter(MetricName.build("test-3"));
@@ -470,7 +470,7 @@ class NoopMetricRegistryTest {
         MetricRegistry deepChild = new MetricRegistry();
 
         deepChild.counter(MetricName.build("test-1"));
-        child.register("deep-child", deepChild);
+        child.register(MetricName.build("deep-child"), deepChild);
         deepChild.counter(MetricName.build("test-2"));
 
         child.counter(MetricName.build("test-3"));
@@ -491,7 +491,7 @@ class NoopMetricRegistryTest {
     void registerNullMetric() {
         MetricRegistry registry = new NoopMetricRegistry();
         assertThatNullPointerException()
-                .isThrownBy(() -> registry.register("any_name", null))
+                .isThrownBy(() -> registry.register(MetricName.build("any_name"), null))
                 .withMessage("metric == null");
     }
 }

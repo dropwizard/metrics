@@ -8,7 +8,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@ResponseMetered
+import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.ALL;
+
+@ResponseMetered(level = ALL)
 @Produces(MediaType.TEXT_PLAIN)
 public class InstrumentedSubResourceResponseMeteredPerClass {
     @GET

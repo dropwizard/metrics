@@ -75,13 +75,13 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
 
         final MetricName prefix = getMetricPrefix();
 
-        metricRegistry.register(prefix.resolve("utilization"), new RatioGauge() {
+        metricRegistry.register(prefix.resolve(NAME_UTILIZATION), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(getThreads() - getIdleThreads(), getThreads());
             }
         });
-        metricRegistry.register(prefix.resolve("utilization-max"), new RatioGauge() {
+        metricRegistry.register(prefix.resolve(NAME_UTILIZATION_MAX), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
                 return Ratio.of(getThreads() - getIdleThreads(), getMaxThreads());

@@ -97,36 +97,86 @@ class SingletonMetricsJerseyTest extends JerseyTest {
     @Test
     void responseMeteredMethodsAreMetered() {
         final Meter meter2xx = registry.meter(name(InstrumentedResource.class,
-        "response2xxMetered",
-        "2xx-responses"));
+                "response2xxMetered",
+                "2xx-responses"));
         final Meter meter4xx = registry.meter(name(InstrumentedResource.class,
-        "response4xxMetered",
-        "4xx-responses"));
+                "response4xxMetered",
+                "4xx-responses"));
         final Meter meter5xx = registry.meter(name(InstrumentedResource.class,
-        "response5xxMetered",
-        "5xx-responses"));
+                "response5xxMetered",
+                "5xx-responses"));
 
         assertThat(meter2xx.getCount()).isZero();
         assertThat(target("response-2xx-metered")
-        .request()
-        .get().getStatus())
-        .isEqualTo(200);
+                .request()
+                .get().getStatus())
+                .isEqualTo(200);
 
         assertThat(meter4xx.getCount()).isZero();
         assertThat(target("response-4xx-metered")
-        .request()
-        .get().getStatus())
-        .isEqualTo(400);
+                .request()
+                .get().getStatus())
+                .isEqualTo(400);
 
         assertThat(meter5xx.getCount()).isZero();
         assertThat(target("response-5xx-metered")
-        .request()
-        .get().getStatus())
-        .isEqualTo(500);
+                .request()
+                .get().getStatus())
+                .isEqualTo(500);
 
         assertThat(meter2xx.getCount()).isEqualTo(1);
         assertThat(meter4xx.getCount()).isEqualTo(1);
         assertThat(meter5xx.getCount()).isEqualTo(1);
+    }
+
+    @Test
+    void responseMeteredMethodsAreMeteredWithDetailedLevel() {
+        final Meter meter2xx = registry.meter(name(InstrumentedResource.class,
+                "responseMeteredDetailed",
+                "2xx-responses"));
+        final Meter meter200 = registry.meter(name(InstrumentedResource.class,
+                "responseMeteredDetailed",
+                "200-responses"));
+        final Meter meter201 = registry.meter(name(InstrumentedResource.class,
+                "responseMeteredDetailed",
+                "201-responses"));
+
+        assertThat(meter2xx.getCount()).isZero();
+        assertThat(meter200.getCount()).isZero();
+        assertThat(meter201.getCount()).isZero();
+        assertThat(target("response-metered-detailed")
+                .request()
+                .get().getStatus())
+                .isEqualTo(200);
+        assertThat(target("response-metered-detailed")
+                .queryParam("status_code", 201)
+                .request()
+                .get().getStatus())
+                .isEqualTo(201);
+
+        assertThat(meter2xx.getCount()).isZero();
+        assertThat(meter200.getCount()).isOne();
+        assertThat(meter201.getCount()).isOne();
+    }
+
+    @Test
+    public void responseMeteredMethodsAreMeteredWithAllLevel() {
+        final Meter meter2xx = registry.meter(name(InstrumentedResource.class,
+                "responseMeteredAll",
+                "2xx-responses"));
+        final Meter meter200 = registry.meter(name(InstrumentedResource.class,
+                "responseMeteredAll",
+                "200-responses"));
+
+        assertThat(meter2xx.getCount()).isZero();
+        assertThat(meter200.getCount()).isZero();
+        assertThat(target("response-metered-all")
+                .request()
+                .get().getStatus())
+                .isEqualTo(200);
+
+        assertThat(meter2xx.getCount()).isOne();
+        assertThat(meter200.getCount()).isOne();
     }
 
     @Test
@@ -151,6 +201,5 @@ class SingletonMetricsJerseyTest extends JerseyTest {
 
         final Timer timer = registry.timer(name(InstrumentedSubResource.class, "timed"));
         assertThat(timer.getCount()).isEqualTo(1);
-
     }
 }

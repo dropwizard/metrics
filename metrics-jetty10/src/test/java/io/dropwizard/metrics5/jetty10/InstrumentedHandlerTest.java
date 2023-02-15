@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
+import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.ALL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class InstrumentedHandlerTest {
@@ -30,7 +31,7 @@ class InstrumentedHandlerTest {
     private final MetricRegistry registry = new MetricRegistry();
     private final Server server = new Server();
     private final ServerConnector connector = new ServerConnector(server);
-    private final InstrumentedHandler handler = new InstrumentedHandler(registry);
+    private final InstrumentedHandler handler = new InstrumentedHandler(registry, null, ALL);
 
     @BeforeEach
     void setUp() throws Exception {
@@ -67,6 +68,7 @@ class InstrumentedHandlerTest {
                         MetricRegistry.name(TestHandler.class, "handler.2xx-responses"),
                         MetricRegistry.name(TestHandler.class, "handler.3xx-responses"),
                         MetricRegistry.name(TestHandler.class, "handler.4xx-responses"),
+                        MetricRegistry.name(TestHandler.class, "handler.404-responses"),
                         MetricRegistry.name(TestHandler.class, "handler.5xx-responses"),
                         MetricRegistry.name(TestHandler.class, "handler.percent-4xx-1m"),
                         MetricRegistry.name(TestHandler.class, "handler.percent-4xx-5m"),
@@ -123,7 +125,7 @@ class InstrumentedHandlerTest {
     }
 
     private void assertResponseTimesValid() {
-        assertThat(registry.getMeters().get(metricName().resolve("2xx-responses"))
+        assertThat(registry.getMeters().get(metricName().resolve("200-responses"))
                 .getCount()).isGreaterThan(0L);
 
 

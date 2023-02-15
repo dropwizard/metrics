@@ -4,6 +4,7 @@ import io.dropwizard.metrics5.Clock;
 import io.dropwizard.metrics5.ExponentiallyDecayingReservoir;
 import io.dropwizard.metrics5.Gauge;
 import io.dropwizard.metrics5.Meter;
+import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.Timer;
 import org.eclipse.jetty.http.HttpHeader;
@@ -44,11 +45,11 @@ class MetricsServletTest extends AbstractServletTest {
         // will call getTick again several times and always get the same value (the last specified here)
         when(clock.getTick()).thenReturn(100L, 100L, 200L, 300L, 300L, 400L);
 
-        registry.register("g1", (Gauge<Long>) () -> 100L);
+        registry.register(MetricName.build("g1"), (Gauge<Long>) () -> 100L);
         registry.counter("c").inc();
         registry.histogram("h").update(1);
-        registry.register("m", new Meter(clock)).mark();
-        registry.register("t", new Timer(new ExponentiallyDecayingReservoir(), clock))
+        registry.register(MetricName.build("m"), new Meter(clock)).mark();
+        registry.register(MetricName.build("t"), new Timer(new ExponentiallyDecayingReservoir(), clock))
                 .update(1, TimeUnit.SECONDS);
 
         request.setMethod("GET");

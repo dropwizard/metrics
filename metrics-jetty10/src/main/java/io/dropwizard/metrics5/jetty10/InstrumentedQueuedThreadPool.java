@@ -89,6 +89,7 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
         });
         // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
         // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.
+
         metricRegistry.registerGauge(prefix.resolve(NAME_SIZE), this::getThreads);
         metricRegistry.registerGauge(prefix.resolve(NAME_JOBS), () -> getQueue().size());
         metricRegistry.register(prefix.resolve(NAME_JOBS_QUEUE_UTILIZATION), new RatioGauge() {

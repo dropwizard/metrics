@@ -14,6 +14,10 @@ import jakarta.ws.rs.core.Response;
 
 import java.io.IOException;
 
+import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.ALL;
+import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.COARSE;
+import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.DETAILED;
+
 @Path("/")
 @Produces(MediaType.TEXT_PLAIN)
 public class InstrumentedResource {
@@ -39,6 +43,27 @@ public class InstrumentedResource {
             throw new IOException("AUGH");
         }
         return "fuh";
+    }
+
+    @GET
+    @ResponseMetered(level = DETAILED)
+    @Path("/response-metered-detailed")
+    public Response responseMeteredDetailed(@QueryParam("status_code") @DefaultValue("200") int statusCode) {
+        return Response.status(Response.Status.fromStatusCode(statusCode)).build();
+    }
+
+    @GET
+    @ResponseMetered(level = COARSE)
+    @Path("/response-metered-coarse")
+    public Response responseMeteredCoarse(@QueryParam("status_code") @DefaultValue("200") int statusCode) {
+        return Response.status(Response.Status.fromStatusCode(statusCode)).build();
+    }
+
+    @GET
+    @ResponseMetered(level = ALL)
+    @Path("/response-metered-all")
+    public Response responseMeteredAll(@QueryParam("status_code") @DefaultValue("200") int statusCode) {
+        return Response.status(Response.Status.fromStatusCode(statusCode)).build();
     }
 
     @GET

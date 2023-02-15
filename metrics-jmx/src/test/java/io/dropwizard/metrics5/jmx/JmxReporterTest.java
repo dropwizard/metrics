@@ -110,11 +110,11 @@ class JmxReporterTest {
 
         when(timer.getSnapshot()).thenReturn(tSnapshot);
 
-        registry.register("gauge", gauge);
-        registry.register("test.counter", counter);
-        registry.register("test.histogram", histogram);
-        registry.register("test.meter", meter);
-        registry.register("test.another.timer", timer);
+        registry.register(MetricName.build("gauge"), gauge);
+        registry.register(MetricName.build("test", "counter"), counter);
+        registry.register(MetricName.build("test", "histogram"), histogram);
+        registry.register(MetricName.build("test", "meter"), meter);
+        registry.register(MetricName.build("test", "another", "timer"), timer);
 
         reporter.start();
     }

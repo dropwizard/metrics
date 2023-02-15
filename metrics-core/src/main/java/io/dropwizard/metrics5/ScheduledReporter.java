@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -166,7 +167,30 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
             throw new IllegalArgumentException("Reporter already started");
         }
 
-        this.scheduledFuture = executor.scheduleWithFixedDelay(runnable, initialDelay, period, unit);
+        this.scheduledFuture = getScheduledFuture(initialDelay, period, unit, runnable);
+    }
+
+
+    /**
+     * Schedule the task, and return a future.
+     *
+     * @deprecated Use {@link #getScheduledFuture(long, long, TimeUnit, Runnable, ScheduledExecutorService)} instead.
+     */
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    @Deprecated
+    protected ScheduledFuture<?> getScheduledFuture(long initialDelay, long period, TimeUnit unit, Runnable runnable) {
+        return getScheduledFuture(initialDelay, period, unit, runnable, this.executor);
+    }
+
+    /**
+     * Schedule the task, and return a future.
+     * The current implementation uses scheduleWithFixedDelay, replacing scheduleWithFixedRate. This avoids queueing issues, but may
+     * cause some reporters to skip metrics, as scheduleWithFixedDelay introduces a growing delta from the original start point.
+     *
+     * Overriding this in a subclass to revert to the old behavior is permitted.
+     */
+    protected ScheduledFuture<?> getScheduledFuture(long initialDelay, long period, TimeUnit unit, Runnable runnable, ScheduledExecutorService executor) {
+        return executor.scheduleWithFixedDelay(runnable, initialDelay, period, unit);
     }
 
     /**

@@ -10,6 +10,7 @@ import io.dropwizard.metrics5.Timer;
 import io.dropwizard.metrics5.annotation.ExceptionMetered;
 import io.dropwizard.metrics5.annotation.Metered;
 import io.dropwizard.metrics5.annotation.ResponseMetered;
+import io.dropwizard.metrics5.annotation.ResponseMeteredLevel;
 import io.dropwizard.metrics5.annotation.Timed;
 import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.model.ModelProcessor;
@@ -28,10 +29,17 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.EnumSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+
+import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.ALL;
+import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.COARSE;
+import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.DETAILED;
 
 /**
  * An application event listener that listens for Jersey application initialization to
@@ -125,19 +133,48 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
      * different response codes
      */
     private static class ResponseMeterMetric {
-        public final List<Meter> meters;
+        private static final Set<ResponseMeteredLevel> COARSE_METER_LEVELS = EnumSet.of(COARSE, ALL);
+        private static final Set<ResponseMeteredLevel> DETAILED_METER_LEVELS = EnumSet.of(DETAILED, ALL);
+        private final MetricName metricName;
+        private final List<Meter> meters;
+        private final Map<Integer, Meter> responseCodeMeters;
+        private final MetricRegistry metricRegistry;
+        private final ResponseMeteredLevel level;
 
         public ResponseMeterMetric(final MetricRegistry registry,
                                    final ResourceMethod method,
                                    final ResponseMetered responseMetered) {
-            final MetricName metricName = chooseName(responseMetered.name(), responseMetered.absolute(), method);
-            this.meters = Collections.unmodifiableList(Arrays.asList(
+            this.metricName = chooseName(responseMetered.name(), responseMetered.absolute(), method);
+            this.level = responseMetered.level();
+            this.meters = COARSE_METER_LEVELS.contains(level) ?
+                    Collections.unmodifiableList(Arrays.asList(
                     registry.meter(metricName.resolve("1xx-responses")), // 1xx
                     registry.meter(metricName.resolve("2xx-responses")), // 2xx
                     registry.meter(metricName.resolve("3xx-responses")), // 3xx
                     registry.meter(metricName.resolve("4xx-responses")), // 4xx
                     registry.meter(metricName.resolve("5xx-responses"))  // 5xx
-            ));
+            )) : Collections.emptyList();
+            this.responseCodeMeters = DETAILED_METER_LEVELS.contains(level) ? new ConcurrentHashMap<>() : Collections.emptyMap();
+            this.metricRegistry = registry;
+        }
+
+        public void mark(int statusCode) {
+            if (DETAILED_METER_LEVELS.contains(level)) {
+                getResponseCodeMeter(statusCode).mark();
+            }
+
+            if (COARSE_METER_LEVELS.contains(level)) {
+                final int responseStatus = statusCode / 100;
+                if (responseStatus >= 1 && responseStatus <= 5) {
+                    meters.get(responseStatus - 1).mark();
+                }
+            }
+        }
+
+        private Meter getResponseCodeMeter(int statusCode) {
+            return responseCodeMeters
+                    .computeIfAbsent(statusCode, sc -> metricRegistry
+                            .meter(metricName.resolve(String.format("%d-responses", sc))));
         }
     }
 
@@ -269,15 +306,10 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
 
                 if (metric != null) {
                     ContainerResponse containerResponse = event.getContainerResponse();
-                    if (containerResponse == null) {
-                        if (event.getException() != null) {
-                            metric.meters.get(4).mark();
-                        }
+                    if (containerResponse == null && event.getException() != null) {
+                        metric.mark(500);
                     } else {
-                        final int responseStatus = containerResponse.getStatus() / 100;
-                        if (responseStatus >= 1 && responseStatus <= 5) {
-                            metric.meters.get(responseStatus - 1).mark();
-                        }
+                        metric.mark(containerResponse.getStatus());
                     }
                 }
             }

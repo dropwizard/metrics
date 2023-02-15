@@ -413,7 +413,7 @@ class MetricRegistryTest {
             return m;
         };
 
-        registry.register("my", metrics);
+        registry.register(MetricName.build("my"), metrics);
 
         assertThat(registry.getNames())
                 .containsOnly(myGauge, myCounter);
@@ -434,7 +434,7 @@ class MetricRegistryTest {
             return m;
         };
 
-        registry.register("my", outer);
+        registry.register(MetricName.build("my"), outer);
 
         final MetricName myCounter = MetricName.build("my.counter");
         final MetricName myInnerGauge = MetricName.build("my.inner.gauge");
@@ -447,7 +447,7 @@ class MetricRegistryTest {
     void registersMetricsFromAnotherRegistry() {
         MetricRegistry other = new MetricRegistry();
         other.register(GAUGE, gauge);
-        registry.register("nested", other);
+        registry.register(MetricName.build("nested"), other);
         assertThat(registry.getNames()).containsOnly(MetricName.build("nested.gauge"));
     }
 
@@ -458,7 +458,6 @@ class MetricRegistryTest {
     }
 
     @Test
-    @SuppressWarnings("NullArgumentToVariableArgMethod")
     void elidesNullValuesFromNamesWhenOnlyOneNullPassedIn() {
         assertThat(name("one", (String) null))
                 .isEqualTo(MetricName.build("one"));
@@ -526,7 +525,7 @@ class MetricRegistryTest {
         MetricRegistry child = new MetricRegistry();
 
         child.counter("test-1");
-        parent.register("child", child);
+        parent.register(MetricName.build("child"), child);
         child.counter("test-2");
 
         Set<MetricName> parentMetrics = parent.getMetrics().keySet();
@@ -543,7 +542,7 @@ class MetricRegistryTest {
 
         child.counter("test-1");
         child.counter("test-2");
-        parent.register("child", child);
+        parent.register(MetricName.build("child"), child);
         child.counter("test-3");
         child.counter("test-4");
 
@@ -561,11 +560,11 @@ class MetricRegistryTest {
         MetricRegistry deepChild = new MetricRegistry();
 
         deepChild.counter("test-1");
-        child.register("deep-child", deepChild);
+        child.register(MetricName.build("deep-child"), deepChild);
         deepChild.counter("test-2");
 
         child.counter("test-3");
-        parent.register("child", child);
+        parent.register(MetricName.build("child"), child);
         child.counter("test-4");
 
         deepChild.counter("test-5");
@@ -589,7 +588,7 @@ class MetricRegistryTest {
         MetricRegistry child = new MetricRegistry();
 
         child.counter("test-1");
-        parent.register("child", child);
+        parent.register(MetricName.build("child"), child);
         child.counter("test-2");
 
         child.remove(MetricName.build("test-1"));
@@ -610,7 +609,7 @@ class MetricRegistryTest {
 
         child.counter("test-1");
         child.counter("test-2");
-        parent.register("child", child);
+        parent.register(MetricName.build("child"), child);
         child.counter("test-3");
         child.counter("test-4");
 
@@ -633,11 +632,11 @@ class MetricRegistryTest {
         MetricRegistry deepChild = new MetricRegistry();
 
         deepChild.counter("test-1");
-        child.register("deep-child", deepChild);
+        child.register(MetricName.build("deep-child"), deepChild);
         deepChild.counter("test-2");
 
         child.counter("test-3");
-        parent.register("child", child);
+        parent.register(MetricName.build("child"), child);
         child.counter("test-4");
 
         deepChild.remove(MetricName.build("test-2"));
@@ -661,7 +660,7 @@ class MetricRegistryTest {
     @Test
     void registerNullMetric() {
         MetricRegistry registry = new MetricRegistry();
-        assertThatThrownBy(() -> registry.register("any_name", null))
+        assertThatThrownBy(() -> registry.register(MetricName.build("any_name"), null))
                 .hasMessage("metric == null");
     }
 

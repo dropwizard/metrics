@@ -13,6 +13,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A registry of metric instances which never creates or registers any metrics and returns no-op implementations of any metric type.
  *
@@ -28,17 +30,6 @@ public final class NoopMetricRegistry extends MetricRegistry {
     @Override
     protected ConcurrentMap<MetricName, Metric> buildMap() {
         return EMPTY_CONCURRENT_MAP;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <T extends Metric> T register(String name, T metric) throws IllegalArgumentException {
-        if (metric == null) {
-            throw new NullPointerException("metric == null");
-        }
-        return metric;
     }
 
     /**
@@ -300,7 +291,7 @@ public final class NoopMetricRegistry extends MetricRegistry {
      */
     @Override
     public <T extends Metric> T register(MetricName name, T metric) throws IllegalArgumentException {
-        return metric;
+        return requireNonNull(metric, "metric == null");
     }
 
     /**
