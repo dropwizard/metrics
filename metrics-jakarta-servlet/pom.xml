@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-jakarta-servlet</artifactId>
-    <name>Metrics5 Integration for Jakarta Servlets</name>
+    <name>Metrics Integration for Jakarta Servlets</name>
     <packaging>bundle</packaging>
     <description>
         An instrumented filter for servlet environments.

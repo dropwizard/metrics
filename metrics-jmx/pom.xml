@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>metrics-jmx</artifactId>
-    <name>Metrics5 Integration with JMX</name>
+    <name>Metrics Integration with JMX</name>
     <packaging>bundle</packaging>
     <description>
         A set of classes which allow you to report metrics via JMX.

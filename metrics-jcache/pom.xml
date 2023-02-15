@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>metrics-jcache</artifactId>
-    <name>Metrics5 Integration for JCache</name>
+    <name>Metrics Integration for JCache</name>
     <packaging>bundle</packaging>
     <description>
         Metrics Integration for JCache, JSR 107 standard for caching.
