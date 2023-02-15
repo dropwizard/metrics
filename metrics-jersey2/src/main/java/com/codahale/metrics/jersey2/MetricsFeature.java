@@ -1,10 +1,6 @@
 package com.codahale.metrics.jersey2;
 
-import com.codahale.metrics.Clock;
-import com.codahale.metrics.ExponentiallyDecayingReservoir;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Reservoir;
-import com.codahale.metrics.SharedMetricRegistries;
+import com.codahale.metrics.*;
 
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
@@ -91,7 +87,14 @@ public class MetricsFeature implements Feature {
      */
     @Override
     public boolean configure(FeatureContext context) {
-        context.register(new InstrumentedResourceMethodApplicationListener(registry, clock, trackFilters, reservoirSupplier));
+        MetricsResourceMethodProvider
+            .INSTANCE
+            .initialize(context);
+
+        context.register(
+            new InstrumentedResourceMethodApplicationListener(registry, clock, trackFilters, reservoirSupplier)
+        );
+
         return true;
     }
 }

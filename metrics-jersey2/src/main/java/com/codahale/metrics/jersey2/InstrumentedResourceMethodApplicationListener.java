@@ -12,10 +12,7 @@ import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.ResponseMeteredLevel;
 import com.codahale.metrics.annotation.Timed;
 import org.glassfish.jersey.server.ContainerResponse;
-import org.glassfish.jersey.server.model.ModelProcessor;
-import org.glassfish.jersey.server.model.Resource;
-import org.glassfish.jersey.server.model.ResourceMethod;
-import org.glassfish.jersey.server.model.ResourceModel;
+import org.glassfish.jersey.server.model.*;
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
 import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
@@ -234,11 +231,15 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         }
 
         private Timer timer(RequestEvent event) {
-            final ResourceMethod resourceMethod = event.getUriInfo().getMatchedResourceMethod();
-            if (resourceMethod == null) {
+            final Method method = MetricsResourceMethodProvider
+                .INSTANCE
+                .getMethod(event);
+
+            if (method == null) {
                 return null;
             }
-            return timers.get(new EventTypeAndMethod(event.getType(), resourceMethod.getInvocable().getHandlingMethod()));
+
+            return timers.get(new EventTypeAndMethod(event.getType(), method));
         }
 
         private Timer.Context context(RequestEvent event) {
@@ -257,7 +258,12 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         @Override
         public void onEvent(RequestEvent event) {
             if (event.getType() == RequestEvent.Type.RESOURCE_METHOD_START) {
-                final Meter meter = this.meters.get(event.getUriInfo().getMatchedResourceMethod().getInvocable().getHandlingMethod());
+                final Meter meter = this.meters.get(
+                    MetricsResourceMethodProvider
+                        .INSTANCE
+                        .getMethod(event)
+                );
+
                 if (meter != null) {
                     meter.mark();
                 }
@@ -276,8 +282,15 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         public void onEvent(RequestEvent event) {
             if (event.getType() == RequestEvent.Type.ON_EXCEPTION) {
                 final ResourceMethod method = event.getUriInfo().getMatchedResourceMethod();
-                final ExceptionMeterMetric metric = (method != null) ?
-                        this.exceptionMeters.get(method.getInvocable().getHandlingMethod()) : null;
+
+                final ExceptionMeterMetric metric =
+                    (method != null)
+                    ? this.exceptionMeters.get(
+                        MetricsResourceMethodProvider
+                            .INSTANCE
+                            .getMethod(event)
+                    )
+                    : null;
 
                 if (metric != null) {
                     if (metric.cause.isAssignableFrom(event.getException().getClass()) ||
@@ -301,8 +314,15 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         public void onEvent(RequestEvent event) {
             if (event.getType() == RequestEvent.Type.FINISHED) {
                 final ResourceMethod method = event.getUriInfo().getMatchedResourceMethod();
-                final ResponseMeterMetric metric = (method != null) ?
-                        this.responseMeters.get(method.getInvocable().getHandlingMethod()) : null;
+
+                final ResponseMeterMetric metric =
+                      (method != null)
+                    ? this.responseMeters.get(
+                        MetricsResourceMethodProvider
+                            .INSTANCE
+                            .getMethod(event)
+                    )
+                    : null;
 
                 if (metric != null) {
                     ContainerResponse containerResponse = event.getContainerResponse();
@@ -406,7 +426,10 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private void registerTimedAnnotations(final ResourceMethod method, final Timed classLevelTimed) {
-        final Method handlingMethod = method.getInvocable().getHandlingMethod();
+        final Method handlingMethod = MetricsResourceMethodProvider
+            .INSTANCE
+            .getMethod(method);
+
         if (classLevelTimed != null) {
             registerTimers(method, handlingMethod, classLevelTimed);
             return;
@@ -428,7 +451,9 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private void registerMeteredAnnotations(final ResourceMethod method, final Metered classLevelMetered) {
-        final Method handlingMethod = method.getInvocable().getHandlingMethod();
+        final Method handlingMethod = MetricsResourceMethodProvider
+            .INSTANCE
+            .getMethod(method);
 
         if (classLevelMetered != null) {
             meters.putIfAbsent(handlingMethod, meterMetric(metrics, method, classLevelMetered));
@@ -442,7 +467,9 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private void registerExceptionMeteredAnnotations(final ResourceMethod method, final ExceptionMetered classLevelExceptionMetered) {
-        final Method handlingMethod = method.getInvocable().getHandlingMethod();
+        final Method handlingMethod = MetricsResourceMethodProvider
+            .INSTANCE
+            .getMethod(method);
 
         if (classLevelExceptionMetered != null) {
             exceptionMeters.putIfAbsent(handlingMethod, new ExceptionMeterMetric(metrics, method, classLevelExceptionMetered));
@@ -456,7 +483,9 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private void registerResponseMeteredAnnotations(final ResourceMethod method, final ResponseMetered classLevelResponseMetered) {
-        final Method handlingMethod = method.getInvocable().getHandlingMethod();
+        final Method handlingMethod = MetricsResourceMethodProvider
+            .INSTANCE
+            .getMethod(method);
 
         if (classLevelResponseMetered != null) {
             responseMeters.putIfAbsent(handlingMethod, new ResponseMeterMetric(metrics, method, classLevelResponseMetered));
@@ -486,7 +515,10 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
 
     protected static String chooseName(final String explicitName, final boolean absolute, final ResourceMethod method,
                                        final String... suffixes) {
-        final Method handlingMethod = method.getInvocable().getHandlingMethod();
+        final Method handlingMethod = MetricsResourceMethodProvider
+            .INSTANCE
+            .getMethod(method);
+
         final String metricName;
         if (explicitName != null && !explicitName.isEmpty()) {
             metricName = absolute ? explicitName : name(handlingMethod.getDeclaringClass(), explicitName);
