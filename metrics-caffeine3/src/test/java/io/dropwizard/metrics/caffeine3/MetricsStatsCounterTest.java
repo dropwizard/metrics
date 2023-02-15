@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * An example of exporting stats to Dropwizard Metrics (http://metrics.dropwizard.io).
+ * An example of exporting stats to  <a href="https://metrics.dropwizard.io">Dropwizard Metrics</a>.
  *
  * @author ben.manes@gmail.com (Ben Manes)
  * @author John Karp
@@ -52,7 +52,7 @@ public final class MetricsStatsCounterTest {
 
     // Perform application work
     for (int i = 0; i < 4; i++) {
-      cache.get(1);
+      Integer unused = cache.get(1);
     }
 
     assertEquals(3L, cache.stats().hitCount());

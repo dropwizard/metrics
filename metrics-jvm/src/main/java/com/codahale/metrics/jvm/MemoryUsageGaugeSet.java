@@ -47,8 +47,8 @@ public class MemoryUsageGaugeSet implements MetricSet {
                 mxBean.getNonHeapMemoryUsage().getInit());
         gauges.put("total.used", (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getUsed() +
                 mxBean.getNonHeapMemoryUsage().getUsed());
-        gauges.put("total.max", (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getMax() +
-                mxBean.getNonHeapMemoryUsage().getMax());
+        gauges.put("total.max", (Gauge<Long>) () -> mxBean.getNonHeapMemoryUsage().getMax() == -1 ?
+                -1 : mxBean.getHeapMemoryUsage().getMax() + mxBean.getNonHeapMemoryUsage().getMax());
         gauges.put("total.committed", (Gauge<Long>) () -> mxBean.getHeapMemoryUsage().getCommitted() +
                 mxBean.getNonHeapMemoryUsage().getCommitted());
 
@@ -72,7 +72,7 @@ public class MemoryUsageGaugeSet implements MetricSet {
             @Override
             protected Ratio getRatio() {
                 final MemoryUsage usage = mxBean.getNonHeapMemoryUsage();
-                return Ratio.of(usage.getUsed(), usage.getMax());
+                return Ratio.of(usage.getUsed(), usage.getMax() == -1 ? usage.getCommitted() : usage.getMax());
             }
         });
 

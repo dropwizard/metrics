@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import static com.codahale.metrics.annotation.ResponseMeteredLevel.ALL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class InstrumentedHttpChannelListenerTest {
@@ -31,7 +32,7 @@ public class InstrumentedHttpChannelListenerTest {
     @Before
     public void setUp() throws Exception {
         registry = new MetricRegistry();
-        connector.addBean(new InstrumentedHttpChannelListener(registry, MetricRegistry.name(TestHandler.class, "handler")));
+        connector.addBean(new InstrumentedHttpChannelListener(registry, MetricRegistry.name(TestHandler.class, "handler"), ALL));
         server.addConnector(connector);
         server.setHandler(handler);
         server.start();
@@ -56,6 +57,7 @@ public class InstrumentedHttpChannelListenerTest {
                         metricName("1xx-responses"),
                         metricName("2xx-responses"),
                         metricName("3xx-responses"),
+                        metricName("404-responses"),
                         metricName("4xx-responses"),
                         metricName("5xx-responses"),
                         metricName("percent-4xx-1m"),
@@ -117,6 +119,8 @@ public class InstrumentedHttpChannelListenerTest {
         }
 
         assertThat(registry.getMeters().get(metricName("2xx-responses"))
+                .getCount()).isPositive();
+        assertThat(registry.getMeters().get(metricName("200-responses"))
                 .getCount()).isPositive();
 
         assertThat(registry.getTimers().get(metricName("get-requests"))
