@@ -87,10 +87,6 @@ public class MetricsFeature implements Feature {
      */
     @Override
     public boolean configure(FeatureContext context) {
-        MetricsResourceMethodProvider
-            .INSTANCE
-            .initialize(context);
-
         context.register(
             new InstrumentedResourceMethodApplicationListener(registry, clock, trackFilters, reservoirSupplier)
         );

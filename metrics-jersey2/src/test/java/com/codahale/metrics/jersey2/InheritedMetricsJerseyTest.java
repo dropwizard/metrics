@@ -24,10 +24,6 @@ public class InheritedMetricsJerseyTest extends JerseyTest {
 
     @Override
     protected Application configure() {
-        MetricsResourceMethodProvider // Manual initialization
-            .INSTANCE
-            .initialize(false); // Search for annotations on definition methods (abstracts).
-
         this.registry = new MetricRegistry();
 
         ResourceConfig config = new ResourceConfig();
