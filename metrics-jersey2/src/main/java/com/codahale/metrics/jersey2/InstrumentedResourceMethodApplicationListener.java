@@ -12,7 +12,10 @@ import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.ResponseMeteredLevel;
 import com.codahale.metrics.annotation.Timed;
 import org.glassfish.jersey.server.ContainerResponse;
-import org.glassfish.jersey.server.model.*;
+import org.glassfish.jersey.server.model.ModelProcessor;
+import org.glassfish.jersey.server.model.Resource;
+import org.glassfish.jersey.server.model.ResourceMethod;
+import org.glassfish.jersey.server.model.ResourceModel;
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
 import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
@@ -118,7 +121,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                                     final ResourceMethod method,
                                     final ExceptionMetered exceptionMetered) {
             final String name = chooseName(exceptionMetered.name(),
-                    exceptionMetered.absolute(), method, ExceptionMetered.class, ExceptionMetered.DEFAULT_NAME_SUFFIX);
+                    exceptionMetered.absolute(), method, ExceptionMetered.DEFAULT_NAME_SUFFIX);
             this.meter = registry.meter(name);
             this.cause = exceptionMetered.cause();
         }
@@ -141,7 +144,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         public ResponseMeterMetric(final MetricRegistry registry,
                                    final ResourceMethod method,
                                    final ResponseMetered responseMetered) {
-            this.metricName = chooseName(responseMetered.name(), responseMetered.absolute(), method, ResponseMetered.class);
+            this.metricName = chooseName(responseMetered.name(), responseMetered.absolute(), method);
             this.level = responseMetered.level();
             this.meters = COARSE_METER_LEVELS.contains(level) ?
                     Collections.unmodifiableList(Arrays.asList(
@@ -231,16 +234,11 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         }
 
         private Timer timer(RequestEvent event) {
-            final MethodAnnotation methodAnnotation = getMethodAnnotation(event, Timed.class);
-
-            if (methodAnnotation == null) {
+            final ResourceMethod resourceMethod = event.getUriInfo().getMatchedResourceMethod();
+            if (resourceMethod == null) {
                 return null;
             }
-
-            return timers.get(new EventTypeAndMethod(
-                event.getType(),
-                methodAnnotation.getMethod()
-            ));
+            return timers.get(new EventTypeAndMethod(event.getType(), resourceMethod.getInvocable().getDefinitionMethod()));
         }
 
         private Timer.Context context(RequestEvent event) {
@@ -259,16 +257,9 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         @Override
         public void onEvent(RequestEvent event) {
             if (event.getType() == RequestEvent.Type.RESOURCE_METHOD_START) {
-                final MethodAnnotation methodAnnotation = getMethodAnnotation(event, Metered.class);
-
-                if (null != methodAnnotation) {
-                    final Meter meter = this.meters.get(
-                        methodAnnotation.getMethod()
-                    );
-
-                    if (meter != null) {
-                        meter.mark();
-                    }
+                final Meter meter = this.meters.get(event.getUriInfo().getMatchedResourceMethod().getInvocable().getDefinitionMethod());
+                if (meter != null) {
+                    meter.mark();
                 }
             }
         }
@@ -284,23 +275,15 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         @Override
         public void onEvent(RequestEvent event) {
             if (event.getType() == RequestEvent.Type.ON_EXCEPTION) {
-                final ResourceMethod   method           = event.getUriInfo().getMatchedResourceMethod();
-                final MethodAnnotation methodAnnotation = getMethodAnnotation(method, ExceptionMetered.class);
+                final ResourceMethod method = event.getUriInfo().getMatchedResourceMethod();
+                final ExceptionMeterMetric metric = (method != null) ?
+                        this.exceptionMeters.get(method.getInvocable().getDefinitionMethod()) : null;
 
-                if (null != methodAnnotation) {
-                    final ExceptionMeterMetric metric =
-                        (method != null)
-                        ? this.exceptionMeters.get(
-                            methodAnnotation.getMethod()
-                        )
-                        : null;
-
-                    if (metric != null) {
-                        if (metric.cause.isAssignableFrom(event.getException().getClass()) ||
-                                (event.getException().getCause() != null &&
-                                        metric.cause.isAssignableFrom(event.getException().getCause().getClass()))) {
-                            metric.meter.mark();
-                        }
+                if (metric != null) {
+                    if (metric.cause.isAssignableFrom(event.getException().getClass()) ||
+                            (event.getException().getCause() != null &&
+                                    metric.cause.isAssignableFrom(event.getException().getCause().getClass()))) {
+                        metric.meter.mark();
                     }
                 }
             }
@@ -317,24 +300,16 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         @Override
         public void onEvent(RequestEvent event) {
             if (event.getType() == RequestEvent.Type.FINISHED) {
-                final ResourceMethod   method           = event.getUriInfo().getMatchedResourceMethod();
-                final MethodAnnotation methodAnnotation = getMethodAnnotation(method, ResponseMetered.class);
+                final ResourceMethod method = event.getUriInfo().getMatchedResourceMethod();
+                final ResponseMeterMetric metric = (method != null) ?
+                        this.responseMeters.get(method.getInvocable().getDefinitionMethod()) : null;
 
-                if (null != methodAnnotation) {
-                    final ResponseMeterMetric metric =
-                          (method != null)
-                        ? this.responseMeters.get(
-                            methodAnnotation.getMethod()
-                        )
-                        : null;
-
-                    if (metric != null) {
-                        ContainerResponse containerResponse = event.getContainerResponse();
-                        if (containerResponse == null && event.getException() != null) {
-                            metric.mark(500);
-                        } else {
-                            metric.mark(containerResponse.getStatus());
-                        }
+                if (metric != null) {
+                    ContainerResponse containerResponse = event.getContainerResponse();
+                    if (containerResponse == null && event.getException() != null) {
+                        metric.mark(500);
+                    } else {
+                        metric.mark(containerResponse.getStatus());
                     }
                 }
             }
@@ -354,26 +329,6 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                 listener.onEvent(event);
             }
         }
-    }
-
-    private static class MethodAnnotation<A extends Annotation> {
-
-        private Method method;
-        private A      annotation;
-
-        public MethodAnnotation(Method method, A annotation) {
-            this.method     = method;
-            this.annotation = annotation;
-        }
-
-        public Method getMethod() {
-            return method;
-        }
-
-        public A getAnnotation() {
-            return annotation;
-        }
-
     }
 
     @Override
@@ -450,188 +405,93 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         return annotation;
     }
 
-    private static <T extends Annotation> MethodAnnotation<T> getMethodAnnotation(Invocable invocable, Class<T> annotationClass) {
-        Method method     = invocable.getHandlingMethod();
-        T      annotation = method.getAnnotation(annotationClass);
-
-        if (null == annotation) {
-            method     = invocable.getDefinitionMethod();
-            annotation = method.getAnnotation(annotationClass);
-        }
-
-        if (null == annotation) {
-            return null;
-        }
-
-        return new MethodAnnotation(method, annotation);
-    }
-
-    private static <T extends Annotation> MethodAnnotation<T> getMethodAnnotation(ResourceMethod resourceMethod, Class<T> annotationClass) {
-        return getMethodAnnotation(
-            resourceMethod.getInvocable(),
-            annotationClass
-        );
-    }
-
-    private static <T extends Annotation> MethodAnnotation<T> getMethodAnnotation(RequestEvent requestEvent, Class<T> annotationClass) {
-        return getMethodAnnotation(
-            requestEvent.getUriInfo().getMatchedResourceMethod(),
-            annotationClass
-        );
-    }
-
     private void registerTimedAnnotations(final ResourceMethod method, final Timed classLevelTimed) {
-        final MethodAnnotation<Timed> methodAnnotation = getMethodAnnotation(method, Timed.class);
-
-        if (null == methodAnnotation) {
-            return;
-        }
-
+        final Method definitionMethod = method.getInvocable().getDefinitionMethod();
         if (classLevelTimed != null) {
-            registerTimers(
-                method,
-                methodAnnotation.getMethod(),
-                classLevelTimed
-            );
-
+            registerTimers(method, definitionMethod, classLevelTimed);
             return;
         }
 
-        registerTimers(
-            method,
-            methodAnnotation.getMethod(),
-            methodAnnotation.getAnnotation()
-        );
+        final Timed annotation = definitionMethod.getAnnotation(Timed.class);
+        if (annotation != null) {
+            registerTimers(method, definitionMethod, annotation);
+        }
     }
 
-    private void registerTimers(ResourceMethod method, Method handlingMethod, Timed annotation) {
-        timers.putIfAbsent(EventTypeAndMethod.requestMethodStart(handlingMethod), timerMetric(metrics, method, annotation));
+    private void registerTimers(ResourceMethod method, Method definitionMethod, Timed annotation) {
+        timers.putIfAbsent(EventTypeAndMethod.requestMethodStart(definitionMethod), timerMetric(metrics, method, annotation));
         if (trackFilters) {
-            timers.putIfAbsent(EventTypeAndMethod.requestMatched(handlingMethod), timerMetric(metrics, method, annotation, REQUEST_FILTERING));
-            timers.putIfAbsent(EventTypeAndMethod.respFiltersStart(handlingMethod), timerMetric(metrics, method, annotation, RESPONSE_FILTERING));
-            timers.putIfAbsent(EventTypeAndMethod.finished(handlingMethod), timerMetric(metrics, method, annotation, TOTAL));
+            timers.putIfAbsent(EventTypeAndMethod.requestMatched(definitionMethod), timerMetric(metrics, method, annotation, REQUEST_FILTERING));
+            timers.putIfAbsent(EventTypeAndMethod.respFiltersStart(definitionMethod), timerMetric(metrics, method, annotation, RESPONSE_FILTERING));
+            timers.putIfAbsent(EventTypeAndMethod.finished(definitionMethod), timerMetric(metrics, method, annotation, TOTAL));
         }
     }
 
     private void registerMeteredAnnotations(final ResourceMethod method, final Metered classLevelMetered) {
-        final MethodAnnotation<Metered> methodAnnotation = getMethodAnnotation(method, Metered.class);
-
-        if (null == methodAnnotation) {
-            return;
-        }
+        final Method definitionMethod = method.getInvocable().getDefinitionMethod();
 
         if (classLevelMetered != null) {
-            meters.putIfAbsent(
-                methodAnnotation.getMethod(),
-                meterMetric(metrics, method, classLevelMetered)
-            );
-
+            meters.putIfAbsent(definitionMethod, meterMetric(metrics, method, classLevelMetered));
             return;
         }
+        final Metered annotation = definitionMethod.getAnnotation(Metered.class);
 
-        meters.putIfAbsent(
-            methodAnnotation.getMethod(),
-            meterMetric(
-                metrics,
-                method,
-                methodAnnotation.getAnnotation()
-            )
-        );
+        if (annotation != null) {
+            meters.putIfAbsent(definitionMethod, meterMetric(metrics, method, annotation));
+        }
     }
 
     private void registerExceptionMeteredAnnotations(final ResourceMethod method, final ExceptionMetered classLevelExceptionMetered) {
-        final MethodAnnotation<ExceptionMetered> methodAnnotation = getMethodAnnotation(method, ExceptionMetered.class);
-
-        if (null == methodAnnotation) {
-            return;
-        }
+        final Method definitionMethod = method.getInvocable().getDefinitionMethod();
 
         if (classLevelExceptionMetered != null) {
-            exceptionMeters.putIfAbsent(
-                methodAnnotation.getMethod(),
-                new ExceptionMeterMetric(metrics, method, classLevelExceptionMetered)
-            );
-
+            exceptionMeters.putIfAbsent(definitionMethod, new ExceptionMeterMetric(metrics, method, classLevelExceptionMetered));
             return;
         }
+        final ExceptionMetered annotation = definitionMethod.getAnnotation(ExceptionMetered.class);
 
-        exceptionMeters.putIfAbsent(
-            methodAnnotation.getMethod(),
-            new ExceptionMeterMetric(
-                metrics,
-                method,
-                methodAnnotation.getAnnotation()
-            )
-        );
+        if (annotation != null) {
+            exceptionMeters.putIfAbsent(definitionMethod, new ExceptionMeterMetric(metrics, method, annotation));
+        }
     }
 
     private void registerResponseMeteredAnnotations(final ResourceMethod method, final ResponseMetered classLevelResponseMetered) {
-        final MethodAnnotation<ResponseMetered> methodAnnotation = getMethodAnnotation(method, ResponseMetered.class);
-
-        if (null == methodAnnotation) {
-            return;
-        }
+        final Method definitionMethod = method.getInvocable().getDefinitionMethod();
 
         if (classLevelResponseMetered != null) {
-            responseMeters.putIfAbsent(
-                methodAnnotation.getMethod(),
-                new ResponseMeterMetric(metrics, method, classLevelResponseMetered)
-            );
-
+            responseMeters.putIfAbsent(definitionMethod, new ResponseMeterMetric(metrics, method, classLevelResponseMetered));
             return;
         }
+        final ResponseMetered annotation = definitionMethod.getAnnotation(ResponseMetered.class);
 
-        responseMeters.putIfAbsent(
-            methodAnnotation.getMethod(),
-            new ResponseMeterMetric(
-                metrics,
-                method,
-                methodAnnotation.getAnnotation()
-            )
-        );
+        if (annotation != null) {
+            responseMeters.putIfAbsent(definitionMethod, new ResponseMeterMetric(metrics, method, annotation));
+        }
     }
 
     private Timer timerMetric(final MetricRegistry registry,
                               final ResourceMethod method,
                               final Timed timed,
                               final String... suffixes) {
-        final String name = chooseName(timed.name(), timed.absolute(), method, Timed.class, suffixes);
+        final String name = chooseName(timed.name(), timed.absolute(), method, suffixes);
         return registry.timer(name, () -> new Timer(reservoirSupplier.get(), clock));
     }
 
     private Meter meterMetric(final MetricRegistry registry,
                               final ResourceMethod method,
                               final Metered metered) {
-        final String name = chooseName(metered.name(), metered.absolute(), method, Metered.class);
+        final String name = chooseName(metered.name(), metered.absolute(), method);
         return registry.meter(name, () -> new Meter(clock));
     }
 
-    protected static <T extends Annotation> String chooseName(
-        final String explicitName,
-        final boolean absolute,
-        final ResourceMethod method,
-        final Class<T> annotationClass,
-        final String... suffixes
-    ) {
-        final MethodAnnotation methodAnnotation = getMethodAnnotation(method, annotationClass);
-
-        if (null == methodAnnotation) {
-            return null;
-        }
-
-        Method gotMethod = methodAnnotation.getMethod();
-
+    protected static String chooseName(final String explicitName, final boolean absolute, final ResourceMethod method,
+                                       final String... suffixes) {
+        final Method definitionMethod = method.getInvocable().getDefinitionMethod();
         final String metricName;
         if (explicitName != null && !explicitName.isEmpty()) {
-            metricName = absolute ? explicitName : name(
-                gotMethod.getDeclaringClass(),
-                explicitName
-            );
+            metricName = absolute ? explicitName : name(definitionMethod.getDeclaringClass(), explicitName);
         } else {
-            metricName = name(
-                gotMethod.getDeclaringClass(),
-                gotMethod.getName()
-            );
+            metricName = name(definitionMethod.getDeclaringClass(), definitionMethod.getName());
         }
         return name(metricName, suffixes);
     }
