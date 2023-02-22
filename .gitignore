@@ -11,4 +11,5 @@ bin
 jcstress.*
 metrics-jcstress/results/
 TODO.md
+*/dependency-reduced-pom.xml
 .mvn/wrapper/maven-wrapper.jar
