@@ -25,6 +25,8 @@ public class InstrumentedExecutorService implements ExecutorService {
     private static final AtomicLong NAME_COUNTER = new AtomicLong();
 
     private final ExecutorService delegate;
+    private final MetricRegistry registry;
+    private final String name;
     private final Meter submitted;
     private final Counter running;
     private final Meter completed;
@@ -50,12 +52,18 @@ public class InstrumentedExecutorService implements ExecutorService {
      */
     public InstrumentedExecutorService(ExecutorService delegate, MetricRegistry registry, String name) {
         this.delegate = delegate;
+        this.registry = registry;
+        this.name = name;
         this.submitted = registry.meter(MetricRegistry.name(name, "submitted"));
         this.running = registry.counter(MetricRegistry.name(name, "running"));
         this.completed = registry.meter(MetricRegistry.name(name, "completed"));
         this.idle = registry.timer(MetricRegistry.name(name, "idle"));
         this.duration = registry.timer(MetricRegistry.name(name, "duration"));
 
+        registerInternalMetrics();
+    }
+
+    private void registerInternalMetrics() {
         if (delegate instanceof ThreadPoolExecutor) {
             ThreadPoolExecutor executor = (ThreadPoolExecutor) delegate;
             registry.registerGauge(MetricRegistry.name(name, "pool.size"),
@@ -83,6 +91,23 @@ public class InstrumentedExecutorService implements ExecutorService {
                     forkJoinPool::getActiveThreadCount);
             registry.registerGauge(MetricRegistry.name(name, "threads.running"),
                     forkJoinPool::getRunningThreadCount);
+        }
+    }
+
+    private void removeInternalMetrics() {
+        if (delegate instanceof ThreadPoolExecutor) {
+            registry.remove(MetricRegistry.name(name, "pool.size"));
+            registry.remove(MetricRegistry.name(name, "pool.core"));
+            registry.remove(MetricRegistry.name(name, "pool.max"));
+            registry.remove(MetricRegistry.name(name, "tasks.active"));
+            registry.remove(MetricRegistry.name(name, "tasks.completed"));
+            registry.remove(MetricRegistry.name(name, "tasks.queued"));
+            registry.remove(MetricRegistry.name(name, "tasks.capacity"));
+        } else if (delegate instanceof ForkJoinPool) {
+            registry.remove(MetricRegistry.name(name, "tasks.stolen"));
+            registry.remove(MetricRegistry.name(name, "tasks.queued"));
+            registry.remove(MetricRegistry.name(name, "threads.active"));
+            registry.remove(MetricRegistry.name(name, "threads.running"));
         }
     }
 
@@ -173,11 +198,14 @@ public class InstrumentedExecutorService implements ExecutorService {
     @Override
     public void shutdown() {
         delegate.shutdown();
+        removeInternalMetrics();
     }
 
     @Override
     public List<Runnable> shutdownNow() {
-        return delegate.shutdownNow();
+        List<Runnable> remainingTasks = delegate.shutdownNow();
+        removeInternalMetrics();
+        return remainingTasks;
     }
 
     @Override
