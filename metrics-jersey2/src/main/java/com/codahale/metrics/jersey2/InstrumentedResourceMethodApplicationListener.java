@@ -223,7 +223,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                 return null;
             }
 
-            final AnnotatedMethod annotatedMethod = AnnotatedMethod.get(resourceMethod, Timed.class);
+            final AnnotatedMethod<Timed> annotatedMethod = AnnotatedMethod.get(resourceMethod, Timed.class);
 
             if (!annotatedMethod.hasAnnotation()) {
                 return null;
@@ -277,7 +277,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                 ExceptionMeterMetric metric = null;
 
                 if (method != null) {
-                    final AnnotatedMethod annotatedMethod = AnnotatedMethod.get(method, ExceptionMetered.class);
+                    final AnnotatedMethod<ExceptionMetered> annotatedMethod = AnnotatedMethod.get(method, ExceptionMetered.class);
 
                     if (annotatedMethod.hasAnnotation()) {
                         metric = this.exceptionMeters.get(annotatedMethod.getMethod());
@@ -310,7 +310,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                 ResponseMeterMetric metric = null;
 
                 if (method != null) {
-                    final AnnotatedMethod annotatedMethod = AnnotatedMethod.get(method, ResponseMetered.class);
+                    final AnnotatedMethod<ResponseMetered> annotatedMethod = AnnotatedMethod.get(method, ResponseMetered.class);
 
                     if (annotatedMethod.hasAnnotation()) {
                         metric = this.responseMeters.get(annotatedMethod.getMethod());
@@ -419,7 +419,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private void registerTimedAnnotations(final ResourceMethod method, final Timed classLevelTimed) {
-        final AnnotatedMethod annotatedMethod = AnnotatedMethod.get(method, Timed.class);
+        final AnnotatedMethod<Timed> annotatedMethod = AnnotatedMethod.get(method, Timed.class);
 
         if (!annotatedMethod.hasMethod()) {
             return;
@@ -439,7 +439,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
             registerTimers(
                 method,
                 annotatedMethod.getMethod(),
-                (Timed)annotatedMethod.getAnnotation()
+                annotatedMethod.getAnnotation()
             );
         }
     }
@@ -458,7 +458,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
     }
 
     private void registerMeteredAnnotations(final ResourceMethod method, final Metered classLevelMetered) {
-        final AnnotatedMethod annotatedMethod = AnnotatedMethod.get(method, Metered.class);
+        final AnnotatedMethod<Metered> annotatedMethod = AnnotatedMethod.get(method, Metered.class);
 
         if (!annotatedMethod.hasMethod()) {
             return;
@@ -479,14 +479,14 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                 meterMetric(
                     metrics,
                     method,
-                    (Metered)annotatedMethod.getAnnotation()
+                    annotatedMethod.getAnnotation()
                 )
             );
         }
     }
 
     private void registerExceptionMeteredAnnotations(final ResourceMethod method, final ExceptionMetered classLevelExceptionMetered) {
-        final AnnotatedMethod annotatedMethod = AnnotatedMethod.get(method, ExceptionMetered.class);
+        final AnnotatedMethod<ExceptionMetered> annotatedMethod = AnnotatedMethod.get(method, ExceptionMetered.class);
 
         if (!annotatedMethod.hasMethod()) {
             return;
@@ -505,13 +505,13 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                 new ExceptionMeterMetric(
                     metrics,
                     method,
-                    (ExceptionMetered)annotatedMethod.getAnnotation()
+                    annotatedMethod.getAnnotation()
                 ));
         }
     }
 
     private void registerResponseMeteredAnnotations(final ResourceMethod method, final ResponseMetered classLevelResponseMetered) {
-        final AnnotatedMethod annotatedMethod = AnnotatedMethod.get(method, ResponseMetered.class);
+        final AnnotatedMethod<ResponseMetered> annotatedMethod = AnnotatedMethod.get(method, ResponseMetered.class);
 
         if (!annotatedMethod.hasMethod()) {
             return;
@@ -532,7 +532,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
                 new ResponseMeterMetric(
                     metrics,
                     method,
-                    (ResponseMetered)annotatedMethod.getAnnotation()
+                    annotatedMethod.getAnnotation()
                 )
             );
         }
