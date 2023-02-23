@@ -4,7 +4,7 @@
 
     <groupId>io.dropwizard.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>4.2.16-SNAPSHOT</version>
+    <version>4.2.17-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
@@ -61,7 +61,7 @@
         <jetty11.version>11.0.13</jetty11.version>
         <slf4j.version>1.7.36</slf4j.version>
         <assertj.version>3.24.2</assertj.version>
-        <byte-buddy.version>1.13.0</byte-buddy.version>
+        <byte-buddy.version>1.14.0</byte-buddy.version>
         <mockito.version>5.1.1</mockito.version>
         <junit.version>4.13.1</junit.version>
         <hamcrest.version>1.3</hamcrest.version>
@@ -226,7 +226,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.4.1</version>
+                        <version>3.5.0</version>
                         <configuration>
                             <source>8</source>
                             <doclint>none</doclint>
@@ -284,7 +284,7 @@
                     <plugin>
                         <groupId>org.cyclonedx</groupId>
                         <artifactId>cyclonedx-maven-plugin</artifactId>
-                        <version>2.7.4</version>
+                        <version>2.7.5</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
