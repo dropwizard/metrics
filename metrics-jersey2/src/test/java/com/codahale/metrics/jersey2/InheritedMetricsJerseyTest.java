@@ -1,17 +1,17 @@
 package com.codahale.metrics.jersey2;
 
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.jersey2.resources.InstrumentedAbstractResource;
+import com.codahale.metrics.Timer;
 import com.codahale.metrics.jersey2.resources.InstrumentedExtendingResource;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
 
 import javax.ws.rs.core.Application;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.codahale.metrics.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class InheritedMetricsJerseyTest extends JerseyTest {
@@ -40,9 +40,28 @@ public class InheritedMetricsJerseyTest extends JerseyTest {
         assertThat(target("concrete/abstract").request().get(String.class)).isEqualTo("concrete");
         assertThat(target("concrete/concrete").request().get(String.class)).isEqualTo("yay");
 
-        assertThat(registry.timer(name(InstrumentedExtendingResource.class, "fromConcreteClass")).getCount()).isEqualTo(1);
-        assertThat(registry.timer(name(InstrumentedExtendingResource.class, "fromAbstractClass")).getCount()).isEqualTo(1);
-        assertThat(registry.timer(name(InstrumentedAbstractResource.class, "interface")).getCount()).isEqualTo(1);
+        Map<String, Timer> timers = registry.getTimers();
+        int timersCount = timers.size();
+
+        assertThat(timersCount)
+            .withFailMessage(
+                "Expected 3 registered timers, got %d.",
+                timersCount
+            )
+            .isEqualTo(3);
+
+        for (String timerName : timers.keySet()) {
+            Timer timer = timers.get(timerName);
+            long  count = timer.getCount();
+
+            assertThat(count)
+                .withFailMessage(
+                    "Failure validating timer \"%s\": got count = %d.",
+                    timerName,
+                    count
+                )
+                .isEqualTo(1);
+        }
     }
 
 }
