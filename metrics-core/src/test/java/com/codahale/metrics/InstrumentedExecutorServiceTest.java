@@ -168,9 +168,9 @@ public class InstrumentedExecutorServiceTest {
 
     @Test
     public void removesMetricsAfterShutdownForThreadPoolExecutor() {
-        ExecutorService executor = new ThreadPoolExecutor(4, 16,
+        executor = new ThreadPoolExecutor(4, 16,
                 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(32));
-        InstrumentedExecutorService instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "stp");
+        instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "stp");
 
         assertThat(registry.getMetrics()).containsKeys("stp.pool.size", "stp.pool.core", "stp.pool.max", "stp.tasks.active", "stp.tasks.completed", "stp.tasks.queued", "stp.tasks.capacity");
 
