@@ -65,7 +65,7 @@
         <mockito.version>5.1.1</mockito.version>
         <junit.version>4.13.1</junit.version>
         <hamcrest.version>1.3</hamcrest.version>
-        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <errorprone.version>2.18.0</errorprone.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
 
