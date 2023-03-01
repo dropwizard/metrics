@@ -95,38 +95,73 @@ public class SingletonMetricsJerseyTest extends JerseyTest {
     }
 
     @Test
-    public void responseMeteredMethodsAreMetered() {
+    public void responseMeteredMethodsAreMeteredWithCoarseLevel() {
         final Meter meter2xx = registry.meter(name(InstrumentedResource.class,
-                "response2xxMetered",
+                "responseMeteredCoarse",
                 "2xx-responses"));
-        final Meter meter4xx = registry.meter(name(InstrumentedResource.class,
-                "response4xxMetered",
-                "4xx-responses"));
-        final Meter meter5xx = registry.meter(name(InstrumentedResource.class,
-                "response5xxMetered",
-                "5xx-responses"));
+        final Meter meter200 = registry.meter(name(InstrumentedResource.class,
+                "responseMeteredCoarse",
+                "200-responses"));
 
         assertThat(meter2xx.getCount()).isZero();
-        assertThat(target("response-2xx-metered")
+        assertThat(meter200.getCount()).isZero();
+        assertThat(target("response-metered-coarse")
                 .request()
                 .get().getStatus())
                 .isEqualTo(200);
 
-        assertThat(meter4xx.getCount()).isZero();
-        assertThat(target("response-4xx-metered")
+        assertThat(meter2xx.getCount()).isOne();
+        assertThat(meter200.getCount()).isZero();
+    }
+
+    @Test
+    public void responseMeteredMethodsAreMeteredWithDetailedLevel() {
+        final Meter meter2xx = registry.meter(name(InstrumentedResource.class,
+                "responseMeteredDetailed",
+                "2xx-responses"));
+        final Meter meter200 = registry.meter(name(InstrumentedResource.class,
+                "responseMeteredDetailed",
+                "200-responses"));
+        final Meter meter201 = registry.meter(name(InstrumentedResource.class,
+                "responseMeteredDetailed",
+                "201-responses"));
+
+        assertThat(meter2xx.getCount()).isZero();
+        assertThat(meter200.getCount()).isZero();
+        assertThat(meter201.getCount()).isZero();
+        assertThat(target("response-metered-detailed")
                 .request()
                 .get().getStatus())
-                .isEqualTo(400);
-
-        assertThat(meter5xx.getCount()).isZero();
-        assertThat(target("response-5xx-metered")
+                .isEqualTo(200);
+        assertThat(target("response-metered-detailed")
+                .queryParam("status_code", 201)
                 .request()
                 .get().getStatus())
-                .isEqualTo(500);
+                .isEqualTo(201);
 
-        assertThat(meter2xx.getCount()).isEqualTo(1);
-        assertThat(meter4xx.getCount()).isEqualTo(1);
-        assertThat(meter5xx.getCount()).isEqualTo(1);
+        assertThat(meter2xx.getCount()).isZero();
+        assertThat(meter200.getCount()).isOne();
+        assertThat(meter201.getCount()).isOne();
+    }
+
+    @Test
+    public void responseMeteredMethodsAreMeteredWithAllLevel() {
+        final Meter meter2xx = registry.meter(name(InstrumentedResource.class,
+                "responseMeteredAll",
+                "2xx-responses"));
+        final Meter meter200 = registry.meter(name(InstrumentedResource.class,
+                "responseMeteredAll",
+                "200-responses"));
+
+        assertThat(meter2xx.getCount()).isZero();
+        assertThat(meter200.getCount()).isZero();
+        assertThat(target("response-metered-all")
+                .request()
+                .get().getStatus())
+                .isEqualTo(200);
+
+        assertThat(meter2xx.getCount()).isOne();
+        assertThat(meter200.getCount()).isOne();
     }
 
     @Test

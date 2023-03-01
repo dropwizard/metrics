@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.2.16-SNAPSHOT</version>
+        <version>4.2.18-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-jvm</artifactId>
@@ -28,6 +28,11 @@
                 <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

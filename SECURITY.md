@@ -8,8 +8,7 @@ In general, only the currently stable version is supported.
 | ------- | ------------------ |
 | 5.0.x   | :x: (in development) |
 | 4.2.x   | :white_check_mark: |
-| 4.1.x   | :white_check_mark: |
-| < 4.1   | :x:                |
+| < 4.2   | :x:                |
 
 ## Reporting a Vulnerability
 
