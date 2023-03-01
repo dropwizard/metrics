@@ -6,8 +6,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
- * A timer metric which aggregates timing durations and provides duration
- * statistics, plus
+ * A timer metric which aggregates timing durations and provides duration statistics, plus
  * throughput statistics via {@link Meter}.
  */
 public class Timer implements Metered, Sampling {
@@ -28,8 +27,7 @@ public class Timer implements Metered, Sampling {
         }
 
         /**
-         * Updates the timer with the difference between current and start time. Call to
-         * this method will
+         * Updates the timer with the difference between current and start time. Call to this method will
          * not reset the start time. Multiple calls result in multiple updates.
          *
          * @return the elapsed time in nanoseconds
@@ -54,8 +52,7 @@ public class Timer implements Metered, Sampling {
     private final Clock clock;
 
     /**
-     * Creates a new {@link Timer} using an {@link ExponentiallyDecayingReservoir}
-     * and the default
+     * Creates a new {@link Timer} using an {@link ExponentiallyDecayingReservoir} and the default
      * {@link Clock}.
      */
     public Timer() {
@@ -72,8 +69,7 @@ public class Timer implements Metered, Sampling {
     }
 
     /**
-     * Creates a new {@link Timer} that uses the given {@link Reservoir} and
-     * {@link Clock}.
+     * Creates a new {@link Timer} that uses the given {@link Reservoir} and {@link Clock}.
      *
      * @param reservoir the {@link Reservoir} implementation the timer should use
      * @param clock     the {@link Clock} implementation the timer should use
@@ -101,8 +97,7 @@ public class Timer implements Metered, Sampling {
     /**
      * Adds a recorded duration.
      *
-     * @param duration the {@link Duration} to add to the timer. Negative or zero
-     *                 value are ignored.
+     * @param duration the {@link Duration} to add to the timer. Negative or zero value are ignored.
      */
     public void update(Duration duration) {
         update(duration.toNanos());
@@ -111,8 +106,7 @@ public class Timer implements Metered, Sampling {
     /**
      * Times and records the duration of event.
      *
-     * @param event a {@link Callable} whose {@link Callable#call()} method
-     *              implements a process
+     * @param event a {@link Callable} whose {@link Callable#call()} method implements a process
      *              whose duration should be timed
      * @param <T>   the type of the value returned by {@code event}
      * @return the value returned by {@code event}
@@ -128,12 +122,10 @@ public class Timer implements Metered, Sampling {
     }
 
     /**
-     * Times and records the duration of event. Should not throw exceptions, for
-     * that use the
+     * Times and records the duration of event. Should not throw exceptions, for that use the
      * {@link #time(Callable)} method.
      *
-     * @param event a {@link Supplier} whose {@link Supplier#get()} method
-     *              implements a process
+     * @param event a {@link Supplier} whose {@link Supplier#get()} method implements a process
      *              whose duration should be timed
      * @param <T>   the type of the value returned by {@code event}
      * @return the value returned by {@code event}
@@ -150,8 +142,7 @@ public class Timer implements Metered, Sampling {
     /**
      * Times and records the duration of event.
      *
-     * @param event a {@link Runnable} whose {@link Runnable#run()} method
-     *              implements a process
+     * @param event a {@link Runnable} whose {@link Runnable#run()} method implements a process
      *              whose duration should be timed
      */
     public void time(Runnable event) {
