@@ -56,16 +56,16 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <jackson.version>2.12.3</jackson.version>
-        <jetty9.version>9.4.50.v20221201</jetty9.version>
-        <jetty10.version>10.0.13</jetty10.version>
-        <jetty11.version>11.0.13</jetty11.version>
+        <jetty9.version>9.4.51.v20230217</jetty9.version>
+        <jetty10.version>10.0.14</jetty10.version>
+        <jetty11.version>11.0.14</jetty11.version>
         <slf4j.version>1.7.36</slf4j.version>
         <assertj.version>3.24.2</assertj.version>
         <byte-buddy.version>1.14.0</byte-buddy.version>
         <mockito.version>5.1.1</mockito.version>
         <junit.version>4.13.1</junit.version>
         <hamcrest.version>1.3</hamcrest.version>
-        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <errorprone.version>2.18.0</errorprone.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
 
