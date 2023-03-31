@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.2.18-SNAPSHOT</version>
+        <version>4.2.19-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-logback</artifactId>
@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.logback</javaModuleName>
-        <logback.version>1.2.11</logback.version>
+        <logback.version>1.2.12</logback.version>
     </properties>
 
     <dependencyManagement>
