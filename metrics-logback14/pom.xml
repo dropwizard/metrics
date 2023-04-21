@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.logback14</javaModuleName>
-        <logback14.version>1.4.6</logback14.version>
+        <logback14.version>1.4.7</logback14.version>
 
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
