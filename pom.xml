@@ -518,7 +518,7 @@
                     <dependency>
                         <groupId>org.openrewrite.recipe</groupId>
                         <artifactId>rewrite-testing-frameworks</artifactId>
-                        <version>1.36.0</version>
+                        <version>1.37.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
