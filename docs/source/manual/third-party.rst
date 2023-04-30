@@ -58,6 +58,7 @@ Reporters
 * `metrics-statsd <https://github.com/ReadyTalk/metrics-statsd>`_ provides a Metrics 2.x and 3.x reporter for `StatsD <https://github.com/etsy/statsd/>`_
 * `metrics-zabbiz <https://github.com/hengyunabc/metrics-zabbix>`_ provides a reporter for `Zabbix <http://www.zabbix.com/>`_.
 * `sematext-metrics-reporter <https://github.com/sematext/sematext-metrics-reporter>`_ provides a reporter for `SPM <https://sematext.com/spm/>`_.
+* `metrics-jfr <https://github.com/poiu-de/metrics-jfr>`_ provides a reporter to publish event via `Java Flight Recorder <https://docs.oracle.com/en/java/java-components/jdk-mission-control/8/user-guide/using-jdk-flight-recorder.html>`_.
 
 Advanced metrics implementations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
