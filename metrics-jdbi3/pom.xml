@@ -15,7 +15,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.jdbi3</javaModuleName>
-        <jdbi3.version>3.38.1</jdbi3.version>
+        <jdbi3.version>3.38.2</jdbi3.version>
     </properties>
 
     <dependencyManagement>
