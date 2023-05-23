@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.2.18-SNAPSHOT</version>
+        <version>4.2.19-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-logback13</artifactId>
@@ -17,8 +17,8 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics.logback13</javaModuleName>
-        <logback13.version>1.3.5</logback13.version>
-        <slf4j.version>2.0.6</slf4j.version>
+        <logback13.version>1.3.7</logback13.version>
+        <slf4j.version>2.0.7</slf4j.version>
     </properties>
 
     <dependencyManagement>
