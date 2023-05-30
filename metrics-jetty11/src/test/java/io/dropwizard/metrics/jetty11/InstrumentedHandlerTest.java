@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.annotation.ResponseMeteredLevel.ALL;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 public class InstrumentedHandlerTest {
     private final HttpClient client = new HttpClient();
@@ -109,6 +110,14 @@ public class InstrumentedHandlerTest {
                 .isEqualTo(200);
 
         assertResponseTimesValid();
+    }
+
+    @Test
+    public void doStopDoesNotThrowNPE() throws Exception {
+        InstrumentedHandler handler = new InstrumentedHandler(registry, null, ALL);
+        handler.setHandler(new TestHandler());
+
+        assertThatCode(handler::doStop).doesNotThrowAnyException();
     }
 
     @Test
