@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.ALL;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 class InstrumentedHandlerTest {
     private final HttpClient client = new HttpClient();
@@ -110,6 +111,14 @@ class InstrumentedHandlerTest {
                 .isEqualTo(200);
 
         assertResponseTimesValid();
+    }
+
+    @Test
+    void doStopDoesNotThrowNPE() throws Exception {
+        InstrumentedHandler handler = new InstrumentedHandler(registry, null, ALL);
+        handler.setHandler(new TestHandler());
+
+        assertThatCode(handler::doStop).doesNotThrowAnyException();
     }
 
     @Test
