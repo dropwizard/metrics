@@ -144,7 +144,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <version>${maven-compiler-plugin.version}</version>
                         <configuration>
                             <compilerId>javac-with-errorprone</compilerId>
                             <forceJavacCompilerUse>true</forceJavacCompilerUse>
@@ -207,7 +206,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <version>${maven-compiler-plugin.version}</version>
                         <configuration>
                             <fork>true</fork>
                             <compilerArgs>
@@ -361,6 +359,8 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <fork>true</fork>
+                    <parameters>true</parameters>
                     <showWarnings>true</showWarnings>
                     <compilerArgs>
                         <arg>-Xlint:all</arg>
