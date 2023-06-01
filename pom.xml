@@ -4,7 +4,7 @@
 
     <groupId>io.dropwizard.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>4.2.19-SNAPSHOT</version>
+    <version>4.2.19</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
@@ -51,7 +51,7 @@
     </modules>
 
     <properties>
-        <project.build.outputTimestamp>2011-02-24T06:12:03Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2023-06-01T21:00:23Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -114,7 +114,7 @@
         <connection>scm:git:git://github.com/dropwizard/metrics.git</connection>
         <developerConnection>scm:git:git@github.com:dropwizard/metrics.git</developerConnection>
         <url>https://github.com/dropwizard/metrics/</url>
-        <tag>HEAD</tag>
+        <tag>v4.2.19</tag>
     </scm>
 
     <issueManagement>
