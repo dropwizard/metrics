@@ -281,9 +281,12 @@ public class InstrumentedHandler extends HandlerWrapper {
         metricRegistry.remove(name(prefix, NAME_PERCENT_5XX_1M));
         metricRegistry.remove(name(prefix, NAME_PERCENT_5XX_5M));
         metricRegistry.remove(name(prefix, NAME_PERCENT_5XX_15M));
-        responseCodeMeters.keySet().stream()
-                .map(sc -> name(getMetricPrefix(), String.format("%d-responses", sc)))
-                .forEach(m -> metricRegistry.remove(m));
+
+        if (responseCodeMeters != null) {
+            responseCodeMeters.keySet().stream()
+                    .map(sc -> name(getMetricPrefix(), String.format("%d-responses", sc)))
+                    .forEach(metricRegistry::remove);
+        }
         super.doStop();
     }
 
