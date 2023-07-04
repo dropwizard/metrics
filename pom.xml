@@ -508,7 +508,7 @@
             <plugin>
                 <groupId>org.openrewrite.maven</groupId>
                 <artifactId>rewrite-maven-plugin</artifactId>
-                <version>5.2.5</version>
+                <version>5.2.6</version>
                 <configuration>
                     <activeRecipes>
                         <recipe>org.openrewrite.java.testing.junit5.JUnit5BestPractices</recipe>
