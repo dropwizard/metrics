@@ -58,8 +58,8 @@ Initialization Parameters
 ``HealthCheckServlet`` supports the following initialization parameters:
 
 * ``io.dropwizard.metrics5.servlets.HealthCheckServlet.httpStatusIndicator``: Provides the
-default setting that determines whether the HTTP status code is used to determine whether the
-application is healthy; if not provided, it defaults to ``"true"``
+  default setting that determines whether the HTTP status code is used to determine whether the
+  application is healthy; if not provided, it defaults to ``"true"``
 
 Query Parameters
 ~~~~~~~~~~~~~~~~
