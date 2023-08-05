@@ -15,7 +15,7 @@
     </description>
 
     <properties>
-        <jmh.version>1.36</jmh.version>
+        <jmh.version>1.37</jmh.version>
         <javaModuleName>io.dropwizard.metrics5.benchmarks</javaModuleName>
         <jar.skipIfEmpty>true</jar.skipIfEmpty>
         <maven.install.skip>true</maven.install.skip>
