@@ -15,7 +15,7 @@
     </description>
 
     <properties>
-        <jmh.version>1.36</jmh.version>
+        <jmh.version>1.37</jmh.version>
         <javaModuleName>com.codahale.metrics.benchmarks</javaModuleName>
         <jar.skipIfEmpty>true</jar.skipIfEmpty>
         <maven.install.skip>true</maven.install.skip>
