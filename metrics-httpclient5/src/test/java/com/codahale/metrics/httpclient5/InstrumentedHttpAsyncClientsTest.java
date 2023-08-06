@@ -6,8 +6,8 @@ import com.codahale.metrics.Timer;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
-import org.apache.hc.client5.http.async.methods.SimpleHttpRequests;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
+import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.core5.concurrent.FutureCallback;
@@ -74,7 +74,9 @@ public class InstrumentedHttpAsyncClientsTest {
         client = InstrumentedHttpAsyncClients.custom(metricRegistry, metricNameStrategy).disableAutomaticRetries().build();
         client.start();
 
-        final SimpleHttpRequest request = SimpleHttpRequests.get("http://localhost:" + httpServer.getAddress().getPort() + "/");
+        final SimpleHttpRequest request = SimpleRequestBuilder
+                .get("http://localhost:" + httpServer.getAddress().getPort() + "/")
+                .build();
         final String metricName = "some.made.up.metric.name";
 
         httpServer.createContext("/", exchange -> {
@@ -114,7 +116,9 @@ public class InstrumentedHttpAsyncClientsTest {
         client.start();
 
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        final SimpleHttpRequest request = SimpleHttpRequests.get("http://localhost:" + httpServer.getAddress().getPort() + "/");
+        final SimpleHttpRequest request = SimpleRequestBuilder
+                .get("http://localhost:" + httpServer.getAddress().getPort() + "/")
+                .build();
         final String requestMetricName = "request";
         final String exceptionMetricName = "exception";
 
@@ -160,7 +164,9 @@ public class InstrumentedHttpAsyncClientsTest {
         client = InstrumentedHttpAsyncClients.custom(metricRegistry, metricNameStrategy, clientConnectionManager).disableAutomaticRetries().build();
         client.start();
 
-        final SimpleHttpRequest request = SimpleHttpRequests.get("http://localhost:" + httpServer.getAddress().getPort() + "/");
+        final SimpleHttpRequest request = SimpleRequestBuilder
+                .get("http://localhost:" + httpServer.getAddress().getPort() + "/")
+                .build();
         final String metricName = "some.made.up.metric.name";
 
         httpServer.createContext("/", exchange -> {
