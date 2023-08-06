@@ -4,9 +4,9 @@ import io.dropwizard.metrics5.MetricName;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
-import org.apache.hc.client5.http.utils.URIUtils;
 import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.message.HttpRequestWrapper;
+import org.apache.hc.core5.net.URIBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
@@ -78,8 +78,8 @@ class HttpClientMetricNameStrategiesTest {
     }
 
     private static HttpRequest rewriteRequestURI(HttpRequest request) throws URISyntaxException {
+        URI uri = new URIBuilder(request.getUri()).setFragment(null).build();
         HttpRequestWrapper wrapper = new HttpRequestWrapper(request);
-        URI uri = URIUtils.rewriteURI(wrapper.getUri(), null, true);
         wrapper.setUri(uri);
 
         return wrapper;
