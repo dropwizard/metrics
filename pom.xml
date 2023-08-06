@@ -28,6 +28,7 @@
         <module>metrics-httpclient5</module>
         <module>metrics-httpasyncclient</module>
         <module>metrics-jakarta-servlet</module>
+        <module>metrics-jakarta-servlet6</module>
         <module>metrics-jakarta-servlets</module>
         <module>metrics-jcache</module>
         <module>metrics-jdbi3</module>

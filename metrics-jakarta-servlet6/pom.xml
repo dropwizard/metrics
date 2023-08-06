@@ -8,16 +8,16 @@
         <version>5.0.0-rc18-SNAPSHOT</version>
     </parent>
 
-    <artifactId>metrics-json</artifactId>
-    <name>Jackson Integration for Metrics5 </name>
+    <artifactId>metrics-jakarta-servlet6</artifactId>
+    <name>Metrics Integration for Jakarta Servlets 6.x</name>
     <packaging>bundle</packaging>
     <description>
-        A set of Jackson modules which provide serializers for most Metrics classes.
+        An instrumented filter for servlet 6.x environments.
     </description>
 
     <properties>
-        <javaModuleName>io.dropwizard.metrics5.json</javaModuleName>
-        <jackson.version>2.15.2</jackson.version>
+        <javaModuleName>io.dropwizard.metrics5.servlet</javaModuleName>
+        <servlet6.version>6.0.0</servlet6.version>
     </properties>
 
     <dependencyManagement>
@@ -29,11 +29,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>net.bytebuddy</groupId>
-                <artifactId>byte-buddy</artifactId>
-                <version>${byte-buddy.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -43,25 +38,10 @@
             <artifactId>metrics-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.dropwizard.metrics5</groupId>
-            <artifactId>metrics-healthchecks</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>${assertj.version}</version>
-            <scope>test</scope>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${servlet6.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -79,12 +59,6 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -72,6 +72,11 @@
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-jakarta-servlet6</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-jakarta-servlets</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -128,11 +133,6 @@
             <dependency>
                 <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-log4j2</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.dropwizard.metrics5</groupId>
-                <artifactId>metrics-logback13</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
