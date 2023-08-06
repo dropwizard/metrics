@@ -7,8 +7,8 @@ import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.MetricRegistryListener;
 import io.dropwizard.metrics5.Timer;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
-import org.apache.hc.client5.http.async.methods.SimpleHttpRequests;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
+import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.core5.concurrent.FutureCallback;
@@ -73,7 +73,9 @@ class InstrumentedHttpAsyncClientsTest {
         client = InstrumentedHttpAsyncClients.custom(metricRegistry, metricNameStrategy).disableAutomaticRetries().build();
         client.start();
 
-        final SimpleHttpRequest request = SimpleHttpRequests.get("http://localhost:" + httpServer.getAddress().getPort() + "/");
+        final SimpleHttpRequest request = SimpleRequestBuilder
+                .get("http://localhost:" + httpServer.getAddress().getPort() + "/")
+                .build();
         final MetricName metricName = MetricName.build("some.made.up.metric.name");
 
         httpServer.createContext("/", exchange -> {
@@ -113,7 +115,9 @@ class InstrumentedHttpAsyncClientsTest {
         client.start();
 
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        final SimpleHttpRequest request = SimpleHttpRequests.get("http://localhost:" + httpServer.getAddress().getPort() + "/");
+        final SimpleHttpRequest request = SimpleRequestBuilder
+                .get("http://localhost:" + httpServer.getAddress().getPort() + "/")
+                .build();
         final MetricName requestMetricName = MetricName.build("request");
         final MetricName exceptionMetricName = MetricName.build("exception");
 
@@ -159,7 +163,9 @@ class InstrumentedHttpAsyncClientsTest {
             client = InstrumentedHttpAsyncClients.custom(metricRegistry, metricNameStrategy, clientConnectionManager).disableAutomaticRetries().build();
             client.start();
 
-            final SimpleHttpRequest request = SimpleHttpRequests.get("http://localhost:" + httpServer.getAddress().getPort() + "/");
+            final SimpleHttpRequest request = SimpleRequestBuilder
+                    .get("http://localhost:" + httpServer.getAddress().getPort() + "/")
+                    .build();
             final MetricName metricName = MetricName.build("some.made.up.metric.name");
 
             httpServer.createContext("/", exchange -> {
