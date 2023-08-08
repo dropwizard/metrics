@@ -56,7 +56,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <jackson.version>2.15.2</jackson.version>
-        <jetty10.version>10.0.15</jetty10.version>
+        <jetty10.version>12.0.0</jetty10.version>
         <jetty11.version>11.0.15</jetty11.version>
         <slf4j.version>2.0.7</slf4j.version>
         <assertj.version>3.24.2</assertj.version>
