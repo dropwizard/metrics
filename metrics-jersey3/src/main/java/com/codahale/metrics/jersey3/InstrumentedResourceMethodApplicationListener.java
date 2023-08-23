@@ -406,6 +406,25 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
         return annotation;
     }
 
+    /**
+     * @param method the method to examine for the annotation
+     * @param annotation the annotation class (e.g. Timed, Metered, etc)
+     * @return the annotation (of type {@code T})from the given method, or null.
+     * @param <T> the type of annotation to return
+     */
+    private static <T extends Annotation> T findAnnotation(final ResourceMethod method, final Class<T> annotation) {
+        // In code-generation situations, developers define their API (via OpenAPI or gRPC or ___), and JAX-RS
+        // interfaces are generated for the defined services (which define @Path, @Produces, etc).
+        // The developer is then responsible for implementing those service interfaces.
+        // For fetching metrics annotations, we presume that any annotation on the implementing method should
+        // take precedence over the interface method, as the developer controls the former more directly.
+        T result = method.getInvocable().getHandlingMethod().getAnnotation(annotation);
+        if (result == null) {
+            result = method.getInvocable().getDefinitionMethod().getAnnotation(annotation);
+        }
+        return result;
+    }
+
     private void registerTimedAnnotations(final ResourceMethod method, final Timed classLevelTimed) {
         final Method definitionMethod = method.getInvocable().getDefinitionMethod();
         if (classLevelTimed != null) {
@@ -413,7 +432,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
             return;
         }
 
-        final Timed annotation = definitionMethod.getAnnotation(Timed.class);
+        final Timed annotation = findAnnotation(method, Timed.class);
         if (annotation != null) {
             registerTimers(method, definitionMethod, annotation);
         }
@@ -435,7 +454,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
             meters.putIfAbsent(definitionMethod, meterMetric(metrics, method, classLevelMetered));
             return;
         }
-        final Metered annotation = definitionMethod.getAnnotation(Metered.class);
+        final Metered annotation = findAnnotation(method, Metered.class);
 
         if (annotation != null) {
             meters.putIfAbsent(definitionMethod, meterMetric(metrics, method, annotation));
@@ -449,7 +468,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
             exceptionMeters.putIfAbsent(definitionMethod, new ExceptionMeterMetric(metrics, method, classLevelExceptionMetered));
             return;
         }
-        final ExceptionMetered annotation = definitionMethod.getAnnotation(ExceptionMetered.class);
+        final ExceptionMetered annotation = findAnnotation(method, ExceptionMetered.class);
 
         if (annotation != null) {
             exceptionMeters.putIfAbsent(definitionMethod, new ExceptionMeterMetric(metrics, method, annotation));
@@ -463,7 +482,7 @@ public class InstrumentedResourceMethodApplicationListener implements Applicatio
             responseMeters.putIfAbsent(definitionMethod, new ResponseMeterMetric(metrics, method, classLevelResponseMetered));
             return;
         }
-        final ResponseMetered annotation = definitionMethod.getAnnotation(ResponseMetered.class);
+        final ResponseMetered annotation = findAnnotation(method, ResponseMetered.class);
 
         if (annotation != null) {
             responseMeters.putIfAbsent(definitionMethod, new ResponseMeterMetric(metrics, method, annotation));
