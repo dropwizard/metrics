@@ -54,7 +54,16 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
                                         @Name("minThreads") int minThreads,
                                         @Name("idleTimeout") int idleTimeout,
                                         @Name("queue") BlockingQueue<Runnable> queue) {
-        this(registry, maxThreads, minThreads, idleTimeout, queue, null);
+        this(registry, maxThreads, minThreads, idleTimeout, queue, (ThreadGroup) null);
+    }
+
+    public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry,
+                                        @Name("maxThreads") int maxThreads,
+                                        @Name("minThreads") int minThreads,
+                                        @Name("idleTimeout") int idleTimeout,
+                                        @Name("queue") BlockingQueue<Runnable> queue,
+                                        @Name("threadFactory") ThreadFactory threadFactory) {
+        this(registry, maxThreads, minThreads, idleTimeout, -1, queue, null, threadFactory);
     }
 
     public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry,
