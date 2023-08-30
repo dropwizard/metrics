@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.2.18-SNAPSHOT</version>
+        <version>4.2.20-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-graphite</artifactId>
@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.graphite</javaModuleName>
-        <rabbitmq.version>5.16.0</rabbitmq.version>
+        <rabbitmq.version>5.18.0</rabbitmq.version>
     </properties>
 
     <dependencyManagement>

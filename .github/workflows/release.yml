@@ -14,18 +14,18 @@ jobs:
     env:
       JAVA_OPTS: "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
     steps:
-    - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3
+    - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
     - name: Set up JDK
-      uses: actions/setup-java@3f07048e3d294f56e9b90ac5ea2c6f74e9ad0f98 # v3
+      uses: actions/setup-java@cd89f46ac9d01407894225f350157564c9c7cee2 # v3
       with:
-        java-version: 11
+        java-version: 17
         distribution: 'zulu'
         server-id: ossrh
         server-username: CI_DEPLOY_USERNAME
         server-password: CI_DEPLOY_PASSWORD
         gpg-passphrase: GPG_PASSPHRASE
         gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-    - uses: actions/cache@69d9d449aced6a2ede0bc19182fadc3a0a42d2b0 # v3.2.6
+    - uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}

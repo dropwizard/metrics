@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.2.18-SNAPSHOT</version>
+        <version>4.2.20-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-jersey3</artifactId>
@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.jersey3</javaModuleName>
-        <jersey.version>3.0.9</jersey.version>
+        <jersey.version>3.0.11</jersey.version>
     </properties>
 
     <dependencyManagement>
