@@ -60,7 +60,7 @@
         <jetty11.version>11.0.16</jetty11.version>
         <slf4j.version>2.0.9</slf4j.version>
         <assertj.version>3.24.2</assertj.version>
-        <byte-buddy.version>1.14.7</byte-buddy.version>
+        <byte-buddy.version>1.14.8</byte-buddy.version>
         <mockito.version>5.5.0</mockito.version>
         <hamcrest.version>1.3</hamcrest.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
