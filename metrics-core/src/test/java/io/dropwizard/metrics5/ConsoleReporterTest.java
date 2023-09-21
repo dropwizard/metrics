@@ -1,5 +1,7 @@
 package io.dropwizard.metrics5;
 
+import org.apache.commons.lang3.JavaVersion;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -42,8 +44,11 @@ class ConsoleReporterTest {
         when(clock.getTime()).thenReturn(1363568676000L);
         // JDK9 has changed the java.text.DateFormat API implementation according to Unicode.
         // See http://mail.openjdk.java.net/pipermail/jdk9-dev/2017-April/005732.html
-        dateHeader = System.getProperty("java.version").startsWith("1.8") ?
+        dateHeader = SystemUtils.isJavaVersionAtMost(JavaVersion.JAVA_1_8) ?
                 "3/17/13 6:04:36 PM =============================================================" :
+                // https://bugs.openjdk.org/browse/JDK-8304925
+                SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_20) ?
+                "3/17/13, 6:04:36\u202FPM ============================================================" :
                 "3/17/13, 6:04:36 PM ============================================================";
     }
 
