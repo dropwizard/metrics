@@ -8,8 +8,8 @@ import jakarta.servlet.AsyncListener;
 import org.eclipse.jetty.ee10.servlet.AsyncContextState;
 import org.eclipse.jetty.ee10.servlet.ServletApiRequest;
 import org.eclipse.jetty.ee10.servlet.ServletApiResponse;
+import org.eclipse.jetty.ee10.servlet.ServletChannelState;
 import org.eclipse.jetty.ee10.servlet.ServletContextRequest;
-import org.eclipse.jetty.ee10.servlet.ServletRequestState;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
@@ -85,7 +85,7 @@ public class InstrumentedEE10Handler extends AbstractInstrumentedHandler {
         activeDispatches.inc();
 
         final long start;
-        final ServletRequestState state = servletContextRequest.getServletRequestState();
+        final ServletChannelState state = servletContextRequest.getServletRequestState();
         if (state.isInitial()) {
             // new request
             activeRequests.inc();
@@ -95,7 +95,7 @@ public class InstrumentedEE10Handler extends AbstractInstrumentedHandler {
             // resumed request
             start = System.currentTimeMillis();
             activeSuspended.dec();
-            if (state.getState() == ServletRequestState.State.HANDLING) {
+            if (state.getState() == ServletChannelState.State.HANDLING) {
                 asyncDispatches.mark();
             }
         }
@@ -137,7 +137,7 @@ public class InstrumentedEE10Handler extends AbstractInstrumentedHandler {
 
         @Override
         public void onComplete(AsyncEvent event) throws IOException {}
-    };
+    }
 
     private class InstrumentedAsyncListener implements AsyncListener {
         private final long startTime;
@@ -165,7 +165,10 @@ public class InstrumentedEE10Handler extends AbstractInstrumentedHandler {
             final ServletApiRequest request = (ServletApiRequest) state.getRequest();
             final ServletApiResponse response = (ServletApiResponse) state.getResponse();
             updateResponses(request.getRequest(), response.getResponse(), startTime, true);
-            if (!state.getServletChannelState().isSuspended()) {
+
+            final ServletContextRequest servletContextRequest = Request.as(request.getRequest(), ServletContextRequest.class);
+            final ServletChannelState servletRequestState = servletContextRequest.getServletRequestState();
+            if (!servletRequestState.isSuspended()) {
                 activeSuspended.dec();
             }
         }
