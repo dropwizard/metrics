@@ -12,6 +12,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.JavaVersion;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,9 +21,12 @@ import org.junit.jupiter.api.Test;
 class ConsoleReporterTest {
 
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    private final String dateHeader = System.getProperty("java.version").startsWith("1.8") ?
-            "3/18/13 1:04:36 AM =============================================================" :
-            "3/18/13, 1:04:36 AM ============================================================";
+    private final String dateHeader = SystemUtils.isJavaVersionAtMost(JavaVersion.JAVA_1_8) ?
+            "3/17/13 6:04:36 PM =============================================================" :
+            // https://bugs.openjdk.org/browse/JDK-8304925
+            SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_20) ?
+            "3/17/13, 6:04:36\u202FPM ============================================================" :
+            "3/17/13, 6:04:36 PM ============================================================";
 
     @AfterEach
     void tearDown() throws Exception {
@@ -55,7 +60,7 @@ class ConsoleReporterTest {
                     public long getTick() {
                         return 0;
                     }
-                }).formattedFor(TimeZone.getTimeZone("UTC"))
+                }).formattedFor(TimeZone.getTimeZone("America/Los_Angeles"))
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .filter(MetricFilter.ALL)
