@@ -6,6 +6,7 @@ import org.eclipse.jetty.util.annotation.Name;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -37,6 +38,13 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
     public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry,
                                         @Name("maxThreads") int maxThreads,
                                         @Name("minThreads") int minThreads,
+                                        @Name("queue") BlockingQueue<Runnable> queue) {
+        this(registry, maxThreads, minThreads, 60000, queue);
+    }
+
+    public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry,
+                                        @Name("maxThreads") int maxThreads,
+                                        @Name("minThreads") int minThreads,
                                         @Name("idleTimeout") int idleTimeout) {
         this(registry, maxThreads, minThreads, idleTimeout, null);
     }
@@ -46,7 +54,7 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
                                         @Name("minThreads") int minThreads,
                                         @Name("idleTimeout") int idleTimeout,
                                         @Name("queue") BlockingQueue<Runnable> queue) {
-        this(registry, maxThreads, minThreads, idleTimeout, queue, null);
+        this(registry, maxThreads, minThreads, idleTimeout, queue, (ThreadGroup) null);
     }
 
     public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry,
@@ -55,7 +63,58 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
                                         @Name("idleTimeout") int idleTimeout,
                                         @Name("queue") BlockingQueue<Runnable> queue,
                                         @Name("prefix") String prefix) {
-        super(maxThreads, minThreads, idleTimeout, queue);
+        this(registry, maxThreads, minThreads, idleTimeout, -1, queue, null, null, prefix);
+    }
+
+    public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry,
+                                        @Name("maxThreads") int maxThreads,
+                                        @Name("minThreads") int minThreads,
+                                        @Name("idleTimeout") int idleTimeout,
+                                        @Name("queue") BlockingQueue<Runnable> queue,
+                                        @Name("threadFactory") ThreadFactory threadFactory) {
+        this(registry, maxThreads, minThreads, idleTimeout, -1, queue, null, threadFactory);
+    }
+
+    public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry,
+                                        @Name("maxThreads") int maxThreads,
+                                        @Name("minThreads") int minThreads,
+                                        @Name("idleTimeout") int idleTimeout,
+                                        @Name("queue") BlockingQueue<Runnable> queue,
+                                        @Name("threadGroup") ThreadGroup threadGroup) {
+        this(registry, maxThreads, minThreads, idleTimeout, -1, queue, threadGroup);
+    }
+
+    public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry,
+                                        @Name("maxThreads") int maxThreads,
+                                        @Name("minThreads") int minThreads,
+                                        @Name("idleTimeout") int idleTimeout,
+                                        @Name("reservedThreads") int reservedThreads,
+                                        @Name("queue") BlockingQueue<Runnable> queue,
+                                        @Name("threadGroup") ThreadGroup threadGroup) {
+        this(registry, maxThreads, minThreads, idleTimeout, reservedThreads, queue, threadGroup, null);
+    }
+
+    public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry,
+                                        @Name("maxThreads") int maxThreads,
+                                        @Name("minThreads") int minThreads,
+                                        @Name("idleTimeout") int idleTimeout,
+                                        @Name("reservedThreads") int reservedThreads,
+                                        @Name("queue") BlockingQueue<Runnable> queue,
+                                        @Name("threadGroup") ThreadGroup threadGroup,
+                                        @Name("threadFactory") ThreadFactory threadFactory) {
+        this(registry, maxThreads, minThreads, idleTimeout, reservedThreads, queue, threadGroup, threadFactory, null);
+    }
+
+    public InstrumentedQueuedThreadPool(@Name("registry") MetricRegistry registry,
+                                        @Name("maxThreads") int maxThreads,
+                                        @Name("minThreads") int minThreads,
+                                        @Name("idleTimeout") int idleTimeout,
+                                        @Name("reservedThreads") int reservedThreads,
+                                        @Name("queue") BlockingQueue<Runnable> queue,
+                                        @Name("threadGroup") ThreadGroup threadGroup,
+                                        @Name("threadFactory") ThreadFactory threadFactory,
+                                        @Name("prefix") String prefix) {
+        super(maxThreads, minThreads, idleTimeout, reservedThreads, queue, threadGroup, threadFactory);
         this.metricRegistry = registry;
         this.prefix = prefix;
     }
