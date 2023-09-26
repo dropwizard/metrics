@@ -266,13 +266,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.6.0</version>
-                        <configuration>
-                            <source>8</source>
-                            <doclint>none</doclint>
-                            <quiet>true</quiet>
-                            <notimestamp>true</notimestamp>
-                        </configuration>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -352,6 +345,18 @@
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>3.1.1</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.6.0</version>
+                    <configuration>
+                        <source>8</source>
+                        <doclint>none</doclint>
+                        <quiet>true</quiet>
+                        <notimestamp>true</notimestamp>
+                        <legacyMode>true</legacyMode>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -359,8 +364,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <release>8</release>
                     <fork>true</fork>
                     <parameters>true</parameters>
                     <showWarnings>true</showWarnings>
