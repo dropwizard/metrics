@@ -43,7 +43,7 @@ jobs:
         key: ${{ runner.os }}-sonar
         restore-keys: ${{ runner.os }}-sonar
     - name: Build
-      run: ./mvnw -B -V -ff -ntp install
+      run: ./mvnw -B -V -ff -ntp install javadoc:javadoc
     - name: Analyze with SonarCloud
       if: ${{ env.SONAR_TOKEN != null && env.SONAR_TOKEN != '' && matrix.java_version == '17' }}
       env:
