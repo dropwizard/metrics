@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>5.0.0-rc18-SNAPSHOT</version>
+        <version>5.0.0-rc18</version>
     </parent>
 
     <artifactId>metrics-jakarta-servlet6</artifactId>
