@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.servlets</javaModuleName>
-        <jackson.version>2.15.3</jackson.version>
+        <jackson.version>2.16.0</jackson.version>
         <papertrail.profiler.version>1.1.1</papertrail.profiler.version>
         <servlet.version>4.0.1</servlet.version>
     </properties>
