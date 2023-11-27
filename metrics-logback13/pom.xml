@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.logback13</javaModuleName>
-        <logback13.version>1.3.12</logback13.version>
+        <logback13.version>1.4.12</logback13.version>
         <slf4j.version>2.0.9</slf4j.version>
     </properties>
 
