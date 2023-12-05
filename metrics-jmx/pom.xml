@@ -3,7 +3,7 @@
     <parent>
         <artifactId>metrics-parent</artifactId>
         <groupId>io.dropwizard.metrics</groupId>
-        <version>4.2.23</version>
+        <version>4.2.24-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
