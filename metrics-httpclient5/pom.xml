@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.httpclient5</javaModuleName>
-        <http-client.version>5.2.3</http-client.version>
+        <http-client.version>5.3</http-client.version>
     </properties>
 
     <dependencyManagement>
