@@ -56,7 +56,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <jetty9.version>9.4.53.v20231009</jetty9.version>
+        <jetty9.version>12.0.4</jetty9.version>
         <jetty10.version>10.0.18</jetty10.version>
         <jetty11.version>11.0.18</jetty11.version>
         <jetty12.version>12.0.4</jetty12.version>
