@@ -1,14 +1,12 @@
 package com.codahale.metrics;
 
-import static com.codahale.metrics.SlidingTimeWindowMovingAverages.NUMBER_OF_BUCKETS;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.time.Instant;
 
-import org.junit.Before;
-import org.junit.Test;
+import static com.codahale.metrics.SlidingTimeWindowMovingAverages.NUMBER_OF_BUCKETS;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class SlidingTimeWindowMovingAveragesTest {
 
@@ -28,16 +26,16 @@ public class SlidingTimeWindowMovingAveragesTest {
 
         SlidingTimeWindowMovingAverages stwm = new SlidingTimeWindowMovingAverages();
 
-        assertThat(stwm.normalizeIndex(0), is(0));
-        assertThat(stwm.normalizeIndex(900), is(0));
-        assertThat(stwm.normalizeIndex(9000), is(0));
-        assertThat(stwm.normalizeIndex(-900), is(0));
+        assertThat(stwm.normalizeIndex(0)).isEqualTo(0);
+        assertThat(stwm.normalizeIndex(900)).isEqualTo(0);
+        assertThat(stwm.normalizeIndex(9000)).isEqualTo(0);
+        assertThat(stwm.normalizeIndex(-900)).isEqualTo(0);
 
-        assertThat(stwm.normalizeIndex(1), is(1));
+        assertThat(stwm.normalizeIndex(1)).isEqualTo(1);
 
-        assertThat(stwm.normalizeIndex(899), is(899));
-        assertThat(stwm.normalizeIndex(-1), is(899));
-        assertThat(stwm.normalizeIndex(-901), is(899));
+        assertThat(stwm.normalizeIndex(899)).isEqualTo(899);
+        assertThat(stwm.normalizeIndex(-1)).isEqualTo(899);
+        assertThat(stwm.normalizeIndex(-901)).isEqualTo(899);
     }
 
     @Test
@@ -45,8 +43,8 @@ public class SlidingTimeWindowMovingAveragesTest {
 
         SlidingTimeWindowMovingAverages stwm = new SlidingTimeWindowMovingAverages(clock);
 
-        assertThat(stwm.calculateIndexOfTick(Instant.ofEpochSecond(0L)), is(0));
-        assertThat(stwm.calculateIndexOfTick(Instant.ofEpochSecond(1L)), is(1));
+        assertThat(stwm.calculateIndexOfTick(Instant.ofEpochSecond(0L))).isEqualTo(0);
+        assertThat(stwm.calculateIndexOfTick(Instant.ofEpochSecond(1L))).isEqualTo(1);
     }
 
     @Test
@@ -63,11 +61,11 @@ public class SlidingTimeWindowMovingAveragesTest {
         }
 
         // verify that no cleanup happened yet
-        assertThat(movingAverages.oldestBucketTime, is(Instant.ofEpochSecond(0L)));
+        assertThat(movingAverages.oldestBucketTime).isEqualTo(Instant.ofEpochSecond(0L));
 
-        assertThat(meter.getOneMinuteRate(), is(60.0));
-        assertThat(meter.getFiveMinuteRate(), is(300.0));
-        assertThat(meter.getFifteenMinuteRate(), is(900.0));
+        assertThat(meter.getOneMinuteRate()).isEqualTo(60.0);
+        assertThat(meter.getFiveMinuteRate()).isEqualTo(300.0);
+        assertThat(meter.getFifteenMinuteRate()).isEqualTo(900.0);
     }
 
     @Test
@@ -84,11 +82,11 @@ public class SlidingTimeWindowMovingAveragesTest {
         }
 
         // verify that at least one cleanup happened
-        assertThat(movingAverages.oldestBucketTime, not(is(Instant.ofEpochSecond(0L))));
+        assertThat(movingAverages.oldestBucketTime).isNotEqualTo(Instant.EPOCH);
 
-        assertThat(meter.getOneMinuteRate(), is(60.0));
-        assertThat(meter.getFiveMinuteRate(), is(300.0));
-        assertThat(meter.getFifteenMinuteRate(), is(900.0));
+        assertThat(meter.getOneMinuteRate()).isEqualTo(60.0);
+        assertThat(meter.getFiveMinuteRate()).isEqualTo(300.0);
+        assertThat(meter.getFifteenMinuteRate()).isEqualTo(900.0);
     }
 
     @Test
@@ -102,10 +100,10 @@ public class SlidingTimeWindowMovingAveragesTest {
             meter.mark();
         }
 
-        assertThat(meter.getCount(), is(10L));
-        assertThat(meter.getOneMinuteRate(), is(10.0));
-        assertThat(meter.getFiveMinuteRate(), is(10.0));
-        assertThat(meter.getFifteenMinuteRate(), is(10.0));
+        assertThat(meter.getCount()).isEqualTo(10L);
+        assertThat(meter.getOneMinuteRate()).isEqualTo(10.0);
+        assertThat(meter.getFiveMinuteRate()).isEqualTo(10.0);
+        assertThat(meter.getFifteenMinuteRate()).isEqualTo(10.0);
     }
 
     @Test
@@ -117,9 +115,9 @@ public class SlidingTimeWindowMovingAveragesTest {
         }
 
         // only 60/300/900 of the 1000 events took place in the last 1/5/15 minute(s)
-        assertThat(meter.getOneMinuteRate(), is(60.0));
-        assertThat(meter.getFiveMinuteRate(), is(300.0));
-        assertThat(meter.getFifteenMinuteRate(), is(900.0));
+        assertThat(meter.getOneMinuteRate()).isEqualTo(60.0);
+        assertThat(meter.getFiveMinuteRate()).isEqualTo(300.0);
+        assertThat(meter.getFifteenMinuteRate()).isEqualTo(900.0);
     }
 
     @Test
@@ -129,9 +127,9 @@ public class SlidingTimeWindowMovingAveragesTest {
 
         // no mark for three minutes
         clock.addSeconds(180);
-        assertThat(meter.getOneMinuteRate(), is(0.0));
-        assertThat(meter.getFiveMinuteRate(), is(10.0));
-        assertThat(meter.getFifteenMinuteRate(), is(10.0));
+        assertThat(meter.getOneMinuteRate()).isEqualTo(0.0);
+        assertThat(meter.getFiveMinuteRate()).isEqualTo(10.0);
+        assertThat(meter.getFifteenMinuteRate()).isEqualTo(10.0);
     }
 
     @Test
@@ -143,15 +141,15 @@ public class SlidingTimeWindowMovingAveragesTest {
 
         // and query at 15:30 minutes (the bucket index must have wrapped around)
         clock.addSeconds(50);
-        assertThat(meter.getOneMinuteRate(), is(10.0));
-        assertThat(meter.getFiveMinuteRate(), is(10.0));
-        assertThat(meter.getFifteenMinuteRate(), is(10.0));
+        assertThat(meter.getOneMinuteRate()).isEqualTo(10.0);
+        assertThat(meter.getFiveMinuteRate()).isEqualTo(10.0);
+        assertThat(meter.getFifteenMinuteRate()).isEqualTo(10.0);
 
         // and query at 30:10 minutes (the bucket index must have wrapped around for the second time)
         clock.addSeconds(880);
-        assertThat(meter.getOneMinuteRate(), is(0.0));
-        assertThat(meter.getFiveMinuteRate(), is(0.0));
-        assertThat(meter.getFifteenMinuteRate(), is(0.0));
+        assertThat(meter.getOneMinuteRate()).isEqualTo(0.0);
+        assertThat(meter.getFiveMinuteRate()).isEqualTo(0.0);
+        assertThat(meter.getFifteenMinuteRate()).isEqualTo(0.0);
     }
 
     @Test
@@ -161,8 +159,8 @@ public class SlidingTimeWindowMovingAveragesTest {
 
         // after forty minutes all rates should be zero
         clock.addSeconds(2400);
-        assertThat(meter.getOneMinuteRate(), is(0.0));
-        assertThat(meter.getFiveMinuteRate(), is(0.0));
-        assertThat(meter.getFifteenMinuteRate(), is(0.0));
+        assertThat(meter.getOneMinuteRate()).isEqualTo(0.0);
+        assertThat(meter.getFiveMinuteRate()).isEqualTo(0.0);
+        assertThat(meter.getFifteenMinuteRate()).isEqualTo(0.0);
     }
 }
