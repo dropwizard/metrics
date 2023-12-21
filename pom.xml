@@ -59,7 +59,7 @@
         <jetty11.version>11.0.19</jetty11.version>
         <slf4j.version>2.0.9</slf4j.version>
         <assertj.version>3.24.2</assertj.version>
-        <byte-buddy.version>1.14.10</byte-buddy.version>
+        <byte-buddy.version>1.14.11</byte-buddy.version>
         <mockito.version>5.8.0</mockito.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <maven-compiler-plugin.version>3.12.0</maven-compiler-plugin.version>
