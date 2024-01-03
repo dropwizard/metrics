@@ -58,7 +58,7 @@
         <jetty10.version>10.0.19</jetty10.version>
         <jetty11.version>11.0.19</jetty11.version>
         <slf4j.version>2.0.10</slf4j.version>
-        <assertj.version>3.25.0</assertj.version>
+        <assertj.version>3.25.1</assertj.version>
         <byte-buddy.version>1.14.11</byte-buddy.version>
         <mockito.version>5.8.0</mockito.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
