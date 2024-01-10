@@ -226,20 +226,20 @@ public class InstrumentedEE10HandlerTest {
                                             servletOutputStream.write("some content from the async\n"
                                                     .getBytes(StandardCharsets.UTF_8));
                                             context.complete();
-                                            servletContextRequest.getServletChannel().sendResponseAndComplete();
+                                            servletContextRequest.getServletChannel().handle();
                                         }
 
                                         @Override
                                         public void onError(Throwable throwable) {
                                             context.complete();
-                                            servletContextRequest.getServletChannel().sendResponseAndComplete();
+                                            servletContextRequest.getServletChannel().handle();
                                         }
                                     }
                             );
                             servletContextRequest.getHttpOutput().run();
                         } catch (IOException e) {
                             context.complete();
-                            servletContextRequest.getServletChannel().sendResponseAndComplete();
+                            servletContextRequest.getServletChannel().handle();
                         }
                     });
                     t.start();

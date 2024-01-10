@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.2.22-SNAPSHOT</version>
+        <version>4.2.24-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-jetty12</artifactId>
@@ -21,7 +21,7 @@
 
         <maven.compiler.release>17</maven.compiler.release>
 
-        <slf4j.version>2.0.9</slf4j.version>
+        <slf4j.version>2.0.11</slf4j.version>
     </properties>
 
     <dependencyManagement>

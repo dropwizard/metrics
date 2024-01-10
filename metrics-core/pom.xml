@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.2.22-SNAPSHOT</version>
+        <version>4.2.24-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-core</artifactId>
@@ -40,12 +40,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-            <version>${hamcrest.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
