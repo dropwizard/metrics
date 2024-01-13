@@ -509,23 +509,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.openrewrite.maven</groupId>
-                <artifactId>rewrite-maven-plugin</artifactId>
-                <version>5.18.0</version>
-                <configuration>
-                    <activeRecipes>
-                        <recipe>org.openrewrite.java.testing.junit5.JUnit5BestPractices</recipe>
-                    </activeRecipes>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.openrewrite.recipe</groupId>
-                        <artifactId>rewrite-testing-frameworks</artifactId>
-                        <version>2.2.0</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
         </plugins>
     </build>
 </project>
