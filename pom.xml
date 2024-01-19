@@ -57,6 +57,8 @@
 
         <jetty10.version>10.0.19</jetty10.version>
         <jetty11.version>11.0.19</jetty11.version>
+        <jetty12.version>12.0.5</jetty12.version>
+        <servlet6.version>6.0.0</servlet6.version>
         <slf4j.version>2.0.11</slf4j.version>
         <assertj.version>3.25.1</assertj.version>
         <byte-buddy.version>1.14.11</byte-buddy.version>
@@ -201,6 +203,10 @@
             <activation>
                 <jdk>[17,)</jdk>
             </activation>
+            <modules>
+                <module>metrics-jetty12</module>
+                <module>metrics-jetty12-ee10</module>
+            </modules>
             <build>
                 <plugins>
                     <plugin>
