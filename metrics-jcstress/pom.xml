@@ -4,7 +4,7 @@
     <parent>
         <artifactId>metrics-parent</artifactId>
         <groupId>io.dropwizard.metrics</groupId>
-        <version>4.2.24-SNAPSHOT</version>
+        <version>4.2.24</version>
     </parent>
 
     <artifactId>metrics-jcstress</artifactId>
