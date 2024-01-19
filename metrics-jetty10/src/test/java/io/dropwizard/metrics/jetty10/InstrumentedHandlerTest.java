@@ -23,6 +23,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.annotation.ResponseMeteredLevel.ALL;
+import static com.codahale.metrics.annotation.ResponseMeteredLevel.COARSE;
+import static com.codahale.metrics.annotation.ResponseMeteredLevel.DETAILED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
@@ -118,6 +120,24 @@ public class InstrumentedHandlerTest {
         handler.setHandler(new TestHandler());
 
         assertThatCode(handler::doStop).doesNotThrowAnyException();
+    }
+
+    @Test
+    public void gaugesAreRegisteredWithResponseMeteredLevelCoarse() throws Exception {
+        InstrumentedHandler handler = new InstrumentedHandler(registry, "coarse", COARSE);
+        handler.setHandler(new TestHandler());
+        handler.setName("handler");
+        handler.doStart();
+        assertThat(registry.getGauges()).containsKey("coarse.handler.percent-4xx-1m");
+    }
+
+    @Test
+    public void gaugesAreNotRegisteredWithResponseMeteredLevelDetailed() throws Exception {
+        InstrumentedHandler handler = new InstrumentedHandler(registry, "detailed", DETAILED);
+        handler.setHandler(new TestHandler());
+        handler.setName("handler");
+        handler.doStart();
+        assertThat(registry.getGauges()).doesNotContainKey("coarse.handler.percent-4xx-1m");
     }
 
     @Test
