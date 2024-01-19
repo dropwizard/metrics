@@ -24,6 +24,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.ALL;
+import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.COARSE;
+import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.DETAILED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
@@ -119,6 +121,24 @@ class InstrumentedHandlerTest {
         handler.setHandler(new TestHandler());
 
         assertThatCode(handler::doStop).doesNotThrowAnyException();
+    }
+
+    @Test
+    public void gaugesAreRegisteredWithResponseMeteredLevelCoarse() throws Exception {
+        InstrumentedHandler handler = new InstrumentedHandler(registry, "coarse", COARSE);
+        handler.setHandler(new TestHandler());
+        handler.setName("handler");
+        handler.doStart();
+        assertThat(registry.getGauges()).containsKey(MetricName.build("coarse", "handler", "percent-4xx-1m"));
+    }
+
+    @Test
+    public void gaugesAreNotRegisteredWithResponseMeteredLevelDetailed() throws Exception {
+        InstrumentedHandler handler = new InstrumentedHandler(registry, "detailed", DETAILED);
+        handler.setHandler(new TestHandler());
+        handler.setName("handler");
+        handler.doStart();
+        assertThat(registry.getGauges()).doesNotContainKey(MetricName.build("detailed", "handler", "percent-4xx-1m"));
     }
 
     @Test
