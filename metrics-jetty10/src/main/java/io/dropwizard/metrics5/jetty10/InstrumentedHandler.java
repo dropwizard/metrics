@@ -170,14 +170,6 @@ public class InstrumentedHandler extends HandlerWrapper {
         this.asyncTimeouts = metricRegistry.meter(prefix.resolve(NAME_ASYNC_TIMEOUTS));
 
         this.responseCodeMeters = DETAILED_METER_LEVELS.contains(responseMeteredLevel) ? new ConcurrentHashMap<>() : Collections.emptyMap();
-        this.responses = COARSE_METER_LEVELS.contains(responseMeteredLevel) ?
-                Collections.unmodifiableList(Arrays.asList(
-                        metricRegistry.meter(prefix.resolve(NAME_1XX_RESPONSES)), // 1xx
-                        metricRegistry.meter(prefix.resolve(NAME_2XX_RESPONSES)), // 2xx
-                        metricRegistry.meter(prefix.resolve(NAME_3XX_RESPONSES)), // 3xx
-                        metricRegistry.meter(prefix.resolve(NAME_4XX_RESPONSES)), // 4xx
-                        metricRegistry.meter(prefix.resolve(NAME_5XX_RESPONSES))  // 5xx
-                )) : Collections.emptyList();
 
         this.getRequests = metricRegistry.timer(prefix.resolve(NAME_GET_REQUESTS));
         this.postRequests = metricRegistry.timer(prefix.resolve(NAME_POST_REQUESTS));
@@ -190,54 +182,65 @@ public class InstrumentedHandler extends HandlerWrapper {
         this.moveRequests = metricRegistry.timer(prefix.resolve(NAME_MOVE_REQUESTS));
         this.otherRequests = metricRegistry.timer(prefix.resolve(NAME_OTHER_REQUESTS));
 
-        metricRegistry.register(prefix.resolve(NAME_PERCENT_4XX_1M), new RatioGauge() {
-            @Override
-            protected Ratio getRatio() {
-                return Ratio.of(responses.get(3).getOneMinuteRate(),
-                        requests.getOneMinuteRate());
-            }
-        });
+        if (COARSE_METER_LEVELS.contains(responseMeteredLevel)) {
+            this.responses = Collections.unmodifiableList(Arrays.asList(
+                    metricRegistry.meter(prefix.resolve(NAME_1XX_RESPONSES)), // 1xx
+                    metricRegistry.meter(prefix.resolve(NAME_2XX_RESPONSES)), // 2xx
+                    metricRegistry.meter(prefix.resolve(NAME_3XX_RESPONSES)), // 3xx
+                    metricRegistry.meter(prefix.resolve(NAME_4XX_RESPONSES)), // 4xx
+                    metricRegistry.meter(prefix.resolve(NAME_5XX_RESPONSES))  // 5xx
+            ));
 
-        metricRegistry.register(prefix.resolve(NAME_PERCENT_4XX_5M), new RatioGauge() {
-            @Override
-            protected Ratio getRatio() {
-                return Ratio.of(responses.get(3).getFiveMinuteRate(),
-                        requests.getFiveMinuteRate());
-            }
-        });
+            metricRegistry.register(prefix.resolve(NAME_PERCENT_4XX_1M), new RatioGauge() {
+                @Override
+                protected Ratio getRatio() {
+                    return Ratio.of(responses.get(3).getOneMinuteRate(),
+                            requests.getOneMinuteRate());
+                }
+            });
 
-        metricRegistry.register(prefix.resolve(NAME_PERCENT_4XX_15M), new RatioGauge() {
-            @Override
-            protected Ratio getRatio() {
-                return Ratio.of(responses.get(3).getFifteenMinuteRate(),
-                        requests.getFifteenMinuteRate());
-            }
-        });
+            metricRegistry.register(prefix.resolve(NAME_PERCENT_4XX_5M), new RatioGauge() {
+                @Override
+                protected Ratio getRatio() {
+                    return Ratio.of(responses.get(3).getFiveMinuteRate(),
+                            requests.getFiveMinuteRate());
+                }
+            });
 
-        metricRegistry.register(prefix.resolve(NAME_PERCENT_5XX_1M), new RatioGauge() {
-            @Override
-            protected Ratio getRatio() {
-                return Ratio.of(responses.get(4).getOneMinuteRate(),
-                        requests.getOneMinuteRate());
-            }
-        });
+            metricRegistry.register(prefix.resolve(NAME_PERCENT_4XX_15M), new RatioGauge() {
+                @Override
+                protected Ratio getRatio() {
+                    return Ratio.of(responses.get(3).getFifteenMinuteRate(),
+                            requests.getFifteenMinuteRate());
+                }
+            });
 
-        metricRegistry.register(prefix.resolve(NAME_PERCENT_5XX_5M), new RatioGauge() {
-            @Override
-            protected Ratio getRatio() {
-                return Ratio.of(responses.get(4).getFiveMinuteRate(),
-                        requests.getFiveMinuteRate());
-            }
-        });
+            metricRegistry.register(prefix.resolve(NAME_PERCENT_5XX_1M), new RatioGauge() {
+                @Override
+                protected Ratio getRatio() {
+                    return Ratio.of(responses.get(4).getOneMinuteRate(),
+                            requests.getOneMinuteRate());
+                }
+            });
 
-        metricRegistry.register(prefix.resolve(NAME_PERCENT_5XX_15M), new RatioGauge() {
-            @Override
-            public Ratio getRatio() {
-                return Ratio.of(responses.get(4).getFifteenMinuteRate(),
-                        requests.getFifteenMinuteRate());
-            }
-        });
+            metricRegistry.register(prefix.resolve(NAME_PERCENT_5XX_5M), new RatioGauge() {
+                @Override
+                protected Ratio getRatio() {
+                    return Ratio.of(responses.get(4).getFiveMinuteRate(),
+                            requests.getFiveMinuteRate());
+                }
+            });
 
+            metricRegistry.register(prefix.resolve(NAME_PERCENT_5XX_15M), new RatioGauge() {
+                @Override
+                public Ratio getRatio() {
+                    return Ratio.of(responses.get(4).getFifteenMinuteRate(),
+                            requests.getFifteenMinuteRate());
+                }
+            });
+        } else {
+            this.responses = Collections.emptyList();
+        }
 
         this.listener = new AsyncAttachingListener();
     }
