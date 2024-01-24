@@ -62,7 +62,7 @@
         <slf4j.version>2.0.11</slf4j.version>
         <assertj.version>3.25.2</assertj.version>
         <byte-buddy.version>1.14.11</byte-buddy.version>
-        <mockito.version>5.9.0</mockito.version>
+        <mockito.version>5.10.0</mockito.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
         <errorprone.version>2.24.1</errorprone.version>
