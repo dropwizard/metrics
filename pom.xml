@@ -61,7 +61,7 @@
         <jetty11.version>11.0.19</jetty11.version>
         <jetty12.version>12.0.5</jetty12.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <assertj.version>3.25.1</assertj.version>
+        <assertj.version>3.25.2</assertj.version>
         <byte-buddy.version>1.14.11</byte-buddy.version>
         <mockito.version>5.9.0</mockito.version>
         <junit.version>4.13.1</junit.version>
