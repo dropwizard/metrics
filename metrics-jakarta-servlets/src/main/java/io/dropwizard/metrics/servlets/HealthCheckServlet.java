@@ -45,11 +45,21 @@ public class HealthCheckServlet extends HttpServlet {
             return HealthCheckFilter.ALL;
         }
 
+        /**
+         * @return the {@link ObjectMapper} that shall be used to render health checks,
+         * or {@code null} if the default object mapper should be used.
+         */
+        protected ObjectMapper getObjectMapper() {
+            // don't use an object mapper by default
+            return null;
+        }
+
         @Override
         public void contextInitialized(ServletContextEvent event) {
             final ServletContext context = event.getServletContext();
             context.setAttribute(HEALTH_CHECK_REGISTRY, getHealthCheckRegistry());
             context.setAttribute(HEALTH_CHECK_EXECUTOR, getExecutorService());
+            context.setAttribute(HEALTH_CHECK_MAPPER, getObjectMapper());
         }
 
         @Override
@@ -61,14 +71,18 @@ public class HealthCheckServlet extends HttpServlet {
     public static final String HEALTH_CHECK_REGISTRY = HealthCheckServlet.class.getCanonicalName() + ".registry";
     public static final String HEALTH_CHECK_EXECUTOR = HealthCheckServlet.class.getCanonicalName() + ".executor";
     public static final String HEALTH_CHECK_FILTER = HealthCheckServlet.class.getCanonicalName() + ".healthCheckFilter";
+    public static final String HEALTH_CHECK_MAPPER = HealthCheckServlet.class.getCanonicalName() + ".mapper";
+    public static final String HEALTH_CHECK_HTTP_STATUS_INDICATOR = HealthCheckServlet.class.getCanonicalName() + ".httpStatusIndicator";
 
     private static final long serialVersionUID = -8432996484889177321L;
     private static final String CONTENT_TYPE = "application/json";
+    private static final String HTTP_STATUS_INDICATOR_PARAM = "httpStatusIndicator";
 
     private transient HealthCheckRegistry registry;
     private transient ExecutorService executorService;
     private transient HealthCheckFilter filter;
     private transient ObjectMapper mapper;
+    private transient boolean httpStatusIndicator;
 
     public HealthCheckServlet() {
     }
@@ -96,7 +110,6 @@ public class HealthCheckServlet extends HttpServlet {
             this.executorService = (ExecutorService) executorAttr;
         }
 
-
         final Object filterAttr = context.getAttribute(HEALTH_CHECK_FILTER);
         if (filterAttr instanceof HealthCheckFilter) {
             filter = (HealthCheckFilter) filterAttr;
@@ -105,7 +118,20 @@ public class HealthCheckServlet extends HttpServlet {
             filter = HealthCheckFilter.ALL;
         }
 
-        this.mapper = new ObjectMapper().registerModule(new HealthCheckModule());
+        final Object mapperAttr = context.getAttribute(HEALTH_CHECK_MAPPER);
+        if (mapperAttr instanceof ObjectMapper) {
+            this.mapper = (ObjectMapper) mapperAttr;
+        } else {
+            this.mapper = new ObjectMapper();
+        }
+        this.mapper.registerModule(new HealthCheckModule());
+
+        final Object httpStatusIndicatorAttr = context.getAttribute(HEALTH_CHECK_HTTP_STATUS_INDICATOR);
+        if (httpStatusIndicatorAttr instanceof Boolean) {
+            this.httpStatusIndicator = (Boolean) httpStatusIndicatorAttr;
+        } else {
+            this.httpStatusIndicator = true;
+        }
     }
 
     @Override
@@ -123,7 +149,10 @@ public class HealthCheckServlet extends HttpServlet {
         if (results.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
         } else {
-            if (isAllHealthy(results)) {
+            final String reqParameter = req.getParameter(HTTP_STATUS_INDICATOR_PARAM);
+            final boolean httpStatusIndicatorParam = Boolean.parseBoolean(reqParameter);
+            final boolean useHttpStatusForHealthCheck = reqParameter == null ? httpStatusIndicator : httpStatusIndicatorParam;
+            if (!useHttpStatusForHealthCheck || isAllHealthy(results)) {
                 resp.setStatus(HttpServletResponse.SC_OK);
             } else {
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -157,5 +186,10 @@ public class HealthCheckServlet extends HttpServlet {
             }
         }
         return true;
+    }
+
+    // visible for testing
+    ObjectMapper getMapper() {
+        return mapper;
     }
 }
