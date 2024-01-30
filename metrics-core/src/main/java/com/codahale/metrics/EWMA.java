@@ -82,6 +82,14 @@ public class EWMA {
     }
 
     /**
+     * Set the rate to the smallest possible positive value. Used to avoid calling tick a large number of times.
+     */
+    public void reset() {
+        uncounted.reset();
+        rate = Double.MIN_NORMAL;
+    }
+
+    /**
      * Mark the passage of time and decay the current rate accordingly.
      */
     public void tick() {
