@@ -157,6 +157,11 @@
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics5</groupId>
+                <artifactId>metrics-logback15</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics5</groupId>
                 <artifactId>metrics-servlet</artifactId>
                 <version>${project.version}</version>
             </dependency>
