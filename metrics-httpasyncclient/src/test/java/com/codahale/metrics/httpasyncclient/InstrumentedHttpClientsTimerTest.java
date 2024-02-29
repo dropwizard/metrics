@@ -138,8 +138,6 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
         verify(context, timeout(200).times(1)).stop();
     }
 
-//    My
-
     /**
      * Test method to verify that the timer is stopped correctly when multiple requests are executed concurrently.
      *
@@ -171,9 +169,7 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
      * @throws Exception if an error occurs during the test execution
      */
     @Test
-    @SuppressWarnings("unchecked")
     public void timerIsStoppedCorrectlyWithProvidedFutureCallbackCancelled() throws Exception {
-        // Arrange
         HttpHost host = startServerWithGlobalRequestHandler(STATUS_OK);
         HttpGet get = new HttpGet("/?q=cancelled");
 
@@ -182,11 +178,9 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
         // Timer hasn't been stopped prior to executing the request
         verify(context, never()).stop();
 
-        // Act
         Future<HttpResponse> responseFuture = asyncHttpClient.execute(host, get, futureCallback);
         responseFuture.cancel(true); // Cancel the future
 
-        // Assert
         // After the computation is cancelled, the timer must be stopped
         verify(context, timeout(200).times(1)).stop();
     }
@@ -199,7 +193,6 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
     @Test
     @SuppressWarnings("unchecked")
     public void timerIsStoppedCorrectlyWithProvidedFutureCallbackAndFailure() throws Exception {
-        // Arrange
         HttpHost host = startServerWithGlobalRequestHandler(STATUS_OK);
         HttpGet get = new HttpGet("/?q=failure");
 
@@ -208,11 +201,9 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
         // Timer hasn't been stopped prior to executing the request
         verify(context, never()).stop();
 
-        // Act
         Future<HttpResponse> responseFuture = asyncHttpClient.execute(host, get, futureCallback);
         responseFuture.get(20, TimeUnit.SECONDS); // Wait for the request to complete
 
-        // Assert
         // After the computation fails, the timer must be stopped
         verify(context, timeout(200).times(1)).stop();
     }
