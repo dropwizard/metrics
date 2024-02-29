@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Clock.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">Clock.java</span></div><h1>Clock.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+/**
+ * An abstraction for how time passes. It is passed to {@link Timer} to track timing.
+ */
+<span class="fc" id="L6">public abstract class Clock {</span>
+    /**
+     * Returns the current time tick.
+     *
+     * @return time tick in nanoseconds
+     */
+    public abstract long getTick();
+
+    /**
+     * Returns the current time in milliseconds.
+     *
+     * @return time in milliseconds
+     */
+    public long getTime() {
+<span class="nc" id="L20">        return System.currentTimeMillis();</span>
+    }
+
+    /**
+     * The default clock to use.
+     *
+     * @return the default {@link Clock} instance
+     * @see Clock.UserTimeClock
+     */
+    public static Clock defaultClock() {
+<span class="fc" id="L30">        return UserTimeClockHolder.DEFAULT;</span>
+    }
+
+    /**
+     * A clock implementation which returns the current time in epoch nanoseconds.
+     */
+<span class="fc" id="L36">    public static class UserTimeClock extends Clock {</span>
+        @Override
+        public long getTick() {
+<span class="fc" id="L39">            return System.nanoTime();</span>
+        }
+    }
+
+    private static class UserTimeClockHolder {
+<span class="fc" id="L44">        private static final Clock DEFAULT = new UserTimeClock();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

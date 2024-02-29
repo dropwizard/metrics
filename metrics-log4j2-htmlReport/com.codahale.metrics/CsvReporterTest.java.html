@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CsvReporterTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">CsvReporterTest.java</span></div><h1>CsvReporterTest.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Locale;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+<span class="nc" id="L22">public class CsvReporterTest {</span>
+<span class="nc" id="L23">    @Rule</span>
+    public final TemporaryFolder folder = new TemporaryFolder();
+
+<span class="nc" id="L26">    private final MetricRegistry registry = mock(MetricRegistry.class);</span>
+<span class="nc" id="L27">    private final Clock clock = mock(Clock.class);</span>
+
+    private File dataDirectory;
+    private CsvReporter reporter;
+
+    @Before
+    public void setUp() throws Exception {
+<span class="nc" id="L34">        when(clock.getTime()).thenReturn(19910191000L);</span>
+
+<span class="nc" id="L36">        this.dataDirectory = folder.newFolder();</span>
+
+<span class="nc" id="L38">        this.reporter = CsvReporter.forRegistry(registry)</span>
+<span class="nc" id="L39">                .formatFor(Locale.US)</span>
+<span class="nc" id="L40">                .convertRatesTo(TimeUnit.SECONDS)</span>
+<span class="nc" id="L41">                .convertDurationsTo(TimeUnit.MILLISECONDS)</span>
+<span class="nc" id="L42">                .withClock(clock)</span>
+<span class="nc" id="L43">                .filter(MetricFilter.ALL)</span>
+<span class="nc" id="L44">                .build(dataDirectory);</span>
+<span class="nc" id="L45">    }</span>
+
+    @Test
+    public void reportsGaugeValues() throws Exception {
+<span class="nc" id="L49">        final Gauge&lt;Integer&gt; gauge = () -&gt; 1;</span>
+
+<span class="nc" id="L51">        reporter.report(map(&quot;gauge&quot;, gauge),</span>
+<span class="nc" id="L52">                map(),</span>
+<span class="nc" id="L53">                map(),</span>
+<span class="nc" id="L54">                map(),</span>
+<span class="nc" id="L55">                map());</span>
+
+<span class="nc" id="L57">        assertThat(fileContents(&quot;gauge.csv&quot;))</span>
+<span class="nc" id="L58">                .isEqualTo(csv(</span>
+                        &quot;t,value&quot;,
+                        &quot;19910191,1&quot;
+                ));
+<span class="nc" id="L62">    }</span>
+
+    @Test
+    public void reportsCounterValues() throws Exception {
+<span class="nc" id="L66">        final Counter counter = mock(Counter.class);</span>
+<span class="nc" id="L67">        when(counter.getCount()).thenReturn(100L);</span>
+
+<span class="nc" id="L69">        reporter.report(map(),</span>
+<span class="nc" id="L70">                map(&quot;test.counter&quot;, counter),</span>
+<span class="nc" id="L71">                map(),</span>
+<span class="nc" id="L72">                map(),</span>
+<span class="nc" id="L73">                map());</span>
+
+<span class="nc" id="L75">        assertThat(fileContents(&quot;test.counter.csv&quot;))</span>
+<span class="nc" id="L76">                .isEqualTo(csv(</span>
+                        &quot;t,count&quot;,
+                        &quot;19910191,100&quot;
+                ));
+<span class="nc" id="L80">    }</span>
+
+    @Test
+    public void reportsHistogramValues() throws Exception {
+<span class="nc" id="L84">        final Histogram histogram = mock(Histogram.class);</span>
+<span class="nc" id="L85">        when(histogram.getCount()).thenReturn(1L);</span>
+
+<span class="nc" id="L87">        final Snapshot snapshot = mock(Snapshot.class);</span>
+<span class="nc" id="L88">        when(snapshot.getMax()).thenReturn(2L);</span>
+<span class="nc" id="L89">        when(snapshot.getMean()).thenReturn(3.0);</span>
+<span class="nc" id="L90">        when(snapshot.getMin()).thenReturn(4L);</span>
+<span class="nc" id="L91">        when(snapshot.getStdDev()).thenReturn(5.0);</span>
+<span class="nc" id="L92">        when(snapshot.getMedian()).thenReturn(6.0);</span>
+<span class="nc" id="L93">        when(snapshot.get75thPercentile()).thenReturn(7.0);</span>
+<span class="nc" id="L94">        when(snapshot.get95thPercentile()).thenReturn(8.0);</span>
+<span class="nc" id="L95">        when(snapshot.get98thPercentile()).thenReturn(9.0);</span>
+<span class="nc" id="L96">        when(snapshot.get99thPercentile()).thenReturn(10.0);</span>
+<span class="nc" id="L97">        when(snapshot.get999thPercentile()).thenReturn(11.0);</span>
+
+<span class="nc" id="L99">        when(histogram.getSnapshot()).thenReturn(snapshot);</span>
+
+<span class="nc" id="L101">        reporter.report(map(),</span>
+<span class="nc" id="L102">                map(),</span>
+<span class="nc" id="L103">                map(&quot;test.histogram&quot;, histogram),</span>
+<span class="nc" id="L104">                map(),</span>
+<span class="nc" id="L105">                map());</span>
+
+<span class="nc" id="L107">        assertThat(fileContents(&quot;test.histogram.csv&quot;))</span>
+<span class="nc" id="L108">                .isEqualTo(csv(</span>
+                        &quot;t,count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999&quot;,
+                        &quot;19910191,1,2,3.000000,4,5.000000,6.000000,7.000000,8.000000,9.000000,10.000000,11.000000&quot;
+                ));
+<span class="nc" id="L112">    }</span>
+
+    @Test
+    public void reportsMeterValues() throws Exception {
+<span class="nc" id="L116">        final Meter meter = mockMeter();</span>
+
+<span class="nc" id="L118">        reporter.report(map(),</span>
+<span class="nc" id="L119">                map(),</span>
+<span class="nc" id="L120">                map(),</span>
+<span class="nc" id="L121">                map(&quot;test.meter&quot;, meter),</span>
+<span class="nc" id="L122">                map());</span>
+
+<span class="nc" id="L124">        assertThat(fileContents(&quot;test.meter.csv&quot;))</span>
+<span class="nc" id="L125">                .isEqualTo(csv(</span>
+                        &quot;t,count,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit&quot;,
+                        &quot;19910191,1,2.000000,3.000000,4.000000,5.000000,events/second&quot;
+                ));
+<span class="nc" id="L129">    }</span>
+
+    @Test
+    public void reportsTimerValues() throws Exception {
+<span class="nc" id="L133">        final Timer timer = mock(Timer.class);</span>
+<span class="nc" id="L134">        when(timer.getCount()).thenReturn(1L);</span>
+<span class="nc" id="L135">        when(timer.getMeanRate()).thenReturn(2.0);</span>
+<span class="nc" id="L136">        when(timer.getOneMinuteRate()).thenReturn(3.0);</span>
+<span class="nc" id="L137">        when(timer.getFiveMinuteRate()).thenReturn(4.0);</span>
+<span class="nc" id="L138">        when(timer.getFifteenMinuteRate()).thenReturn(5.0);</span>
+
+<span class="nc" id="L140">        final Snapshot snapshot = mock(Snapshot.class);</span>
+<span class="nc" id="L141">        when(snapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));</span>
+<span class="nc" id="L142">        when(snapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));</span>
+<span class="nc" id="L143">        when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));</span>
+<span class="nc" id="L144">        when(snapshot.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));</span>
+<span class="nc" id="L145">        when(snapshot.getMedian()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(500));</span>
+<span class="nc" id="L146">        when(snapshot.get75thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(600));</span>
+<span class="nc" id="L147">        when(snapshot.get95thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(700));</span>
+<span class="nc" id="L148">        when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));</span>
+<span class="nc" id="L149">        when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));</span>
+<span class="nc" id="L150">        when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(1000));</span>
+
+<span class="nc" id="L152">        when(timer.getSnapshot()).thenReturn(snapshot);</span>
+
+<span class="nc" id="L154">        reporter.report(map(),</span>
+<span class="nc" id="L155">                map(),</span>
+<span class="nc" id="L156">                map(),</span>
+<span class="nc" id="L157">                map(),</span>
+<span class="nc" id="L158">                map(&quot;test.another.timer&quot;, timer));</span>
+
+<span class="nc" id="L160">        assertThat(fileContents(&quot;test.another.timer.csv&quot;))</span>
+<span class="nc" id="L161">                .isEqualTo(csv(</span>
+                        &quot;t,count,max,mean,min,stddev,p50,p75,p95,p98,p99,p999,mean_rate,m1_rate,m5_rate,m15_rate,rate_unit,duration_unit&quot;,
+                        &quot;19910191,1,100.000000,200.000000,300.000000,400.000000,500.000000,600.000000,700.000000,800.000000,900.000000,1000.000000,2.000000,3.000000,4.000000,5.000000,calls/second,milliseconds&quot;
+                ));
+<span class="nc" id="L165">    }</span>
+
+    @Test
+    public void testCsvFileProviderIsUsed() {
+<span class="nc" id="L169">        CsvFileProvider fileProvider = mock(CsvFileProvider.class);</span>
+<span class="nc" id="L170">        when(fileProvider.getFile(dataDirectory, &quot;gauge&quot;)).thenReturn(new File(dataDirectory, &quot;guage.csv&quot;));</span>
+
+<span class="nc" id="L172">        CsvReporter reporter = CsvReporter.forRegistry(registry)</span>
+<span class="nc" id="L173">                .withCsvFileProvider(fileProvider)</span>
+<span class="nc" id="L174">                .build(dataDirectory);</span>
+
+<span class="nc" id="L176">        final Gauge&lt;Integer&gt; gauge = () -&gt; 1;</span>
+
+<span class="nc" id="L178">        reporter.report(map(&quot;gauge&quot;, gauge),</span>
+<span class="nc" id="L179">                map(),</span>
+<span class="nc" id="L180">                map(),</span>
+<span class="nc" id="L181">                map(),</span>
+<span class="nc" id="L182">                map());</span>
+
+<span class="nc" id="L184">        verify(fileProvider).getFile(dataDirectory, &quot;gauge&quot;);</span>
+<span class="nc" id="L185">    }</span>
+
+    @Test
+    public void itFormatsWithCustomSeparator() throws Exception {
+<span class="nc" id="L189">        final Meter meter = mockMeter();</span>
+
+<span class="nc" id="L191">        CsvReporter customSeparatorReporter = CsvReporter.forRegistry(registry)</span>
+<span class="nc" id="L192">                .formatFor(Locale.US)</span>
+<span class="nc" id="L193">                .withSeparator(&quot;|&quot;)</span>
+<span class="nc" id="L194">                .convertRatesTo(TimeUnit.SECONDS)</span>
+<span class="nc" id="L195">                .convertDurationsTo(TimeUnit.MILLISECONDS)</span>
+<span class="nc" id="L196">                .withClock(clock)</span>
+<span class="nc" id="L197">                .filter(MetricFilter.ALL)</span>
+<span class="nc" id="L198">                .build(dataDirectory);</span>
+
+<span class="nc" id="L200">        customSeparatorReporter.report(map(),</span>
+<span class="nc" id="L201">                map(),</span>
+<span class="nc" id="L202">                map(),</span>
+<span class="nc" id="L203">                map(&quot;test.meter&quot;, meter),</span>
+<span class="nc" id="L204">                map());</span>
+
+<span class="nc" id="L206">        assertThat(fileContents(&quot;test.meter.csv&quot;))</span>
+<span class="nc" id="L207">                .isEqualTo(csv(</span>
+                        &quot;t|count|mean_rate|m1_rate|m5_rate|m15_rate|rate_unit&quot;,
+                        &quot;19910191|1|2.000000|3.000000|4.000000|5.000000|events/second&quot;
+                ));
+<span class="nc" id="L211">    }</span>
+
+    private Meter mockMeter() {
+<span class="nc" id="L214">        final Meter meter = mock(Meter.class);</span>
+<span class="nc" id="L215">        when(meter.getCount()).thenReturn(1L);</span>
+<span class="nc" id="L216">        when(meter.getMeanRate()).thenReturn(2.0);</span>
+<span class="nc" id="L217">        when(meter.getOneMinuteRate()).thenReturn(3.0);</span>
+<span class="nc" id="L218">        when(meter.getFiveMinuteRate()).thenReturn(4.0);</span>
+<span class="nc" id="L219">        when(meter.getFifteenMinuteRate()).thenReturn(5.0);</span>
+
+<span class="nc" id="L221">        return meter;</span>
+    }
+
+    private String csv(String... lines) {
+<span class="nc" id="L225">        final StringBuilder builder = new StringBuilder();</span>
+<span class="nc bnc" id="L226" title="All 2 branches missed.">        for (String line : lines) {</span>
+<span class="nc" id="L227">            builder.append(line).append(String.format(&quot;%n&quot;));</span>
+        }
+<span class="nc" id="L229">        return builder.toString();</span>
+    }
+
+    private String fileContents(String filename) throws IOException {
+<span class="nc" id="L233">        return new String(Files.readAllBytes(new File(dataDirectory, filename).toPath()), StandardCharsets.UTF_8);</span>
+    }
+
+    private &lt;T&gt; SortedMap&lt;String, T&gt; map() {
+<span class="nc" id="L237">        return new TreeMap&lt;&gt;();</span>
+    }
+
+    private &lt;T&gt; SortedMap&lt;String, T&gt; map(String name, T metric) {
+<span class="nc" id="L241">        final TreeMap&lt;String, T&gt; map = new TreeMap&lt;&gt;();</span>
+<span class="nc" id="L242">        map.put(name, metric);</span>
+<span class="nc" id="L243">        return map;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

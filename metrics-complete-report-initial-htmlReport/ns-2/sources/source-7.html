@@ -1,0 +1,121 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Counted</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.annotation</a>
+</div>
+
+<h1>Coverage Summary for Class: Counted (com.codahale.metrics.annotation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">Counted</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.annotation;
+&nbsp;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.ElementType;
+&nbsp;import java.lang.annotation.Inherited;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.RetentionPolicy;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;
+&nbsp;/**
+&nbsp; * An annotation for marking a method of an annotated object as counted.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Given a method like this:
+&nbsp; * &lt;pre&gt;&lt;code&gt;
+&nbsp; *     {@literal @}Counted(name = &quot;fancyName&quot;)
+&nbsp; *     public String fancyName(String name) {
+&nbsp; *         return &quot;Sir Captain &quot; + name;
+&nbsp; *     }
+&nbsp; * &lt;/code&gt;&lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * A counter for the defining class with the name {@code fancyName} will be created and each time the
+&nbsp; * {@code #fancyName(String)} method is invoked, the counter will be marked.
+&nbsp; *
+&nbsp; * @since 3.1
+&nbsp; */
+&nbsp;@Inherited
+&nbsp;@Documented
+&nbsp;@Retention(RetentionPolicy.RUNTIME)
+&nbsp;@Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
+&nbsp;public @interface Counted {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return The name of the counter.
+&nbsp;     */
+&nbsp;    String name() default &quot;&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
+&nbsp;     * relative to the annotated class. When annotating a class, this must be {@code false}.
+&nbsp;     */
+&nbsp;    boolean absolute() default false;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return 
+&nbsp;     * If {@code false} (default), the counter is decremented when the annotated
+&nbsp;     * method returns, counting current invocations of the annotated method.
+&nbsp;     * If {@code true}, the counter increases monotonically, counting total
+&nbsp;     * invocations of the annotated method.
+&nbsp;     */
+&nbsp;    boolean monotonic() default false;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-27 23:52</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InstrumentedExecutorService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">InstrumentedExecutorService.java</span></div><h1>InstrumentedExecutorService.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicLong;
+
+/**
+ * An {@link ExecutorService} that monitors the number of tasks submitted, running,
+ * completed and also keeps a {@link Timer} for the task duration.
+ * &lt;p&gt;
+ * It will register the metrics using the given (or auto-generated) name as classifier, e.g:
+ * &quot;your-executor-service.submitted&quot;, &quot;your-executor-service.running&quot;, etc.
+ */
+public class InstrumentedExecutorService implements ExecutorService {
+<span class="nc" id="L25">    private static final AtomicLong NAME_COUNTER = new AtomicLong();</span>
+
+    private final ExecutorService delegate;
+    private final Meter submitted;
+    private final Counter running;
+    private final Meter completed;
+    private final Timer idle;
+    private final Timer duration;
+
+    /**
+     * Wraps an {@link ExecutorService} uses an auto-generated default name.
+     *
+     * @param delegate {@link ExecutorService} to wrap.
+     * @param registry {@link MetricRegistry} that will contain the metrics.
+     */
+    public InstrumentedExecutorService(ExecutorService delegate, MetricRegistry registry) {
+<span class="nc" id="L41">        this(delegate, registry, &quot;instrumented-delegate-&quot; + NAME_COUNTER.incrementAndGet());</span>
+<span class="nc" id="L42">    }</span>
+
+    /**
+     * Wraps an {@link ExecutorService} with an explicit name.
+     *
+     * @param delegate {@link ExecutorService} to wrap.
+     * @param registry {@link MetricRegistry} that will contain the metrics.
+     * @param name     name for this executor service.
+     */
+<span class="nc" id="L51">    public InstrumentedExecutorService(ExecutorService delegate, MetricRegistry registry, String name) {</span>
+<span class="nc" id="L52">        this.delegate = delegate;</span>
+<span class="nc" id="L53">        this.submitted = registry.meter(MetricRegistry.name(name, &quot;submitted&quot;));</span>
+<span class="nc" id="L54">        this.running = registry.counter(MetricRegistry.name(name, &quot;running&quot;));</span>
+<span class="nc" id="L55">        this.completed = registry.meter(MetricRegistry.name(name, &quot;completed&quot;));</span>
+<span class="nc" id="L56">        this.idle = registry.timer(MetricRegistry.name(name, &quot;idle&quot;));</span>
+<span class="nc" id="L57">        this.duration = registry.timer(MetricRegistry.name(name, &quot;duration&quot;));</span>
+
+<span class="nc bnc" id="L59" title="All 2 branches missed.">        if (delegate instanceof ThreadPoolExecutor) {</span>
+<span class="nc" id="L60">            ThreadPoolExecutor executor = (ThreadPoolExecutor) delegate;</span>
+<span class="nc" id="L61">            registry.registerGauge(MetricRegistry.name(name, &quot;pool.size&quot;),</span>
+<span class="nc" id="L62">                    executor::getPoolSize);</span>
+<span class="nc" id="L63">            registry.registerGauge(MetricRegistry.name(name, &quot;pool.core&quot;),</span>
+<span class="nc" id="L64">                    executor::getCorePoolSize);</span>
+<span class="nc" id="L65">            registry.registerGauge(MetricRegistry.name(name, &quot;pool.max&quot;),</span>
+<span class="nc" id="L66">                    executor::getMaximumPoolSize);</span>
+<span class="nc" id="L67">            final BlockingQueue&lt;Runnable&gt; queue = executor.getQueue();</span>
+<span class="nc" id="L68">            registry.registerGauge(MetricRegistry.name(name, &quot;tasks.active&quot;),</span>
+<span class="nc" id="L69">                    executor::getActiveCount);</span>
+<span class="nc" id="L70">            registry.registerGauge(MetricRegistry.name(name, &quot;tasks.completed&quot;),</span>
+<span class="nc" id="L71">                    executor::getCompletedTaskCount);</span>
+<span class="nc" id="L72">            registry.registerGauge(MetricRegistry.name(name, &quot;tasks.queued&quot;),</span>
+<span class="nc" id="L73">                    queue::size);</span>
+<span class="nc" id="L74">            registry.registerGauge(MetricRegistry.name(name, &quot;tasks.capacity&quot;),</span>
+<span class="nc" id="L75">                    queue::remainingCapacity);</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        } else if (delegate instanceof ForkJoinPool) {</span>
+<span class="nc" id="L77">            ForkJoinPool forkJoinPool = (ForkJoinPool) delegate;</span>
+<span class="nc" id="L78">            registry.registerGauge(MetricRegistry.name(name, &quot;tasks.stolen&quot;),</span>
+<span class="nc" id="L79">                    forkJoinPool::getStealCount);</span>
+<span class="nc" id="L80">            registry.registerGauge(MetricRegistry.name(name, &quot;tasks.queued&quot;),</span>
+<span class="nc" id="L81">                    forkJoinPool::getQueuedTaskCount);</span>
+<span class="nc" id="L82">            registry.registerGauge(MetricRegistry.name(name, &quot;threads.active&quot;),</span>
+<span class="nc" id="L83">                    forkJoinPool::getActiveThreadCount);</span>
+<span class="nc" id="L84">            registry.registerGauge(MetricRegistry.name(name, &quot;threads.running&quot;),</span>
+<span class="nc" id="L85">                    forkJoinPool::getRunningThreadCount);</span>
+        }
+<span class="nc" id="L87">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void execute(Runnable runnable) {
+<span class="nc" id="L94">        submitted.mark();</span>
+<span class="nc" id="L95">        delegate.execute(new InstrumentedRunnable(runnable));</span>
+<span class="nc" id="L96">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Future&lt;?&gt; submit(Runnable runnable) {
+<span class="nc" id="L103">        submitted.mark();</span>
+<span class="nc" id="L104">        return delegate.submit(new InstrumentedRunnable(runnable));</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public &lt;T&gt; Future&lt;T&gt; submit(Runnable runnable, T result) {
+<span class="nc" id="L112">        submitted.mark();</span>
+<span class="nc" id="L113">        return delegate.submit(new InstrumentedRunnable(runnable), result);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public &lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task) {
+<span class="nc" id="L121">        submitted.mark();</span>
+<span class="nc" id="L122">        return delegate.submit(new InstrumentedCallable&lt;&gt;(task));</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public &lt;T&gt; List&lt;Future&lt;T&gt;&gt; invokeAll(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks) throws InterruptedException {
+<span class="nc" id="L130">        submitted.mark(tasks.size());</span>
+<span class="nc" id="L131">        Collection&lt;? extends Callable&lt;T&gt;&gt; instrumented = instrument(tasks);</span>
+<span class="nc" id="L132">        return delegate.invokeAll(instrumented);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public &lt;T&gt; List&lt;Future&lt;T&gt;&gt; invokeAll(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks, long timeout, TimeUnit unit) throws InterruptedException {
+<span class="nc" id="L140">        submitted.mark(tasks.size());</span>
+<span class="nc" id="L141">        Collection&lt;? extends Callable&lt;T&gt;&gt; instrumented = instrument(tasks);</span>
+<span class="nc" id="L142">        return delegate.invokeAll(instrumented, timeout, unit);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public &lt;T&gt; T invokeAny(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks) throws ExecutionException, InterruptedException {
+<span class="nc" id="L150">        submitted.mark(tasks.size());</span>
+<span class="nc" id="L151">        Collection&lt;? extends Callable&lt;T&gt;&gt; instrumented = instrument(tasks);</span>
+<span class="nc" id="L152">        return delegate.invokeAny(instrumented);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public &lt;T&gt; T invokeAny(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks, long timeout, TimeUnit unit) throws ExecutionException, InterruptedException, TimeoutException {
+<span class="nc" id="L160">        submitted.mark(tasks.size());</span>
+<span class="nc" id="L161">        Collection&lt;? extends Callable&lt;T&gt;&gt; instrumented = instrument(tasks);</span>
+<span class="nc" id="L162">        return delegate.invokeAny(instrumented, timeout, unit);</span>
+    }
+
+    private &lt;T&gt; Collection&lt;? extends Callable&lt;T&gt;&gt; instrument(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks) {
+<span class="nc" id="L166">        final List&lt;InstrumentedCallable&lt;T&gt;&gt; instrumented = new ArrayList&lt;&gt;(tasks.size());</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">        for (Callable&lt;T&gt; task : tasks) {</span>
+<span class="nc" id="L168">            instrumented.add(new InstrumentedCallable&lt;&gt;(task));</span>
+<span class="nc" id="L169">        }</span>
+<span class="nc" id="L170">        return instrumented;</span>
+    }
+
+    @Override
+    public void shutdown() {
+<span class="nc" id="L175">        delegate.shutdown();</span>
+<span class="nc" id="L176">    }</span>
+
+    @Override
+    public List&lt;Runnable&gt; shutdownNow() {
+<span class="nc" id="L180">        return delegate.shutdownNow();</span>
+    }
+
+    @Override
+    public boolean isShutdown() {
+<span class="nc" id="L185">        return delegate.isShutdown();</span>
+    }
+
+    @Override
+    public boolean isTerminated() {
+<span class="nc" id="L190">        return delegate.isTerminated();</span>
+    }
+
+    @Override
+    public boolean awaitTermination(long l, TimeUnit timeUnit) throws InterruptedException {
+<span class="nc" id="L195">        return delegate.awaitTermination(l, timeUnit);</span>
+    }
+
+    private class InstrumentedRunnable implements Runnable {
+        private final Runnable task;
+        private final Timer.Context idleContext;
+
+<span class="nc" id="L202">        InstrumentedRunnable(Runnable task) {</span>
+<span class="nc" id="L203">            this.task = task;</span>
+<span class="nc" id="L204">            this.idleContext = idle.time();</span>
+<span class="nc" id="L205">        }</span>
+
+        @Override
+        public void run() {
+<span class="nc" id="L209">            idleContext.stop();</span>
+<span class="nc" id="L210">            running.inc();</span>
+<span class="nc" id="L211">            try (Timer.Context durationContext = duration.time()) {</span>
+<span class="nc" id="L212">                task.run();</span>
+            } finally {
+<span class="nc" id="L214">                running.dec();</span>
+<span class="nc" id="L215">                completed.mark();</span>
+            }
+<span class="nc" id="L217">        }</span>
+    }
+
+    private class InstrumentedCallable&lt;T&gt; implements Callable&lt;T&gt; {
+        private final Callable&lt;T&gt; callable;
+        private final Timer.Context idleContext;
+
+<span class="nc" id="L224">        InstrumentedCallable(Callable&lt;T&gt; callable) {</span>
+<span class="nc" id="L225">            this.callable = callable;</span>
+<span class="nc" id="L226">            this.idleContext = idle.time();</span>
+<span class="nc" id="L227">        }</span>
+
+        @Override
+        public T call() throws Exception {
+<span class="nc" id="L231">            idleContext.stop();</span>
+<span class="nc" id="L232">            running.inc();</span>
+<span class="nc" id="L233">            try (Timer.Context context = duration.time()) {</span>
+<span class="nc" id="L234">                return callable.call();</span>
+            } finally {
+<span class="nc" id="L236">                running.dec();</span>
+<span class="nc" id="L237">                completed.mark();</span>
+            }
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

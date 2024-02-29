@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Slf4jReporterTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">Slf4jReporterTest.java</span></div><h1>Slf4jReporterTest.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.Marker;
+
+import java.util.EnumSet;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
+
+import static com.codahale.metrics.MetricAttribute.COUNT;
+import static com.codahale.metrics.MetricAttribute.M1_RATE;
+import static com.codahale.metrics.MetricAttribute.MEAN_RATE;
+import static com.codahale.metrics.MetricAttribute.MIN;
+import static com.codahale.metrics.MetricAttribute.P50;
+import static com.codahale.metrics.MetricAttribute.P999;
+import static com.codahale.metrics.MetricAttribute.STDDEV;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
+<span class="nc" id="L24">public class Slf4jReporterTest {</span>
+
+<span class="nc" id="L26">    private final Logger logger = mock(Logger.class);</span>
+<span class="nc" id="L27">    private final Marker marker = mock(Marker.class);</span>
+<span class="nc" id="L28">    private final MetricRegistry registry = mock(MetricRegistry.class);</span>
+
+    /**
+     * The set of disabled metric attributes to pass to the Slf4jReporter builder
+     * in the default factory methods of {@link #infoReporter}
+     * and {@link #errorReporter}.
+     *
+     * This value can be overridden by tests before calling the {@link #infoReporter}
+     * and {@link #errorReporter} factory methods.
+     */
+<span class="nc" id="L38">    private Set&lt;MetricAttribute&gt; disabledMetricAttributes = null;</span>
+
+    private Slf4jReporter infoReporter() {
+<span class="nc" id="L41">        return Slf4jReporter.forRegistry(registry)</span>
+<span class="nc" id="L42">                .outputTo(logger)</span>
+<span class="nc" id="L43">                .markWith(marker)</span>
+<span class="nc" id="L44">                .prefixedWith(&quot;prefix&quot;)</span>
+<span class="nc" id="L45">                .convertRatesTo(TimeUnit.SECONDS)</span>
+<span class="nc" id="L46">                .convertDurationsTo(TimeUnit.MILLISECONDS)</span>
+<span class="nc" id="L47">                .withLoggingLevel(Slf4jReporter.LoggingLevel.INFO)</span>
+<span class="nc" id="L48">                .filter(MetricFilter.ALL)</span>
+<span class="nc" id="L49">                .disabledMetricAttributes(disabledMetricAttributes)</span>
+<span class="nc" id="L50">                .build();</span>
+    }
+
+    private Slf4jReporter errorReporter() {
+<span class="nc" id="L54">        return Slf4jReporter.forRegistry(registry)</span>
+<span class="nc" id="L55">                .outputTo(logger)</span>
+<span class="nc" id="L56">                .markWith(marker)</span>
+<span class="nc" id="L57">                .convertRatesTo(TimeUnit.SECONDS)</span>
+<span class="nc" id="L58">                .convertDurationsTo(TimeUnit.MILLISECONDS)</span>
+<span class="nc" id="L59">                .withLoggingLevel(Slf4jReporter.LoggingLevel.ERROR)</span>
+<span class="nc" id="L60">                .filter(MetricFilter.ALL)</span>
+<span class="nc" id="L61">                .disabledMetricAttributes(disabledMetricAttributes)</span>
+<span class="nc" id="L62">                .build();</span>
+    }
+
+    @Test
+    public void reportsGaugeValuesAtErrorDefault() {
+<span class="nc" id="L67">        reportsGaugeValuesAtError();</span>
+<span class="nc" id="L68">    }</span>
+
+    @Test
+    public void reportsGaugeValuesAtErrorAllDisabled() {
+<span class="nc" id="L72">        disabledMetricAttributes = EnumSet.allOf(MetricAttribute.class); // has no effect</span>
+<span class="nc" id="L73">        reportsGaugeValuesAtError();</span>
+<span class="nc" id="L74">    }</span>
+
+    private void reportsGaugeValuesAtError() {
+<span class="nc" id="L77">        when(logger.isErrorEnabled(marker)).thenReturn(true);</span>
+<span class="nc" id="L78">        errorReporter().report(map(&quot;gauge&quot;, () -&gt; &quot;value&quot;),</span>
+<span class="nc" id="L79">                map(),</span>
+<span class="nc" id="L80">                map(),</span>
+<span class="nc" id="L81">                map(),</span>
+<span class="nc" id="L82">                map());</span>
+
+<span class="nc" id="L84">        verify(logger).error(marker, &quot;type=GAUGE, name=gauge, value=value&quot;);</span>
+<span class="nc" id="L85">    }</span>
+
+
+    private Timer timer() {
+<span class="nc" id="L89">        final Timer timer = mock(Timer.class);</span>
+<span class="nc" id="L90">        when(timer.getCount()).thenReturn(1L);</span>
+
+<span class="nc" id="L92">        when(timer.getMeanRate()).thenReturn(2.0);</span>
+<span class="nc" id="L93">        when(timer.getOneMinuteRate()).thenReturn(3.0);</span>
+<span class="nc" id="L94">        when(timer.getFiveMinuteRate()).thenReturn(4.0);</span>
+<span class="nc" id="L95">        when(timer.getFifteenMinuteRate()).thenReturn(5.0);</span>
+
+<span class="nc" id="L97">        final Snapshot snapshot = mock(Snapshot.class);</span>
+<span class="nc" id="L98">        when(snapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));</span>
+<span class="nc" id="L99">        when(snapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));</span>
+<span class="nc" id="L100">        when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));</span>
+<span class="nc" id="L101">        when(snapshot.getStdDev()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(400));</span>
+<span class="nc" id="L102">        when(snapshot.getMedian()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(500));</span>
+<span class="nc" id="L103">        when(snapshot.get75thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(600));</span>
+<span class="nc" id="L104">        when(snapshot.get95thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(700));</span>
+<span class="nc" id="L105">        when(snapshot.get98thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(800));</span>
+<span class="nc" id="L106">        when(snapshot.get99thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(900));</span>
+<span class="nc" id="L107">        when(snapshot.get999thPercentile()).thenReturn((double) TimeUnit.MILLISECONDS</span>
+<span class="nc" id="L108">                .toNanos(1000));</span>
+
+<span class="nc" id="L110">        when(timer.getSnapshot()).thenReturn(snapshot);</span>
+<span class="nc" id="L111">        return timer;</span>
+    }
+
+    private Histogram histogram() {
+<span class="nc" id="L115">        final Histogram histogram = mock(Histogram.class);</span>
+<span class="nc" id="L116">        when(histogram.getCount()).thenReturn(1L);</span>
+
+<span class="nc" id="L118">        final Snapshot snapshot = mock(Snapshot.class);</span>
+<span class="nc" id="L119">        when(snapshot.getMax()).thenReturn(2L);</span>
+<span class="nc" id="L120">        when(snapshot.getMean()).thenReturn(3.0);</span>
+<span class="nc" id="L121">        when(snapshot.getMin()).thenReturn(4L);</span>
+<span class="nc" id="L122">        when(snapshot.getStdDev()).thenReturn(5.0);</span>
+<span class="nc" id="L123">        when(snapshot.getMedian()).thenReturn(6.0);</span>
+<span class="nc" id="L124">        when(snapshot.get75thPercentile()).thenReturn(7.0);</span>
+<span class="nc" id="L125">        when(snapshot.get95thPercentile()).thenReturn(8.0);</span>
+<span class="nc" id="L126">        when(snapshot.get98thPercentile()).thenReturn(9.0);</span>
+<span class="nc" id="L127">        when(snapshot.get99thPercentile()).thenReturn(10.0);</span>
+<span class="nc" id="L128">        when(snapshot.get999thPercentile()).thenReturn(11.0);</span>
+
+<span class="nc" id="L130">        when(histogram.getSnapshot()).thenReturn(snapshot);</span>
+<span class="nc" id="L131">        return histogram;</span>
+    }
+
+    private Meter meter() {
+<span class="nc" id="L135">        final Meter meter = mock(Meter.class);</span>
+<span class="nc" id="L136">        when(meter.getCount()).thenReturn(1L);</span>
+<span class="nc" id="L137">        when(meter.getMeanRate()).thenReturn(2.0);</span>
+<span class="nc" id="L138">        when(meter.getOneMinuteRate()).thenReturn(3.0);</span>
+<span class="nc" id="L139">        when(meter.getFiveMinuteRate()).thenReturn(4.0);</span>
+<span class="nc" id="L140">        when(meter.getFifteenMinuteRate()).thenReturn(5.0);</span>
+<span class="nc" id="L141">        return meter;</span>
+    }
+
+    private Counter counter() {
+<span class="nc" id="L145">        final Counter counter = mock(Counter.class);</span>
+<span class="nc" id="L146">        when(counter.getCount()).thenReturn(100L);</span>
+<span class="nc" id="L147">        return counter;</span>
+    }
+
+    @Test
+    public void reportsCounterValuesAtErrorDefault() {
+<span class="nc" id="L152">        reportsCounterValuesAtError();</span>
+<span class="nc" id="L153">    }</span>
+
+    @Test
+    public void reportsCounterValuesAtErrorAllDisabled() {
+<span class="nc" id="L157">        disabledMetricAttributes = EnumSet.allOf(MetricAttribute.class); // has no effect</span>
+<span class="nc" id="L158">        reportsCounterValuesAtError();</span>
+<span class="nc" id="L159">    }</span>
+
+    private void reportsCounterValuesAtError() {
+<span class="nc" id="L162">        final Counter counter = counter();</span>
+<span class="nc" id="L163">        when(logger.isErrorEnabled(marker)).thenReturn(true);</span>
+
+<span class="nc" id="L165">        errorReporter().report(map(),</span>
+<span class="nc" id="L166">                map(&quot;test.counter&quot;, counter),</span>
+<span class="nc" id="L167">                map(),</span>
+<span class="nc" id="L168">                map(),</span>
+<span class="nc" id="L169">                map());</span>
+
+<span class="nc" id="L171">        verify(logger).error(marker, &quot;type=COUNTER, name=test.counter, count=100&quot;);</span>
+<span class="nc" id="L172">    }</span>
+
+    @Test
+    public void reportsHistogramValuesAtErrorDefault() {
+<span class="nc" id="L176">        reportsHistogramValuesAtError(&quot;type=HISTOGRAM, name=test.histogram, count=1, min=4, &quot; +</span>
+                &quot;max=2, mean=3.0, stddev=5.0, p50=6.0, p75=7.0, p95=8.0, p98=9.0, p99=10.0, p999=11.0&quot;);
+<span class="nc" id="L178">    }</span>
+
+    @Test
+    public void reportsHistogramValuesAtErrorWithDisabledMetricAttributes() {
+<span class="nc" id="L182">        disabledMetricAttributes = EnumSet.of(COUNT, MIN, P50);</span>
+<span class="nc" id="L183">        reportsHistogramValuesAtError(&quot;type=HISTOGRAM, name=test.histogram, max=2, mean=3.0, &quot; +</span>
+                &quot;stddev=5.0, p75=7.0, p95=8.0, p98=9.0, p99=10.0, p999=11.0&quot;);
+<span class="nc" id="L185">    }</span>
+
+    private void reportsHistogramValuesAtError(final String expectedLog) {
+<span class="nc" id="L188">        final Histogram histogram = histogram();</span>
+<span class="nc" id="L189">        when(logger.isErrorEnabled(marker)).thenReturn(true);</span>
+
+<span class="nc" id="L191">        errorReporter().report(map(),</span>
+<span class="nc" id="L192">                map(),</span>
+<span class="nc" id="L193">                map(&quot;test.histogram&quot;, histogram),</span>
+<span class="nc" id="L194">                map(),</span>
+<span class="nc" id="L195">                map());</span>
+
+<span class="nc" id="L197">        verify(logger).error(marker, expectedLog);</span>
+<span class="nc" id="L198">    }</span>
+
+    @Test
+    public void reportsMeterValuesAtErrorDefault() {
+<span class="nc" id="L202">        reportsMeterValuesAtError(&quot;type=METER, name=test.meter, count=1, m1_rate=3.0, m5_rate=4.0, &quot; +</span>
+                &quot;m15_rate=5.0, mean_rate=2.0, rate_unit=events/second&quot;);
+<span class="nc" id="L204">    }</span>
+
+    @Test
+    public void reportsMeterValuesAtErrorWithDisabledMetricAttributes() {
+<span class="nc" id="L208">        disabledMetricAttributes = EnumSet.of(MIN, P50, M1_RATE);</span>
+<span class="nc" id="L209">        reportsMeterValuesAtError(&quot;type=METER, name=test.meter, count=1, m5_rate=4.0, m15_rate=5.0, &quot; +</span>
+                &quot;mean_rate=2.0, rate_unit=events/second&quot;);
+<span class="nc" id="L211">    }</span>
+
+    private void reportsMeterValuesAtError(final String expectedLog) {
+<span class="nc" id="L214">        final Meter meter = meter();</span>
+<span class="nc" id="L215">        when(logger.isErrorEnabled(marker)).thenReturn(true);</span>
+
+<span class="nc" id="L217">        errorReporter().report(map(),</span>
+<span class="nc" id="L218">                map(),</span>
+<span class="nc" id="L219">                map(),</span>
+<span class="nc" id="L220">                map(&quot;test.meter&quot;, meter),</span>
+<span class="nc" id="L221">                map());</span>
+
+<span class="nc" id="L223">        verify(logger).error(marker, expectedLog);</span>
+<span class="nc" id="L224">    }</span>
+
+
+    @Test
+    public void reportsTimerValuesAtErrorDefault() {
+<span class="nc" id="L229">        reportsTimerValuesAtError(&quot;type=TIMER, name=test.another.timer, count=1, min=300.0, max=100.0, &quot; +</span>
+                &quot;mean=200.0, stddev=400.0, p50=500.0, p75=600.0, p95=700.0, p98=800.0, p99=900.0, p999=1000.0, &quot; +
+                &quot;m1_rate=3.0, m5_rate=4.0, m15_rate=5.0, mean_rate=2.0, rate_unit=events/second, &quot; +
+                &quot;duration_unit=milliseconds&quot;);
+<span class="nc" id="L233">    }</span>
+
+    @Test
+    public void reportsTimerValuesAtErrorWithDisabledMetricAttributes() {
+<span class="nc" id="L237">        disabledMetricAttributes = EnumSet.of(MIN, STDDEV, P999, MEAN_RATE);</span>
+<span class="nc" id="L238">        reportsTimerValuesAtError(&quot;type=TIMER, name=test.another.timer, count=1, max=100.0, mean=200.0, &quot; +</span>
+                &quot;p50=500.0, p75=600.0, p95=700.0, p98=800.0, p99=900.0, m1_rate=3.0, m5_rate=4.0, m15_rate=5.0, &quot; +
+                &quot;rate_unit=events/second, duration_unit=milliseconds&quot;);
+<span class="nc" id="L241">    }</span>
+
+    private void reportsTimerValuesAtError(final String expectedLog) {
+<span class="nc" id="L244">        final Timer timer = timer();</span>
+
+<span class="nc" id="L246">        when(logger.isErrorEnabled(marker)).thenReturn(true);</span>
+
+<span class="nc" id="L248">        errorReporter().report(map(),</span>
+<span class="nc" id="L249">                map(),</span>
+<span class="nc" id="L250">                map(),</span>
+<span class="nc" id="L251">                map(),</span>
+<span class="nc" id="L252">                map(&quot;test.another.timer&quot;, timer));</span>
+
+<span class="nc" id="L254">        verify(logger).error(marker, expectedLog);</span>
+<span class="nc" id="L255">    }</span>
+
+    @Test
+    public void reportsGaugeValuesDefault() {
+<span class="nc" id="L259">        when(logger.isInfoEnabled(marker)).thenReturn(true);</span>
+<span class="nc" id="L260">        infoReporter().report(map(&quot;gauge&quot;, () -&gt; &quot;value&quot;),</span>
+<span class="nc" id="L261">                map(),</span>
+<span class="nc" id="L262">                map(),</span>
+<span class="nc" id="L263">                map(),</span>
+<span class="nc" id="L264">                map());</span>
+
+<span class="nc" id="L266">        verify(logger).info(marker, &quot;type=GAUGE, name=prefix.gauge, value=value&quot;);</span>
+<span class="nc" id="L267">    }</span>
+
+
+    @Test
+    public void reportsCounterValuesDefault() {
+<span class="nc" id="L272">        final Counter counter = counter();</span>
+<span class="nc" id="L273">        when(logger.isInfoEnabled(marker)).thenReturn(true);</span>
+
+<span class="nc" id="L275">        infoReporter().report(map(),</span>
+<span class="nc" id="L276">                map(&quot;test.counter&quot;, counter),</span>
+<span class="nc" id="L277">                map(),</span>
+<span class="nc" id="L278">                map(),</span>
+<span class="nc" id="L279">                map());</span>
+
+<span class="nc" id="L281">        verify(logger).info(marker, &quot;type=COUNTER, name=prefix.test.counter, count=100&quot;);</span>
+<span class="nc" id="L282">    }</span>
+
+    @Test
+    public void reportsHistogramValuesDefault() {
+<span class="nc" id="L286">        final Histogram histogram = histogram();</span>
+<span class="nc" id="L287">        when(logger.isInfoEnabled(marker)).thenReturn(true);</span>
+
+<span class="nc" id="L289">        infoReporter().report(map(),</span>
+<span class="nc" id="L290">                map(),</span>
+<span class="nc" id="L291">                map(&quot;test.histogram&quot;, histogram),</span>
+<span class="nc" id="L292">                map(),</span>
+<span class="nc" id="L293">                map());</span>
+
+<span class="nc" id="L295">        verify(logger).info(marker, &quot;type=HISTOGRAM, name=prefix.test.histogram, count=1, min=4, max=2, mean=3.0, &quot; +</span>
+                &quot;stddev=5.0, p50=6.0, p75=7.0, p95=8.0, p98=9.0, p99=10.0, p999=11.0&quot;);
+<span class="nc" id="L297">    }</span>
+
+    @Test
+    public void reportsMeterValuesDefault() {
+<span class="nc" id="L301">        final Meter meter = meter();</span>
+<span class="nc" id="L302">        when(logger.isInfoEnabled(marker)).thenReturn(true);</span>
+
+<span class="nc" id="L304">        infoReporter().report(map(),</span>
+<span class="nc" id="L305">                map(),</span>
+<span class="nc" id="L306">                map(),</span>
+<span class="nc" id="L307">                map(&quot;test.meter&quot;, meter),</span>
+<span class="nc" id="L308">                map());</span>
+
+<span class="nc" id="L310">        verify(logger).info(marker, &quot;type=METER, name=prefix.test.meter, count=1, m1_rate=3.0, m5_rate=4.0, &quot; +</span>
+                &quot;m15_rate=5.0, mean_rate=2.0, rate_unit=events/second&quot;);
+<span class="nc" id="L312">    }</span>
+
+    @Test
+    public void reportsTimerValuesDefault() {
+<span class="nc" id="L316">        final Timer timer = timer();</span>
+<span class="nc" id="L317">        when(logger.isInfoEnabled(marker)).thenReturn(true);</span>
+
+<span class="nc" id="L319">        infoReporter().report(map(),</span>
+<span class="nc" id="L320">                map(),</span>
+<span class="nc" id="L321">                map(),</span>
+<span class="nc" id="L322">                map(),</span>
+<span class="nc" id="L323">                map(&quot;test.another.timer&quot;, timer));</span>
+
+<span class="nc" id="L325">        verify(logger).info(marker, &quot;type=TIMER, name=prefix.test.another.timer, count=1, min=300.0, max=100.0, &quot; +</span>
+                &quot;mean=200.0, stddev=400.0, p50=500.0, p75=600.0, p95=700.0, p98=800.0, p99=900.0, p999=1000.0,&quot; +
+                &quot; m1_rate=3.0, m5_rate=4.0, m15_rate=5.0, mean_rate=2.0, rate_unit=events/second, duration_unit=milliseconds&quot;);
+<span class="nc" id="L328">    }</span>
+
+
+    @Test
+    public void reportsAllMetricsDefault() {
+<span class="nc" id="L333">        when(logger.isInfoEnabled(marker)).thenReturn(true);</span>
+
+<span class="nc" id="L335">        infoReporter().report(map(&quot;test.gauge&quot;, () -&gt; &quot;value&quot;),</span>
+<span class="nc" id="L336">                map(&quot;test.counter&quot;, counter()),</span>
+<span class="nc" id="L337">                map(&quot;test.histogram&quot;, histogram()),</span>
+<span class="nc" id="L338">                map(&quot;test.meter&quot;, meter()),</span>
+<span class="nc" id="L339">                map(&quot;test.timer&quot;, timer()));</span>
+
+<span class="nc" id="L341">        verify(logger).info(marker, &quot;type=GAUGE, name=prefix.test.gauge, value=value&quot;);</span>
+<span class="nc" id="L342">        verify(logger).info(marker, &quot;type=COUNTER, name=prefix.test.counter, count=100&quot;);</span>
+<span class="nc" id="L343">        verify(logger).info(marker, &quot;type=HISTOGRAM, name=prefix.test.histogram, count=1, min=4, max=2, mean=3.0, &quot; +</span>
+                &quot;stddev=5.0, p50=6.0, p75=7.0, p95=8.0, p98=9.0, p99=10.0, p999=11.0&quot;);
+<span class="nc" id="L345">        verify(logger).info(marker, &quot;type=METER, name=prefix.test.meter, count=1, m1_rate=3.0, m5_rate=4.0, &quot; +</span>
+                &quot;m15_rate=5.0, mean_rate=2.0, rate_unit=events/second&quot;);
+<span class="nc" id="L347">        verify(logger).info(marker, &quot;type=TIMER, name=prefix.test.timer, count=1, min=300.0, max=100.0, &quot; +</span>
+                &quot;mean=200.0, stddev=400.0, p50=500.0, p75=600.0, p95=700.0, p98=800.0, p99=900.0, p999=1000.0,&quot; +
+                &quot; m1_rate=3.0, m5_rate=4.0, m15_rate=5.0, mean_rate=2.0, rate_unit=events/second, duration_unit=milliseconds&quot;);
+<span class="nc" id="L350">    }</span>
+
+    private &lt;T&gt; SortedMap&lt;String, T&gt; map() {
+<span class="nc" id="L353">        return new TreeMap&lt;&gt;();</span>
+    }
+
+    private &lt;T&gt; SortedMap&lt;String, T&gt; map(String name, T metric) {
+<span class="nc" id="L357">        final TreeMap&lt;String, T&gt; map = new TreeMap&lt;&gt;();</span>
+<span class="nc" id="L358">        map.put(name, metric);</span>
+<span class="nc" id="L359">        return map;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

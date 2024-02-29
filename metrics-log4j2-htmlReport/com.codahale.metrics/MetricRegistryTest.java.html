@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MetricRegistryTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">MetricRegistryTest.java</span></div><h1>MetricRegistryTest.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.codahale.metrics.MetricRegistry.name;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
+<span class="nc" id="L19">public class MetricRegistryTest {</span>
+<span class="nc" id="L20">    private final MetricRegistryListener listener = mock(MetricRegistryListener.class);</span>
+<span class="nc" id="L21">    private final MetricRegistry registry = new MetricRegistry();</span>
+<span class="nc" id="L22">    private final Gauge&lt;String&gt; gauge = () -&gt; &quot;&quot;;</span>
+<span class="nc" id="L23">    private final SettableGauge&lt;String&gt; settableGauge = new DefaultSettableGauge&lt;&gt;(&quot;&quot;);</span>
+<span class="nc" id="L24">    private final Counter counter = mock(Counter.class);</span>
+<span class="nc" id="L25">    private final Histogram histogram = mock(Histogram.class);</span>
+<span class="nc" id="L26">    private final Meter meter = mock(Meter.class);</span>
+<span class="nc" id="L27">    private final Timer timer = mock(Timer.class);</span>
+
+    @Before
+    public void setUp() {
+<span class="nc" id="L31">        registry.addListener(listener);</span>
+<span class="nc" id="L32">    }</span>
+
+    @Test
+    public void registeringAGaugeTriggersANotification() {
+<span class="nc" id="L36">        assertThat(registry.register(&quot;thing&quot;, gauge))</span>
+<span class="nc" id="L37">                .isEqualTo(gauge);</span>
+
+<span class="nc" id="L39">        verify(listener).onGaugeAdded(&quot;thing&quot;, gauge);</span>
+<span class="nc" id="L40">    }</span>
+
+    @Test
+    public void removingAGaugeTriggersANotification() {
+<span class="nc" id="L44">        registry.register(&quot;thing&quot;, gauge);</span>
+
+<span class="nc" id="L46">        assertThat(registry.remove(&quot;thing&quot;))</span>
+<span class="nc" id="L47">                .isTrue();</span>
+
+<span class="nc" id="L49">        verify(listener).onGaugeRemoved(&quot;thing&quot;);</span>
+<span class="nc" id="L50">    }</span>
+
+    @Test
+    public void registeringACounterTriggersANotification() {
+<span class="nc" id="L54">        assertThat(registry.register(&quot;thing&quot;, counter))</span>
+<span class="nc" id="L55">                .isEqualTo(counter);</span>
+
+<span class="nc" id="L57">        verify(listener).onCounterAdded(&quot;thing&quot;, counter);</span>
+<span class="nc" id="L58">    }</span>
+
+    @Test
+    public void accessingACounterRegistersAndReusesTheCounter() {
+<span class="nc" id="L62">        final Counter counter1 = registry.counter(&quot;thing&quot;);</span>
+<span class="nc" id="L63">        final Counter counter2 = registry.counter(&quot;thing&quot;);</span>
+
+<span class="nc" id="L65">        assertThat(counter1)</span>
+<span class="nc" id="L66">                .isSameAs(counter2);</span>
+
+<span class="nc" id="L68">        verify(listener).onCounterAdded(&quot;thing&quot;, counter1);</span>
+<span class="nc" id="L69">    }</span>
+
+    @Test
+    public void accessingACustomCounterRegistersAndReusesTheCounter() {
+<span class="nc" id="L73">        final MetricRegistry.MetricSupplier&lt;Counter&gt; supplier = () -&gt; counter;</span>
+<span class="nc" id="L74">        final Counter counter1 = registry.counter(&quot;thing&quot;, supplier);</span>
+<span class="nc" id="L75">        final Counter counter2 = registry.counter(&quot;thing&quot;, supplier);</span>
+
+<span class="nc" id="L77">        assertThat(counter1)</span>
+<span class="nc" id="L78">                .isSameAs(counter2);</span>
+
+<span class="nc" id="L80">        verify(listener).onCounterAdded(&quot;thing&quot;, counter1);</span>
+<span class="nc" id="L81">    }</span>
+
+
+    @Test
+    public void removingACounterTriggersANotification() {
+<span class="nc" id="L86">        registry.register(&quot;thing&quot;, counter);</span>
+
+<span class="nc" id="L88">        assertThat(registry.remove(&quot;thing&quot;))</span>
+<span class="nc" id="L89">                .isTrue();</span>
+
+<span class="nc" id="L91">        verify(listener).onCounterRemoved(&quot;thing&quot;);</span>
+<span class="nc" id="L92">    }</span>
+
+    @Test
+    public void registeringAHistogramTriggersANotification() {
+<span class="nc" id="L96">        assertThat(registry.register(&quot;thing&quot;, histogram))</span>
+<span class="nc" id="L97">                .isEqualTo(histogram);</span>
+
+<span class="nc" id="L99">        verify(listener).onHistogramAdded(&quot;thing&quot;, histogram);</span>
+<span class="nc" id="L100">    }</span>
+
+    @Test
+    public void accessingAHistogramRegistersAndReusesIt() {
+<span class="nc" id="L104">        final Histogram histogram1 = registry.histogram(&quot;thing&quot;);</span>
+<span class="nc" id="L105">        final Histogram histogram2 = registry.histogram(&quot;thing&quot;);</span>
+
+<span class="nc" id="L107">        assertThat(histogram1)</span>
+<span class="nc" id="L108">                .isSameAs(histogram2);</span>
+
+<span class="nc" id="L110">        verify(listener).onHistogramAdded(&quot;thing&quot;, histogram1);</span>
+<span class="nc" id="L111">    }</span>
+
+    @Test
+    public void accessingACustomHistogramRegistersAndReusesIt() {
+<span class="nc" id="L115">        final MetricRegistry.MetricSupplier&lt;Histogram&gt; supplier = () -&gt; histogram;</span>
+<span class="nc" id="L116">        final Histogram histogram1 = registry.histogram(&quot;thing&quot;, supplier);</span>
+<span class="nc" id="L117">        final Histogram histogram2 = registry.histogram(&quot;thing&quot;, supplier);</span>
+
+<span class="nc" id="L119">        assertThat(histogram1)</span>
+<span class="nc" id="L120">                .isSameAs(histogram2);</span>
+
+<span class="nc" id="L122">        verify(listener).onHistogramAdded(&quot;thing&quot;, histogram1);</span>
+<span class="nc" id="L123">    }</span>
+
+    @Test
+    public void removingAHistogramTriggersANotification() {
+<span class="nc" id="L127">        registry.register(&quot;thing&quot;, histogram);</span>
+
+<span class="nc" id="L129">        assertThat(registry.remove(&quot;thing&quot;))</span>
+<span class="nc" id="L130">                .isTrue();</span>
+
+<span class="nc" id="L132">        verify(listener).onHistogramRemoved(&quot;thing&quot;);</span>
+<span class="nc" id="L133">    }</span>
+
+    @Test
+    public void registeringAMeterTriggersANotification() {
+<span class="nc" id="L137">        assertThat(registry.register(&quot;thing&quot;, meter))</span>
+<span class="nc" id="L138">                .isEqualTo(meter);</span>
+
+<span class="nc" id="L140">        verify(listener).onMeterAdded(&quot;thing&quot;, meter);</span>
+<span class="nc" id="L141">    }</span>
+
+    @Test
+    public void accessingAMeterRegistersAndReusesIt() {
+<span class="nc" id="L145">        final Meter meter1 = registry.meter(&quot;thing&quot;);</span>
+<span class="nc" id="L146">        final Meter meter2 = registry.meter(&quot;thing&quot;);</span>
+
+<span class="nc" id="L148">        assertThat(meter1)</span>
+<span class="nc" id="L149">                .isSameAs(meter2);</span>
+
+<span class="nc" id="L151">        verify(listener).onMeterAdded(&quot;thing&quot;, meter1);</span>
+<span class="nc" id="L152">    }</span>
+
+    @Test
+    public void accessingACustomMeterRegistersAndReusesIt() {
+<span class="nc" id="L156">        final MetricRegistry.MetricSupplier&lt;Meter&gt; supplier = () -&gt; meter;</span>
+<span class="nc" id="L157">        final Meter meter1 = registry.meter(&quot;thing&quot;, supplier);</span>
+<span class="nc" id="L158">        final Meter meter2 = registry.meter(&quot;thing&quot;, supplier);</span>
+
+<span class="nc" id="L160">        assertThat(meter1)</span>
+<span class="nc" id="L161">                .isSameAs(meter2);</span>
+
+<span class="nc" id="L163">        verify(listener).onMeterAdded(&quot;thing&quot;, meter1);</span>
+<span class="nc" id="L164">    }</span>
+
+    @Test
+    public void removingAMeterTriggersANotification() {
+<span class="nc" id="L168">        registry.register(&quot;thing&quot;, meter);</span>
+
+<span class="nc" id="L170">        assertThat(registry.remove(&quot;thing&quot;))</span>
+<span class="nc" id="L171">                .isTrue();</span>
+
+<span class="nc" id="L173">        verify(listener).onMeterRemoved(&quot;thing&quot;);</span>
+<span class="nc" id="L174">    }</span>
+
+    @Test
+    public void registeringATimerTriggersANotification() {
+<span class="nc" id="L178">        assertThat(registry.register(&quot;thing&quot;, timer))</span>
+<span class="nc" id="L179">                .isEqualTo(timer);</span>
+
+<span class="nc" id="L181">        verify(listener).onTimerAdded(&quot;thing&quot;, timer);</span>
+<span class="nc" id="L182">    }</span>
+
+    @Test
+    public void accessingATimerRegistersAndReusesIt() {
+<span class="nc" id="L186">        final Timer timer1 = registry.timer(&quot;thing&quot;);</span>
+<span class="nc" id="L187">        final Timer timer2 = registry.timer(&quot;thing&quot;);</span>
+
+<span class="nc" id="L189">        assertThat(timer1)</span>
+<span class="nc" id="L190">                .isSameAs(timer2);</span>
+
+<span class="nc" id="L192">        verify(listener).onTimerAdded(&quot;thing&quot;, timer1);</span>
+<span class="nc" id="L193">    }</span>
+
+    @Test
+    public void accessingACustomTimerRegistersAndReusesIt() {
+<span class="nc" id="L197">        final MetricRegistry.MetricSupplier&lt;Timer&gt; supplier = () -&gt; timer;</span>
+<span class="nc" id="L198">        final Timer timer1 = registry.timer(&quot;thing&quot;, supplier);</span>
+<span class="nc" id="L199">        final Timer timer2 = registry.timer(&quot;thing&quot;, supplier);</span>
+
+<span class="nc" id="L201">        assertThat(timer1)</span>
+<span class="nc" id="L202">                .isSameAs(timer2);</span>
+
+<span class="nc" id="L204">        verify(listener).onTimerAdded(&quot;thing&quot;, timer1);</span>
+<span class="nc" id="L205">    }</span>
+
+
+    @Test
+    public void removingATimerTriggersANotification() {
+<span class="nc" id="L210">        registry.register(&quot;thing&quot;, timer);</span>
+
+<span class="nc" id="L212">        assertThat(registry.remove(&quot;thing&quot;))</span>
+<span class="nc" id="L213">                .isTrue();</span>
+
+<span class="nc" id="L215">        verify(listener).onTimerRemoved(&quot;thing&quot;);</span>
+<span class="nc" id="L216">    }</span>
+
+    @Test
+    public void accessingASettableGaugeRegistersAndReusesIt() {
+<span class="nc" id="L220">        final SettableGauge&lt;String&gt; gauge1 = registry.gauge(&quot;thing&quot;);</span>
+<span class="nc" id="L221">        gauge1.setValue(&quot;Test&quot;);</span>
+<span class="nc" id="L222">        final Gauge&lt;String&gt; gauge2 = registry.gauge(&quot;thing&quot;);</span>
+
+<span class="nc" id="L224">        assertThat(gauge1).isSameAs(gauge2);</span>
+<span class="nc" id="L225">        assertThat(gauge2.getValue()).isEqualTo(&quot;Test&quot;);</span>
+
+<span class="nc" id="L227">        verify(listener).onGaugeAdded(&quot;thing&quot;, gauge1);</span>
+<span class="nc" id="L228">    }</span>
+
+    @Test
+    public void accessingAnExistingGaugeReusesIt() {
+<span class="nc" id="L232">        final Gauge&lt;String&gt; gauge1 = registry.gauge(&quot;thing&quot;, () -&gt; () -&gt; &quot;string-gauge&quot;);</span>
+<span class="nc" id="L233">        final Gauge&lt;String&gt; gauge2 = registry.gauge(&quot;thing&quot;, () -&gt; new DefaultSettableGauge&lt;&gt;(&quot;settable-gauge&quot;));</span>
+
+<span class="nc" id="L235">        assertThat(gauge1).isSameAs(gauge2);</span>
+<span class="nc" id="L236">        assertThat(gauge2.getValue()).isEqualTo(&quot;string-gauge&quot;);</span>
+
+<span class="nc" id="L238">        verify(listener).onGaugeAdded(&quot;thing&quot;, gauge1);</span>
+<span class="nc" id="L239">    }</span>
+
+    @Test
+    public void accessingAnExistingSettableGaugeReusesIt() {
+<span class="nc" id="L243">        final Gauge&lt;String&gt; gauge1 = registry.gauge(&quot;thing&quot;, () -&gt; new DefaultSettableGauge&lt;&gt;(&quot;settable-gauge&quot;));</span>
+<span class="nc" id="L244">        final Gauge&lt;String&gt; gauge2 = registry.gauge(&quot;thing&quot;);</span>
+
+<span class="nc" id="L246">        assertThat(gauge1).isSameAs(gauge2);</span>
+<span class="nc" id="L247">        assertThat(gauge2.getValue()).isEqualTo(&quot;settable-gauge&quot;);</span>
+
+<span class="nc" id="L249">        verify(listener).onGaugeAdded(&quot;thing&quot;, gauge1);</span>
+<span class="nc" id="L250">    }</span>
+
+    @Test
+    @SuppressWarnings(&quot;rawtypes&quot;)
+    public void accessingACustomGaugeRegistersAndReusesIt() {
+<span class="nc" id="L255">        final MetricRegistry.MetricSupplier&lt;Gauge&gt; supplier = () -&gt; gauge;</span>
+<span class="nc" id="L256">        final Gauge gauge1 = registry.gauge(&quot;thing&quot;, supplier);</span>
+<span class="nc" id="L257">        final Gauge gauge2 = registry.gauge(&quot;thing&quot;, supplier);</span>
+
+<span class="nc" id="L259">        assertThat(gauge1)</span>
+<span class="nc" id="L260">                .isSameAs(gauge2);</span>
+
+<span class="nc" id="L262">        verify(listener).onGaugeAdded(&quot;thing&quot;, gauge1);</span>
+<span class="nc" id="L263">    }</span>
+
+    @Test
+    public void settableGaugeIsTreatedLikeAGauge() {
+<span class="nc" id="L267">        final MetricRegistry.MetricSupplier&lt;SettableGauge&lt;String&gt;&gt; supplier = () -&gt; settableGauge;</span>
+<span class="nc" id="L268">        final SettableGauge&lt;String&gt; gauge1 = registry.gauge(&quot;thing&quot;, supplier);</span>
+<span class="nc" id="L269">        final SettableGauge&lt;String&gt; gauge2 = registry.gauge(&quot;thing&quot;, supplier);</span>
+
+<span class="nc" id="L271">        assertThat(gauge1)</span>
+<span class="nc" id="L272">                .isSameAs(gauge2);</span>
+
+<span class="nc" id="L274">        verify(listener).onGaugeAdded(&quot;thing&quot;, gauge1);</span>
+<span class="nc" id="L275">    }</span>
+
+    @Test
+    public void addingAListenerWithExistingMetricsCatchesItUp() {
+<span class="nc" id="L279">        registry.register(&quot;gauge&quot;, gauge);</span>
+<span class="nc" id="L280">        registry.register(&quot;counter&quot;, counter);</span>
+<span class="nc" id="L281">        registry.register(&quot;histogram&quot;, histogram);</span>
+<span class="nc" id="L282">        registry.register(&quot;meter&quot;, meter);</span>
+<span class="nc" id="L283">        registry.register(&quot;timer&quot;, timer);</span>
+
+<span class="nc" id="L285">        final MetricRegistryListener other = mock(MetricRegistryListener.class);</span>
+<span class="nc" id="L286">        registry.addListener(other);</span>
+
+<span class="nc" id="L288">        verify(other).onGaugeAdded(&quot;gauge&quot;, gauge);</span>
+<span class="nc" id="L289">        verify(other).onCounterAdded(&quot;counter&quot;, counter);</span>
+<span class="nc" id="L290">        verify(other).onHistogramAdded(&quot;histogram&quot;, histogram);</span>
+<span class="nc" id="L291">        verify(other).onMeterAdded(&quot;meter&quot;, meter);</span>
+<span class="nc" id="L292">        verify(other).onTimerAdded(&quot;timer&quot;, timer);</span>
+<span class="nc" id="L293">    }</span>
+
+    @Test
+    public void aRemovedListenerDoesNotReceiveUpdates() {
+<span class="nc" id="L297">        registry.register(&quot;gauge&quot;, gauge);</span>
+<span class="nc" id="L298">        registry.removeListener(listener);</span>
+<span class="nc" id="L299">        registry.register(&quot;gauge2&quot;, gauge);</span>
+
+<span class="nc" id="L301">        verify(listener, never()).onGaugeAdded(&quot;gauge2&quot;, gauge);</span>
+<span class="nc" id="L302">    }</span>
+
+    @Test
+    public void hasAMapOfRegisteredGauges() {
+<span class="nc" id="L306">        registry.register(&quot;gauge&quot;, gauge);</span>
+
+<span class="nc" id="L308">        assertThat(registry.getGauges())</span>
+<span class="nc" id="L309">                .contains(entry(&quot;gauge&quot;, gauge));</span>
+<span class="nc" id="L310">    }</span>
+
+    @Test
+    public void hasAMapOfRegisteredCounters() {
+<span class="nc" id="L314">        registry.register(&quot;counter&quot;, counter);</span>
+
+<span class="nc" id="L316">        assertThat(registry.getCounters())</span>
+<span class="nc" id="L317">                .contains(entry(&quot;counter&quot;, counter));</span>
+<span class="nc" id="L318">    }</span>
+
+    @Test
+    public void hasAMapOfRegisteredHistograms() {
+<span class="nc" id="L322">        registry.register(&quot;histogram&quot;, histogram);</span>
+
+<span class="nc" id="L324">        assertThat(registry.getHistograms())</span>
+<span class="nc" id="L325">                .contains(entry(&quot;histogram&quot;, histogram));</span>
+<span class="nc" id="L326">    }</span>
+
+    @Test
+    public void hasAMapOfRegisteredMeters() {
+<span class="nc" id="L330">        registry.register(&quot;meter&quot;, meter);</span>
+
+<span class="nc" id="L332">        assertThat(registry.getMeters())</span>
+<span class="nc" id="L333">                .contains(entry(&quot;meter&quot;, meter));</span>
+<span class="nc" id="L334">    }</span>
+
+    @Test
+    public void hasAMapOfRegisteredTimers() {
+<span class="nc" id="L338">        registry.register(&quot;timer&quot;, timer);</span>
+
+<span class="nc" id="L340">        assertThat(registry.getTimers())</span>
+<span class="nc" id="L341">                .contains(entry(&quot;timer&quot;, timer));</span>
+<span class="nc" id="L342">    }</span>
+
+    @Test
+    public void hasASetOfRegisteredMetricNames() {
+<span class="nc" id="L346">        registry.register(&quot;gauge&quot;, gauge);</span>
+<span class="nc" id="L347">        registry.register(&quot;counter&quot;, counter);</span>
+<span class="nc" id="L348">        registry.register(&quot;histogram&quot;, histogram);</span>
+<span class="nc" id="L349">        registry.register(&quot;meter&quot;, meter);</span>
+<span class="nc" id="L350">        registry.register(&quot;timer&quot;, timer);</span>
+
+<span class="nc" id="L352">        assertThat(registry.getNames())</span>
+<span class="nc" id="L353">                .containsOnly(&quot;gauge&quot;, &quot;counter&quot;, &quot;histogram&quot;, &quot;meter&quot;, &quot;timer&quot;);</span>
+<span class="nc" id="L354">    }</span>
+
+    @Test
+    public void registersMultipleMetrics() {
+<span class="nc" id="L358">        final MetricSet metrics = () -&gt; {</span>
+<span class="nc" id="L359">            final Map&lt;String, Metric&gt; m = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L360">            m.put(&quot;gauge&quot;, gauge);</span>
+<span class="nc" id="L361">            m.put(&quot;counter&quot;, counter);</span>
+<span class="nc" id="L362">            return m;</span>
+        };
+
+<span class="nc" id="L365">        registry.registerAll(metrics);</span>
+
+<span class="nc" id="L367">        assertThat(registry.getNames())</span>
+<span class="nc" id="L368">                .containsOnly(&quot;gauge&quot;, &quot;counter&quot;);</span>
+<span class="nc" id="L369">    }</span>
+
+    @Test
+    public void registersMultipleMetricsWithAPrefix() {
+<span class="nc" id="L373">        final MetricSet metrics = () -&gt; {</span>
+<span class="nc" id="L374">            final Map&lt;String, Metric&gt; m = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L375">            m.put(&quot;gauge&quot;, gauge);</span>
+<span class="nc" id="L376">            m.put(&quot;counter&quot;, counter);</span>
+<span class="nc" id="L377">            return m;</span>
+        };
+
+<span class="nc" id="L380">        registry.register(&quot;my&quot;, metrics);</span>
+
+<span class="nc" id="L382">        assertThat(registry.getNames())</span>
+<span class="nc" id="L383">                .containsOnly(&quot;my.gauge&quot;, &quot;my.counter&quot;);</span>
+<span class="nc" id="L384">    }</span>
+
+    @Test
+    public void registersRecursiveMetricSets() {
+<span class="nc" id="L388">        final MetricSet inner = () -&gt; {</span>
+<span class="nc" id="L389">            final Map&lt;String, Metric&gt; m = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L390">            m.put(&quot;gauge&quot;, gauge);</span>
+<span class="nc" id="L391">            return m;</span>
+        };
+
+<span class="nc" id="L394">        final MetricSet outer = () -&gt; {</span>
+<span class="nc" id="L395">            final Map&lt;String, Metric&gt; m = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L396">            m.put(&quot;inner&quot;, inner);</span>
+<span class="nc" id="L397">            m.put(&quot;counter&quot;, counter);</span>
+<span class="nc" id="L398">            return m;</span>
+        };
+
+<span class="nc" id="L401">        registry.register(&quot;my&quot;, outer);</span>
+
+<span class="nc" id="L403">        assertThat(registry.getNames())</span>
+<span class="nc" id="L404">                .containsOnly(&quot;my.inner.gauge&quot;, &quot;my.counter&quot;);</span>
+<span class="nc" id="L405">    }</span>
+
+    @Test
+    public void registersMetricsFromAnotherRegistry() {
+<span class="nc" id="L409">        MetricRegistry other = new MetricRegistry();</span>
+<span class="nc" id="L410">        other.register(&quot;gauge&quot;, gauge);</span>
+<span class="nc" id="L411">        registry.register(&quot;nested&quot;, other);</span>
+<span class="nc" id="L412">        assertThat(registry.getNames()).containsOnly(&quot;nested.gauge&quot;);</span>
+<span class="nc" id="L413">    }</span>
+
+    @Test
+    public void concatenatesStringsToFormADottedName() {
+<span class="nc" id="L417">        assertThat(name(&quot;one&quot;, &quot;two&quot;, &quot;three&quot;))</span>
+<span class="nc" id="L418">                .isEqualTo(&quot;one.two.three&quot;);</span>
+<span class="nc" id="L419">    }</span>
+
+    @Test
+    @SuppressWarnings(&quot;NullArgumentToVariableArgMethod&quot;)
+    public void elidesNullValuesFromNamesWhenOnlyOneNullPassedIn() {
+<span class="nc" id="L424">        assertThat(name(&quot;one&quot;, (String) null))</span>
+<span class="nc" id="L425">                .isEqualTo(&quot;one&quot;);</span>
+<span class="nc" id="L426">    }</span>
+
+    @Test
+    public void elidesNullValuesFromNamesWhenManyNullsPassedIn() {
+<span class="nc" id="L430">        assertThat(name(&quot;one&quot;, null, null))</span>
+<span class="nc" id="L431">                .isEqualTo(&quot;one&quot;);</span>
+<span class="nc" id="L432">    }</span>
+
+    @Test
+    public void elidesNullValuesFromNamesWhenNullAndNotNullPassedIn() {
+<span class="nc" id="L436">        assertThat(name(&quot;one&quot;, null, &quot;three&quot;))</span>
+<span class="nc" id="L437">                .isEqualTo(&quot;one.three&quot;);</span>
+<span class="nc" id="L438">    }</span>
+
+    @Test
+    public void elidesEmptyStringsFromNames() {
+<span class="nc" id="L442">        assertThat(name(&quot;one&quot;, &quot;&quot;, &quot;three&quot;))</span>
+<span class="nc" id="L443">                .isEqualTo(&quot;one.three&quot;);</span>
+<span class="nc" id="L444">    }</span>
+
+    @Test
+    public void concatenatesClassNamesWithStringsToFormADottedName() {
+<span class="nc" id="L448">        assertThat(name(MetricRegistryTest.class, &quot;one&quot;, &quot;two&quot;))</span>
+<span class="nc" id="L449">                .isEqualTo(&quot;com.codahale.metrics.MetricRegistryTest.one.two&quot;);</span>
+<span class="nc" id="L450">    }</span>
+
+    @Test
+    public void concatenatesClassesWithoutCanonicalNamesWithStrings() {
+<span class="nc" id="L454">        final Gauge&lt;String&gt; g = () -&gt; null;</span>
+
+<span class="nc" id="L456">        assertThat(name(g.getClass(), &quot;one&quot;, &quot;two&quot;))</span>
+<span class="nc" id="L457">                .matches(&quot;com\\.codahale\\.metrics\\.MetricRegistryTest.+?\\.one\\.two&quot;);</span>
+<span class="nc" id="L458">    }</span>
+
+    @Test
+    public void removesMetricsMatchingAFilter() {
+<span class="nc" id="L462">        registry.timer(&quot;timer-1&quot;);</span>
+<span class="nc" id="L463">        registry.timer(&quot;timer-2&quot;);</span>
+<span class="nc" id="L464">        registry.histogram(&quot;histogram-1&quot;);</span>
+
+<span class="nc" id="L466">        assertThat(registry.getNames())</span>
+<span class="nc" id="L467">                .contains(&quot;timer-1&quot;, &quot;timer-2&quot;, &quot;histogram-1&quot;);</span>
+
+<span class="nc" id="L469">        registry.removeMatching((name, metric) -&gt; name.endsWith(&quot;1&quot;));</span>
+
+<span class="nc" id="L471">        assertThat(registry.getNames())</span>
+<span class="nc" id="L472">                .doesNotContain(&quot;timer-1&quot;, &quot;histogram-1&quot;);</span>
+<span class="nc" id="L473">        assertThat(registry.getNames())</span>
+<span class="nc" id="L474">                .contains(&quot;timer-2&quot;);</span>
+
+<span class="nc" id="L476">        verify(listener).onTimerRemoved(&quot;timer-1&quot;);</span>
+<span class="nc" id="L477">        verify(listener).onHistogramRemoved(&quot;histogram-1&quot;);</span>
+<span class="nc" id="L478">    }</span>
+
+    @Test
+    public void addingChildMetricAfterRegister() {
+<span class="nc" id="L482">        MetricRegistry parent = new MetricRegistry();</span>
+<span class="nc" id="L483">        MetricRegistry child = new MetricRegistry();</span>
+
+<span class="nc" id="L485">        child.counter(&quot;test-1&quot;);</span>
+<span class="nc" id="L486">        parent.register(&quot;child&quot;, child);</span>
+<span class="nc" id="L487">        child.counter(&quot;test-2&quot;);</span>
+
+<span class="nc" id="L489">        Set&lt;String&gt; parentMetrics = parent.getMetrics().keySet();</span>
+<span class="nc" id="L490">        Set&lt;String&gt; childMetrics = child.getMetrics().keySet();</span>
+
+<span class="nc" id="L492">        assertThat(parentMetrics)</span>
+<span class="nc" id="L493">                .isEqualTo(childMetrics.stream().map(m -&gt; &quot;child.&quot; + m).collect(Collectors.toSet()));</span>
+<span class="nc" id="L494">    }</span>
+
+    @Test
+    public void addingMultipleChildMetricsAfterRegister() {
+<span class="nc" id="L498">        MetricRegistry parent = new MetricRegistry();</span>
+<span class="nc" id="L499">        MetricRegistry child = new MetricRegistry();</span>
+
+<span class="nc" id="L501">        child.counter(&quot;test-1&quot;);</span>
+<span class="nc" id="L502">        child.counter(&quot;test-2&quot;);</span>
+<span class="nc" id="L503">        parent.register(&quot;child&quot;, child);</span>
+<span class="nc" id="L504">        child.counter(&quot;test-3&quot;);</span>
+<span class="nc" id="L505">        child.counter(&quot;test-4&quot;);</span>
+
+<span class="nc" id="L507">        Set&lt;String&gt; parentMetrics = parent.getMetrics().keySet();</span>
+<span class="nc" id="L508">        Set&lt;String&gt; childMetrics = child.getMetrics().keySet();</span>
+
+<span class="nc" id="L510">        assertThat(parentMetrics)</span>
+<span class="nc" id="L511">                .isEqualTo(childMetrics.stream().map(m -&gt; &quot;child.&quot; + m).collect(Collectors.toSet()));</span>
+<span class="nc" id="L512">    }</span>
+
+    @Test
+    public void addingDeepChildMetricsAfterRegister() {
+<span class="nc" id="L516">        MetricRegistry parent = new MetricRegistry();</span>
+<span class="nc" id="L517">        MetricRegistry child = new MetricRegistry();</span>
+<span class="nc" id="L518">        MetricRegistry deepChild = new MetricRegistry();</span>
+
+<span class="nc" id="L520">        deepChild.counter(&quot;test-1&quot;);</span>
+<span class="nc" id="L521">        child.register(&quot;deep-child&quot;, deepChild);</span>
+<span class="nc" id="L522">        deepChild.counter(&quot;test-2&quot;);</span>
+
+<span class="nc" id="L524">        child.counter(&quot;test-3&quot;);</span>
+<span class="nc" id="L525">        parent.register(&quot;child&quot;, child);</span>
+<span class="nc" id="L526">        child.counter(&quot;test-4&quot;);</span>
+
+<span class="nc" id="L528">        deepChild.counter(&quot;test-5&quot;);</span>
+
+<span class="nc" id="L530">        Set&lt;String&gt; parentMetrics = parent.getMetrics().keySet();</span>
+<span class="nc" id="L531">        Set&lt;String&gt; childMetrics = child.getMetrics().keySet();</span>
+<span class="nc" id="L532">        Set&lt;String&gt; deepChildMetrics = deepChild.getMetrics().keySet();</span>
+
+<span class="nc" id="L534">        assertThat(parentMetrics)</span>
+<span class="nc" id="L535">                .isEqualTo(childMetrics.stream().map(m -&gt; &quot;child.&quot; + m).collect(Collectors.toSet()));</span>
+
+<span class="nc" id="L537">        assertThat(childMetrics)</span>
+<span class="nc" id="L538">                .containsAll(deepChildMetrics.stream().map(m -&gt; &quot;deep-child.&quot; + m).collect(Collectors.toSet()));</span>
+
+<span class="nc" id="L540">        assertThat(deepChildMetrics.size()).isEqualTo(3);</span>
+<span class="nc" id="L541">        assertThat(childMetrics.size()).isEqualTo(5);</span>
+<span class="nc" id="L542">    }</span>
+
+    @Test
+    public void removingChildMetricAfterRegister() {
+<span class="nc" id="L546">        MetricRegistry parent = new MetricRegistry();</span>
+<span class="nc" id="L547">        MetricRegistry child = new MetricRegistry();</span>
+
+<span class="nc" id="L549">        child.counter(&quot;test-1&quot;);</span>
+<span class="nc" id="L550">        parent.register(&quot;child&quot;, child);</span>
+<span class="nc" id="L551">        child.counter(&quot;test-2&quot;);</span>
+
+<span class="nc" id="L553">        child.remove(&quot;test-1&quot;);</span>
+
+<span class="nc" id="L555">        Set&lt;String&gt; parentMetrics = parent.getMetrics().keySet();</span>
+<span class="nc" id="L556">        Set&lt;String&gt; childMetrics = child.getMetrics().keySet();</span>
+
+<span class="nc" id="L558">        assertThat(parentMetrics)</span>
+<span class="nc" id="L559">                .isEqualTo(childMetrics.stream().map(m -&gt; &quot;child.&quot; + m).collect(Collectors.toSet()));</span>
+
+<span class="nc" id="L561">        assertThat(childMetrics).doesNotContain(&quot;test-1&quot;);</span>
+<span class="nc" id="L562">    }</span>
+
+    @Test
+    public void removingMultipleChildMetricsAfterRegister() {
+<span class="nc" id="L566">        MetricRegistry parent = new MetricRegistry();</span>
+<span class="nc" id="L567">        MetricRegistry child = new MetricRegistry();</span>
+
+<span class="nc" id="L569">        child.counter(&quot;test-1&quot;);</span>
+<span class="nc" id="L570">        child.counter(&quot;test-2&quot;);</span>
+<span class="nc" id="L571">        parent.register(&quot;child&quot;, child);</span>
+<span class="nc" id="L572">        child.counter(&quot;test-3&quot;);</span>
+<span class="nc" id="L573">        child.counter(&quot;test-4&quot;);</span>
+
+<span class="nc" id="L575">        child.remove(&quot;test-1&quot;);</span>
+<span class="nc" id="L576">        child.remove(&quot;test-3&quot;);</span>
+
+<span class="nc" id="L578">        Set&lt;String&gt; parentMetrics = parent.getMetrics().keySet();</span>
+<span class="nc" id="L579">        Set&lt;String&gt; childMetrics = child.getMetrics().keySet();</span>
+
+<span class="nc" id="L581">        assertThat(parentMetrics)</span>
+<span class="nc" id="L582">                .isEqualTo(childMetrics.stream().map(m -&gt; &quot;child.&quot; + m).collect(Collectors.toSet()));</span>
+
+<span class="nc" id="L584">        assertThat(childMetrics).doesNotContain(&quot;test-1&quot;, &quot;test-3&quot;);</span>
+<span class="nc" id="L585">    }</span>
+
+    @Test
+    public void removingDeepChildMetricsAfterRegister() {
+<span class="nc" id="L589">        MetricRegistry parent = new MetricRegistry();</span>
+<span class="nc" id="L590">        MetricRegistry child = new MetricRegistry();</span>
+<span class="nc" id="L591">        MetricRegistry deepChild = new MetricRegistry();</span>
+
+<span class="nc" id="L593">        deepChild.counter(&quot;test-1&quot;);</span>
+<span class="nc" id="L594">        child.register(&quot;deep-child&quot;, deepChild);</span>
+<span class="nc" id="L595">        deepChild.counter(&quot;test-2&quot;);</span>
+
+<span class="nc" id="L597">        child.counter(&quot;test-3&quot;);</span>
+<span class="nc" id="L598">        parent.register(&quot;child&quot;, child);</span>
+<span class="nc" id="L599">        child.counter(&quot;test-4&quot;);</span>
+
+<span class="nc" id="L601">        deepChild.remove(&quot;test-2&quot;);</span>
+
+<span class="nc" id="L603">        Set&lt;String&gt; parentMetrics = parent.getMetrics().keySet();</span>
+<span class="nc" id="L604">        Set&lt;String&gt; childMetrics = child.getMetrics().keySet();</span>
+<span class="nc" id="L605">        Set&lt;String&gt; deepChildMetrics = deepChild.getMetrics().keySet();</span>
+
+<span class="nc" id="L607">        assertThat(parentMetrics)</span>
+<span class="nc" id="L608">                .isEqualTo(childMetrics.stream().map(m -&gt; &quot;child.&quot; + m).collect(Collectors.toSet()));</span>
+
+<span class="nc" id="L610">        assertThat(childMetrics)</span>
+<span class="nc" id="L611">                .containsAll(deepChildMetrics.stream().map(m -&gt; &quot;deep-child.&quot; + m).collect(Collectors.toSet()));</span>
+
+<span class="nc" id="L613">        assertThat(deepChildMetrics).doesNotContain(&quot;test-2&quot;);</span>
+
+<span class="nc" id="L615">        assertThat(deepChildMetrics.size()).isEqualTo(1);</span>
+<span class="nc" id="L616">        assertThat(childMetrics.size()).isEqualTo(3);</span>
+<span class="nc" id="L617">    }</span>
+
+    @Test
+    public void registerNullMetric() {
+<span class="nc" id="L621">        MetricRegistry registry = new MetricRegistry();</span>
+        try {
+<span class="nc" id="L623">            registry.register(&quot;any_name&quot;, null);</span>
+<span class="nc" id="L624">            Assert.fail(&quot;NullPointerException must be thrown !!!&quot;);</span>
+<span class="nc" id="L625">        } catch (NullPointerException e) {</span>
+<span class="nc" id="L626">            Assert.assertEquals(&quot;metric == null&quot;, e.getMessage());</span>
+<span class="nc" id="L627">        }</span>
+<span class="nc" id="L628">    }</span>
+
+    @Test
+    public void infersGaugeType() {
+<span class="nc" id="L632">        Gauge&lt;Long&gt; gauge = registry.registerGauge(&quot;gauge&quot;, () -&gt; 10_000_000_000L);</span>
+
+<span class="nc" id="L634">        assertThat(gauge.getValue()).isEqualTo(10_000_000_000L);</span>
+<span class="nc" id="L635">    }</span>
+
+    @Test
+    public void registersGaugeAsLambda() {
+<span class="nc" id="L639">        registry.registerGauge(&quot;gauge&quot;, () -&gt; 3.14);</span>
+
+<span class="nc" id="L641">        assertThat(registry.gauge(&quot;gauge&quot;).getValue()).isEqualTo(3.14);</span>
+<span class="nc" id="L642">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

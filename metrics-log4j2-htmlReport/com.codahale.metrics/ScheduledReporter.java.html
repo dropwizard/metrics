@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ScheduledReporter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">ScheduledReporter.java</span></div><h1>ScheduledReporter.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Closeable;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * The abstract base class for all scheduled reporters (i.e., reporters which process a registry's
+ * metrics periodically).
+ *
+ * @see ConsoleReporter
+ * @see CsvReporter
+ * @see Slf4jReporter
+ */
+public abstract class ScheduledReporter implements Closeable, Reporter {
+
+<span class="nc" id="L29">    private static final Logger LOG = LoggerFactory.getLogger(ScheduledReporter.class);</span>
+
+    /**
+     * A simple named thread factory.
+     */
+    @SuppressWarnings(&quot;NullableProblems&quot;)
+    private static class NamedThreadFactory implements ThreadFactory {
+        private final ThreadGroup group;
+<span class="nc" id="L37">        private final AtomicInteger threadNumber = new AtomicInteger(1);</span>
+        private final String namePrefix;
+
+<span class="nc" id="L40">        private NamedThreadFactory(String name) {</span>
+<span class="nc" id="L41">            final SecurityManager s = System.getSecurityManager();</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">            this.group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();</span>
+<span class="nc" id="L43">            this.namePrefix = &quot;metrics-&quot; + name + &quot;-thread-&quot;;</span>
+<span class="nc" id="L44">        }</span>
+
+        @Override
+        public Thread newThread(Runnable r) {
+<span class="nc" id="L48">            final Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);</span>
+<span class="nc" id="L49">            t.setDaemon(true);</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">            if (t.getPriority() != Thread.NORM_PRIORITY) {</span>
+<span class="nc" id="L51">                t.setPriority(Thread.NORM_PRIORITY);</span>
+            }
+<span class="nc" id="L53">            return t;</span>
+        }
+    }
+
+<span class="nc" id="L57">    private static final AtomicInteger FACTORY_ID = new AtomicInteger();</span>
+
+    private final MetricRegistry registry;
+    private final ScheduledExecutorService executor;
+    private final boolean shutdownExecutorOnStop;
+    private final Set&lt;MetricAttribute&gt; disabledMetricAttributes;
+    private ScheduledFuture&lt;?&gt; scheduledFuture;
+    private final MetricFilter filter;
+    private final long durationFactor;
+    private final String durationUnit;
+    private final long rateFactor;
+    private final String rateUnit;
+
+    /**
+     * Creates a new {@link ScheduledReporter} instance.
+     *
+     * @param registry     the {@link com.codahale.metrics.MetricRegistry} containing the metrics this
+     *                     reporter will report
+     * @param name         the reporter's name
+     * @param filter       the filter for which metrics to report
+     * @param rateUnit     a unit of time
+     * @param durationUnit a unit of time
+     */
+    protected ScheduledReporter(MetricRegistry registry,
+                                String name,
+                                MetricFilter filter,
+                                TimeUnit rateUnit,
+                                TimeUnit durationUnit) {
+<span class="nc" id="L85">        this(registry, name, filter, rateUnit, durationUnit, createDefaultExecutor(name));</span>
+<span class="nc" id="L86">    }</span>
+
+    /**
+     * Creates a new {@link ScheduledReporter} instance.
+     *
+     * @param registry the {@link com.codahale.metrics.MetricRegistry} containing the metrics this
+     *                 reporter will report
+     * @param name     the reporter's name
+     * @param filter   the filter for which metrics to report
+     * @param executor the executor to use while scheduling reporting of metrics.
+     */
+    protected ScheduledReporter(MetricRegistry registry,
+                                String name,
+                                MetricFilter filter,
+                                TimeUnit rateUnit,
+                                TimeUnit durationUnit,
+                                ScheduledExecutorService executor) {
+<span class="nc" id="L103">        this(registry, name, filter, rateUnit, durationUnit, executor, true);</span>
+<span class="nc" id="L104">    }</span>
+
+    /**
+     * Creates a new {@link ScheduledReporter} instance.
+     *
+     * @param registry               the {@link com.codahale.metrics.MetricRegistry} containing the metrics this
+     *                               reporter will report
+     * @param name                   the reporter's name
+     * @param filter                 the filter for which metrics to report
+     * @param executor               the executor to use while scheduling reporting of metrics.
+     * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
+     */
+    protected ScheduledReporter(MetricRegistry registry,
+                                String name,
+                                MetricFilter filter,
+                                TimeUnit rateUnit,
+                                TimeUnit durationUnit,
+                                ScheduledExecutorService executor,
+                                boolean shutdownExecutorOnStop) {
+<span class="nc" id="L123">        this(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, Collections.emptySet());</span>
+<span class="nc" id="L124">    }</span>
+
+    protected ScheduledReporter(MetricRegistry registry,
+                                String name,
+                                MetricFilter filter,
+                                TimeUnit rateUnit,
+                                TimeUnit durationUnit,
+                                ScheduledExecutorService executor,
+                                boolean shutdownExecutorOnStop,
+<span class="nc" id="L133">                                Set&lt;MetricAttribute&gt; disabledMetricAttributes) {</span>
+
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        if (registry == null) {</span>
+<span class="nc" id="L136">            throw new NullPointerException(&quot;registry == null&quot;);</span>
+        }
+
+<span class="nc" id="L139">        this.registry = registry;</span>
+<span class="nc" id="L140">        this.filter = filter;</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">        this.executor = executor == null ? createDefaultExecutor(name) : executor;</span>
+<span class="nc" id="L142">        this.shutdownExecutorOnStop = shutdownExecutorOnStop;</span>
+<span class="nc" id="L143">        this.rateFactor = rateUnit.toSeconds(1);</span>
+<span class="nc" id="L144">        this.rateUnit = calculateRateUnit(rateUnit);</span>
+<span class="nc" id="L145">        this.durationFactor = durationUnit.toNanos(1);</span>
+<span class="nc" id="L146">        this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">        this.disabledMetricAttributes = disabledMetricAttributes != null ? disabledMetricAttributes :</span>
+<span class="nc" id="L148">                Collections.emptySet();</span>
+<span class="nc" id="L149">    }</span>
+
+    /**
+     * Starts the reporter polling at the given period.
+     *
+     * @param period the amount of time between polls
+     * @param unit   the unit for {@code period}
+     */
+    public void start(long period, TimeUnit unit) {
+<span class="nc" id="L158">        start(period, period, unit);</span>
+<span class="nc" id="L159">    }</span>
+
+    /**
+     * Starts the reporter polling at the given period with the specific runnable action.
+     * Visible only for testing.
+     */
+    synchronized void start(long initialDelay, long period, TimeUnit unit, Runnable runnable) {
+<span class="nc bnc" id="L166" title="All 2 branches missed.">        if (this.scheduledFuture != null) {</span>
+<span class="nc" id="L167">            throw new IllegalArgumentException(&quot;Reporter already started&quot;);</span>
+        }
+
+<span class="nc" id="L170">        this.scheduledFuture = getScheduledFuture(initialDelay, period, unit, runnable);</span>
+<span class="nc" id="L171">    }</span>
+
+
+    /**
+     * Schedule the task, and return a future.
+     *
+     * @deprecated Use {@link #getScheduledFuture(long, long, TimeUnit, Runnable, ScheduledExecutorService)} instead.
+     */
+    @SuppressWarnings(&quot;DeprecatedIsStillUsed&quot;)
+    @Deprecated
+    protected ScheduledFuture&lt;?&gt; getScheduledFuture(long initialDelay, long period, TimeUnit unit, Runnable runnable) {
+<span class="nc" id="L182">        return getScheduledFuture(initialDelay, period, unit, runnable, this.executor);</span>
+    }
+
+    /**
+     * Schedule the task, and return a future.
+     * The current implementation uses scheduleWithFixedDelay, replacing scheduleWithFixedRate. This avoids queueing issues, but may
+     * cause some reporters to skip metrics, as scheduleWithFixedDelay introduces a growing delta from the original start point.
+     *
+     * Overriding this in a subclass to revert to the old behavior is permitted.
+     */
+    protected ScheduledFuture&lt;?&gt; getScheduledFuture(long initialDelay, long period, TimeUnit unit, Runnable runnable, ScheduledExecutorService executor) {
+<span class="nc" id="L193">        return executor.scheduleWithFixedDelay(runnable, initialDelay, period, unit);</span>
+    }
+
+    /**
+     * Starts the reporter polling at the given period.
+     *
+     * @param initialDelay the time to delay the first execution
+     * @param period       the amount of time between polls
+     * @param unit         the unit for {@code period} and {@code initialDelay}
+     */
+    synchronized public void start(long initialDelay, long period, TimeUnit unit) {
+<span class="nc" id="L204">        start(initialDelay, period, unit, () -&gt; {</span>
+            try {
+<span class="nc" id="L206">                report();</span>
+<span class="nc" id="L207">            } catch (Throwable ex) {</span>
+<span class="nc" id="L208">                LOG.error(&quot;Exception thrown from {}#report. Exception was suppressed.&quot;, ScheduledReporter.this.getClass().getSimpleName(), ex);</span>
+<span class="nc" id="L209">            }</span>
+<span class="nc" id="L210">        });</span>
+<span class="nc" id="L211">    }</span>
+
+    /**
+     * Stops the reporter and if shutdownExecutorOnStop is true then shuts down its thread of execution.
+     * &lt;p&gt;
+     * Uses the shutdown pattern from http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ExecutorService.html
+     */
+    public void stop() {
+<span class="nc bnc" id="L219" title="All 2 branches missed.">        if (shutdownExecutorOnStop) {</span>
+<span class="nc" id="L220">            executor.shutdown(); // Disable new tasks from being submitted</span>
+        }
+
+        try {
+<span class="nc" id="L224">            report(); // Report metrics one last time</span>
+<span class="nc" id="L225">        } catch (Exception e) {</span>
+<span class="nc" id="L226">            LOG.warn(&quot;Final reporting of metrics failed.&quot;, e);</span>
+<span class="nc" id="L227">        }</span>
+
+<span class="nc bnc" id="L229" title="All 2 branches missed.">        if (shutdownExecutorOnStop) {</span>
+            try {
+                // Wait a while for existing tasks to terminate
+<span class="nc bnc" id="L232" title="All 2 branches missed.">                if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {</span>
+<span class="nc" id="L233">                    executor.shutdownNow(); // Cancel currently executing tasks</span>
+                    // Wait a while for tasks to respond to being cancelled
+<span class="nc bnc" id="L235" title="All 2 branches missed.">                    if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {</span>
+<span class="nc" id="L236">                        LOG.warn(&quot;ScheduledExecutorService did not terminate.&quot;);</span>
+                    }
+                }
+<span class="nc" id="L239">            } catch (InterruptedException ie) {</span>
+                // (Re-)Cancel if current thread also interrupted
+<span class="nc" id="L241">                executor.shutdownNow();</span>
+                // Preserve interrupt status
+<span class="nc" id="L243">                Thread.currentThread().interrupt();</span>
+<span class="nc" id="L244">            }</span>
+        } else {
+            // The external manager (like JEE container) responsible for lifecycle of executor
+<span class="nc" id="L247">            cancelScheduledFuture();</span>
+        }
+<span class="nc" id="L249">    }</span>
+
+    private synchronized void cancelScheduledFuture() {
+<span class="nc bnc" id="L252" title="All 2 branches missed.">        if (this.scheduledFuture == null) {</span>
+            // was never started
+<span class="nc" id="L254">            return;</span>
+        }
+<span class="nc bnc" id="L256" title="All 2 branches missed.">        if (this.scheduledFuture.isCancelled()) {</span>
+            // already cancelled
+<span class="nc" id="L258">            return;</span>
+        }
+        // just cancel the scheduledFuture and exit
+<span class="nc" id="L261">        this.scheduledFuture.cancel(false);</span>
+<span class="nc" id="L262">    }</span>
+
+    /**
+     * Stops the reporter and shuts down its thread of execution.
+     */
+    @Override
+    public void close() {
+<span class="nc" id="L269">        stop();</span>
+<span class="nc" id="L270">    }</span>
+
+    /**
+     * Report the current values of all metrics in the registry.
+     */
+    public void report() {
+<span class="nc" id="L276">        synchronized (this) {</span>
+<span class="nc" id="L277">            report(registry.getGauges(filter),</span>
+<span class="nc" id="L278">                    registry.getCounters(filter),</span>
+<span class="nc" id="L279">                    registry.getHistograms(filter),</span>
+<span class="nc" id="L280">                    registry.getMeters(filter),</span>
+<span class="nc" id="L281">                    registry.getTimers(filter));</span>
+<span class="nc" id="L282">        }</span>
+<span class="nc" id="L283">    }</span>
+
+    /**
+     * Called periodically by the polling thread. Subclasses should report all the given metrics.
+     *
+     * @param gauges     all of the gauges in the registry
+     * @param counters   all of the counters in the registry
+     * @param histograms all of the histograms in the registry
+     * @param meters     all of the meters in the registry
+     * @param timers     all of the timers in the registry
+     */
+    @SuppressWarnings(&quot;rawtypes&quot;)
+    public abstract void report(SortedMap&lt;String, Gauge&gt; gauges,
+                                SortedMap&lt;String, Counter&gt; counters,
+                                SortedMap&lt;String, Histogram&gt; histograms,
+                                SortedMap&lt;String, Meter&gt; meters,
+                                SortedMap&lt;String, Timer&gt; timers);
+
+    protected String getRateUnit() {
+<span class="nc" id="L302">        return rateUnit;</span>
+    }
+
+    protected String getDurationUnit() {
+<span class="nc" id="L306">        return durationUnit;</span>
+    }
+
+    protected double convertDuration(double duration) {
+<span class="nc" id="L310">        return duration / durationFactor;</span>
+    }
+
+    protected double convertRate(double rate) {
+<span class="nc" id="L314">        return rate * rateFactor;</span>
+    }
+
+    protected boolean isShutdownExecutorOnStop() {
+<span class="nc" id="L318">        return shutdownExecutorOnStop;</span>
+    }
+
+    protected Set&lt;MetricAttribute&gt; getDisabledMetricAttributes() {
+<span class="nc" id="L322">        return disabledMetricAttributes;</span>
+    }
+
+    private String calculateRateUnit(TimeUnit unit) {
+<span class="nc" id="L326">        final String s = unit.toString().toLowerCase(Locale.US);</span>
+<span class="nc" id="L327">        return s.substring(0, s.length() - 1);</span>
+    }
+
+    private static ScheduledExecutorService createDefaultExecutor(String name) {
+<span class="nc" id="L331">        return Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name + '-' + FACTORY_ID.incrementAndGet()));</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

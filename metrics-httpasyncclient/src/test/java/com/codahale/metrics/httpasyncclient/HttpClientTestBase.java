@@ -62,6 +62,8 @@ public abstract class HttpClientTestBase {
         return new HttpHost("localhost", address.getPort(), "http");
     }
 
+
+
     @After
     public void tearDown() {
         if (server != null) {

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MetricRegistryListener.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">MetricRegistryListener.java</span></div><h1>MetricRegistryListener.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import java.util.EventListener;
+
+/**
+ * Listeners for events from the registry.  Listeners must be thread-safe.
+ */
+public interface MetricRegistryListener extends EventListener {
+    /**
+     * A no-op implementation of {@link MetricRegistryListener}.
+     */
+<span class="nc" id="L12">    abstract class Base implements MetricRegistryListener {</span>
+        @Override
+        public void onGaugeAdded(String name, Gauge&lt;?&gt; gauge) {
+<span class="nc" id="L15">        }</span>
+
+        @Override
+        public void onGaugeRemoved(String name) {
+<span class="nc" id="L19">        }</span>
+
+        @Override
+        public void onCounterAdded(String name, Counter counter) {
+<span class="nc" id="L23">        }</span>
+
+        @Override
+        public void onCounterRemoved(String name) {
+<span class="nc" id="L27">        }</span>
+
+        @Override
+        public void onHistogramAdded(String name, Histogram histogram) {
+<span class="nc" id="L31">        }</span>
+
+        @Override
+        public void onHistogramRemoved(String name) {
+<span class="nc" id="L35">        }</span>
+
+        @Override
+        public void onMeterAdded(String name, Meter meter) {
+<span class="nc" id="L39">        }</span>
+
+        @Override
+        public void onMeterRemoved(String name) {
+<span class="nc" id="L43">        }</span>
+
+        @Override
+        public void onTimerAdded(String name, Timer timer) {
+<span class="nc" id="L47">        }</span>
+
+        @Override
+        public void onTimerRemoved(String name) {
+<span class="nc" id="L51">        }</span>
+    }
+
+    /**
+     * Called when a {@link Gauge} is added to the registry.
+     *
+     * @param name  the gauge's name
+     * @param gauge the gauge
+     */
+    void onGaugeAdded(String name, Gauge&lt;?&gt; gauge);
+
+    /**
+     * Called when a {@link Gauge} is removed from the registry.
+     *
+     * @param name the gauge's name
+     */
+    void onGaugeRemoved(String name);
+
+    /**
+     * Called when a {@link Counter} is added to the registry.
+     *
+     * @param name    the counter's name
+     * @param counter the counter
+     */
+    void onCounterAdded(String name, Counter counter);
+
+    /**
+     * Called when a {@link Counter} is removed from the registry.
+     *
+     * @param name the counter's name
+     */
+    void onCounterRemoved(String name);
+
+    /**
+     * Called when a {@link Histogram} is added to the registry.
+     *
+     * @param name      the histogram's name
+     * @param histogram the histogram
+     */
+    void onHistogramAdded(String name, Histogram histogram);
+
+    /**
+     * Called when a {@link Histogram} is removed from the registry.
+     *
+     * @param name the histogram's name
+     */
+    void onHistogramRemoved(String name);
+
+    /**
+     * Called when a {@link Meter} is added to the registry.
+     *
+     * @param name  the meter's name
+     * @param meter the meter
+     */
+    void onMeterAdded(String name, Meter meter);
+
+    /**
+     * Called when a {@link Meter} is removed from the registry.
+     *
+     * @param name the meter's name
+     */
+    void onMeterRemoved(String name);
+
+    /**
+     * Called when a {@link Timer} is added to the registry.
+     *
+     * @param name  the timer's name
+     * @param timer the timer
+     */
+    void onTimerAdded(String name, Timer timer);
+
+    /**
+     * Called when a {@link Timer} is removed from the registry.
+     *
+     * @param name the timer's name
+     */
+    void onTimerRemoved(String name);
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

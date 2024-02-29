@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WeightedSnapshot.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">WeightedSnapshot.java</span></div><h1>WeightedSnapshot.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+/**
+ * A statistical snapshot of a {@link WeightedSnapshot}.
+ */
+public class WeightedSnapshot extends Snapshot {
+
+    /**
+     * A single sample item with value and its weights for {@link WeightedSnapshot}.
+     */
+    public static class WeightedSample {
+        public final long value;
+        public final double weight;
+
+<span class="nc" id="L24">        public WeightedSample(long value, double weight) {</span>
+<span class="nc" id="L25">            this.value = value;</span>
+<span class="nc" id="L26">            this.weight = weight;</span>
+<span class="nc" id="L27">        }</span>
+    }
+
+    private final long[] values;
+    private final double[] normWeights;
+    private final double[] quantiles;
+
+    /**
+     * Create a new {@link Snapshot} with the given values.
+     *
+     * @param values an unordered set of values in the reservoir
+     */
+<span class="nc" id="L39">    public WeightedSnapshot(Collection&lt;WeightedSample&gt; values) {</span>
+<span class="nc" id="L40">        final WeightedSample[] copy = values.toArray(new WeightedSample[]{});</span>
+
+<span class="nc" id="L42">        Arrays.sort(copy, Comparator.comparingLong(w -&gt; w.value));</span>
+
+<span class="nc" id="L44">        this.values = new long[copy.length];</span>
+<span class="nc" id="L45">        this.normWeights = new double[copy.length];</span>
+<span class="nc" id="L46">        this.quantiles = new double[copy.length];</span>
+
+<span class="nc" id="L48">        double sumWeight = 0;</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">        for (WeightedSample sample : copy) {</span>
+<span class="nc" id="L50">            sumWeight += sample.weight;</span>
+        }
+
+<span class="nc bnc" id="L53" title="All 2 branches missed.">        for (int i = 0; i &lt; copy.length; i++) {</span>
+<span class="nc" id="L54">            this.values[i] = copy[i].value;</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">            this.normWeights[i] = sumWeight != 0 ? copy[i].weight / sumWeight : 0;</span>
+        }
+
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        for (int i = 1; i &lt; copy.length; i++) {</span>
+<span class="nc" id="L59">            this.quantiles[i] = this.quantiles[i - 1] + this.normWeights[i - 1];</span>
+        }
+<span class="nc" id="L61">    }</span>
+
+    /**
+     * Returns the value at the given quantile.
+     *
+     * @param quantile a given quantile, in {@code [0..1]}
+     * @return the value in the distribution at {@code quantile}
+     */
+    @Override
+    public double getValue(double quantile) {
+<span class="nc bnc" id="L71" title="All 6 branches missed.">        if (quantile &lt; 0.0 || quantile &gt; 1.0 || Double.isNaN(quantile)) {</span>
+<span class="nc" id="L72">            throw new IllegalArgumentException(quantile + &quot; is not in [0..1]&quot;);</span>
+        }
+
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        if (values.length == 0) {</span>
+<span class="nc" id="L76">            return 0.0;</span>
+        }
+
+<span class="nc" id="L79">        int posx = Arrays.binarySearch(quantiles, quantile);</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        if (posx &lt; 0)</span>
+<span class="nc" id="L81">            posx = ((-posx) - 1) - 1;</span>
+
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        if (posx &lt; 1) {</span>
+<span class="nc" id="L84">            return values[0];</span>
+        }
+
+<span class="nc bnc" id="L87" title="All 2 branches missed.">        if (posx &gt;= values.length) {</span>
+<span class="nc" id="L88">            return values[values.length - 1];</span>
+        }
+
+<span class="nc" id="L91">        return values[posx];</span>
+    }
+
+    /**
+     * Returns the number of values in the snapshot.
+     *
+     * @return the number of values
+     */
+    @Override
+    public int size() {
+<span class="nc" id="L101">        return values.length;</span>
+    }
+
+    /**
+     * Returns the entire set of values in the snapshot.
+     *
+     * @return the entire set of values
+     */
+    @Override
+    public long[] getValues() {
+<span class="nc" id="L111">        return Arrays.copyOf(values, values.length);</span>
+    }
+
+    /**
+     * Returns the highest value in the snapshot.
+     *
+     * @return the highest value
+     */
+    @Override
+    public long getMax() {
+<span class="nc bnc" id="L121" title="All 2 branches missed.">        if (values.length == 0) {</span>
+<span class="nc" id="L122">            return 0;</span>
+        }
+<span class="nc" id="L124">        return values[values.length - 1];</span>
+    }
+
+    /**
+     * Returns the lowest value in the snapshot.
+     *
+     * @return the lowest value
+     */
+    @Override
+    public long getMin() {
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        if (values.length == 0) {</span>
+<span class="nc" id="L135">            return 0;</span>
+        }
+<span class="nc" id="L137">        return values[0];</span>
+    }
+
+    /**
+     * Returns the weighted arithmetic mean of the values in the snapshot.
+     *
+     * @return the weighted arithmetic mean
+     */
+    @Override
+    public double getMean() {
+<span class="nc bnc" id="L147" title="All 2 branches missed.">        if (values.length == 0) {</span>
+<span class="nc" id="L148">            return 0;</span>
+        }
+
+<span class="nc" id="L151">        double sum = 0;</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">        for (int i = 0; i &lt; values.length; i++) {</span>
+<span class="nc" id="L153">            sum += values[i] * normWeights[i];</span>
+        }
+<span class="nc" id="L155">        return sum;</span>
+    }
+
+    /**
+     * Returns the weighted standard deviation of the values in the snapshot.
+     *
+     * @return the weighted standard deviation value
+     */
+    @Override
+    public double getStdDev() {
+        // two-pass algorithm for variance, avoids numeric overflow
+
+<span class="nc bnc" id="L167" title="All 2 branches missed.">        if (values.length &lt;= 1) {</span>
+<span class="nc" id="L168">            return 0;</span>
+        }
+
+<span class="nc" id="L171">        final double mean = getMean();</span>
+<span class="nc" id="L172">        double variance = 0;</span>
+
+<span class="nc bnc" id="L174" title="All 2 branches missed.">        for (int i = 0; i &lt; values.length; i++) {</span>
+<span class="nc" id="L175">            final double diff = values[i] - mean;</span>
+<span class="nc" id="L176">            variance += normWeights[i] * diff * diff;</span>
+        }
+
+<span class="nc" id="L179">        return Math.sqrt(variance);</span>
+    }
+
+    /**
+     * Writes the values of the snapshot to the given stream.
+     *
+     * @param output an output stream
+     */
+    @Override
+    public void dump(OutputStream output) {
+<span class="nc" id="L189">        try (PrintWriter out = new PrintWriter(new OutputStreamWriter(output, UTF_8))) {</span>
+<span class="nc bnc" id="L190" title="All 2 branches missed.">            for (long value : values) {</span>
+<span class="nc" id="L191">                out.printf(&quot;%d%n&quot;, value);</span>
+            }
+        }
+<span class="nc" id="L194">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

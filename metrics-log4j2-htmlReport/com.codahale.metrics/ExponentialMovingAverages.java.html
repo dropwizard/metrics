@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExponentialMovingAverages.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">ExponentialMovingAverages.java</span></div><h1>ExponentialMovingAverages.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+
+/**
+ * A triple (one, five and fifteen minutes) of exponentially-weighted moving average rates as needed by {@link Meter}.
+ * &lt;p&gt;
+ * The rates have the same exponential decay factor as the fifteen-minute load average in the
+ * {@code top} Unix command.
+ */
+public class ExponentialMovingAverages implements MovingAverages {
+
+<span class="fc" id="L14">    private static final long TICK_INTERVAL = TimeUnit.SECONDS.toNanos(5);</span>
+
+<span class="fc" id="L16">    private final EWMA m1Rate = EWMA.oneMinuteEWMA();</span>
+<span class="fc" id="L17">    private final EWMA m5Rate = EWMA.fiveMinuteEWMA();</span>
+<span class="fc" id="L18">    private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();</span>
+
+    private final AtomicLong lastTick;
+    private final Clock clock;
+
+    /**
+     * Creates a new {@link ExponentialMovingAverages}.
+     */
+    public ExponentialMovingAverages() {
+<span class="nc" id="L27">        this(Clock.defaultClock());</span>
+<span class="nc" id="L28">    }</span>
+
+    /**
+     * Creates a new {@link ExponentialMovingAverages}.
+     */
+<span class="fc" id="L33">    public ExponentialMovingAverages(Clock clock) {</span>
+<span class="fc" id="L34">        this.clock = clock;</span>
+<span class="fc" id="L35">        this.lastTick = new AtomicLong(this.clock.getTick());</span>
+<span class="fc" id="L36">    }</span>
+
+    @Override
+    public void update(long n) {
+<span class="fc" id="L40">        m1Rate.update(n);</span>
+<span class="fc" id="L41">        m5Rate.update(n);</span>
+<span class="fc" id="L42">        m15Rate.update(n);</span>
+<span class="fc" id="L43">    }</span>
+
+    @Override
+    public void tickIfNecessary() {
+<span class="fc" id="L47">        final long oldTick = lastTick.get();</span>
+<span class="fc" id="L48">        final long newTick = clock.getTick();</span>
+<span class="fc" id="L49">        final long age = newTick - oldTick;</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (age &gt; TICK_INTERVAL) {</span>
+<span class="nc" id="L51">            final long newIntervalStartTick = newTick - age % TICK_INTERVAL;</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">            if (lastTick.compareAndSet(oldTick, newIntervalStartTick)) {</span>
+<span class="nc" id="L53">                final long requiredTicks = age / TICK_INTERVAL;</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">                for (long i = 0; i &lt; requiredTicks; i++) {</span>
+<span class="nc" id="L55">                    m1Rate.tick();</span>
+<span class="nc" id="L56">                    m5Rate.tick();</span>
+<span class="nc" id="L57">                    m15Rate.tick();</span>
+                }
+            }
+        }
+<span class="fc" id="L61">    }</span>
+
+    @Override
+    public double getM1Rate() {
+<span class="nc" id="L65">        return m1Rate.getRate(TimeUnit.SECONDS);</span>
+    }
+
+    @Override
+    public double getM5Rate() {
+<span class="nc" id="L70">        return m5Rate.getRate(TimeUnit.SECONDS);</span>
+    }
+
+    @Override
+    public double getM15Rate() {
+<span class="nc" id="L75">        return m15Rate.getRate(TimeUnit.SECONDS);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

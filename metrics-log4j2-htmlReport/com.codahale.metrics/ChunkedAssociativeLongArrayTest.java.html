@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ChunkedAssociativeLongArrayTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">ChunkedAssociativeLongArrayTest.java</span></div><h1>ChunkedAssociativeLongArrayTest.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import static org.assertj.core.api.BDDAssertions.then;
+
+import org.junit.Test;
+
+<span class="nc" id="L7">public class ChunkedAssociativeLongArrayTest {</span>
+
+    @Test
+    public void testTrim() {
+<span class="nc" id="L11">        ChunkedAssociativeLongArray array = new ChunkedAssociativeLongArray(3);</span>
+<span class="nc" id="L12">        array.put(-3, 3);</span>
+<span class="nc" id="L13">        array.put(-2, 1);</span>
+<span class="nc" id="L14">        array.put(0, 5);</span>
+<span class="nc" id="L15">        array.put(3, 0);</span>
+<span class="nc" id="L16">        array.put(9, 8);</span>
+<span class="nc" id="L17">        array.put(15, 0);</span>
+<span class="nc" id="L18">        array.put(19, 5);</span>
+<span class="nc" id="L19">        array.put(21, 5);</span>
+<span class="nc" id="L20">        array.put(34, -9);</span>
+<span class="nc" id="L21">        array.put(109, 5);</span>
+
+<span class="nc" id="L23">        then(array.out())</span>
+<span class="nc" id="L24">                .isEqualTo(&quot;[(-3: 3) (-2: 1) (0: 5) ]-&gt;[(3: 0) (9: 8) (15: 0) ]-&gt;[(19: 5) (21: 5) (34: -9) ]-&gt;[(109: 5) ]&quot;);</span>
+<span class="nc" id="L25">        then(array.values())</span>
+<span class="nc" id="L26">                .isEqualTo(new long[]{3, 1, 5, 0, 8, 0, 5, 5, -9, 5});</span>
+<span class="nc" id="L27">        then(array.size())</span>
+<span class="nc" id="L28">                .isEqualTo(10);</span>
+
+<span class="nc" id="L30">        array.trim(-2, 20);</span>
+
+<span class="nc" id="L32">        then(array.out())</span>
+<span class="nc" id="L33">                .isEqualTo(&quot;[(-2: 1) (0: 5) ]-&gt;[(3: 0) (9: 8) (15: 0) ]-&gt;[(19: 5) ]&quot;);</span>
+<span class="nc" id="L34">        then(array.values())</span>
+<span class="nc" id="L35">                .isEqualTo(new long[]{1, 5, 0, 8, 0, 5});</span>
+<span class="nc" id="L36">        then(array.size())</span>
+<span class="nc" id="L37">                .isEqualTo(6);</span>
+
+<span class="nc" id="L39">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

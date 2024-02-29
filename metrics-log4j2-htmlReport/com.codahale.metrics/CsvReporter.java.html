@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CsvReporter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">CsvReporter.java</span></div><h1>CsvReporter.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.Locale;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+/**
+ * A reporter which creates a comma-separated values file of the measurements for each metric.
+ */
+public class CsvReporter extends ScheduledReporter {
+    private static final String DEFAULT_SEPARATOR = &quot;,&quot;;
+
+    /**
+     * Returns a new {@link Builder} for {@link CsvReporter}.
+     *
+     * @param registry the registry to report
+     * @return a {@link Builder} instance for a {@link CsvReporter}
+     */
+    public static Builder forRegistry(MetricRegistry registry) {
+<span class="nc" id="L32">        return new Builder(registry);</span>
+    }
+
+    /**
+     * A builder for {@link CsvReporter} instances. Defaults to using the default locale, converting
+     * rates to events/second, converting durations to milliseconds, and not filtering metrics.
+     */
+    public static class Builder {
+        private final MetricRegistry registry;
+        private Locale locale;
+        private String separator;
+        private TimeUnit rateUnit;
+        private TimeUnit durationUnit;
+        private Clock clock;
+        private MetricFilter filter;
+        private ScheduledExecutorService executor;
+        private boolean shutdownExecutorOnStop;
+        private CsvFileProvider csvFileProvider;
+
+<span class="nc" id="L51">        private Builder(MetricRegistry registry) {</span>
+<span class="nc" id="L52">            this.registry = registry;</span>
+<span class="nc" id="L53">            this.locale = Locale.getDefault();</span>
+<span class="nc" id="L54">            this.separator = DEFAULT_SEPARATOR;</span>
+<span class="nc" id="L55">            this.rateUnit = TimeUnit.SECONDS;</span>
+<span class="nc" id="L56">            this.durationUnit = TimeUnit.MILLISECONDS;</span>
+<span class="nc" id="L57">            this.clock = Clock.defaultClock();</span>
+<span class="nc" id="L58">            this.filter = MetricFilter.ALL;</span>
+<span class="nc" id="L59">            this.executor = null;</span>
+<span class="nc" id="L60">            this.shutdownExecutorOnStop = true;</span>
+<span class="nc" id="L61">            this.csvFileProvider = new FixedNameCsvFileProvider();</span>
+<span class="nc" id="L62">        }</span>
+
+        /**
+         * Specifies whether or not, the executor (used for reporting) will be stopped with same time with reporter.
+         * Default value is true.
+         * Setting this parameter to false, has the sense in combining with providing external managed executor via {@link #scheduleOn(ScheduledExecutorService)}.
+         *
+         * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
+         * @return {@code this}
+         */
+        public Builder shutdownExecutorOnStop(boolean shutdownExecutorOnStop) {
+<span class="nc" id="L73">            this.shutdownExecutorOnStop = shutdownExecutorOnStop;</span>
+<span class="nc" id="L74">            return this;</span>
+        }
+
+        /**
+         * Specifies the executor to use while scheduling reporting of metrics.
+         * Default value is null.
+         * Null value leads to executor will be auto created on start.
+         *
+         * @param executor the executor to use while scheduling reporting of metrics.
+         * @return {@code this}
+         */
+        public Builder scheduleOn(ScheduledExecutorService executor) {
+<span class="nc" id="L86">            this.executor = executor;</span>
+<span class="nc" id="L87">            return this;</span>
+        }
+
+        /**
+         * Format numbers for the given {@link Locale}.
+         *
+         * @param locale a {@link Locale}
+         * @return {@code this}
+         */
+        public Builder formatFor(Locale locale) {
+<span class="nc" id="L97">            this.locale = locale;</span>
+<span class="nc" id="L98">            return this;</span>
+        }
+
+        /**
+         * Convert rates to the given time unit.
+         *
+         * @param rateUnit a unit of time
+         * @return {@code this}
+         */
+        public Builder convertRatesTo(TimeUnit rateUnit) {
+<span class="nc" id="L108">            this.rateUnit = rateUnit;</span>
+<span class="nc" id="L109">            return this;</span>
+        }
+
+        /**
+         * Convert durations to the given time unit.
+         *
+         * @param durationUnit a unit of time
+         * @return {@code this}
+         */
+        public Builder convertDurationsTo(TimeUnit durationUnit) {
+<span class="nc" id="L119">            this.durationUnit = durationUnit;</span>
+<span class="nc" id="L120">            return this;</span>
+        }
+
+        /**
+         * Use the given string to use as the separator for values.
+         *
+         * @param separator the string to use for the separator.
+         * @return {@code this}
+         */
+        public Builder withSeparator(String separator) {
+<span class="nc" id="L130">            this.separator = separator;</span>
+<span class="nc" id="L131">            return this;</span>
+        }
+
+        /**
+         * Use the given {@link Clock} instance for the time.
+         *
+         * @param clock a {@link Clock} instance
+         * @return {@code this}
+         */
+        public Builder withClock(Clock clock) {
+<span class="nc" id="L141">            this.clock = clock;</span>
+<span class="nc" id="L142">            return this;</span>
+        }
+
+        /**
+         * Only report metrics which match the given filter.
+         *
+         * @param filter a {@link MetricFilter}
+         * @return {@code this}
+         */
+        public Builder filter(MetricFilter filter) {
+<span class="nc" id="L152">            this.filter = filter;</span>
+<span class="nc" id="L153">            return this;</span>
+        }
+
+        public Builder withCsvFileProvider(CsvFileProvider csvFileProvider) {
+<span class="nc" id="L157">            this.csvFileProvider = csvFileProvider;</span>
+<span class="nc" id="L158">            return this;</span>
+        }
+
+        /**
+         * Builds a {@link CsvReporter} with the given properties, writing {@code .csv} files to the
+         * given directory.
+         *
+         * @param directory the directory in which the {@code .csv} files will be created
+         * @return a {@link CsvReporter}
+         */
+        public CsvReporter build(File directory) {
+<span class="nc" id="L169">            return new CsvReporter(registry,</span>
+                    directory,
+                    locale,
+                    separator,
+                    rateUnit,
+                    durationUnit,
+                    clock,
+                    filter,
+                    executor,
+                    shutdownExecutorOnStop,
+                    csvFileProvider);
+        }
+    }
+
+<span class="nc" id="L183">    private static final Logger LOGGER = LoggerFactory.getLogger(CsvReporter.class);</span>
+
+    private final File directory;
+    private final Locale locale;
+    private final String separator;
+    private final Clock clock;
+    private final CsvFileProvider csvFileProvider;
+
+    private final String histogramFormat;
+    private final String meterFormat;
+    private final String timerFormat;
+
+    private final String timerHeader;
+    private final String meterHeader;
+    private final String histogramHeader;
+
+    private CsvReporter(MetricRegistry registry,
+                        File directory,
+                        Locale locale,
+                        String separator,
+                        TimeUnit rateUnit,
+                        TimeUnit durationUnit,
+                        Clock clock,
+                        MetricFilter filter,
+                        ScheduledExecutorService executor,
+                        boolean shutdownExecutorOnStop,
+                        CsvFileProvider csvFileProvider) {
+<span class="nc" id="L210">        super(registry, &quot;csv-reporter&quot;, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop);</span>
+<span class="nc" id="L211">        this.directory = directory;</span>
+<span class="nc" id="L212">        this.locale = locale;</span>
+<span class="nc" id="L213">        this.separator = separator;</span>
+<span class="nc" id="L214">        this.clock = clock;</span>
+<span class="nc" id="L215">        this.csvFileProvider = csvFileProvider;</span>
+
+<span class="nc" id="L217">        this.histogramFormat = String.join(separator, &quot;%d&quot;, &quot;%d&quot;, &quot;%f&quot;, &quot;%d&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;);</span>
+<span class="nc" id="L218">        this.meterFormat = String.join(separator, &quot;%d&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;events/%s&quot;);</span>
+<span class="nc" id="L219">        this.timerFormat = String.join(separator, &quot;%d&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;%f&quot;, &quot;calls/%s&quot;, &quot;%s&quot;);</span>
+
+<span class="nc" id="L221">        this.timerHeader = String.join(separator, &quot;count&quot;, &quot;max&quot;, &quot;mean&quot;, &quot;min&quot;, &quot;stddev&quot;, &quot;p50&quot;, &quot;p75&quot;, &quot;p95&quot;, &quot;p98&quot;, &quot;p99&quot;, &quot;p999&quot;, &quot;mean_rate&quot;, &quot;m1_rate&quot;, &quot;m5_rate&quot;, &quot;m15_rate&quot;, &quot;rate_unit&quot;, &quot;duration_unit&quot;);</span>
+<span class="nc" id="L222">        this.meterHeader = String.join(separator, &quot;count&quot;, &quot;mean_rate&quot;, &quot;m1_rate&quot;, &quot;m5_rate&quot;, &quot;m15_rate&quot;, &quot;rate_unit&quot;);</span>
+<span class="nc" id="L223">        this.histogramHeader = String.join(separator, &quot;count&quot;, &quot;max&quot;, &quot;mean&quot;, &quot;min&quot;, &quot;stddev&quot;, &quot;p50&quot;, &quot;p75&quot;, &quot;p95&quot;, &quot;p98&quot;, &quot;p99&quot;, &quot;p999&quot;);</span>
+<span class="nc" id="L224">    }</span>
+
+    @Override
+    @SuppressWarnings(&quot;rawtypes&quot;)
+    public void report(SortedMap&lt;String, Gauge&gt; gauges,
+                       SortedMap&lt;String, Counter&gt; counters,
+                       SortedMap&lt;String, Histogram&gt; histograms,
+                       SortedMap&lt;String, Meter&gt; meters,
+                       SortedMap&lt;String, Timer&gt; timers) {
+<span class="nc" id="L233">        final long timestamp = TimeUnit.MILLISECONDS.toSeconds(clock.getTime());</span>
+
+<span class="nc bnc" id="L235" title="All 2 branches missed.">        for (Map.Entry&lt;String, Gauge&gt; entry : gauges.entrySet()) {</span>
+<span class="nc" id="L236">            reportGauge(timestamp, entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L237">        }</span>
+
+<span class="nc bnc" id="L239" title="All 2 branches missed.">        for (Map.Entry&lt;String, Counter&gt; entry : counters.entrySet()) {</span>
+<span class="nc" id="L240">            reportCounter(timestamp, entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L241">        }</span>
+
+<span class="nc bnc" id="L243" title="All 2 branches missed.">        for (Map.Entry&lt;String, Histogram&gt; entry : histograms.entrySet()) {</span>
+<span class="nc" id="L244">            reportHistogram(timestamp, entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L245">        }</span>
+
+<span class="nc bnc" id="L247" title="All 2 branches missed.">        for (Map.Entry&lt;String, Meter&gt; entry : meters.entrySet()) {</span>
+<span class="nc" id="L248">            reportMeter(timestamp, entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L249">        }</span>
+
+<span class="nc bnc" id="L251" title="All 2 branches missed.">        for (Map.Entry&lt;String, Timer&gt; entry : timers.entrySet()) {</span>
+<span class="nc" id="L252">            reportTimer(timestamp, entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L253">        }</span>
+<span class="nc" id="L254">    }</span>
+
+    private void reportTimer(long timestamp, String name, Timer timer) {
+<span class="nc" id="L257">        final Snapshot snapshot = timer.getSnapshot();</span>
+
+<span class="nc" id="L259">        report(timestamp,</span>
+                name,
+                timerHeader,
+                timerFormat,
+<span class="nc" id="L263">                timer.getCount(),</span>
+<span class="nc" id="L264">                convertDuration(snapshot.getMax()),</span>
+<span class="nc" id="L265">                convertDuration(snapshot.getMean()),</span>
+<span class="nc" id="L266">                convertDuration(snapshot.getMin()),</span>
+<span class="nc" id="L267">                convertDuration(snapshot.getStdDev()),</span>
+<span class="nc" id="L268">                convertDuration(snapshot.getMedian()),</span>
+<span class="nc" id="L269">                convertDuration(snapshot.get75thPercentile()),</span>
+<span class="nc" id="L270">                convertDuration(snapshot.get95thPercentile()),</span>
+<span class="nc" id="L271">                convertDuration(snapshot.get98thPercentile()),</span>
+<span class="nc" id="L272">                convertDuration(snapshot.get99thPercentile()),</span>
+<span class="nc" id="L273">                convertDuration(snapshot.get999thPercentile()),</span>
+<span class="nc" id="L274">                convertRate(timer.getMeanRate()),</span>
+<span class="nc" id="L275">                convertRate(timer.getOneMinuteRate()),</span>
+<span class="nc" id="L276">                convertRate(timer.getFiveMinuteRate()),</span>
+<span class="nc" id="L277">                convertRate(timer.getFifteenMinuteRate()),</span>
+<span class="nc" id="L278">                getRateUnit(),</span>
+<span class="nc" id="L279">                getDurationUnit());</span>
+<span class="nc" id="L280">    }</span>
+
+    private void reportMeter(long timestamp, String name, Meter meter) {
+<span class="nc" id="L283">        report(timestamp,</span>
+                name,
+                meterHeader,
+                meterFormat,
+<span class="nc" id="L287">                meter.getCount(),</span>
+<span class="nc" id="L288">                convertRate(meter.getMeanRate()),</span>
+<span class="nc" id="L289">                convertRate(meter.getOneMinuteRate()),</span>
+<span class="nc" id="L290">                convertRate(meter.getFiveMinuteRate()),</span>
+<span class="nc" id="L291">                convertRate(meter.getFifteenMinuteRate()),</span>
+<span class="nc" id="L292">                getRateUnit());</span>
+<span class="nc" id="L293">    }</span>
+
+    private void reportHistogram(long timestamp, String name, Histogram histogram) {
+<span class="nc" id="L296">        final Snapshot snapshot = histogram.getSnapshot();</span>
+
+<span class="nc" id="L298">        report(timestamp,</span>
+                name,
+                histogramHeader,
+                histogramFormat,
+<span class="nc" id="L302">                histogram.getCount(),</span>
+<span class="nc" id="L303">                snapshot.getMax(),</span>
+<span class="nc" id="L304">                snapshot.getMean(),</span>
+<span class="nc" id="L305">                snapshot.getMin(),</span>
+<span class="nc" id="L306">                snapshot.getStdDev(),</span>
+<span class="nc" id="L307">                snapshot.getMedian(),</span>
+<span class="nc" id="L308">                snapshot.get75thPercentile(),</span>
+<span class="nc" id="L309">                snapshot.get95thPercentile(),</span>
+<span class="nc" id="L310">                snapshot.get98thPercentile(),</span>
+<span class="nc" id="L311">                snapshot.get99thPercentile(),</span>
+<span class="nc" id="L312">                snapshot.get999thPercentile());</span>
+<span class="nc" id="L313">    }</span>
+
+    private void reportCounter(long timestamp, String name, Counter counter) {
+<span class="nc" id="L316">        report(timestamp, name, &quot;count&quot;, &quot;%d&quot;, counter.getCount());</span>
+<span class="nc" id="L317">    }</span>
+
+    private void reportGauge(long timestamp, String name, Gauge&lt;?&gt; gauge) {
+<span class="nc" id="L320">        report(timestamp, name, &quot;value&quot;, &quot;%s&quot;, gauge.getValue());</span>
+<span class="nc" id="L321">    }</span>
+
+    private void report(long timestamp, String name, String header, String line, Object... values) {
+        try {
+<span class="nc" id="L325">            final File file = csvFileProvider.getFile(directory, name);</span>
+<span class="nc" id="L326">            final boolean fileAlreadyExists = file.exists();</span>
+<span class="nc bnc" id="L327" title="All 4 branches missed.">            if (fileAlreadyExists || file.createNewFile()) {</span>
+<span class="nc" id="L328">                try (PrintWriter out = new PrintWriter(new OutputStreamWriter(</span>
+                        new FileOutputStream(file, true), UTF_8))) {
+<span class="nc bnc" id="L330" title="All 2 branches missed.">                    if (!fileAlreadyExists) {</span>
+<span class="nc" id="L331">                        out.println(&quot;t&quot; + separator + header);</span>
+                    }
+<span class="nc" id="L333">                    out.printf(locale, String.format(locale, &quot;%d&quot; + separator + &quot;%s%n&quot;, timestamp, line), values);</span>
+                }
+            }
+<span class="nc" id="L336">        } catch (IOException e) {</span>
+<span class="nc" id="L337">            LOGGER.warn(&quot;Error writing to {}&quot;, name, e);</span>
+<span class="nc" id="L338">        }</span>
+<span class="nc" id="L339">    }</span>
+
+    protected String sanitize(String name) {
+<span class="nc" id="L342">        return name;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

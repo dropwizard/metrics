@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Timer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">Timer.java</span></div><h1>Timer.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import java.time.Duration;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
+/**
+ * A timer metric which aggregates timing durations and provides duration statistics, plus
+ * throughput statistics via {@link Meter}.
+ */
+public class Timer implements Metered, Sampling {
+    /**
+     * A timing context.
+     *
+     * @see Timer#time()
+     */
+    public static class Context implements AutoCloseable {
+        private final Timer timer;
+        private final Clock clock;
+        private final long startTime;
+
+<span class="nc" id="L23">        Context(Timer timer, Clock clock) {</span>
+<span class="nc" id="L24">            this.timer = timer;</span>
+<span class="nc" id="L25">            this.clock = clock;</span>
+<span class="nc" id="L26">            this.startTime = clock.getTick();</span>
+<span class="nc" id="L27">        }</span>
+
+        /**
+         * Updates the timer with the difference between current and start time. Call to this method will
+         * not reset the start time. Multiple calls result in multiple updates.
+         *
+         * @return the elapsed time in nanoseconds
+         */
+        public long stop() {
+<span class="nc" id="L36">            final long elapsed = clock.getTick() - startTime;</span>
+<span class="nc" id="L37">            timer.update(elapsed, TimeUnit.NANOSECONDS);</span>
+<span class="nc" id="L38">            return elapsed;</span>
+        }
+
+        /**
+         * Equivalent to calling {@link #stop()}.
+         */
+        @Override
+        public void close() {
+<span class="nc" id="L46">            stop();</span>
+<span class="nc" id="L47">        }</span>
+    }
+
+    private final Meter meter;
+    private final Histogram histogram;
+    private final Clock clock;
+
+    /**
+     * Creates a new {@link Timer} using an {@link ExponentiallyDecayingReservoir} and the default
+     * {@link Clock}.
+     */
+    public Timer() {
+<span class="nc" id="L59">        this(new ExponentiallyDecayingReservoir());</span>
+<span class="nc" id="L60">    }</span>
+
+    /**
+     * Creates a new {@link Timer} that uses the given {@link Reservoir}.
+     *
+     * @param reservoir the {@link Reservoir} implementation the timer should use
+     */
+    public Timer(Reservoir reservoir) {
+<span class="nc" id="L68">        this(reservoir, Clock.defaultClock());</span>
+<span class="nc" id="L69">    }</span>
+
+    /**
+     * Creates a new {@link Timer} that uses the given {@link Reservoir} and {@link Clock}.
+     *
+     * @param reservoir the {@link Reservoir} implementation the timer should use
+     * @param clock     the {@link Clock} implementation the timer should use
+     */
+    public Timer(Reservoir reservoir, Clock clock) {
+<span class="nc" id="L78">        this(new Meter(clock), new Histogram(reservoir), clock);</span>
+<span class="nc" id="L79">    }</span>
+
+<span class="nc" id="L81">    public Timer(Meter meter, Histogram histogram, Clock clock) {</span>
+<span class="nc" id="L82">        this.meter = meter;</span>
+<span class="nc" id="L83">        this.histogram = histogram;</span>
+<span class="nc" id="L84">        this.clock = clock;</span>
+<span class="nc" id="L85">    }</span>
+
+    /**
+     * Adds a recorded duration.
+     *
+     * @param duration the length of the duration
+     * @param unit     the scale unit of {@code duration}
+     */
+    public void update(long duration, TimeUnit unit) {
+<span class="nc" id="L94">        update(unit.toNanos(duration));</span>
+<span class="nc" id="L95">    }</span>
+
+    /**
+     * Adds a recorded duration.
+     *
+     * @param duration the {@link Duration} to add to the timer. Negative or zero value are ignored.
+     */
+    public void update(Duration duration) {
+<span class="nc" id="L103">        update(duration.toNanos());</span>
+<span class="nc" id="L104">    }</span>
+
+    /**
+     * Times and records the duration of event.
+     *
+     * @param event a {@link Callable} whose {@link Callable#call()} method implements a process
+     *              whose duration should be timed
+     * @param &lt;T&gt;   the type of the value returned by {@code event}
+     * @return the value returned by {@code event}
+     * @throws Exception if {@code event} throws an {@link Exception}
+     */
+    public &lt;T&gt; T time(Callable&lt;T&gt; event) throws Exception {
+<span class="nc" id="L116">        final long startTime = clock.getTick();</span>
+        try {
+<span class="nc" id="L118">            return event.call();</span>
+        } finally {
+<span class="nc" id="L120">            update(clock.getTick() - startTime);</span>
+        }
+    }
+
+    /**
+     * Times and records the duration of event. Should not throw exceptions, for that use the
+     * {@link #time(Callable)} method.
+     *
+     * @param event a {@link Supplier} whose {@link Supplier#get()} method implements a process
+     *              whose duration should be timed
+     * @param &lt;T&gt;   the type of the value returned by {@code event}
+     * @return the value returned by {@code event}
+     */
+    public &lt;T&gt; T timeSupplier(Supplier&lt;T&gt; event) {
+<span class="nc" id="L134">        final long startTime = clock.getTick();</span>
+        try {
+<span class="nc" id="L136">            return event.get();</span>
+        } finally {
+<span class="nc" id="L138">            update(clock.getTick() - startTime);</span>
+        }
+    }
+
+    /**
+     * Times and records the duration of event.
+     *
+     * @param event a {@link Runnable} whose {@link Runnable#run()} method implements a process
+     *              whose duration should be timed
+     */
+    public void time(Runnable event) {
+<span class="nc" id="L149">        final long startTime = clock.getTick();</span>
+        try {
+<span class="nc" id="L151">            event.run();</span>
+        } finally {
+<span class="nc" id="L153">            update(clock.getTick() - startTime);</span>
+        }
+<span class="nc" id="L155">    }</span>
+
+    /**
+     * Returns a new {@link Context}.
+     *
+     * @return a new {@link Context}
+     * @see Context
+     */
+    public Context time() {
+<span class="nc" id="L164">        return new Context(this, clock);</span>
+    }
+
+    @Override
+    public long getCount() {
+<span class="nc" id="L169">        return histogram.getCount();</span>
+    }
+
+    @Override
+    public double getFifteenMinuteRate() {
+<span class="nc" id="L174">        return meter.getFifteenMinuteRate();</span>
+    }
+
+    @Override
+    public double getFiveMinuteRate() {
+<span class="nc" id="L179">        return meter.getFiveMinuteRate();</span>
+    }
+
+    @Override
+    public double getMeanRate() {
+<span class="nc" id="L184">        return meter.getMeanRate();</span>
+    }
+
+    @Override
+    public double getOneMinuteRate() {
+<span class="nc" id="L189">        return meter.getOneMinuteRate();</span>
+    }
+
+    @Override
+    public Snapshot getSnapshot() {
+<span class="nc" id="L194">        return histogram.getSnapshot();</span>
+    }
+
+    private void update(long duration) {
+<span class="nc bnc" id="L198" title="All 2 branches missed.">        if (duration &gt;= 0) {</span>
+<span class="nc" id="L199">            histogram.update(duration);</span>
+<span class="nc" id="L200">            meter.mark();</span>
+        }
+<span class="nc" id="L202">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

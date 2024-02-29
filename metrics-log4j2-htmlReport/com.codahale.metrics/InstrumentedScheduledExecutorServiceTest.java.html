@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InstrumentedScheduledExecutorServiceTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">InstrumentedScheduledExecutorServiceTest.java</span></div><h1>InstrumentedScheduledExecutorServiceTest.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import org.junit.After;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+<span class="nc" id="L17">public class InstrumentedScheduledExecutorServiceTest {</span>
+<span class="nc" id="L18">    private static final Logger LOGGER = LoggerFactory.getLogger(InstrumentedScheduledExecutorServiceTest.class);</span>
+
+<span class="nc" id="L20">    private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();</span>
+<span class="nc" id="L21">    private final MetricRegistry registry = new MetricRegistry();</span>
+<span class="nc" id="L22">    private final InstrumentedScheduledExecutorService instrumentedScheduledExecutor = new InstrumentedScheduledExecutorService(scheduledExecutor, registry, &quot;xs&quot;);</span>
+
+<span class="nc" id="L24">    private final Meter submitted = registry.meter(&quot;xs.submitted&quot;);</span>
+
+<span class="nc" id="L26">    private final Counter running = registry.counter(&quot;xs.running&quot;);</span>
+<span class="nc" id="L27">    private final Meter completed = registry.meter(&quot;xs.completed&quot;);</span>
+<span class="nc" id="L28">    private final Timer duration = registry.timer(&quot;xs.duration&quot;);</span>
+
+<span class="nc" id="L30">    private final Meter scheduledOnce = registry.meter(&quot;xs.scheduled.once&quot;);</span>
+<span class="nc" id="L31">    private final Meter scheduledRepetitively = registry.meter(&quot;xs.scheduled.repetitively&quot;);</span>
+<span class="nc" id="L32">    private final Counter scheduledOverrun = registry.counter(&quot;xs.scheduled.overrun&quot;);</span>
+<span class="nc" id="L33">    private final Histogram percentOfPeriod = registry.histogram(&quot;xs.scheduled.percent-of-period&quot;);</span>
+
+    @Test
+    public void testSubmitRunnable() throws Exception {
+<span class="nc" id="L37">        assertThat(submitted.getCount()).isZero();</span>
+
+<span class="nc" id="L39">        assertThat(running.getCount()).isZero();</span>
+<span class="nc" id="L40">        assertThat(completed.getCount()).isZero();</span>
+<span class="nc" id="L41">        assertThat(duration.getCount()).isZero();</span>
+
+<span class="nc" id="L43">        assertThat(scheduledOnce.getCount()).isZero();</span>
+<span class="nc" id="L44">        assertThat(scheduledRepetitively.getCount()).isZero();</span>
+<span class="nc" id="L45">        assertThat(scheduledOverrun.getCount()).isZero();</span>
+<span class="nc" id="L46">        assertThat(percentOfPeriod.getCount()).isZero();</span>
+
+<span class="nc" id="L48">        Future&lt;?&gt; theFuture = instrumentedScheduledExecutor.submit(() -&gt; {</span>
+<span class="nc" id="L49">            assertThat(submitted.getCount()).isEqualTo(1);</span>
+
+<span class="nc" id="L51">            assertThat(running.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L52">            assertThat(completed.getCount()).isZero();</span>
+<span class="nc" id="L53">            assertThat(duration.getCount()).isZero();</span>
+
+<span class="nc" id="L55">            assertThat(scheduledOnce.getCount()).isZero();</span>
+<span class="nc" id="L56">            assertThat(scheduledRepetitively.getCount()).isZero();</span>
+<span class="nc" id="L57">            assertThat(scheduledOverrun.getCount()).isZero();</span>
+<span class="nc" id="L58">            assertThat(percentOfPeriod.getCount()).isZero();</span>
+<span class="nc" id="L59">        });</span>
+
+<span class="nc" id="L61">        theFuture.get();</span>
+
+<span class="nc" id="L63">        assertThat(submitted.getCount()).isEqualTo(1);</span>
+
+<span class="nc" id="L65">        assertThat(running.getCount()).isZero();</span>
+<span class="nc" id="L66">        assertThat(completed.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L67">        assertThat(duration.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L68">        assertThat(duration.getSnapshot().size()).isEqualTo(1);</span>
+
+<span class="nc" id="L70">        assertThat(scheduledOnce.getCount()).isZero();</span>
+<span class="nc" id="L71">        assertThat(scheduledRepetitively.getCount()).isZero();</span>
+<span class="nc" id="L72">        assertThat(scheduledOverrun.getCount()).isZero();</span>
+<span class="nc" id="L73">        assertThat(percentOfPeriod.getCount()).isZero();</span>
+<span class="nc" id="L74">    }</span>
+
+    @Test
+    public void testScheduleRunnable() throws Exception {
+<span class="nc" id="L78">        assertThat(submitted.getCount()).isZero();</span>
+
+<span class="nc" id="L80">        assertThat(running.getCount()).isZero();</span>
+<span class="nc" id="L81">        assertThat(completed.getCount()).isZero();</span>
+<span class="nc" id="L82">        assertThat(duration.getCount()).isZero();</span>
+
+<span class="nc" id="L84">        assertThat(scheduledOnce.getCount()).isZero();</span>
+<span class="nc" id="L85">        assertThat(scheduledRepetitively.getCount()).isZero();</span>
+<span class="nc" id="L86">        assertThat(scheduledOverrun.getCount()).isZero();</span>
+<span class="nc" id="L87">        assertThat(percentOfPeriod.getCount()).isZero();</span>
+
+<span class="nc" id="L89">        ScheduledFuture&lt;?&gt; theFuture = instrumentedScheduledExecutor.schedule(() -&gt; {</span>
+<span class="nc" id="L90">            assertThat(submitted.getCount()).isZero();</span>
+
+<span class="nc" id="L92">            assertThat(running.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L93">            assertThat(completed.getCount()).isZero();</span>
+<span class="nc" id="L94">            assertThat(duration.getCount()).isZero();</span>
+
+<span class="nc" id="L96">            assertThat(scheduledOnce.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L97">            assertThat(scheduledRepetitively.getCount()).isZero();</span>
+<span class="nc" id="L98">            assertThat(scheduledOverrun.getCount()).isZero();</span>
+<span class="nc" id="L99">            assertThat(percentOfPeriod.getCount()).isZero();</span>
+<span class="nc" id="L100">        }, 10L, TimeUnit.MILLISECONDS);</span>
+
+<span class="nc" id="L102">        theFuture.get();</span>
+
+<span class="nc" id="L104">        assertThat(submitted.getCount()).isZero();</span>
+
+<span class="nc" id="L106">        assertThat(running.getCount()).isZero();</span>
+<span class="nc" id="L107">        assertThat(completed.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L108">        assertThat(duration.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L109">        assertThat(duration.getSnapshot().size()).isEqualTo(1);</span>
+
+<span class="nc" id="L111">        assertThat(scheduledOnce.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L112">        assertThat(scheduledRepetitively.getCount()).isZero();</span>
+<span class="nc" id="L113">        assertThat(scheduledOverrun.getCount()).isZero();</span>
+<span class="nc" id="L114">        assertThat(percentOfPeriod.getCount()).isZero();</span>
+<span class="nc" id="L115">    }</span>
+
+    @Test
+    public void testSubmitCallable() throws Exception {
+<span class="nc" id="L119">        assertThat(submitted.getCount()).isZero();</span>
+
+<span class="nc" id="L121">        assertThat(running.getCount()).isZero();</span>
+<span class="nc" id="L122">        assertThat(completed.getCount()).isZero();</span>
+<span class="nc" id="L123">        assertThat(duration.getCount()).isZero();</span>
+
+<span class="nc" id="L125">        assertThat(scheduledOnce.getCount()).isZero();</span>
+<span class="nc" id="L126">        assertThat(scheduledRepetitively.getCount()).isZero();</span>
+<span class="nc" id="L127">        assertThat(scheduledOverrun.getCount()).isZero();</span>
+<span class="nc" id="L128">        assertThat(percentOfPeriod.getCount()).isZero();</span>
+
+<span class="nc" id="L130">        final Object obj = new Object();</span>
+
+<span class="nc" id="L132">        Future&lt;Object&gt; theFuture = instrumentedScheduledExecutor.submit(() -&gt; {</span>
+<span class="nc" id="L133">            assertThat(submitted.getCount()).isEqualTo(1);</span>
+
+<span class="nc" id="L135">            assertThat(running.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L136">            assertThat(completed.getCount()).isZero();</span>
+<span class="nc" id="L137">            assertThat(duration.getCount()).isZero();</span>
+
+<span class="nc" id="L139">            assertThat(scheduledOnce.getCount()).isZero();</span>
+<span class="nc" id="L140">            assertThat(scheduledRepetitively.getCount()).isZero();</span>
+<span class="nc" id="L141">            assertThat(scheduledOverrun.getCount()).isZero();</span>
+<span class="nc" id="L142">            assertThat(percentOfPeriod.getCount()).isZero();</span>
+
+<span class="nc" id="L144">            return obj;</span>
+        });
+
+<span class="nc" id="L147">        assertThat(theFuture.get()).isEqualTo(obj);</span>
+
+<span class="nc" id="L149">        assertThat(submitted.getCount()).isEqualTo(1);</span>
+
+<span class="nc" id="L151">        assertThat(running.getCount()).isZero();</span>
+<span class="nc" id="L152">        assertThat(completed.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L153">        assertThat(duration.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L154">        assertThat(duration.getSnapshot().size()).isEqualTo(1);</span>
+
+<span class="nc" id="L156">        assertThat(scheduledOnce.getCount()).isZero();</span>
+<span class="nc" id="L157">        assertThat(scheduledRepetitively.getCount()).isZero();</span>
+<span class="nc" id="L158">        assertThat(scheduledOverrun.getCount()).isZero();</span>
+<span class="nc" id="L159">        assertThat(percentOfPeriod.getCount()).isZero();</span>
+<span class="nc" id="L160">    }</span>
+
+    @Test
+    public void testScheduleCallable() throws Exception {
+<span class="nc" id="L164">        assertThat(submitted.getCount()).isZero();</span>
+
+<span class="nc" id="L166">        assertThat(running.getCount()).isZero();</span>
+<span class="nc" id="L167">        assertThat(completed.getCount()).isZero();</span>
+<span class="nc" id="L168">        assertThat(duration.getCount()).isZero();</span>
+
+<span class="nc" id="L170">        assertThat(scheduledOnce.getCount()).isZero();</span>
+<span class="nc" id="L171">        assertThat(scheduledRepetitively.getCount()).isZero();</span>
+<span class="nc" id="L172">        assertThat(scheduledOverrun.getCount()).isZero();</span>
+<span class="nc" id="L173">        assertThat(percentOfPeriod.getCount()).isZero();</span>
+
+<span class="nc" id="L175">        final Object obj = new Object();</span>
+
+<span class="nc" id="L177">        ScheduledFuture&lt;Object&gt; theFuture = instrumentedScheduledExecutor.schedule(() -&gt; {</span>
+<span class="nc" id="L178">            assertThat(submitted.getCount()).isZero();</span>
+
+<span class="nc" id="L180">            assertThat(running.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L181">            assertThat(completed.getCount()).isZero();</span>
+<span class="nc" id="L182">            assertThat(duration.getCount()).isZero();</span>
+
+<span class="nc" id="L184">            assertThat(scheduledOnce.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L185">            assertThat(scheduledRepetitively.getCount()).isZero();</span>
+<span class="nc" id="L186">            assertThat(scheduledOverrun.getCount()).isZero();</span>
+<span class="nc" id="L187">            assertThat(percentOfPeriod.getCount()).isZero();</span>
+
+<span class="nc" id="L189">            return obj;</span>
+        }, 10L, TimeUnit.MILLISECONDS);
+
+<span class="nc" id="L192">        assertThat(theFuture.get()).isEqualTo(obj);</span>
+
+<span class="nc" id="L194">        assertThat(submitted.getCount()).isZero();</span>
+
+<span class="nc" id="L196">        assertThat(running.getCount()).isZero();</span>
+<span class="nc" id="L197">        assertThat(completed.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L198">        assertThat(duration.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L199">        assertThat(duration.getSnapshot().size()).isEqualTo(1);</span>
+
+<span class="nc" id="L201">        assertThat(scheduledOnce.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L202">        assertThat(scheduledRepetitively.getCount()).isZero();</span>
+<span class="nc" id="L203">        assertThat(scheduledOverrun.getCount()).isZero();</span>
+<span class="nc" id="L204">        assertThat(percentOfPeriod.getCount()).isZero();</span>
+<span class="nc" id="L205">    }</span>
+
+    @Test
+    public void testScheduleFixedRateCallable() throws Exception {
+<span class="nc" id="L209">        assertThat(submitted.getCount()).isZero();</span>
+
+<span class="nc" id="L211">        assertThat(running.getCount()).isZero();</span>
+<span class="nc" id="L212">        assertThat(completed.getCount()).isZero();</span>
+<span class="nc" id="L213">        assertThat(duration.getCount()).isZero();</span>
+
+<span class="nc" id="L215">        assertThat(scheduledOnce.getCount()).isZero();</span>
+<span class="nc" id="L216">        assertThat(scheduledRepetitively.getCount()).isZero();</span>
+<span class="nc" id="L217">        assertThat(scheduledOverrun.getCount()).isZero();</span>
+<span class="nc" id="L218">        assertThat(percentOfPeriod.getCount()).isZero();</span>
+
+<span class="nc" id="L220">        CountDownLatch countDownLatch = new CountDownLatch(1);</span>
+<span class="nc" id="L221">        ScheduledFuture&lt;?&gt; theFuture = instrumentedScheduledExecutor.scheduleAtFixedRate(() -&gt; {</span>
+<span class="nc" id="L222">            assertThat(submitted.getCount()).isZero();</span>
+
+<span class="nc" id="L224">            assertThat(running.getCount()).isEqualTo(1);</span>
+
+<span class="nc" id="L226">            assertThat(scheduledOnce.getCount()).isEqualTo(0);</span>
+<span class="nc" id="L227">            assertThat(scheduledRepetitively.getCount()).isEqualTo(1);</span>
+
+            try {
+<span class="nc" id="L230">                TimeUnit.MILLISECONDS.sleep(50);</span>
+<span class="nc" id="L231">            } catch (InterruptedException ex) {</span>
+<span class="nc" id="L232">                Thread.currentThread().interrupt();</span>
+<span class="nc" id="L233">            }</span>
+<span class="nc" id="L234">            countDownLatch.countDown();</span>
+<span class="nc" id="L235">        }, 10L, 10L, TimeUnit.MILLISECONDS);</span>
+<span class="nc" id="L236">        TimeUnit.MILLISECONDS.sleep(100); // Give some time for the task to be run</span>
+<span class="nc" id="L237">        countDownLatch.await(5, TimeUnit.SECONDS); // Don't cancel until it didn't complete once</span>
+<span class="nc" id="L238">        theFuture.cancel(true);</span>
+<span class="nc" id="L239">        TimeUnit.MILLISECONDS.sleep(200);         // Wait while the task is cancelled</span>
+
+<span class="nc" id="L241">        assertThat(submitted.getCount()).isZero();</span>
+
+<span class="nc" id="L243">        assertThat(running.getCount()).isZero();</span>
+<span class="nc" id="L244">        assertThat(completed.getCount()).isNotEqualTo(0);</span>
+<span class="nc" id="L245">        assertThat(duration.getCount()).isNotEqualTo(0);</span>
+<span class="nc" id="L246">        assertThat(duration.getSnapshot().size()).isNotEqualTo(0);</span>
+
+<span class="nc" id="L248">        assertThat(scheduledOnce.getCount()).isZero();</span>
+<span class="nc" id="L249">        assertThat(scheduledRepetitively.getCount()).isEqualTo(1);</span>
+<span class="nc" id="L250">        assertThat(scheduledOverrun.getCount()).isNotEqualTo(0);</span>
+<span class="nc" id="L251">        assertThat(percentOfPeriod.getCount()).isNotEqualTo(0);</span>
+<span class="nc" id="L252">    }</span>
+
+    @Test
+    public void testScheduleFixedDelayCallable() throws Exception {
+<span class="nc" id="L256">        assertThat(submitted.getCount()).isZero();</span>
+
+<span class="nc" id="L258">        assertThat(running.getCount()).isZero();</span>
+<span class="nc" id="L259">        assertThat(completed.getCount()).isZero();</span>
+<span class="nc" id="L260">        assertThat(duration.getCount()).isZero();</span>
+
+<span class="nc" id="L262">        assertThat(scheduledOnce.getCount()).isZero();</span>
+<span class="nc" id="L263">        assertThat(scheduledRepetitively.getCount()).isZero();</span>
+<span class="nc" id="L264">        assertThat(scheduledOverrun.getCount()).isZero();</span>
+<span class="nc" id="L265">        assertThat(percentOfPeriod.getCount()).isZero();</span>
+
+<span class="nc" id="L267">        CountDownLatch countDownLatch = new CountDownLatch(1);</span>
+<span class="nc" id="L268">        ScheduledFuture&lt;?&gt; theFuture = instrumentedScheduledExecutor.scheduleWithFixedDelay(() -&gt; {</span>
+<span class="nc" id="L269">            assertThat(submitted.getCount()).isZero();</span>
+
+<span class="nc" id="L271">            assertThat(running.getCount()).isEqualTo(1);</span>
+
+<span class="nc" id="L273">            assertThat(scheduledOnce.getCount()).isEqualTo(0);</span>
+<span class="nc" id="L274">            assertThat(scheduledRepetitively.getCount()).isEqualTo(1);</span>
+
+            try {
+<span class="nc" id="L277">                TimeUnit.MILLISECONDS.sleep(50);</span>
+<span class="nc" id="L278">            } catch (InterruptedException ex) {</span>
+<span class="nc" id="L279">                Thread.currentThread().interrupt();</span>
+<span class="nc" id="L280">            }</span>
+<span class="nc" id="L281">            countDownLatch.countDown();</span>
+<span class="nc" id="L282">        }, 10L, 10L, TimeUnit.MILLISECONDS);</span>
+
+<span class="nc" id="L284">        TimeUnit.MILLISECONDS.sleep(100);</span>
+<span class="nc" id="L285">        countDownLatch.await(5, TimeUnit.SECONDS);</span>
+<span class="nc" id="L286">        theFuture.cancel(true);</span>
+<span class="nc" id="L287">        TimeUnit.MILLISECONDS.sleep(200);</span>
+
+<span class="nc" id="L289">        assertThat(submitted.getCount()).isZero();</span>
+
+<span class="nc" id="L291">        assertThat(running.getCount()).isZero();</span>
+<span class="nc" id="L292">        assertThat(completed.getCount()).isNotEqualTo(0);</span>
+<span class="nc" id="L293">        assertThat(duration.getCount()).isNotEqualTo(0);</span>
+<span class="nc" id="L294">        assertThat(duration.getSnapshot().size()).isNotEqualTo(0);</span>
+<span class="nc" id="L295">    }</span>
+
+    @After
+    public void tearDown() throws Exception {
+<span class="nc" id="L299">        instrumentedScheduledExecutor.shutdown();</span>
+<span class="nc bnc" id="L300" title="All 2 branches missed.">        if (!instrumentedScheduledExecutor.awaitTermination(2, TimeUnit.SECONDS)) {</span>
+<span class="nc" id="L301">            LOGGER.error(&quot;InstrumentedScheduledExecutorService did not terminate.&quot;);</span>
+        }
+<span class="nc" id="L303">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RatioGauge.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">RatioGauge.java</span></div><h1>RatioGauge.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import static java.lang.Double.isInfinite;
+import static java.lang.Double.isNaN;
+
+/**
+ * A gauge which measures the ratio of one value to another.
+ * &lt;p&gt;
+ * If the denominator is zero, not a number, or infinite, the resulting ratio is not a number.
+ */
+<span class="nc" id="L11">public abstract class RatioGauge implements Gauge&lt;Double&gt; {</span>
+    /**
+     * A ratio of one quantity to another.
+     */
+    public static class Ratio {
+        /**
+         * Creates a new ratio with the given numerator and denominator.
+         *
+         * @param numerator   the numerator of the ratio
+         * @param denominator the denominator of the ratio
+         * @return {@code numerator:denominator}
+         */
+        public static Ratio of(double numerator, double denominator) {
+<span class="nc" id="L24">            return new Ratio(numerator, denominator);</span>
+        }
+
+        private final double numerator;
+        private final double denominator;
+
+<span class="nc" id="L30">        private Ratio(double numerator, double denominator) {</span>
+<span class="nc" id="L31">            this.numerator = numerator;</span>
+<span class="nc" id="L32">            this.denominator = denominator;</span>
+<span class="nc" id="L33">        }</span>
+
+        /**
+         * Returns the ratio, which is either a {@code double} between 0 and 1 (inclusive) or
+         * {@code NaN}.
+         *
+         * @return the ratio
+         */
+        public double getValue() {
+<span class="nc" id="L42">            final double d = denominator;</span>
+<span class="nc bnc" id="L43" title="All 6 branches missed.">            if (isNaN(d) || isInfinite(d) || d == 0) {</span>
+<span class="nc" id="L44">                return Double.NaN;</span>
+            }
+<span class="nc" id="L46">            return numerator / d;</span>
+        }
+
+        @Override
+        public String toString() {
+<span class="nc" id="L51">            return numerator + &quot;:&quot; + denominator;</span>
+        }
+    }
+
+    /**
+     * Returns the {@link Ratio} which is the gauge's current value.
+     *
+     * @return the {@link Ratio} which is the gauge's current value
+     */
+    protected abstract Ratio getRatio();
+
+    @Override
+    public Double getValue() {
+<span class="nc" id="L64">        return getRatio().getValue();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

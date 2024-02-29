@@ -1,0 +1,308 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > InstrumentedHttpClientConnectionManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.httpclient5</a>
+</div>
+
+<h1>Coverage Summary for Class: InstrumentedHttpClientConnectionManager (com.codahale.metrics.httpclient5)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InstrumentedHttpClientConnectionManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (23/23)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">InstrumentedHttpClientConnectionManager$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (4/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    38.5%
+  </span>
+  <span class="absValue">
+    (10/26)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    63.6%
+  </span>
+  <span class="absValue">
+    (14/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    67.3%
+  </span>
+  <span class="absValue">
+    (33/49)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.httpclient5;
+&nbsp;
+&nbsp;import com.codahale.metrics.MetricRegistry;
+&nbsp;import org.apache.hc.client5.http.DnsResolver;
+&nbsp;import org.apache.hc.client5.http.SchemePortResolver;
+&nbsp;import org.apache.hc.client5.http.impl.io.DefaultHttpClientConnectionOperator;
+&nbsp;import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+&nbsp;import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+&nbsp;import org.apache.hc.client5.http.io.HttpClientConnectionOperator;
+&nbsp;import org.apache.hc.client5.http.io.ManagedHttpClientConnection;
+&nbsp;import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+&nbsp;import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+&nbsp;import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+&nbsp;import org.apache.hc.core5.http.URIScheme;
+&nbsp;import org.apache.hc.core5.http.config.Registry;
+&nbsp;import org.apache.hc.core5.http.config.RegistryBuilder;
+&nbsp;import org.apache.hc.core5.http.io.HttpConnectionFactory;
+&nbsp;import org.apache.hc.core5.io.CloseMode;
+&nbsp;import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
+&nbsp;import org.apache.hc.core5.pool.PoolReusePolicy;
+&nbsp;import org.apache.hc.core5.util.TimeValue;
+&nbsp;
+&nbsp;import static com.codahale.metrics.MetricRegistry.name;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link HttpClientConnectionManager} which monitors the number of open connections.
+&nbsp; */
+&nbsp;public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientConnectionManager {
+<b class="fc">&nbsp;    private static final String METRICS_PREFIX = HttpClientConnectionManager.class.getName();</b>
+&nbsp;
+&nbsp;    protected static Registry&lt;ConnectionSocketFactory&gt; getDefaultRegistry() {
+<b class="fc">&nbsp;        return RegistryBuilder.&lt;ConnectionSocketFactory&gt;create()</b>
+<b class="fc">&nbsp;                .register(URIScheme.HTTP.id, PlainConnectionSocketFactory.getSocketFactory())</b>
+<b class="fc">&nbsp;                .register(URIScheme.HTTPS.id, SSLConnectionSocketFactory.getSocketFactory())</b>
+<b class="fc">&nbsp;                .build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final MetricRegistry metricsRegistry;
+&nbsp;    private final String name;
+&nbsp;
+&nbsp;    InstrumentedHttpClientConnectionManager(final MetricRegistry metricRegistry,
+&nbsp;                                            final String name,
+&nbsp;                                            final HttpClientConnectionOperator httpClientConnectionOperator,
+&nbsp;                                            final PoolConcurrencyPolicy poolConcurrencyPolicy,
+&nbsp;                                            final PoolReusePolicy poolReusePolicy,
+&nbsp;                                            final TimeValue timeToLive,
+&nbsp;                                            final HttpConnectionFactory&lt;ManagedHttpClientConnection&gt; connFactory) {
+&nbsp;
+<b class="fc">&nbsp;        super(httpClientConnectionOperator, poolConcurrencyPolicy, poolReusePolicy, timeToLive, connFactory);</b>
+<b class="fc">&nbsp;        this.metricsRegistry = requireNonNull(metricRegistry, &quot;metricRegistry&quot;);</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+&nbsp;
+&nbsp;        // this acquires a lock on the connection pool; remove if contention sucks
+<b class="fc">&nbsp;        metricRegistry.registerGauge(name(METRICS_PREFIX, name, &quot;available-connections&quot;),</b>
+&nbsp;                () -&gt; {
+<b class="fc">&nbsp;                    return getTotalStats().getAvailable();</b>
+&nbsp;                });
+&nbsp;        // this acquires a lock on the connection pool; remove if contention sucks
+<b class="fc">&nbsp;        metricRegistry.registerGauge(name(METRICS_PREFIX, name, &quot;leased-connections&quot;),</b>
+<b class="fc">&nbsp;                () -&gt; getTotalStats().getLeased());</b>
+&nbsp;        // this acquires a lock on the connection pool; remove if contention sucks
+<b class="fc">&nbsp;        metricRegistry.registerGauge(name(METRICS_PREFIX, name, &quot;max-connections&quot;),</b>
+<b class="fc">&nbsp;                () -&gt; getTotalStats().getMax()</b>
+&nbsp;        );
+&nbsp;        // this acquires a lock on the connection pool; remove if contention sucks
+<b class="fc">&nbsp;        metricRegistry.registerGauge(name(METRICS_PREFIX, name, &quot;pending-connections&quot;),</b>
+<b class="fc">&nbsp;                () -&gt; getTotalStats().getPending());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@inheritDoc}
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void close() {
+<b class="fc">&nbsp;        close(CloseMode.GRACEFUL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@inheritDoc}
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void close(CloseMode closeMode) {
+<b class="fc">&nbsp;        super.close(closeMode);</b>
+<b class="fc">&nbsp;        metricsRegistry.remove(name(METRICS_PREFIX, name, &quot;available-connections&quot;));</b>
+<b class="fc">&nbsp;        metricsRegistry.remove(name(METRICS_PREFIX, name, &quot;leased-connections&quot;));</b>
+<b class="fc">&nbsp;        metricsRegistry.remove(name(METRICS_PREFIX, name, &quot;max-connections&quot;));</b>
+<b class="fc">&nbsp;        metricsRegistry.remove(name(METRICS_PREFIX, name, &quot;pending-connections&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Builder builder(MetricRegistry metricsRegistry) {
+<b class="fc">&nbsp;        return new Builder().metricsRegistry(metricsRegistry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class Builder {
+&nbsp;        private MetricRegistry metricsRegistry;
+&nbsp;        private String name;
+&nbsp;        private HttpClientConnectionOperator httpClientConnectionOperator;
+<b class="fc">&nbsp;        private Registry&lt;ConnectionSocketFactory&gt; socketFactoryRegistry = getDefaultRegistry();</b>
+&nbsp;        private SchemePortResolver schemePortResolver;
+&nbsp;        private DnsResolver dnsResolver;
+&nbsp;        private PoolConcurrencyPolicy poolConcurrencyPolicy;
+&nbsp;        private PoolReusePolicy poolReusePolicy;
+<b class="fc">&nbsp;        private TimeValue timeToLive = TimeValue.NEG_ONE_MILLISECOND;</b>
+&nbsp;        private HttpConnectionFactory&lt;ManagedHttpClientConnection&gt; connFactory;
+&nbsp;
+<b class="fc">&nbsp;        Builder() {</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder metricsRegistry(MetricRegistry metricRegistry) {
+<b class="fc">&nbsp;            this.metricsRegistry = requireNonNull(metricRegistry, &quot;metricRegistry&quot;);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder name(final String name) {
+<b class="fc">&nbsp;            this.name = name;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder socketFactoryRegistry(Registry&lt;ConnectionSocketFactory&gt; socketFactoryRegistry) {
+<b class="nc">&nbsp;            this.socketFactoryRegistry = requireNonNull(socketFactoryRegistry, &quot;socketFactoryRegistry&quot;);</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder connFactory(HttpConnectionFactory&lt;ManagedHttpClientConnection&gt; connFactory) {
+<b class="nc">&nbsp;            this.connFactory = connFactory;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder schemePortResolver(SchemePortResolver schemePortResolver) {
+<b class="nc">&nbsp;            this.schemePortResolver = schemePortResolver;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder dnsResolver(DnsResolver dnsResolver) {
+<b class="nc">&nbsp;            this.dnsResolver = dnsResolver;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder timeToLive(TimeValue timeToLive) {
+<b class="nc">&nbsp;            this.timeToLive = timeToLive;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder httpClientConnectionOperator(HttpClientConnectionOperator httpClientConnectionOperator) {
+<b class="nc">&nbsp;            this.httpClientConnectionOperator = httpClientConnectionOperator;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder poolConcurrencyPolicy(PoolConcurrencyPolicy poolConcurrencyPolicy) {
+<b class="nc">&nbsp;            this.poolConcurrencyPolicy = poolConcurrencyPolicy;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder poolReusePolicy(PoolReusePolicy poolReusePolicy) {
+<b class="nc">&nbsp;            this.poolReusePolicy = poolReusePolicy;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public InstrumentedHttpClientConnectionManager build() {
+<b class="fc">&nbsp;            if (httpClientConnectionOperator == null) {</b>
+<b class="fc">&nbsp;                httpClientConnectionOperator = new DefaultHttpClientConnectionOperator(</b>
+&nbsp;                        socketFactoryRegistry,
+&nbsp;                        schemePortResolver,
+&nbsp;                        dnsResolver);
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            return new InstrumentedHttpClientConnectionManager(</b>
+&nbsp;                    metricsRegistry,
+&nbsp;                    name,
+&nbsp;                    httpClientConnectionOperator,
+&nbsp;                    poolConcurrencyPolicy,
+&nbsp;                    poolReusePolicy,
+&nbsp;                    timeToLive,
+&nbsp;                    connFactory);
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-27 23:52</div>
+</div>
+</body>
+</html>

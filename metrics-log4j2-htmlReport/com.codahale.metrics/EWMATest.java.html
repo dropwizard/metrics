@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EWMATest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">EWMATest.java</span></div><h1>EWMATest.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import org.junit.Test;
+
+import java.util.concurrent.TimeUnit;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.offset;
+
+<span class="nc" id="L10">public class EWMATest {</span>
+    @Test
+    public void aOneMinuteEWMAWithAValueOfThree() {
+<span class="nc" id="L13">        final EWMA ewma = EWMA.oneMinuteEWMA();</span>
+<span class="nc" id="L14">        ewma.update(3);</span>
+<span class="nc" id="L15">        ewma.tick();</span>
+
+<span class="nc" id="L17">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.6, offset(0.000001));</span>
+
+<span class="nc" id="L19">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L21">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.22072766, offset(0.000001));</span>
+
+<span class="nc" id="L23">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L25">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.08120117, offset(0.000001));</span>
+
+<span class="nc" id="L27">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L29">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.02987224, offset(0.000001));</span>
+
+<span class="nc" id="L31">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L33">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.01098938, offset(0.000001));</span>
+
+<span class="nc" id="L35">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L37">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.00404277, offset(0.000001));</span>
+
+<span class="nc" id="L39">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L41">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.00148725, offset(0.000001));</span>
+
+<span class="nc" id="L43">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L45">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.00054713, offset(0.000001));</span>
+
+<span class="nc" id="L47">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L49">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.00020128, offset(0.000001));</span>
+
+<span class="nc" id="L51">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L53">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.00007405, offset(0.000001));</span>
+
+<span class="nc" id="L55">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L57">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.00002724, offset(0.000001));</span>
+
+<span class="nc" id="L59">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L61">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.00001002, offset(0.000001));</span>
+
+<span class="nc" id="L63">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L65">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.00000369, offset(0.000001));</span>
+
+<span class="nc" id="L67">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L69">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.00000136, offset(0.000001));</span>
+
+<span class="nc" id="L71">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L73">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.00000050, offset(0.000001));</span>
+
+<span class="nc" id="L75">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L77">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.00000018, offset(0.000001));</span>
+<span class="nc" id="L78">    }</span>
+
+    @Test
+    public void aFiveMinuteEWMAWithAValueOfThree() {
+<span class="nc" id="L82">        final EWMA ewma = EWMA.fiveMinuteEWMA();</span>
+<span class="nc" id="L83">        ewma.update(3);</span>
+<span class="nc" id="L84">        ewma.tick();</span>
+
+<span class="nc" id="L86">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.6, offset(0.000001));</span>
+
+<span class="nc" id="L88">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L90">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.49123845, offset(0.000001));</span>
+
+<span class="nc" id="L92">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L94">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.40219203, offset(0.000001));</span>
+
+<span class="nc" id="L96">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L98">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.32928698, offset(0.000001));</span>
+
+<span class="nc" id="L100">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L102">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.26959738, offset(0.000001));</span>
+
+<span class="nc" id="L104">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L106">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.22072766, offset(0.000001));</span>
+
+<span class="nc" id="L108">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L110">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.18071653, offset(0.000001));</span>
+
+<span class="nc" id="L112">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L114">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.14795818, offset(0.000001));</span>
+
+<span class="nc" id="L116">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L118">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.12113791, offset(0.000001));</span>
+
+<span class="nc" id="L120">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L122">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.09917933, offset(0.000001));</span>
+
+<span class="nc" id="L124">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L126">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.08120117, offset(0.000001));</span>
+
+<span class="nc" id="L128">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L130">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.06648190, offset(0.000001));</span>
+
+<span class="nc" id="L132">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L134">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.05443077, offset(0.000001));</span>
+
+<span class="nc" id="L136">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L138">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.04456415, offset(0.000001));</span>
+
+<span class="nc" id="L140">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L142">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.03648604, offset(0.000001));</span>
+
+<span class="nc" id="L144">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L146">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.02987224, offset(0.000001));</span>
+<span class="nc" id="L147">    }</span>
+
+    @Test
+    public void aFifteenMinuteEWMAWithAValueOfThree() {
+<span class="nc" id="L151">        final EWMA ewma = EWMA.fifteenMinuteEWMA();</span>
+<span class="nc" id="L152">        ewma.update(3);</span>
+<span class="nc" id="L153">        ewma.tick();</span>
+
+<span class="nc" id="L155">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.6, offset(0.000001));</span>
+
+<span class="nc" id="L157">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L159">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.56130419, offset(0.000001));</span>
+
+<span class="nc" id="L161">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L163">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.52510399, offset(0.000001));</span>
+
+<span class="nc" id="L165">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L167">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.49123845, offset(0.000001));</span>
+
+<span class="nc" id="L169">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L171">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.45955700, offset(0.000001));</span>
+
+<span class="nc" id="L173">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L175">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.42991879, offset(0.000001));</span>
+
+<span class="nc" id="L177">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L179">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.40219203, offset(0.000001));</span>
+
+<span class="nc" id="L181">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L183">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.37625345, offset(0.000001));</span>
+
+<span class="nc" id="L185">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L187">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.35198773, offset(0.000001));</span>
+
+<span class="nc" id="L189">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L191">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.32928698, offset(0.000001));</span>
+
+<span class="nc" id="L193">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L195">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.30805027, offset(0.000001));</span>
+
+<span class="nc" id="L197">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L199">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.28818318, offset(0.000001));</span>
+
+<span class="nc" id="L201">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L203">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.26959738, offset(0.000001));</span>
+
+<span class="nc" id="L205">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L207">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.25221023, offset(0.000001));</span>
+
+<span class="nc" id="L209">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L211">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.23594443, offset(0.000001));</span>
+
+<span class="nc" id="L213">        elapseMinute(ewma);</span>
+
+<span class="nc" id="L215">        assertThat(ewma.getRate(TimeUnit.SECONDS)).isEqualTo(0.22072766, offset(0.000001));</span>
+<span class="nc" id="L216">    }</span>
+
+
+    private void elapseMinute(EWMA ewma) {
+<span class="nc bnc" id="L220" title="All 2 branches missed.">        for (int i = 1; i &lt;= 12; i++) {</span>
+<span class="nc" id="L221">            ewma.tick();</span>
+        }
+<span class="nc" id="L223">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

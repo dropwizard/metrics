@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Slf4jReporter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">Slf4jReporter.java</span></div><h1>Slf4jReporter.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import java.util.Collections;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
+import static com.codahale.metrics.MetricAttribute.COUNT;
+import static com.codahale.metrics.MetricAttribute.M15_RATE;
+import static com.codahale.metrics.MetricAttribute.M1_RATE;
+import static com.codahale.metrics.MetricAttribute.M5_RATE;
+import static com.codahale.metrics.MetricAttribute.MAX;
+import static com.codahale.metrics.MetricAttribute.MEAN;
+import static com.codahale.metrics.MetricAttribute.MEAN_RATE;
+import static com.codahale.metrics.MetricAttribute.MIN;
+import static com.codahale.metrics.MetricAttribute.P50;
+import static com.codahale.metrics.MetricAttribute.P75;
+import static com.codahale.metrics.MetricAttribute.P95;
+import static com.codahale.metrics.MetricAttribute.P98;
+import static com.codahale.metrics.MetricAttribute.P99;
+import static com.codahale.metrics.MetricAttribute.P999;
+import static com.codahale.metrics.MetricAttribute.STDDEV;
+
+/**
+ * A reporter class for logging metrics values to a SLF4J {@link Logger} periodically, similar to
+ * {@link ConsoleReporter} or {@link CsvReporter}, but using the SLF4J framework instead. It also
+ * supports specifying a {@link Marker} instance that can be used by custom appenders and filters
+ * for the bound logging toolkit to further process metrics reports.
+ */
+public class Slf4jReporter extends ScheduledReporter {
+    /**
+     * Returns a new {@link Builder} for {@link Slf4jReporter}.
+     *
+     * @param registry the registry to report
+     * @return a {@link Builder} instance for a {@link Slf4jReporter}
+     */
+    public static Builder forRegistry(MetricRegistry registry) {
+<span class="nc" id="L45">        return new Builder(registry);</span>
+    }
+
+<span class="nc" id="L48">    public enum LoggingLevel { TRACE, DEBUG, INFO, WARN, ERROR }</span>
+
+    /**
+     * A builder for {@link Slf4jReporter} instances. Defaults to logging to {@code metrics}, not
+     * using a marker, converting rates to events/second, converting durations to milliseconds, and
+     * not filtering metrics.
+     */
+    public static class Builder {
+        private final MetricRegistry registry;
+        private Logger logger;
+        private LoggingLevel loggingLevel;
+        private Marker marker;
+        private String prefix;
+        private TimeUnit rateUnit;
+        private TimeUnit durationUnit;
+        private MetricFilter filter;
+        private ScheduledExecutorService executor;
+        private boolean shutdownExecutorOnStop;
+        private Set&lt;MetricAttribute&gt; disabledMetricAttributes;
+
+<span class="nc" id="L68">        private Builder(MetricRegistry registry) {</span>
+<span class="nc" id="L69">            this.registry = registry;</span>
+<span class="nc" id="L70">            this.logger = LoggerFactory.getLogger(&quot;metrics&quot;);</span>
+<span class="nc" id="L71">            this.marker = null;</span>
+<span class="nc" id="L72">            this.prefix = &quot;&quot;;</span>
+<span class="nc" id="L73">            this.rateUnit = TimeUnit.SECONDS;</span>
+<span class="nc" id="L74">            this.durationUnit = TimeUnit.MILLISECONDS;</span>
+<span class="nc" id="L75">            this.filter = MetricFilter.ALL;</span>
+<span class="nc" id="L76">            this.loggingLevel = LoggingLevel.INFO;</span>
+<span class="nc" id="L77">            this.executor = null;</span>
+<span class="nc" id="L78">            this.shutdownExecutorOnStop = true;</span>
+<span class="nc" id="L79">            this.disabledMetricAttributes = Collections.emptySet();</span>
+<span class="nc" id="L80">        }</span>
+
+        /**
+         * Specifies whether or not, the executor (used for reporting) will be stopped with same time with reporter.
+         * Default value is true.
+         * Setting this parameter to false, has the sense in combining with providing external managed executor via {@link #scheduleOn(ScheduledExecutorService)}.
+         *
+         * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
+         * @return {@code this}
+         */
+        public Builder shutdownExecutorOnStop(boolean shutdownExecutorOnStop) {
+<span class="nc" id="L91">            this.shutdownExecutorOnStop = shutdownExecutorOnStop;</span>
+<span class="nc" id="L92">            return this;</span>
+        }
+
+        /**
+         * Specifies the executor to use while scheduling reporting of metrics.
+         * Default value is null.
+         * Null value leads to executor will be auto created on start.
+         *
+         * @param executor the executor to use while scheduling reporting of metrics.
+         * @return {@code this}
+         */
+        public Builder scheduleOn(ScheduledExecutorService executor) {
+<span class="nc" id="L104">            this.executor = executor;</span>
+<span class="nc" id="L105">            return this;</span>
+        }
+
+        /**
+         * Log metrics to the given logger.
+         *
+         * @param logger an SLF4J {@link Logger}
+         * @return {@code this}
+         */
+        public Builder outputTo(Logger logger) {
+<span class="nc" id="L115">            this.logger = logger;</span>
+<span class="nc" id="L116">            return this;</span>
+        }
+
+        /**
+         * Mark all logged metrics with the given marker.
+         *
+         * @param marker an SLF4J {@link Marker}
+         * @return {@code this}
+         */
+        public Builder markWith(Marker marker) {
+<span class="nc" id="L126">            this.marker = marker;</span>
+<span class="nc" id="L127">            return this;</span>
+        }
+
+        /**
+         * Prefix all metric names with the given string.
+         *
+         * @param prefix the prefix for all metric names
+         * @return {@code this}
+         */
+        public Builder prefixedWith(String prefix) {
+<span class="nc" id="L137">            this.prefix = prefix;</span>
+<span class="nc" id="L138">            return this;</span>
+        }
+
+        /**
+         * Convert rates to the given time unit.
+         *
+         * @param rateUnit a unit of time
+         * @return {@code this}
+         */
+        public Builder convertRatesTo(TimeUnit rateUnit) {
+<span class="nc" id="L148">            this.rateUnit = rateUnit;</span>
+<span class="nc" id="L149">            return this;</span>
+        }
+
+        /**
+         * Convert durations to the given time unit.
+         *
+         * @param durationUnit a unit of time
+         * @return {@code this}
+         */
+        public Builder convertDurationsTo(TimeUnit durationUnit) {
+<span class="nc" id="L159">            this.durationUnit = durationUnit;</span>
+<span class="nc" id="L160">            return this;</span>
+        }
+
+        /**
+         * Only report metrics which match the given filter.
+         *
+         * @param filter a {@link MetricFilter}
+         * @return {@code this}
+         */
+        public Builder filter(MetricFilter filter) {
+<span class="nc" id="L170">            this.filter = filter;</span>
+<span class="nc" id="L171">            return this;</span>
+        }
+
+        /**
+         * Use Logging Level when reporting.
+         *
+         * @param loggingLevel a (@link Slf4jReporter.LoggingLevel}
+         * @return {@code this}
+         */
+        public Builder withLoggingLevel(LoggingLevel loggingLevel) {
+<span class="nc" id="L181">            this.loggingLevel = loggingLevel;</span>
+<span class="nc" id="L182">            return this;</span>
+        }
+
+        /**
+         * Don't report the passed metric attributes for all metrics (e.g. &quot;p999&quot;, &quot;stddev&quot; or &quot;m15&quot;).
+         * See {@link MetricAttribute}.
+         *
+         * @param disabledMetricAttributes a set of {@link MetricAttribute}
+         * @return {@code this}
+         */
+        public Builder disabledMetricAttributes(Set&lt;MetricAttribute&gt; disabledMetricAttributes) {
+<span class="nc" id="L193">            this.disabledMetricAttributes = disabledMetricAttributes;</span>
+<span class="nc" id="L194">            return this;</span>
+        }
+
+        /**
+         * Builds a {@link Slf4jReporter} with the given properties.
+         *
+         * @return a {@link Slf4jReporter}
+         */
+        public Slf4jReporter build() {
+            LoggerProxy loggerProxy;
+<span class="nc bnc" id="L204" title="All 5 branches missed.">            switch (loggingLevel) {</span>
+                case TRACE:
+<span class="nc" id="L206">                    loggerProxy = new TraceLoggerProxy(logger);</span>
+<span class="nc" id="L207">                    break;</span>
+                case INFO:
+<span class="nc" id="L209">                    loggerProxy = new InfoLoggerProxy(logger);</span>
+<span class="nc" id="L210">                    break;</span>
+                case WARN:
+<span class="nc" id="L212">                    loggerProxy = new WarnLoggerProxy(logger);</span>
+<span class="nc" id="L213">                    break;</span>
+                case ERROR:
+<span class="nc" id="L215">                    loggerProxy = new ErrorLoggerProxy(logger);</span>
+<span class="nc" id="L216">                    break;</span>
+                default:
+                case DEBUG:
+<span class="nc" id="L219">                    loggerProxy = new DebugLoggerProxy(logger);</span>
+                    break;
+            }
+<span class="nc" id="L222">            return new Slf4jReporter(registry, loggerProxy, marker, prefix, rateUnit, durationUnit, filter, executor,</span>
+                    shutdownExecutorOnStop, disabledMetricAttributes);
+        }
+    }
+
+    private final LoggerProxy loggerProxy;
+    private final Marker marker;
+    private final String prefix;
+
+    private Slf4jReporter(MetricRegistry registry,
+                          LoggerProxy loggerProxy,
+                          Marker marker,
+                          String prefix,
+                          TimeUnit rateUnit,
+                          TimeUnit durationUnit,
+                          MetricFilter filter,
+                          ScheduledExecutorService executor,
+                          boolean shutdownExecutorOnStop,
+                          Set&lt;MetricAttribute&gt; disabledMetricAttributes) {
+<span class="nc" id="L241">        super(registry, &quot;logger-reporter&quot;, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,</span>
+                disabledMetricAttributes);
+<span class="nc" id="L243">        this.loggerProxy = loggerProxy;</span>
+<span class="nc" id="L244">        this.marker = marker;</span>
+<span class="nc" id="L245">        this.prefix = prefix;</span>
+<span class="nc" id="L246">    }</span>
+
+    @Override
+    @SuppressWarnings(&quot;rawtypes&quot;)
+    public void report(SortedMap&lt;String, Gauge&gt; gauges,
+                       SortedMap&lt;String, Counter&gt; counters,
+                       SortedMap&lt;String, Histogram&gt; histograms,
+                       SortedMap&lt;String, Meter&gt; meters,
+                       SortedMap&lt;String, Timer&gt; timers) {
+<span class="nc bnc" id="L255" title="All 2 branches missed.">        if (loggerProxy.isEnabled(marker)) {</span>
+<span class="nc" id="L256">            StringBuilder b = new StringBuilder();</span>
+<span class="nc bnc" id="L257" title="All 2 branches missed.">            for (Entry&lt;String, Gauge&gt; entry : gauges.entrySet()) {</span>
+<span class="nc" id="L258">                logGauge(b, entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L259">            }</span>
+
+<span class="nc bnc" id="L261" title="All 2 branches missed.">            for (Entry&lt;String, Counter&gt; entry : counters.entrySet()) {</span>
+<span class="nc" id="L262">                logCounter(b, entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L263">            }</span>
+
+<span class="nc bnc" id="L265" title="All 2 branches missed.">            for (Entry&lt;String, Histogram&gt; entry : histograms.entrySet()) {</span>
+<span class="nc" id="L266">                logHistogram(b, entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L267">            }</span>
+
+<span class="nc bnc" id="L269" title="All 2 branches missed.">            for (Entry&lt;String, Meter&gt; entry : meters.entrySet()) {</span>
+<span class="nc" id="L270">                logMeter(b, entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L271">            }</span>
+
+<span class="nc bnc" id="L273" title="All 2 branches missed.">            for (Entry&lt;String, Timer&gt; entry : timers.entrySet()) {</span>
+<span class="nc" id="L274">                logTimer(b, entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L275">            }</span>
+        }
+<span class="nc" id="L277">    }</span>
+
+    private void logTimer(StringBuilder b, String name, Timer timer) {
+<span class="nc" id="L280">        final Snapshot snapshot = timer.getSnapshot();</span>
+<span class="nc" id="L281">        b.setLength(0);</span>
+<span class="nc" id="L282">        b.append(&quot;type=TIMER&quot;);</span>
+<span class="nc" id="L283">        append(b, &quot;name&quot;, prefix(name));</span>
+<span class="nc" id="L284">        appendCountIfEnabled(b, timer);</span>
+<span class="nc" id="L285">        appendLongDurationIfEnabled(b, MIN, snapshot::getMin);</span>
+<span class="nc" id="L286">        appendLongDurationIfEnabled(b, MAX, snapshot::getMax);</span>
+<span class="nc" id="L287">        appendDoubleDurationIfEnabled(b, MEAN, snapshot::getMean);</span>
+<span class="nc" id="L288">        appendDoubleDurationIfEnabled(b, STDDEV, snapshot::getStdDev);</span>
+<span class="nc" id="L289">        appendDoubleDurationIfEnabled(b, P50, snapshot::getMedian);</span>
+<span class="nc" id="L290">        appendDoubleDurationIfEnabled(b, P75, snapshot::get75thPercentile);</span>
+<span class="nc" id="L291">        appendDoubleDurationIfEnabled(b, P95, snapshot::get95thPercentile);</span>
+<span class="nc" id="L292">        appendDoubleDurationIfEnabled(b, P98, snapshot::get98thPercentile);</span>
+<span class="nc" id="L293">        appendDoubleDurationIfEnabled(b, P99, snapshot::get99thPercentile);</span>
+<span class="nc" id="L294">        appendDoubleDurationIfEnabled(b, P999, snapshot::get999thPercentile);</span>
+<span class="nc" id="L295">        appendMetered(b, timer);</span>
+<span class="nc" id="L296">        append(b, &quot;rate_unit&quot;, getRateUnit());</span>
+<span class="nc" id="L297">        append(b, &quot;duration_unit&quot;, getDurationUnit());</span>
+<span class="nc" id="L298">        loggerProxy.log(marker, b.toString());</span>
+<span class="nc" id="L299">    }</span>
+
+    private void logMeter(StringBuilder b, String name, Meter meter) {
+<span class="nc" id="L302">        b.setLength(0);</span>
+<span class="nc" id="L303">        b.append(&quot;type=METER&quot;);</span>
+<span class="nc" id="L304">        append(b, &quot;name&quot;, prefix(name));</span>
+<span class="nc" id="L305">        appendCountIfEnabled(b, meter);</span>
+<span class="nc" id="L306">        appendMetered(b, meter);</span>
+<span class="nc" id="L307">        append(b, &quot;rate_unit&quot;, getRateUnit());</span>
+<span class="nc" id="L308">        loggerProxy.log(marker, b.toString());</span>
+<span class="nc" id="L309">    }</span>
+
+    private void logHistogram(StringBuilder b, String name, Histogram histogram) {
+<span class="nc" id="L312">        final Snapshot snapshot = histogram.getSnapshot();</span>
+<span class="nc" id="L313">        b.setLength(0);</span>
+<span class="nc" id="L314">        b.append(&quot;type=HISTOGRAM&quot;);</span>
+<span class="nc" id="L315">        append(b, &quot;name&quot;, prefix(name));</span>
+<span class="nc" id="L316">        appendCountIfEnabled(b, histogram);</span>
+<span class="nc" id="L317">        appendLongIfEnabled(b, MIN, snapshot::getMin);</span>
+<span class="nc" id="L318">        appendLongIfEnabled(b, MAX, snapshot::getMax);</span>
+<span class="nc" id="L319">        appendDoubleIfEnabled(b, MEAN, snapshot::getMean);</span>
+<span class="nc" id="L320">        appendDoubleIfEnabled(b, STDDEV, snapshot::getStdDev);</span>
+<span class="nc" id="L321">        appendDoubleIfEnabled(b, P50, snapshot::getMedian);</span>
+<span class="nc" id="L322">        appendDoubleIfEnabled(b, P75, snapshot::get75thPercentile);</span>
+<span class="nc" id="L323">        appendDoubleIfEnabled(b, P95, snapshot::get95thPercentile);</span>
+<span class="nc" id="L324">        appendDoubleIfEnabled(b, P98, snapshot::get98thPercentile);</span>
+<span class="nc" id="L325">        appendDoubleIfEnabled(b, P99, snapshot::get99thPercentile);</span>
+<span class="nc" id="L326">        appendDoubleIfEnabled(b, P999, snapshot::get999thPercentile);</span>
+<span class="nc" id="L327">        loggerProxy.log(marker, b.toString());</span>
+<span class="nc" id="L328">    }</span>
+
+    private void logCounter(StringBuilder b, String name, Counter counter) {
+<span class="nc" id="L331">        b.setLength(0);</span>
+<span class="nc" id="L332">        b.append(&quot;type=COUNTER&quot;);</span>
+<span class="nc" id="L333">        append(b, &quot;name&quot;, prefix(name));</span>
+<span class="nc" id="L334">        append(b, COUNT.getCode(), counter.getCount());</span>
+<span class="nc" id="L335">        loggerProxy.log(marker, b.toString());</span>
+<span class="nc" id="L336">    }</span>
+
+    private void logGauge(StringBuilder b, String name, Gauge&lt;?&gt; gauge) {
+<span class="nc" id="L339">        b.setLength(0);</span>
+<span class="nc" id="L340">        b.append(&quot;type=GAUGE&quot;);</span>
+<span class="nc" id="L341">        append(b, &quot;name&quot;, prefix(name));</span>
+<span class="nc" id="L342">        append(b, &quot;value&quot;, gauge.getValue());</span>
+<span class="nc" id="L343">        loggerProxy.log(marker, b.toString());</span>
+<span class="nc" id="L344">    }</span>
+
+    private void appendLongDurationIfEnabled(StringBuilder b, MetricAttribute metricAttribute,
+                                             Supplier&lt;Long&gt; durationSupplier) {
+<span class="nc bnc" id="L348" title="All 2 branches missed.">        if (!getDisabledMetricAttributes().contains(metricAttribute)) {</span>
+<span class="nc" id="L349">            append(b, metricAttribute.getCode(), convertDuration(durationSupplier.get()));</span>
+        }
+<span class="nc" id="L351">    }</span>
+
+    private void appendDoubleDurationIfEnabled(StringBuilder b, MetricAttribute metricAttribute,
+                                               Supplier&lt;Double&gt; durationSupplier) {
+<span class="nc bnc" id="L355" title="All 2 branches missed.">        if (!getDisabledMetricAttributes().contains(metricAttribute)) {</span>
+<span class="nc" id="L356">            append(b, metricAttribute.getCode(), convertDuration(durationSupplier.get()));</span>
+        }
+<span class="nc" id="L358">    }</span>
+
+    private void appendLongIfEnabled(StringBuilder b, MetricAttribute metricAttribute,
+                                     Supplier&lt;Long&gt; valueSupplier) {
+<span class="nc bnc" id="L362" title="All 2 branches missed.">        if (!getDisabledMetricAttributes().contains(metricAttribute)) {</span>
+<span class="nc" id="L363">            append(b, metricAttribute.getCode(), valueSupplier.get());</span>
+        }
+<span class="nc" id="L365">    }</span>
+
+    private void appendDoubleIfEnabled(StringBuilder b, MetricAttribute metricAttribute,
+                                       Supplier&lt;Double&gt; valueSupplier) {
+<span class="nc bnc" id="L369" title="All 2 branches missed.">        if (!getDisabledMetricAttributes().contains(metricAttribute)) {</span>
+<span class="nc" id="L370">            append(b, metricAttribute.getCode(), valueSupplier.get());</span>
+        }
+<span class="nc" id="L372">    }</span>
+
+    private void appendCountIfEnabled(StringBuilder b, Counting counting) {
+<span class="nc bnc" id="L375" title="All 2 branches missed.">        if (!getDisabledMetricAttributes().contains(COUNT)) {</span>
+<span class="nc" id="L376">            append(b, COUNT.getCode(), counting.getCount());</span>
+        }
+<span class="nc" id="L378">    }</span>
+
+    private void appendMetered(StringBuilder b, Metered meter) {
+<span class="nc" id="L381">        appendRateIfEnabled(b, M1_RATE, meter::getOneMinuteRate);</span>
+<span class="nc" id="L382">        appendRateIfEnabled(b, M5_RATE, meter::getFiveMinuteRate);</span>
+<span class="nc" id="L383">        appendRateIfEnabled(b, M15_RATE,  meter::getFifteenMinuteRate);</span>
+<span class="nc" id="L384">        appendRateIfEnabled(b, MEAN_RATE,  meter::getMeanRate);</span>
+<span class="nc" id="L385">    }</span>
+
+    private void appendRateIfEnabled(StringBuilder b, MetricAttribute metricAttribute, Supplier&lt;Double&gt; rateSupplier) {
+<span class="nc bnc" id="L388" title="All 2 branches missed.">        if (!getDisabledMetricAttributes().contains(metricAttribute)) {</span>
+<span class="nc" id="L389">            append(b, metricAttribute.getCode(), convertRate(rateSupplier.get()));</span>
+        }
+<span class="nc" id="L391">    }</span>
+
+    private void append(StringBuilder b, String key, long value) {
+<span class="nc" id="L394">        b.append(&quot;, &quot;).append(key).append('=').append(value);</span>
+<span class="nc" id="L395">    }</span>
+
+    private void append(StringBuilder b, String key, double value) {
+<span class="nc" id="L398">        b.append(&quot;, &quot;).append(key).append('=').append(value);</span>
+<span class="nc" id="L399">    }</span>
+
+    private void append(StringBuilder b, String key, String value) {
+<span class="nc" id="L402">        b.append(&quot;, &quot;).append(key).append('=').append(value);</span>
+<span class="nc" id="L403">    }</span>
+
+    private void append(StringBuilder b, String key, Object value) {
+<span class="nc" id="L406">        b.append(&quot;, &quot;).append(key).append('=').append(value);</span>
+<span class="nc" id="L407">    }</span>
+
+    @Override
+    protected String getRateUnit() {
+<span class="nc" id="L411">        return &quot;events/&quot; + super.getRateUnit();</span>
+    }
+
+    private String prefix(String... components) {
+<span class="nc" id="L415">        return MetricRegistry.name(prefix, components);</span>
+    }
+
+    /* private class to allow logger configuration */
+    static abstract class LoggerProxy {
+        protected final Logger logger;
+
+<span class="nc" id="L422">        public LoggerProxy(Logger logger) {</span>
+<span class="nc" id="L423">            this.logger = logger;</span>
+<span class="nc" id="L424">        }</span>
+
+        abstract void log(Marker marker, String format);
+
+        abstract boolean isEnabled(Marker marker);
+    }
+
+    /* private class to allow logger configuration */
+    private static class DebugLoggerProxy extends LoggerProxy {
+        public DebugLoggerProxy(Logger logger) {
+<span class="nc" id="L434">            super(logger);</span>
+<span class="nc" id="L435">        }</span>
+
+        @Override
+        public void log(Marker marker, String format) {
+<span class="nc" id="L439">            logger.debug(marker, format);</span>
+<span class="nc" id="L440">        }</span>
+
+        @Override
+        public boolean isEnabled(Marker marker) {
+<span class="nc" id="L444">            return logger.isDebugEnabled(marker);</span>
+        }
+    }
+
+    /* private class to allow logger configuration */
+    private static class TraceLoggerProxy extends LoggerProxy {
+        public TraceLoggerProxy(Logger logger) {
+<span class="nc" id="L451">            super(logger);</span>
+<span class="nc" id="L452">        }</span>
+
+        @Override
+        public void log(Marker marker, String format) {
+<span class="nc" id="L456">            logger.trace(marker, format);</span>
+<span class="nc" id="L457">        }</span>
+
+        @Override
+        public boolean isEnabled(Marker marker) {
+<span class="nc" id="L461">            return logger.isTraceEnabled(marker);</span>
+        }
+    }
+
+    /* private class to allow logger configuration */
+    private static class InfoLoggerProxy extends LoggerProxy {
+        public InfoLoggerProxy(Logger logger) {
+<span class="nc" id="L468">            super(logger);</span>
+<span class="nc" id="L469">        }</span>
+
+        @Override
+        public void log(Marker marker, String format) {
+<span class="nc" id="L473">            logger.info(marker, format);</span>
+<span class="nc" id="L474">        }</span>
+
+        @Override
+        public boolean isEnabled(Marker marker) {
+<span class="nc" id="L478">            return logger.isInfoEnabled(marker);</span>
+        }
+    }
+
+    /* private class to allow logger configuration */
+    private static class WarnLoggerProxy extends LoggerProxy {
+        public WarnLoggerProxy(Logger logger) {
+<span class="nc" id="L485">            super(logger);</span>
+<span class="nc" id="L486">        }</span>
+
+        @Override
+        public void log(Marker marker, String format) {
+<span class="nc" id="L490">            logger.warn(marker, format);</span>
+<span class="nc" id="L491">        }</span>
+
+        @Override
+        public boolean isEnabled(Marker marker) {
+<span class="nc" id="L495">            return logger.isWarnEnabled(marker);</span>
+        }
+    }
+
+    /* private class to allow logger configuration */
+    private static class ErrorLoggerProxy extends LoggerProxy {
+        public ErrorLoggerProxy(Logger logger) {
+<span class="nc" id="L502">            super(logger);</span>
+<span class="nc" id="L503">        }</span>
+
+        @Override
+        public void log(Marker marker, String format) {
+<span class="nc" id="L507">            logger.error(marker, format);</span>
+<span class="nc" id="L508">        }</span>
+
+        @Override
+        public boolean isEnabled(Marker marker) {
+<span class="nc" id="L512">            return logger.isErrorEnabled(marker);</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

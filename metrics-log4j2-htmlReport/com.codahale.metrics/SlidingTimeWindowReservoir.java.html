@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SlidingTimeWindowReservoir.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">SlidingTimeWindowReservoir.java</span></div><h1>SlidingTimeWindowReservoir.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+
+/**
+ * A {@link Reservoir} implementation backed by a sliding window that stores only the measurements made
+ * in the last {@code N} seconds (or other time unit).
+ */
+public class SlidingTimeWindowReservoir implements Reservoir {
+    // allow for this many duplicate ticks before overwriting measurements
+    private static final int COLLISION_BUFFER = 256;
+    // only trim on updating once every N
+    private static final int TRIM_THRESHOLD = 256;
+    // offsets the front of the time window for the purposes of clearing the buffer in trim
+<span class="nc" id="L17">    private static final long CLEAR_BUFFER = TimeUnit.HOURS.toNanos(1) * COLLISION_BUFFER;</span>
+
+    private final Clock clock;
+    private final ConcurrentSkipListMap&lt;Long, Long&gt; measurements;
+    private final long window;
+    private final AtomicLong lastTick;
+    private final AtomicLong count;
+    private final long startTick;
+
+    /**
+     * Creates a new {@link SlidingTimeWindowReservoir} with the given window of time.
+     *
+     * @param window     the window of time
+     * @param windowUnit the unit of {@code window}
+     */
+    public SlidingTimeWindowReservoir(long window, TimeUnit windowUnit) {
+<span class="nc" id="L33">        this(window, windowUnit, Clock.defaultClock());</span>
+<span class="nc" id="L34">    }</span>
+
+    /**
+     * Creates a new {@link SlidingTimeWindowReservoir} with the given clock and window of time.
+     *
+     * @param window     the window of time
+     * @param windowUnit the unit of {@code window}
+     * @param clock      the {@link Clock} to use
+     */
+<span class="nc" id="L43">    public SlidingTimeWindowReservoir(long window, TimeUnit windowUnit, Clock clock) {</span>
+<span class="nc" id="L44">        this.startTick = clock.getTick();</span>
+<span class="nc" id="L45">        this.clock = clock;</span>
+<span class="nc" id="L46">        this.measurements = new ConcurrentSkipListMap&lt;&gt;();</span>
+<span class="nc" id="L47">        this.window = windowUnit.toNanos(window) * COLLISION_BUFFER;</span>
+<span class="nc" id="L48">        this.lastTick = new AtomicLong((clock.getTick() - startTick) * COLLISION_BUFFER);</span>
+<span class="nc" id="L49">        this.count = new AtomicLong();</span>
+<span class="nc" id="L50">    }</span>
+
+    @Override
+    public int size() {
+<span class="nc" id="L54">        trim();</span>
+<span class="nc" id="L55">        return measurements.size();</span>
+    }
+
+    @Override
+    public void update(long value) {
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (count.incrementAndGet() % TRIM_THRESHOLD == 0) {</span>
+<span class="nc" id="L61">            trim();</span>
+        }
+<span class="nc" id="L63">        measurements.put(getTick(), value);</span>
+<span class="nc" id="L64">    }</span>
+
+    @Override
+    public Snapshot getSnapshot() {
+<span class="nc" id="L68">        trim();</span>
+<span class="nc" id="L69">        return new UniformSnapshot(measurements.values());</span>
+    }
+
+    private long getTick() {
+        for ( ;; ) {
+<span class="nc" id="L74">            final long oldTick = lastTick.get();</span>
+<span class="nc" id="L75">            final long tick = (clock.getTick() - startTick) * COLLISION_BUFFER;</span>
+            // ensure the tick is strictly incrementing even if there are duplicate ticks
+<span class="nc bnc" id="L77" title="All 2 branches missed.">            final long newTick = tick - oldTick &gt; 0 ? tick : oldTick + 1;</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">            if (lastTick.compareAndSet(oldTick, newTick)) {</span>
+<span class="nc" id="L79">                return newTick;</span>
+            }
+<span class="nc" id="L81">        }</span>
+    }
+
+    private void trim() {
+<span class="nc" id="L85">        final long now = getTick();</span>
+<span class="nc" id="L86">        final long windowStart = now - window;</span>
+<span class="nc" id="L87">        final long windowEnd = now + CLEAR_BUFFER;</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        if (windowStart &lt; windowEnd) {</span>
+<span class="nc" id="L89">            measurements.headMap(windowStart).clear();</span>
+<span class="nc" id="L90">            measurements.tailMap(windowEnd).clear();</span>
+        } else {
+<span class="nc" id="L92">            measurements.subMap(windowEnd, windowStart).clear();</span>
+        }
+<span class="nc" id="L94">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

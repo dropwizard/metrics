@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HistogramTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">HistogramTest.java</span></div><h1>HistogramTest.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+<span class="nc" id="L10">public class HistogramTest {</span>
+<span class="nc" id="L11">    private final Reservoir reservoir = mock(Reservoir.class);</span>
+<span class="nc" id="L12">    private final Histogram histogram = new Histogram(reservoir);</span>
+
+    @Test
+    public void updatesTheCountOnUpdates() {
+<span class="nc" id="L16">        assertThat(histogram.getCount())</span>
+<span class="nc" id="L17">                .isZero();</span>
+
+<span class="nc" id="L19">        histogram.update(1);</span>
+
+<span class="nc" id="L21">        assertThat(histogram.getCount())</span>
+<span class="nc" id="L22">                .isEqualTo(1);</span>
+<span class="nc" id="L23">    }</span>
+
+    @Test
+    public void returnsTheSnapshotFromTheReservoir() {
+<span class="nc" id="L27">        final Snapshot snapshot = mock(Snapshot.class);</span>
+<span class="nc" id="L28">        when(reservoir.getSnapshot()).thenReturn(snapshot);</span>
+
+<span class="nc" id="L30">        assertThat(histogram.getSnapshot())</span>
+<span class="nc" id="L31">                .isEqualTo(snapshot);</span>
+<span class="nc" id="L32">    }</span>
+
+    @Test
+    public void updatesTheReservoir() throws Exception {
+<span class="nc" id="L36">        histogram.update(1);</span>
+
+<span class="nc" id="L38">        verify(reservoir).update(1);</span>
+<span class="nc" id="L39">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Histogram.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">Histogram.java</span></div><h1>Histogram.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import java.util.concurrent.atomic.LongAdder;
+
+/**
+ * A metric which calculates the distribution of a value.
+ *
+ * @see &lt;a href=&quot;http://www.johndcook.com/standard_deviation.html&quot;&gt;Accurately computing running
+ * variance&lt;/a&gt;
+ */
+public class Histogram implements Metric, Sampling, Counting {
+    private final Reservoir reservoir;
+    private final LongAdder count;
+
+    /**
+     * Creates a new {@link Histogram} with the given reservoir.
+     *
+     * @param reservoir the reservoir to create a histogram from
+     */
+<span class="nc" id="L20">    public Histogram(Reservoir reservoir) {</span>
+<span class="nc" id="L21">        this.reservoir = reservoir;</span>
+<span class="nc" id="L22">        this.count = new LongAdder();</span>
+<span class="nc" id="L23">    }</span>
+
+    /**
+     * Adds a recorded value.
+     *
+     * @param value the length of the value
+     */
+    public void update(int value) {
+<span class="nc" id="L31">        update((long) value);</span>
+<span class="nc" id="L32">    }</span>
+
+    /**
+     * Adds a recorded value.
+     *
+     * @param value the length of the value
+     */
+    public void update(long value) {
+<span class="nc" id="L40">        count.increment();</span>
+<span class="nc" id="L41">        reservoir.update(value);</span>
+<span class="nc" id="L42">    }</span>
+
+    /**
+     * Returns the number of values recorded.
+     *
+     * @return the number of values recorded
+     */
+    @Override
+    public long getCount() {
+<span class="nc" id="L51">        return count.sum();</span>
+    }
+
+    @Override
+    public Snapshot getSnapshot() {
+<span class="nc" id="L56">        return reservoir.getSnapshot();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

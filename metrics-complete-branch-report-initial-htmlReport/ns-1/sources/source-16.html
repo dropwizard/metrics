@@ -1,0 +1,275 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > MetricRegistryListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics</a>
+</div>
+
+<h1>Coverage Summary for Class: MetricRegistryListener (com.codahale.metrics)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+  <tr>
+    <td class="name">MetricRegistryListener$Base</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MetricRegistryListener$MockitoMock$bBAqK8Rp</td>
+  </tr>
+  <tr>
+    <td class="name">MetricRegistryListener$MockitoMock$bBAqK8Rp$auxiliary$kc3WhlPd</td>
+  </tr>
+  <tr>
+    <td class="name">MetricRegistryListener$MockitoMock$bBAqK8Rp$auxiliary$WxcZc5Nx</td>
+  </tr>
+  <tr>
+    <td class="name">MetricRegistryListener$MockitoMock$EMx0XVUf</td>
+  </tr>
+  <tr>
+    <td class="name">MetricRegistryListener$MockitoMock$EMx0XVUf$auxiliary$krK504rI</td>
+  </tr>
+  <tr>
+    <td class="name">MetricRegistryListener$MockitoMock$EMx0XVUf$auxiliary$wKr6IMOU</td>
+  </tr>
+  <tr>
+    <td class="name">MetricRegistryListener$MockitoMock$tHZUiESM</td>
+  </tr>
+  <tr>
+    <td class="name">MetricRegistryListener$MockitoMock$tHZUiESM$auxiliary$9DOHHjXd</td>
+  </tr>
+  <tr>
+    <td class="name">MetricRegistryListener$MockitoMock$tHZUiESM$auxiliary$ztuf8DfG</td>
+  </tr>
+  <tr>
+    <td class="name">MetricRegistryListener$MockitoMock$YQLkFUNB</td>
+  </tr>
+  <tr>
+    <td class="name">MetricRegistryListener$MockitoMock$YQLkFUNB$auxiliary$hFZQcRWP</td>
+  </tr>
+  <tr>
+    <td class="name">MetricRegistryListener$MockitoMock$YQLkFUNB$auxiliary$Z8XAJUEo</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics;
+&nbsp;
+&nbsp;import java.util.EventListener;
+&nbsp;
+&nbsp;/**
+&nbsp; * Listeners for events from the registry.  Listeners must be thread-safe.
+&nbsp; */
+&nbsp;public interface MetricRegistryListener extends EventListener {
+&nbsp;    /**
+&nbsp;     * A no-op implementation of {@link MetricRegistryListener}.
+&nbsp;     */
+<b class="fc">&nbsp;    abstract class Base implements MetricRegistryListener {</b>
+&nbsp;        @Override
+&nbsp;        public void onGaugeAdded(String name, Gauge&lt;?&gt; gauge) {
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onGaugeRemoved(String name) {
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onCounterAdded(String name, Counter counter) {
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onCounterRemoved(String name) {
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onHistogramAdded(String name, Histogram histogram) {
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onHistogramRemoved(String name) {
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onMeterAdded(String name, Meter meter) {
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onMeterRemoved(String name) {
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onTimerAdded(String name, Timer timer) {
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onTimerRemoved(String name) {
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a {@link Gauge} is added to the registry.
+&nbsp;     *
+&nbsp;     * @param name  the gauge&#39;s name
+&nbsp;     * @param gauge the gauge
+&nbsp;     */
+&nbsp;    void onGaugeAdded(String name, Gauge&lt;?&gt; gauge);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a {@link Gauge} is removed from the registry.
+&nbsp;     *
+&nbsp;     * @param name the gauge&#39;s name
+&nbsp;     */
+&nbsp;    void onGaugeRemoved(String name);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a {@link Counter} is added to the registry.
+&nbsp;     *
+&nbsp;     * @param name    the counter&#39;s name
+&nbsp;     * @param counter the counter
+&nbsp;     */
+&nbsp;    void onCounterAdded(String name, Counter counter);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a {@link Counter} is removed from the registry.
+&nbsp;     *
+&nbsp;     * @param name the counter&#39;s name
+&nbsp;     */
+&nbsp;    void onCounterRemoved(String name);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a {@link Histogram} is added to the registry.
+&nbsp;     *
+&nbsp;     * @param name      the histogram&#39;s name
+&nbsp;     * @param histogram the histogram
+&nbsp;     */
+&nbsp;    void onHistogramAdded(String name, Histogram histogram);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a {@link Histogram} is removed from the registry.
+&nbsp;     *
+&nbsp;     * @param name the histogram&#39;s name
+&nbsp;     */
+&nbsp;    void onHistogramRemoved(String name);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a {@link Meter} is added to the registry.
+&nbsp;     *
+&nbsp;     * @param name  the meter&#39;s name
+&nbsp;     * @param meter the meter
+&nbsp;     */
+&nbsp;    void onMeterAdded(String name, Meter meter);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a {@link Meter} is removed from the registry.
+&nbsp;     *
+&nbsp;     * @param name the meter&#39;s name
+&nbsp;     */
+&nbsp;    void onMeterRemoved(String name);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a {@link Timer} is added to the registry.
+&nbsp;     *
+&nbsp;     * @param name  the timer&#39;s name
+&nbsp;     * @param timer the timer
+&nbsp;     */
+&nbsp;    void onTimerAdded(String name, Timer timer);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a {@link Timer} is removed from the registry.
+&nbsp;     *
+&nbsp;     * @param name the timer&#39;s name
+&nbsp;     */
+&nbsp;    void onTimerRemoved(String name);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 00:31</div>
+</div>
+</body>
+</html>

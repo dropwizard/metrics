@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SlidingWindowReservoirTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">SlidingWindowReservoirTest.java</span></div><h1>SlidingWindowReservoirTest.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+<span class="nc" id="L7">public class SlidingWindowReservoirTest {</span>
+<span class="nc" id="L8">    private final SlidingWindowReservoir reservoir = new SlidingWindowReservoir(3);</span>
+
+    @Test
+    public void handlesSmallDataStreams() {
+<span class="nc" id="L12">        reservoir.update(1);</span>
+<span class="nc" id="L13">        reservoir.update(2);</span>
+
+<span class="nc" id="L15">        assertThat(reservoir.getSnapshot().getValues())</span>
+<span class="nc" id="L16">                .containsOnly(1, 2);</span>
+<span class="nc" id="L17">    }</span>
+
+    @Test
+    public void onlyKeepsTheMostRecentFromBigDataStreams() {
+<span class="nc" id="L21">        reservoir.update(1);</span>
+<span class="nc" id="L22">        reservoir.update(2);</span>
+<span class="nc" id="L23">        reservoir.update(3);</span>
+<span class="nc" id="L24">        reservoir.update(4);</span>
+
+<span class="nc" id="L26">        assertThat(reservoir.getSnapshot().getValues())</span>
+<span class="nc" id="L27">                .containsOnly(2, 3, 4);</span>
+<span class="nc" id="L28">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InstrumentedScheduledExecutorService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in metrics-log4j2 Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.codahale.metrics</a> &gt; <span class="el_source">InstrumentedScheduledExecutorService.java</span></div><h1>InstrumentedScheduledExecutorService.java</h1><pre class="source lang-java linenums">package com.codahale.metrics;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicLong;
+
+/**
+ * An {@link ScheduledExecutorService} that monitors the number of tasks submitted, running,
+ * completed and also keeps a {@link Timer} for the task duration.
+ * &lt;p&gt;
+ * It will register the metrics using the given (or auto-generated) name as classifier, e.g:
+ * &quot;your-executor-service.submitted&quot;, &quot;your-executor-service.running&quot;, etc.
+ */
+public class InstrumentedScheduledExecutorService implements ScheduledExecutorService {
+<span class="nc" id="L23">    private static final AtomicLong NAME_COUNTER = new AtomicLong();</span>
+
+    private final ScheduledExecutorService delegate;
+
+    private final Meter submitted;
+    private final Counter running;
+    private final Meter completed;
+    private final Timer duration;
+
+    private final Meter scheduledOnce;
+    private final Meter scheduledRepetitively;
+    private final Counter scheduledOverrun;
+    private final Histogram percentOfPeriod;
+
+    /**
+     * Wraps an {@link ScheduledExecutorService} uses an auto-generated default name.
+     *
+     * @param delegate {@link ScheduledExecutorService} to wrap.
+     * @param registry {@link MetricRegistry} that will contain the metrics.
+     */
+    public InstrumentedScheduledExecutorService(ScheduledExecutorService delegate, MetricRegistry registry) {
+<span class="nc" id="L44">        this(delegate, registry, &quot;instrumented-scheduled-executor-service-&quot; + NAME_COUNTER.incrementAndGet());</span>
+<span class="nc" id="L45">    }</span>
+
+    /**
+     * Wraps an {@link ScheduledExecutorService} with an explicit name.
+     *
+     * @param delegate {@link ScheduledExecutorService} to wrap.
+     * @param registry {@link MetricRegistry} that will contain the metrics.
+     * @param name     name for this executor service.
+     */
+<span class="nc" id="L54">    public InstrumentedScheduledExecutorService(ScheduledExecutorService delegate, MetricRegistry registry, String name) {</span>
+<span class="nc" id="L55">        this.delegate = delegate;</span>
+
+<span class="nc" id="L57">        this.submitted = registry.meter(MetricRegistry.name(name, &quot;submitted&quot;));</span>
+
+<span class="nc" id="L59">        this.running = registry.counter(MetricRegistry.name(name, &quot;running&quot;));</span>
+<span class="nc" id="L60">        this.completed = registry.meter(MetricRegistry.name(name, &quot;completed&quot;));</span>
+<span class="nc" id="L61">        this.duration = registry.timer(MetricRegistry.name(name, &quot;duration&quot;));</span>
+
+<span class="nc" id="L63">        this.scheduledOnce = registry.meter(MetricRegistry.name(name, &quot;scheduled.once&quot;));</span>
+<span class="nc" id="L64">        this.scheduledRepetitively = registry.meter(MetricRegistry.name(name, &quot;scheduled.repetitively&quot;));</span>
+<span class="nc" id="L65">        this.scheduledOverrun = registry.counter(MetricRegistry.name(name, &quot;scheduled.overrun&quot;));</span>
+<span class="nc" id="L66">        this.percentOfPeriod = registry.histogram(MetricRegistry.name(name, &quot;scheduled.percent-of-period&quot;));</span>
+<span class="nc" id="L67">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ScheduledFuture&lt;?&gt; schedule(Runnable command, long delay, TimeUnit unit) {
+<span class="nc" id="L74">        scheduledOnce.mark();</span>
+<span class="nc" id="L75">        return delegate.schedule(new InstrumentedRunnable(command), delay, unit);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public &lt;V&gt; ScheduledFuture&lt;V&gt; schedule(Callable&lt;V&gt; callable, long delay, TimeUnit unit) {
+<span class="nc" id="L83">        scheduledOnce.mark();</span>
+<span class="nc" id="L84">        return delegate.schedule(new InstrumentedCallable&lt;&gt;(callable), delay, unit);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ScheduledFuture&lt;?&gt; scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
+<span class="nc" id="L92">        scheduledRepetitively.mark();</span>
+<span class="nc" id="L93">        return delegate.scheduleAtFixedRate(new InstrumentedPeriodicRunnable(command, period, unit), initialDelay, period, unit);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ScheduledFuture&lt;?&gt; scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
+<span class="nc" id="L101">        scheduledRepetitively.mark();</span>
+<span class="nc" id="L102">        return delegate.scheduleWithFixedDelay(new InstrumentedRunnable(command), initialDelay, delay, unit);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void shutdown() {
+<span class="nc" id="L110">        delegate.shutdown();</span>
+<span class="nc" id="L111">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List&lt;Runnable&gt; shutdownNow() {
+<span class="nc" id="L118">        return delegate.shutdownNow();</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isShutdown() {
+<span class="nc" id="L126">        return delegate.isShutdown();</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isTerminated() {
+<span class="nc" id="L134">        return delegate.isTerminated();</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+<span class="nc" id="L142">        return delegate.awaitTermination(timeout, unit);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public &lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task) {
+<span class="nc" id="L150">        submitted.mark();</span>
+<span class="nc" id="L151">        return delegate.submit(new InstrumentedCallable&lt;&gt;(task));</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public &lt;T&gt; Future&lt;T&gt; submit(Runnable task, T result) {
+<span class="nc" id="L159">        submitted.mark();</span>
+<span class="nc" id="L160">        return delegate.submit(new InstrumentedRunnable(task), result);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Future&lt;?&gt; submit(Runnable task) {
+<span class="nc" id="L168">        submitted.mark();</span>
+<span class="nc" id="L169">        return delegate.submit(new InstrumentedRunnable(task));</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public &lt;T&gt; List&lt;Future&lt;T&gt;&gt; invokeAll(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks) throws InterruptedException {
+<span class="nc" id="L177">        submitted.mark(tasks.size());</span>
+<span class="nc" id="L178">        Collection&lt;? extends Callable&lt;T&gt;&gt; instrumented = instrument(tasks);</span>
+<span class="nc" id="L179">        return delegate.invokeAll(instrumented);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public &lt;T&gt; List&lt;Future&lt;T&gt;&gt; invokeAll(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks, long timeout, TimeUnit unit) throws InterruptedException {
+<span class="nc" id="L187">        submitted.mark(tasks.size());</span>
+<span class="nc" id="L188">        Collection&lt;? extends Callable&lt;T&gt;&gt; instrumented = instrument(tasks);</span>
+<span class="nc" id="L189">        return delegate.invokeAll(instrumented, timeout, unit);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public &lt;T&gt; T invokeAny(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks) throws InterruptedException, ExecutionException {
+<span class="nc" id="L197">        submitted.mark(tasks.size());</span>
+<span class="nc" id="L198">        Collection&lt;? extends Callable&lt;T&gt;&gt; instrumented = instrument(tasks);</span>
+<span class="nc" id="L199">        return delegate.invokeAny(instrumented);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public &lt;T&gt; T invokeAny(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks, long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+<span class="nc" id="L207">        submitted.mark(tasks.size());</span>
+<span class="nc" id="L208">        Collection&lt;? extends Callable&lt;T&gt;&gt; instrumented = instrument(tasks);</span>
+<span class="nc" id="L209">        return delegate.invokeAny(instrumented, timeout, unit);</span>
+    }
+
+    private &lt;T&gt; Collection&lt;? extends Callable&lt;T&gt;&gt; instrument(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks) {
+<span class="nc" id="L213">        final List&lt;InstrumentedCallable&lt;T&gt;&gt; instrumented = new ArrayList&lt;&gt;(tasks.size());</span>
+<span class="nc bnc" id="L214" title="All 2 branches missed.">        for (Callable&lt;T&gt; task : tasks) {</span>
+<span class="nc" id="L215">            instrumented.add(new InstrumentedCallable&lt;&gt;(task));</span>
+<span class="nc" id="L216">        }</span>
+<span class="nc" id="L217">        return instrumented;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void execute(Runnable command) {
+<span class="nc" id="L225">        submitted.mark();</span>
+<span class="nc" id="L226">        delegate.execute(new InstrumentedRunnable(command));</span>
+<span class="nc" id="L227">    }</span>
+
+    private class InstrumentedRunnable implements Runnable {
+        private final Runnable command;
+
+<span class="nc" id="L232">        InstrumentedRunnable(Runnable command) {</span>
+<span class="nc" id="L233">            this.command = command;</span>
+<span class="nc" id="L234">        }</span>
+
+        @Override
+        public void run() {
+<span class="nc" id="L238">            running.inc();</span>
+<span class="nc" id="L239">            final Timer.Context context = duration.time();</span>
+            try {
+<span class="nc" id="L241">                command.run();</span>
+            } finally {
+<span class="nc" id="L243">                context.stop();</span>
+<span class="nc" id="L244">                running.dec();</span>
+<span class="nc" id="L245">                completed.mark();</span>
+            }
+<span class="nc" id="L247">        }</span>
+    }
+
+    private class InstrumentedPeriodicRunnable implements Runnable {
+        private final Runnable command;
+        private final long periodInNanos;
+
+<span class="nc" id="L254">        InstrumentedPeriodicRunnable(Runnable command, long period, TimeUnit unit) {</span>
+<span class="nc" id="L255">            this.command = command;</span>
+<span class="nc" id="L256">            this.periodInNanos = unit.toNanos(period);</span>
+<span class="nc" id="L257">        }</span>
+
+        @Override
+        public void run() {
+<span class="nc" id="L261">            running.inc();</span>
+<span class="nc" id="L262">            final Timer.Context context = duration.time();</span>
+            try {
+<span class="nc" id="L264">                command.run();</span>
+            } finally {
+<span class="nc" id="L266">                final long elapsed = context.stop();</span>
+<span class="nc" id="L267">                running.dec();</span>
+<span class="nc" id="L268">                completed.mark();</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">                if (elapsed &gt; periodInNanos) {</span>
+<span class="nc" id="L270">                    scheduledOverrun.inc();</span>
+                }
+<span class="nc" id="L272">                percentOfPeriod.update((100L * elapsed) / periodInNanos);</span>
+            }
+<span class="nc" id="L274">        }</span>
+    }
+
+    private class InstrumentedCallable&lt;T&gt; implements Callable&lt;T&gt; {
+        private final Callable&lt;T&gt; task;
+
+<span class="nc" id="L280">        InstrumentedCallable(Callable&lt;T&gt; task) {</span>
+<span class="nc" id="L281">            this.task = task;</span>
+<span class="nc" id="L282">        }</span>
+
+        @Override
+        public T call() throws Exception {
+<span class="nc" id="L286">            running.inc();</span>
+<span class="nc" id="L287">            final Timer.Context context = duration.time();</span>
+            try {
+<span class="nc" id="L289">                return task.call();</span>
+            } finally {
+<span class="nc" id="L291">                context.stop();</span>
+<span class="nc" id="L292">                running.dec();</span>
+<span class="nc" id="L293">                completed.mark();</span>
+            }
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
