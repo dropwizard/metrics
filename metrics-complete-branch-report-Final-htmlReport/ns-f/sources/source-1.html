@@ -1,0 +1,143 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > InstrumentedTimingCollector</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.jdbi</a>
+</div>
+
+<h1>Coverage Summary for Class: InstrumentedTimingCollector (com.codahale.metrics.jdbi)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InstrumentedTimingCollector</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jdbi;
+&nbsp;
+&nbsp;import com.codahale.metrics.MetricRegistry;
+&nbsp;import com.codahale.metrics.Timer;
+&nbsp;import com.codahale.metrics.jdbi.strategies.SmartNameStrategy;
+&nbsp;import com.codahale.metrics.jdbi.strategies.StatementNameStrategy;
+&nbsp;import org.skife.jdbi.v2.StatementContext;
+&nbsp;import org.skife.jdbi.v2.TimingCollector;
+&nbsp;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link TimingCollector} implementation for JDBI which uses the SQL objects&#39; class names and
+&nbsp; * method names for millisecond-precision timers.
+&nbsp; */
+&nbsp;public class InstrumentedTimingCollector implements TimingCollector {
+&nbsp;    private final MetricRegistry registry;
+&nbsp;    private final StatementNameStrategy statementNameStrategy;
+&nbsp;
+&nbsp;    public InstrumentedTimingCollector(MetricRegistry registry) {
+<b class="nc">&nbsp;        this(registry, new SmartNameStrategy());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public InstrumentedTimingCollector(MetricRegistry registry,
+<b class="fc">&nbsp;                                       StatementNameStrategy statementNameStrategy) {</b>
+<b class="fc">&nbsp;        this.registry = registry;</b>
+<b class="fc">&nbsp;        this.statementNameStrategy = statementNameStrategy;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void collect(long elapsedTime, StatementContext ctx) {
+<b class="fc">&nbsp;        final Timer timer = getTimer(ctx);</b>
+<b class="fc">&nbsp;        timer.update(elapsedTime, TimeUnit.NANOSECONDS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Timer getTimer(StatementContext ctx) {
+<b class="fc">&nbsp;        return registry.timer(statementNameStrategy.getStatementName(ctx));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-29 23:40</div>
+</div>
+</body>
+</html>

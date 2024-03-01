@@ -1,0 +1,325 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > HealthCheckServlet</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.servlets</a>
+</div>
+
+<h1>Coverage Summary for Class: HealthCheckServlet (com.codahale.metrics.servlets)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HealthCheckServlet</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.7%
+  </span>
+  <span class="absValue">
+    (59/61)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HealthCheckServlet$ContextListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (10/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.3%
+  </span>
+  <span class="absValue">
+    (59/70)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.servlets;
+&nbsp;
+&nbsp;import com.codahale.metrics.health.HealthCheck;
+&nbsp;import com.codahale.metrics.health.HealthCheckFilter;
+&nbsp;import com.codahale.metrics.health.HealthCheckRegistry;
+&nbsp;import com.codahale.metrics.json.HealthCheckModule;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import com.fasterxml.jackson.databind.ObjectWriter;
+&nbsp;
+&nbsp;import javax.servlet.ServletConfig;
+&nbsp;import javax.servlet.ServletContext;
+&nbsp;import javax.servlet.ServletContextEvent;
+&nbsp;import javax.servlet.ServletContextListener;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServlet;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.SortedMap;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;
+&nbsp;public class HealthCheckServlet extends HttpServlet {
+<b class="nc">&nbsp;    public static abstract class ContextListener implements ServletContextListener {</b>
+&nbsp;        /**
+&nbsp;         * @return the {@link HealthCheckRegistry} to inject into the servlet context.
+&nbsp;         */
+&nbsp;        protected abstract HealthCheckRegistry getHealthCheckRegistry();
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @return the {@link ExecutorService} to inject into the servlet context, or {@code null}
+&nbsp;         * if the health checks should be run in the servlet worker thread.
+&nbsp;         */
+&nbsp;        protected ExecutorService getExecutorService() {
+&nbsp;            // don&#39;t use a thread pool by default
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @return the {@link HealthCheckFilter} that shall be used to filter health checks,
+&nbsp;         * or {@link HealthCheckFilter#ALL} if the default should be used.
+&nbsp;         */
+&nbsp;        protected HealthCheckFilter getHealthCheckFilter() {
+<b class="nc">&nbsp;            return HealthCheckFilter.ALL;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @return the {@link ObjectMapper} that shall be used to render health checks,
+&nbsp;         * or {@code null} if the default object mapper should be used.
+&nbsp;         */
+&nbsp;        protected ObjectMapper getObjectMapper() {
+&nbsp;            // don&#39;t use an object mapper by default
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void contextInitialized(ServletContextEvent event) {
+<b class="nc">&nbsp;            final ServletContext context = event.getServletContext();</b>
+<b class="nc">&nbsp;            context.setAttribute(HEALTH_CHECK_REGISTRY, getHealthCheckRegistry());</b>
+<b class="nc">&nbsp;            context.setAttribute(HEALTH_CHECK_EXECUTOR, getExecutorService());</b>
+<b class="nc">&nbsp;            context.setAttribute(HEALTH_CHECK_MAPPER, getObjectMapper());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void contextDestroyed(ServletContextEvent event) {
+&nbsp;            // no-op
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public static final String HEALTH_CHECK_REGISTRY = HealthCheckServlet.class.getCanonicalName() + &quot;.registry&quot;;</b>
+<b class="fc">&nbsp;    public static final String HEALTH_CHECK_EXECUTOR = HealthCheckServlet.class.getCanonicalName() + &quot;.executor&quot;;</b>
+<b class="fc">&nbsp;    public static final String HEALTH_CHECK_FILTER = HealthCheckServlet.class.getCanonicalName() + &quot;.healthCheckFilter&quot;;</b>
+<b class="fc">&nbsp;    public static final String HEALTH_CHECK_MAPPER = HealthCheckServlet.class.getCanonicalName() + &quot;.mapper&quot;;</b>
+<b class="fc">&nbsp;    public static final String HEALTH_CHECK_HTTP_STATUS_INDICATOR = HealthCheckServlet.class.getCanonicalName() + &quot;.httpStatusIndicator&quot;;</b>
+&nbsp;
+&nbsp;    private static final long serialVersionUID = -8432996484889177321L;
+&nbsp;    private static final String CONTENT_TYPE = &quot;application/json&quot;;
+&nbsp;    private static final String HTTP_STATUS_INDICATOR_PARAM = &quot;httpStatusIndicator&quot;;
+&nbsp;
+&nbsp;    private transient HealthCheckRegistry registry;
+&nbsp;    private transient ExecutorService executorService;
+&nbsp;    private transient HealthCheckFilter filter;
+&nbsp;    private transient ObjectMapper mapper;
+&nbsp;    private transient boolean httpStatusIndicator;
+&nbsp;
+<b class="fc">&nbsp;    public HealthCheckServlet() {</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public HealthCheckServlet(HealthCheckRegistry registry) {</b>
+<b class="fc">&nbsp;        this.registry = registry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init(ServletConfig config) throws ServletException {
+<b class="fc">&nbsp;        super.init(config);</b>
+&nbsp;
+<b class="fc">&nbsp;        final ServletContext context = config.getServletContext();</b>
+<b class="fc">&nbsp;        if (null == registry) {</b>
+<b class="fc">&nbsp;            final Object registryAttr = context.getAttribute(HEALTH_CHECK_REGISTRY);</b>
+<b class="fc">&nbsp;            if (registryAttr instanceof HealthCheckRegistry) {</b>
+<b class="fc">&nbsp;                this.registry = (HealthCheckRegistry) registryAttr;</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                throw new ServletException(&quot;Couldn&#39;t find a HealthCheckRegistry instance.&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        final Object executorAttr = context.getAttribute(HEALTH_CHECK_EXECUTOR);</b>
+<b class="fc">&nbsp;        if (executorAttr instanceof ExecutorService) {</b>
+<b class="fc">&nbsp;            this.executorService = (ExecutorService) executorAttr;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        final Object filterAttr = context.getAttribute(HEALTH_CHECK_FILTER);</b>
+<b class="fc">&nbsp;        if (filterAttr instanceof HealthCheckFilter) {</b>
+<b class="fc">&nbsp;            filter = (HealthCheckFilter) filterAttr;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (filter == null) {</b>
+<b class="fc">&nbsp;            filter = HealthCheckFilter.ALL;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        final Object mapperAttr = context.getAttribute(HEALTH_CHECK_MAPPER);</b>
+<b class="fc">&nbsp;        if (mapperAttr instanceof ObjectMapper) {</b>
+<b class="fc">&nbsp;            this.mapper = (ObjectMapper) mapperAttr;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            this.mapper = new ObjectMapper();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.mapper.registerModule(new HealthCheckModule());</b>
+&nbsp;
+<b class="fc">&nbsp;        final Object httpStatusIndicatorAttr = context.getAttribute(HEALTH_CHECK_HTTP_STATUS_INDICATOR);</b>
+<b class="fc">&nbsp;        if (httpStatusIndicatorAttr instanceof Boolean) {</b>
+<b class="nc">&nbsp;            this.httpStatusIndicator = (Boolean) httpStatusIndicatorAttr;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            this.httpStatusIndicator = true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void destroy() {
+<b class="fc">&nbsp;        super.destroy();</b>
+<b class="fc">&nbsp;        registry.shutdown();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void doGet(HttpServletRequest req,
+&nbsp;                         HttpServletResponse resp) throws ServletException, IOException {
+<b class="fc">&nbsp;        final SortedMap&lt;String, HealthCheck.Result&gt; results = runHealthChecks();</b>
+<b class="fc">&nbsp;        resp.setContentType(CONTENT_TYPE);</b>
+<b class="fc">&nbsp;        resp.setHeader(&quot;Cache-Control&quot;, &quot;must-revalidate,no-cache,no-store&quot;);</b>
+<b class="fc">&nbsp;        if (results.isEmpty()) {</b>
+<b class="fc">&nbsp;            resp.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            final String reqParameter = req.getParameter(HTTP_STATUS_INDICATOR_PARAM);</b>
+<b class="fc">&nbsp;            final boolean httpStatusIndicatorParam = Boolean.parseBoolean(reqParameter);</b>
+<b class="fc">&nbsp;            final boolean useHttpStatusForHealthCheck = reqParameter == null ? httpStatusIndicator : httpStatusIndicatorParam;</b>
+<b class="fc">&nbsp;            if (!useHttpStatusForHealthCheck || isAllHealthy(results)) {</b>
+<b class="fc">&nbsp;                resp.setStatus(HttpServletResponse.SC_OK);</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        try (OutputStream output = resp.getOutputStream()) {</b>
+<b class="fc">&nbsp;            getWriter(req).writeValue(output, results);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ObjectWriter getWriter(HttpServletRequest request) {
+<b class="fc">&nbsp;        final boolean prettyPrint = Boolean.parseBoolean(request.getParameter(&quot;pretty&quot;));</b>
+<b class="fc">&nbsp;        if (prettyPrint) {</b>
+<b class="fc">&nbsp;            return mapper.writerWithDefaultPrettyPrinter();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return mapper.writer();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SortedMap&lt;String, HealthCheck.Result&gt; runHealthChecks() {
+<b class="fc">&nbsp;        if (executorService == null) {</b>
+<b class="nc">&nbsp;            return registry.runHealthChecks(filter);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return registry.runHealthChecks(executorService, filter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isAllHealthy(Map&lt;String, HealthCheck.Result&gt; results) {
+<b class="fc">&nbsp;        for (HealthCheck.Result result : results.values()) {</b>
+<b class="fc">&nbsp;            if (!result.isHealthy()) {</b>
+<b class="fc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // visible for testing
+&nbsp;    ObjectMapper getMapper() {
+<b class="fc">&nbsp;        return mapper;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-29 23:40</div>
+</div>
+</body>
+</html>

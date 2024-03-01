@@ -1,0 +1,107 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Timed</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.annotation</a>
+</div>
+
+<h1>Coverage Summary for Class: Timed (com.codahale.metrics.annotation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">Timed</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.annotation;
+&nbsp;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.ElementType;
+&nbsp;import java.lang.annotation.Inherited;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.RetentionPolicy;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;
+&nbsp;/**
+&nbsp; * An annotation for marking a method of an annotated object as timed.
+&nbsp; * &lt;p&gt;
+&nbsp; * Given a method like this:
+&nbsp; * &lt;pre&gt;&lt;code&gt;
+&nbsp; *     {@literal @}Timed(name = &quot;fancyName&quot;)
+&nbsp; *     public String fancyName(String name) {
+&nbsp; *         return &quot;Sir Captain &quot; + name;
+&nbsp; *     }
+&nbsp; * &lt;/code&gt;&lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * A timer for the defining class with the name {@code fancyName} will be created and each time the
+&nbsp; * {@code #fancyName(String)} method is invoked, the method&#39;s execution will be timed.
+&nbsp; */
+&nbsp;@Inherited
+&nbsp;@Documented
+&nbsp;@Retention(RetentionPolicy.RUNTIME)
+&nbsp;@Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
+&nbsp;public @interface Timed {
+&nbsp;    /**
+&nbsp;     * @return The name of the timer.
+&nbsp;     */
+&nbsp;    String name() default &quot;&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
+&nbsp;     * relative to the annotated class. When annotating a class, this must be {@code false}.
+&nbsp;     */
+&nbsp;    boolean absolute() default false;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-29 23:40</div>
+</div>
+</body>
+</html>

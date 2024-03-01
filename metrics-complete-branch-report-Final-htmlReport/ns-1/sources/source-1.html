@@ -1,0 +1,178 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CachedGauge</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics</a>
+</div>
+
+<h1>Coverage Summary for Class: CachedGauge (com.codahale.metrics)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CachedGauge</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (20/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics;
+&nbsp;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.concurrent.atomic.AtomicLong;
+&nbsp;import java.util.concurrent.atomic.AtomicReference;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link Gauge} implementation which caches its value for a period of time.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the type of the gauge&#39;s value
+&nbsp; */
+&nbsp;public abstract class CachedGauge&lt;T&gt; implements Gauge&lt;T&gt; {
+&nbsp;    private final Clock clock;
+&nbsp;    private final AtomicLong reloadAt;
+&nbsp;    private final long timeoutNS;
+&nbsp;    private final AtomicReference&lt;T&gt; value;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new cached gauge with the given timeout period.
+&nbsp;     *
+&nbsp;     * @param timeout     the timeout
+&nbsp;     * @param timeoutUnit the unit of {@code timeout}
+&nbsp;     */
+&nbsp;    protected CachedGauge(long timeout, TimeUnit timeoutUnit) {
+<b class="fc">&nbsp;        this(Clock.defaultClock(), timeout, timeoutUnit);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new cached gauge with the given clock and timeout period.
+&nbsp;     *
+&nbsp;     * @param clock       the clock used to calculate the timeout
+&nbsp;     * @param timeout     the timeout
+&nbsp;     * @param timeoutUnit the unit of {@code timeout}
+&nbsp;     */
+<b class="fc">&nbsp;    protected CachedGauge(Clock clock, long timeout, TimeUnit timeoutUnit) {</b>
+<b class="fc">&nbsp;        this.clock = clock;</b>
+<b class="fc">&nbsp;        this.reloadAt = new AtomicLong(clock.getTick());</b>
+<b class="fc">&nbsp;        this.timeoutNS = timeoutUnit.toNanos(timeout);</b>
+<b class="fc">&nbsp;        this.value = new AtomicReference&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads the value and returns it.
+&nbsp;     *
+&nbsp;     * @return the new value
+&nbsp;     */
+&nbsp;    protected abstract T loadValue();
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public T getValue() {
+<b class="fc">&nbsp;        T currentValue = this.value.get();</b>
+<b class="fc">&nbsp;        if (shouldLoad() || currentValue == null) {</b>
+<b class="fc">&nbsp;            T newValue = loadValue();</b>
+<b class="fc">&nbsp;            if (!this.value.compareAndSet(currentValue, newValue)) {</b>
+<b class="fc">&nbsp;                return this.value.get();</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return newValue;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return currentValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean shouldLoad() {
+&nbsp;        for ( ;; ) {
+<b class="fc">&nbsp;            final long time = clock.getTick();</b>
+<b class="fc">&nbsp;            final long current = reloadAt.get();</b>
+<b class="fc">&nbsp;            if (current &gt; time) {</b>
+<b class="fc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            if (reloadAt.compareAndSet(current, time + timeoutNS)) {</b>
+<b class="fc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-29 23:40</div>
+</div>
+</body>
+</html>

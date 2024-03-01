@@ -1,0 +1,155 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > JvmAttributeGaugeSet</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.jvm</a>
+</div>
+
+<h1>Coverage Summary for Class: JvmAttributeGaugeSet (com.codahale.metrics.jvm)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JvmAttributeGaugeSet</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jvm;
+&nbsp;
+&nbsp;import com.codahale.metrics.Gauge;
+&nbsp;import com.codahale.metrics.Metric;
+&nbsp;import com.codahale.metrics.MetricSet;
+&nbsp;
+&nbsp;import java.lang.management.ManagementFactory;
+&nbsp;import java.lang.management.RuntimeMXBean;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;/**
+&nbsp; * A set of gauges for the JVM name, vendor, and uptime.
+&nbsp; */
+&nbsp;public class JvmAttributeGaugeSet implements MetricSet {
+&nbsp;    private final RuntimeMXBean runtime;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new set of gauges.
+&nbsp;     */
+&nbsp;    public JvmAttributeGaugeSet() {
+<b class="fc">&nbsp;        this(ManagementFactory.getRuntimeMXBean());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new set of gauges with the given {@link RuntimeMXBean}.
+&nbsp;     *
+&nbsp;     * @param runtime JVM management interface with access to system properties
+&nbsp;     */
+<b class="fc">&nbsp;    public JvmAttributeGaugeSet(RuntimeMXBean runtime) {</b>
+<b class="fc">&nbsp;        this.runtime = runtime;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Map&lt;String, Metric&gt; getMetrics() {
+<b class="fc">&nbsp;        final Map&lt;String, Metric&gt; gauges = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        gauges.put(&quot;name&quot;, (Gauge&lt;String&gt;) runtime::getName);</b>
+<b class="fc">&nbsp;        gauges.put(&quot;vendor&quot;, (Gauge&lt;String&gt;) () -&gt; String.format(Locale.US,</b>
+&nbsp;                &quot;%s %s %s (%s)&quot;,
+<b class="fc">&nbsp;                runtime.getVmVendor(),</b>
+<b class="fc">&nbsp;                runtime.getVmName(),</b>
+<b class="fc">&nbsp;                runtime.getVmVersion(),</b>
+<b class="fc">&nbsp;                runtime.getSpecVersion()));</b>
+<b class="fc">&nbsp;        gauges.put(&quot;uptime&quot;, (Gauge&lt;Long&gt;) runtime::getUptime);</b>
+&nbsp;
+<b class="fc">&nbsp;        return Collections.unmodifiableMap(gauges);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-29 23:40</div>
+</div>
+</body>
+</html>

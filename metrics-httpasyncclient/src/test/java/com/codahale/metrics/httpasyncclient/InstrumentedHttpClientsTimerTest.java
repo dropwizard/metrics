@@ -215,18 +215,16 @@ public class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
      */
     @Test
     public void timerIsStoppedCorrectlyWithExceptionInFutureGet() throws Exception {
-        // Arrange
         HttpHost host = startServerWithGlobalRequestHandler(STATUS_OK);
         HttpGet get = new HttpGet("/?q=exception");
 
         // Timer hasn't been stopped prior to executing the request
         verify(context, never()).stop();
 
-        // Act
+
         Future<HttpResponse> responseFuture = asyncHttpClient.execute(host, get, null);
         responseFuture.get(); // Let the future throw an exception
 
-        // Assert
         // After the computation throws an exception, the timer must be stopped
         verify(context, timeout(200).times(1)).stop();
     }

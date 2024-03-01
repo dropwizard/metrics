@@ -1,0 +1,330 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > InstrumentedHttpClientConnectionManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.httpclient</a>
+</div>
+
+<h1>Coverage Summary for Class: InstrumentedHttpClientConnectionManager (com.codahale.metrics.httpclient)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InstrumentedHttpClientConnectionManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (8/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84%
+  </span>
+  <span class="absValue">
+    (21/25)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">InstrumentedHttpClientConnectionManager$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.4%
+  </span>
+  <span class="absValue">
+    (4/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    46.2%
+  </span>
+  <span class="absValue">
+    (12/26)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    52.2%
+  </span>
+  <span class="absValue">
+    (12/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    64.7%
+  </span>
+  <span class="absValue">
+    (33/51)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.httpclient;
+&nbsp;
+&nbsp;import com.codahale.metrics.MetricRegistry;
+&nbsp;import org.apache.http.config.Registry;
+&nbsp;import org.apache.http.config.RegistryBuilder;
+&nbsp;import org.apache.http.conn.DnsResolver;
+&nbsp;import org.apache.http.conn.HttpClientConnectionManager;
+&nbsp;import org.apache.http.conn.HttpClientConnectionOperator;
+&nbsp;import org.apache.http.conn.HttpConnectionFactory;
+&nbsp;import org.apache.http.conn.ManagedHttpClientConnection;
+&nbsp;import org.apache.http.conn.SchemePortResolver;
+&nbsp;import org.apache.http.conn.routing.HttpRoute;
+&nbsp;import org.apache.http.conn.socket.ConnectionSocketFactory;
+&nbsp;import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+&nbsp;import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+&nbsp;import org.apache.http.impl.conn.DefaultHttpClientConnectionOperator;
+&nbsp;import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+&nbsp;import org.apache.http.impl.conn.SystemDefaultDnsResolver;
+&nbsp;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;import static com.codahale.metrics.MetricRegistry.name;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link HttpClientConnectionManager} which monitors the number of open connections.
+&nbsp; */
+&nbsp;public class InstrumentedHttpClientConnectionManager extends PoolingHttpClientConnectionManager {
+&nbsp;
+&nbsp;
+&nbsp;    protected static Registry&lt;ConnectionSocketFactory&gt; getDefaultRegistry() {
+<b class="fc">&nbsp;        return RegistryBuilder.&lt;ConnectionSocketFactory&gt;create()</b>
+<b class="fc">&nbsp;            .register(&quot;http&quot;, PlainConnectionSocketFactory.getSocketFactory())</b>
+<b class="fc">&nbsp;            .register(&quot;https&quot;, SSLConnectionSocketFactory.getSocketFactory())</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final MetricRegistry metricsRegistry;
+&nbsp;    private final String name;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use {@link #builder(MetricRegistry)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public InstrumentedHttpClientConnectionManager(MetricRegistry metricRegistry) {
+<b class="nc">&nbsp;        this(metricRegistry, getDefaultRegistry());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use {@link #builder(MetricRegistry)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public InstrumentedHttpClientConnectionManager(MetricRegistry metricsRegistry,
+&nbsp;                                                   Registry&lt;ConnectionSocketFactory&gt; socketFactoryRegistry) {
+<b class="nc">&nbsp;        this(metricsRegistry, socketFactoryRegistry, -1, TimeUnit.MILLISECONDS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use {@link #builder(MetricRegistry)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public InstrumentedHttpClientConnectionManager(MetricRegistry metricsRegistry,
+&nbsp;                                                   Registry&lt;ConnectionSocketFactory&gt; socketFactoryRegistry,
+&nbsp;                                                   long connTTL,
+&nbsp;                                                   TimeUnit connTTLTimeUnit) {
+<b class="nc">&nbsp;        this(metricsRegistry, socketFactoryRegistry, null, null, SystemDefaultDnsResolver.INSTANCE, connTTL, connTTLTimeUnit, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use {@link #builder(MetricRegistry)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public InstrumentedHttpClientConnectionManager(MetricRegistry metricsRegistry,
+&nbsp;                                                   Registry&lt;ConnectionSocketFactory&gt; socketFactoryRegistry,
+&nbsp;                                                   HttpConnectionFactory&lt;HttpRoute, ManagedHttpClientConnection&gt;
+&nbsp;                                                           connFactory,
+&nbsp;                                                   SchemePortResolver schemePortResolver,
+&nbsp;                                                   DnsResolver dnsResolver,
+&nbsp;                                                   long connTTL,
+&nbsp;                                                   TimeUnit connTTLTimeUnit,
+&nbsp;                                                   String name) {
+<b class="nc">&nbsp;        this(metricsRegistry,</b>
+&nbsp;             new DefaultHttpClientConnectionOperator(socketFactoryRegistry, schemePortResolver, dnsResolver),
+&nbsp;             connFactory,
+&nbsp;             connTTL,
+&nbsp;             connTTLTimeUnit,
+&nbsp;             name);
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use {@link #builder(MetricRegistry)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public InstrumentedHttpClientConnectionManager(MetricRegistry metricsRegistry,
+&nbsp;                                                   HttpClientConnectionOperator httpClientConnectionOperator,
+&nbsp;                                                   HttpConnectionFactory&lt;HttpRoute, ManagedHttpClientConnection&gt;
+&nbsp;                                                           connFactory,
+&nbsp;                                                   long connTTL,
+&nbsp;                                                   TimeUnit connTTLTimeUnit,
+&nbsp;                                                   String name) {
+<b class="fc">&nbsp;        super(httpClientConnectionOperator, connFactory, connTTL, connTTLTimeUnit);</b>
+<b class="fc">&nbsp;        this.metricsRegistry = metricsRegistry;</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+&nbsp;
+&nbsp;        // this acquires a lock on the connection pool; remove if contention sucks
+<b class="fc">&nbsp;        metricsRegistry.registerGauge(name(HttpClientConnectionManager.class, name, &quot;available-connections&quot;),</b>
+<b class="fc">&nbsp;                () -&gt; getTotalStats().getAvailable());</b>
+&nbsp;        // this acquires a lock on the connection pool; remove if contention sucks
+<b class="fc">&nbsp;        metricsRegistry.registerGauge(name(HttpClientConnectionManager.class, name, &quot;leased-connections&quot;),</b>
+<b class="fc">&nbsp;                () -&gt; getTotalStats().getLeased());</b>
+&nbsp;        // this acquires a lock on the connection pool; remove if contention sucks
+<b class="fc">&nbsp;        metricsRegistry.registerGauge(name(HttpClientConnectionManager.class, name, &quot;max-connections&quot;),</b>
+<b class="fc">&nbsp;                () -&gt; getTotalStats().getMax());</b>
+&nbsp;        // this acquires a lock on the connection pool; remove if contention sucks
+<b class="fc">&nbsp;        metricsRegistry.registerGauge(name(HttpClientConnectionManager.class, name, &quot;pending-connections&quot;),</b>
+<b class="fc">&nbsp;                () -&gt; getTotalStats().getPending());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void shutdown() {
+<b class="fc">&nbsp;        super.shutdown();</b>
+<b class="fc">&nbsp;        metricsRegistry.remove(name(HttpClientConnectionManager.class, name, &quot;available-connections&quot;));</b>
+<b class="fc">&nbsp;        metricsRegistry.remove(name(HttpClientConnectionManager.class, name, &quot;leased-connections&quot;));</b>
+<b class="fc">&nbsp;        metricsRegistry.remove(name(HttpClientConnectionManager.class, name, &quot;max-connections&quot;));</b>
+<b class="fc">&nbsp;        metricsRegistry.remove(name(HttpClientConnectionManager.class, name, &quot;pending-connections&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Builder builder(MetricRegistry metricsRegistry) {
+<b class="fc">&nbsp;        return new Builder().metricsRegistry(metricsRegistry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class Builder {
+&nbsp;        private MetricRegistry metricsRegistry;
+&nbsp;        private HttpClientConnectionOperator httpClientConnectionOperator;
+<b class="fc">&nbsp;        private Registry&lt;ConnectionSocketFactory&gt; socketFactoryRegistry = getDefaultRegistry();</b>
+&nbsp;        private HttpConnectionFactory&lt;HttpRoute, ManagedHttpClientConnection&gt; connFactory;
+&nbsp;        private SchemePortResolver schemePortResolver;
+<b class="fc">&nbsp;        private DnsResolver dnsResolver = SystemDefaultDnsResolver.INSTANCE;</b>
+<b class="fc">&nbsp;        private long connTTL = -1;</b>
+<b class="fc">&nbsp;        private TimeUnit connTTLTimeUnit = TimeUnit.MILLISECONDS;</b>
+&nbsp;        private String name;
+&nbsp;
+<b class="fc">&nbsp;        Builder() {</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder metricsRegistry(MetricRegistry metricsRegistry) {
+<b class="fc">&nbsp;            this.metricsRegistry = metricsRegistry;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder socketFactoryRegistry(Registry&lt;ConnectionSocketFactory&gt; socketFactoryRegistry) {
+<b class="nc">&nbsp;            this.socketFactoryRegistry = socketFactoryRegistry;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder connFactory(HttpConnectionFactory&lt;HttpRoute, ManagedHttpClientConnection&gt; connFactory) {
+<b class="nc">&nbsp;            this.connFactory = connFactory;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder schemePortResolver(SchemePortResolver schemePortResolver) {
+<b class="nc">&nbsp;            this.schemePortResolver = schemePortResolver;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder dnsResolver(DnsResolver dnsResolver) {
+<b class="nc">&nbsp;            this.dnsResolver = dnsResolver;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder connTTL(long connTTL) {
+<b class="nc">&nbsp;            this.connTTL = connTTL;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder connTTLTimeUnit(TimeUnit connTTLTimeUnit) {
+<b class="nc">&nbsp;            this.connTTLTimeUnit = connTTLTimeUnit;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder httpClientConnectionOperator(HttpClientConnectionOperator httpClientConnectionOperator) {
+<b class="nc">&nbsp;            this.httpClientConnectionOperator = httpClientConnectionOperator;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder name(final String name) {
+<b class="fc">&nbsp;            this.name = name;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public InstrumentedHttpClientConnectionManager build() {
+<b class="fc">&nbsp;            if (httpClientConnectionOperator == null) {</b>
+<b class="fc">&nbsp;                httpClientConnectionOperator = new DefaultHttpClientConnectionOperator(socketFactoryRegistry, schemePortResolver, dnsResolver);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return new InstrumentedHttpClientConnectionManager(metricsRegistry, httpClientConnectionOperator, connFactory, connTTL, connTTLTimeUnit, name);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-29 23:40</div>
+</div>
+</body>
+</html>

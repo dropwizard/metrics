@@ -1,0 +1,222 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > GraphiteUDP</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.graphite</a>
+</div>
+
+<h1>Coverage Summary for Class: GraphiteUDP (com.codahale.metrics.graphite)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GraphiteUDP</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    53.8%
+  </span>
+  <span class="absValue">
+    (7/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (17/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.graphite;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.InetSocketAddress;
+&nbsp;import java.net.InetAddress;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.channels.DatagramChannel;
+&nbsp;
+&nbsp;import static java.nio.charset.StandardCharsets.UTF_8;
+&nbsp;
+&nbsp;/**
+&nbsp; * A client to a Carbon server using unconnected UDP
+&nbsp; */
+&nbsp;public class GraphiteUDP implements GraphiteSender {
+&nbsp;
+&nbsp;    private final String hostname;
+&nbsp;    private final int port;
+&nbsp;    private InetSocketAddress address;
+&nbsp;
+<b class="fc">&nbsp;    private DatagramChannel datagramChannel = null;</b>
+&nbsp;    private int failures;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which sends data to given address using UDP
+&nbsp;     *
+&nbsp;     * @param hostname The hostname of the Carbon server
+&nbsp;     * @param port     The port of the Carbon server
+&nbsp;     */
+<b class="fc">&nbsp;    public GraphiteUDP(String hostname, int port) {</b>
+<b class="fc">&nbsp;        this.hostname = hostname;</b>
+<b class="fc">&nbsp;        this.port = port;</b>
+<b class="fc">&nbsp;        this.address = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which sends data to given address using UDP
+&nbsp;     *
+&nbsp;     * @param address the address of the Carbon server
+&nbsp;     */
+<b class="nc">&nbsp;    public GraphiteUDP(InetSocketAddress address) {</b>
+<b class="nc">&nbsp;        this.hostname = null;</b>
+<b class="nc">&nbsp;        this.port = -1;</b>
+<b class="nc">&nbsp;        this.address = address;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void connect() throws IllegalStateException, IOException {
+<b class="fc">&nbsp;        if (isConnected()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Already connected&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Resolve hostname
+<b class="fc">&nbsp;        if (hostname != null) {</b>
+<b class="fc">&nbsp;            address = new InetSocketAddress(InetAddress.getByName(hostname), port);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        datagramChannel = DatagramChannel.open();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isConnected() {
+<b class="fc">&nbsp;        return datagramChannel != null &amp;&amp; !datagramChannel.socket().isClosed();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void send(String name, String value, long timestamp) throws IOException {
+&nbsp;        try {
+<b class="fc">&nbsp;            String str = sanitize(name) + &#39; &#39; + sanitize(value) + &#39; &#39; + Long.toString(timestamp) + &#39;\n&#39;;</b>
+<b class="fc">&nbsp;            ByteBuffer byteBuffer = ByteBuffer.wrap(str.getBytes(UTF_8));</b>
+<b class="fc">&nbsp;            datagramChannel.send(byteBuffer, address);</b>
+<b class="fc">&nbsp;            this.failures = 0;</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            failures++;</b>
+<b class="nc">&nbsp;            throw e;</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getFailures() {
+<b class="nc">&nbsp;        return failures;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void flush() throws IOException {
+&nbsp;        // Nothing to do
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() throws IOException {
+<b class="nc">&nbsp;        if (datagramChannel != null) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                datagramChannel.close();</b>
+&nbsp;            } finally {
+<b class="nc">&nbsp;                datagramChannel = null;</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String sanitize(String s) {
+<b class="fc">&nbsp;        return GraphiteSanitize.sanitize(s);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    DatagramChannel getDatagramChannel() {
+<b class="nc">&nbsp;        return datagramChannel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void setDatagramChannel(DatagramChannel datagramChannel) {
+<b class="fc">&nbsp;        this.datagramChannel = datagramChannel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    InetSocketAddress getAddress() {
+<b class="nc">&nbsp;        return address;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void setAddress(InetSocketAddress address) {
+<b class="fc">&nbsp;        this.address = address;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-29 23:40</div>
+</div>
+</body>
+</html>

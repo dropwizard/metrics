@@ -1,0 +1,189 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > JCacheGaugeSet</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.jcache</a>
+</div>
+
+<h1>Coverage Summary for Class: JCacheGaugeSet (com.codahale.metrics.jcache)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JCacheGaugeSet</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.5%
+  </span>
+  <span class="absValue">
+    (23/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jcache;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import com.codahale.metrics.jvm.JmxAttributeGauge;
+&nbsp;import com.codahale.metrics.Metric;
+&nbsp;import com.codahale.metrics.MetricSet;
+&nbsp;
+&nbsp;import java.lang.management.ManagementFactory;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javax.cache.management.CacheStatisticsMXBean;
+&nbsp;import javax.management.MalformedObjectNameException;
+&nbsp;import javax.management.ObjectInstance;
+&nbsp;import javax.management.ObjectName;
+&nbsp;
+&nbsp;import static com.codahale.metrics.MetricRegistry.name;
+&nbsp;
+&nbsp;/**
+&nbsp; * Gauge set retrieving JCache JMX attributes
+&nbsp; *
+&nbsp; * @author &lt;a href=&quot;mailto:henri.tremblay@softwareag.com&quot;&gt;Henri Tremblay&lt;/a&gt;
+&nbsp; * @author &lt;a href=&quot;mailto:anthony.dahanne@softwareag.com&quot;&gt;Anthony Dahanne&lt;/a&gt;
+&nbsp; */
+<b class="fc">&nbsp;public class JCacheGaugeSet implements MetricSet {</b>
+&nbsp;
+&nbsp;    private static final String M_BEAN_COORDINATES = &quot;javax.cache:type=CacheStatistics,CacheManager=*,Cache=*&quot;;
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(JCacheGaugeSet.class);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Map&lt;String, Metric&gt; getMetrics() {
+<b class="fc">&nbsp;        Set&lt;ObjectInstance&gt; cacheBeans = getCacheBeans();</b>
+<b class="fc">&nbsp;        List&lt;String&gt; availableStatsNames = retrieveStatsNames();</b>
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;String, Metric&gt; gauges = new HashMap&lt;&gt;(cacheBeans.size() * availableStatsNames.size());</b>
+&nbsp;
+<b class="fc">&nbsp;        for (ObjectInstance cacheBean : cacheBeans) {</b>
+<b class="fc">&nbsp;            ObjectName objectName = cacheBean.getObjectName();</b>
+<b class="fc">&nbsp;            String cacheName = objectName.getKeyProperty(&quot;Cache&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;            for (String statsName : availableStatsNames) {</b>
+<b class="fc">&nbsp;                JmxAttributeGauge jmxAttributeGauge = new JmxAttributeGauge(objectName, statsName);</b>
+<b class="fc">&nbsp;                gauges.put(name(cacheName, toSpinalCase(statsName)), jmxAttributeGauge);</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        return Collections.unmodifiableMap(gauges);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Set&lt;ObjectInstance&gt; getCacheBeans() {
+&nbsp;        try {
+<b class="fc">&nbsp;            return ManagementFactory.getPlatformMBeanServer().queryMBeans(ObjectName.getInstance(M_BEAN_COORDINATES), null);</b>
+<b class="nc">&nbsp;        } catch (MalformedObjectNameException e) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Unable to retrieve {}. Are JCache statistics enabled?&quot;, M_BEAN_COORDINATES);</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;String&gt; retrieveStatsNames() {
+<b class="fc">&nbsp;        Method[] methods = CacheStatisticsMXBean.class.getDeclaredMethods();</b>
+<b class="fc">&nbsp;        List&lt;String&gt; availableStatsNames = new ArrayList&lt;&gt;(methods.length);</b>
+&nbsp;
+<b class="fc">&nbsp;        for (Method method : methods) {</b>
+<b class="fc">&nbsp;            String methodName = method.getName();</b>
+<b class="fc">&nbsp;            if (methodName.startsWith(&quot;get&quot;)) {</b>
+<b class="fc">&nbsp;                availableStatsNames.add(methodName.substring(3));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return availableStatsNames;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String toSpinalCase(String camelCase) {
+<b class="fc">&nbsp;        return camelCase.replaceAll(&quot;(.)(\\p{Upper})&quot;, &quot;$1-$2&quot;).toLowerCase(Locale.US);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-29 23:40</div>
+</div>
+</body>
+</html>

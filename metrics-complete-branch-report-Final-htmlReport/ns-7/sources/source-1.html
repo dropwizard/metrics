@@ -1,0 +1,305 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Graphite</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.graphite</a>
+</div>
+
+<h1>Coverage Summary for Class: Graphite (com.codahale.metrics.graphite)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Graphite</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    64.3%
+  </span>
+  <span class="absValue">
+    (9/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    53.4%
+  </span>
+  <span class="absValue">
+    (31/58)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.graphite;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import javax.net.SocketFactory;
+&nbsp;import java.io.BufferedWriter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.io.Writer;
+&nbsp;import java.net.InetSocketAddress;
+&nbsp;import java.net.Socket;
+&nbsp;import java.net.UnknownHostException;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;
+&nbsp;import static java.nio.charset.StandardCharsets.UTF_8;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;
+&nbsp;/**
+&nbsp; * A client to a Carbon server via TCP.
+&nbsp; */
+&nbsp;public class Graphite implements GraphiteSender {
+&nbsp;    // this may be optimistic about Carbon/Graphite
+&nbsp;
+&nbsp;    private final String hostname;
+&nbsp;    private final int port;
+&nbsp;    private final InetSocketAddress address;
+&nbsp;    private final SocketFactory socketFactory;
+&nbsp;    private final Charset charset;
+&nbsp;
+&nbsp;    private Socket socket;
+&nbsp;    private Writer writer;
+&nbsp;    private int failures;
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(Graphite.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which connects to the given address using the default
+&nbsp;     * {@link SocketFactory}.
+&nbsp;     *
+&nbsp;     * @param hostname The hostname of the Carbon server
+&nbsp;     * @param port     The port of the Carbon server
+&nbsp;     */
+&nbsp;    public Graphite(String hostname, int port) {
+<b class="nc">&nbsp;        this(hostname, port, SocketFactory.getDefault());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which connects to the given address and socket factory.
+&nbsp;     *
+&nbsp;     * @param hostname      The hostname of the Carbon server
+&nbsp;     * @param port          The port of the Carbon server
+&nbsp;     * @param socketFactory the socket factory
+&nbsp;     */
+&nbsp;    public Graphite(String hostname, int port, SocketFactory socketFactory) {
+<b class="fc">&nbsp;        this(hostname, port, socketFactory, UTF_8);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which connects to the given address and socket factory using the given
+&nbsp;     * character set.
+&nbsp;     *
+&nbsp;     * @param hostname      The hostname of the Carbon server
+&nbsp;     * @param port          The port of the Carbon server
+&nbsp;     * @param socketFactory the socket factory
+&nbsp;     * @param charset       the character set used by the server
+&nbsp;     */
+<b class="fc">&nbsp;    public Graphite(String hostname, int port, SocketFactory socketFactory, Charset charset) {</b>
+<b class="fc">&nbsp;        if (hostname == null || hostname.isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;hostname must not be null or empty&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (port &lt; 0 || port &gt; 65535) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;port must be a valid IP port (0-65535)&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        this.hostname = hostname;</b>
+<b class="fc">&nbsp;        this.port = port;</b>
+<b class="fc">&nbsp;        this.address = null;</b>
+<b class="fc">&nbsp;        this.socketFactory = requireNonNull(socketFactory, &quot;socketFactory must not be null&quot;);</b>
+<b class="fc">&nbsp;        this.charset = requireNonNull(charset, &quot;charset must not be null&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which connects to the given address using the default
+&nbsp;     * {@link SocketFactory}.
+&nbsp;     *
+&nbsp;     * @param address the address of the Carbon server
+&nbsp;     */
+&nbsp;    public Graphite(InetSocketAddress address) {
+<b class="nc">&nbsp;        this(address, SocketFactory.getDefault());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which connects to the given address and socket factory.
+&nbsp;     *
+&nbsp;     * @param address       the address of the Carbon server
+&nbsp;     * @param socketFactory the socket factory
+&nbsp;     */
+&nbsp;    public Graphite(InetSocketAddress address, SocketFactory socketFactory) {
+<b class="fc">&nbsp;        this(address, socketFactory, UTF_8);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which connects to the given address and socket factory using the given
+&nbsp;     * character set.
+&nbsp;     *
+&nbsp;     * @param address       the address of the Carbon server
+&nbsp;     * @param socketFactory the socket factory
+&nbsp;     * @param charset       the character set used by the server
+&nbsp;     */
+<b class="fc">&nbsp;    public Graphite(InetSocketAddress address, SocketFactory socketFactory, Charset charset) {</b>
+<b class="fc">&nbsp;        this.hostname = null;</b>
+<b class="fc">&nbsp;        this.port = -1;</b>
+<b class="fc">&nbsp;        this.address = requireNonNull(address, &quot;address must not be null&quot;);</b>
+<b class="fc">&nbsp;        this.socketFactory = requireNonNull(socketFactory, &quot;socketFactory must not be null&quot;);</b>
+<b class="fc">&nbsp;        this.charset = requireNonNull(charset, &quot;charset must not be null&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void connect() throws IllegalStateException, IOException {
+<b class="fc">&nbsp;        if (isConnected()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Already connected&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        InetSocketAddress address = this.address;</b>
+&nbsp;        // the previous dns retry logic did not work, as address.getAddress would always return the cached value
+&nbsp;        // this version of the simplified logic will always cause a dns request if hostname has been supplied.
+&nbsp;        // InetAddress.getByName forces the dns lookup
+&nbsp;        // if an InetSocketAddress was supplied at create time that will take precedence.
+<b class="fc">&nbsp;        if (address == null || address.getHostName() == null &amp;&amp; hostname != null) {</b>
+<b class="fc">&nbsp;            address = new InetSocketAddress(hostname, port);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (address.getAddress() == null) {</b>
+<b class="fc">&nbsp;            throw new UnknownHostException(address.getHostName());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.socket = socketFactory.createSocket(address.getAddress(), address.getPort());</b>
+<b class="nc">&nbsp;        this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), charset));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isConnected() {
+<b class="fc">&nbsp;        return socket != null &amp;&amp; socket.isConnected() &amp;&amp; !socket.isClosed();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void send(String name, String value, long timestamp) throws IOException {
+&nbsp;        try {
+<b class="nc">&nbsp;            writer.write(sanitize(name));</b>
+<b class="nc">&nbsp;            writer.write(&#39; &#39;);</b>
+<b class="nc">&nbsp;            writer.write(sanitize(value));</b>
+<b class="nc">&nbsp;            writer.write(&#39; &#39;);</b>
+<b class="nc">&nbsp;            writer.write(Long.toString(timestamp));</b>
+<b class="nc">&nbsp;            writer.write(&#39;\n&#39;);</b>
+<b class="nc">&nbsp;            this.failures = 0;</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            failures++;</b>
+<b class="nc">&nbsp;            throw e;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getFailures() {
+<b class="fc">&nbsp;        return failures;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void flush() throws IOException {
+<b class="nc">&nbsp;        if (writer != null) {</b>
+<b class="nc">&nbsp;            writer.flush();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() throws IOException {
+&nbsp;        try {
+<b class="fc">&nbsp;            if (writer != null) {</b>
+<b class="nc">&nbsp;                writer.close();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IOException ex) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Error closing writer&quot;, ex);</b>
+&nbsp;        } finally {
+<b class="fc">&nbsp;            this.writer = null;</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            if (socket != null) {</b>
+<b class="nc">&nbsp;                socket.close();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IOException ex) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Error closing socket&quot;, ex);</b>
+&nbsp;        } finally {
+<b class="fc">&nbsp;            this.socket = null;</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String sanitize(String s) {
+<b class="nc">&nbsp;        return GraphiteSanitize.sanitize(s);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-29 23:40</div>
+</div>
+</body>
+</html>
