@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > CachedGauge</title>
+  <title>Coverage Report > Metric</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,14 +22,14 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.codahale.metrics.annotation</a>
 </div>
 
-<h1>Coverage Summary for Class: CachedGauge (com.codahale.metrics.annotation)</h1>
+<h1>Coverage Summary for Class: Metric (com.codahale.metrics.annotation)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 </tr>
 <tr>
-  <td class="name">CachedGauge</td>
+  <td class="name">Metric</td>
 </tr>
 
 </table>
@@ -45,51 +45,46 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import java.lang.annotation.Retention;
 &nbsp;import java.lang.annotation.RetentionPolicy;
 &nbsp;import java.lang.annotation.Target;
-&nbsp;import java.util.concurrent.TimeUnit;
 &nbsp;
 &nbsp;/**
-&nbsp; * An annotation for marking a method as a gauge, which caches the result for a specified time.
+&nbsp; * An annotation requesting that a metric be injected or registered.
 &nbsp; *
 &nbsp; * &lt;p&gt;
-&nbsp; * Given a method like this:
+&nbsp; * Given a field like this:
 &nbsp; * &lt;pre&gt;&lt;code&gt;
-&nbsp; *     {@literal @}CachedGauge(name = &quot;queueSize&quot;, timeout = 30, timeoutUnit = TimeUnit.SECONDS)
-&nbsp; *     public int getQueueSize() {
-&nbsp; *         return queue.getSize();
-&nbsp; *     }
-&nbsp; *
+&nbsp; *     {@literal @}Metric
+&nbsp; *     public Histogram histogram;
 &nbsp; * &lt;/code&gt;&lt;/pre&gt;
 &nbsp; * &lt;p&gt;
+&nbsp; * A meter of the field&#39;s type will be created and injected into managed objects.
+&nbsp; * It will be up to the user to interact with the metric. This annotation
+&nbsp; * can be used on fields of type Meter, Timer, Counter, and Histogram.
 &nbsp; *
-&nbsp; * A gauge for the defining class with the name queueSize will be created which uses the annotated method&#39;s
-&nbsp; * return value as its value, and which caches the result for 30 seconds.
+&nbsp; * &lt;p&gt;
+&nbsp; * This may also be used to register a metric, which is useful for creating a histogram with
+&nbsp; * a custom Reservoir.
+&nbsp; * &lt;pre&gt;&lt;code&gt;
+&nbsp; *     {@literal @}Metric
+&nbsp; *     public Histogram uniformHistogram = new Histogram(new UniformReservoir());
+&nbsp; * &lt;/code&gt;&lt;/pre&gt;
+&nbsp; * &lt;p&gt;
 &nbsp; *
 &nbsp; * @since 3.1
 &nbsp; */
 &nbsp;@Retention(RetentionPolicy.RUNTIME)
-&nbsp;@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
-&nbsp;public @interface CachedGauge {
+&nbsp;@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE })
+&nbsp;public @interface Metric {
 &nbsp;
 &nbsp;    /**
-&nbsp;     * @return The name of the counter.
+&nbsp;     * @return The name of the metric.
 &nbsp;     */
 &nbsp;    String name() default &quot;&quot;;
 &nbsp;
 &nbsp;    /**
-&nbsp;     * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
-&nbsp;     * relative to the annotated class.
+&nbsp;     * @return If {@code true}, use the given name as an absolute name. If {@code false},
+&nbsp;     * use the given name relative to the annotated class.
 &nbsp;     */
 &nbsp;    boolean absolute() default false;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * @return The amount of time to cache the result
-&nbsp;     */
-&nbsp;    long timeout();
-&nbsp;
-&nbsp;    /**
-&nbsp;     * @return The unit of timeout
-&nbsp;     */
-&nbsp;    TimeUnit timeoutUnit() default TimeUnit.MILLISECONDS;
 &nbsp;
 &nbsp;}
 </code>
@@ -115,7 +110,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

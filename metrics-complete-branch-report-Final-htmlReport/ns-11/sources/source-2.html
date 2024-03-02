@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > InstrumentedTimingCollector</title>
+  <title>Coverage Report > ContextNameStrategy</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.codahale.metrics.jdbi3</a>
+    <a href="../index.html">com.codahale.metrics.jdbi.strategies</a>
 </div>
 
-<h1>Coverage Summary for Class: InstrumentedTimingCollector (com.codahale.metrics.jdbi3)</h1>
+<h1>Coverage Summary for Class: ContextNameStrategy (com.codahale.metrics.jdbi.strategies)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -41,29 +41,29 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">InstrumentedTimingCollector</td>
+  <td class="name">ContextNameStrategy</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    0%
   </span>
   <span class="absValue">
-    (2/3)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    85.7%
+    0%
   </span>
   <span class="absValue">
-    (6/7)
+    (0/1)
   </span>
 </td>
 </tr>
@@ -75,45 +75,19 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jdbi3;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jdbi.strategies;
 &nbsp;
-&nbsp;import com.codahale.metrics.MetricRegistry;
-&nbsp;import com.codahale.metrics.jdbi3.strategies.SmartNameStrategy;
-&nbsp;import com.codahale.metrics.jdbi3.strategies.StatementNameStrategy;
-&nbsp;import org.jdbi.v3.core.statement.SqlLogger;
-&nbsp;import org.jdbi.v3.core.statement.StatementContext;
-&nbsp;import org.jdbi.v3.core.statement.TimingCollector;
-&nbsp;
-&nbsp;import java.util.concurrent.TimeUnit;
 &nbsp;
 &nbsp;/**
-&nbsp; * A {@link TimingCollector} implementation for JDBI which uses the SQL objects&#39; class names and
-&nbsp; * method names for millisecond-precision timers.
-&nbsp; *
-&nbsp; * @deprecated Use {@link InstrumentedSqlLogger} and {@link org.jdbi.v3.core.Jdbi#setSqlLogger(SqlLogger)} instead.
+&nbsp; * Adds statistics for JDBI queries that set the {@link NameStrategies#STATEMENT_GROUP} and {@link
+&nbsp; * NameStrategies#STATEMENT_NAME} for group based display.
 &nbsp; */
-&nbsp;@Deprecated
-&nbsp;public class InstrumentedTimingCollector implements TimingCollector {
-&nbsp;
-&nbsp;    private final MetricRegistry registry;
-&nbsp;    private final StatementNameStrategy statementNameStrategy;
-&nbsp;
-&nbsp;    public InstrumentedTimingCollector(MetricRegistry registry) {
-<b class="nc">&nbsp;        this(registry, new SmartNameStrategy());</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    public InstrumentedTimingCollector(MetricRegistry registry,
-<b class="fc">&nbsp;                                       StatementNameStrategy statementNameStrategy) {</b>
-<b class="fc">&nbsp;        this.registry = registry;</b>
-<b class="fc">&nbsp;        this.statementNameStrategy = statementNameStrategy;</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    @Override
-&nbsp;    public void collect(long elapsedTime, StatementContext ctx) {
-<b class="fc">&nbsp;        String statementName = statementNameStrategy.getStatementName(ctx);</b>
-<b class="fc">&nbsp;        if (statementName != null) {</b>
-<b class="fc">&nbsp;            registry.timer(statementName).update(elapsedTime, TimeUnit.NANOSECONDS);</b>
-&nbsp;        }
+&nbsp;public class ContextNameStrategy extends DelegatingStatementNameStrategy {
+&nbsp;    public ContextNameStrategy() {
+<b class="nc">&nbsp;        super(NameStrategies.CHECK_EMPTY,</b>
+&nbsp;                NameStrategies.CHECK_RAW,
+&nbsp;                NameStrategies.CONTEXT_NAME,
+&nbsp;                NameStrategies.NAIVE_NAME);
 &nbsp;    }
 &nbsp;}
 </code>
@@ -139,7 +113,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

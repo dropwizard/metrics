@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > MetricSet</title>
+  <title>Coverage Report > SettableGauge</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,14 +22,14 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.codahale.metrics</a>
 </div>
 
-<h1>Coverage Summary for Class: MetricSet (com.codahale.metrics)</h1>
+<h1>Coverage Summary for Class: SettableGauge (com.codahale.metrics)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 </tr>
 <tr>
-  <td class="name">MetricSet</td>
+  <td class="name">SettableGauge</td>
 </tr>
 
 </table>
@@ -41,20 +41,17 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics;
 &nbsp;
-&nbsp;import java.util.Map;
-&nbsp;
 &nbsp;/**
-&nbsp; * A set of named metrics.
-&nbsp; *
-&nbsp; * @see MetricRegistry#registerAll(MetricSet)
+&nbsp; * &lt;p&gt;
+&nbsp; * Similar to {@link Gauge}, but metric value is updated via calling {@link #setValue(T)} instead.
+&nbsp; * See {@link DefaultSettableGauge}.
+&nbsp; * &lt;/p&gt;
 &nbsp; */
-&nbsp;public interface MetricSet extends Metric {
+&nbsp;public interface SettableGauge&lt;T&gt; extends Gauge&lt;T&gt; {
 &nbsp;    /**
-&nbsp;     * A map of metric names to metrics.
-&nbsp;     *
-&nbsp;     * @return the metrics
+&nbsp;     * Set the metric to a new value.
 &nbsp;     */
-&nbsp;    Map&lt;String, Metric&gt; getMetrics();
+&nbsp;    void setValue(T value);
 &nbsp;}
 </code>
 </pre>
@@ -79,7 +76,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

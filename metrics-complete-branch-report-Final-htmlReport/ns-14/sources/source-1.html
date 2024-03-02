@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.codahale.metrics.jersey3</a>
+    <a href="../index.html">com.codahale.metrics.jersey2</a>
 </div>
 
-<h1>Coverage Summary for Class: InstrumentedResourceMethodApplicationListener (com.codahale.metrics.jersey3)</h1>
+<h1>Coverage Summary for Class: InstrumentedResourceMethodApplicationListener (com.codahale.metrics.jersey2)</h1>
 
 <table class="coverageStats">
 
@@ -253,7 +253,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jersey3;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jersey2;
 &nbsp;
 &nbsp;import com.codahale.metrics.Clock;
 &nbsp;import com.codahale.metrics.ExponentiallyDecayingReservoir;
@@ -266,8 +266,6 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import com.codahale.metrics.annotation.ResponseMetered;
 &nbsp;import com.codahale.metrics.annotation.ResponseMeteredLevel;
 &nbsp;import com.codahale.metrics.annotation.Timed;
-&nbsp;import jakarta.ws.rs.core.Configuration;
-&nbsp;import jakarta.ws.rs.ext.Provider;
 &nbsp;import org.glassfish.jersey.server.ContainerResponse;
 &nbsp;import org.glassfish.jersey.server.model.ModelProcessor;
 &nbsp;import org.glassfish.jersey.server.model.Resource;
@@ -278,24 +276,25 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import org.glassfish.jersey.server.monitoring.RequestEvent;
 &nbsp;import org.glassfish.jersey.server.monitoring.RequestEventListener;
 &nbsp;
+&nbsp;import javax.ws.rs.core.Configuration;
+&nbsp;import javax.ws.rs.ext.Provider;
 &nbsp;import java.lang.annotation.Annotation;
 &nbsp;import java.lang.reflect.Method;
 &nbsp;import java.util.Arrays;
 &nbsp;import java.util.Collections;
-&nbsp;import java.util.EnumSet;
 &nbsp;import java.util.List;
 &nbsp;import java.util.Map;
 &nbsp;import java.util.Set;
+&nbsp;import java.util.EnumSet;
 &nbsp;import java.util.concurrent.ConcurrentHashMap;
 &nbsp;import java.util.concurrent.ConcurrentMap;
 &nbsp;import java.util.concurrent.TimeUnit;
 &nbsp;import java.util.function.Supplier;
 &nbsp;
 &nbsp;import static com.codahale.metrics.MetricRegistry.name;
-&nbsp;import static com.codahale.metrics.annotation.ResponseMeteredLevel.ALL;
 &nbsp;import static com.codahale.metrics.annotation.ResponseMeteredLevel.COARSE;
 &nbsp;import static com.codahale.metrics.annotation.ResponseMeteredLevel.DETAILED;
-&nbsp;
+&nbsp;import static com.codahale.metrics.annotation.ResponseMeteredLevel.ALL;
 &nbsp;
 &nbsp;/**
 &nbsp; * An application event listener that listens for Jersey application initialization to
@@ -404,12 +403,12 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;            this.level = responseMetered.level();</b>
 <b class="fc">&nbsp;            this.meters = COARSE_METER_LEVELS.contains(level) ?</b>
 <b class="fc">&nbsp;                    Collections.unmodifiableList(Arrays.asList(</b>
-<b class="fc">&nbsp;                            registry.meter(name(metricName, &quot;1xx-responses&quot;)), // 1xx</b>
-<b class="fc">&nbsp;                            registry.meter(name(metricName, &quot;2xx-responses&quot;)), // 2xx</b>
-<b class="fc">&nbsp;                            registry.meter(name(metricName, &quot;3xx-responses&quot;)), // 3xx</b>
-<b class="fc">&nbsp;                            registry.meter(name(metricName, &quot;4xx-responses&quot;)), // 4xx</b>
-<b class="fc">&nbsp;                            registry.meter(name(metricName, &quot;5xx-responses&quot;))  // 5xx</b>
-<b class="fc">&nbsp;                    )) : Collections.emptyList();</b>
+<b class="fc">&nbsp;                    registry.meter(name(metricName, &quot;1xx-responses&quot;)), // 1xx</b>
+<b class="fc">&nbsp;                    registry.meter(name(metricName, &quot;2xx-responses&quot;)), // 2xx</b>
+<b class="fc">&nbsp;                    registry.meter(name(metricName, &quot;3xx-responses&quot;)), // 3xx</b>
+<b class="fc">&nbsp;                    registry.meter(name(metricName, &quot;4xx-responses&quot;)), // 4xx</b>
+<b class="fc">&nbsp;                    registry.meter(name(metricName, &quot;5xx-responses&quot;))  // 5xx</b>
+<b class="fc">&nbsp;            )) : Collections.emptyList();</b>
 <b class="fc">&nbsp;            this.responseCodeMeters = DETAILED_METER_LEVELS.contains(level) ? new ConcurrentHashMap&lt;&gt;() : Collections.emptyMap();</b>
 <b class="fc">&nbsp;            this.metricRegistry = registry;</b>
 &nbsp;        }
@@ -826,7 +825,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

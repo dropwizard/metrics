@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">io.dropwizard.metrics.jetty11</a>
+    <a href="../index.html">io.dropwizard.metrics.jetty10</a>
 </div>
 
-<h1>Coverage Summary for Class: InstrumentedHandler (io.dropwizard.metrics.jetty11)</h1>
+<h1>Coverage Summary for Class: InstrumentedHandler (io.dropwizard.metrics.jetty10)</h1>
 
 <table class="coverageStats">
 
@@ -273,7 +273,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package io.dropwizard.metrics.jetty11;
+<code class="sourceCode" id="sourceCode">&nbsp;package io.dropwizard.metrics.jetty10;
 &nbsp;
 &nbsp;import com.codahale.metrics.Counter;
 &nbsp;import com.codahale.metrics.Meter;
@@ -281,11 +281,6 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import com.codahale.metrics.RatioGauge;
 &nbsp;import com.codahale.metrics.Timer;
 &nbsp;import com.codahale.metrics.annotation.ResponseMeteredLevel;
-&nbsp;import jakarta.servlet.AsyncEvent;
-&nbsp;import jakarta.servlet.AsyncListener;
-&nbsp;import jakarta.servlet.ServletException;
-&nbsp;import jakarta.servlet.http.HttpServletRequest;
-&nbsp;import jakarta.servlet.http.HttpServletResponse;
 &nbsp;import org.eclipse.jetty.http.HttpMethod;
 &nbsp;import org.eclipse.jetty.server.AsyncContextState;
 &nbsp;import org.eclipse.jetty.server.Handler;
@@ -293,6 +288,11 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import org.eclipse.jetty.server.Request;
 &nbsp;import org.eclipse.jetty.server.handler.HandlerWrapper;
 &nbsp;
+&nbsp;import javax.servlet.AsyncEvent;
+&nbsp;import javax.servlet.AsyncListener;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpServletResponse;
 &nbsp;import java.io.IOException;
 &nbsp;import java.util.Arrays;
 &nbsp;import java.util.Collections;
@@ -414,9 +414,9 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     * @param responseMeteredLevel the level to determine individual/aggregate response codes that are instrumented
 &nbsp;     */
 <b class="fc">&nbsp;    public InstrumentedHandler(MetricRegistry registry, String prefix, ResponseMeteredLevel responseMeteredLevel) {</b>
-<b class="fc">&nbsp;        this.responseMeteredLevel = responseMeteredLevel;</b>
 <b class="fc">&nbsp;        this.metricRegistry = registry;</b>
 <b class="fc">&nbsp;        this.prefix = prefix;</b>
+<b class="fc">&nbsp;        this.responseMeteredLevel = responseMeteredLevel;</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public String getName() {
@@ -458,12 +458,13 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 <b class="fc">&nbsp;        if (COARSE_METER_LEVELS.contains(responseMeteredLevel)) {</b>
 <b class="fc">&nbsp;            this.responses = Collections.unmodifiableList(Arrays.asList(</b>
-<b class="fc">&nbsp;                            metricRegistry.meter(name(prefix, NAME_1XX_RESPONSES)), // 1xx</b>
-<b class="fc">&nbsp;                            metricRegistry.meter(name(prefix, NAME_2XX_RESPONSES)), // 2xx</b>
-<b class="fc">&nbsp;                            metricRegistry.meter(name(prefix, NAME_3XX_RESPONSES)), // 3xx</b>
-<b class="fc">&nbsp;                            metricRegistry.meter(name(prefix, NAME_4XX_RESPONSES)), // 4xx</b>
-<b class="fc">&nbsp;                            metricRegistry.meter(name(prefix, NAME_5XX_RESPONSES))  // 5xx</b>
-&nbsp;                    ));
+<b class="fc">&nbsp;                    metricRegistry.meter(name(prefix, NAME_1XX_RESPONSES)), // 1xx</b>
+<b class="fc">&nbsp;                    metricRegistry.meter(name(prefix, NAME_2XX_RESPONSES)), // 2xx</b>
+<b class="fc">&nbsp;                    metricRegistry.meter(name(prefix, NAME_3XX_RESPONSES)), // 3xx</b>
+<b class="fc">&nbsp;                    metricRegistry.meter(name(prefix, NAME_4XX_RESPONSES)), // 4xx</b>
+<b class="fc">&nbsp;                    metricRegistry.meter(name(prefix, NAME_5XX_RESPONSES))  // 5xx</b>
+&nbsp;            ));
+&nbsp;
 <b class="fc">&nbsp;            metricRegistry.register(name(prefix, NAME_PERCENT_4XX_1M), new RatioGauge() {</b>
 &nbsp;                @Override
 &nbsp;                protected Ratio getRatio() {
@@ -739,7 +740,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

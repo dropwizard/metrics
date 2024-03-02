@@ -1,0 +1,490 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ConsoleReporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics</a>
+</div>
+
+<h1>Coverage Summary for Class: ConsoleReporter (com.codahale.metrics)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConsoleReporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (90/90)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConsoleReporter$1</td>
+  </tr>
+  <tr>
+    <td class="name">ConsoleReporter$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.6%
+  </span>
+  <span class="absValue">
+    (11/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.2%
+  </span>
+  <span class="absValue">
+    (30/34)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (22/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.8%
+  </span>
+  <span class="absValue">
+    (120/124)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics;
+&nbsp;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.text.DateFormat;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.SortedMap;
+&nbsp;import java.util.TimeZone;
+&nbsp;import java.util.concurrent.ScheduledExecutorService;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;/**
+&nbsp; * A reporter which outputs measurements to a {@link PrintStream}, like {@code System.out}.
+&nbsp; */
+<b class="fc">&nbsp;public class ConsoleReporter extends ScheduledReporter {</b>
+&nbsp;    /**
+&nbsp;     * Returns a new {@link Builder} for {@link ConsoleReporter}.
+&nbsp;     *
+&nbsp;     * @param registry the registry to report
+&nbsp;     * @return a {@link Builder} instance for a {@link ConsoleReporter}
+&nbsp;     */
+&nbsp;    public static Builder forRegistry(MetricRegistry registry) {
+<b class="fc">&nbsp;        return new Builder(registry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A builder for {@link ConsoleReporter} instances. Defaults to using the default locale and
+&nbsp;     * time zone, writing to {@code System.out}, converting rates to events/second, converting
+&nbsp;     * durations to milliseconds, and not filtering metrics.
+&nbsp;     */
+<b class="fc">&nbsp;    public static class Builder {</b>
+&nbsp;        private final MetricRegistry registry;
+&nbsp;        private PrintStream output;
+&nbsp;        private Locale locale;
+&nbsp;        private Clock clock;
+&nbsp;        private TimeZone timeZone;
+&nbsp;        private TimeUnit rateUnit;
+&nbsp;        private TimeUnit durationUnit;
+&nbsp;        private MetricFilter filter;
+&nbsp;        private ScheduledExecutorService executor;
+&nbsp;        private boolean shutdownExecutorOnStop;
+&nbsp;        private Set&lt;MetricAttribute&gt; disabledMetricAttributes;
+&nbsp;
+<b class="fc">&nbsp;        private Builder(MetricRegistry registry) {</b>
+<b class="fc">&nbsp;            this.registry = registry;</b>
+<b class="fc">&nbsp;            this.output = System.out;</b>
+<b class="fc">&nbsp;            this.locale = Locale.getDefault();</b>
+<b class="fc">&nbsp;            this.clock = Clock.defaultClock();</b>
+<b class="fc">&nbsp;            this.timeZone = TimeZone.getDefault();</b>
+<b class="fc">&nbsp;            this.rateUnit = TimeUnit.SECONDS;</b>
+<b class="fc">&nbsp;            this.durationUnit = TimeUnit.MILLISECONDS;</b>
+<b class="fc">&nbsp;            this.filter = MetricFilter.ALL;</b>
+<b class="fc">&nbsp;            this.executor = null;</b>
+<b class="fc">&nbsp;            this.shutdownExecutorOnStop = true;</b>
+<b class="fc">&nbsp;            disabledMetricAttributes = Collections.emptySet();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Specifies whether or not, the executor (used for reporting) will be stopped with same time with reporter.
+&nbsp;         * Default value is true.
+&nbsp;         * Setting this parameter to false, has the sense in combining with providing external managed executor via {@link #scheduleOn(ScheduledExecutorService)}.
+&nbsp;         *
+&nbsp;         * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public Builder shutdownExecutorOnStop(boolean shutdownExecutorOnStop) {
+<b class="nc">&nbsp;            this.shutdownExecutorOnStop = shutdownExecutorOnStop;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Specifies the executor to use while scheduling reporting of metrics.
+&nbsp;         * Default value is null.
+&nbsp;         * Null value leads to executor will be auto created on start.
+&nbsp;         *
+&nbsp;         * @param executor the executor to use while scheduling reporting of metrics.
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public Builder scheduleOn(ScheduledExecutorService executor) {
+<b class="nc">&nbsp;            this.executor = executor;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Write to the given {@link PrintStream}.
+&nbsp;         *
+&nbsp;         * @param output a {@link PrintStream} instance.
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public Builder outputTo(PrintStream output) {
+<b class="fc">&nbsp;            this.output = output;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Format numbers for the given {@link Locale}.
+&nbsp;         *
+&nbsp;         * @param locale a {@link Locale}
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public Builder formattedFor(Locale locale) {
+<b class="fc">&nbsp;            this.locale = locale;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Use the given {@link Clock} instance for the time.
+&nbsp;         *
+&nbsp;         * @param clock a {@link Clock} instance
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public Builder withClock(Clock clock) {
+<b class="fc">&nbsp;            this.clock = clock;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Use the given {@link TimeZone} for the time.
+&nbsp;         *
+&nbsp;         * @param timeZone a {@link TimeZone}
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public Builder formattedFor(TimeZone timeZone) {
+<b class="fc">&nbsp;            this.timeZone = timeZone;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Convert rates to the given time unit.
+&nbsp;         *
+&nbsp;         * @param rateUnit a unit of time
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public Builder convertRatesTo(TimeUnit rateUnit) {
+<b class="fc">&nbsp;            this.rateUnit = rateUnit;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Convert durations to the given time unit.
+&nbsp;         *
+&nbsp;         * @param durationUnit a unit of time
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public Builder convertDurationsTo(TimeUnit durationUnit) {
+<b class="fc">&nbsp;            this.durationUnit = durationUnit;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Only report metrics which match the given filter.
+&nbsp;         *
+&nbsp;         * @param filter a {@link MetricFilter}
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public Builder filter(MetricFilter filter) {
+<b class="fc">&nbsp;            this.filter = filter;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Don&#39;t report the passed metric attributes for all metrics (e.g. &quot;p999&quot;, &quot;stddev&quot; or &quot;m15&quot;).
+&nbsp;         * See {@link MetricAttribute}.
+&nbsp;         *
+&nbsp;         * @param disabledMetricAttributes a {@link MetricFilter}
+&nbsp;         * @return {@code this}
+&nbsp;         */
+&nbsp;        public Builder disabledMetricAttributes(Set&lt;MetricAttribute&gt; disabledMetricAttributes) {
+<b class="fc">&nbsp;            this.disabledMetricAttributes = disabledMetricAttributes;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Builds a {@link ConsoleReporter} with the given properties.
+&nbsp;         *
+&nbsp;         * @return a {@link ConsoleReporter}
+&nbsp;         */
+&nbsp;        public ConsoleReporter build() {
+<b class="fc">&nbsp;            return new ConsoleReporter(registry,</b>
+&nbsp;                    output,
+&nbsp;                    locale,
+&nbsp;                    clock,
+&nbsp;                    timeZone,
+&nbsp;                    rateUnit,
+&nbsp;                    durationUnit,
+&nbsp;                    filter,
+&nbsp;                    executor,
+&nbsp;                    shutdownExecutorOnStop,
+&nbsp;                    disabledMetricAttributes);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final int CONSOLE_WIDTH = 80;
+&nbsp;
+&nbsp;    private final PrintStream output;
+&nbsp;    private final Locale locale;
+&nbsp;    private final Clock clock;
+&nbsp;    private final DateFormat dateFormat;
+&nbsp;
+&nbsp;    private ConsoleReporter(MetricRegistry registry,
+&nbsp;                            PrintStream output,
+&nbsp;                            Locale locale,
+&nbsp;                            Clock clock,
+&nbsp;                            TimeZone timeZone,
+&nbsp;                            TimeUnit rateUnit,
+&nbsp;                            TimeUnit durationUnit,
+&nbsp;                            MetricFilter filter,
+&nbsp;                            ScheduledExecutorService executor,
+&nbsp;                            boolean shutdownExecutorOnStop,
+&nbsp;                            Set&lt;MetricAttribute&gt; disabledMetricAttributes) {
+<b class="fc">&nbsp;        super(registry, &quot;console-reporter&quot;, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, disabledMetricAttributes);</b>
+<b class="fc">&nbsp;        this.output = output;</b>
+<b class="fc">&nbsp;        this.locale = locale;</b>
+<b class="fc">&nbsp;        this.clock = clock;</b>
+<b class="fc">&nbsp;        this.dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT,</b>
+&nbsp;                DateFormat.MEDIUM,
+&nbsp;                locale);
+<b class="fc">&nbsp;        dateFormat.setTimeZone(timeZone);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;    public void report(SortedMap&lt;String, Gauge&gt; gauges,
+&nbsp;                       SortedMap&lt;String, Counter&gt; counters,
+&nbsp;                       SortedMap&lt;String, Histogram&gt; histograms,
+&nbsp;                       SortedMap&lt;String, Meter&gt; meters,
+&nbsp;                       SortedMap&lt;String, Timer&gt; timers) {
+<b class="fc">&nbsp;        final String dateTime = dateFormat.format(new Date(clock.getTime()));</b>
+<b class="fc">&nbsp;        printWithBanner(dateTime, &#39;=&#39;);</b>
+<b class="fc">&nbsp;        output.println();</b>
+&nbsp;
+<b class="fc">&nbsp;        if (!gauges.isEmpty()) {</b>
+<b class="fc">&nbsp;            printWithBanner(&quot;-- Gauges&quot;, &#39;-&#39;);</b>
+<b class="fc">&nbsp;            for (Map.Entry&lt;String, Gauge&gt; entry : gauges.entrySet()) {</b>
+<b class="fc">&nbsp;                output.println(entry.getKey());</b>
+<b class="fc">&nbsp;                printGauge(entry.getValue());</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            output.println();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (!counters.isEmpty()) {</b>
+<b class="fc">&nbsp;            printWithBanner(&quot;-- Counters&quot;, &#39;-&#39;);</b>
+<b class="fc">&nbsp;            for (Map.Entry&lt;String, Counter&gt; entry : counters.entrySet()) {</b>
+<b class="fc">&nbsp;                output.println(entry.getKey());</b>
+<b class="fc">&nbsp;                printCounter(entry);</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            output.println();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (!histograms.isEmpty()) {</b>
+<b class="fc">&nbsp;            printWithBanner(&quot;-- Histograms&quot;, &#39;-&#39;);</b>
+<b class="fc">&nbsp;            for (Map.Entry&lt;String, Histogram&gt; entry : histograms.entrySet()) {</b>
+<b class="fc">&nbsp;                output.println(entry.getKey());</b>
+<b class="fc">&nbsp;                printHistogram(entry.getValue());</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            output.println();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (!meters.isEmpty()) {</b>
+<b class="fc">&nbsp;            printWithBanner(&quot;-- Meters&quot;, &#39;-&#39;);</b>
+<b class="fc">&nbsp;            for (Map.Entry&lt;String, Meter&gt; entry : meters.entrySet()) {</b>
+<b class="fc">&nbsp;                output.println(entry.getKey());</b>
+<b class="fc">&nbsp;                printMeter(entry.getValue());</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            output.println();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (!timers.isEmpty()) {</b>
+<b class="fc">&nbsp;            printWithBanner(&quot;-- Timers&quot;, &#39;-&#39;);</b>
+<b class="fc">&nbsp;            for (Map.Entry&lt;String, Timer&gt; entry : timers.entrySet()) {</b>
+<b class="fc">&nbsp;                output.println(entry.getKey());</b>
+<b class="fc">&nbsp;                printTimer(entry.getValue());</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            output.println();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        output.println();</b>
+<b class="fc">&nbsp;        output.flush();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void printMeter(Meter meter) {
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.COUNT, String.format(locale, &quot;             count = %d&quot;, meter.getCount()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.MEAN_RATE, String.format(locale, &quot;         mean rate = %2.2f events/%s&quot;, convertRate(meter.getMeanRate()), getRateUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.M1_RATE, String.format(locale, &quot;     1-minute rate = %2.2f events/%s&quot;, convertRate(meter.getOneMinuteRate()), getRateUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.M5_RATE, String.format(locale, &quot;     5-minute rate = %2.2f events/%s&quot;, convertRate(meter.getFiveMinuteRate()), getRateUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.M15_RATE, String.format(locale, &quot;    15-minute rate = %2.2f events/%s&quot;, convertRate(meter.getFifteenMinuteRate()), getRateUnit()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void printCounter(Map.Entry&lt;String, Counter&gt; entry) {
+<b class="fc">&nbsp;        output.printf(locale, &quot;             count = %d%n&quot;, entry.getValue().getCount());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void printGauge(Gauge&lt;?&gt; gauge) {
+<b class="fc">&nbsp;        output.printf(locale, &quot;             value = %s%n&quot;, gauge.getValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void printHistogram(Histogram histogram) {
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.COUNT, String.format(locale, &quot;             count = %d&quot;, histogram.getCount()));</b>
+<b class="fc">&nbsp;        Snapshot snapshot = histogram.getSnapshot();</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.MIN, String.format(locale, &quot;               min = %d&quot;, snapshot.getMin()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.MAX, String.format(locale, &quot;               max = %d&quot;, snapshot.getMax()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.MEAN, String.format(locale, &quot;              mean = %2.2f&quot;, snapshot.getMean()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.STDDEV, String.format(locale, &quot;            stddev = %2.2f&quot;, snapshot.getStdDev()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.P50, String.format(locale, &quot;            median = %2.2f&quot;, snapshot.getMedian()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.P75, String.format(locale, &quot;              75%% &lt;= %2.2f&quot;, snapshot.get75thPercentile()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.P95, String.format(locale, &quot;              95%% &lt;= %2.2f&quot;, snapshot.get95thPercentile()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.P98, String.format(locale, &quot;              98%% &lt;= %2.2f&quot;, snapshot.get98thPercentile()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.P99, String.format(locale, &quot;              99%% &lt;= %2.2f&quot;, snapshot.get99thPercentile()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.P999, String.format(locale, &quot;            99.9%% &lt;= %2.2f&quot;, snapshot.get999thPercentile()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void printTimer(Timer timer) {
+<b class="fc">&nbsp;        final Snapshot snapshot = timer.getSnapshot();</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.COUNT, String.format(locale, &quot;             count = %d&quot;, timer.getCount()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.MEAN_RATE, String.format(locale, &quot;         mean rate = %2.2f calls/%s&quot;, convertRate(timer.getMeanRate()), getRateUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.M1_RATE, String.format(locale, &quot;     1-minute rate = %2.2f calls/%s&quot;, convertRate(timer.getOneMinuteRate()), getRateUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.M5_RATE, String.format(locale, &quot;     5-minute rate = %2.2f calls/%s&quot;, convertRate(timer.getFiveMinuteRate()), getRateUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.M15_RATE, String.format(locale, &quot;    15-minute rate = %2.2f calls/%s&quot;, convertRate(timer.getFifteenMinuteRate()), getRateUnit()));</b>
+&nbsp;
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.MIN, String.format(locale, &quot;               min = %2.2f %s&quot;, convertDuration(snapshot.getMin()), getDurationUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.MAX, String.format(locale, &quot;               max = %2.2f %s&quot;, convertDuration(snapshot.getMax()), getDurationUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.MEAN, String.format(locale, &quot;              mean = %2.2f %s&quot;, convertDuration(snapshot.getMean()), getDurationUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.STDDEV, String.format(locale, &quot;            stddev = %2.2f %s&quot;, convertDuration(snapshot.getStdDev()), getDurationUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.P50, String.format(locale, &quot;            median = %2.2f %s&quot;, convertDuration(snapshot.getMedian()), getDurationUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.P75, String.format(locale, &quot;              75%% &lt;= %2.2f %s&quot;, convertDuration(snapshot.get75thPercentile()), getDurationUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.P95, String.format(locale, &quot;              95%% &lt;= %2.2f %s&quot;, convertDuration(snapshot.get95thPercentile()), getDurationUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.P98, String.format(locale, &quot;              98%% &lt;= %2.2f %s&quot;, convertDuration(snapshot.get98thPercentile()), getDurationUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.P99, String.format(locale, &quot;              99%% &lt;= %2.2f %s&quot;, convertDuration(snapshot.get99thPercentile()), getDurationUnit()));</b>
+<b class="fc">&nbsp;        printIfEnabled(MetricAttribute.P999, String.format(locale, &quot;            99.9%% &lt;= %2.2f %s&quot;, convertDuration(snapshot.get999thPercentile()), getDurationUnit()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void printWithBanner(String s, char c) {
+<b class="fc">&nbsp;        output.print(s);</b>
+<b class="fc">&nbsp;        output.print(&#39; &#39;);</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; (CONSOLE_WIDTH - s.length() - 1); i++) {</b>
+<b class="fc">&nbsp;            output.print(c);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        output.println();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Print only if the attribute is enabled
+&nbsp;     *
+&nbsp;     * @param type   Metric attribute
+&nbsp;     * @param status Status to be logged
+&nbsp;     */
+&nbsp;    private void printIfEnabled(MetricAttribute type, String status) {
+<b class="fc">&nbsp;        if (getDisabledMetricAttributes().contains(type)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        output.println(status);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-01 18:42</div>
+</div>
+</body>
+</html>

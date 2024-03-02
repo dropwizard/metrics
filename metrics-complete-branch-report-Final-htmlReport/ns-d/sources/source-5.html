@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > InstrumentedHttpAsyncClients</title>
+  <title>Coverage Report > InstrumentedHttpRequestExecutor</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.codahale.metrics.httpclient5</a>
+    <a href="../index.html">com.codahale.metrics.httpclient</a>
 </div>
 
-<h1>Coverage Summary for Class: InstrumentedHttpAsyncClients (com.codahale.metrics.httpclient5)</h1>
+<h1>Coverage Summary for Class: InstrumentedHttpRequestExecutor (com.codahale.metrics.httpclient)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -41,7 +41,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">InstrumentedHttpAsyncClients</td>
+  <td class="name">InstrumentedHttpRequestExecutor</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -52,18 +52,18 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    40%
+    100%
   </span>
   <span class="absValue">
-    (2/5)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    57.1%
+    100%
   </span>
   <span class="absValue">
-    (4/7)
+    (15/15)
   </span>
 </td>
 </tr>
@@ -75,48 +75,67 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.httpclient5;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.httpclient;
 &nbsp;
 &nbsp;import com.codahale.metrics.MetricRegistry;
-&nbsp;import org.apache.hc.client5.http.impl.ChainElement;
-&nbsp;import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
-&nbsp;import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
-&nbsp;import org.apache.hc.client5.http.nio.AsyncClientConnectionManager;
+&nbsp;import com.codahale.metrics.Timer;
+&nbsp;import org.apache.http.HttpClientConnection;
+&nbsp;import org.apache.http.HttpException;
+&nbsp;import org.apache.http.HttpRequest;
+&nbsp;import org.apache.http.HttpResponse;
+&nbsp;import org.apache.http.protocol.HttpContext;
+&nbsp;import org.apache.http.protocol.HttpRequestExecutor;
 &nbsp;
-&nbsp;import static com.codahale.metrics.httpclient5.HttpClientMetricNameStrategies.METHOD_ONLY;
+&nbsp;import com.codahale.metrics.Meter;
 &nbsp;
-&nbsp;public class InstrumentedHttpAsyncClients {
-&nbsp;    private InstrumentedHttpAsyncClients() {
-&nbsp;        super();
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;public class InstrumentedHttpRequestExecutor extends HttpRequestExecutor {
+&nbsp;    private final MetricRegistry registry;
+&nbsp;    private final HttpClientMetricNameStrategy metricNameStrategy;
+&nbsp;    private final String name;
+&nbsp;
+&nbsp;    public InstrumentedHttpRequestExecutor(MetricRegistry registry,
+&nbsp;                                           HttpClientMetricNameStrategy metricNameStrategy) {
+<b class="fc">&nbsp;        this(registry, metricNameStrategy, null);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    public static CloseableHttpAsyncClient createDefault(MetricRegistry metricRegistry) {
-<b class="nc">&nbsp;        return createDefault(metricRegistry, METHOD_ONLY);</b>
+&nbsp;    public InstrumentedHttpRequestExecutor(MetricRegistry registry,
+&nbsp;                                           HttpClientMetricNameStrategy metricNameStrategy,
+&nbsp;                                           String name) {
+<b class="fc">&nbsp;        this(registry, metricNameStrategy, name, HttpRequestExecutor.DEFAULT_WAIT_FOR_CONTINUE);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    public static CloseableHttpAsyncClient createDefault(MetricRegistry metricRegistry,
-&nbsp;                                                         HttpClientMetricNameStrategy metricNameStrategy) {
-<b class="nc">&nbsp;        return custom(metricRegistry, metricNameStrategy).build();</b>
+&nbsp;    public InstrumentedHttpRequestExecutor(MetricRegistry registry,
+&nbsp;                                           HttpClientMetricNameStrategy metricNameStrategy,
+&nbsp;                                           String name,
+&nbsp;                                           int waitForContinue) {
+<b class="fc">&nbsp;        super(waitForContinue);</b>
+<b class="fc">&nbsp;        this.registry = registry;</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+<b class="fc">&nbsp;        this.metricNameStrategy = metricNameStrategy;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    public static HttpAsyncClientBuilder custom(MetricRegistry metricRegistry) {
-<b class="nc">&nbsp;        return custom(metricRegistry, METHOD_ONLY);</b>
+&nbsp;    @Override
+&nbsp;    public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context) throws HttpException, IOException {
+<b class="fc">&nbsp;        final Timer.Context timerContext = timer(request).time();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            return super.execute(request, conn, context);</b>
+<b class="fc">&nbsp;        } catch (HttpException | IOException e) {</b>
+<b class="fc">&nbsp;            meter(e).mark();</b>
+<b class="fc">&nbsp;            throw e;</b>
+&nbsp;        } finally {
+<b class="fc">&nbsp;            timerContext.stop();</b>
+<b class="fc">&nbsp;        }</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    public static HttpAsyncClientBuilder custom(MetricRegistry metricRegistry,
-&nbsp;                                                HttpClientMetricNameStrategy metricNameStrategy) {
-<b class="fc">&nbsp;        return custom(metricRegistry, metricNameStrategy, InstrumentedAsyncClientConnectionManager.builder(metricRegistry).build());</b>
+&nbsp;    private Timer timer(HttpRequest request) {
+<b class="fc">&nbsp;        return registry.timer(metricNameStrategy.getNameFor(name, request));</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    public static HttpAsyncClientBuilder custom(MetricRegistry metricRegistry,
-&nbsp;                                                HttpClientMetricNameStrategy metricNameStrategy,
-&nbsp;                                                AsyncClientConnectionManager clientConnectionManager) {
-<b class="fc">&nbsp;        return HttpAsyncClientBuilder.create()</b>
-<b class="fc">&nbsp;                .setConnectionManager(clientConnectionManager)</b>
-<b class="fc">&nbsp;                .addExecInterceptorBefore(ChainElement.CONNECT.name(), &quot;dropwizard-metrics&quot;,</b>
-&nbsp;                        new InstrumentedAsyncExecChainHandler(metricRegistry, metricNameStrategy));
+&nbsp;    private Meter meter(Exception e) {
+<b class="fc">&nbsp;        return registry.meter(metricNameStrategy.getNameFor(name, e));</b>
 &nbsp;    }
-&nbsp;
 &nbsp;}
 </code>
 </pre>
@@ -141,7 +160,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

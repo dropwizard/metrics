@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > Reservoir</title>
+  <title>Coverage Report > Gauge</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.codahale.metrics</a>
 </div>
 
-<h1>Coverage Summary for Class: Reservoir (com.codahale.metrics)</h1>
+<h1>Coverage Summary for Class: Gauge (com.codahale.metrics)</h1>
 
 <table class="coverageStats">
 
@@ -30,13 +30,13 @@ Current scope:     <a href="../../index.html">all classes</a>
   <th class="name">Class</th>
 </tr>
   <tr>
-    <td class="name">Reservoir$MockitoMock$8D80dqav</td>
+    <td class="name">Gauge$MockitoMock$16J7fyYM</td>
   </tr>
   <tr>
-    <td class="name">Reservoir$MockitoMock$8D80dqav$auxiliary$KGzDpHA7</td>
+    <td class="name">Gauge$MockitoMock$16J7fyYM$auxiliary$VXWBejxv</td>
   </tr>
   <tr>
-    <td class="name">Reservoir$MockitoMock$8D80dqav$auxiliary$lJ9cZIw6</td>
+    <td class="name">Gauge$MockitoMock$16J7fyYM$auxiliary$YZRkD9Gi</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
@@ -50,30 +50,29 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics;
 &nbsp;
+&nbsp;
 &nbsp;/**
-&nbsp; * A statistically representative reservoir of a data stream.
+&nbsp; * A gauge metric is an instantaneous reading of a particular value. To instrument a queue&#39;s depth,
+&nbsp; * for example:&lt;br&gt;
+&nbsp; * &lt;pre&gt;&lt;code&gt;
+&nbsp; * final Queue&amp;lt;String&amp;gt; queue = new ConcurrentLinkedQueue&amp;lt;String&amp;gt;();
+&nbsp; * final Gauge&amp;lt;Integer&amp;gt; queueDepth = new Gauge&amp;lt;Integer&amp;gt;() {
+&nbsp; *     public Integer getValue() {
+&nbsp; *         return queue.size();
+&nbsp; *     }
+&nbsp; * };
+&nbsp; * &lt;/code&gt;&lt;/pre&gt;
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the type of the metric&#39;s value
 &nbsp; */
-&nbsp;public interface Reservoir {
+&nbsp;@FunctionalInterface
+&nbsp;public interface Gauge&lt;T&gt; extends Metric {
 &nbsp;    /**
-&nbsp;     * Returns the number of values recorded.
+&nbsp;     * Returns the metric&#39;s current value.
 &nbsp;     *
-&nbsp;     * @return the number of values recorded
+&nbsp;     * @return the metric&#39;s current value
 &nbsp;     */
-&nbsp;    int size();
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Adds a new recorded value to the reservoir.
-&nbsp;     *
-&nbsp;     * @param value a new recorded value
-&nbsp;     */
-&nbsp;    void update(long value);
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Returns a snapshot of the reservoir&#39;s values.
-&nbsp;     *
-&nbsp;     * @return a snapshot of the reservoir&#39;s values
-&nbsp;     */
-&nbsp;    Snapshot getSnapshot();
+&nbsp;    T getValue();
 &nbsp;}
 </code>
 </pre>
@@ -98,7 +97,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

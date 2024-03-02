@@ -1,0 +1,154 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Sender</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.collectd</a>
+</div>
+
+<h1>Coverage Summary for Class: Sender (com.codahale.metrics.collectd)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Sender</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.9%
+  </span>
+  <span class="absValue">
+    (13/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.collectd;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.InetSocketAddress;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.channels.DatagramChannel;
+&nbsp;
+&nbsp;public class Sender {
+&nbsp;
+&nbsp;    private final String host;
+&nbsp;    private final int port;
+&nbsp;
+&nbsp;    private InetSocketAddress address;
+&nbsp;    private DatagramChannel channel;
+&nbsp;
+<b class="fc">&nbsp;    public Sender(String host, int port) {</b>
+<b class="fc">&nbsp;        this.host = host;</b>
+<b class="fc">&nbsp;        this.port = port;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void connect() throws IOException {
+<b class="fc">&nbsp;        if (isConnected()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Already connected&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (host != null) {</b>
+<b class="fc">&nbsp;            address = new InetSocketAddress(host, port);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        channel = DatagramChannel.open();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isConnected() {
+<b class="fc">&nbsp;        return channel != null &amp;&amp; !channel.socket().isClosed();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void send(ByteBuffer buffer) throws IOException {
+<b class="fc">&nbsp;        channel.send(buffer, address);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void disconnect() throws IOException {
+<b class="fc">&nbsp;        if (channel == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;        try {
+<b class="fc">&nbsp;            channel.close();</b>
+&nbsp;        } finally {
+<b class="fc">&nbsp;            channel = null;</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-01 18:42</div>
+</div>
+</body>
+</html>

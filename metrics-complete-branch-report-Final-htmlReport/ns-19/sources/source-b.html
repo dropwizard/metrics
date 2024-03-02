@@ -1,0 +1,217 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ThreadDump</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.jvm</a>
+</div>
+
+<h1>Coverage Summary for Class: ThreadDump (com.codahale.metrics.jvm)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ThreadDump</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (40/48)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jvm;
+&nbsp;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.lang.management.LockInfo;
+&nbsp;import java.lang.management.MonitorInfo;
+&nbsp;import java.lang.management.ThreadInfo;
+&nbsp;import java.lang.management.ThreadMXBean;
+&nbsp;
+&nbsp;import static java.nio.charset.StandardCharsets.UTF_8;
+&nbsp;
+&nbsp;
+&nbsp;/**
+&nbsp; * A convenience class for getting a thread dump.
+&nbsp; */
+&nbsp;public class ThreadDump {
+&nbsp;
+&nbsp;    private final ThreadMXBean threadMXBean;
+&nbsp;
+<b class="fc">&nbsp;    public ThreadDump(ThreadMXBean threadMXBean) {</b>
+<b class="fc">&nbsp;        this.threadMXBean = threadMXBean;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Dumps all of the threads&#39; current information, including synchronization, to an output stream.
+&nbsp;     *
+&nbsp;     * @param out an output stream
+&nbsp;     */
+&nbsp;    public void dump(OutputStream out) {
+<b class="fc">&nbsp;        dump(true, true, out);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Dumps all of the threads&#39; current information, optionally including synchronization, to an output stream.
+&nbsp;     *
+&nbsp;     * Having control over including synchronization info allows using this method (and its wrappers, i.e.
+&nbsp;     * ThreadDumpServlet) in environments where getting object monitor and/or ownable synchronizer usage is not
+&nbsp;     * supported. It can also speed things up.
+&nbsp;     *
+&nbsp;     * See {@link ThreadMXBean#dumpAllThreads(boolean, boolean)}
+&nbsp;     *
+&nbsp;     * @param lockedMonitors dump all locked monitors if true
+&nbsp;     * @param lockedSynchronizers dump all locked ownable synchronizers if true
+&nbsp;     * @param out an output stream
+&nbsp;     */
+&nbsp;    public void dump(boolean lockedMonitors, boolean lockedSynchronizers, OutputStream out) {
+<b class="fc">&nbsp;        final ThreadInfo[] threads = this.threadMXBean.dumpAllThreads(lockedMonitors, lockedSynchronizers);</b>
+<b class="fc">&nbsp;        final PrintWriter writer = new PrintWriter(new OutputStreamWriter(out, UTF_8));</b>
+&nbsp;
+<b class="fc">&nbsp;        for (int ti = threads.length - 1; ti &gt;= 0; ti--) {</b>
+<b class="fc">&nbsp;            final ThreadInfo t = threads[ti];</b>
+<b class="fc">&nbsp;            writer.printf(&quot;\&quot;%s\&quot; id=%d state=%s&quot;,</b>
+<b class="fc">&nbsp;                    t.getThreadName(),</b>
+<b class="fc">&nbsp;                    t.getThreadId(),</b>
+<b class="fc">&nbsp;                    t.getThreadState());</b>
+<b class="fc">&nbsp;            final LockInfo lock = t.getLockInfo();</b>
+<b class="fc">&nbsp;            if (lock != null &amp;&amp; t.getThreadState() != Thread.State.BLOCKED) {</b>
+<b class="fc">&nbsp;                writer.printf(&quot;%n    - waiting on &lt;0x%08x&gt; (a %s)&quot;,</b>
+<b class="fc">&nbsp;                        lock.getIdentityHashCode(),</b>
+<b class="fc">&nbsp;                        lock.getClassName());</b>
+<b class="fc">&nbsp;                writer.printf(&quot;%n    - locked &lt;0x%08x&gt; (a %s)&quot;,</b>
+<b class="fc">&nbsp;                        lock.getIdentityHashCode(),</b>
+<b class="fc">&nbsp;                        lock.getClassName());</b>
+<b class="fc">&nbsp;            } else if (lock != null &amp;&amp; t.getThreadState() == Thread.State.BLOCKED) {</b>
+<b class="nc">&nbsp;                writer.printf(&quot;%n    - waiting to lock &lt;0x%08x&gt; (a %s)&quot;,</b>
+<b class="nc">&nbsp;                        lock.getIdentityHashCode(),</b>
+<b class="nc">&nbsp;                        lock.getClassName());</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            if (t.isSuspended()) {</b>
+<b class="nc">&nbsp;                writer.print(&quot; (suspended)&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            if (t.isInNative()) {</b>
+<b class="fc">&nbsp;                writer.print(&quot; (running in native)&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            writer.println();</b>
+<b class="fc">&nbsp;            if (t.getLockOwnerName() != null) {</b>
+<b class="nc">&nbsp;                writer.printf(&quot;     owned by %s id=%d%n&quot;, t.getLockOwnerName(), t.getLockOwnerId());</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            final StackTraceElement[] elements = t.getStackTrace();</b>
+<b class="fc">&nbsp;            final MonitorInfo[] monitors = t.getLockedMonitors();</b>
+&nbsp;
+<b class="fc">&nbsp;            for (int i = 0; i &lt; elements.length; i++) {</b>
+<b class="fc">&nbsp;                final StackTraceElement element = elements[i];</b>
+<b class="fc">&nbsp;                writer.printf(&quot;    at %s%n&quot;, element);</b>
+<b class="fc">&nbsp;                for (int j = 1; j &lt; monitors.length; j++) {</b>
+<b class="nc">&nbsp;                    final MonitorInfo monitor = monitors[j];</b>
+<b class="nc">&nbsp;                    if (monitor.getLockedStackDepth() == i) {</b>
+<b class="nc">&nbsp;                        writer.printf(&quot;      - locked %s%n&quot;, monitor);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            writer.println();</b>
+&nbsp;
+<b class="fc">&nbsp;            final LockInfo[] locks = t.getLockedSynchronizers();</b>
+<b class="fc">&nbsp;            if (locks.length &gt; 0) {</b>
+<b class="fc">&nbsp;                writer.printf(&quot;    Locked synchronizers: count = %d%n&quot;, locks.length);</b>
+<b class="fc">&nbsp;                for (LockInfo l : locks) {</b>
+<b class="fc">&nbsp;                    writer.printf(&quot;      - %s%n&quot;, l);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                writer.println();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        writer.println();</b>
+<b class="fc">&nbsp;        writer.flush();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
+</div>
+</body>
+</html>

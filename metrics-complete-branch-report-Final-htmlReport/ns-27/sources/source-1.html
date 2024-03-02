@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">io.dropwizard.metrics.servlet6</a>
+    <a href="../index.html">io.dropwizard.metrics.servlet</a>
 </div>
 
-<h1>Coverage Summary for Class: AbstractInstrumentedFilter (io.dropwizard.metrics.servlet6)</h1>
+<h1>Coverage Summary for Class: AbstractInstrumentedFilter (io.dropwizard.metrics.servlet)</h1>
 
 <table class="coverageStats">
 
@@ -94,7 +94,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     0%
   </span>
   <span class="absValue">
-    (0/5)
+    (0/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -102,7 +102,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     0%
   </span>
   <span class="absValue">
-    (0/9)
+    (0/11)
   </span>
 </td>
   </tr>
@@ -113,7 +113,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     0%
   </span>
   <span class="absValue">
-    (0/17)
+    (0/18)
   </span>
 </td>
 <td class="coverageStat">
@@ -129,7 +129,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     0%
   </span>
   <span class="absValue">
-    (0/71)
+    (0/73)
   </span>
 </td>
 </tr>
@@ -140,7 +140,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package io.dropwizard.metrics.servlet6;
+<code class="sourceCode" id="sourceCode">&nbsp;package io.dropwizard.metrics.servlet;
 &nbsp;
 &nbsp;import com.codahale.metrics.Counter;
 &nbsp;import com.codahale.metrics.Meter;
@@ -306,13 +306,20 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        }
 &nbsp;
 &nbsp;        @Override
+&nbsp;        @SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;        public void setStatus(int sc, String sm) {
+<b class="nc">&nbsp;            httpStatus = sc;</b>
+<b class="nc">&nbsp;            super.setStatus(sc, sm);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
 &nbsp;        public int getStatus() {
 <b class="nc">&nbsp;            return httpStatus;</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    private class AsyncResultListener implements AsyncListener {
-&nbsp;        private final Timer.Context context;
+&nbsp;        private Timer.Context context;
 <b class="nc">&nbsp;        private boolean done = false;</b>
 &nbsp;
 <b class="nc">&nbsp;        public AsyncResultListener(Timer.Context context) {</b>
@@ -374,7 +381,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > Metered</title>
+  <title>Coverage Report > MetricSet</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,14 +22,14 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.codahale.metrics</a>
 </div>
 
-<h1>Coverage Summary for Class: Metered (com.codahale.metrics)</h1>
+<h1>Coverage Summary for Class: MetricSet (com.codahale.metrics)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 </tr>
 <tr>
-  <td class="name">Metered</td>
+  <td class="name">MetricSet</td>
 </tr>
 
 </table>
@@ -41,51 +41,20 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics;
 &nbsp;
+&nbsp;import java.util.Map;
+&nbsp;
 &nbsp;/**
-&nbsp; * An object which maintains mean and moving average rates.
+&nbsp; * A set of named metrics.
+&nbsp; *
+&nbsp; * @see MetricRegistry#registerAll(MetricSet)
 &nbsp; */
-&nbsp;public interface Metered extends Metric, Counting {
+&nbsp;public interface MetricSet extends Metric {
 &nbsp;    /**
-&nbsp;     * Returns the number of events which have been marked.
+&nbsp;     * A map of metric names to metrics.
 &nbsp;     *
-&nbsp;     * @return the number of events which have been marked
+&nbsp;     * @return the metrics
 &nbsp;     */
-&nbsp;    @Override
-&nbsp;    long getCount();
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Returns the fifteen-minute moving average rate at which events have
-&nbsp;     * occurred since the meter was created.
-&nbsp;     *
-&nbsp;     * @return the fifteen-minute moving average rate at which events have
-&nbsp;     * occurred since the meter was created
-&nbsp;     */
-&nbsp;    double getFifteenMinuteRate();
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Returns the five-minute moving average rate at which events have
-&nbsp;     * occurred since the meter was created.
-&nbsp;     *
-&nbsp;     * @return the five-minute moving average rate at which events have
-&nbsp;     * occurred since the meter was created
-&nbsp;     */
-&nbsp;    double getFiveMinuteRate();
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Returns the mean rate at which events have occurred since the meter was created.
-&nbsp;     *
-&nbsp;     * @return the mean rate at which events have occurred since the meter was created
-&nbsp;     */
-&nbsp;    double getMeanRate();
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Returns the one-minute moving average rate at which events have
-&nbsp;     * occurred since the meter was created.
-&nbsp;     *
-&nbsp;     * @return the one-minute moving average rate at which events have
-&nbsp;     * occurred since the meter was created
-&nbsp;     */
-&nbsp;    double getOneMinuteRate();
+&nbsp;    Map&lt;String, Metric&gt; getMetrics();
 &nbsp;}
 </code>
 </pre>
@@ -110,7 +79,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

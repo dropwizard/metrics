@@ -1,0 +1,424 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PacketWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.collectd</a>
+</div>
+
+<h1>Coverage Summary for Class: PacketWriter (com.codahale.metrics.collectd)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PacketWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.4%
+  </span>
+  <span class="absValue">
+    (88/103)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PacketWriter$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PacketWriter$EncryptionResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.1%
+  </span>
+  <span class="absValue">
+    (93/108)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.collectd;
+&nbsp;
+&nbsp;import javax.crypto.BadPaddingException;
+&nbsp;import javax.crypto.Cipher;
+&nbsp;import javax.crypto.IllegalBlockSizeException;
+&nbsp;import javax.crypto.Mac;
+&nbsp;import javax.crypto.NoSuchPaddingException;
+&nbsp;import javax.crypto.ShortBufferException;
+&nbsp;import javax.crypto.spec.IvParameterSpec;
+&nbsp;import javax.crypto.spec.SecretKeySpec;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.BufferOverflowException;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.ByteOrder;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.security.InvalidKeyException;
+&nbsp;import java.security.MessageDigest;
+&nbsp;import java.security.NoSuchAlgorithmException;
+&nbsp;import java.security.spec.InvalidParameterSpecException;
+&nbsp;import java.util.Arrays;
+&nbsp;
+&nbsp;class PacketWriter {
+&nbsp;
+&nbsp;    private static final int TYPE_HOST = 0;
+&nbsp;    private static final int TYPE_TIME = 1;
+&nbsp;    private static final int TYPE_PLUGIN = 2;
+&nbsp;    private static final int TYPE_PLUGIN_INSTANCE = 3;
+&nbsp;    private static final int TYPE_TYPE = 4;
+&nbsp;    private static final int TYPE_TYPE_INSTANCE = 5;
+&nbsp;    private static final int TYPE_VALUES = 6;
+&nbsp;    private static final int TYPE_INTERVAL = 7;
+&nbsp;    private static final int TYPE_SIGN_SHA256 = 0x0200;
+&nbsp;    private static final int TYPE_ENCR_AES256 = 0x0210;
+&nbsp;
+&nbsp;    private static final int UINT16_LEN = 2;
+&nbsp;    private static final int UINT32_LEN = UINT16_LEN * 2;
+&nbsp;    private static final int UINT64_LEN = UINT32_LEN * 2;
+&nbsp;    private static final int HEADER_LEN = UINT16_LEN * 2;
+&nbsp;    private static final int BUFFER_SIZE = 1024;
+&nbsp;
+&nbsp;    private static final int VALUE_COUNT_LEN = UINT16_LEN;
+&nbsp;    private static final int NUMBER_LEN = HEADER_LEN + UINT64_LEN;
+&nbsp;    private static final int SIGNATURE_LEN = 36;      // 2b Type + 2b Length + 32b Hash
+&nbsp;    private static final int ENCRYPT_DATA_LEN = 22;   // 16b IV + 2b Type + 2b Length + 2b Username length
+&nbsp;    private static final int IV_LENGTH = 16;
+&nbsp;    private static final int SHA1_LENGTH = 20;
+&nbsp;
+&nbsp;    private static final int VALUE_LEN = 9;
+&nbsp;    private static final byte DATA_TYPE_GAUGE = (byte) 1;
+&nbsp;    private static final byte NULL = (byte) &#39;\0&#39;;
+&nbsp;    private static final String HMAC_SHA256_ALGORITHM = &quot;HmacSHA256&quot;;
+&nbsp;    private static final String AES_CYPHER = &quot;AES_256/OFB/NoPadding&quot;;
+&nbsp;    private static final String AES = &quot;AES&quot;;
+&nbsp;    private static final String SHA_256_ALGORITHM = &quot;SHA-256&quot;;
+&nbsp;    private static final String SHA_1_ALGORITHM = &quot;SHA1&quot;;
+&nbsp;
+&nbsp;    private final Sender sender;
+&nbsp;
+&nbsp;    private final SecurityLevel securityLevel;
+&nbsp;    private final byte[] username;
+&nbsp;    private final byte[] password;
+&nbsp;
+<b class="fc">&nbsp;    PacketWriter(Sender sender, String username, String password, SecurityLevel securityLevel) {</b>
+<b class="fc">&nbsp;        this.sender = sender;</b>
+<b class="fc">&nbsp;        this.securityLevel = securityLevel;</b>
+<b class="fc">&nbsp;        this.username = username != null ? username.getBytes(StandardCharsets.UTF_8) : null;</b>
+<b class="fc">&nbsp;        this.password = password != null ? password.getBytes(StandardCharsets.UTF_8) : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void write(MetaData metaData, Number... values) throws BufferOverflowException, IOException {
+<b class="fc">&nbsp;        final ByteBuffer packet = ByteBuffer.allocate(BUFFER_SIZE);</b>
+<b class="fc">&nbsp;        write(packet, metaData);</b>
+<b class="fc">&nbsp;        write(packet, values);</b>
+<b class="fc">&nbsp;        packet.flip();</b>
+&nbsp;
+<b class="fc">&nbsp;        switch (securityLevel) {</b>
+&nbsp;            case NONE:
+<b class="fc">&nbsp;                sender.send(packet);</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            case SIGN:
+<b class="fc">&nbsp;                sender.send(signPacket(packet));</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            case ENCRYPT:
+<b class="fc">&nbsp;                sender.send(encryptPacket(packet));</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            default:
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;Unsupported security level: &quot; + securityLevel);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    private void write(ByteBuffer buffer, MetaData metaData) {
+<b class="fc">&nbsp;        writeString(buffer, TYPE_HOST, metaData.getHost());</b>
+<b class="fc">&nbsp;        writeNumber(buffer, TYPE_TIME, metaData.getTimestamp());</b>
+<b class="fc">&nbsp;        writeString(buffer, TYPE_PLUGIN, metaData.getPlugin());</b>
+<b class="fc">&nbsp;        writeString(buffer, TYPE_PLUGIN_INSTANCE, metaData.getPluginInstance());</b>
+<b class="fc">&nbsp;        writeString(buffer, TYPE_TYPE, metaData.getType());</b>
+<b class="fc">&nbsp;        writeString(buffer, TYPE_TYPE_INSTANCE, metaData.getTypeInstance());</b>
+<b class="fc">&nbsp;        writeNumber(buffer, TYPE_INTERVAL, metaData.getPeriod());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void write(ByteBuffer buffer, Number... values) {
+<b class="fc">&nbsp;        final int numValues = values.length;</b>
+<b class="fc">&nbsp;        final int length = HEADER_LEN + VALUE_COUNT_LEN + numValues * VALUE_LEN;</b>
+<b class="fc">&nbsp;        writeHeader(buffer, TYPE_VALUES, length);</b>
+<b class="fc">&nbsp;        buffer.putShort((short) numValues);</b>
+<b class="fc">&nbsp;        buffer.put(nCopies(numValues, DATA_TYPE_GAUGE));</b>
+<b class="fc">&nbsp;        buffer.order(ByteOrder.LITTLE_ENDIAN);</b>
+<b class="fc">&nbsp;        for (Number value : values) {</b>
+<b class="fc">&nbsp;            buffer.putDouble(value.doubleValue());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        buffer.order(ByteOrder.BIG_ENDIAN);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private byte[] nCopies(int n, byte value) {
+<b class="fc">&nbsp;        final byte[] array = new byte[n];</b>
+<b class="fc">&nbsp;        Arrays.fill(array, value);</b>
+<b class="fc">&nbsp;        return array;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void writeString(ByteBuffer buffer, int type, String val) {
+<b class="fc">&nbsp;        if (val == null || val.length() == 0) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="fc">&nbsp;        int len = HEADER_LEN + val.length() + 1;</b>
+<b class="fc">&nbsp;        writeHeader(buffer, type, len);</b>
+<b class="fc">&nbsp;        buffer.put(val.getBytes(StandardCharsets.US_ASCII)).put(NULL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void writeNumber(ByteBuffer buffer, int type, long val) {
+<b class="fc">&nbsp;        writeHeader(buffer, type, NUMBER_LEN);</b>
+<b class="fc">&nbsp;        buffer.putLong(val);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void writeHeader(ByteBuffer buffer, int type, int len) {
+<b class="fc">&nbsp;        buffer.putShort((short) type);</b>
+<b class="fc">&nbsp;        buffer.putShort((short) len);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Signs the provided packet, so a CollectD server can verify that its authenticity.
+&nbsp;     * Wire format:
+&nbsp;     * &lt;pre&gt;
+&nbsp;     * +-------------------------------+-------------------------------+
+&nbsp;     * ! Type (0x0200)                 ! Length                        !
+&nbsp;     * +-------------------------------+-------------------------------+
+&nbsp;     * ! Signature (SHA2(username + packet))                           \
+&nbsp;     * +-------------------------------+-------------------------------+
+&nbsp;     * ! Username                      ! Packet                        \
+&nbsp;     * +---------------------------------------------------------------+
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     *
+&nbsp;     * @see &lt;a href=&quot;https://collectd.org/wiki/index.php/Binary_protocol#Signature_part&quot;&gt;
+&nbsp;     * Binary protocol - CollectD | Signature part&lt;/a&gt;
+&nbsp;     */
+&nbsp;    private ByteBuffer signPacket(ByteBuffer packet) {
+<b class="fc">&nbsp;        final byte[] signature = sign(password, (ByteBuffer) ByteBuffer.allocate(packet.remaining() + username.length)</b>
+<b class="fc">&nbsp;                .put(username)</b>
+<b class="fc">&nbsp;                .put(packet)</b>
+<b class="fc">&nbsp;                .flip());</b>
+<b class="fc">&nbsp;        return (ByteBuffer) ByteBuffer.allocate(BUFFER_SIZE)</b>
+<b class="fc">&nbsp;                .putShort((short) TYPE_SIGN_SHA256)</b>
+<b class="fc">&nbsp;                .putShort((short) (username.length + SIGNATURE_LEN))</b>
+<b class="fc">&nbsp;                .put(signature)</b>
+<b class="fc">&nbsp;                .put(username)</b>
+<b class="fc">&nbsp;                .put((ByteBuffer) packet.flip())</b>
+<b class="fc">&nbsp;                .flip();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Encrypts the provided packet, so it&#39;s can&#39;t be eavesdropped during a transfer
+&nbsp;     * to a CollectD server. Wire format:
+&nbsp;     * &lt;pre&gt;
+&nbsp;     * +---------------------------------+-------------------------------+
+&nbsp;     * ! Type (0x0210)                   ! Length                        !
+&nbsp;     * +---------------------------------+-------------------------------+
+&nbsp;     * ! Username length in bytes        ! Username                      \
+&nbsp;     * +-----------------------------------------------------------------+
+&nbsp;     * ! Initialization Vector (IV)      !                               \
+&nbsp;     * +---------------------------------+-------------------------------+
+&nbsp;     * ! Encrypted bytes (AES (SHA1(packet) + packet))                   \
+&nbsp;     * +---------------------------------+-------------------------------+
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     *
+&nbsp;     * @see &lt;a href=&quot;https://collectd.org/wiki/index.php/Binary_protocol#Encrypted_part&quot;&gt;
+&nbsp;     * Binary protocol - CollectD | Encrypted part&lt;/a&gt;
+&nbsp;     */
+&nbsp;    private ByteBuffer encryptPacket(ByteBuffer packet) {
+<b class="fc">&nbsp;        final ByteBuffer payload = (ByteBuffer) ByteBuffer.allocate(SHA1_LENGTH + packet.remaining())</b>
+<b class="fc">&nbsp;                .put(sha1(packet))</b>
+<b class="fc">&nbsp;                .put((ByteBuffer) packet.flip())</b>
+<b class="fc">&nbsp;                .flip();</b>
+<b class="fc">&nbsp;        final EncryptionResult er = encrypt(password, payload);</b>
+<b class="fc">&nbsp;        return (ByteBuffer) ByteBuffer.allocate(BUFFER_SIZE)</b>
+<b class="fc">&nbsp;                .putShort((short) TYPE_ENCR_AES256)</b>
+<b class="fc">&nbsp;                .putShort((short) (ENCRYPT_DATA_LEN + username.length + er.output.remaining()))</b>
+<b class="fc">&nbsp;                .putShort((short) username.length)</b>
+<b class="fc">&nbsp;                .put(username)</b>
+<b class="fc">&nbsp;                .put(er.iv)</b>
+<b class="fc">&nbsp;                .put(er.output)</b>
+<b class="fc">&nbsp;                .flip();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static byte[] sign(byte[] secret, ByteBuffer input) {
+&nbsp;        final Mac mac;
+&nbsp;        try {
+<b class="fc">&nbsp;            mac = Mac.getInstance(HMAC_SHA256_ALGORITHM);</b>
+<b class="fc">&nbsp;            mac.init(new SecretKeySpec(secret, HMAC_SHA256_ALGORITHM));</b>
+<b class="nc">&nbsp;        } catch (NoSuchAlgorithmException | InvalidKeyException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        mac.update(input);</b>
+<b class="fc">&nbsp;        return mac.doFinal();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static EncryptionResult encrypt(byte[] password, ByteBuffer input) {
+&nbsp;        final Cipher cipher;
+&nbsp;        try {
+<b class="fc">&nbsp;            cipher = Cipher.getInstance(AES_CYPHER);</b>
+<b class="fc">&nbsp;            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(sha256(password), AES));</b>
+<b class="nc">&nbsp;        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;        final byte[] iv;
+&nbsp;        try {
+<b class="fc">&nbsp;            iv = cipher.getParameters().getParameterSpec(IvParameterSpec.class).getIV();</b>
+<b class="nc">&nbsp;        } catch (InvalidParameterSpecException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        if (iv.length != IV_LENGTH) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Bad initialization vector&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        final ByteBuffer output = ByteBuffer.allocate(input.remaining() * 2);</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            cipher.doFinal(input, output);</b>
+<b class="nc">&nbsp;        } catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return new EncryptionResult(iv, (ByteBuffer) output.flip());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static byte[] sha256(byte[] input) {
+&nbsp;        try {
+<b class="fc">&nbsp;            return MessageDigest.getInstance(SHA_256_ALGORITHM).digest(input);</b>
+<b class="nc">&nbsp;        } catch (NoSuchAlgorithmException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static byte[] sha1(ByteBuffer input) {
+&nbsp;        try {
+<b class="fc">&nbsp;            final MessageDigest digest = MessageDigest.getInstance(SHA_1_ALGORITHM);</b>
+<b class="fc">&nbsp;            digest.update(input);</b>
+<b class="fc">&nbsp;            final byte[] output = digest.digest();</b>
+<b class="fc">&nbsp;            if (output.length != SHA1_LENGTH) {</b>
+<b class="nc">&nbsp;                throw new IllegalStateException(&quot;Bad SHA1 hash&quot;);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return output;</b>
+<b class="nc">&nbsp;        } catch (NoSuchAlgorithmException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static class EncryptionResult {</b>
+&nbsp;
+&nbsp;        private final byte[] iv;
+&nbsp;        private final ByteBuffer output;
+&nbsp;
+<b class="fc">&nbsp;        private EncryptionResult(byte[] iv, ByteBuffer output) {</b>
+<b class="fc">&nbsp;            this.iv = iv;</b>
+<b class="fc">&nbsp;            this.output = output;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
+</div>
+</body>
+</html>

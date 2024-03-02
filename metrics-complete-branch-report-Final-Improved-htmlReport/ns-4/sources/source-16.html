@@ -1,0 +1,484 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ReservoirBenchmark_perfSlidingTimeWindowArrayReservoir_jmhTest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.benchmarks.jmh_generated</a>
+</div>
+
+<h1>Coverage Summary for Class: ReservoirBenchmark_perfSlidingTimeWindowArrayReservoir_jmhTest (com.codahale.metrics.benchmarks.jmh_generated)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReservoirBenchmark_perfSlidingTimeWindowArrayReservoir_jmhTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/80)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/222)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.benchmarks.jmh_generated;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.atomic.AtomicInteger;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import org.openjdk.jmh.annotations.CompilerControl;
+&nbsp;import org.openjdk.jmh.runner.InfraControl;
+&nbsp;import org.openjdk.jmh.infra.ThreadParams;
+&nbsp;import org.openjdk.jmh.results.BenchmarkTaskResult;
+&nbsp;import org.openjdk.jmh.results.Result;
+&nbsp;import org.openjdk.jmh.results.ThroughputResult;
+&nbsp;import org.openjdk.jmh.results.AverageTimeResult;
+&nbsp;import org.openjdk.jmh.results.SampleTimeResult;
+&nbsp;import org.openjdk.jmh.results.SingleShotResult;
+&nbsp;import org.openjdk.jmh.util.SampleBuffer;
+&nbsp;import org.openjdk.jmh.annotations.Mode;
+&nbsp;import org.openjdk.jmh.annotations.Fork;
+&nbsp;import org.openjdk.jmh.annotations.Measurement;
+&nbsp;import org.openjdk.jmh.annotations.Threads;
+&nbsp;import org.openjdk.jmh.annotations.Warmup;
+&nbsp;import org.openjdk.jmh.annotations.BenchmarkMode;
+&nbsp;import org.openjdk.jmh.results.RawResults;
+&nbsp;import org.openjdk.jmh.results.ResultRole;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;import org.openjdk.jmh.infra.BenchmarkParams;
+&nbsp;import org.openjdk.jmh.infra.IterationParams;
+&nbsp;import org.openjdk.jmh.infra.Blackhole;
+&nbsp;import org.openjdk.jmh.infra.Control;
+&nbsp;import org.openjdk.jmh.results.ScalarResult;
+&nbsp;import org.openjdk.jmh.results.AggregationPolicy;
+&nbsp;import org.openjdk.jmh.runner.FailureAssistException;
+&nbsp;
+&nbsp;import com.codahale.metrics.benchmarks.jmh_generated.ReservoirBenchmark_jmhType;
+<b class="nc">&nbsp;public final class ReservoirBenchmark_perfSlidingTimeWindowArrayReservoir_jmhTest {</b>
+&nbsp;
+&nbsp;    byte p000, p001, p002, p003, p004, p005, p006, p007, p008, p009, p010, p011, p012, p013, p014, p015;
+&nbsp;    byte p016, p017, p018, p019, p020, p021, p022, p023, p024, p025, p026, p027, p028, p029, p030, p031;
+&nbsp;    byte p032, p033, p034, p035, p036, p037, p038, p039, p040, p041, p042, p043, p044, p045, p046, p047;
+&nbsp;    byte p048, p049, p050, p051, p052, p053, p054, p055, p056, p057, p058, p059, p060, p061, p062, p063;
+&nbsp;    byte p064, p065, p066, p067, p068, p069, p070, p071, p072, p073, p074, p075, p076, p077, p078, p079;
+&nbsp;    byte p080, p081, p082, p083, p084, p085, p086, p087, p088, p089, p090, p091, p092, p093, p094, p095;
+&nbsp;    byte p096, p097, p098, p099, p100, p101, p102, p103, p104, p105, p106, p107, p108, p109, p110, p111;
+&nbsp;    byte p112, p113, p114, p115, p116, p117, p118, p119, p120, p121, p122, p123, p124, p125, p126, p127;
+&nbsp;    byte p128, p129, p130, p131, p132, p133, p134, p135, p136, p137, p138, p139, p140, p141, p142, p143;
+&nbsp;    byte p144, p145, p146, p147, p148, p149, p150, p151, p152, p153, p154, p155, p156, p157, p158, p159;
+&nbsp;    byte p160, p161, p162, p163, p164, p165, p166, p167, p168, p169, p170, p171, p172, p173, p174, p175;
+&nbsp;    byte p176, p177, p178, p179, p180, p181, p182, p183, p184, p185, p186, p187, p188, p189, p190, p191;
+&nbsp;    byte p192, p193, p194, p195, p196, p197, p198, p199, p200, p201, p202, p203, p204, p205, p206, p207;
+&nbsp;    byte p208, p209, p210, p211, p212, p213, p214, p215, p216, p217, p218, p219, p220, p221, p222, p223;
+&nbsp;    byte p224, p225, p226, p227, p228, p229, p230, p231, p232, p233, p234, p235, p236, p237, p238, p239;
+&nbsp;    byte p240, p241, p242, p243, p244, p245, p246, p247, p248, p249, p250, p251, p252, p253, p254, p255;
+&nbsp;    int startRndMask;
+&nbsp;    BenchmarkParams benchmarkParams;
+&nbsp;    IterationParams iterationParams;
+&nbsp;    ThreadParams threadParams;
+&nbsp;    Blackhole blackhole;
+&nbsp;    Control notifyControl;
+&nbsp;
+&nbsp;    public BenchmarkTaskResult perfSlidingTimeWindowArrayReservoir_Throughput(InfraControl control, ThreadParams threadParams) throws Throwable {
+<b class="nc">&nbsp;        this.benchmarkParams = control.benchmarkParams;</b>
+<b class="nc">&nbsp;        this.iterationParams = control.iterationParams;</b>
+<b class="nc">&nbsp;        this.threadParams    = threadParams;</b>
+<b class="nc">&nbsp;        this.notifyControl   = control.notifyControl;</b>
+<b class="nc">&nbsp;        if (this.blackhole == null) {</b>
+<b class="nc">&nbsp;            this.blackhole = new Blackhole(&quot;Today&#39;s password is swordfish. I understand instantiating Blackholes directly is dangerous.&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (threadParams.getSubgroupIndex() == 0) {</b>
+<b class="nc">&nbsp;            RawResults res = new RawResults();</b>
+<b class="nc">&nbsp;            ReservoirBenchmark_jmhType l_reservoirbenchmark0_G = _jmh_tryInit_f_reservoirbenchmark0_G(control);</b>
+&nbsp;
+<b class="nc">&nbsp;            control.preSetup();</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;            control.announceWarmupReady();</b>
+<b class="nc">&nbsp;            while (control.warmupShouldWait) {</b>
+<b class="nc">&nbsp;                blackhole.consume(l_reservoirbenchmark0_G.perfSlidingTimeWindowArrayReservoir());</b>
+<b class="nc">&nbsp;                if (control.shouldYield) Thread.yield();</b>
+<b class="nc">&nbsp;                res.allOps++;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            notifyControl.startMeasurement = true;</b>
+<b class="nc">&nbsp;            perfSlidingTimeWindowArrayReservoir_thrpt_jmhStub(control, res, benchmarkParams, iterationParams, threadParams, blackhole, notifyControl, startRndMask, l_reservoirbenchmark0_G);</b>
+<b class="nc">&nbsp;            notifyControl.stopMeasurement = true;</b>
+<b class="nc">&nbsp;            control.announceWarmdownReady();</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                while (control.warmdownShouldWait) {</b>
+<b class="nc">&nbsp;                    blackhole.consume(l_reservoirbenchmark0_G.perfSlidingTimeWindowArrayReservoir());</b>
+<b class="nc">&nbsp;                    if (control.shouldYield) Thread.yield();</b>
+<b class="nc">&nbsp;                    res.allOps++;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                if (!(e instanceof InterruptedException)) throw e;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            control.preTearDown();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (control.isLastIteration()) {</b>
+<b class="nc">&nbsp;                synchronized(this.getClass()) {</b>
+<b class="nc">&nbsp;                    f_reservoirbenchmark0_G = null;</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;            res.allOps += res.measuredOps;</b>
+<b class="nc">&nbsp;            int batchSize = iterationParams.getBatchSize();</b>
+<b class="nc">&nbsp;            int opsPerInv = benchmarkParams.getOpsPerInvocation();</b>
+<b class="nc">&nbsp;            res.allOps *= opsPerInv;</b>
+<b class="nc">&nbsp;            res.allOps /= batchSize;</b>
+<b class="nc">&nbsp;            res.measuredOps *= opsPerInv;</b>
+<b class="nc">&nbsp;            res.measuredOps /= batchSize;</b>
+<b class="nc">&nbsp;            BenchmarkTaskResult results = new BenchmarkTaskResult((long)res.allOps, (long)res.measuredOps);</b>
+<b class="nc">&nbsp;            results.add(new ThroughputResult(ResultRole.PRIMARY, &quot;perfSlidingTimeWindowArrayReservoir&quot;, res.measuredOps, res.getTime(), benchmarkParams.getTimeUnit()));</b>
+<b class="nc">&nbsp;            this.blackhole.evaporate(&quot;Yes, I am Stephen Hawking, and know a thing or two about black holes.&quot;);</b>
+<b class="nc">&nbsp;            return results;</b>
+&nbsp;        } else
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Harness failed to distribute threads among groups properly&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void perfSlidingTimeWindowArrayReservoir_thrpt_jmhStub(InfraControl control, RawResults result, BenchmarkParams benchmarkParams, IterationParams iterationParams, ThreadParams threadParams, Blackhole blackhole, Control notifyControl, int startRndMask, ReservoirBenchmark_jmhType l_reservoirbenchmark0_G) throws Throwable {
+<b class="nc">&nbsp;        long operations = 0;</b>
+<b class="nc">&nbsp;        long realTime = 0;</b>
+<b class="nc">&nbsp;        result.startTime = System.nanoTime();</b>
+&nbsp;        do {
+<b class="nc">&nbsp;            blackhole.consume(l_reservoirbenchmark0_G.perfSlidingTimeWindowArrayReservoir());</b>
+<b class="nc">&nbsp;            operations++;</b>
+<b class="nc">&nbsp;        } while(!control.isDone);</b>
+<b class="nc">&nbsp;        result.stopTime = System.nanoTime();</b>
+<b class="nc">&nbsp;        result.realTime = realTime;</b>
+<b class="nc">&nbsp;        result.measuredOps = operations;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public BenchmarkTaskResult perfSlidingTimeWindowArrayReservoir_AverageTime(InfraControl control, ThreadParams threadParams) throws Throwable {
+<b class="nc">&nbsp;        this.benchmarkParams = control.benchmarkParams;</b>
+<b class="nc">&nbsp;        this.iterationParams = control.iterationParams;</b>
+<b class="nc">&nbsp;        this.threadParams    = threadParams;</b>
+<b class="nc">&nbsp;        this.notifyControl   = control.notifyControl;</b>
+<b class="nc">&nbsp;        if (this.blackhole == null) {</b>
+<b class="nc">&nbsp;            this.blackhole = new Blackhole(&quot;Today&#39;s password is swordfish. I understand instantiating Blackholes directly is dangerous.&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (threadParams.getSubgroupIndex() == 0) {</b>
+<b class="nc">&nbsp;            RawResults res = new RawResults();</b>
+<b class="nc">&nbsp;            ReservoirBenchmark_jmhType l_reservoirbenchmark0_G = _jmh_tryInit_f_reservoirbenchmark0_G(control);</b>
+&nbsp;
+<b class="nc">&nbsp;            control.preSetup();</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;            control.announceWarmupReady();</b>
+<b class="nc">&nbsp;            while (control.warmupShouldWait) {</b>
+<b class="nc">&nbsp;                blackhole.consume(l_reservoirbenchmark0_G.perfSlidingTimeWindowArrayReservoir());</b>
+<b class="nc">&nbsp;                if (control.shouldYield) Thread.yield();</b>
+<b class="nc">&nbsp;                res.allOps++;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            notifyControl.startMeasurement = true;</b>
+<b class="nc">&nbsp;            perfSlidingTimeWindowArrayReservoir_avgt_jmhStub(control, res, benchmarkParams, iterationParams, threadParams, blackhole, notifyControl, startRndMask, l_reservoirbenchmark0_G);</b>
+<b class="nc">&nbsp;            notifyControl.stopMeasurement = true;</b>
+<b class="nc">&nbsp;            control.announceWarmdownReady();</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                while (control.warmdownShouldWait) {</b>
+<b class="nc">&nbsp;                    blackhole.consume(l_reservoirbenchmark0_G.perfSlidingTimeWindowArrayReservoir());</b>
+<b class="nc">&nbsp;                    if (control.shouldYield) Thread.yield();</b>
+<b class="nc">&nbsp;                    res.allOps++;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                if (!(e instanceof InterruptedException)) throw e;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            control.preTearDown();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (control.isLastIteration()) {</b>
+<b class="nc">&nbsp;                synchronized(this.getClass()) {</b>
+<b class="nc">&nbsp;                    f_reservoirbenchmark0_G = null;</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;            res.allOps += res.measuredOps;</b>
+<b class="nc">&nbsp;            int batchSize = iterationParams.getBatchSize();</b>
+<b class="nc">&nbsp;            int opsPerInv = benchmarkParams.getOpsPerInvocation();</b>
+<b class="nc">&nbsp;            res.allOps *= opsPerInv;</b>
+<b class="nc">&nbsp;            res.allOps /= batchSize;</b>
+<b class="nc">&nbsp;            res.measuredOps *= opsPerInv;</b>
+<b class="nc">&nbsp;            res.measuredOps /= batchSize;</b>
+<b class="nc">&nbsp;            BenchmarkTaskResult results = new BenchmarkTaskResult((long)res.allOps, (long)res.measuredOps);</b>
+<b class="nc">&nbsp;            results.add(new AverageTimeResult(ResultRole.PRIMARY, &quot;perfSlidingTimeWindowArrayReservoir&quot;, res.measuredOps, res.getTime(), benchmarkParams.getTimeUnit()));</b>
+<b class="nc">&nbsp;            this.blackhole.evaporate(&quot;Yes, I am Stephen Hawking, and know a thing or two about black holes.&quot;);</b>
+<b class="nc">&nbsp;            return results;</b>
+&nbsp;        } else
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Harness failed to distribute threads among groups properly&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void perfSlidingTimeWindowArrayReservoir_avgt_jmhStub(InfraControl control, RawResults result, BenchmarkParams benchmarkParams, IterationParams iterationParams, ThreadParams threadParams, Blackhole blackhole, Control notifyControl, int startRndMask, ReservoirBenchmark_jmhType l_reservoirbenchmark0_G) throws Throwable {
+<b class="nc">&nbsp;        long operations = 0;</b>
+<b class="nc">&nbsp;        long realTime = 0;</b>
+<b class="nc">&nbsp;        result.startTime = System.nanoTime();</b>
+&nbsp;        do {
+<b class="nc">&nbsp;            blackhole.consume(l_reservoirbenchmark0_G.perfSlidingTimeWindowArrayReservoir());</b>
+<b class="nc">&nbsp;            operations++;</b>
+<b class="nc">&nbsp;        } while(!control.isDone);</b>
+<b class="nc">&nbsp;        result.stopTime = System.nanoTime();</b>
+<b class="nc">&nbsp;        result.realTime = realTime;</b>
+<b class="nc">&nbsp;        result.measuredOps = operations;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public BenchmarkTaskResult perfSlidingTimeWindowArrayReservoir_SampleTime(InfraControl control, ThreadParams threadParams) throws Throwable {
+<b class="nc">&nbsp;        this.benchmarkParams = control.benchmarkParams;</b>
+<b class="nc">&nbsp;        this.iterationParams = control.iterationParams;</b>
+<b class="nc">&nbsp;        this.threadParams    = threadParams;</b>
+<b class="nc">&nbsp;        this.notifyControl   = control.notifyControl;</b>
+<b class="nc">&nbsp;        if (this.blackhole == null) {</b>
+<b class="nc">&nbsp;            this.blackhole = new Blackhole(&quot;Today&#39;s password is swordfish. I understand instantiating Blackholes directly is dangerous.&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (threadParams.getSubgroupIndex() == 0) {</b>
+<b class="nc">&nbsp;            RawResults res = new RawResults();</b>
+<b class="nc">&nbsp;            ReservoirBenchmark_jmhType l_reservoirbenchmark0_G = _jmh_tryInit_f_reservoirbenchmark0_G(control);</b>
+&nbsp;
+<b class="nc">&nbsp;            control.preSetup();</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;            control.announceWarmupReady();</b>
+<b class="nc">&nbsp;            while (control.warmupShouldWait) {</b>
+<b class="nc">&nbsp;                blackhole.consume(l_reservoirbenchmark0_G.perfSlidingTimeWindowArrayReservoir());</b>
+<b class="nc">&nbsp;                if (control.shouldYield) Thread.yield();</b>
+<b class="nc">&nbsp;                res.allOps++;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            notifyControl.startMeasurement = true;</b>
+<b class="nc">&nbsp;            int targetSamples = (int) (control.getDuration(TimeUnit.MILLISECONDS) * 20); // at max, 20 timestamps per millisecond</b>
+<b class="nc">&nbsp;            int batchSize = iterationParams.getBatchSize();</b>
+<b class="nc">&nbsp;            int opsPerInv = benchmarkParams.getOpsPerInvocation();</b>
+<b class="nc">&nbsp;            SampleBuffer buffer = new SampleBuffer();</b>
+<b class="nc">&nbsp;            perfSlidingTimeWindowArrayReservoir_sample_jmhStub(control, res, benchmarkParams, iterationParams, threadParams, blackhole, notifyControl, startRndMask, buffer, targetSamples, opsPerInv, batchSize, l_reservoirbenchmark0_G);</b>
+<b class="nc">&nbsp;            notifyControl.stopMeasurement = true;</b>
+<b class="nc">&nbsp;            control.announceWarmdownReady();</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                while (control.warmdownShouldWait) {</b>
+<b class="nc">&nbsp;                    blackhole.consume(l_reservoirbenchmark0_G.perfSlidingTimeWindowArrayReservoir());</b>
+<b class="nc">&nbsp;                    if (control.shouldYield) Thread.yield();</b>
+<b class="nc">&nbsp;                    res.allOps++;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                if (!(e instanceof InterruptedException)) throw e;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            control.preTearDown();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (control.isLastIteration()) {</b>
+<b class="nc">&nbsp;                synchronized(this.getClass()) {</b>
+<b class="nc">&nbsp;                    f_reservoirbenchmark0_G = null;</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;            res.allOps += res.measuredOps * batchSize;</b>
+<b class="nc">&nbsp;            res.allOps *= opsPerInv;</b>
+<b class="nc">&nbsp;            res.allOps /= batchSize;</b>
+<b class="nc">&nbsp;            res.measuredOps *= opsPerInv;</b>
+<b class="nc">&nbsp;            BenchmarkTaskResult results = new BenchmarkTaskResult((long)res.allOps, (long)res.measuredOps);</b>
+<b class="nc">&nbsp;            results.add(new SampleTimeResult(ResultRole.PRIMARY, &quot;perfSlidingTimeWindowArrayReservoir&quot;, buffer, benchmarkParams.getTimeUnit()));</b>
+<b class="nc">&nbsp;            this.blackhole.evaporate(&quot;Yes, I am Stephen Hawking, and know a thing or two about black holes.&quot;);</b>
+<b class="nc">&nbsp;            return results;</b>
+&nbsp;        } else
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Harness failed to distribute threads among groups properly&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void perfSlidingTimeWindowArrayReservoir_sample_jmhStub(InfraControl control, RawResults result, BenchmarkParams benchmarkParams, IterationParams iterationParams, ThreadParams threadParams, Blackhole blackhole, Control notifyControl, int startRndMask, SampleBuffer buffer, int targetSamples, long opsPerInv, int batchSize, ReservoirBenchmark_jmhType l_reservoirbenchmark0_G) throws Throwable {
+<b class="nc">&nbsp;        long realTime = 0;</b>
+<b class="nc">&nbsp;        long operations = 0;</b>
+<b class="nc">&nbsp;        int rnd = (int)System.nanoTime();</b>
+<b class="nc">&nbsp;        int rndMask = startRndMask;</b>
+<b class="nc">&nbsp;        long time = 0;</b>
+<b class="nc">&nbsp;        int currentStride = 0;</b>
+&nbsp;        do {
+<b class="nc">&nbsp;            rnd = (rnd * 1664525 + 1013904223);</b>
+<b class="nc">&nbsp;            boolean sample = (rnd &amp; rndMask) == 0;</b>
+<b class="nc">&nbsp;            if (sample) {</b>
+<b class="nc">&nbsp;                time = System.nanoTime();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            for (int b = 0; b &lt; batchSize; b++) {</b>
+<b class="nc">&nbsp;                if (control.volatileSpoiler) return;</b>
+<b class="nc">&nbsp;                blackhole.consume(l_reservoirbenchmark0_G.perfSlidingTimeWindowArrayReservoir());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (sample) {</b>
+<b class="nc">&nbsp;                buffer.add((System.nanoTime() - time) / opsPerInv);</b>
+<b class="nc">&nbsp;                if (currentStride++ &gt; targetSamples) {</b>
+<b class="nc">&nbsp;                    buffer.half();</b>
+<b class="nc">&nbsp;                    currentStride = 0;</b>
+<b class="nc">&nbsp;                    rndMask = (rndMask &lt;&lt; 1) + 1;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            operations++;</b>
+<b class="nc">&nbsp;        } while(!control.isDone);</b>
+<b class="nc">&nbsp;        startRndMask = Math.max(startRndMask, rndMask);</b>
+<b class="nc">&nbsp;        result.realTime = realTime;</b>
+<b class="nc">&nbsp;        result.measuredOps = operations;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public BenchmarkTaskResult perfSlidingTimeWindowArrayReservoir_SingleShotTime(InfraControl control, ThreadParams threadParams) throws Throwable {
+<b class="nc">&nbsp;        this.benchmarkParams = control.benchmarkParams;</b>
+<b class="nc">&nbsp;        this.iterationParams = control.iterationParams;</b>
+<b class="nc">&nbsp;        this.threadParams    = threadParams;</b>
+<b class="nc">&nbsp;        this.notifyControl   = control.notifyControl;</b>
+<b class="nc">&nbsp;        if (this.blackhole == null) {</b>
+<b class="nc">&nbsp;            this.blackhole = new Blackhole(&quot;Today&#39;s password is swordfish. I understand instantiating Blackholes directly is dangerous.&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (threadParams.getSubgroupIndex() == 0) {</b>
+<b class="nc">&nbsp;            ReservoirBenchmark_jmhType l_reservoirbenchmark0_G = _jmh_tryInit_f_reservoirbenchmark0_G(control);</b>
+&nbsp;
+<b class="nc">&nbsp;            control.preSetup();</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;            notifyControl.startMeasurement = true;</b>
+<b class="nc">&nbsp;            RawResults res = new RawResults();</b>
+<b class="nc">&nbsp;            int batchSize = iterationParams.getBatchSize();</b>
+<b class="nc">&nbsp;            perfSlidingTimeWindowArrayReservoir_ss_jmhStub(control, res, benchmarkParams, iterationParams, threadParams, blackhole, notifyControl, startRndMask, batchSize, l_reservoirbenchmark0_G);</b>
+<b class="nc">&nbsp;            control.preTearDown();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (control.isLastIteration()) {</b>
+<b class="nc">&nbsp;                synchronized(this.getClass()) {</b>
+<b class="nc">&nbsp;                    f_reservoirbenchmark0_G = null;</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;            int opsPerInv = control.benchmarkParams.getOpsPerInvocation();</b>
+<b class="nc">&nbsp;            long totalOps = opsPerInv;</b>
+<b class="nc">&nbsp;            BenchmarkTaskResult results = new BenchmarkTaskResult(totalOps, totalOps);</b>
+<b class="nc">&nbsp;            results.add(new SingleShotResult(ResultRole.PRIMARY, &quot;perfSlidingTimeWindowArrayReservoir&quot;, res.getTime(), totalOps, benchmarkParams.getTimeUnit()));</b>
+<b class="nc">&nbsp;            this.blackhole.evaporate(&quot;Yes, I am Stephen Hawking, and know a thing or two about black holes.&quot;);</b>
+<b class="nc">&nbsp;            return results;</b>
+&nbsp;        } else
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Harness failed to distribute threads among groups properly&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void perfSlidingTimeWindowArrayReservoir_ss_jmhStub(InfraControl control, RawResults result, BenchmarkParams benchmarkParams, IterationParams iterationParams, ThreadParams threadParams, Blackhole blackhole, Control notifyControl, int startRndMask, int batchSize, ReservoirBenchmark_jmhType l_reservoirbenchmark0_G) throws Throwable {
+<b class="nc">&nbsp;        long realTime = 0;</b>
+<b class="nc">&nbsp;        result.startTime = System.nanoTime();</b>
+<b class="nc">&nbsp;        for (int b = 0; b &lt; batchSize; b++) {</b>
+<b class="nc">&nbsp;            if (control.volatileSpoiler) return;</b>
+<b class="nc">&nbsp;            blackhole.consume(l_reservoirbenchmark0_G.perfSlidingTimeWindowArrayReservoir());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        result.stopTime = System.nanoTime();</b>
+<b class="nc">&nbsp;        result.realTime = realTime;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    
+&nbsp;    static volatile ReservoirBenchmark_jmhType f_reservoirbenchmark0_G;
+&nbsp;    
+&nbsp;    ReservoirBenchmark_jmhType _jmh_tryInit_f_reservoirbenchmark0_G(InfraControl control) throws Throwable {
+<b class="nc">&nbsp;        ReservoirBenchmark_jmhType val = f_reservoirbenchmark0_G;</b>
+<b class="nc">&nbsp;        if (val != null) {</b>
+<b class="nc">&nbsp;            return val;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        synchronized(this.getClass()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;            if (control.isFailing) throw new FailureAssistException();</b>
+<b class="nc">&nbsp;            val = f_reservoirbenchmark0_G;</b>
+<b class="nc">&nbsp;            if (val != null) {</b>
+<b class="nc">&nbsp;                return val;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            val = new ReservoirBenchmark_jmhType();</b>
+<b class="nc">&nbsp;            val.readyTrial = true;</b>
+<b class="nc">&nbsp;            f_reservoirbenchmark0_G = val;</b>
+<b class="nc">&nbsp;            } catch (Throwable t) {</b>
+<b class="nc">&nbsp;                control.isFailing = true;</b>
+<b class="nc">&nbsp;                throw t;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return val;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-01 18:42</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,441 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LockFreeExponentiallyDecayingReservoir</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics</a>
+</div>
+
+<h1>Coverage Summary for Class: LockFreeExponentiallyDecayingReservoir (com.codahale.metrics)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LockFreeExponentiallyDecayingReservoir</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (23/23)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LockFreeExponentiallyDecayingReservoir$1</td>
+  </tr>
+  <tr>
+    <td class="name">LockFreeExponentiallyDecayingReservoir$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (15/18)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LockFreeExponentiallyDecayingReservoir$RescalingConsumer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LockFreeExponentiallyDecayingReservoir$State</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (28/30)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    96.3%
+  </span>
+  <span class="absValue">
+    (26/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (75/80)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics;
+&nbsp;
+&nbsp;import com.codahale.metrics.WeightedSnapshot.WeightedSample;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.concurrent.ConcurrentSkipListMap;
+&nbsp;import java.util.concurrent.ThreadLocalRandom;
+&nbsp;import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+&nbsp;import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
+&nbsp;import java.util.function.BiConsumer;
+&nbsp;
+&nbsp;/**
+&nbsp; * A lock-free exponentially-decaying random reservoir of {@code long}s. Uses Cormode et al&#39;s
+&nbsp; * forward-decaying priority reservoir sampling method to produce a statistically representative
+&nbsp; * sampling reservoir, exponentially biased towards newer entries.
+&nbsp; *
+&nbsp; * @see &lt;a href=&quot;http://dimacs.rutgers.edu/~graham/pubs/papers/fwddecay.pdf&quot;&gt;
+&nbsp; * Cormode et al. Forward Decay: A Practical Time Decay Model for Streaming Systems. ICDE &#39;09:
+&nbsp; * Proceedings of the 2009 IEEE International Conference on Data Engineering (2009)&lt;/a&gt;
+&nbsp; *
+&nbsp; * {@link LockFreeExponentiallyDecayingReservoir} is based closely on the {@link ExponentiallyDecayingReservoir},
+&nbsp; * however it provides looser guarantees while completely avoiding locks.
+&nbsp; *
+&nbsp; * Looser guarantees:
+&nbsp; * &lt;ul&gt;
+&nbsp; *     &lt;li&gt; Updates which occur concurrently with rescaling may be discarded if the orphaned state node is updated after
+&nbsp; *     rescale has replaced it. This condition has a greater probability as the rescale interval is reduced due to the
+&nbsp; *     increased frequency of rescaling. {@link #rescaleThresholdNanos} values below 30 seconds are not recommended.
+&nbsp; *     &lt;li&gt; Given a small rescale threshold, updates may attempt to rescale into a new bucket, but lose the CAS race
+&nbsp; *     and update into a newer bucket than expected. In these cases the measurement weight is reduced accordingly.
+&nbsp; *     &lt;li&gt;In the worst case, all concurrent threads updating the reservoir may attempt to rescale rather than
+&nbsp; *     a single thread holding an exclusive write lock. It&#39;s expected that the configuration is set such that
+&nbsp; *     rescaling is substantially less common than updating at peak load. Even so, when size is reasonably small
+&nbsp; *     it can be more efficient to rescale than to park and context switch.
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * @author &lt;a href=&quot;mailto:ckozak@ckozak.net&quot;&gt;Carter Kozak&lt;/a&gt;
+&nbsp; */
+<b class="fc">&nbsp;public final class LockFreeExponentiallyDecayingReservoir implements Reservoir {</b>
+&nbsp;
+&nbsp;    private static final double SECONDS_PER_NANO = .000_000_001D;
+<b class="fc">&nbsp;    private static final AtomicReferenceFieldUpdater&lt;LockFreeExponentiallyDecayingReservoir, State&gt; stateUpdater =</b>
+<b class="fc">&nbsp;            AtomicReferenceFieldUpdater.newUpdater(LockFreeExponentiallyDecayingReservoir.class, State.class, &quot;state&quot;);</b>
+&nbsp;
+&nbsp;    private final int size;
+&nbsp;    private final long rescaleThresholdNanos;
+&nbsp;    private final Clock clock;
+&nbsp;
+&nbsp;    private volatile State state;
+&nbsp;
+<b class="fc">&nbsp;    private static final class State {</b>
+&nbsp;
+<b class="fc">&nbsp;        private static final AtomicIntegerFieldUpdater&lt;State&gt; countUpdater =</b>
+<b class="fc">&nbsp;                AtomicIntegerFieldUpdater.newUpdater(State.class, &quot;count&quot;);</b>
+&nbsp;
+&nbsp;        private final double alphaNanos;
+&nbsp;        private final int size;
+&nbsp;        private final long startTick;
+&nbsp;        // Count is updated after samples are successfully added to the map.
+&nbsp;        private final ConcurrentSkipListMap&lt;Double, WeightedSample&gt; values;
+&nbsp;
+&nbsp;        private volatile int count;
+&nbsp;
+&nbsp;        State(
+&nbsp;                double alphaNanos,
+&nbsp;                int size,
+&nbsp;                long startTick,
+&nbsp;                int count,
+<b class="fc">&nbsp;                ConcurrentSkipListMap&lt;Double, WeightedSample&gt; values) {</b>
+<b class="fc">&nbsp;            this.alphaNanos = alphaNanos;</b>
+<b class="fc">&nbsp;            this.size = size;</b>
+<b class="fc">&nbsp;            this.startTick = startTick;</b>
+<b class="fc">&nbsp;            this.values = values;</b>
+<b class="fc">&nbsp;            this.count = count;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void update(long value, long timestampNanos) {
+<b class="fc">&nbsp;            double itemWeight = weight(timestampNanos - startTick);</b>
+<b class="fc">&nbsp;            double priority = itemWeight / ThreadLocalRandom.current().nextDouble();</b>
+<b class="fc">&nbsp;            boolean mapIsFull = count &gt;= size;</b>
+<b class="fc">&nbsp;            if (!mapIsFull || values.firstKey() &lt; priority) {</b>
+<b class="fc">&nbsp;                addSample(priority, value, itemWeight, mapIsFull);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private void addSample(double priority, long value, double itemWeight, boolean bypassIncrement) {
+<b class="fc">&nbsp;            if (values.putIfAbsent(priority, new WeightedSample(value, itemWeight)) == null</b>
+<b class="fc">&nbsp;                    &amp;&amp; (bypassIncrement || countUpdater.incrementAndGet(this) &gt; size)) {</b>
+<b class="fc">&nbsp;                values.pollFirstEntry();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        /* &quot;A common feature of the above techniques—indeed, the key technique that
+&nbsp;         * allows us to track the decayed weights efficiently—is that they maintain
+&nbsp;         * counts and other quantities based on g(ti ? L), and only scale by g(t ? L)
+&nbsp;         * at query time. But while g(ti ?L)/g(t?L) is guaranteed to lie between zero
+&nbsp;         * and one, the intermediate values of g(ti ? L) could become very large. For
+&nbsp;         * polynomial functions, these values should not grow too large, and should be
+&nbsp;         * effectively represented in practice by floating point values without loss of
+&nbsp;         * precision. For exponential functions, these values could grow quite large as
+&nbsp;         * new values of (ti ? L) become large, and potentially exceed the capacity of
+&nbsp;         * common floating point types. However, since the values stored by the
+&nbsp;         * algorithms are linear combinations of g values (scaled sums), they can be
+&nbsp;         * rescaled relative to a new landmark. That is, by the analysis of exponential
+&nbsp;         * decay in Section III-A, the choice of L does not affect the final result. We
+&nbsp;         * can therefore multiply each value based on L by a factor of exp(??(L? ? L)),
+&nbsp;         * and obtain the correct value as if we had instead computed relative to a new
+&nbsp;         * landmark L? (and then use this new L? at query time). This can be done with
+&nbsp;         * a linear pass over whatever data structure is being used.&quot;
+&nbsp;         */
+&nbsp;        State rescale(long newTick) {
+<b class="fc">&nbsp;            long durationNanos = newTick - startTick;</b>
+<b class="fc">&nbsp;            double scalingFactor = Math.exp(-alphaNanos * durationNanos);</b>
+<b class="fc">&nbsp;            int newCount = 0;</b>
+<b class="fc">&nbsp;            ConcurrentSkipListMap&lt;Double, WeightedSample&gt; newValues = new ConcurrentSkipListMap&lt;&gt;();</b>
+<b class="fc">&nbsp;            if (Double.compare(scalingFactor, 0) != 0) {</b>
+<b class="fc">&nbsp;                RescalingConsumer consumer = new RescalingConsumer(scalingFactor, newValues);</b>
+<b class="fc">&nbsp;                values.forEach(consumer);</b>
+&nbsp;                // make sure the counter is in sync with the number of stored samples.
+<b class="fc">&nbsp;                newCount = consumer.count;</b>
+&nbsp;            }
+&nbsp;            // It&#39;s possible that more values were added while the map was scanned, those with the
+&nbsp;            // minimum priorities are removed.
+<b class="fc">&nbsp;            while (newCount &gt; size) {</b>
+<b class="nc">&nbsp;                Objects.requireNonNull(newValues.pollFirstEntry(), &quot;Expected an entry&quot;);</b>
+<b class="nc">&nbsp;                newCount--;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return new State(alphaNanos, size, newTick, newCount, newValues);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private double weight(long durationNanos) {
+<b class="fc">&nbsp;            return Math.exp(alphaNanos * durationNanos);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final class RescalingConsumer implements BiConsumer&lt;Double, WeightedSample&gt; {</b>
+&nbsp;        private final double scalingFactor;
+&nbsp;        private final ConcurrentSkipListMap&lt;Double, WeightedSample&gt; values;
+&nbsp;        private int count;
+&nbsp;
+<b class="fc">&nbsp;        RescalingConsumer(double scalingFactor, ConcurrentSkipListMap&lt;Double, WeightedSample&gt; values) {</b>
+<b class="fc">&nbsp;            this.scalingFactor = scalingFactor;</b>
+<b class="fc">&nbsp;            this.values = values;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void accept(Double priority, WeightedSample sample) {
+<b class="fc">&nbsp;            double newWeight = sample.weight * scalingFactor;</b>
+<b class="fc">&nbsp;            if (Double.compare(newWeight, 0) == 0) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="fc">&nbsp;            WeightedSample newSample = new WeightedSample(sample.value, newWeight);</b>
+<b class="fc">&nbsp;            if (values.put(priority * scalingFactor, newSample) == null) {</b>
+<b class="fc">&nbsp;                count++;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private LockFreeExponentiallyDecayingReservoir(int size, double alpha, Duration rescaleThreshold, Clock clock) {</b>
+&nbsp;        // Scale alpha to nanoseconds
+<b class="fc">&nbsp;        double alphaNanos = alpha * SECONDS_PER_NANO;</b>
+<b class="fc">&nbsp;        this.size = size;</b>
+<b class="fc">&nbsp;        this.clock = clock;</b>
+<b class="fc">&nbsp;        this.rescaleThresholdNanos = rescaleThreshold.toNanos();</b>
+<b class="fc">&nbsp;        this.state = new State(alphaNanos, size, clock.getTick(), 0, new ConcurrentSkipListMap&lt;&gt;());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int size() {
+<b class="fc">&nbsp;        return Math.min(size, state.count);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void update(long value) {
+<b class="fc">&nbsp;        long now = clock.getTick();</b>
+<b class="fc">&nbsp;        rescaleIfNeeded(now).update(value, now);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private State rescaleIfNeeded(long currentTick) {
+&nbsp;        // This method is optimized for size so the check may be quickly inlined.
+&nbsp;        // Rescaling occurs substantially less frequently than the check itself.
+<b class="fc">&nbsp;        State stateSnapshot = this.state;</b>
+<b class="fc">&nbsp;        if (currentTick - stateSnapshot.startTick &gt;= rescaleThresholdNanos) {</b>
+<b class="fc">&nbsp;            return doRescale(currentTick, stateSnapshot);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return stateSnapshot;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private State doRescale(long currentTick, State stateSnapshot) {
+<b class="fc">&nbsp;        State newState = stateSnapshot.rescale(currentTick);</b>
+<b class="fc">&nbsp;        if (stateUpdater.compareAndSet(this, stateSnapshot, newState)) {</b>
+&nbsp;            // newState successfully installed
+<b class="fc">&nbsp;            return newState;</b>
+&nbsp;        }
+&nbsp;        // Otherwise another thread has won the race and we can return the result of a volatile read.
+&nbsp;        // It&#39;s possible this has taken so long that another update is required, however that&#39;s unlikely
+&nbsp;        // and no worse than the standard race between a rescale and update.
+<b class="fc">&nbsp;        return this.state;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Snapshot getSnapshot() {
+<b class="fc">&nbsp;        State stateSnapshot = rescaleIfNeeded(clock.getTick());</b>
+<b class="fc">&nbsp;        return new WeightedSnapshot(stateSnapshot.values.values());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Builder builder() {
+<b class="fc">&nbsp;        return new Builder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * By default this uses a size of 1028 elements, which offers a 99.9%
+&nbsp;     * confidence level with a 5% margin of error assuming a normal distribution, and an alpha
+&nbsp;     * factor of 0.015, which heavily biases the reservoir to the past 5 minutes of measurements.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final class Builder {</b>
+&nbsp;        private static final int DEFAULT_SIZE = 1028;
+&nbsp;        private static final double DEFAULT_ALPHA = 0.015D;
+<b class="fc">&nbsp;        private static final Duration DEFAULT_RESCALE_THRESHOLD = Duration.ofHours(1);</b>
+&nbsp;
+<b class="fc">&nbsp;        private int size = DEFAULT_SIZE;</b>
+<b class="fc">&nbsp;        private double alpha = DEFAULT_ALPHA;</b>
+<b class="fc">&nbsp;        private Duration rescaleThreshold = DEFAULT_RESCALE_THRESHOLD;</b>
+<b class="fc">&nbsp;        private Clock clock = Clock.defaultClock();</b>
+&nbsp;
+<b class="fc">&nbsp;        private Builder() {}</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Maximum number of samples to keep in the reservoir. Once this number is reached older samples are
+&nbsp;         * replaced (based on weight, with some amount of random jitter).
+&nbsp;         */
+&nbsp;        public Builder size(int value) {
+<b class="fc">&nbsp;            if (value &lt;= 0) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(</b>
+&nbsp;                        &quot;LockFreeExponentiallyDecayingReservoir size must be positive: &quot; + value);
+&nbsp;            }
+<b class="fc">&nbsp;            this.size = value;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Alpha is the exponential decay factor. Higher values bias results more heavily toward newer values.
+&nbsp;         */
+&nbsp;        public Builder alpha(double value) {
+<b class="fc">&nbsp;            this.alpha = value;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Interval at which this reservoir is rescaled.
+&nbsp;         */
+&nbsp;        public Builder rescaleThreshold(Duration value) {
+<b class="nc">&nbsp;            this.rescaleThreshold = Objects.requireNonNull(value, &quot;rescaleThreshold is required&quot;);</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Clock instance used for decay.
+&nbsp;         */
+&nbsp;        public Builder clock(Clock value) {
+<b class="fc">&nbsp;            this.clock = Objects.requireNonNull(value, &quot;clock is required&quot;);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Reservoir build() {
+<b class="fc">&nbsp;            return new LockFreeExponentiallyDecayingReservoir(size, alpha, rescaleThreshold, clock);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-01 18:42</div>
+</div>
+</body>
+</html>

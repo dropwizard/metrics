@@ -1,0 +1,293 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > GraphiteRabbitMQ</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.graphite</a>
+</div>
+
+<h1>Coverage Summary for Class: GraphiteRabbitMQ (com.codahale.metrics.graphite)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GraphiteRabbitMQ</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.7%
+  </span>
+  <span class="absValue">
+    (8/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.2%
+  </span>
+  <span class="absValue">
+    (24/38)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GraphiteRabbitMQ$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    61.5%
+  </span>
+  <span class="absValue">
+    (8/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    58.5%
+  </span>
+  <span class="absValue">
+    (24/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.graphite;
+&nbsp;
+&nbsp;import com.rabbitmq.client.Channel;
+&nbsp;import com.rabbitmq.client.Connection;
+&nbsp;import com.rabbitmq.client.ConnectionFactory;
+&nbsp;import com.rabbitmq.client.DefaultSocketConfigurator;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.Socket;
+&nbsp;import java.util.concurrent.TimeoutException;
+&nbsp;
+&nbsp;import static java.nio.charset.StandardCharsets.UTF_8;
+&nbsp;
+&nbsp;/**
+&nbsp; * A rabbit-mq client to a Carbon server.
+&nbsp; */
+&nbsp;public class GraphiteRabbitMQ implements GraphiteSender {
+&nbsp;
+<b class="fc">&nbsp;    private static final Integer DEFAULT_RABBIT_CONNECTION_TIMEOUT_MS = 500;</b>
+<b class="fc">&nbsp;    private static final Integer DEFAULT_RABBIT_SOCKET_TIMEOUT_MS = 5000;</b>
+<b class="fc">&nbsp;    private static final Integer DEFAULT_RABBIT_REQUESTED_HEARTBEAT_SEC = 10;</b>
+&nbsp;
+&nbsp;    private ConnectionFactory connectionFactory;
+&nbsp;    private Connection connection;
+&nbsp;    private Channel channel;
+&nbsp;    private String exchange;
+&nbsp;
+&nbsp;    private int failures;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client with a given a {@link com.rabbitmq.client.ConnectionFactory} and an amqp exchange
+&nbsp;     *
+&nbsp;     * @param connectionFactory the {@link com.rabbitmq.client.ConnectionFactory} used to establish connection and publish to graphite server
+&nbsp;     * @param exchange          the amqp exchange
+&nbsp;     */
+<b class="fc">&nbsp;    public GraphiteRabbitMQ(final ConnectionFactory connectionFactory, final String exchange) {</b>
+<b class="fc">&nbsp;        this.connectionFactory = connectionFactory;</b>
+<b class="fc">&nbsp;        this.exchange = exchange;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client given connection details
+&nbsp;     *
+&nbsp;     * @param rabbitHost     the rabbitmq server host
+&nbsp;     * @param rabbitPort     the rabbitmq server port
+&nbsp;     * @param rabbitUsername the rabbitmq server username
+&nbsp;     * @param rabbitPassword the rabbitmq server password
+&nbsp;     * @param exchange       the amqp exchange
+&nbsp;     */
+&nbsp;    public GraphiteRabbitMQ(
+&nbsp;            final String rabbitHost,
+&nbsp;            final Integer rabbitPort,
+&nbsp;            final String rabbitUsername,
+&nbsp;            final String rabbitPassword,
+&nbsp;            final String exchange) {
+&nbsp;
+<b class="nc">&nbsp;        this(rabbitHost,</b>
+&nbsp;                rabbitPort,
+&nbsp;                rabbitUsername,
+&nbsp;                rabbitPassword,
+&nbsp;                exchange,
+&nbsp;                DEFAULT_RABBIT_CONNECTION_TIMEOUT_MS,
+&nbsp;                DEFAULT_RABBIT_SOCKET_TIMEOUT_MS,
+&nbsp;                DEFAULT_RABBIT_REQUESTED_HEARTBEAT_SEC);
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client given connection details
+&nbsp;     *
+&nbsp;     * @param rabbitHost                        the rabbitmq server host
+&nbsp;     * @param rabbitPort                        the rabbitmq server port
+&nbsp;     * @param rabbitUsername                    the rabbitmq server username
+&nbsp;     * @param rabbitPassword                    the rabbitmq server password
+&nbsp;     * @param exchange                          the amqp exchange
+&nbsp;     * @param rabbitConnectionTimeoutMS         the connection timeout in milliseconds
+&nbsp;     * @param rabbitSocketTimeoutMS             the socket timeout in milliseconds
+&nbsp;     * @param rabbitRequestedHeartbeatInSeconds the hearthbeat in seconds
+&nbsp;     */
+&nbsp;    public GraphiteRabbitMQ(
+&nbsp;            final String rabbitHost,
+&nbsp;            final Integer rabbitPort,
+&nbsp;            final String rabbitUsername,
+&nbsp;            final String rabbitPassword,
+&nbsp;            final String exchange,
+&nbsp;            final Integer rabbitConnectionTimeoutMS,
+&nbsp;            final Integer rabbitSocketTimeoutMS,
+<b class="nc">&nbsp;            final Integer rabbitRequestedHeartbeatInSeconds) {</b>
+&nbsp;
+<b class="nc">&nbsp;        this.exchange = exchange;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.connectionFactory = new ConnectionFactory();</b>
+&nbsp;
+<b class="nc">&nbsp;        connectionFactory.setSocketConfigurator(new DefaultSocketConfigurator() {</b>
+&nbsp;            @Override
+&nbsp;            public void configure(Socket socket) throws IOException {
+<b class="nc">&nbsp;                super.configure(socket);</b>
+<b class="nc">&nbsp;                socket.setSoTimeout(rabbitSocketTimeoutMS);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        connectionFactory.setConnectionTimeout(rabbitConnectionTimeoutMS);</b>
+<b class="nc">&nbsp;        connectionFactory.setRequestedHeartbeat(rabbitRequestedHeartbeatInSeconds);</b>
+<b class="nc">&nbsp;        connectionFactory.setHost(rabbitHost);</b>
+<b class="nc">&nbsp;        connectionFactory.setPort(rabbitPort);</b>
+<b class="nc">&nbsp;        connectionFactory.setUsername(rabbitUsername);</b>
+<b class="nc">&nbsp;        connectionFactory.setPassword(rabbitPassword);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void connect() throws IllegalStateException, IOException {
+<b class="fc">&nbsp;        if (isConnected()) {</b>
+<b class="fc">&nbsp;            throw new IllegalStateException(&quot;Already connected&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            connection = connectionFactory.newConnection();</b>
+<b class="nc">&nbsp;        } catch (TimeoutException e) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(e);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        channel = connection.createChannel();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isConnected() {
+<b class="fc">&nbsp;        return connection != null &amp;&amp; connection.isOpen();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void send(String name, String value, long timestamp) throws IOException {
+&nbsp;        try {
+<b class="fc">&nbsp;            final String sanitizedName = sanitize(name);</b>
+<b class="fc">&nbsp;            final String sanitizedValue = sanitize(value);</b>
+&nbsp;
+<b class="fc">&nbsp;            final String message = sanitizedName + &#39; &#39; + sanitizedValue + &#39; &#39; + Long.toString(timestamp) + &#39;\n&#39;;</b>
+<b class="fc">&nbsp;            channel.basicPublish(exchange, sanitizedName, null, message.getBytes(UTF_8));</b>
+<b class="fc">&nbsp;        } catch (IOException e) {</b>
+<b class="fc">&nbsp;            failures++;</b>
+<b class="fc">&nbsp;            throw e;</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void flush() throws IOException {
+&nbsp;        // Nothing to do
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() throws IOException {
+<b class="fc">&nbsp;        if (connection != null) {</b>
+<b class="fc">&nbsp;            connection.close();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getFailures() {
+<b class="fc">&nbsp;        return failures;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String sanitize(String s) {
+<b class="fc">&nbsp;        return GraphiteSanitize.sanitize(s);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-01 18:42</div>
+</div>
+</body>
+</html>

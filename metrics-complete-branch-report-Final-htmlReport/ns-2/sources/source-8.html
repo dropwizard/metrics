@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > Counted</title>
+  <title>Coverage Report > ExceptionMetered</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,14 +22,14 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.codahale.metrics.annotation</a>
 </div>
 
-<h1>Coverage Summary for Class: Counted (com.codahale.metrics.annotation)</h1>
+<h1>Coverage Summary for Class: ExceptionMetered (com.codahale.metrics.annotation)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 </tr>
 <tr>
-  <td class="name">Counted</td>
+  <td class="name">ExceptionMetered</td>
 </tr>
 
 </table>
@@ -49,30 +49,47 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import java.lang.annotation.Target;
 &nbsp;
 &nbsp;/**
-&nbsp; * An annotation for marking a method of an annotated object as counted.
-&nbsp; *
+&nbsp; * An annotation for marking a method of an annotated object as metered.
 &nbsp; * &lt;p&gt;
 &nbsp; * Given a method like this:
 &nbsp; * &lt;pre&gt;&lt;code&gt;
-&nbsp; *     {@literal @}Counted(name = &quot;fancyName&quot;)
+&nbsp; *     {@literal @}ExceptionMetered(name = &quot;fancyName&quot;, cause=IllegalArgumentException.class)
 &nbsp; *     public String fancyName(String name) {
 &nbsp; *         return &quot;Sir Captain &quot; + name;
 &nbsp; *     }
 &nbsp; * &lt;/code&gt;&lt;/pre&gt;
 &nbsp; * &lt;p&gt;
-&nbsp; * A counter for the defining class with the name {@code fancyName} will be created and each time the
-&nbsp; * {@code #fancyName(String)} method is invoked, the counter will be marked.
-&nbsp; *
-&nbsp; * @since 3.1
+&nbsp; * A meter for the defining class with the name {@code fancyName} will be created and each time the
+&nbsp; * {@code #fancyName(String)} throws an exception of type {@code cause} (or a subclass), the meter
+&nbsp; * will be marked.
+&nbsp; * &lt;p&gt;
+&nbsp; * A name for the metric can be specified as an annotation parameter, otherwise, the metric will be
+&nbsp; * named based on the method name.
+&nbsp; * &lt;p&gt;
+&nbsp; * For instance, given a declaration of
+&nbsp; * &lt;pre&gt;&lt;code&gt;
+&nbsp; *     {@literal @}ExceptionMetered
+&nbsp; *     public String fancyName(String name) {
+&nbsp; *         return &quot;Sir Captain &quot; + name;
+&nbsp; *     }
+&nbsp; * &lt;/code&gt;&lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * A meter named {@code fancyName.exceptions} will be created and marked every time an exception is
+&nbsp; * thrown.
 &nbsp; */
 &nbsp;@Inherited
 &nbsp;@Documented
 &nbsp;@Retention(RetentionPolicy.RUNTIME)
 &nbsp;@Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
-&nbsp;public @interface Counted {
+&nbsp;public @interface ExceptionMetered {
+&nbsp;    /**
+&nbsp;     * The default suffix for meter names.
+&nbsp;     */
+&nbsp;    String DEFAULT_NAME_SUFFIX = &quot;exceptions&quot;;
 &nbsp;
 &nbsp;    /**
-&nbsp;     * @return The name of the counter.
+&nbsp;     * @return The name of the meter. If not specified, the meter will be given a name based on the method
+&nbsp;     * it decorates and the suffix &quot;Exceptions&quot;.
 &nbsp;     */
 &nbsp;    String name() default &quot;&quot;;
 &nbsp;
@@ -83,14 +100,9 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    boolean absolute() default false;
 &nbsp;
 &nbsp;    /**
-&nbsp;     * @return 
-&nbsp;     * If {@code false} (default), the counter is decremented when the annotated
-&nbsp;     * method returns, counting current invocations of the annotated method.
-&nbsp;     * If {@code true}, the counter increases monotonically, counting total
-&nbsp;     * invocations of the annotated method.
+&nbsp;     * @return The type of exceptions that the meter will catch and count.
 &nbsp;     */
-&nbsp;    boolean monotonic() default false;
-&nbsp;
+&nbsp;    Class&lt;? extends Throwable&gt; cause() default Exception.class;
 &nbsp;}
 </code>
 </pre>
@@ -115,7 +127,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

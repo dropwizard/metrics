@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > Gauge</title>
+  <title>Coverage Report > Metered</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,25 +22,16 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.codahale.metrics</a>
 </div>
 
-<h1>Coverage Summary for Class: Gauge (com.codahale.metrics)</h1>
+<h1>Coverage Summary for Class: Metered (com.codahale.metrics)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 </tr>
-  <tr>
-    <td class="name">Gauge$MockitoMock$KSnylESQ</td>
-  </tr>
-  <tr>
-    <td class="name">Gauge$MockitoMock$KSnylESQ$auxiliary$H3iA5ZrO</td>
-  </tr>
-  <tr>
-    <td class="name">Gauge$MockitoMock$KSnylESQ$auxiliary$oaTpXMBj</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
+  <td class="name">Metered</td>
 </tr>
+
 </table>
 
 <br/>
@@ -50,29 +41,51 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics;
 &nbsp;
-&nbsp;
 &nbsp;/**
-&nbsp; * A gauge metric is an instantaneous reading of a particular value. To instrument a queue&#39;s depth,
-&nbsp; * for example:&lt;br&gt;
-&nbsp; * &lt;pre&gt;&lt;code&gt;
-&nbsp; * final Queue&amp;lt;String&amp;gt; queue = new ConcurrentLinkedQueue&amp;lt;String&amp;gt;();
-&nbsp; * final Gauge&amp;lt;Integer&amp;gt; queueDepth = new Gauge&amp;lt;Integer&amp;gt;() {
-&nbsp; *     public Integer getValue() {
-&nbsp; *         return queue.size();
-&nbsp; *     }
-&nbsp; * };
-&nbsp; * &lt;/code&gt;&lt;/pre&gt;
-&nbsp; *
-&nbsp; * @param &lt;T&gt; the type of the metric&#39;s value
+&nbsp; * An object which maintains mean and moving average rates.
 &nbsp; */
-&nbsp;@FunctionalInterface
-&nbsp;public interface Gauge&lt;T&gt; extends Metric {
+&nbsp;public interface Metered extends Metric, Counting {
 &nbsp;    /**
-&nbsp;     * Returns the metric&#39;s current value.
+&nbsp;     * Returns the number of events which have been marked.
 &nbsp;     *
-&nbsp;     * @return the metric&#39;s current value
+&nbsp;     * @return the number of events which have been marked
 &nbsp;     */
-&nbsp;    T getValue();
+&nbsp;    @Override
+&nbsp;    long getCount();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the fifteen-minute moving average rate at which events have
+&nbsp;     * occurred since the meter was created.
+&nbsp;     *
+&nbsp;     * @return the fifteen-minute moving average rate at which events have
+&nbsp;     * occurred since the meter was created
+&nbsp;     */
+&nbsp;    double getFifteenMinuteRate();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the five-minute moving average rate at which events have
+&nbsp;     * occurred since the meter was created.
+&nbsp;     *
+&nbsp;     * @return the five-minute moving average rate at which events have
+&nbsp;     * occurred since the meter was created
+&nbsp;     */
+&nbsp;    double getFiveMinuteRate();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the mean rate at which events have occurred since the meter was created.
+&nbsp;     *
+&nbsp;     * @return the mean rate at which events have occurred since the meter was created
+&nbsp;     */
+&nbsp;    double getMeanRate();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the one-minute moving average rate at which events have
+&nbsp;     * occurred since the meter was created.
+&nbsp;     *
+&nbsp;     * @return the one-minute moving average rate at which events have
+&nbsp;     * occurred since the meter was created
+&nbsp;     */
+&nbsp;    double getOneMinuteRate();
 &nbsp;}
 </code>
 </pre>
@@ -97,7 +110,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

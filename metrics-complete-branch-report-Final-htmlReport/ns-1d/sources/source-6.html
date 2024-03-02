@@ -1,0 +1,159 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ThreadDumpServlet</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.servlets</a>
+</div>
+
+<h1>Coverage Summary for Class: ThreadDumpServlet (com.codahale.metrics.servlets)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ThreadDumpServlet</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.2%
+  </span>
+  <span class="absValue">
+    (13/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.servlets;
+&nbsp;
+&nbsp;import com.codahale.metrics.jvm.ThreadDump;
+&nbsp;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServlet;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.lang.management.ManagementFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * An HTTP servlets which outputs a {@code text/plain} dump of all threads in
+&nbsp; * the VM. Only responds to {@code GET} requests.
+&nbsp; */
+<b class="fc">&nbsp;public class ThreadDumpServlet extends HttpServlet {</b>
+&nbsp;
+&nbsp;    private static final long serialVersionUID = -2690343532336103046L;
+&nbsp;    private static final String CONTENT_TYPE = &quot;text/plain&quot;;
+&nbsp;
+&nbsp;    private transient ThreadDump threadDump;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init() throws ServletException {
+&nbsp;        try {
+&nbsp;            // Some PaaS like Google App Engine blacklist java.lang.managament
+<b class="fc">&nbsp;            this.threadDump = new ThreadDump(ManagementFactory.getThreadMXBean());</b>
+<b class="nc">&nbsp;        } catch (NoClassDefFoundError ncdfe) {</b>
+<b class="nc">&nbsp;            this.threadDump = null; // we won&#39;t be able to provide thread dump</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void doGet(HttpServletRequest req,
+&nbsp;                         HttpServletResponse resp) throws ServletException, IOException {
+<b class="fc">&nbsp;        final boolean includeMonitors = getParam(req.getParameter(&quot;monitors&quot;), true);</b>
+<b class="fc">&nbsp;        final boolean includeSynchronizers = getParam(req.getParameter(&quot;synchronizers&quot;), true);</b>
+&nbsp;
+<b class="fc">&nbsp;        resp.setStatus(HttpServletResponse.SC_OK);</b>
+<b class="fc">&nbsp;        resp.setContentType(CONTENT_TYPE);</b>
+<b class="fc">&nbsp;        resp.setHeader(&quot;Cache-Control&quot;, &quot;must-revalidate,no-cache,no-store&quot;);</b>
+<b class="fc">&nbsp;        if (threadDump == null) {</b>
+<b class="nc">&nbsp;            resp.getWriter().println(&quot;Sorry your runtime environment does not allow to dump threads.&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="fc">&nbsp;        try (OutputStream output = resp.getOutputStream()) {</b>
+<b class="fc">&nbsp;            threadDump.dump(includeMonitors, includeSynchronizers, output);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Boolean getParam(String initParam, boolean defaultValue) {
+<b class="fc">&nbsp;        return initParam == null ? defaultValue : Boolean.parseBoolean(initParam);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
+</div>
+</body>
+</html>

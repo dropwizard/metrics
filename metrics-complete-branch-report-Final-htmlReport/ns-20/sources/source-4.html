@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">io.dropwizard.metrics.jetty11</a>
+    <a href="../index.html">io.dropwizard.metrics.jetty10</a>
 </div>
 
-<h1>Coverage Summary for Class: InstrumentedQueuedThreadPool (io.dropwizard.metrics.jetty11)</h1>
+<h1>Coverage Summary for Class: InstrumentedQueuedThreadPool (io.dropwizard.metrics.jetty10)</h1>
 
 <table class="coverageStats">
 
@@ -139,7 +139,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package io.dropwizard.metrics.jetty11;
+<code class="sourceCode" id="sourceCode">&nbsp;package io.dropwizard.metrics.jetty10;
 &nbsp;
 &nbsp;import com.codahale.metrics.MetricRegistry;
 &nbsp;import com.codahale.metrics.RatioGauge;
@@ -286,9 +286,9 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;                return Ratio.of(getThreads() - getIdleThreads(), getMaxThreads());</b>
 &nbsp;            }
 &nbsp;        });
-<b class="fc">&nbsp;        metricRegistry.registerGauge(name(prefix, NAME_SIZE), this::getThreads);</b>
 &nbsp;        // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
 &nbsp;        // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.
+<b class="fc">&nbsp;        metricRegistry.registerGauge(name(prefix, NAME_SIZE), this::getThreads);</b>
 <b class="fc">&nbsp;        metricRegistry.registerGauge(name(prefix, NAME_JOBS), () -&gt; getQueue().size());</b>
 <b class="fc">&nbsp;        metricRegistry.register(name(prefix, NAME_JOBS_QUEUE_UTILIZATION), new RatioGauge() {</b>
 &nbsp;            @Override
@@ -339,7 +339,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

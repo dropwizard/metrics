@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > ExceptionMetered</title>
+  <title>Coverage Report > CachedGauge</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,14 +22,14 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.codahale.metrics.annotation</a>
 </div>
 
-<h1>Coverage Summary for Class: ExceptionMetered (com.codahale.metrics.annotation)</h1>
+<h1>Coverage Summary for Class: CachedGauge (com.codahale.metrics.annotation)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 </tr>
 <tr>
-  <td class="name">ExceptionMetered</td>
+  <td class="name">CachedGauge</td>
 </tr>
 
 </table>
@@ -41,68 +41,56 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.annotation;
 &nbsp;
-&nbsp;import java.lang.annotation.Documented;
 &nbsp;import java.lang.annotation.ElementType;
-&nbsp;import java.lang.annotation.Inherited;
 &nbsp;import java.lang.annotation.Retention;
 &nbsp;import java.lang.annotation.RetentionPolicy;
 &nbsp;import java.lang.annotation.Target;
+&nbsp;import java.util.concurrent.TimeUnit;
 &nbsp;
 &nbsp;/**
-&nbsp; * An annotation for marking a method of an annotated object as metered.
+&nbsp; * An annotation for marking a method as a gauge, which caches the result for a specified time.
+&nbsp; *
 &nbsp; * &lt;p&gt;
 &nbsp; * Given a method like this:
 &nbsp; * &lt;pre&gt;&lt;code&gt;
-&nbsp; *     {@literal @}ExceptionMetered(name = &quot;fancyName&quot;, cause=IllegalArgumentException.class)
-&nbsp; *     public String fancyName(String name) {
-&nbsp; *         return &quot;Sir Captain &quot; + name;
+&nbsp; *     {@literal @}CachedGauge(name = &quot;queueSize&quot;, timeout = 30, timeoutUnit = TimeUnit.SECONDS)
+&nbsp; *     public int getQueueSize() {
+&nbsp; *         return queue.getSize();
 &nbsp; *     }
+&nbsp; *
 &nbsp; * &lt;/code&gt;&lt;/pre&gt;
 &nbsp; * &lt;p&gt;
-&nbsp; * A meter for the defining class with the name {@code fancyName} will be created and each time the
-&nbsp; * {@code #fancyName(String)} throws an exception of type {@code cause} (or a subclass), the meter
-&nbsp; * will be marked.
-&nbsp; * &lt;p&gt;
-&nbsp; * A name for the metric can be specified as an annotation parameter, otherwise, the metric will be
-&nbsp; * named based on the method name.
-&nbsp; * &lt;p&gt;
-&nbsp; * For instance, given a declaration of
-&nbsp; * &lt;pre&gt;&lt;code&gt;
-&nbsp; *     {@literal @}ExceptionMetered
-&nbsp; *     public String fancyName(String name) {
-&nbsp; *         return &quot;Sir Captain &quot; + name;
-&nbsp; *     }
-&nbsp; * &lt;/code&gt;&lt;/pre&gt;
-&nbsp; * &lt;p&gt;
-&nbsp; * A meter named {@code fancyName.exceptions} will be created and marked every time an exception is
-&nbsp; * thrown.
+&nbsp; *
+&nbsp; * A gauge for the defining class with the name queueSize will be created which uses the annotated method&#39;s
+&nbsp; * return value as its value, and which caches the result for 30 seconds.
+&nbsp; *
+&nbsp; * @since 3.1
 &nbsp; */
-&nbsp;@Inherited
-&nbsp;@Documented
 &nbsp;@Retention(RetentionPolicy.RUNTIME)
-&nbsp;@Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
-&nbsp;public @interface ExceptionMetered {
-&nbsp;    /**
-&nbsp;     * The default suffix for meter names.
-&nbsp;     */
-&nbsp;    String DEFAULT_NAME_SUFFIX = &quot;exceptions&quot;;
+&nbsp;@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE })
+&nbsp;public @interface CachedGauge {
 &nbsp;
 &nbsp;    /**
-&nbsp;     * @return The name of the meter. If not specified, the meter will be given a name based on the method
-&nbsp;     * it decorates and the suffix &quot;Exceptions&quot;.
+&nbsp;     * @return The name of the counter.
 &nbsp;     */
 &nbsp;    String name() default &quot;&quot;;
 &nbsp;
 &nbsp;    /**
 &nbsp;     * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
-&nbsp;     * relative to the annotated class. When annotating a class, this must be {@code false}.
+&nbsp;     * relative to the annotated class.
 &nbsp;     */
 &nbsp;    boolean absolute() default false;
 &nbsp;
 &nbsp;    /**
-&nbsp;     * @return The type of exceptions that the meter will catch and count.
+&nbsp;     * @return The amount of time to cache the result
 &nbsp;     */
-&nbsp;    Class&lt;? extends Throwable&gt; cause() default Exception.class;
+&nbsp;    long timeout();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return The unit of timeout
+&nbsp;     */
+&nbsp;    TimeUnit timeoutUnit() default TimeUnit.MILLISECONDS;
+&nbsp;
 &nbsp;}
 </code>
 </pre>
@@ -127,7 +115,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

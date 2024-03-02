@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > Metered</title>
+  <title>Coverage Report > Counted</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,14 +22,14 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.codahale.metrics.annotation</a>
 </div>
 
-<h1>Coverage Summary for Class: Metered (com.codahale.metrics.annotation)</h1>
+<h1>Coverage Summary for Class: Counted (com.codahale.metrics.annotation)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 </tr>
 <tr>
-  <td class="name">Metered</td>
+  <td class="name">Counted</td>
 </tr>
 
 </table>
@@ -49,26 +49,30 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import java.lang.annotation.Target;
 &nbsp;
 &nbsp;/**
-&nbsp; * An annotation for marking a method of an annotated object as metered.
+&nbsp; * An annotation for marking a method of an annotated object as counted.
+&nbsp; *
 &nbsp; * &lt;p&gt;
 &nbsp; * Given a method like this:
 &nbsp; * &lt;pre&gt;&lt;code&gt;
-&nbsp; *     {@literal @}Metered(name = &quot;fancyName&quot;)
+&nbsp; *     {@literal @}Counted(name = &quot;fancyName&quot;)
 &nbsp; *     public String fancyName(String name) {
 &nbsp; *         return &quot;Sir Captain &quot; + name;
 &nbsp; *     }
 &nbsp; * &lt;/code&gt;&lt;/pre&gt;
 &nbsp; * &lt;p&gt;
-&nbsp; * A meter for the defining class with the name {@code fancyName} will be created and each time the
-&nbsp; * {@code #fancyName(String)} method is invoked, the meter will be marked.
+&nbsp; * A counter for the defining class with the name {@code fancyName} will be created and each time the
+&nbsp; * {@code #fancyName(String)} method is invoked, the counter will be marked.
+&nbsp; *
+&nbsp; * @since 3.1
 &nbsp; */
 &nbsp;@Inherited
 &nbsp;@Documented
 &nbsp;@Retention(RetentionPolicy.RUNTIME)
 &nbsp;@Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
-&nbsp;public @interface Metered {
+&nbsp;public @interface Counted {
+&nbsp;
 &nbsp;    /**
-&nbsp;     * @return The name of the meter.
+&nbsp;     * @return The name of the counter.
 &nbsp;     */
 &nbsp;    String name() default &quot;&quot;;
 &nbsp;
@@ -77,6 +81,16 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     * relative to the annotated class. When annotating a class, this must be {@code false}.
 &nbsp;     */
 &nbsp;    boolean absolute() default false;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return 
+&nbsp;     * If {@code false} (default), the counter is decremented when the annotated
+&nbsp;     * method returns, counting current invocations of the annotated method.
+&nbsp;     * If {@code true}, the counter increases monotonically, counting total
+&nbsp;     * invocations of the annotated method.
+&nbsp;     */
+&nbsp;    boolean monotonic() default false;
+&nbsp;
 &nbsp;}
 </code>
 </pre>
@@ -101,7 +115,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

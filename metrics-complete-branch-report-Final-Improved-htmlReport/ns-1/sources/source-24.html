@@ -1,0 +1,353 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Timer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics</a>
+</div>
+
+<h1>Coverage Summary for Class: Timer (com.codahale.metrics)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Timer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.5%
+  </span>
+  <span class="absValue">
+    (29/31)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Timer$Context</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (20/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.9%
+  </span>
+  <span class="absValue">
+    (37/39)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;/**
+&nbsp; * A timer metric which aggregates timing durations and provides duration statistics, plus
+&nbsp; * throughput statistics via {@link Meter}.
+&nbsp; */
+&nbsp;public class Timer implements Metered, Sampling {
+&nbsp;    /**
+&nbsp;     * A timing context.
+&nbsp;     *
+&nbsp;     * @see Timer#time()
+&nbsp;     */
+&nbsp;    public static class Context implements AutoCloseable {
+&nbsp;        private final Timer timer;
+&nbsp;        private final Clock clock;
+&nbsp;        private final long startTime;
+&nbsp;
+<b class="fc">&nbsp;        Context(Timer timer, Clock clock) {</b>
+<b class="fc">&nbsp;            this.timer = timer;</b>
+<b class="fc">&nbsp;            this.clock = clock;</b>
+<b class="fc">&nbsp;            this.startTime = clock.getTick();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Updates the timer with the difference between current and start time. Call to this method will
+&nbsp;         * not reset the start time. Multiple calls result in multiple updates.
+&nbsp;         *
+&nbsp;         * @return the elapsed time in nanoseconds
+&nbsp;         */
+&nbsp;        public long stop() {
+<b class="fc">&nbsp;            final long elapsed = clock.getTick() - startTime;</b>
+<b class="fc">&nbsp;            timer.update(elapsed, TimeUnit.NANOSECONDS);</b>
+<b class="fc">&nbsp;            return elapsed;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Equivalent to calling {@link #stop()}.
+&nbsp;         */
+&nbsp;        @Override
+&nbsp;        public void close() {
+<b class="fc">&nbsp;            stop();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private final Meter meter;
+&nbsp;    private final Histogram histogram;
+&nbsp;    private final Clock clock;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new {@link Timer} using an {@link ExponentiallyDecayingReservoir} and the default
+&nbsp;     * {@link Clock}.
+&nbsp;     */
+&nbsp;    public Timer() {
+<b class="fc">&nbsp;        this(new ExponentiallyDecayingReservoir());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new {@link Timer} that uses the given {@link Reservoir}.
+&nbsp;     *
+&nbsp;     * @param reservoir the {@link Reservoir} implementation the timer should use
+&nbsp;     */
+&nbsp;    public Timer(Reservoir reservoir) {
+<b class="fc">&nbsp;        this(reservoir, Clock.defaultClock());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new {@link Timer} that uses the given {@link Reservoir} and {@link Clock}.
+&nbsp;     *
+&nbsp;     * @param reservoir the {@link Reservoir} implementation the timer should use
+&nbsp;     * @param clock     the {@link Clock} implementation the timer should use
+&nbsp;     */
+&nbsp;    public Timer(Reservoir reservoir, Clock clock) {
+<b class="fc">&nbsp;        this(new Meter(clock), new Histogram(reservoir), clock);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public Timer(Meter meter, Histogram histogram, Clock clock) {</b>
+<b class="fc">&nbsp;        this.meter = meter;</b>
+<b class="fc">&nbsp;        this.histogram = histogram;</b>
+<b class="fc">&nbsp;        this.clock = clock;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds a recorded duration.
+&nbsp;     *
+&nbsp;     * @param duration the length of the duration
+&nbsp;     * @param unit     the scale unit of {@code duration}
+&nbsp;     */
+&nbsp;    public void update(long duration, TimeUnit unit) {
+<b class="fc">&nbsp;        update(unit.toNanos(duration));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds a recorded duration.
+&nbsp;     *
+&nbsp;     * @param duration the {@link Duration} to add to the timer. Negative or zero value are ignored.
+&nbsp;     */
+&nbsp;    public void update(Duration duration) {
+<b class="fc">&nbsp;        update(duration.toNanos());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Times and records the duration of event.
+&nbsp;     *
+&nbsp;     * @param event a {@link Callable} whose {@link Callable#call()} method implements a process
+&nbsp;     *              whose duration should be timed
+&nbsp;     * @param &lt;T&gt;   the type of the value returned by {@code event}
+&nbsp;     * @return the value returned by {@code event}
+&nbsp;     * @throws Exception if {@code event} throws an {@link Exception}
+&nbsp;     */
+&nbsp;    public &lt;T&gt; T time(Callable&lt;T&gt; event) throws Exception {
+<b class="fc">&nbsp;        final long startTime = clock.getTick();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            return event.call();</b>
+&nbsp;        } finally {
+<b class="fc">&nbsp;            update(clock.getTick() - startTime);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Times and records the duration of event. Should not throw exceptions, for that use the
+&nbsp;     * {@link #time(Callable)} method.
+&nbsp;     *
+&nbsp;     * @param event a {@link Supplier} whose {@link Supplier#get()} method implements a process
+&nbsp;     *              whose duration should be timed
+&nbsp;     * @param &lt;T&gt;   the type of the value returned by {@code event}
+&nbsp;     * @return the value returned by {@code event}
+&nbsp;     */
+&nbsp;    public &lt;T&gt; T timeSupplier(Supplier&lt;T&gt; event) {
+<b class="fc">&nbsp;        final long startTime = clock.getTick();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            return event.get();</b>
+&nbsp;        } finally {
+<b class="fc">&nbsp;            update(clock.getTick() - startTime);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Times and records the duration of event.
+&nbsp;     *
+&nbsp;     * @param event a {@link Runnable} whose {@link Runnable#run()} method implements a process
+&nbsp;     *              whose duration should be timed
+&nbsp;     */
+&nbsp;    public void time(Runnable event) {
+<b class="fc">&nbsp;        final long startTime = clock.getTick();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            event.run();</b>
+&nbsp;        } finally {
+<b class="fc">&nbsp;            update(clock.getTick() - startTime);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a new {@link Context}.
+&nbsp;     *
+&nbsp;     * @return a new {@link Context}
+&nbsp;     * @see Context
+&nbsp;     */
+&nbsp;    public Context time() {
+<b class="fc">&nbsp;        return new Context(this, clock);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public long getCount() {
+<b class="fc">&nbsp;        return histogram.getCount();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public double getFifteenMinuteRate() {
+<b class="fc">&nbsp;        return meter.getFifteenMinuteRate();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public double getFiveMinuteRate() {
+<b class="fc">&nbsp;        return meter.getFiveMinuteRate();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public double getMeanRate() {
+<b class="fc">&nbsp;        return meter.getMeanRate();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public double getOneMinuteRate() {
+<b class="fc">&nbsp;        return meter.getOneMinuteRate();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Snapshot getSnapshot() {
+<b class="fc">&nbsp;        return histogram.getSnapshot();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void update(long duration) {
+<b class="pc">&nbsp;        if (duration &gt;= 0) {</b>
+<b class="fc">&nbsp;            histogram.update(duration);</b>
+<b class="fc">&nbsp;            meter.mark();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-01 18:42</div>
+</div>
+</body>
+</html>

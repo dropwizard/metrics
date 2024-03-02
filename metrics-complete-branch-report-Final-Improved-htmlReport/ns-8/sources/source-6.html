@@ -1,0 +1,467 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PickledGraphite</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.graphite</a>
+</div>
+
+<h1>Coverage Summary for Class: PickledGraphite (com.codahale.metrics.graphite)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PickledGraphite</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (4/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.5%
+  </span>
+  <span class="absValue">
+    (15/91)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PickledGraphite$MetricTuple</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    21.1%
+  </span>
+  <span class="absValue">
+    (4/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    15.8%
+  </span>
+  <span class="absValue">
+    (15/95)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.graphite;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import javax.net.SocketFactory;
+&nbsp;
+&nbsp;import java.io.BufferedWriter;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.io.Writer;
+&nbsp;import java.net.InetSocketAddress;
+&nbsp;import java.net.Socket;
+&nbsp;import java.net.UnknownHostException;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import static java.nio.charset.StandardCharsets.UTF_8;
+&nbsp;
+&nbsp;/**
+&nbsp; * A client to a Carbon server that sends all metrics after they have been pickled in configurable sized batches
+&nbsp; */
+&nbsp;public class PickledGraphite implements GraphiteSender {
+&nbsp;
+&nbsp;    static class MetricTuple {
+&nbsp;        String name;
+&nbsp;        long timestamp;
+&nbsp;        String value;
+&nbsp;
+<b class="nc">&nbsp;        MetricTuple(String name, long timestamp, String value) {</b>
+<b class="nc">&nbsp;            this.name = name;</b>
+<b class="nc">&nbsp;            this.timestamp = timestamp;</b>
+<b class="nc">&nbsp;            this.value = value;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Minimally necessary pickle opcodes.
+&nbsp;     */
+&nbsp;    private static final char
+&nbsp;            MARK = &#39;(&#39;,
+&nbsp;            STOP = &#39;.&#39;,
+&nbsp;            LONG = &#39;L&#39;,
+&nbsp;            STRING = &#39;S&#39;,
+&nbsp;            APPEND = &#39;a&#39;,
+&nbsp;            LIST = &#39;l&#39;,
+&nbsp;            TUPLE = &#39;t&#39;,
+&nbsp;            QUOTE = &#39;\&#39;&#39;,
+&nbsp;            LF = &#39;\n&#39;;
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(PickledGraphite.class);</b>
+&nbsp;    private final static int DEFAULT_BATCH_SIZE = 100;
+&nbsp;
+&nbsp;    private int batchSize;
+&nbsp;    // graphite expects a python-pickled list of nested tuples.
+<b class="fc">&nbsp;    private List&lt;MetricTuple&gt; metrics = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final String hostname;
+&nbsp;    private final int port;
+&nbsp;    private final InetSocketAddress address;
+&nbsp;    private final SocketFactory socketFactory;
+&nbsp;    private final Charset charset;
+&nbsp;
+&nbsp;    private Socket socket;
+&nbsp;    private Writer writer;
+&nbsp;    private int failures;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which connects to the given address using the default {@link SocketFactory}. This defaults
+&nbsp;     * to a batchSize of 100
+&nbsp;     *
+&nbsp;     * @param address the address of the Carbon server
+&nbsp;     */
+&nbsp;    public PickledGraphite(InetSocketAddress address) {
+<b class="nc">&nbsp;        this(address, DEFAULT_BATCH_SIZE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which connects to the given address using the default {@link SocketFactory}.
+&nbsp;     *
+&nbsp;     * @param address   the address of the Carbon server
+&nbsp;     * @param batchSize how many metrics are bundled into a single pickle request to graphite
+&nbsp;     */
+&nbsp;    public PickledGraphite(InetSocketAddress address, int batchSize) {
+<b class="nc">&nbsp;        this(address, SocketFactory.getDefault(), batchSize);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which connects to the given address and socket factory.
+&nbsp;     *
+&nbsp;     * @param address       the address of the Carbon server
+&nbsp;     * @param socketFactory the socket factory
+&nbsp;     * @param batchSize     how many metrics are bundled into a single pickle request to graphite
+&nbsp;     */
+&nbsp;    public PickledGraphite(InetSocketAddress address, SocketFactory socketFactory, int batchSize) {
+<b class="nc">&nbsp;        this(address, socketFactory, UTF_8, batchSize);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which connects to the given address and socket factory using the given character set.
+&nbsp;     *
+&nbsp;     * @param address       the address of the Carbon server
+&nbsp;     * @param socketFactory the socket factory
+&nbsp;     * @param charset       the character set used by the server
+&nbsp;     * @param batchSize     how many metrics are bundled into a single pickle request to graphite
+&nbsp;     */
+<b class="fc">&nbsp;    public PickledGraphite(InetSocketAddress address, SocketFactory socketFactory, Charset charset, int batchSize) {</b>
+<b class="fc">&nbsp;        this.address = address;</b>
+<b class="fc">&nbsp;        this.hostname = null;</b>
+<b class="fc">&nbsp;        this.port = -1;</b>
+<b class="fc">&nbsp;        this.socketFactory = socketFactory;</b>
+<b class="fc">&nbsp;        this.charset = charset;</b>
+<b class="fc">&nbsp;        this.batchSize = batchSize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which connects to the given address using the default {@link SocketFactory}. This defaults
+&nbsp;     * to a batchSize of 100
+&nbsp;     *
+&nbsp;     * @param hostname the hostname of the Carbon server
+&nbsp;     * @param port     the port of the Carbon server
+&nbsp;     */
+&nbsp;    public PickledGraphite(String hostname, int port) {
+<b class="nc">&nbsp;        this(hostname, port, DEFAULT_BATCH_SIZE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which connects to the given address using the default {@link SocketFactory}.
+&nbsp;     *
+&nbsp;     * @param hostname  the hostname of the Carbon server
+&nbsp;     * @param port      the port of the Carbon server
+&nbsp;     * @param batchSize how many metrics are bundled into a single pickle request to graphite
+&nbsp;     */
+&nbsp;    public PickledGraphite(String hostname, int port, int batchSize) {
+<b class="nc">&nbsp;        this(hostname, port, SocketFactory.getDefault(), batchSize);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which connects to the given address and socket factory.
+&nbsp;     *
+&nbsp;     * @param hostname      the hostname of the Carbon server
+&nbsp;     * @param port          the port of the Carbon server
+&nbsp;     * @param socketFactory the socket factory
+&nbsp;     * @param batchSize     how many metrics are bundled into a single pickle request to graphite
+&nbsp;     */
+&nbsp;    public PickledGraphite(String hostname, int port, SocketFactory socketFactory, int batchSize) {
+<b class="nc">&nbsp;        this(hostname, port, socketFactory, UTF_8, batchSize);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new client which connects to the given address and socket factory using the given character set.
+&nbsp;     *
+&nbsp;     * @param hostname      the hostname of the Carbon server
+&nbsp;     * @param port          the port of the Carbon server
+&nbsp;     * @param socketFactory the socket factory
+&nbsp;     * @param charset       the character set used by the server
+&nbsp;     * @param batchSize     how many metrics are bundled into a single pickle request to graphite
+&nbsp;     */
+<b class="nc">&nbsp;    public PickledGraphite(String hostname, int port, SocketFactory socketFactory, Charset charset, int batchSize) {</b>
+<b class="nc">&nbsp;        this.address = null;</b>
+<b class="nc">&nbsp;        this.hostname = hostname;</b>
+<b class="nc">&nbsp;        this.port = port;</b>
+<b class="nc">&nbsp;        this.socketFactory = socketFactory;</b>
+<b class="nc">&nbsp;        this.charset = charset;</b>
+<b class="nc">&nbsp;        this.batchSize = batchSize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void connect() throws IllegalStateException, IOException {
+<b class="fc">&nbsp;        if (isConnected()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Already connected&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        InetSocketAddress address = this.address;</b>
+<b class="fc">&nbsp;        if (address == null) {</b>
+<b class="nc">&nbsp;            address = new InetSocketAddress(hostname, port);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (address.getAddress() == null) {</b>
+<b class="fc">&nbsp;            throw new UnknownHostException(address.getHostName());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.socket = socketFactory.createSocket(address.getAddress(), address.getPort());</b>
+<b class="nc">&nbsp;        this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), charset));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isConnected() {
+<b class="fc">&nbsp;        return socket != null &amp;&amp; socket.isConnected() &amp;&amp; !socket.isClosed();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert the metric to a python tuple of the form:
+&nbsp;     * &lt;p&gt;
+&nbsp;     * (timestamp, (name, value))
+&nbsp;     * &lt;p&gt;
+&nbsp;     * And add it to the list of metrics. If we reach the batch size, write them out.
+&nbsp;     *
+&nbsp;     * @param name      the name of the metric
+&nbsp;     * @param value     the value of the metric
+&nbsp;     * @param timestamp the timestamp of the metric
+&nbsp;     * @throws IOException if there was an error sending the metric
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void send(String name, String value, long timestamp) throws IOException {
+<b class="nc">&nbsp;        metrics.add(new MetricTuple(sanitize(name), timestamp, sanitize(value)));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (metrics.size() &gt;= batchSize) {</b>
+<b class="nc">&nbsp;            writeMetrics();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void flush() throws IOException {
+<b class="nc">&nbsp;        writeMetrics();</b>
+<b class="nc">&nbsp;        if (writer != null) {</b>
+<b class="nc">&nbsp;            writer.flush();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() throws IOException {
+&nbsp;        try {
+<b class="nc">&nbsp;            flush();</b>
+<b class="nc">&nbsp;            if (writer != null) {</b>
+<b class="nc">&nbsp;                writer.close();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IOException ex) {</b>
+<b class="nc">&nbsp;            if (socket != null) {</b>
+<b class="nc">&nbsp;                socket.close();</b>
+&nbsp;            }
+&nbsp;        } finally {
+<b class="nc">&nbsp;            this.socket = null;</b>
+<b class="nc">&nbsp;            this.writer = null;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getFailures() {
+<b class="nc">&nbsp;        return failures;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 1. Run the pickler script to package all the pending metrics into a single message
+&nbsp;     * 2. Send the message to graphite
+&nbsp;     * 3. Clear out the list of metrics
+&nbsp;     */
+&nbsp;    private void writeMetrics() throws IOException {
+<b class="nc">&nbsp;        if (metrics.size() &gt; 0) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                byte[] payload = pickleMetrics(metrics);</b>
+<b class="nc">&nbsp;                byte[] header = ByteBuffer.allocate(4).putInt(payload.length).array();</b>
+&nbsp;
+&nbsp;                @SuppressWarnings(&quot;resource&quot;)
+<b class="nc">&nbsp;                OutputStream outputStream = socket.getOutputStream();</b>
+<b class="nc">&nbsp;                outputStream.write(header);</b>
+<b class="nc">&nbsp;                outputStream.write(payload);</b>
+<b class="nc">&nbsp;                outputStream.flush();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (LOGGER.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;                    LOGGER.debug(&quot;Wrote {} metrics&quot;, metrics.size());</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                this.failures++;</b>
+<b class="nc">&nbsp;                throw e;</b>
+&nbsp;            } finally {
+&nbsp;                // if there was an error, we might miss some data. for now, drop those on the floor and
+&nbsp;                // try to keep going.
+<b class="nc">&nbsp;                metrics.clear();</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * See: http://readthedocs.org/docs/graphite/en/1.0/feeding-carbon.html
+&nbsp;     *
+&nbsp;     * @throws IOException shouldn&#39;t happen because we write to memory.
+&nbsp;     */
+&nbsp;    byte[] pickleMetrics(List&lt;MetricTuple&gt; metrics) throws IOException {
+&nbsp;        // Extremely rough estimate of 75 bytes per message
+<b class="nc">&nbsp;        ByteArrayOutputStream out = new ByteArrayOutputStream(metrics.size() * 75);</b>
+<b class="nc">&nbsp;        Writer pickled = new OutputStreamWriter(out, charset);</b>
+&nbsp;
+<b class="nc">&nbsp;        pickled.append(MARK);</b>
+<b class="nc">&nbsp;        pickled.append(LIST);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (MetricTuple tuple : metrics) {</b>
+&nbsp;            // start the outer tuple
+<b class="nc">&nbsp;            pickled.append(MARK);</b>
+&nbsp;
+&nbsp;            // the metric name is a string.
+<b class="nc">&nbsp;            pickled.append(STRING);</b>
+&nbsp;            // the single quotes are to match python&#39;s repr(&quot;abcd&quot;)
+<b class="nc">&nbsp;            pickled.append(QUOTE);</b>
+<b class="nc">&nbsp;            pickled.append(tuple.name);</b>
+<b class="nc">&nbsp;            pickled.append(QUOTE);</b>
+<b class="nc">&nbsp;            pickled.append(LF);</b>
+&nbsp;
+&nbsp;            // start the inner tuple
+<b class="nc">&nbsp;            pickled.append(MARK);</b>
+&nbsp;
+&nbsp;            // timestamp is a long
+<b class="nc">&nbsp;            pickled.append(LONG);</b>
+<b class="nc">&nbsp;            pickled.append(Long.toString(tuple.timestamp));</b>
+&nbsp;            // the trailing L is to match python&#39;s repr(long(1234))
+<b class="nc">&nbsp;            pickled.append(LONG);</b>
+<b class="nc">&nbsp;            pickled.append(LF);</b>
+&nbsp;
+&nbsp;            // and the value is a string.
+<b class="nc">&nbsp;            pickled.append(STRING);</b>
+<b class="nc">&nbsp;            pickled.append(QUOTE);</b>
+<b class="nc">&nbsp;            pickled.append(tuple.value);</b>
+<b class="nc">&nbsp;            pickled.append(QUOTE);</b>
+<b class="nc">&nbsp;            pickled.append(LF);</b>
+&nbsp;
+<b class="nc">&nbsp;            pickled.append(TUPLE); // inner close</b>
+<b class="nc">&nbsp;            pickled.append(TUPLE); // outer close</b>
+&nbsp;
+<b class="nc">&nbsp;            pickled.append(APPEND);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        // every pickle ends with STOP
+<b class="nc">&nbsp;        pickled.append(STOP);</b>
+&nbsp;
+<b class="nc">&nbsp;        pickled.flush();</b>
+&nbsp;
+<b class="nc">&nbsp;        return out.toByteArray();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String sanitize(String s) {
+<b class="nc">&nbsp;        return GraphiteSanitize.sanitize(s);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-01 18:42</div>
+</div>
+</body>
+</html>

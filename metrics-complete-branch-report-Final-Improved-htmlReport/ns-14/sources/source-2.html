@@ -1,0 +1,201 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > MetricsFeature</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.jersey2</a>
+</div>
+
+<h1>Coverage Summary for Class: MetricsFeature (com.codahale.metrics.jersey2)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MetricsFeature</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (11/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jersey2;
+&nbsp;
+&nbsp;import com.codahale.metrics.Clock;
+&nbsp;import com.codahale.metrics.ExponentiallyDecayingReservoir;
+&nbsp;import com.codahale.metrics.MetricRegistry;
+&nbsp;import com.codahale.metrics.Reservoir;
+&nbsp;import com.codahale.metrics.SharedMetricRegistries;
+&nbsp;
+&nbsp;import javax.ws.rs.core.Feature;
+&nbsp;import javax.ws.rs.core.FeatureContext;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link Feature} which registers a {@link InstrumentedResourceMethodApplicationListener}
+&nbsp; * for recording request events.
+&nbsp; */
+&nbsp;public class MetricsFeature implements Feature {
+&nbsp;
+&nbsp;    private final MetricRegistry registry;
+&nbsp;    private final Clock clock;
+&nbsp;    private final boolean trackFilters;
+&nbsp;    private final Supplier&lt;Reservoir&gt; reservoirSupplier;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * @param registry          the metrics registry where the metrics will be stored
+&nbsp;     */
+&nbsp;    public MetricsFeature(MetricRegistry registry) {
+<b class="fc">&nbsp;        this(registry, Clock.defaultClock());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * @param registry          the metrics registry where the metrics will be stored
+&nbsp;     * @param reservoirSupplier Supplier for creating the {@link Reservoir} for {@link Timer timers}.
+&nbsp;     */
+&nbsp;    public MetricsFeature(MetricRegistry registry, Supplier&lt;Reservoir&gt; reservoirSupplier) {
+<b class="fc">&nbsp;        this(registry, Clock.defaultClock(), false, reservoirSupplier);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * @param registry          the metrics registry where the metrics will be stored
+&nbsp;     * @param clock             the {@link Clock} to track time (used mostly in testing) in timers
+&nbsp;     */
+&nbsp;    public MetricsFeature(MetricRegistry registry, Clock clock) {
+<b class="fc">&nbsp;        this(registry, clock, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * @param registry          the metrics registry where the metrics will be stored
+&nbsp;     * @param clock             the {@link Clock} to track time (used mostly in testing) in timers
+&nbsp;     * @param trackFilters      whether the processing time for request and response filters should be tracked
+&nbsp;     */
+&nbsp;    public MetricsFeature(MetricRegistry registry, Clock clock, boolean trackFilters) {
+<b class="fc">&nbsp;        this(registry, clock, trackFilters, ExponentiallyDecayingReservoir::new);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * @param registry          the metrics registry where the metrics will be stored
+&nbsp;     * @param clock             the {@link Clock} to track time (used mostly in testing) in timers
+&nbsp;     * @param trackFilters      whether the processing time for request and response filters should be tracked
+&nbsp;     * @param reservoirSupplier Supplier for creating the {@link Reservoir} for {@link Timer timers}.
+&nbsp;     */
+<b class="fc">&nbsp;    public MetricsFeature(MetricRegistry registry, Clock clock, boolean trackFilters, Supplier&lt;Reservoir&gt; reservoirSupplier) {</b>
+<b class="fc">&nbsp;        this.registry = registry;</b>
+<b class="fc">&nbsp;        this.clock = clock;</b>
+<b class="fc">&nbsp;        this.trackFilters = trackFilters;</b>
+<b class="fc">&nbsp;        this.reservoirSupplier = reservoirSupplier;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MetricsFeature(String registryName) {
+<b class="nc">&nbsp;        this(SharedMetricRegistries.getOrCreate(registryName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A call-back method called when the feature is to be enabled in a given
+&nbsp;     * runtime configuration scope.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The responsibility of the feature is to properly update the supplied runtime configuration context
+&nbsp;     * and return {@code true} if the feature was successfully enabled or {@code false} otherwise.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note that under some circumstances the feature may decide not to enable itself, which
+&nbsp;     * is indicated by returning {@code false}. In such case the configuration context does
+&nbsp;     * not add the feature to the collection of enabled features and a subsequent call to
+&nbsp;     * {@link javax.ws.rs.core.Configuration#isEnabled(javax.ws.rs.core.Feature)} or
+&nbsp;     * {@link javax.ws.rs.core.Configuration#isEnabled(Class)} method
+&nbsp;     * would return {@code false}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     *
+&nbsp;     * @param context configurable context in which the feature should be enabled.
+&nbsp;     * @return {@code true} if the feature was successfully enabled, {@code false}
+&nbsp;     * otherwise.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean configure(FeatureContext context) {
+<b class="fc">&nbsp;        context.register(new InstrumentedResourceMethodApplicationListener(registry, clock, trackFilters, reservoirSupplier));</b>
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-01 18:42</div>
+</div>
+</body>
+</html>

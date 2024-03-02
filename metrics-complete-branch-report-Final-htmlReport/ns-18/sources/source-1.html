@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > BufferPoolMetricSet</title>
+  <title>Coverage Report > HealthCheckModule</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.codahale.metrics.jvm</a>
+    <a href="../index.html">com.codahale.metrics.json</a>
 </div>
 
-<h1>Coverage Summary for Class: BufferPoolMetricSet (com.codahale.metrics.jvm)</h1>
+<h1>Coverage Summary for Class: HealthCheckModule (com.codahale.metrics.json)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -41,13 +38,13 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">BufferPoolMetricSet</td>
+  <td class="name">HealthCheckModule</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -55,19 +52,51 @@ Current scope:     <a href="../../index.html">all classes</a>
     100%
   </span>
   <span class="absValue">
-    (3/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (18/18)
+    (4/4)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">HealthCheckModule$1</td>
+  </tr>
+  <tr>
+    <td class="name">HealthCheckModule$HealthCheckResultSerializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (27/27)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (31/31)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -75,56 +104,88 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jvm;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.json;
 &nbsp;
-&nbsp;import com.codahale.metrics.Metric;
-&nbsp;import com.codahale.metrics.MetricSet;
-&nbsp;import org.slf4j.Logger;
-&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import com.codahale.metrics.health.HealthCheck;
+&nbsp;import com.fasterxml.jackson.core.JsonGenerator;
+&nbsp;import com.fasterxml.jackson.core.Version;
+&nbsp;import com.fasterxml.jackson.databind.Module;
+&nbsp;import com.fasterxml.jackson.databind.SerializerProvider;
+&nbsp;import com.fasterxml.jackson.databind.module.SimpleSerializers;
+&nbsp;import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 &nbsp;
-&nbsp;import javax.management.JMException;
-&nbsp;import javax.management.MBeanServer;
-&nbsp;import javax.management.ObjectName;
+&nbsp;import java.io.IOException;
 &nbsp;import java.util.Collections;
-&nbsp;import java.util.HashMap;
 &nbsp;import java.util.Map;
 &nbsp;
-&nbsp;import static com.codahale.metrics.MetricRegistry.name;
+<b class="fc">&nbsp;public class HealthCheckModule extends Module {</b>
+<b class="fc">&nbsp;    private static class HealthCheckResultSerializer extends StdSerializer&lt;HealthCheck.Result&gt; {</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * A set of gauges for the count, usage, and capacity of the JVM&#39;s direct and mapped buffer pools.
-&nbsp; * &lt;p&gt;
-&nbsp; * These JMX objects are only available on Java 7 and above.
-&nbsp; */
-&nbsp;public class BufferPoolMetricSet implements MetricSet {
-<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BufferPoolMetricSet.class);</b>
-<b class="fc">&nbsp;    private static final String[] ATTRIBUTES = {&quot;Count&quot;, &quot;MemoryUsed&quot;, &quot;TotalCapacity&quot;};</b>
-<b class="fc">&nbsp;    private static final String[] NAMES = {&quot;count&quot;, &quot;used&quot;, &quot;capacity&quot;};</b>
-<b class="fc">&nbsp;    private static final String[] POOLS = {&quot;direct&quot;, &quot;mapped&quot;};</b>
+&nbsp;        private static final long serialVersionUID = 1L;
 &nbsp;
-&nbsp;    private final MBeanServer mBeanServer;
+&nbsp;        private HealthCheckResultSerializer() {
+<b class="fc">&nbsp;            super(HealthCheck.Result.class);</b>
+&nbsp;        }
 &nbsp;
-<b class="fc">&nbsp;    public BufferPoolMetricSet(MBeanServer mBeanServer) {</b>
-<b class="fc">&nbsp;        this.mBeanServer = mBeanServer;</b>
+&nbsp;        @Override
+&nbsp;        public void serialize(HealthCheck.Result result,
+&nbsp;                              JsonGenerator json,
+&nbsp;                              SerializerProvider provider) throws IOException {
+<b class="fc">&nbsp;            json.writeStartObject();</b>
+<b class="fc">&nbsp;            json.writeBooleanField(&quot;healthy&quot;, result.isHealthy());</b>
+&nbsp;
+<b class="fc">&nbsp;            final String message = result.getMessage();</b>
+<b class="fc">&nbsp;            if (message != null) {</b>
+<b class="fc">&nbsp;                json.writeStringField(&quot;message&quot;, message);</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            serializeThrowable(json, result.getError(), &quot;error&quot;);</b>
+<b class="fc">&nbsp;            json.writeNumberField(&quot;duration&quot;, result.getDuration());</b>
+&nbsp;
+<b class="fc">&nbsp;            Map&lt;String, Object&gt; details = result.getDetails();</b>
+<b class="fc">&nbsp;            if (details != null &amp;&amp; !details.isEmpty()) {</b>
+<b class="fc">&nbsp;                for (Map.Entry&lt;String, Object&gt; e : details.entrySet()) {</b>
+<b class="fc">&nbsp;                    json.writeObjectField(e.getKey(), e.getValue());</b>
+<b class="fc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            json.writeStringField(&quot;timestamp&quot;, result.getTimestamp());</b>
+<b class="fc">&nbsp;            json.writeEndObject();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void serializeThrowable(JsonGenerator json, Throwable error, String name) throws IOException {
+<b class="fc">&nbsp;            if (error != null) {</b>
+<b class="fc">&nbsp;                json.writeObjectFieldStart(name);</b>
+<b class="fc">&nbsp;                json.writeStringField(&quot;type&quot;, error.getClass().getTypeName());</b>
+<b class="fc">&nbsp;                json.writeStringField(&quot;message&quot;, error.getMessage());</b>
+<b class="fc">&nbsp;                json.writeArrayFieldStart(&quot;stack&quot;);</b>
+<b class="fc">&nbsp;                for (StackTraceElement element : error.getStackTrace()) {</b>
+<b class="fc">&nbsp;                    json.writeString(element.toString());</b>
+&nbsp;                }
+<b class="fc">&nbsp;                json.writeEndArray();</b>
+&nbsp;
+<b class="fc">&nbsp;                if (error.getCause() != null) {</b>
+<b class="fc">&nbsp;                    serializeThrowable(json, error.getCause(), &quot;cause&quot;);</b>
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                json.writeEndObject();</b>
+&nbsp;            }
+&nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    @Override
-&nbsp;    public Map&lt;String, Metric&gt; getMetrics() {
-<b class="fc">&nbsp;        final Map&lt;String, Metric&gt; gauges = new HashMap&lt;&gt;();</b>
-<b class="fc">&nbsp;        for (String pool : POOLS) {</b>
-<b class="fc">&nbsp;            for (int i = 0; i &lt; ATTRIBUTES.length; i++) {</b>
-<b class="fc">&nbsp;                final String attribute = ATTRIBUTES[i];</b>
-<b class="fc">&nbsp;                final String name = NAMES[i];</b>
-&nbsp;                try {
-<b class="fc">&nbsp;                    final ObjectName on = new ObjectName(&quot;java.nio:type=BufferPool,name=&quot; + pool);</b>
-<b class="fc">&nbsp;                    mBeanServer.getMBeanInfo(on);</b>
-<b class="fc">&nbsp;                    gauges.put(name(pool, name), new JmxAttributeGauge(mBeanServer, on, attribute));</b>
-<b class="fc">&nbsp;                } catch (JMException ignored) {</b>
-<b class="fc">&nbsp;                    LOGGER.debug(&quot;Unable to load buffer pool MBeans, possibly running on Java 6&quot;);</b>
-<b class="fc">&nbsp;                }</b>
-&nbsp;            }
-&nbsp;        }
-<b class="fc">&nbsp;        return Collections.unmodifiableMap(gauges);</b>
+&nbsp;    public String getModuleName() {
+<b class="fc">&nbsp;        return &quot;healthchecks&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Version version() {
+<b class="fc">&nbsp;        return MetricsModule.VERSION;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setupModule(SetupContext context) {
+<b class="fc">&nbsp;        context.addSerializers(new SimpleSerializers(Collections.singletonList(new HealthCheckResultSerializer())));</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -150,7 +211,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

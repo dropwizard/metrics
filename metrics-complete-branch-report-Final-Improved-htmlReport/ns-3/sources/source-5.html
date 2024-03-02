@@ -1,0 +1,184 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SlidingTimeWindowReservoirsBenchmark</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.codahale.metrics.benchmarks</a>
+</div>
+
+<h1>Coverage Summary for Class: SlidingTimeWindowReservoirsBenchmark (com.codahale.metrics.benchmarks)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SlidingTimeWindowReservoirsBenchmark</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.benchmarks;
+&nbsp;
+&nbsp;import com.codahale.metrics.SlidingTimeWindowArrayReservoir;
+&nbsp;import com.codahale.metrics.SlidingTimeWindowReservoir;
+&nbsp;import com.codahale.metrics.Snapshot;
+&nbsp;
+&nbsp;import org.openjdk.jmh.annotations.Benchmark;
+&nbsp;import org.openjdk.jmh.annotations.Group;
+&nbsp;import org.openjdk.jmh.annotations.GroupThreads;
+&nbsp;import org.openjdk.jmh.annotations.Mode;
+&nbsp;import org.openjdk.jmh.annotations.Scope;
+&nbsp;import org.openjdk.jmh.annotations.State;
+&nbsp;import org.openjdk.jmh.profile.GCProfiler;
+&nbsp;import org.openjdk.jmh.runner.Runner;
+&nbsp;import org.openjdk.jmh.runner.RunnerException;
+&nbsp;import org.openjdk.jmh.runner.options.Options;
+&nbsp;import org.openjdk.jmh.runner.options.OptionsBuilder;
+&nbsp;import org.openjdk.jmh.runner.options.TimeValue;
+&nbsp;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author bstorozhuk
+&nbsp; */
+&nbsp;@State(Scope.Benchmark)
+<b class="nc">&nbsp;public class SlidingTimeWindowReservoirsBenchmark {</b>
+<b class="nc">&nbsp;    private final SlidingTimeWindowReservoir slidingTime = new SlidingTimeWindowReservoir(200, TimeUnit.MILLISECONDS);</b>
+<b class="nc">&nbsp;    private final SlidingTimeWindowArrayReservoir arrTime = new SlidingTimeWindowArrayReservoir(200, TimeUnit.MILLISECONDS);</b>
+&nbsp;
+&nbsp;    // It&#39;s intentionally not declared as final to avoid constant folding
+<b class="nc">&nbsp;    private long nextValue = 0xFBFBABBA;</b>
+&nbsp;
+&nbsp;    @Benchmark
+&nbsp;    @Group(&quot;slidingTime&quot;)
+&nbsp;    @GroupThreads(3)
+&nbsp;    public Object slidingTimeAddMeasurement() {
+<b class="nc">&nbsp;        slidingTime.update(nextValue);</b>
+<b class="nc">&nbsp;        return slidingTime;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Benchmark
+&nbsp;    @Group(&quot;slidingTime&quot;)
+&nbsp;    @GroupThreads(1)
+&nbsp;    public Object slidingTimeRead() {
+<b class="nc">&nbsp;        Snapshot snapshot = slidingTime.getSnapshot();</b>
+<b class="nc">&nbsp;        return snapshot;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Benchmark
+&nbsp;    @Group(&quot;arrTime&quot;)
+&nbsp;    @GroupThreads(3)
+&nbsp;    public Object arrTimeAddMeasurement() {
+<b class="nc">&nbsp;        arrTime.update(nextValue);</b>
+<b class="nc">&nbsp;        return slidingTime;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Benchmark
+&nbsp;    @Group(&quot;arrTime&quot;)
+&nbsp;    @GroupThreads(1)
+&nbsp;    public Object arrTimeRead() {
+<b class="nc">&nbsp;        Snapshot snapshot = arrTime.getSnapshot();</b>
+<b class="nc">&nbsp;        return snapshot;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void main(String[] args) throws RunnerException {
+<b class="nc">&nbsp;        Options opt = new OptionsBuilder()</b>
+<b class="nc">&nbsp;            .include(&quot;.*&quot; + SlidingTimeWindowReservoirsBenchmark.class.getSimpleName() + &quot;.*&quot;)</b>
+<b class="nc">&nbsp;            .warmupIterations(10)</b>
+<b class="nc">&nbsp;            .measurementIterations(10)</b>
+<b class="nc">&nbsp;            .addProfiler(GCProfiler.class)</b>
+<b class="nc">&nbsp;            .measurementTime(TimeValue.seconds(3))</b>
+<b class="nc">&nbsp;            .timeUnit(TimeUnit.MICROSECONDS)</b>
+<b class="nc">&nbsp;            .mode(Mode.AverageTime)</b>
+<b class="nc">&nbsp;            .forks(1)</b>
+<b class="nc">&nbsp;            .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        new Runner(opt).run();</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-01 18:42</div>
+</div>
+</body>
+</html>

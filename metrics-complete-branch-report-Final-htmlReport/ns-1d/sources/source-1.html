@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > MetricsStatsCounter</title>
+  <title>Coverage Report > AdminServlet</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">io.dropwizard.metrics.caffeine3</a>
+    <a href="../index.html">com.codahale.metrics.servlets</a>
 </div>
 
-<h1>Coverage Summary for Class: MetricsStatsCounter (io.dropwizard.metrics.caffeine3)</h1>
+<h1>Coverage Summary for Class: AdminServlet (com.codahale.metrics.servlets)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -41,7 +41,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">MetricsStatsCounter</td>
+  <td class="name">AdminServlet</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -52,18 +52,18 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    87.5%
+    100%
   </span>
   <span class="absValue">
-    (7/8)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    96.6%
+    71.6%
   </span>
   <span class="absValue">
-    (28/29)
+    (53/74)
   </span>
 </td>
 </tr>
@@ -75,121 +75,194 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;/*
-&nbsp; * Copyright 2016 Ben Manes. All Rights Reserved.
-&nbsp; *
-&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
-&nbsp; * you may not use this file except in compliance with the License.
-&nbsp; * You may obtain a copy of the License at
-&nbsp; *
-&nbsp; *     http://www.apache.org/licenses/LICENSE-2.0
-&nbsp; *
-&nbsp; * Unless required by applicable law or agreed to in writing, software
-&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
-&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-&nbsp; * See the License for the specific language governing permissions and
-&nbsp; * limitations under the License.
-&nbsp; */
-&nbsp;package io.dropwizard.metrics.caffeine3;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.servlets;
 &nbsp;
-&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import javax.servlet.ServletConfig;
+&nbsp;import javax.servlet.ServletContext;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServlet;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.text.MessageFormat;
 &nbsp;
-&nbsp;import java.util.EnumMap;
-&nbsp;import java.util.concurrent.TimeUnit;
-&nbsp;import java.util.concurrent.atomic.LongAdder;
+<b class="fc">&nbsp;public class AdminServlet extends HttpServlet {</b>
+&nbsp;    public static final String DEFAULT_HEALTHCHECK_URI = &quot;/healthcheck&quot;;
+&nbsp;    public static final String DEFAULT_METRICS_URI = &quot;/metrics&quot;;
+&nbsp;    public static final String DEFAULT_PING_URI = &quot;/ping&quot;;
+&nbsp;    public static final String DEFAULT_THREADS_URI = &quot;/threads&quot;;
+&nbsp;    public static final String DEFAULT_CPU_PROFILE_URI = &quot;/pprof&quot;;
 &nbsp;
-&nbsp;import com.codahale.metrics.Counter;
-&nbsp;import com.codahale.metrics.Histogram;
-&nbsp;import com.codahale.metrics.MetricRegistry;
-&nbsp;import com.codahale.metrics.Timer;
-&nbsp;import com.github.benmanes.caffeine.cache.RemovalCause;
-&nbsp;import com.github.benmanes.caffeine.cache.stats.CacheStats;
-&nbsp;import com.github.benmanes.caffeine.cache.stats.StatsCounter;
-&nbsp;import org.checkerframework.checker.index.qual.NonNegative;
+&nbsp;    public static final String METRICS_ENABLED_PARAM_KEY = &quot;metrics-enabled&quot;;
+&nbsp;    public static final String METRICS_URI_PARAM_KEY = &quot;metrics-uri&quot;;
+&nbsp;    public static final String PING_ENABLED_PARAM_KEY = &quot;ping-enabled&quot;;
+&nbsp;    public static final String PING_URI_PARAM_KEY = &quot;ping-uri&quot;;
+&nbsp;    public static final String THREADS_ENABLED_PARAM_KEY = &quot;threads-enabled&quot;;
+&nbsp;    public static final String THREADS_URI_PARAM_KEY = &quot;threads-uri&quot;;
+&nbsp;    public static final String HEALTHCHECK_ENABLED_PARAM_KEY = &quot;healthcheck-enabled&quot;;
+&nbsp;    public static final String HEALTHCHECK_URI_PARAM_KEY = &quot;healthcheck-uri&quot;;
+&nbsp;    public static final String SERVICE_NAME_PARAM_KEY = &quot;service-name&quot;;
+&nbsp;    public static final String CPU_PROFILE_ENABLED_PARAM_KEY = &quot;cpu-profile-enabled&quot;;
+&nbsp;    public static final String CPU_PROFILE_URI_PARAM_KEY = &quot;cpu-profile-uri&quot;;
 &nbsp;
-&nbsp;/**
-&nbsp; * A {@link StatsCounter} instrumented with Dropwizard Metrics.
-&nbsp; *
-&nbsp; * @author ben.manes@gmail.com (Ben Manes)
-&nbsp; * @author John Karp
-&nbsp; */
-&nbsp;public final class MetricsStatsCounter implements StatsCounter {
-&nbsp;  private final Counter hitCount;
-&nbsp;  private final Counter missCount;
-&nbsp;  private final Timer loadSuccess;
-&nbsp;  private final Timer loadFailure;
-&nbsp;  private final Counter evictionWeight;
-&nbsp;  private final EnumMap&lt;RemovalCause, Histogram&gt; evictionsWithCause;
+&nbsp;    private static final String BASE_TEMPLATE =
+&nbsp;            &quot;&lt;!DOCTYPE HTML PUBLIC \&quot;-//W3C//DTD HTML 4.01 Transitional//EN\&quot;%n&quot; +
+&nbsp;                    &quot;        \&quot;http://www.w3.org/TR/html4/loose.dtd\&quot;&gt;%n&quot; +
+&nbsp;                    &quot;&lt;html&gt;%n&quot; +
+&nbsp;                    &quot;&lt;head&gt;%n&quot; +
+&nbsp;                    &quot;  &lt;title&gt;Metrics{10}&lt;/title&gt;%n&quot; +
+&nbsp;                    &quot;&lt;/head&gt;%n&quot; +
+&nbsp;                    &quot;&lt;body&gt;%n&quot; +
+&nbsp;                    &quot;  &lt;h1&gt;Operational Menu{10}&lt;/h1&gt;%n&quot; +
+&nbsp;                    &quot;  &lt;ul&gt;%n&quot; +
+&nbsp;                    &quot;%s&quot; +
+&nbsp;                    &quot;  &lt;/ul&gt;%n&quot; +
+&nbsp;                    &quot;&lt;/body&gt;%n&quot; +
+&nbsp;                    &quot;&lt;/html&gt;&quot;;
+&nbsp;    private static final String METRICS_LINK = &quot;    &lt;li&gt;&lt;a href=\&quot;{0}{1}?pretty=true\&quot;&gt;Metrics&lt;/a&gt;&lt;/li&gt;%n&quot;;
+&nbsp;    private static final String PING_LINK = &quot;    &lt;li&gt;&lt;a href=\&quot;{2}{3}\&quot;&gt;Ping&lt;/a&gt;&lt;/li&gt;%n&quot; ;
+&nbsp;    private static final String THREADS_LINK = &quot;    &lt;li&gt;&lt;a href=\&quot;{4}{5}\&quot;&gt;Threads&lt;/a&gt;&lt;/li&gt;%n&quot; ;
+&nbsp;    private static final String HEALTHCHECK_LINK = &quot;    &lt;li&gt;&lt;a href=\&quot;{6}{7}?pretty=true\&quot;&gt;Healthcheck&lt;/a&gt;&lt;/li&gt;%n&quot; ;
+&nbsp;    private static final String CPU_PROFILE_LINK = &quot;    &lt;li&gt;&lt;a href=\&quot;{8}{9}\&quot;&gt;CPU Profile&lt;/a&gt;&lt;/li&gt;%n&quot; +
+&nbsp;            &quot;    &lt;li&gt;&lt;a href=\&quot;{8}{9}?state=blocked\&quot;&gt;CPU Contention&lt;/a&gt;&lt;/li&gt;%n&quot;;
 &nbsp;
-&nbsp;  // for implementing snapshot()
-<b class="fc">&nbsp;  private final LongAdder totalLoadTime = new LongAdder();</b>
 &nbsp;
-&nbsp;  /**
-&nbsp;   * Constructs an instance for use by a single cache.
-&nbsp;   *
-&nbsp;   * @param registry the registry of metric instances
-&nbsp;   * @param metricsPrefix the prefix name for the metrics
-&nbsp;   */
-<b class="fc">&nbsp;  public MetricsStatsCounter(MetricRegistry registry, String metricsPrefix) {</b>
-<b class="fc">&nbsp;    requireNonNull(metricsPrefix);</b>
-<b class="fc">&nbsp;    hitCount = registry.counter(MetricRegistry.name(metricsPrefix, &quot;hits&quot;));</b>
-<b class="fc">&nbsp;    missCount = registry.counter(MetricRegistry.name(metricsPrefix, &quot;misses&quot;));</b>
-<b class="fc">&nbsp;    loadSuccess = registry.timer(MetricRegistry.name(metricsPrefix, &quot;loads-success&quot;));</b>
-<b class="fc">&nbsp;    loadFailure = registry.timer(MetricRegistry.name(metricsPrefix, &quot;loads-failure&quot;));</b>
-<b class="fc">&nbsp;    evictionWeight = registry.counter(MetricRegistry.name(metricsPrefix, &quot;evictions-weight&quot;));</b>
+&nbsp;    private static final String CONTENT_TYPE = &quot;text/html&quot;;
+&nbsp;    private static final long serialVersionUID = -2850794040708785318L;
 &nbsp;
-<b class="fc">&nbsp;    evictionsWithCause = new EnumMap&lt;&gt;(RemovalCause.class);</b>
-<b class="fc">&nbsp;    for (RemovalCause cause : RemovalCause.values()) {</b>
-<b class="fc">&nbsp;      evictionsWithCause.put(</b>
-&nbsp;          cause,
-<b class="fc">&nbsp;          registry.histogram(MetricRegistry.name(metricsPrefix, &quot;evictions&quot;, cause.name())));</b>
+&nbsp;    private transient HealthCheckServlet healthCheckServlet;
+&nbsp;    private transient MetricsServlet metricsServlet;
+&nbsp;    private transient PingServlet pingServlet;
+&nbsp;    private transient ThreadDumpServlet threadDumpServlet;
+&nbsp;    private transient CpuProfileServlet cpuProfileServlet;
+&nbsp;    private transient boolean metricsEnabled;
+&nbsp;    private transient String metricsUri;
+&nbsp;    private transient boolean pingEnabled;
+&nbsp;    private transient String pingUri;
+&nbsp;    private transient boolean threadsEnabled;
+&nbsp;    private transient String threadsUri;
+&nbsp;    private transient boolean healthcheckEnabled;
+&nbsp;    private transient String healthcheckUri;
+&nbsp;    private transient boolean cpuProfileEnabled;
+&nbsp;    private transient String cpuProfileUri;
+&nbsp;    private transient String serviceName;
+&nbsp;    private transient String pageContentTemplate;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init(ServletConfig config) throws ServletException {
+<b class="fc">&nbsp;        super.init(config);</b>
+&nbsp;
+<b class="fc">&nbsp;        final ServletContext context = config.getServletContext();</b>
+<b class="fc">&nbsp;        final StringBuilder servletLinks = new StringBuilder();</b>
+&nbsp;
+<b class="fc">&nbsp;        this.metricsEnabled =</b>
+<b class="fc">&nbsp;                Boolean.parseBoolean(getParam(context.getInitParameter(METRICS_ENABLED_PARAM_KEY), &quot;true&quot;));</b>
+<b class="fc">&nbsp;        if (this.metricsEnabled) {</b>
+<b class="fc">&nbsp;            servletLinks.append(METRICS_LINK);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.metricsServlet = new MetricsServlet();</b>
+<b class="fc">&nbsp;        metricsServlet.init(config);</b>
+&nbsp;
+<b class="fc">&nbsp;        this.pingEnabled =</b>
+<b class="fc">&nbsp;                Boolean.parseBoolean(getParam(context.getInitParameter(PING_ENABLED_PARAM_KEY), &quot;true&quot;));</b>
+<b class="fc">&nbsp;        if (this.pingEnabled) {</b>
+<b class="fc">&nbsp;            servletLinks.append(PING_LINK);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.pingServlet = new PingServlet();</b>
+<b class="fc">&nbsp;        pingServlet.init(config);</b>
+&nbsp;
+<b class="fc">&nbsp;        this.threadsEnabled =</b>
+<b class="fc">&nbsp;                Boolean.parseBoolean(getParam(context.getInitParameter(THREADS_ENABLED_PARAM_KEY), &quot;true&quot;));</b>
+<b class="fc">&nbsp;        if (this.threadsEnabled) {</b>
+<b class="fc">&nbsp;            servletLinks.append(THREADS_LINK);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.threadDumpServlet = new ThreadDumpServlet();</b>
+<b class="fc">&nbsp;        threadDumpServlet.init(config);</b>
+&nbsp;
+<b class="fc">&nbsp;        this.healthcheckEnabled =</b>
+<b class="fc">&nbsp;                Boolean.parseBoolean(getParam(context.getInitParameter(HEALTHCHECK_ENABLED_PARAM_KEY), &quot;true&quot;));</b>
+<b class="fc">&nbsp;        if (this.healthcheckEnabled) {</b>
+<b class="fc">&nbsp;            servletLinks.append(HEALTHCHECK_LINK);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.healthCheckServlet = new HealthCheckServlet();</b>
+<b class="fc">&nbsp;        healthCheckServlet.init(config);</b>
+&nbsp;
+<b class="fc">&nbsp;        this.cpuProfileEnabled =</b>
+<b class="fc">&nbsp;                Boolean.parseBoolean(getParam(context.getInitParameter(CPU_PROFILE_ENABLED_PARAM_KEY), &quot;true&quot;));</b>
+<b class="fc">&nbsp;        if (this.cpuProfileEnabled) {</b>
+<b class="fc">&nbsp;            servletLinks.append(CPU_PROFILE_LINK);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.cpuProfileServlet = new CpuProfileServlet();</b>
+<b class="fc">&nbsp;        cpuProfileServlet.init(config);</b>
+&nbsp;
+<b class="fc">&nbsp;        pageContentTemplate = String.format(BASE_TEMPLATE, String.format(servletLinks.toString()));</b>
+&nbsp;
+<b class="fc">&nbsp;        this.metricsUri = getParam(context.getInitParameter(METRICS_URI_PARAM_KEY), DEFAULT_METRICS_URI);</b>
+<b class="fc">&nbsp;        this.pingUri = getParam(context.getInitParameter(PING_URI_PARAM_KEY), DEFAULT_PING_URI);</b>
+<b class="fc">&nbsp;        this.threadsUri = getParam(context.getInitParameter(THREADS_URI_PARAM_KEY), DEFAULT_THREADS_URI);</b>
+<b class="fc">&nbsp;        this.healthcheckUri = getParam(context.getInitParameter(HEALTHCHECK_URI_PARAM_KEY), DEFAULT_HEALTHCHECK_URI);</b>
+<b class="fc">&nbsp;        this.cpuProfileUri = getParam(context.getInitParameter(CPU_PROFILE_URI_PARAM_KEY), DEFAULT_CPU_PROFILE_URI);</b>
+<b class="fc">&nbsp;        this.serviceName = getParam(context.getInitParameter(SERVICE_NAME_PARAM_KEY), null);</b>
 &nbsp;    }
-&nbsp;  }
 &nbsp;
-&nbsp;  @Override
-&nbsp;  public void recordHits(int count) {
-<b class="fc">&nbsp;    hitCount.inc(count);</b>
-&nbsp;  }
+&nbsp;    @Override
+&nbsp;    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+<b class="fc">&nbsp;        final String path = req.getContextPath() + req.getServletPath();</b>
 &nbsp;
-&nbsp;  @Override
-&nbsp;  public void recordMisses(int count) {
-<b class="fc">&nbsp;    missCount.inc(count);</b>
-&nbsp;  }
+<b class="fc">&nbsp;        resp.setStatus(HttpServletResponse.SC_OK);</b>
+<b class="fc">&nbsp;        resp.setHeader(&quot;Cache-Control&quot;, &quot;must-revalidate,no-cache,no-store&quot;);</b>
+<b class="fc">&nbsp;        resp.setContentType(CONTENT_TYPE);</b>
+<b class="fc">&nbsp;        try (PrintWriter writer = resp.getWriter()) {</b>
+<b class="fc">&nbsp;            writer.println(MessageFormat.format(pageContentTemplate, path, metricsUri, path, pingUri, path,</b>
+&nbsp;                    threadsUri, path, healthcheckUri, path, cpuProfileUri,
+<b class="fc">&nbsp;                    serviceName == null ? &quot;&quot; : &quot; (&quot; + serviceName + &quot;)&quot;));</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
 &nbsp;
-&nbsp;  @Override
-&nbsp;  public void recordLoadSuccess(long loadTime) {
-<b class="fc">&nbsp;    loadSuccess.update(loadTime, TimeUnit.NANOSECONDS);</b>
-<b class="fc">&nbsp;    totalLoadTime.add(loadTime);</b>
-&nbsp;  }
+&nbsp;    @Override
+&nbsp;    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+<b class="fc">&nbsp;        final String uri = req.getPathInfo();</b>
+<b class="fc">&nbsp;        if (uri == null || uri.equals(&quot;/&quot;)) {</b>
+<b class="fc">&nbsp;            super.service(req, resp);</b>
+<b class="nc">&nbsp;        } else if (uri.equals(healthcheckUri)) {</b>
+<b class="nc">&nbsp;            if (healthcheckEnabled) {</b>
+<b class="nc">&nbsp;                healthCheckServlet.service(req, resp);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                resp.sendError(HttpServletResponse.SC_NOT_FOUND);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (uri.startsWith(metricsUri)) {</b>
+<b class="nc">&nbsp;            if (metricsEnabled) {</b>
+<b class="nc">&nbsp;                metricsServlet.service(req, resp);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                resp.sendError(HttpServletResponse.SC_NOT_FOUND);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (uri.equals(pingUri)) {</b>
+<b class="nc">&nbsp;            if (pingEnabled) {</b>
+<b class="nc">&nbsp;                pingServlet.service(req, resp);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                resp.sendError(HttpServletResponse.SC_NOT_FOUND);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (uri.equals(threadsUri)) {</b>
+<b class="nc">&nbsp;            if (threadsEnabled) {</b>
+<b class="nc">&nbsp;                threadDumpServlet.service(req, resp);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                resp.sendError(HttpServletResponse.SC_NOT_FOUND);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (uri.equals(cpuProfileUri)) {</b>
+<b class="nc">&nbsp;            if (cpuProfileEnabled) {</b>
+<b class="nc">&nbsp;                cpuProfileServlet.service(req, resp);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                resp.sendError(HttpServletResponse.SC_NOT_FOUND);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            resp.sendError(HttpServletResponse.SC_NOT_FOUND);</b>
+&nbsp;        }
+&nbsp;    }
 &nbsp;
-&nbsp;  @Override
-&nbsp;  public void recordLoadFailure(long loadTime) {
-<b class="fc">&nbsp;    loadFailure.update(loadTime, TimeUnit.NANOSECONDS);</b>
-<b class="fc">&nbsp;    totalLoadTime.add(loadTime);</b>
-&nbsp;  }
-&nbsp;
-&nbsp;  @Override
-&nbsp;  public void recordEviction(@NonNegative int weight, RemovalCause cause) {
-<b class="fc">&nbsp;    evictionsWithCause.get(cause).update(weight);</b>
-<b class="fc">&nbsp;    evictionWeight.inc(weight);</b>
-&nbsp;  }
-&nbsp;
-&nbsp;  @Override
-&nbsp;  public CacheStats snapshot() {
-<b class="fc">&nbsp;    return CacheStats.of(</b>
-<b class="fc">&nbsp;        hitCount.getCount(),</b>
-<b class="fc">&nbsp;        missCount.getCount(),</b>
-<b class="fc">&nbsp;        loadSuccess.getCount(),</b>
-<b class="fc">&nbsp;        loadFailure.getCount(),</b>
-<b class="fc">&nbsp;        totalLoadTime.sum(),</b>
-<b class="fc">&nbsp;        evictionsWithCause.values().stream().mapToLong(Histogram::getCount).sum(),</b>
-<b class="fc">&nbsp;        evictionWeight.getCount());</b>
-&nbsp;  }
-&nbsp;
-&nbsp;  @Override
-&nbsp;  public String toString() {
-<b class="nc">&nbsp;    return snapshot().toString();</b>
-&nbsp;  }
+&nbsp;    private static String getParam(String initParam, String defaultValue) {
+<b class="fc">&nbsp;        return initParam == null ? defaultValue : initParam;</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -214,7 +287,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

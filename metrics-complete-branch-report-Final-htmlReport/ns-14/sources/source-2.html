@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.codahale.metrics.jersey3</a>
+    <a href="../index.html">com.codahale.metrics.jersey2</a>
 </div>
 
-<h1>Coverage Summary for Class: MetricsFeature (com.codahale.metrics.jersey3)</h1>
+<h1>Coverage Summary for Class: MetricsFeature (com.codahale.metrics.jersey2)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -75,16 +75,16 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jersey3;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jersey2;
 &nbsp;
 &nbsp;import com.codahale.metrics.Clock;
 &nbsp;import com.codahale.metrics.ExponentiallyDecayingReservoir;
 &nbsp;import com.codahale.metrics.MetricRegistry;
 &nbsp;import com.codahale.metrics.Reservoir;
 &nbsp;import com.codahale.metrics.SharedMetricRegistries;
-&nbsp;import jakarta.ws.rs.core.Feature;
-&nbsp;import jakarta.ws.rs.core.FeatureContext;
 &nbsp;
+&nbsp;import javax.ws.rs.core.Feature;
+&nbsp;import javax.ws.rs.core.FeatureContext;
 &nbsp;import java.util.function.Supplier;
 &nbsp;
 &nbsp;/**
@@ -157,8 +157,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     * Note that under some circumstances the feature may decide not to enable itself, which
 &nbsp;     * is indicated by returning {@code false}. In such case the configuration context does
 &nbsp;     * not add the feature to the collection of enabled features and a subsequent call to
-&nbsp;     * {@link jakarta.ws.rs.core.Configuration#isEnabled(jakarta.ws.rs.core.Feature)} or
-&nbsp;     * {@link jakarta.ws.rs.core.Configuration#isEnabled(Class)} method
+&nbsp;     * {@link javax.ws.rs.core.Configuration#isEnabled(javax.ws.rs.core.Feature)} or
+&nbsp;     * {@link javax.ws.rs.core.Configuration#isEnabled(Class)} method
 &nbsp;     * would return {@code false}.
 &nbsp;     * &lt;p&gt;
 &nbsp;     *
@@ -195,7 +195,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

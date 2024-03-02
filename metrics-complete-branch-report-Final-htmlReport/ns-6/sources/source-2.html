@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > InstrumentedEhcache</title>
+  <title>Coverage Report > MetaData</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.codahale.metrics.ehcache</a>
+    <a href="../index.html">com.codahale.metrics.collectd</a>
 </div>
 
-<h1>Coverage Summary for Class: InstrumentedEhcache (com.codahale.metrics.ehcache)</h1>
+<h1>Coverage Summary for Class: MetaData (com.codahale.metrics.collectd)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -41,33 +38,62 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">InstrumentedEhcache</td>
+  <td class="name">MetaData</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    87.5%
+    100%
   </span>
   <span class="absValue">
-    (21/24)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    78%
-  </span>
-  <span class="absValue">
-    (46/59)
+    (15/15)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">MetaData$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.7%
+  </span>
+  <span class="absValue">
+    (13/15)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (14/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (28/30)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -75,235 +101,102 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.ehcache;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.collectd;
 &nbsp;
-&nbsp;import com.codahale.metrics.MetricRegistry;
-&nbsp;import com.codahale.metrics.Timer;
-&nbsp;import net.sf.ehcache.CacheException;
-&nbsp;import net.sf.ehcache.Ehcache;
-&nbsp;import net.sf.ehcache.Element;
-&nbsp;import net.sf.ehcache.constructs.EhcacheDecoratorAdapter;
-&nbsp;import net.sf.ehcache.statistics.StatisticsGateway;
+&nbsp;class MetaData {
 &nbsp;
-&nbsp;import java.io.Serializable;
+&nbsp;    private final String host;
+&nbsp;    private final String plugin;
+&nbsp;    private final String pluginInstance;
+&nbsp;    private final String type;
+&nbsp;    private final String typeInstance;
+&nbsp;    private final long timestamp;
+&nbsp;    private final long period;
 &nbsp;
-&nbsp;import static com.codahale.metrics.MetricRegistry.name;
-&nbsp;
-&nbsp;/**
-&nbsp; * An instrumented {@link Ehcache} instance.
-&nbsp; */
-&nbsp;public class InstrumentedEhcache extends EhcacheDecoratorAdapter {
-&nbsp;    /**
-&nbsp;     * Instruments the given {@link Ehcache} instance with get and put timers
-&nbsp;     * and a set of gauges for Ehcache&#39;s built-in statistics:
-&nbsp;     * &lt;p&gt;
-&nbsp;     * &lt;table&gt;
-&nbsp;     * &lt;caption&gt;Ehcache timered metrics&lt;/caption&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code hits}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;The number of times a requested item was found in the
-&nbsp;     * cache.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code in-memory-hits}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;Number of times a requested item was found in the memory
-&nbsp;     * store.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code off-heap-hits}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;Number of times a requested item was found in the off-heap
-&nbsp;     * store.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code on-disk-hits}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;Number of times a requested item was found in the disk
-&nbsp;     * store.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code misses}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;Number of times a requested item was not found in the
-&nbsp;     * cache.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code in-memory-misses}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;Number of times a requested item was not found in the memory
-&nbsp;     * store.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code off-heap-misses}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;Number of times a requested item was not found in the
-&nbsp;     * off-heap store.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code on-disk-misses}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;Number of times a requested item was not found in the disk
-&nbsp;     * store.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code objects}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;Number of elements stored in the cache.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code in-memory-objects}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;Number of objects in the memory store.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code off-heap-objects}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;Number of objects in the off-heap store.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code on-disk-objects}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;Number of objects in the disk store.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code mean-get-time}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;The average get time. Because ehcache support JDK1.4.2, each
-&nbsp;     * get time uses {@link System#currentTimeMillis()}, rather than
-&nbsp;     * nanoseconds. The accuracy is thus limited.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code mean-search-time}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;The average execution time (in milliseconds) within the last
-&nbsp;     * sample period.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code eviction-count}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;The number of cache evictions, since the cache was created,
-&nbsp;     * or statistics were cleared.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code searches-per-second}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;The number of search executions that have completed in the
-&nbsp;     * last second.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;tr&gt;
-&nbsp;     * &lt;td&gt;{@code accuracy}&lt;/td&gt;
-&nbsp;     * &lt;td&gt;A human readable description of the accuracy setting. One of
-&nbsp;     * &quot;None&quot;, &quot;Best Effort&quot; or &quot;Guaranteed&quot;.&lt;/td&gt;
-&nbsp;     * &lt;/tr&gt;
-&nbsp;     * &lt;/table&gt;
-&nbsp;     * &lt;p&gt;
-&nbsp;     * &lt;b&gt;N.B.: This enables Ehcache&#39;s sampling statistics with an accuracy
-&nbsp;     * level of &quot;none.&quot;&lt;/b&gt;
-&nbsp;     *
-&nbsp;     * @param cache    an {@link Ehcache} instance
-&nbsp;     * @param registry a {@link MetricRegistry}
-&nbsp;     * @return an instrumented decorator for {@code cache}
-&nbsp;     * @see StatisticsGateway
-&nbsp;     */
-&nbsp;    public static Ehcache instrument(MetricRegistry registry, final Ehcache cache) {
-&nbsp;
-<b class="fc">&nbsp;        final String prefix = name(cache.getClass(), cache.getName());</b>
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;hits&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().cacheHitCount());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;in-memory-hits&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().localHeapHitCount());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;off-heap-hits&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().localOffHeapHitCount());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;on-disk-hits&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().localDiskHitCount());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;misses&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().cacheMissCount());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;in-memory-misses&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().localHeapMissCount());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;off-heap-misses&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().localOffHeapMissCount());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;on-disk-misses&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().localDiskMissCount());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;objects&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().getSize());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;in-memory-objects&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().getLocalHeapSize());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;off-heap-objects&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().getLocalOffHeapSize());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;on-disk-objects&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().getLocalDiskSize());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;mean-get-time&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().cacheGetOperation().latency().average().value());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;mean-search-time&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().cacheSearchOperation().latency().average().value());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;eviction-count&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().cacheEvictionOperation().count().value());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;searches-per-second&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().cacheSearchOperation().rate().value());</b>
-&nbsp;
-<b class="fc">&nbsp;        registry.registerGauge(name(prefix, &quot;writer-queue-size&quot;),</b>
-<b class="fc">&nbsp;                () -&gt; cache.getStatistics().getWriterQueueLength());</b>
-&nbsp;
-<b class="fc">&nbsp;        return new InstrumentedEhcache(registry, cache);</b>
+&nbsp;    MetaData(String host, String plugin, String pluginInstance, String type, String typeInstance,
+<b class="fc">&nbsp;             long timestamp, long period) {</b>
+<b class="fc">&nbsp;        this.host = host;</b>
+<b class="fc">&nbsp;        this.plugin = plugin;</b>
+<b class="fc">&nbsp;        this.pluginInstance = pluginInstance;</b>
+<b class="fc">&nbsp;        this.type = type;</b>
+<b class="fc">&nbsp;        this.typeInstance = typeInstance;</b>
+<b class="fc">&nbsp;        this.timestamp = timestamp;</b>
+<b class="fc">&nbsp;        this.period = period;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    private final Timer getTimer, putTimer;
-&nbsp;
-&nbsp;    private InstrumentedEhcache(MetricRegistry registry, Ehcache cache) {
-<b class="fc">&nbsp;        super(cache);</b>
-<b class="fc">&nbsp;        this.getTimer = registry.timer(name(cache.getClass(), cache.getName(), &quot;gets&quot;));</b>
-<b class="fc">&nbsp;        this.putTimer = registry.timer(name(cache.getClass(), cache.getName(), &quot;puts&quot;));</b>
+&nbsp;    String getHost() {
+<b class="fc">&nbsp;        return host;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    @Override
-&nbsp;    public Element get(Object key) throws IllegalStateException, CacheException {
-<b class="nc">&nbsp;        final Timer.Context ctx = getTimer.time();</b>
-&nbsp;        try {
-<b class="nc">&nbsp;            return underlyingCache.get(key);</b>
-&nbsp;        } finally {
-<b class="nc">&nbsp;            ctx.stop();</b>
-<b class="nc">&nbsp;        }</b>
+&nbsp;    String getPlugin() {
+<b class="fc">&nbsp;        return plugin;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    @Override
-&nbsp;    public Element get(Serializable key) throws IllegalStateException, CacheException {
-<b class="fc">&nbsp;        final Timer.Context ctx = getTimer.time();</b>
-&nbsp;        try {
-<b class="fc">&nbsp;            return underlyingCache.get(key);</b>
-&nbsp;        } finally {
-<b class="fc">&nbsp;            ctx.stop();</b>
-<b class="nc">&nbsp;        }</b>
+&nbsp;    String getPluginInstance() {
+<b class="fc">&nbsp;        return pluginInstance;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    @Override
-&nbsp;    public void put(Element element) throws IllegalArgumentException, IllegalStateException, CacheException {
-<b class="fc">&nbsp;        final Timer.Context ctx = putTimer.time();</b>
-&nbsp;        try {
-<b class="fc">&nbsp;            underlyingCache.put(element);</b>
-&nbsp;        } finally {
-<b class="fc">&nbsp;            ctx.stop();</b>
-<b class="fc">&nbsp;        }</b>
+&nbsp;    String getType() {
+<b class="fc">&nbsp;        return type;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    @Override
-&nbsp;    public void put(Element element, boolean doNotNotifyCacheReplicators) throws IllegalArgumentException, IllegalStateException, CacheException {
-<b class="nc">&nbsp;        final Timer.Context ctx = putTimer.time();</b>
-&nbsp;        try {
-<b class="nc">&nbsp;            underlyingCache.put(element, doNotNotifyCacheReplicators);</b>
-&nbsp;        } finally {
-<b class="nc">&nbsp;            ctx.stop();</b>
-<b class="nc">&nbsp;        }</b>
+&nbsp;    String getTypeInstance() {
+<b class="fc">&nbsp;        return typeInstance;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    @Override
-&nbsp;    public Element putIfAbsent(Element element) throws NullPointerException {
-<b class="nc">&nbsp;        final Timer.Context ctx = putTimer.time();</b>
-&nbsp;        try {
-<b class="nc">&nbsp;            return underlyingCache.putIfAbsent(element);</b>
-&nbsp;        } finally {
-<b class="nc">&nbsp;            ctx.stop();</b>
-<b class="nc">&nbsp;        }</b>
+&nbsp;    long getTimestamp() {
+<b class="fc">&nbsp;        return timestamp;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    long getPeriod() {
+<b class="fc">&nbsp;        return period;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static class Builder {
+&nbsp;
+&nbsp;        private String host;
+&nbsp;        private String plugin;
+&nbsp;        private String pluginInstance;
+&nbsp;        private String type;
+&nbsp;        private String typeInstance;
+&nbsp;        private long timestamp;
+&nbsp;        private long period;
+&nbsp;        private Sanitize sanitize;
+&nbsp;
+&nbsp;        Builder(String host, long timestamp, long duration) {
+<b class="fc">&nbsp;            this(new Sanitize(Sanitize.DEFAULT_MAX_LENGTH), host, timestamp, duration);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Builder(Sanitize sanitize, String host, long timestamp, long duration) {</b>
+<b class="fc">&nbsp;            this.sanitize = sanitize;</b>
+<b class="fc">&nbsp;            this.host = sanitize.instanceName(host);</b>
+<b class="fc">&nbsp;            this.timestamp = timestamp;</b>
+<b class="fc">&nbsp;            period = duration;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        Builder plugin(String name) {
+<b class="fc">&nbsp;            plugin = sanitize.name(name);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        Builder pluginInstance(String name) {
+<b class="nc">&nbsp;            pluginInstance = sanitize.instanceName(name);</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        Builder type(String name) {
+<b class="fc">&nbsp;            type = sanitize.name(name);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        Builder typeInstance(String name) {
+<b class="fc">&nbsp;            typeInstance = sanitize.instanceName(name);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        MetaData get() {
+<b class="fc">&nbsp;            return new MetaData(host, plugin, pluginInstance, type, typeInstance, timestamp, period);</b>
+&nbsp;        }
 &nbsp;    }
 &nbsp;}
 </code>
@@ -329,7 +222,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

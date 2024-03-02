@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > InstrumentedSqlLogger</title>
+  <title>Coverage Report > BasicSqlNameStrategy</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.codahale.metrics.jdbi3</a>
+    <a href="../index.html">com.codahale.metrics.jdbi.strategies</a>
 </div>
 
-<h1>Coverage Summary for Class: InstrumentedSqlLogger (com.codahale.metrics.jdbi3)</h1>
+<h1>Coverage Summary for Class: BasicSqlNameStrategy (com.codahale.metrics.jdbi.strategies)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -41,29 +41,29 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">InstrumentedSqlLogger</td>
+  <td class="name">BasicSqlNameStrategy</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    80%
+    0%
   </span>
   <span class="absValue">
-    (4/5)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    90%
+    0%
   </span>
   <span class="absValue">
-    (9/10)
+    (0/1)
   </span>
 </td>
 </tr>
@@ -75,52 +75,12 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jdbi3;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jdbi.strategies;
 &nbsp;
-&nbsp;import com.codahale.metrics.MetricRegistry;
-&nbsp;import com.codahale.metrics.jdbi3.strategies.SmartNameStrategy;
-&nbsp;import com.codahale.metrics.jdbi3.strategies.StatementNameStrategy;
-&nbsp;import org.jdbi.v3.core.statement.SqlLogger;
-&nbsp;import org.jdbi.v3.core.statement.StatementContext;
-&nbsp;
-&nbsp;import java.sql.SQLException;
-&nbsp;import java.time.temporal.ChronoUnit;
-&nbsp;import java.util.concurrent.TimeUnit;
-&nbsp;
-&nbsp;/**
-&nbsp; * A {@link SqlLogger} implementation for JDBI which uses the SQL objects&#39; class names and
-&nbsp; * method names for nanosecond-precision timers.
-&nbsp; */
-&nbsp;public class InstrumentedSqlLogger implements SqlLogger {
-&nbsp;    private final MetricRegistry registry;
-&nbsp;    private final StatementNameStrategy statementNameStrategy;
-&nbsp;
-&nbsp;    public InstrumentedSqlLogger(MetricRegistry registry) {
-<b class="nc">&nbsp;        this(registry, new SmartNameStrategy());</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    public InstrumentedSqlLogger(MetricRegistry registry,
-<b class="fc">&nbsp;                                 StatementNameStrategy statementNameStrategy) {</b>
-<b class="fc">&nbsp;        this.registry = registry;</b>
-<b class="fc">&nbsp;        this.statementNameStrategy = statementNameStrategy;</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    @Override
-&nbsp;    public void logAfterExecution(StatementContext context) {
-<b class="fc">&nbsp;        log(context);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    @Override
-&nbsp;    public void logException(StatementContext context, SQLException ex) {
-<b class="fc">&nbsp;        log(context);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    private void log(StatementContext context) {
-<b class="fc">&nbsp;        String statementName = statementNameStrategy.getStatementName(context);</b>
-<b class="fc">&nbsp;        if (statementName != null) {</b>
-<b class="fc">&nbsp;            final long elapsed = context.getElapsedTime(ChronoUnit.NANOS);</b>
-<b class="fc">&nbsp;            registry.timer(statementName).update(elapsed, TimeUnit.NANOSECONDS);</b>
-&nbsp;        }
+&nbsp;public class BasicSqlNameStrategy extends DelegatingStatementNameStrategy {
+&nbsp;    public BasicSqlNameStrategy() {
+<b class="nc">&nbsp;        super(NameStrategies.CHECK_EMPTY,</b>
+&nbsp;                NameStrategies.SQL_OBJECT);
 &nbsp;    }
 &nbsp;}
 </code>
@@ -146,7 +106,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

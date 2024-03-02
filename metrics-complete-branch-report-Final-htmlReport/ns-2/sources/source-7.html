@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > Gauge</title>
+  <title>Coverage Report > ResponseMetered</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,14 +22,14 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.codahale.metrics.annotation</a>
 </div>
 
-<h1>Coverage Summary for Class: Gauge (com.codahale.metrics.annotation)</h1>
+<h1>Coverage Summary for Class: ResponseMetered (com.codahale.metrics.annotation)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 </tr>
 <tr>
-  <td class="name">Gauge</td>
+  <td class="name">ResponseMetered</td>
 </tr>
 
 </table>
@@ -41,38 +41,48 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.annotation;
 &nbsp;
+&nbsp;import java.lang.annotation.Documented;
 &nbsp;import java.lang.annotation.ElementType;
+&nbsp;import java.lang.annotation.Inherited;
 &nbsp;import java.lang.annotation.Retention;
 &nbsp;import java.lang.annotation.RetentionPolicy;
 &nbsp;import java.lang.annotation.Target;
 &nbsp;
 &nbsp;/**
-&nbsp; * An annotation for marking a method of an annotated object as a gauge.
+&nbsp; * An annotation for marking a method of an annotated object as metered.
 &nbsp; * &lt;p&gt;
 &nbsp; * Given a method like this:
 &nbsp; * &lt;pre&gt;&lt;code&gt;
-&nbsp; *     {@literal @}Gauge(name = &quot;queueSize&quot;)
-&nbsp; *     public int getQueueSize() {
-&nbsp; *         return queue.size;
+&nbsp; *     {@literal @}ResponseMetered(name = &quot;fancyName&quot;, level = ResponseMeteredLevel.ALL)
+&nbsp; *     public String fancyName(String name) {
+&nbsp; *         return &quot;Sir Captain &quot; + name;
 &nbsp; *     }
 &nbsp; * &lt;/code&gt;&lt;/pre&gt;
 &nbsp; * &lt;p&gt;
-&nbsp; * A gauge for the defining class with the name {@code queueSize} will be created which uses the
-&nbsp; * annotated method&#39;s return value as its value.
+&nbsp; * Meters for the defining class with the name {@code fancyName} will be created for response codes
+&nbsp; * based on the ResponseMeteredLevel selected. Each time the {@code #fancyName(String)} method is invoked,
+&nbsp; * the appropriate response meter will be marked.
 &nbsp; */
+&nbsp;@Inherited
+&nbsp;@Documented
 &nbsp;@Retention(RetentionPolicy.RUNTIME)
-&nbsp;@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE })
-&nbsp;public @interface Gauge {
+&nbsp;@Target({ ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
+&nbsp;public @interface ResponseMetered {
 &nbsp;    /**
-&nbsp;     * @return The gauge&#39;s name.
+&nbsp;     * @return The name of the meter.
 &nbsp;     */
 &nbsp;    String name() default &quot;&quot;;
 &nbsp;
 &nbsp;    /**
 &nbsp;     * @return If {@code true}, use the given name as an absolute name. If {@code false}, use the given name
-&nbsp;     * relative to the annotated class.
+&nbsp;     * relative to the annotated class. When annotating a class, this must be {@code false}.
 &nbsp;     */
 &nbsp;    boolean absolute() default false;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return the ResponseMeteredLevel which decides which response code meters are marked.
+&nbsp;     */
+&nbsp;    ResponseMeteredLevel level() default ResponseMeteredLevel.COARSE;
 &nbsp;}
 </code>
 </pre>
@@ -97,7 +107,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

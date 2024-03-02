@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > DefaultNameStrategy</title>
+  <title>Coverage Report > InstrumentedTimingCollector</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.codahale.metrics.jdbi3.strategies</a>
+    <a href="../index.html">com.codahale.metrics.jdbi3</a>
 </div>
 
-<h1>Coverage Summary for Class: DefaultNameStrategy (com.codahale.metrics.jdbi3.strategies)</h1>
+<h1>Coverage Summary for Class: InstrumentedTimingCollector (com.codahale.metrics.jdbi3)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -38,119 +41,33 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">DefaultNameStrategy</td>
+  <td class="name">InstrumentedTimingCollector</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    66.7%
   </span>
   <span class="absValue">
-    (5/5)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">DefaultNameStrategy$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
+    (2/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    85.7%
   </span>
   <span class="absValue">
-    (3/3)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">DefaultNameStrategy$2</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (5/5)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">DefaultNameStrategy$3</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">DefaultNameStrategy$4</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (10/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (17/17)
+    (6/7)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -158,64 +75,46 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jdbi3.strategies;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics.jdbi3;
 &nbsp;
 &nbsp;import com.codahale.metrics.MetricRegistry;
-&nbsp;import org.jdbi.v3.core.extension.ExtensionMethod;
+&nbsp;import com.codahale.metrics.jdbi3.strategies.SmartNameStrategy;
+&nbsp;import com.codahale.metrics.jdbi3.strategies.StatementNameStrategy;
+&nbsp;import org.jdbi.v3.core.statement.SqlLogger;
 &nbsp;import org.jdbi.v3.core.statement.StatementContext;
+&nbsp;import org.jdbi.v3.core.statement.TimingCollector;
+&nbsp;
+&nbsp;import java.util.concurrent.TimeUnit;
 &nbsp;
 &nbsp;/**
-&nbsp; * Default strategies which build a basis of more complex strategies
+&nbsp; * A {@link TimingCollector} implementation for JDBI which uses the SQL objects&#39; class names and
+&nbsp; * method names for millisecond-precision timers.
+&nbsp; *
+&nbsp; * @deprecated Use {@link InstrumentedSqlLogger} and {@link org.jdbi.v3.core.Jdbi#setSqlLogger(SqlLogger)} instead.
 &nbsp; */
-<b class="fc">&nbsp;public enum DefaultNameStrategy implements StatementNameStrategy {</b>
+&nbsp;@Deprecated
+&nbsp;public class InstrumentedTimingCollector implements TimingCollector {
 &nbsp;
-&nbsp;    /**
-&nbsp;     * If no SQL in the context, returns `sql.empty`, otherwise falls through
-&nbsp;     */
-<b class="fc">&nbsp;    CHECK_EMPTY {</b>
-&nbsp;        @Override
-&nbsp;        public String getStatementName(StatementContext statementContext) {
-<b class="fc">&nbsp;            final String rawSql = statementContext.getRawSql();</b>
-<b class="fc">&nbsp;            return rawSql == null || rawSql.isEmpty() ? &quot;sql.empty&quot; : null;</b>
-&nbsp;        }
-&nbsp;    },
+&nbsp;    private final MetricRegistry registry;
+&nbsp;    private final StatementNameStrategy statementNameStrategy;
 &nbsp;
-&nbsp;    /**
-&nbsp;     * If there is an SQL object attached to the context, returns the name package,
-&nbsp;     * the class and the method on which SQL is declared. If not SQL object is attached,
-&nbsp;     * falls through
-&nbsp;     */
-<b class="fc">&nbsp;    SQL_OBJECT {</b>
-&nbsp;        @Override
-&nbsp;        public String getStatementName(StatementContext statementContext) {
-<b class="fc">&nbsp;            ExtensionMethod extensionMethod = statementContext.getExtensionMethod();</b>
-<b class="fc">&nbsp;            if (extensionMethod != null) {</b>
-<b class="fc">&nbsp;                return MetricRegistry.name(extensionMethod.getType(), extensionMethod.getMethod().getName());</b>
-&nbsp;            }
-<b class="fc">&nbsp;            return null;</b>
-&nbsp;        }
-&nbsp;    },
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Returns a raw SQL in the context (even if it&#39;s not exist)
-&nbsp;     */
-<b class="fc">&nbsp;    NAIVE_NAME {</b>
-&nbsp;        @Override
-&nbsp;        public String getStatementName(StatementContext statementContext) {
-<b class="fc">&nbsp;            return statementContext.getRawSql();</b>
-&nbsp;        }
-&nbsp;    },
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Returns the `sql.raw` constant
-&nbsp;     */
-<b class="fc">&nbsp;    CONSTANT_SQL_RAW {</b>
-&nbsp;        @Override
-&nbsp;        public String getStatementName(StatementContext statementContext) {
-<b class="fc">&nbsp;            return &quot;sql.raw&quot;;</b>
-&nbsp;        }
+&nbsp;    public InstrumentedTimingCollector(MetricRegistry registry) {
+<b class="nc">&nbsp;        this(registry, new SmartNameStrategy());</b>
 &nbsp;    }
 &nbsp;
+&nbsp;    public InstrumentedTimingCollector(MetricRegistry registry,
+<b class="fc">&nbsp;                                       StatementNameStrategy statementNameStrategy) {</b>
+<b class="fc">&nbsp;        this.registry = registry;</b>
+<b class="fc">&nbsp;        this.statementNameStrategy = statementNameStrategy;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void collect(long elapsedTime, StatementContext ctx) {
+<b class="fc">&nbsp;        String statementName = statementNameStrategy.getStatementName(ctx);</b>
+<b class="fc">&nbsp;        if (statementName != null) {</b>
+<b class="fc">&nbsp;            registry.timer(statementName).update(elapsedTime, TimeUnit.NANOSECONDS);</b>
+&nbsp;        }
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -240,7 +139,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>

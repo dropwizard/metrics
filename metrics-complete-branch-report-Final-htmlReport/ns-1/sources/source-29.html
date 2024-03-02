@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
-  <title>Coverage Report > Reporter</title>
+  <title>Coverage Report > Sampling</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,14 +22,14 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.codahale.metrics</a>
 </div>
 
-<h1>Coverage Summary for Class: Reporter (com.codahale.metrics)</h1>
+<h1>Coverage Summary for Class: Sampling (com.codahale.metrics)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 </tr>
 <tr>
-  <td class="name">Reporter</td>
+  <td class="name">Sampling</td>
 </tr>
 
 </table>
@@ -41,13 +41,16 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.codahale.metrics;
 &nbsp;
-&nbsp;import java.io.Closeable;
-&nbsp;
-&nbsp;/*
-&nbsp; * A tag interface to indicate that a class is a Reporter.
+&nbsp;/**
+&nbsp; * An object which samples values.
 &nbsp; */
-&nbsp;public interface Reporter extends Closeable {
-&nbsp;
+&nbsp;public interface Sampling {
+&nbsp;    /**
+&nbsp;     * Returns a snapshot of the values.
+&nbsp;     *
+&nbsp;     * @return a snapshot of the values
+&nbsp;     */
+&nbsp;    Snapshot getSnapshot();
 &nbsp;}
 </code>
 </pre>
@@ -72,7 +75,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-02-29 23:40</div>
+    <div style="float:right;">generated on 2024-03-01 18:41</div>
 </div>
 </body>
 </html>
