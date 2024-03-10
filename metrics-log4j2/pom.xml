@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.log4j2</javaModuleName>
-        <log4j2.version>2.23.0</log4j2.version>
+        <log4j2.version>2.23.1</log4j2.version>
     </properties>
 
     <build>
