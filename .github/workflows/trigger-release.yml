@@ -23,7 +23,7 @@ jobs:
       with:
         ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - name: Set up JDK
-      uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4
+      uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4
       with:
         distribution: 'temurin'
         java-version: '17'
@@ -31,8 +31,6 @@ jobs:
         server-id: ossrh
         server-username: ${{ secrets.CI_DEPLOY_USERNAME }}
         server-password: ${{ secrets.CI_DEPLOY_PASSWORD }}
-        gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
-        gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
     - name: Set up Git
       run: |
         git config --global committer.email "48418865+dropwizard-committers@users.noreply.github.com"
@@ -41,6 +39,9 @@ jobs:
         git config --global author.name "${GITHUB_ACTOR}"
     - name: Prepare release
       run: ./mvnw -V -B -ntp -Prelease -DreleaseVersion=${{ inputs.releaseVersion }} -DdevelopmentVersion=${{ inputs.developmentVersion }} release:prepare
+      env:
+        MAVEN_GPG_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
     - name: Rollback on failure
       if: failure()
       run: |

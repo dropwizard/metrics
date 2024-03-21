@@ -60,15 +60,15 @@
         <jetty9.version>9.4.54.v20240208</jetty9.version>
         <jetty10.version>10.0.20</jetty10.version>
         <jetty11.version>11.0.20</jetty11.version>
-        <jetty12.version>12.0.6</jetty12.version>
+        <jetty12.version>12.0.7</jetty12.version>
         <slf4j.version>1.7.36</slf4j.version>
         <assertj.version>3.25.3</assertj.version>
         <byte-buddy.version>1.14.12</byte-buddy.version>
-        <mockito.version>5.10.0</mockito.version>
+        <mockito.version>5.11.0</mockito.version>
         <junit.version>4.13.1</junit.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
-        <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
-        <errorprone.version>2.25.0</errorprone.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <errorprone.version>2.26.1</errorprone.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
         <servlet6.version>6.0.0</servlet6.version>
 
@@ -209,9 +209,6 @@
                     <value>true</value>
                 </property>
             </activation>
-            <properties>
-                <gpg.keyname>EDA86E9FB607B5FC9223FB767D4868B53E31E7AD</gpg.keyname>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -263,12 +260,10 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.1.0</version>
+                        <version>3.2.1</version>
                         <configuration>
-                            <gpgArguments>
-                                <arg>--pinentry-mode</arg>
-                                <arg>loopback</arg>
-                            </gpgArguments>
+                            <signer>bc</signer>
+                            <bestPractices>true</bestPractices>
                         </configuration>
                         <executions>
                             <execution>
