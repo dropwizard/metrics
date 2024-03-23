@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.jersey2</javaModuleName>
-        <jersey.version>2.42</jersey.version>
+        <jersey2.version>2.42</jersey2.version>
     </properties>
 
     <dependencyManagement>
@@ -33,7 +33,7 @@
             <dependency>
                 <groupId>org.glassfish.jersey</groupId>
                 <artifactId>jersey-bom</artifactId>
-                <version>${jersey.version}</version>
+                <version>${jersey2.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
