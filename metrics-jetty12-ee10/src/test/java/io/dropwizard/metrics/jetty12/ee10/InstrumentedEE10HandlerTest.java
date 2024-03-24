@@ -2,18 +2,13 @@ package io.dropwizard.metrics.jetty12.ee10;
 
 import com.codahale.metrics.MetricRegistry;
 import org.eclipse.jetty.client.ContentResponse;
-import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.ee10.servlet.DefaultServlet;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletContextRequest;
 import org.eclipse.jetty.ee10.servlet.ServletHandler;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.Callback;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -32,39 +27,15 @@ import static com.codahale.metrics.annotation.ResponseMeteredLevel.DETAILED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-public class InstrumentedEE10HandlerTest {
-    private final HttpClient client = new HttpClient();
-    private final MetricRegistry registry = new MetricRegistry();
-    private final Server server = new Server();
-    private final ServerConnector connector = new ServerConnector(server);
-    private final InstrumentedEE10Handler handler = new InstrumentedEE10Handler(registry, null, ALL);
+public class InstrumentedEE10HandlerTest extends AbstractIntegrationTest {
 
-    @Before
-    public void setUp() throws Exception {
-        handler.setName("handler");
-
-        TestHandler testHandler = new TestHandler();
+    @Override
+    protected Handler getHandler() {
+        InstrumentedEE10HandlerTest.TestHandler testHandler = new InstrumentedEE10HandlerTest.TestHandler();
         // a servlet handler needs a servlet mapping, else the request will be short-circuited
         // so use the DefaultServlet here
         testHandler.addServletWithMapping(DefaultServlet.class, "/");
-
-        // builds the following handler chain:
-        // ServletContextHandler -> InstrumentedHandler -> TestHandler
-        // the ServletContextHandler is needed to utilize servlet related classes
-        ServletContextHandler servletContextHandler = new ServletContextHandler();
-        servletContextHandler.setHandler(testHandler);
-        servletContextHandler.insertHandler(handler);
-        server.setHandler(servletContextHandler);
-
-        server.addConnector(connector);
-        server.start();
-        client.start();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        server.stop();
-        client.stop();
+        return testHandler;
     }
 
     @Test
@@ -181,10 +152,6 @@ public class InstrumentedEE10HandlerTest {
 
         assertThat(registry.getTimers().get(metricName() + ".requests")
                 .getSnapshot().getMedian()).isGreaterThan(0.0).isLessThan(TimeUnit.SECONDS.toNanos(1));
-    }
-
-    private String uri(String path) {
-        return "http://localhost:" + connector.getLocalPort() + path;
     }
 
     private String metricName() {

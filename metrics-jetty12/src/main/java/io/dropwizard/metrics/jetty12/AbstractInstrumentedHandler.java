@@ -10,6 +10,7 @@ import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.util.Callback;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.codahale.metrics.annotation.ResponseMeteredLevel.ALL;
@@ -273,6 +275,47 @@ public abstract class AbstractInstrumentedHandler extends Handler.Wrapper {
         super.doStop();
     }
 
+    @Override
+    public boolean handle(Request request, Response response, Callback callback) throws Exception {
+        activeDispatches.inc();
+        activeRequests.inc();
+        final long start = Request.getTimeStamp(request);
+
+        final AtomicBoolean suspended = new AtomicBoolean(false);
+
+        final Runnable metricUpdater = () -> {
+            updateResponses(request, response, start, true);
+            if (suspended.get()) {
+                activeSuspended.dec();
+            }
+        };
+
+        final Callback metricUpdaterCallback = Callback.from(callback, metricUpdater);
+        boolean handled = false;
+
+        setupServletListeners(request, response);
+
+        try {
+            handled = super.handle(request, response, metricUpdaterCallback);
+        } finally {
+            final long now = System.currentTimeMillis();
+            final long dispatched = now - start;
+
+            activeDispatches.dec();
+            dispatches.update(dispatched, TimeUnit.MILLISECONDS);
+
+            if (isSuspended(request, response) && suspended.compareAndSet(false, true)) {
+                activeSuspended.inc();
+            }
+
+            if (!handled) {
+                updateResponses(request, response, start, false);
+            }
+        }
+
+        return handled;
+    }
+
     protected Timer requestTimer(String method) {
         final HttpMethod m = HttpMethod.fromString(method);
         if (m == null) {
@@ -307,7 +350,7 @@ public abstract class AbstractInstrumentedHandler extends Handler.Wrapper {
         if (isHandled) {
             mark(response.getStatus());
         } else {
-            mark(404);; // will end up with a 404 response sent by HttpChannel.handle
+            mark(404); // will end up with a 404 response sent by HttpChannel.handle
         }
         activeRequests.dec();
         final long elapsedTime = System.currentTimeMillis() - start;
@@ -337,4 +380,16 @@ public abstract class AbstractInstrumentedHandler extends Handler.Wrapper {
     protected String getMetricPrefix() {
         return this.prefix == null ? name(getHandler().getClass(), name) : name(this.prefix, name);
     }
+
+    protected abstract void setupServletListeners(Request request, Response response);
+
+    protected final Meter getAsyncDispatches() {
+        return asyncDispatches;
+    }
+
+    protected final Meter getAsyncTimeouts() {
+        return asyncTimeouts;
+    }
+
+    protected abstract boolean isSuspended(Request request, Response response);
 }
