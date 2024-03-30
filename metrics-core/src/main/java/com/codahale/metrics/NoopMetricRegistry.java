@@ -19,25 +19,89 @@ import java.util.function.Supplier;
  * @since 4.1.17
  */
 public final class NoopMetricRegistry extends MetricRegistry {
+
     private static final EmptyConcurrentMap<String, Metric> EMPTY_CONCURRENT_MAP = new EmptyConcurrentMap<>();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ConcurrentMap<String, Metric> buildMap() {
-        return EMPTY_CONCURRENT_MAP;
-    }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected ConcurrentMap<String, Metric> buildMap() {
+            return new EmptyConcurrentMap<>();
+        }
+
+        /**
+         * Factory method to create instances of Noop metrics.
+         */
+        public static NoopMetricFactory metricFactory() {
+            return new NoopMetricFactory();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public <T extends Metric> T register(String name, T metric) throws IllegalArgumentException {
+            if (metric == null) {
+                throw new NullPointerException("metric == null");
+            }
+            return metric;
+        }
+
 
     /**
-     * {@inheritDoc}
+     * Factory class to create instances of Noop metrics.
      */
-    @Override
-    public <T extends Metric> T register(String name, T metric) throws IllegalArgumentException {
-        if (metric == null) {
-            throw new NullPointerException("metric == null");
+    static class NoopMetricFactory {
+
+        public Counter counter(String name, MetricSupplier<Counter> supplier) {
+            return NoopCounter.INSTANCE;
         }
-        return metric;
+
+        public Histogram histogram(String name, MetricSupplier<Histogram> supplier) {
+            return NoopHistogram.INSTANCE;
+        }
+
+        public Histogram histogram(String name) {
+            return NoopHistogram.INSTANCE;
+        }
+
+        public Meter meter(String name) {
+            return NoopMeter.INSTANCE;
+        }
+
+        public Meter meter(String name, MetricSupplier<Meter> supplier) {
+            return NoopMeter.INSTANCE;
+        }
+
+        public Timer timer(String name) {
+            return NoopTimer.INSTANCE;
+        }
+
+        public Timer timer(String name, MetricSupplier<Timer> supplier) {
+            return NoopTimer.INSTANCE;
+        }
+
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        public <T extends Gauge> T gauge(String name) {
+            return (T) NoopGauge.INSTANCE;
+        }
+
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        public <T extends Gauge> T gauge(String name, MetricSupplier<T> supplier) {
+            return (T) NoopGauge.INSTANCE;
+        }
+
+        protected ConcurrentMap<String, Metric> buildMap() {
+            return EMPTY_CONCURRENT_MAP;
+        }
+
+        public <T extends Metric> T register(String name, T metric) throws IllegalArgumentException {
+            if (metric == null) {
+                throw new NullPointerException("metric == null");
+            }
+            return metric;
+        }
     }
 
     /**
@@ -48,89 +112,6 @@ public final class NoopMetricRegistry extends MetricRegistry {
         // NOP
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Counter counter(String name) {
-        return NoopCounter.INSTANCE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Counter counter(String name, MetricSupplier<Counter> supplier) {
-        return NoopCounter.INSTANCE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Histogram histogram(String name) {
-        return NoopHistogram.INSTANCE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Histogram histogram(String name, MetricSupplier<Histogram> supplier) {
-        return NoopHistogram.INSTANCE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Meter meter(String name) {
-        return NoopMeter.INSTANCE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Meter meter(String name, MetricSupplier<Meter> supplier) {
-        return NoopMeter.INSTANCE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Timer timer(String name) {
-        return NoopTimer.INSTANCE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Timer timer(String name, MetricSupplier<Timer> supplier) {
-        return NoopTimer.INSTANCE;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 4.2
-     */
-    @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public <T extends Gauge> T gauge(String name) {
-        return (T) NoopGauge.INSTANCE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public <T extends Gauge> T gauge(String name, MetricSupplier<T> supplier) {
-        return (T) NoopGauge.INSTANCE;
-    }
 
     /**
      * {@inheritDoc}

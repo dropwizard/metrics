@@ -42,8 +42,8 @@ import static com.codahale.metrics.annotation.ResponseMeteredLevel.DETAILED;
 public class InstrumentedHttpChannelListener
         implements Listener {
     private static final String START_ATTR = InstrumentedHttpChannelListener.class.getName() + ".start";
-    private static final Set<ResponseMeteredLevel> COARSE_METER_LEVELS = EnumSet.of(COARSE, ALL);
-    private static final Set<ResponseMeteredLevel> DETAILED_METER_LEVELS = EnumSet.of(DETAILED, ALL);
+    static final Set<ResponseMeteredLevel> COARSE_METER_LEVELS = EnumSet.of(COARSE, ALL);
+    static final Set<ResponseMeteredLevel> DETAILED_METER_LEVELS = EnumSet.of(DETAILED, ALL);
 
     private final MetricRegistry metricRegistry;
 

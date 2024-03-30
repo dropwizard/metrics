@@ -57,18 +57,40 @@ class ChunkedAssociativeLongArray {
 
     synchronized boolean put(long key, long value) {
         Chunk activeChunk = chunks.peekLast();
-        if (activeChunk != null && activeChunk.cursor != 0 && activeChunk.keys[activeChunk.cursor - 1] > key) {
-            // key should be the same as last inserted or bigger
-            return false;
+
+        // Validate key order
+        if (hasValidActiveChunkForAppend(activeChunk) && isKeyOutOfOrder(activeChunk, key)) {
+            return false; // Key should be the same as last inserted or bigger
         }
-        if (activeChunk == null || activeChunk.cursor - activeChunk.startIndex == activeChunk.chunkSize) {
-            // The last chunk doesn't exist or full
-            activeChunk = allocateChunk();
-            chunks.add(activeChunk);
-        }
+
+        // Ensure chunk availability
+        activeChunk = ensureChunkAvailable(activeChunk);
+
+        // Append key-value pair
         activeChunk.append(key, value);
         return true;
     }
+
+    private boolean hasValidActiveChunkForAppend(Chunk activeChunk) {
+        return activeChunk != null && activeChunk.cursor != 0;
+    }
+
+    private boolean isKeyOutOfOrder(Chunk activeChunk, long key) {
+        return activeChunk.keys[activeChunk.cursor - 1] > key;
+    }
+
+    private Chunk ensureChunkAvailable(Chunk activeChunk) {
+        if (activeChunk == null || isChunkFull(activeChunk)) {
+            return allocateChunk();
+        } else {
+            return activeChunk;
+        }
+    }
+
+    private boolean isChunkFull(Chunk activeChunk) {
+        return activeChunk.cursor - activeChunk.startIndex == activeChunk.chunkSize;
+    }
+
 
     synchronized long[] values() {
         final int valuesSize = size();

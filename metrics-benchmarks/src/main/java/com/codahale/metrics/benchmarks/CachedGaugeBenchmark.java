@@ -15,15 +15,18 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 public class CachedGaugeBenchmark {
 
+    private static final long LOAD_VALUE_DELAY_MILLIS = 10; // Loading delay for 10 milliseconds
+    private static final int DEFAULT_VALUE = 12345; // Placeholder value
+
     private CachedGauge<Integer> cachedGauge = new CachedGauge<Integer>(100, TimeUnit.MILLISECONDS) {
         @Override
         protected Integer loadValue() {
             try {
-                Thread.sleep(10);
+                Thread.sleep(LOAD_VALUE_DELAY_MILLIS);
             } catch (InterruptedException e) {
                 throw new RuntimeException("Thread was interrupted", e);
             }
-            return 12345;
+            return DEFAULT_VALUE;
         }
     };
 

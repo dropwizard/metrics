@@ -375,7 +375,8 @@ public abstract class HealthCheck {
         } catch (Exception e) {
             result = Result.unhealthy(e);
         }
-        result.setDuration(TimeUnit.MILLISECONDS.convert(clock().getTick() - start, TimeUnit.NANOSECONDS));
+        result.setDuration(TimeUnit.MILLISECONDS.convert(
+                clock().getTick() - start, TimeUnit.NANOSECONDS));
         return result;
     }
 

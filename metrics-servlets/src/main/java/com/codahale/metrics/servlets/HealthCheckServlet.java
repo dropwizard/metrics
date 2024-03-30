@@ -96,43 +96,49 @@ public class HealthCheckServlet extends HttpServlet {
         super.init(config);
 
         final ServletContext context = config.getServletContext();
-        if (null == registry) {
-            final Object registryAttr = context.getAttribute(HEALTH_CHECK_REGISTRY);
-            if (registryAttr instanceof HealthCheckRegistry) {
-                this.registry = (HealthCheckRegistry) registryAttr;
-            } else {
+
+        // Initialize registry with fallback and exception handling
+        try {
+            this.registry = getAttributeOfType(context, HEALTH_CHECK_REGISTRY, HealthCheckRegistry.class);
+            if (registry == null) {
                 throw new ServletException("Couldn't find a HealthCheckRegistry instance.");
             }
+        } catch (ClassCastException e) {
+            throw new ServletException("Invalid attribute type for " + HEALTH_CHECK_REGISTRY, e);
         }
 
-        final Object executorAttr = context.getAttribute(HEALTH_CHECK_EXECUTOR);
-        if (executorAttr instanceof ExecutorService) {
-            this.executorService = (ExecutorService) executorAttr;
-        }
+        // Initialize executor service (optional)
+        this.executorService = getAttributeOfType(context, HEALTH_CHECK_EXECUTOR, ExecutorService.class);
 
-        final Object filterAttr = context.getAttribute(HEALTH_CHECK_FILTER);
-        if (filterAttr instanceof HealthCheckFilter) {
-            filter = (HealthCheckFilter) filterAttr;
-        }
-        if (filter == null) {
-            filter = HealthCheckFilter.ALL;
-        }
+        // Initialize filter with default
+        this.filter = getAttributeOfType(context, HEALTH_CHECK_FILTER, HealthCheckFilter.class, HealthCheckFilter.ALL);
 
-        final Object mapperAttr = context.getAttribute(HEALTH_CHECK_MAPPER);
-        if (mapperAttr instanceof ObjectMapper) {
-            this.mapper = (ObjectMapper) mapperAttr;
-        } else {
+        // Initialize ObjectMapper with configuration
+        this.mapper = getAttributeOfType(context, HEALTH_CHECK_MAPPER, ObjectMapper.class);
+        if (mapper == null) {
             this.mapper = new ObjectMapper();
         }
         this.mapper.registerModule(new HealthCheckModule());
 
-        final Object httpStatusIndicatorAttr = context.getAttribute(HEALTH_CHECK_HTTP_STATUS_INDICATOR);
-        if (httpStatusIndicatorAttr instanceof Boolean) {
-            this.httpStatusIndicator = (Boolean) httpStatusIndicatorAttr;
-        } else {
-            this.httpStatusIndicator = true;
-        }
+        // Initialize httpStatusIndicator with default
+        this.httpStatusIndicator = getAttributeOfType(context, HEALTH_CHECK_HTTP_STATUS_INDICATOR,
+                Boolean.class, true);
     }
+
+    private <T> T getAttributeOfType(ServletContext context, String attributeName, Class<T> expectedType)
+            throws ClassCastException {
+        return getAttributeOfType(context, attributeName, expectedType, null);
+    }
+
+    private <T> T getAttributeOfType(ServletContext context, String attributeName, Class<T> expectedType, T defaultValue)
+            throws ClassCastException {
+        Object attr = context.getAttribute(attributeName);
+        if (attr != null && expectedType.isInstance(attr)) {
+            return expectedType.cast(attr);
+        }
+        return defaultValue;
+    }
+
 
     @Override
     public void destroy() {
