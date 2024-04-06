@@ -24,6 +24,6 @@ jobs:
         uses: JetBrains/qodana-action@a040a784cc28cb9cabdf884c4e8c32d0aa3fcdb3 # v2023.3.2
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
-      - uses: github/codeql-action/upload-sarif@1b1aada464948af03b950897e5eb522f92603cc2 # v3
+      - uses: github/codeql-action/upload-sarif@4355270be187e1b672a7a1c7c7bae5afdc1ab94a # v3
         with:
           sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
