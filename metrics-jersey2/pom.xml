@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.2.24-SNAPSHOT</version>
+        <version>4.2.26-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-jersey2</artifactId>
@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.jersey2</javaModuleName>
-        <jersey.version>2.41</jersey.version>
+        <jersey2.version>2.42</jersey2.version>
     </properties>
 
     <dependencyManagement>
@@ -33,7 +33,7 @@
             <dependency>
                 <groupId>org.glassfish.jersey</groupId>
                 <artifactId>jersey-bom</artifactId>
-                <version>${jersey.version}</version>
+                <version>${jersey2.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

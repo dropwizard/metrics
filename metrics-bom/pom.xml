@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.2.24-SNAPSHOT</version>
+        <version>4.2.26-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-bom</artifactId>
@@ -173,6 +173,11 @@
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-logback14</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-logback15</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
