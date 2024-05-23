@@ -1,17 +1,6 @@
 package com.codahale.metrics.graphite;
 
-import com.codahale.metrics.Clock;
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.Histogram;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.Metered;
-import com.codahale.metrics.MetricAttribute;
-import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.ScheduledReporter;
-import com.codahale.metrics.Snapshot;
-import com.codahale.metrics.Timer;
+import com.codahale.metrics.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +64,8 @@ public class GraphiteReporter extends ScheduledReporter {
         private boolean addMetricAttributesAsTags;
         private DoubleFunction<String> floatingPointFormatter;
 
+        private GetScheduledFuture<?> getScheduledFuture;
+
         private Builder(MetricRegistry registry) {
             this.registry = registry;
             this.clock = Clock.defaultClock();
@@ -87,6 +78,7 @@ public class GraphiteReporter extends ScheduledReporter {
             this.disabledMetricAttributes = Collections.emptySet();
             this.addMetricAttributesAsTags = false;
             this.floatingPointFormatter = DEFAULT_FP_FORMATTER;
+            this.getScheduledFuture = null;
         }
 
         /**
@@ -212,6 +204,18 @@ public class GraphiteReporter extends ScheduledReporter {
         }
 
         /**
+         * Use custom schedule logic.
+         * By default, logic is scheduledWithFixedDelay
+         *
+         * @param getScheduledFuture a method to schedule next update
+         * @return {@code this}
+         */
+        public Builder withScheduledFuture(GetScheduledFuture<?> getScheduledFuture) {
+            this.getScheduledFuture = getScheduledFuture;
+            return this;
+        }
+
+        /**
          * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
          * given {@link GraphiteSender}.
          * <p>
@@ -243,7 +247,8 @@ public class GraphiteReporter extends ScheduledReporter {
                     shutdownExecutorOnStop,
                     disabledMetricAttributes,
                     addMetricAttributesAsTags,
-                    floatingPointFormatter);
+                    floatingPointFormatter,
+                    getScheduledFuture);
         }
     }
 
@@ -318,7 +323,7 @@ public class GraphiteReporter extends ScheduledReporter {
                                Set<MetricAttribute> disabledMetricAttributes,
                                boolean addMetricAttributesAsTags) {
         this(registry, graphite, clock, prefix, rateUnit, durationUnit, filter, executor, shutdownExecutorOnStop,
-                disabledMetricAttributes, addMetricAttributesAsTags, DEFAULT_FP_FORMATTER);
+                disabledMetricAttributes, addMetricAttributesAsTags, DEFAULT_FP_FORMATTER, null);
     }
 
     /**
@@ -338,6 +343,7 @@ public class GraphiteReporter extends ScheduledReporter {
      * @param disabledMetricAttributes  do not report specific metric attributes
      * @param addMetricAttributesAsTags if true, then add metric attributes as tags instead of suffixes
      * @param floatingPointFormatter    custom floating point formatter
+     * @param getScheduledFuture        custom scheduling logic (may be null).
      */
     protected GraphiteReporter(MetricRegistry registry,
                                GraphiteSender graphite,
@@ -350,9 +356,11 @@ public class GraphiteReporter extends ScheduledReporter {
                                boolean shutdownExecutorOnStop,
                                Set<MetricAttribute> disabledMetricAttributes,
                                boolean addMetricAttributesAsTags,
-                               DoubleFunction<String> floatingPointFormatter) {
+                               DoubleFunction<String> floatingPointFormatter,
+                               GetScheduledFuture<?> getScheduledFuture
+    ) {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
-                disabledMetricAttributes, null);
+                disabledMetricAttributes, getScheduledFuture);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;
