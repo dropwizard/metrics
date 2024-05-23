@@ -186,7 +186,7 @@ public class CollectdReporter extends ScheduledReporter {
                              String username, String password,
                              SecurityLevel securityLevel, Sanitize sanitize) {
         super(registry, REPORTER_NAME, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
-                disabledMetricAttributes);
+                disabledMetricAttributes, null);
         this.hostName = (hostname != null) ? hostname : resolveHostName();
         this.sender = sender;
         this.clock = clock;

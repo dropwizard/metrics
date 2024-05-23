@@ -211,7 +211,7 @@ public class ConsoleReporter extends ScheduledReporter {
                             ScheduledExecutorService executor,
                             boolean shutdownExecutorOnStop,
                             Set<MetricAttribute> disabledMetricAttributes) {
-        super(registry, "console-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, disabledMetricAttributes);
+        super(registry, "console-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, disabledMetricAttributes, null);
         this.output = output;
         this.locale = locale;
         this.clock = clock;
