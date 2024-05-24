@@ -352,7 +352,7 @@ public class GraphiteReporter extends ScheduledReporter {
                                boolean addMetricAttributesAsTags,
                                DoubleFunction<String> floatingPointFormatter) {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
-                disabledMetricAttributes);
+                disabledMetricAttributes, SchedulingLogic.FIXED_DELAY);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;

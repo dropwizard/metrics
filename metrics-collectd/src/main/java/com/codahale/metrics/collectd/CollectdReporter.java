@@ -9,6 +9,7 @@ import com.codahale.metrics.MetricAttribute;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ScheduledReporter;
+import com.codahale.metrics.SchedulingLogic;
 import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
 import org.slf4j.Logger;
@@ -186,7 +187,7 @@ public class CollectdReporter extends ScheduledReporter {
                              String username, String password,
                              SecurityLevel securityLevel, Sanitize sanitize) {
         super(registry, REPORTER_NAME, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
-                disabledMetricAttributes);
+                disabledMetricAttributes, SchedulingLogic.FIXED_DELAY);
         this.hostName = (hostname != null) ? hostname : resolveHostName();
         this.sender = sender;
         this.clock = clock;
