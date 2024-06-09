@@ -3,7 +3,7 @@
     <parent>
         <groupId>io.dropwizard.metrics5</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>5.0.0-rc21</version>
+        <version>5.0.0-rc22-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-legacy-adapter-healthchecks</artifactId>
