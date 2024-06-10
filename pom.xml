@@ -71,7 +71,7 @@
         <errorprone.version>2.28.0</errorprone.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
         <servlet6.version>6.0.0</servlet6.version>
-        <awaitility.version>4.2.0</awaitility.version>
+        <awaitility.version>4.2.1</awaitility.version>
 
         <sonar.projectKey>dropwizard_metrics</sonar.projectKey>
         <sonar.organization>dropwizard</sonar.organization>
