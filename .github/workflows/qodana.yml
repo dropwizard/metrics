@@ -17,13 +17,13 @@ jobs:
       checks: "write"
       security-events: "write"
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
         with:
           fetch-depth: 0
       - name: 'Qodana Scan'
-        uses: JetBrains/qodana-action@a040a784cc28cb9cabdf884c4e8c32d0aa3fcdb3 # v2023.3.2
+        uses: JetBrains/qodana-action@32840fdb87f8dd110e0a6b09323c7142b667b25d # v2024.1.5
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
-      - uses: github/codeql-action/upload-sarif@c7f9125735019aa87cfc361530512d50ea439c71 # v3
+      - uses: github/codeql-action/upload-sarif@530d4feaa9c62aaab2d250371e2061eb7a172363 # v3
         with:
           sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json

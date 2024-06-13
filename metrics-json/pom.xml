@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.2.26-SNAPSHOT</version>
+        <version>4.2.27-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-json</artifactId>
@@ -18,7 +18,7 @@
     <properties>
         <javaModuleName>com.codahale.metrics.json</javaModuleName>
         <jackson.version>2.12.7</jackson.version>
-        <jackson-databind.version>2.12.7.1</jackson-databind.version>
+        <jackson-databind.version>2.12.7.2</jackson-databind.version>
     </properties>
 
     <dependencyManagement>

@@ -127,15 +127,10 @@ public class InstrumentedQueuedThreadPool extends QueuedThreadPool {
         metricRegistry.register(name(prefix, NAME_UTILIZATION), new RatioGauge() {
             @Override
             protected Ratio getRatio() {
-                return Ratio.of(getThreads() - getIdleThreads(), getThreads());
+                return  Ratio.of(getUtilizedThreads(), getThreads() - getLeasedThreads());
             }
         });
-        metricRegistry.register(name(prefix, NAME_UTILIZATION_MAX), new RatioGauge() {
-            @Override
-            protected Ratio getRatio() {
-                return Ratio.of(getThreads() - getIdleThreads(), getMaxThreads());
-            }
-        });
+        metricRegistry.registerGauge(name(prefix, NAME_UTILIZATION_MAX), this::getUtilizationRate);
         metricRegistry.registerGauge(name(prefix, NAME_SIZE), this::getThreads);
         // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
         // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.

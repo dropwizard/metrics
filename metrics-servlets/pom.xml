@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.2.26-SNAPSHOT</version>
+        <version>4.2.27-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-servlets</artifactId>
@@ -20,7 +20,7 @@
         <javaModuleName>com.codahale.metrics.servlets</javaModuleName>
         <papertrail.profiler.version>1.1.1</papertrail.profiler.version>
         <servlet.version>4.0.1</servlet.version>
-        <jackson.version>2.12.7.1</jackson.version>
+        <jackson.version>2.12.7.2</jackson.version>
     </properties>
 
     <dependencyManagement>

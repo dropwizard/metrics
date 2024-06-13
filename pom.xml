@@ -4,7 +4,7 @@
 
     <groupId>io.dropwizard.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>4.2.26-SNAPSHOT</version>
+    <version>4.2.27-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
@@ -53,24 +53,25 @@
     </modules>
 
     <properties>
-        <project.build.outputTimestamp>2024-01-24T22:52:21Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2024-06-09T22:21:39Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <jetty9.version>9.4.54.v20240208</jetty9.version>
-        <jetty10.version>10.0.20</jetty10.version>
-        <jetty11.version>11.0.20</jetty11.version>
-        <jetty12.version>12.0.8</jetty12.version>
+        <jetty10.version>10.0.21</jetty10.version>
+        <jetty11.version>11.0.21</jetty11.version>
+        <jetty12.version>12.0.10</jetty12.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <assertj.version>3.25.3</assertj.version>
-        <byte-buddy.version>1.14.13</byte-buddy.version>
-        <mockito.version>5.11.0</mockito.version>
+        <assertj.version>3.26.0</assertj.version>
+        <byte-buddy.version>1.14.17</byte-buddy.version>
+        <mockito.version>5.12.0</mockito.version>
         <junit.version>4.13.1</junit.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-        <errorprone.version>2.26.1</errorprone.version>
+        <errorprone.version>2.28.0</errorprone.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
         <servlet6.version>6.0.0</servlet6.version>
+        <awaitility.version>4.2.1</awaitility.version>
 
         <sonar.projectKey>dropwizard_metrics</sonar.projectKey>
         <sonar.organization>dropwizard</sonar.organization>
@@ -256,7 +257,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.13</version>
+                        <version>1.7.0</version>
                         <configuration>
                             <serverId>ossrh</serverId>
                             <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
@@ -301,12 +302,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.6.3</version>
+                    <version>3.7.0</version>
                     <configuration>
                         <source>8</source>
                         <doclint>none</doclint>
@@ -370,7 +371,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <id>enforce</id>
@@ -388,7 +389,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>3.7.0</version>
                 <executions>
                     <execution>
                         <id>analyze</id>
@@ -434,7 +435,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
