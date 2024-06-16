@@ -220,10 +220,13 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
             executor.shutdown(); // Disable new tasks from being submitted
         }
 
-        try {
-            report(); // Report metrics one last time
-        } catch (Exception e) {
-            LOG.warn("Final reporting of metrics failed.", e);
+        if (this.scheduledFuture != null) {
+            // Reporter started, try to report metrics one last time
+            try {
+                report();
+            } catch (Exception e) {
+                LOG.warn("Final reporting of metrics failed.", e);
+            }
         }
 
         if (shutdownExecutorOnStop) {
