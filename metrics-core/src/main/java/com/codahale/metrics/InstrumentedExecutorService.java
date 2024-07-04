@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -28,6 +29,7 @@ public class InstrumentedExecutorService implements ExecutorService {
     private final Meter submitted;
     private final Counter running;
     private final Meter completed;
+    private final Counter rejected;
     private final Timer idle;
     private final Timer duration;
 
@@ -53,6 +55,7 @@ public class InstrumentedExecutorService implements ExecutorService {
         this.submitted = registry.meter(MetricRegistry.name(name, "submitted"));
         this.running = registry.counter(MetricRegistry.name(name, "running"));
         this.completed = registry.meter(MetricRegistry.name(name, "completed"));
+        this.rejected = registry.counter(MetricRegistry.name(name, "rejected"));
         this.idle = registry.timer(MetricRegistry.name(name, "idle"));
         this.duration = registry.timer(MetricRegistry.name(name, "duration"));
 
@@ -73,6 +76,8 @@ public class InstrumentedExecutorService implements ExecutorService {
                     queue::size);
             registry.registerGauge(MetricRegistry.name(name, "tasks.capacity"),
                     queue::remainingCapacity);
+            RejectedExecutionHandler delegateHandler = executor.getRejectedExecutionHandler();
+            executor.setRejectedExecutionHandler(new InstrumentedRejectedExecutionHandler(delegateHandler));
         } else if (delegate instanceof ForkJoinPool) {
             ForkJoinPool forkJoinPool = (ForkJoinPool) delegate;
             registry.registerGauge(MetricRegistry.name(name, "tasks.stolen"),
@@ -193,6 +198,20 @@ public class InstrumentedExecutorService implements ExecutorService {
     @Override
     public boolean awaitTermination(long l, TimeUnit timeUnit) throws InterruptedException {
         return delegate.awaitTermination(l, timeUnit);
+    }
+
+    private class InstrumentedRejectedExecutionHandler implements RejectedExecutionHandler {
+        private final RejectedExecutionHandler delegateHandler;
+
+        public InstrumentedRejectedExecutionHandler(RejectedExecutionHandler delegateHandler) {
+            this.delegateHandler = delegateHandler;
+        }
+
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            rejected.inc();
+            this.delegateHandler.rejectedExecution(r, executor);
+        }
     }
 
     private class InstrumentedRunnable implements Runnable {
