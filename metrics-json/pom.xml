@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.json</javaModuleName>
-        <jackson.version>2.12.7</jackson.version>
+        <jackson.version>2.17.2</jackson.version>
         <jackson-databind.version>2.12.7.2</jackson-databind.version>
     </properties>
 
