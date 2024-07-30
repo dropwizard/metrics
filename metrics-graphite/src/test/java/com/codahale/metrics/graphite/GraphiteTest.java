@@ -6,7 +6,7 @@ import org.junit.Test;
 import javax.net.SocketFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
+import java.net.SocketAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -15,9 +15,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import org.mockito.ArgumentCaptor;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -42,6 +45,7 @@ public class GraphiteTest {
 
         when(socket.isClosed()).thenAnswer(invocation -> closed.get());
 
+        doNothing().when(socket).connect(any(SocketAddress.class), anyInt());
         doAnswer(invocation -> {
             connected.set(false);
             closed.set(true);
@@ -57,7 +61,7 @@ public class GraphiteTest {
             return null;
         }).when(output).close();
 
-        when(socketFactory.createSocket(any(InetAddress.class), anyInt())).thenReturn(socket);
+        when(socketFactory.createSocket()).thenReturn(socket);
     }
 
     @Test
@@ -65,15 +69,24 @@ public class GraphiteTest {
         try (Graphite graphite = new Graphite(address, socketFactory)) {
             graphite.connect();
         }
-        verify(socketFactory).createSocket(address.getAddress(), address.getPort());
+        verify(socketFactory).createSocket();
+        verify(socket).connect(eq(address), anyInt());
     }
 
     @Test
     public void connectsToGraphiteWithHostAndPort() throws Exception {
+        ArgumentCaptor <InetSocketAddress> addressCaptor = ArgumentCaptor.forClass(InetSocketAddress.class);
+        doNothing().when(socket).connect(addressCaptor.capture(), anyInt());
+
         try (Graphite graphite = new Graphite(host, port, socketFactory)) {
             graphite.connect();
         }
-        verify(socketFactory).createSocket(address.getAddress(), port);
+        verify(socketFactory).createSocket();
+        verify(socket).connect(any(InetSocketAddress.class), anyInt());
+        
+        assertThat(addressCaptor.getValue().getHostString()).isEqualTo(host);
+        assertThat(addressCaptor.getValue().getPort()).isEqualTo(port);
+
     }
 
     @Test

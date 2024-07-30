@@ -22,11 +22,16 @@ import static java.util.Objects.requireNonNull;
 public class Graphite implements GraphiteSender {
     // this may be optimistic about Carbon/Graphite
 
+    private static final Integer DEFAULT_CONNECTION_TIMEOUT_MS = 500;
+    private static final Integer DEFAULT_SOCKET_TIMEOUT_MS = 5000;
+
     private final String hostname;
     private final int port;
     private final InetSocketAddress address;
     private final SocketFactory socketFactory;
     private final Charset charset;
+    private final int connectionTimeoutMs;
+    private final int socketTimeoutMs;
 
     private Socket socket;
     private Writer writer;
@@ -50,7 +55,7 @@ public class Graphite implements GraphiteSender {
      *
      * @param hostname      The hostname of the Carbon server
      * @param port          The port of the Carbon server
-     * @param socketFactory the socket factory
+     * @param socketFactory The socket factory
      */
     public Graphite(String hostname, int port, SocketFactory socketFactory) {
         this(hostname, port, socketFactory, UTF_8);
@@ -62,10 +67,31 @@ public class Graphite implements GraphiteSender {
      *
      * @param hostname      The hostname of the Carbon server
      * @param port          The port of the Carbon server
-     * @param socketFactory the socket factory
-     * @param charset       the character set used by the server
+     * @param socketFactory The socket factory
+     * @param charset       The character set used by the server
      */
     public Graphite(String hostname, int port, SocketFactory socketFactory, Charset charset) {
+        this(hostname, port, socketFactory, charset, DEFAULT_CONNECTION_TIMEOUT_MS, DEFAULT_SOCKET_TIMEOUT_MS);
+    }
+
+    /**
+     * Creates a new client which connects to the given address and socket factory using the given
+     * character set and timeout.
+     *
+     * @param hostname            The hostname of the Carbon server
+     * @param port                The port of the Carbon server
+     * @param socketFactory       The socket factory
+     * @param charset             The character set used by the server
+     * @param connectionTimeoutMs Timeout in milliseconds for connecting to the server
+     * @param socketTimeoutMs     Timeout in milliseconds for writing to the server
+     */
+    public Graphite(
+        String hostname,
+        int port,
+        SocketFactory socketFactory,
+        Charset charset,
+        int connectionTimeoutMs,
+        int socketTimeoutMs) {
         if (hostname == null || hostname.isEmpty()) {
             throw new IllegalArgumentException("hostname must not be null or empty");
         }
@@ -79,6 +105,8 @@ public class Graphite implements GraphiteSender {
         this.address = null;
         this.socketFactory = requireNonNull(socketFactory, "socketFactory must not be null");
         this.charset = requireNonNull(charset, "charset must not be null");
+        this.connectionTimeoutMs = connectionTimeoutMs;
+        this.socketTimeoutMs = socketTimeoutMs;
     }
 
     /**
@@ -94,8 +122,8 @@ public class Graphite implements GraphiteSender {
     /**
      * Creates a new client which connects to the given address and socket factory.
      *
-     * @param address       the address of the Carbon server
-     * @param socketFactory the socket factory
+     * @param address       The address of the Carbon server
+     * @param socketFactory The socket factory
      */
     public Graphite(InetSocketAddress address, SocketFactory socketFactory) {
         this(address, socketFactory, UTF_8);
@@ -105,16 +133,37 @@ public class Graphite implements GraphiteSender {
      * Creates a new client which connects to the given address and socket factory using the given
      * character set.
      *
-     * @param address       the address of the Carbon server
-     * @param socketFactory the socket factory
-     * @param charset       the character set used by the server
+     * @param address       The address of the Carbon server
+     * @param socketFactory The socket factory
+     * @param charset       The character set used by the server
      */
     public Graphite(InetSocketAddress address, SocketFactory socketFactory, Charset charset) {
+        this(address, socketFactory, charset, DEFAULT_CONNECTION_TIMEOUT_MS, DEFAULT_SOCKET_TIMEOUT_MS);
+    }
+
+    /**
+     * Creates a new client which connects to the given address and socket factory using the given
+     * character set.
+     *
+     * @param address             The address of the Carbon server
+     * @param socketFactory       The socket factory
+     * @param charset             The character set used by the server
+     * @param connectionTimeoutMs Timeout in milliseconds for connecting to the server
+     * @param socketTimeoutMs     Timeout in milliseconds for writing to the server
+     */
+    public Graphite(
+        InetSocketAddress address,
+        SocketFactory socketFactory,
+        Charset charset,
+        int connectionTimeoutMs,
+        int socketTimeoutMs) {
         this.hostname = null;
         this.port = -1;
         this.address = requireNonNull(address, "address must not be null");
         this.socketFactory = requireNonNull(socketFactory, "socketFactory must not be null");
         this.charset = requireNonNull(charset, "charset must not be null");
+        this.connectionTimeoutMs = connectionTimeoutMs;
+        this.socketTimeoutMs = socketTimeoutMs;
     }
 
     @Override
@@ -135,7 +184,9 @@ public class Graphite implements GraphiteSender {
             throw new UnknownHostException(address.getHostName());
         }
 
-        this.socket = socketFactory.createSocket(address.getAddress(), address.getPort());
+        this.socket = socketFactory.createSocket();
+        this.socket.connect(address, connectionTimeoutMs);
+        this.socket.setSoTimeout(socketTimeoutMs);
         this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), charset));
     }
 
