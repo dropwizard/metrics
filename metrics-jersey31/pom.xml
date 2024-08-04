@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics5.jersey31</javaModuleName>
-        <jersey31.version>3.1.7</jersey31.version>
+        <jersey31.version>3.1.8</jersey31.version>
     </properties>
 
     <dependencyManagement>
