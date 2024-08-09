@@ -21,7 +21,7 @@
 
         <maven.compiler.release>17</maven.compiler.release>
 
-        <slf4j.version>2.0.14</slf4j.version>
+        <slf4j.version>2.0.15</slf4j.version>
     </properties>
 
     <dependencyManagement>
