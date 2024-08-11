@@ -68,7 +68,7 @@
         <junit.version>4.13.1</junit.version>
         <commons-lang3.version>3.16.0</commons-lang3.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-        <errorprone.version>2.29.2</errorprone.version>
+        <errorprone.version>2.30.0</errorprone.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
         <servlet6.version>6.0.0</servlet6.version>
         <awaitility.version>4.2.2</awaitility.version>
