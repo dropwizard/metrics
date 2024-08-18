@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.logback</javaModuleName>
-        <logback.version>1.2.13</logback.version>
+        <logback.version>1.5.7</logback.version>
     </properties>
 
     <dependencyManagement>
