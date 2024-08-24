@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.jersey3</javaModuleName>
-        <jersey30.version>3.0.14</jersey30.version>
+        <jersey30.version>3.0.15</jersey30.version>
     </properties>
 
     <dependencyManagement>
