@@ -21,7 +21,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: 'Qodana Scan'
-        uses: JetBrains/qodana-action@c5a69b02e6c1adb092153f7a479169a4b9f3a1cf # v2024.1.9
+        uses: JetBrains/qodana-action@b2d538780ce5314539ba79e3f9649ffbcc77b9af # v2024.1.11
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
       - uses: github/codeql-action/upload-sarif@8214744c546c1e5c8f03dde8fab3a7353211988d # v3
