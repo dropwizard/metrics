@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.2.27-SNAPSHOT</version>
+        <version>4.2.28-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-log4j2</artifactId>
@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.log4j2</javaModuleName>
-        <log4j2.version>2.23.1</log4j2.version>
+        <log4j2.version>2.24.0</log4j2.version>
     </properties>
 
     <build>
