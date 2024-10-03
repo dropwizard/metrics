@@ -10,7 +10,6 @@ import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
@@ -194,10 +193,22 @@ public class InstrumentedExecutorServiceTest {
         latch.countDown();
         assertThat(rejected.getCount()).isEqualTo(1);
     }
+  
+    public void removesMetricsAfterShutdownForThreadPoolExecutor() {
+        executor = new ThreadPoolExecutor(4, 16,
+                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(32));
+        instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "stp");
+
+        assertThat(registry.getMetrics()).containsKeys("stp.pool.size", "stp.pool.core", "stp.pool.max", "stp.tasks.active", "stp.tasks.completed", "stp.tasks.queued", "stp.tasks.capacity");
+
+        instrumentedExecutorService.shutdown();
+
+        assertThat(registry.getMetrics()).doesNotContainKeys("stp.pool.size", "stp.pool.core", "stp.pool.max", "stp.tasks.active", "stp.tasks.completed", "stp.tasks.queued", "stp.tasks.capacity");
+    }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void reportsTasksInformationForForkJoinPool() throws Exception {
+    public void reportsTasksInformationForForkJoinPool() {
         executor = Executors.newWorkStealingPool(4);
         instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "fjp");
         submitted = registry.meter("fjp.submitted");
@@ -242,5 +253,17 @@ public class InstrumentedExecutorServiceTest {
         assertThat(duration.getSnapshot().size()).isEqualTo(1);
         assertThat(idle.getCount()).isEqualTo(1);
         assertThat(idle.getSnapshot().size()).isEqualTo(1);
+    }
+
+    @Test
+    public void removesMetricsAfterShutdownForForkJoinPool() {
+        executor = Executors.newWorkStealingPool(4);
+        instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "sfjp");
+
+        assertThat(registry.getMetrics()).containsKeys("sfjp.tasks.stolen", "sfjp.tasks.queued", "sfjp.threads.active", "sfjp.threads.running");
+
+        instrumentedExecutorService.shutdown();
+
+        assertThat(registry.getMetrics()).doesNotContainKeys("sfjp.tasks.stolen", "sfjp.tasks.queued", "sfjp.threads.active", "sfjp.threads.running");
     }
 }
