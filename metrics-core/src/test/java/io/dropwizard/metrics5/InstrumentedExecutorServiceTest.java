@@ -10,7 +10,6 @@ import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -168,6 +167,36 @@ class InstrumentedExecutorServiceTest {
     }
 
     @Test
+    public void removesMetricsAfterShutdownForThreadPoolExecutor() {
+        executor = new ThreadPoolExecutor(4, 16,
+                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(32));
+        instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "stp");
+
+        MetricName prefix = MetricName.build("stp");
+        assertThat(registry.getMetrics()).containsKeys(
+                MetricRegistry.name("stp", "pool.size"),
+                MetricRegistry.name("stp", "pool.core"),
+                MetricRegistry.name("stp", "pool.max"),
+                MetricRegistry.name("stp", "tasks.active"),
+                MetricRegistry.name("stp", "tasks.completed"),
+                MetricRegistry.name("stp", "tasks.queued"),
+                MetricRegistry.name("stp", "tasks.capacity")
+        );
+
+        instrumentedExecutorService.shutdown();
+
+        assertThat(registry.getMetrics()).doesNotContainKeys(
+                MetricRegistry.name("stp", "pool.size"),
+                MetricRegistry.name("stp", "pool.core"),
+                MetricRegistry.name("stp", "pool.max"),
+                MetricRegistry.name("stp", "tasks.active"),
+                MetricRegistry.name("stp", "tasks.completed"),
+                MetricRegistry.name("stp", "tasks.queued"),
+                MetricRegistry.name("stp", "tasks.capacity")
+        );
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     void reportsTasksInformationForForkJoinPool() throws Exception {
         executor = Executors.newWorkStealingPool(4);
@@ -214,5 +243,27 @@ class InstrumentedExecutorServiceTest {
         assertThat(duration.getSnapshot().size()).isEqualTo(1);
         assertThat(idle.getCount()).isEqualTo(1);
         assertThat(idle.getSnapshot().size()).isEqualTo(1);
+    }
+
+    @Test
+    public void removesMetricsAfterShutdownForForkJoinPool() {
+        executor = Executors.newWorkStealingPool(4);
+        instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "sfjp");
+
+        assertThat(registry.getMetrics()).containsKeys(
+                MetricRegistry.name("sfjp", "tasks.stolen"),
+                MetricRegistry.name("sfjp", "tasks.queued"),
+                MetricRegistry.name("sfjp", "threads.active"),
+                MetricRegistry.name("sfjp", "threads.running")
+        );
+
+        instrumentedExecutorService.shutdown();
+
+        assertThat(registry.getMetrics()).doesNotContainKeys(
+                MetricRegistry.name("sfjp", "tasks.stolen"),
+                MetricRegistry.name("sfjp", "tasks.queued"),
+                MetricRegistry.name("sfjp", "threads.active"),
+                MetricRegistry.name("sfjp", "threads.running")
+        );
     }
 }
