@@ -8,14 +8,17 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class InstrumentedExecutorServiceTest {
 
@@ -164,6 +167,32 @@ public class InstrumentedExecutorServiceTest {
         assertThat(idle.getCount()).isEqualTo(1);
         assertThat(idle.getSnapshot().size()).isEqualTo(1);
         assertThat(poolSize.getValue()).isEqualTo(1);
+    }
+
+    @Test
+    public void reportsRejectedTasksForThreadPoolExecutor() throws Exception {
+        executor = new ThreadPoolExecutor(1, 1,
+                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(1));
+        instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "tp");
+        final Counter rejected = registry.counter("tp.rejected");
+        assertThat(rejected.getCount()).isEqualTo(0);
+
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        Runnable runnable = () -> {
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        Future<?> executingFuture = instrumentedExecutorService.submit(runnable);
+        Future<?> queuedFuture = instrumentedExecutorService.submit(runnable);
+        assertThatThrownBy(() -> instrumentedExecutorService.submit(runnable))
+                .isInstanceOf(RejectedExecutionException.class);
+        latch.countDown();
+        assertThat(rejected.getCount()).isEqualTo(1);
     }
 
     @Test
