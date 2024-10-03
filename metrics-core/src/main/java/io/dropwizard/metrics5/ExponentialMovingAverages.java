@@ -12,7 +12,27 @@ import java.util.concurrent.atomic.LongAdder;
  */
 public class ExponentialMovingAverages implements MovingAverages {
 
+    /**
+     * If ticking would reduce even Long.MAX_VALUE in the 15 minute EWMA below this target then don't bother
+     * ticking in a loop and instead reset all the EWMAs.
+     */
+    private static final double maxTickZeroTarget = 0.0001;
+    private static final int maxTicks;
     private static final long TICK_INTERVAL = TimeUnit.SECONDS.toNanos(5);
+
+    static
+    {
+        int m3Ticks = 1;
+        final EWMA m3 = EWMA.fifteenMinuteEWMA();
+        m3.update(Long.MAX_VALUE);
+        do
+        {
+            m3.tick();
+            m3Ticks++;
+        }
+        while (m3.getRate(TimeUnit.SECONDS) > maxTickZeroTarget);
+        maxTicks = m3Ticks;
+    }
 
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
     private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
@@ -54,10 +74,19 @@ public class ExponentialMovingAverages implements MovingAverages {
             if (lastTick.compareAndSet(oldTick, newIntervalStartTick)) {
                 sum.add(age);
                 final long requiredTicks = age / TICK_INTERVAL;
-                for (long i = 0; i < requiredTicks; i++) {
-                    m1Rate.tick();
-                    m5Rate.tick();
-                    m15Rate.tick();
+                if (requiredTicks >= maxTicks) {
+                    m1Rate.reset();
+                    m5Rate.reset();
+                    m15Rate.reset();
+                }
+                else
+                {
+                    for (long i = 0; i < requiredTicks; i++)
+                    {
+                        m1Rate.tick();
+                        m5Rate.tick();
+                        m15Rate.tick();
+                    }
                 }
             }
         }
