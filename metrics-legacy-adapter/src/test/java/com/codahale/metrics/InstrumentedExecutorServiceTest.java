@@ -29,6 +29,6 @@ class InstrumentedExecutorServiceTest {
 
         assertThat(registry.getMetrics()).containsOnlyKeys("test-instrumented.completed",
                 "test-instrumented.submitted", "test-instrumented.duration", "test-instrumented.idle",
-                "test-instrumented.running");
+                "test-instrumented.running", "test-instrumented.rejected");
     }
 }
