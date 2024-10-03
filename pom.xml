@@ -70,7 +70,7 @@
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <errorprone.version>2.31.0</errorprone.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
-        <servlet6.version>6.0.0</servlet6.version>
+        <servlet6.version>6.1.0</servlet6.version>
         <awaitility.version>4.2.2</awaitility.version>
 
         <sonar.projectKey>dropwizard_metrics</sonar.projectKey>

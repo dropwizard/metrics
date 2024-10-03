@@ -17,7 +17,7 @@
 
     <properties>
         <javaModuleName>io.dropwizard.metrics.servlet</javaModuleName>
-        <servlet6.version>6.0.0</servlet6.version>
+        <servlet6.version>6.1.0</servlet6.version>
     </properties>
 
     <dependencyManagement>
