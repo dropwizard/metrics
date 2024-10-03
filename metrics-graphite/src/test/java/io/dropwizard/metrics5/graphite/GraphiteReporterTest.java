@@ -458,6 +458,7 @@ class GraphiteReporterTest {
 
     @Test
     void closesConnectionOnReporterStop() throws Exception {
+        reporter.start(1, TimeUnit.SECONDS);
         reporter.stop();
 
         final InOrder inOrder = inOrder(graphite);
