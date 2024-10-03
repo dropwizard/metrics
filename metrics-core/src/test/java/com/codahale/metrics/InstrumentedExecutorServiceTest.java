@@ -194,7 +194,8 @@ public class InstrumentedExecutorServiceTest {
         latch.countDown();
         assertThat(rejected.getCount()).isEqualTo(1);
     }
-  
+
+    @Test
     public void removesMetricsAfterShutdownForThreadPoolExecutor() {
         executor = new ThreadPoolExecutor(4, 16,
                 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(32));
