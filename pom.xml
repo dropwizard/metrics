@@ -63,7 +63,7 @@
         <jetty12.version>12.0.14</jetty12.version>
         <slf4j.version>1.7.36</slf4j.version>
         <assertj.version>3.26.3</assertj.version>
-        <byte-buddy.version>1.15.4</byte-buddy.version>
+        <byte-buddy.version>1.15.5</byte-buddy.version>
         <mockito.version>5.14.2</mockito.version>
         <junit.version>4.13.1</junit.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
