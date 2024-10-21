@@ -67,6 +67,8 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
     private final long rateFactor;
     private final String rateUnit;
 
+    private final GetScheduledFuture getScheduledFuture;
+
     /**
      * Creates a new {@link ScheduledReporter} instance.
      *
@@ -120,7 +122,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 TimeUnit durationUnit,
                                 ScheduledExecutorService executor,
                                 boolean shutdownExecutorOnStop) {
-        this(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, Collections.emptySet());
+        this(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, Collections.emptySet(), null);
     }
 
     protected ScheduledReporter(MetricRegistry registry,
@@ -130,7 +132,8 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 TimeUnit durationUnit,
                                 ScheduledExecutorService executor,
                                 boolean shutdownExecutorOnStop,
-                                Set<MetricAttribute> disabledMetricAttributes) {
+                                Set<MetricAttribute> disabledMetricAttributes,
+                                GetScheduledFuture getScheduledFuture) {
 
         if (registry == null) {
             throw new NullPointerException("registry == null");
@@ -146,6 +149,8 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
         this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
         this.disabledMetricAttributes = disabledMetricAttributes != null ? disabledMetricAttributes :
                 Collections.emptySet();
+        this.getScheduledFuture = getScheduledFuture == null ? this::getScheduledFuture : getScheduledFuture;
+
     }
 
     /**
@@ -167,20 +172,10 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
             throw new IllegalArgumentException("Reporter already started");
         }
 
-        this.scheduledFuture = getScheduledFuture(initialDelay, period, unit, runnable);
+        this.scheduledFuture = this.getScheduledFuture.schedule(initialDelay, period, unit, runnable, this.executor);
     }
 
 
-    /**
-     * Schedule the task, and return a future.
-     *
-     * @deprecated Use {@link #getScheduledFuture(long, long, TimeUnit, Runnable, ScheduledExecutorService)} instead.
-     */
-    @SuppressWarnings("DeprecatedIsStillUsed")
-    @Deprecated
-    protected ScheduledFuture<?> getScheduledFuture(long initialDelay, long period, TimeUnit unit, Runnable runnable) {
-        return getScheduledFuture(initialDelay, period, unit, runnable, this.executor);
-    }
 
     /**
      * Schedule the task, and return a future.
