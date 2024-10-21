@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
@@ -46,6 +47,7 @@ public class ScheduledReporterTest {
     private final ScheduledReporter reporterWithCustomMockExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, mockExecutor);
     private final ScheduledReporter reporterWithCustomExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, customExecutor);
     private final DummyReporter reporterWithExternallyManagedExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, externalExecutor, false);
+    private final ScheduledReporter reporterWithFixedRate = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, mockExecutor, false, null, SchedulingLogic.FIXED_RATE);
     private final ScheduledReporter[] reporters = new ScheduledReporter[] {reporter, reporterWithCustomExecutor, reporterWithExternallyManagedExecutor};
 
     @Before
@@ -117,6 +119,15 @@ public class ScheduledReporterTest {
 
         verify(mockExecutor).scheduleWithFixedDelay(
             any(Runnable.class), eq(350L), eq(100L), eq(TimeUnit.MILLISECONDS)
+        );
+    }
+
+    @Test
+    public void shouldUseFixedRateWhenSpecified() throws Exception {
+        reporterWithFixedRate.start(200, TimeUnit.MILLISECONDS);
+
+        verify(mockExecutor).scheduleAtFixedRate(
+                any(Runnable.class), eq(200L), eq(200L), eq(TimeUnit.MILLISECONDS)
         );
     }
 
@@ -272,6 +283,10 @@ public class ScheduledReporterTest {
 
         DummyReporter(MetricRegistry registry, String name, MetricFilter filter, TimeUnit rateUnit, TimeUnit durationUnit, ScheduledExecutorService executor, boolean shutdownExecutorOnStop) {
             super(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop);
+        }
+
+        DummyReporter(MetricRegistry registry, String name, MetricFilter filter, TimeUnit rateUnit, TimeUnit durationUnit, ScheduledExecutorService executor, boolean shutdownExecutorOnStop, Set<MetricAttribute> disabledMetricAttributes, SchedulingLogic schedulingLogic) {
+            super(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, disabledMetricAttributes, schedulingLogic);
         }
 
         @Override

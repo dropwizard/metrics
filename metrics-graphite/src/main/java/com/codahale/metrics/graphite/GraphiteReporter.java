@@ -10,6 +10,7 @@ import com.codahale.metrics.MetricAttribute;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ScheduledReporter;
+import com.codahale.metrics.SchedulingLogic;
 import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
 import org.slf4j.Logger;
@@ -75,6 +76,8 @@ public class GraphiteReporter extends ScheduledReporter {
         private boolean addMetricAttributesAsTags;
         private DoubleFunction<String> floatingPointFormatter;
 
+        private SchedulingLogic schedulingLogic;
+
         private Builder(MetricRegistry registry) {
             this.registry = registry;
             this.clock = Clock.defaultClock();
@@ -87,6 +90,7 @@ public class GraphiteReporter extends ScheduledReporter {
             this.disabledMetricAttributes = Collections.emptySet();
             this.addMetricAttributesAsTags = false;
             this.floatingPointFormatter = DEFAULT_FP_FORMATTER;
+            this.schedulingLogic = SchedulingLogic.FIXED_DELAY;
         }
 
         /**
@@ -212,6 +216,18 @@ public class GraphiteReporter extends ScheduledReporter {
         }
 
         /**
+         * Use custom scheduling logic.
+         * By default, logic is Fixed Delay
+         *
+         * @param schedulingLogic a scheduling logic
+         * @return {@code this}
+         */
+        public Builder withSchedulingLogic(SchedulingLogic schedulingLogic) {
+            this.schedulingLogic = schedulingLogic;
+            return this;
+        }
+
+        /**
          * Builds a {@link GraphiteReporter} with the given properties, sending metrics using the
          * given {@link GraphiteSender}.
          * <p>
@@ -243,7 +259,8 @@ public class GraphiteReporter extends ScheduledReporter {
                     shutdownExecutorOnStop,
                     disabledMetricAttributes,
                     addMetricAttributesAsTags,
-                    floatingPointFormatter);
+                    floatingPointFormatter,
+                    schedulingLogic);
         }
     }
 
@@ -318,7 +335,7 @@ public class GraphiteReporter extends ScheduledReporter {
                                Set<MetricAttribute> disabledMetricAttributes,
                                boolean addMetricAttributesAsTags) {
         this(registry, graphite, clock, prefix, rateUnit, durationUnit, filter, executor, shutdownExecutorOnStop,
-                disabledMetricAttributes, addMetricAttributesAsTags, DEFAULT_FP_FORMATTER);
+                disabledMetricAttributes, addMetricAttributesAsTags, DEFAULT_FP_FORMATTER, SchedulingLogic.FIXED_DELAY);
     }
 
     /**
@@ -338,6 +355,7 @@ public class GraphiteReporter extends ScheduledReporter {
      * @param disabledMetricAttributes  do not report specific metric attributes
      * @param addMetricAttributesAsTags if true, then add metric attributes as tags instead of suffixes
      * @param floatingPointFormatter    custom floating point formatter
+     * @param schedulingLogic           the scheduling logic for the report of metrics, default at fixed delay
      */
     protected GraphiteReporter(MetricRegistry registry,
                                GraphiteSender graphite,
@@ -350,9 +368,10 @@ public class GraphiteReporter extends ScheduledReporter {
                                boolean shutdownExecutorOnStop,
                                Set<MetricAttribute> disabledMetricAttributes,
                                boolean addMetricAttributesAsTags,
-                               DoubleFunction<String> floatingPointFormatter) {
+                               DoubleFunction<String> floatingPointFormatter,
+                               SchedulingLogic schedulingLogic) {
         super(registry, "graphite-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
-                disabledMetricAttributes);
+                disabledMetricAttributes, schedulingLogic);
         this.graphite = graphite;
         this.clock = clock;
         this.prefix = prefix;

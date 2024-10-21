@@ -66,6 +66,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
     private final String durationUnit;
     private final long rateFactor;
     private final String rateUnit;
+    private final SchedulingLogic schedulingLogic;
 
     /**
      * Creates a new {@link ScheduledReporter} instance.
@@ -120,7 +121,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 TimeUnit durationUnit,
                                 ScheduledExecutorService executor,
                                 boolean shutdownExecutorOnStop) {
-        this(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, Collections.emptySet());
+        this(registry, name, filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop, Collections.emptySet(), SchedulingLogic.FIXED_DELAY);
     }
 
     protected ScheduledReporter(MetricRegistry registry,
@@ -130,7 +131,8 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
                                 TimeUnit durationUnit,
                                 ScheduledExecutorService executor,
                                 boolean shutdownExecutorOnStop,
-                                Set<MetricAttribute> disabledMetricAttributes) {
+                                Set<MetricAttribute> disabledMetricAttributes,
+                                SchedulingLogic schedulingLogic) {
 
         if (registry == null) {
             throw new NullPointerException("registry == null");
@@ -146,6 +148,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
         this.durationUnit = durationUnit.toString().toLowerCase(Locale.US);
         this.disabledMetricAttributes = disabledMetricAttributes != null ? disabledMetricAttributes :
                 Collections.emptySet();
+        this.schedulingLogic = schedulingLogic;
     }
 
     /**
@@ -190,6 +193,10 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      * Overriding this in a subclass to revert to the old behavior is permitted.
      */
     protected ScheduledFuture<?> getScheduledFuture(long initialDelay, long period, TimeUnit unit, Runnable runnable, ScheduledExecutorService executor) {
+        if (this.schedulingLogic == SchedulingLogic.FIXED_DELAY)
+            return executor.scheduleWithFixedDelay(runnable, initialDelay, period, unit);
+        else if (this.schedulingLogic == SchedulingLogic.FIXED_RATE)
+            return executor.scheduleAtFixedRate(runnable, initialDelay, period, unit);
         return executor.scheduleWithFixedDelay(runnable, initialDelay, period, unit);
     }
 

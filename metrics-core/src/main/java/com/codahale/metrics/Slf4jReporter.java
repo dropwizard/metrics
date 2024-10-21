@@ -239,7 +239,7 @@ public class Slf4jReporter extends ScheduledReporter {
                           boolean shutdownExecutorOnStop,
                           Set<MetricAttribute> disabledMetricAttributes) {
         super(registry, "logger-reporter", filter, rateUnit, durationUnit, executor, shutdownExecutorOnStop,
-                disabledMetricAttributes);
+                disabledMetricAttributes, SchedulingLogic.FIXED_DELAY);
         this.loggerProxy = loggerProxy;
         this.marker = marker;
         this.prefix = prefix;
