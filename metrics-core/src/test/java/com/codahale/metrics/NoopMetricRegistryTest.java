@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
@@ -491,5 +492,14 @@ public class NoopMetricRegistryTest {
         assertThatNullPointerException()
                 .isThrownBy(() -> registry.register("any_name", null))
                 .withMessage("metric == null");
+    }
+
+    @Test
+    public void timesRunnableInstances() {
+        final Timer timer = registry.timer("thing");
+        final AtomicBoolean called = new AtomicBoolean();
+        timer.time(() -> called.set(true));
+
+        assertThat(called).isTrue();
     }
 }
