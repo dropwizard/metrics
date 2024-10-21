@@ -19,8 +19,6 @@
     <properties>
         <javaModuleName>io.dropwizard.metrics.jetty12.ee10</javaModuleName>
 
-        <maven.compiler.release>17</maven.compiler.release>
-
         <slf4j.version>2.0.16</slf4j.version>
     </properties>
 
