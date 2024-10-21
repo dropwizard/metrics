@@ -138,68 +138,6 @@
 
     <profiles>
         <profile>
-            <id>jdk8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <compilerId>javac-with-errorprone</compilerId>
-                            <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                            <showWarnings>true</showWarnings>
-                            <compilerArgument>-Xlint:all</compilerArgument>
-                            <source>1.8</source>
-                            <target>1.8</target>
-                            <fork>true</fork>
-                            <compilerArgs combine.children="append">
-                                <arg>-XepExcludedPaths:.*/target/generated-sources/.*</arg>
-                                <arg>-J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${errorprone.javac.version}/javac-${errorprone.javac.version}.jar</arg>
-                            </compilerArgs>
-                        </configuration>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.codehaus.plexus</groupId>
-                                <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                                <version>2.15.0</version>
-                            </dependency>
-                            <!-- override plexus-compiler-javac-errorprone's dependency on
-                                 Error Prone with the latest version -->
-                            <dependency>
-                                <groupId>com.google.errorprone</groupId>
-                                <artifactId>error_prone_core</artifactId>
-                                <version>${errorprone.version}</version>
-                            </dependency>
-                        </dependencies>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>jdk11</id>
-            <activation>
-                <jdk>11</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <version>${maven-compiler-plugin.version}</version>
-                        <configuration>
-                            <source>1.8</source>
-                            <target>1.8</target>
-                            <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                            <showWarnings>true</showWarnings>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <id>jdk17</id>
             <activation>
                 <jdk>[17,)</jdk>
@@ -364,7 +302,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <release>8</release>
+                    <release>17</release>
                     <fork>true</fork>
                     <parameters>true</parameters>
                     <showWarnings>true</showWarnings>
