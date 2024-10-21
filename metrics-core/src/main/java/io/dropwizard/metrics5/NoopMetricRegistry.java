@@ -468,7 +468,7 @@ public final class NoopMetricRegistry extends MetricRegistry {
          */
         @Override
         public void time(Runnable event) {
-            // NOP
+            event.run();
         }
 
         /**
