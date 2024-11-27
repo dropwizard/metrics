@@ -258,7 +258,7 @@ public class InstrumentedEE10HandlerTest {
                                         }
                                     }
                             );
-                            servletContextRequest.getHttpOutput().run();
+                            servletContextRequest.getHttpOutput().writeCallback();
                         } catch (IOException e) {
                             context.complete();
                             servletContextRequest.getServletChannel().handle();
