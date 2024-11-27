@@ -19,7 +19,9 @@
     {%- for cssfile in css_files %}
     <link rel="stylesheet" href="{{ pathto(cssfile, 1) }}" type="text/css"/>
     {%- endfor %}
+    {%- for style in styles -%}
     <link rel="stylesheet" href="{{ pathto('_static/' + style, 1) }}" type="text/css"/>
+    {%- endfor -%}
     {%- if favicon %}
     <link rel="shortcut icon" href="{{ pathto('_static/' + favicon, 1) }}"/>
     {%- endif %}
