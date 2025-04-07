@@ -62,7 +62,7 @@
         <servlet6.version>6.1.0</servlet6.version>
         <slf4j.version>2.0.17</slf4j.version>
         <assertj.version>3.27.3</assertj.version>
-        <byte-buddy.version>1.17.4</byte-buddy.version>
+        <byte-buddy.version>1.17.5</byte-buddy.version>
         <mockito.version>5.16.1</mockito.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
