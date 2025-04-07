@@ -58,7 +58,7 @@
 
         <jetty10.version>10.0.25</jetty10.version>
         <jetty11.version>11.0.25</jetty11.version>
-        <jetty12.version>12.0.18</jetty12.version>
+        <jetty12.version>12.0.19</jetty12.version>
         <servlet6.version>6.1.0</servlet6.version>
         <slf4j.version>2.0.17</slf4j.version>
         <assertj.version>3.27.3</assertj.version>
