@@ -1,12 +1,11 @@
 package io.dropwizard.metrics5;
 
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,7 +16,7 @@ import java.util.stream.Stream;
 public class MetricName implements Comparable<MetricName> {
 
     private static final String SEPARATOR = ".";
-    private static final Map<String, String> EMPTY_TAGS = Collections.emptyMap();
+    private static final SortedMap<String, String> EMPTY_TAGS = Collections.emptySortedMap();
     static final MetricName EMPTY = new MetricName("", EMPTY_TAGS);
 
     /**
@@ -30,11 +29,17 @@ public class MetricName implements Comparable<MetricName> {
     }
 
     private final String key;
-    private final Map<String, String> tags;
+    private final SortedMap<String, String> tags;
 
     public MetricName(String key, Map<String, String> tags) {
-        this.key = Objects.requireNonNull(key);
-        this.tags = tags.isEmpty() ? EMPTY_TAGS : unmodifiableSortedCopy(tags);
+        this.key = Objects.requireNonNull(key, "Metric key must not be null");
+        if (tags == null || tags.isEmpty()) {
+            this.tags = EMPTY_TAGS;
+        } else if (tags instanceof SortedMap) {
+            this.tags = Collections.unmodifiableSortedMap((SortedMap<String, String>) tags);
+        } else {
+            this.tags = Collections.unmodifiableSortedMap(new TreeMap<>(tags));
+        }
     }
 
     public String getKey() {
@@ -76,8 +81,10 @@ public class MetricName implements Comparable<MetricName> {
      * @return A newly created metric name with the specified tags associated with it.
      */
     public MetricName tagged(Map<String, String> add) {
-        final Map<String, String> newTags = new HashMap<>();
-        newTags.putAll(tags);
+        if (add == null) {
+            return this;
+        }
+        final SortedMap<String, String> newTags = new TreeMap<>(tags);
         newTags.putAll(add);
         return new MetricName(key, newTags);
     }
@@ -98,12 +105,12 @@ public class MetricName implements Comparable<MetricName> {
             throw new IllegalArgumentException("Argument count must be even");
         }
 
-        final Map<String, String> add = new HashMap<>();
+        final SortedMap<String, String> newTags = new TreeMap<>(tags);
         for (int i = 0; i < pairs.length; i += 2) {
-            add.put(pairs[i], pairs[i + 1]);
+            newTags.put(pairs[i], pairs[i + 1]);
         }
 
-        return tagged(add);
+        return new MetricName(key, newTags);
     }
 
     /**
@@ -137,7 +144,358 @@ public class MetricName implements Comparable<MetricName> {
 
     @Override
     public String toString() {
-        return tags.isEmpty() ? key : key + tags;
+        if (tags.isEmpty()) {
+            return escapeKey(key);
+        }
+
+        StringBuilder builder = new StringBuilder();
+        if (!key.isEmpty()) {
+            builder.append(escapeKey(key));
+        }
+
+        for (Map.Entry<String, String> entry : tags.entrySet()) {
+            builder.append(',');
+            builder.append(escapeTag(entry.getKey()));
+            builder.append('=');
+            builder.append(escapeTag(entry.getValue()));
+        }
+
+        return builder.toString();
+    }
+
+    /**
+     * Parse a metric name from its string representation.
+     * <p>
+     * Format: "measurement,tag1=value1,tag2=value2" or just "measurement"
+     *
+     * @param metricNameString the string representation of the metric name
+     * @return the parsed MetricName
+     * @throws IllegalArgumentException if the string cannot be parsed
+     */
+    public static MetricName parse(String metricNameString) {
+        if (metricNameString == null || metricNameString.isEmpty()) {
+            return EMPTY;
+        }
+
+        int firstCommaIndex = findFirstUnescapedComma(metricNameString);
+
+        if (firstCommaIndex == -1) {
+            // No tags, just the key
+            return new MetricName(unescapeKey(metricNameString), EMPTY_TAGS);
+        }
+
+        String keyPart = metricNameString.substring(0, firstCommaIndex);
+        String tagsPart = metricNameString.substring(firstCommaIndex + 1);
+
+        String key = unescapeKey(keyPart);
+        SortedMap<String, String> tags = parseTags(tagsPart);
+
+        return new MetricName(key, tags);
+    }
+
+    private static int findFirstUnescapedComma(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == ',' && !isEscaped(str, i)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static boolean isEscaped(String str, int index) {
+        if (index == 0) {
+            return false;
+        }
+        int backslashCount = 0;
+        for (int i = index - 1; i >= 0 && str.charAt(i) == '\\'; i--) {
+            backslashCount++;
+        }
+        return backslashCount % 2 == 1;
+    }
+
+    private static SortedMap<String, String> parseTags(String tagsPart) {
+        SortedMap<String, String> tags = new TreeMap<>();
+
+        if (tagsPart.isEmpty()) {
+            return tags;
+        }
+
+        // Check for trailing comma
+        if (tagsPart.endsWith(",")) {
+            throw new IllegalArgumentException("Trailing comma in tags");
+        }
+
+        // Check for consecutive commas
+        if (tagsPart.contains(",,")) {
+            throw new IllegalArgumentException("Consecutive commas in tags");
+        }
+
+        int start = 0;
+        while (start < tagsPart.length()) {
+            int commaIndex = findNextUnescapedComma(tagsPart, start);
+            int endIndex = commaIndex == -1 ? tagsPart.length() : commaIndex;
+
+            String tagPair = tagsPart.substring(start, endIndex);
+            parseTagPair(tagPair, tags);
+
+            start = endIndex + 1;
+        }
+
+        return tags;
+    }
+
+    private static int findNextUnescapedComma(String str, int startFrom) {
+        for (int i = startFrom; i < str.length(); i++) {
+            if (str.charAt(i) == ',' && !isEscaped(str, i)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static void parseTagPair(String tagPair, Map<String, String> tags) {
+        if (tagPair.trim().isEmpty()) {
+            throw new IllegalArgumentException("Empty tag pair");
+        }
+
+        int equalIndex = findFirstUnescapedEquals(tagPair);
+        if (equalIndex == -1) {
+            throw new IllegalArgumentException("Invalid tag format: " + tagPair);
+        }
+
+        if (equalIndex == 0) {
+            throw new IllegalArgumentException("Empty tag key in: " + tagPair);
+        }
+
+        String key = unescapeTag(tagPair.substring(0, equalIndex));
+        String value = unescapeTag(tagPair.substring(equalIndex + 1));
+
+        if (key.isEmpty()) {
+            throw new IllegalArgumentException("Empty tag key after unescaping in: " + tagPair);
+        }
+
+        tags.put(key, value);
+    }
+
+    private static int findFirstUnescapedEquals(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == '=' && !isEscaped(str, i)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static String escapeKey(String key) {
+        if (key == null || key.isEmpty()) {
+            return key;
+        }
+        StringBuilder escaped = new StringBuilder(key.length());
+        for (int i = 0; i < key.length(); i++) {
+            char c = key.charAt(i);
+            switch (c) {
+                case '\\':
+                    escaped.append("\\\\");
+                    break;
+                case ',':
+                    escaped.append("\\,");
+                    break;
+                case '=':
+                    escaped.append("\\=");
+                    break;
+                case ' ':
+                    escaped.append("\\ ");
+                    break;
+                case '\n':
+                    escaped.append("\\n");
+                    break;
+                case '\t':
+                    escaped.append("\\t");
+                    break;
+                case '\r':
+                    escaped.append("\\r");
+                    break;
+                default:
+                    if (c < 32 || c == 127) { // Control characters and DEL
+                        escaped.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        escaped.append(c);
+                    }
+                    break;
+            }
+        }
+        return escaped.toString();
+    }
+
+    private static String escapeTag(String tag) {
+        if (tag == null || tag.isEmpty()) {
+            return tag;
+        }
+        StringBuilder escaped = new StringBuilder(tag.length());
+        for (int i = 0; i < tag.length(); i++) {
+            char c = tag.charAt(i);
+            switch (c) {
+                case '\\':
+                    escaped.append("\\\\");
+                    break;
+                case ',':
+                    escaped.append("\\,");
+                    break;
+                case '=':
+                    escaped.append("\\=");
+                    break;
+                case ' ':
+                    escaped.append("\\ ");
+                    break;
+                case '\n':
+                    escaped.append("\\n");
+                    break;
+                case '\t':
+                    escaped.append("\\t");
+                    break;
+                case '\r':
+                    escaped.append("\\r");
+                    break;
+                default:
+                    if (c < 32 || c == 127) { // Control characters and DEL
+                        escaped.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        escaped.append(c);
+                    }
+                    break;
+            }
+        }
+        return escaped.toString();
+    }
+
+    private static String unescapeKey(String escapedKey) {
+        if (escapedKey == null || escapedKey.trim().isEmpty()) {
+            return escapedKey;
+        }
+        StringBuilder unescaped = new StringBuilder(escapedKey.length());
+        for (int i = 0; i < escapedKey.length(); i++) {
+            char c = escapedKey.charAt(i);
+            if (c == '\\' && i + 1 < escapedKey.length()) {
+                char next = escapedKey.charAt(i + 1);
+                switch (next) {
+                    case '\\':
+                        unescaped.append('\\');
+                        i++;
+                        break;
+                    case ',':
+                        unescaped.append(',');
+                        i++;
+                        break;
+                    case '=':
+                        unescaped.append('=');
+                        i++;
+                        break;
+                    case ' ':
+                        unescaped.append(' ');
+                        i++;
+                        break;
+                    case 'n':
+                        unescaped.append('\n');
+                        i++;
+                        break;
+                    case 't':
+                        unescaped.append('\t');
+                        i++;
+                        break;
+                    case 'r':
+                        unescaped.append('\r');
+                        i++;
+                        break;
+                    case 'u':
+                        if (i + 6 <= escapedKey.length()) {
+                            String hex = escapedKey.substring(i + 2, i + 6); // remove "\\u" prefix
+                            try {
+                                int codePoint = Integer.parseInt(hex, 16);
+                                unescaped.append((char) codePoint);
+                                i += 5; // 'u' + 4 hex digits
+                            } catch (NumberFormatException e) {
+                                throw new IllegalArgumentException("Invalid unicode escape sequence: \\u" + hex);
+                            }
+                        } else {
+                            throw new IllegalArgumentException("Incomplete unicode escape sequence at end of string");
+                        }
+                        break;
+                    default:
+                        unescaped.append(c);
+                        break;
+                }
+            } else if (c == '\\') {
+                throw new IllegalArgumentException("Incomplete escape sequence at end of string");
+            } else {
+                unescaped.append(c);
+            }
+        }
+        return unescaped.toString();
+    }
+
+    private static String unescapeTag(String escapedTag) {
+        if (escapedTag == null || escapedTag.trim().isEmpty()) {
+            return escapedTag;
+        }
+        StringBuilder unescaped = new StringBuilder(escapedTag.length());
+        for (int i = 0; i < escapedTag.length(); i++) {
+            char c = escapedTag.charAt(i);
+            if (c == '\\' && i + 1 < escapedTag.length()) {
+                char next = escapedTag.charAt(i + 1);
+                switch (next) {
+                    case '\\':
+                        unescaped.append('\\');
+                        i++;
+                        break;
+                    case ',':
+                        unescaped.append(',');
+                        i++;
+                        break;
+                    case '=':
+                        unescaped.append('=');
+                        i++;
+                        break;
+                    case ' ':
+                        unescaped.append(' ');
+                        i++;
+                        break;
+                    case 'n':
+                        unescaped.append('\n');
+                        i++;
+                        break;
+                    case 't':
+                        unescaped.append('\t');
+                        i++;
+                        break;
+                    case 'r':
+                        unescaped.append('\r');
+                        i++;
+                        break;
+                    case 'u':
+                        if (i + 6 <= escapedTag.length()) {
+                            String hex = escapedTag.substring(i + 2, i + 6); // remove "\\u" prefix
+                            try {
+                                int codePoint = Integer.parseInt(hex, 16);
+                                unescaped.append((char) codePoint);
+                                i += 5; // 'u' + 4 hex digits
+                            } catch (NumberFormatException e) {
+                                throw new IllegalArgumentException("Invalid unicode escape sequence: \\u" + hex);
+                            }
+                        } else {
+                            throw new IllegalArgumentException("Incomplete unicode escape sequence at end of string");
+                        }
+                        break;
+                    default:
+                        unescaped.append(c);
+                        break;
+                }
+            } else if (c == '\\') {
+                throw new IllegalArgumentException("Incomplete escape sequence at end of string");
+            } else {
+                unescaped.append(c);
+            }
+        }
+        return unescaped.toString();
     }
 
     @Override
@@ -200,14 +558,4 @@ public class MetricName implements Comparable<MetricName> {
             return 0;
         }
     }
-
-    private static <K extends Comparable<K>, V> Map<K, V> unmodifiableSortedCopy(Map<K, V> map) {
-        LinkedHashMap<K, V> sorted = new LinkedHashMap<>();
-        map.entrySet()
-                .stream()
-                .sorted(Comparator.comparing(Map.Entry::getKey))
-                .forEach(e -> sorted.put(e.getKey(), e.getValue()));
-        return Collections.unmodifiableMap(sorted);
-    }
-
 }
