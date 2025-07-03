@@ -1,6 +1,9 @@
 ---
 # yamllint disable rule:comments rule:line-length
 name: Assign Milestone
+permissions:
+  contents: read
+  pull-requests: write
 # yamllint disable-line rule:truthy
 on:
   pull_request_target:
