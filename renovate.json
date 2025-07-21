@@ -3,9 +3,17 @@
   "extends": [
     "local>dropwizard/renovate-config"
   ],
-  "baseBranches": ["release/4.2.x", "release/5.0.x"],
+  "baseBranchPatterns": [
+    "release/4.2.x",
+    "release/5.0.x"
+  ],
   "vulnerabilityAlerts": {
-    "labels": ["security"],
-    "assignees": ["team:committers", "team:metrics"]
+    "labels": [
+      "security"
+    ],
+    "assignees": [
+      "team:committers",
+      "team:metrics"
+    ]
   }
 }
