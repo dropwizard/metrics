@@ -161,6 +161,7 @@
             <modules>
                 <module>metrics-jetty12</module>
                 <module>metrics-jetty12-ee10</module>
+                <module>metrics-jetty12-ee11</module>
             </modules>
             <build>
                 <plugins>
