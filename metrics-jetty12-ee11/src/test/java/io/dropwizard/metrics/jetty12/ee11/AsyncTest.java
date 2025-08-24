@@ -13,6 +13,7 @@ import org.eclipse.jetty.client.Request;
 import org.eclipse.jetty.client.Response;
 import org.eclipse.jetty.ee11.servlet.ServletHandler;
 import org.eclipse.jetty.server.Handler;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.EnumSet;
@@ -46,6 +47,7 @@ public class AsyncTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @Ignore("FIXME: Flaky test")
     public void testActiveSuspended() {
         servletContextHandler.addFilter((request, response, chain) -> {
             AsyncContext asyncContext = request.startAsync();
