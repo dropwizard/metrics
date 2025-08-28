@@ -126,13 +126,6 @@
         <url>https://github.com/dropwizard/metrics/issues/</url>
     </issueManagement>
 
-    <distributionManagement>
-        <repository>
-            <id>ossrh</id>
-            <name>Sonatype Central Portal Repository</name>
-        </repository>
-    </distributionManagement>
-
     <profiles>
         <profile>
             <id>jdk8</id>
