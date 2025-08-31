@@ -22,7 +22,6 @@ import io.dropwizard.metrics5.Counter;
 import io.dropwizard.metrics5.Histogram;
 import io.dropwizard.metrics5.MetricRegistry;
 import io.dropwizard.metrics5.Timer;
-import org.checkerframework.checker.index.qual.NonNegative;
 
 import java.util.EnumMap;
 import java.util.concurrent.TimeUnit;
@@ -92,7 +91,7 @@ public final class MetricsStatsCounter implements StatsCounter {
   }
 
   @Override
-  public void recordEviction(@NonNegative int weight, RemovalCause cause) {
+  public void recordEviction(int weight, RemovalCause cause) {
     evictionsWithCause.get(cause).update(weight);
     evictionWeight.inc(weight);
   }
