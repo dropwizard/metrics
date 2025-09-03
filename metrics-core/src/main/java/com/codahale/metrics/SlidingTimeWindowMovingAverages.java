@@ -3,6 +3,7 @@ package com.codahale.metrics;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
@@ -39,7 +40,7 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
      * One counter per time bucket/slot (i.e. per second, see TICK_INTERVAL) for the entire
      * time window (i.e. 15 minutes, see TIME_WINDOW_DURATION_MINUTES)
      */
-    private ArrayList<LongAdder> buckets;
+    private final List<LongAdder> buckets;
 
     /**
      * Index into buckets, pointing at the bucket containing the oldest counts
@@ -179,19 +180,20 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
         // increment toIndex to include the current bucket into the sum
         int toIndex = normalizeIndex(calculateIndexOfTick(toTime) + 1);
         int fromIndex = normalizeIndex(toIndex - numberOfBuckets);
-        LongAdder adder = new LongAdder();
+        long sum = 0;
 
         if (fromIndex < toIndex) {
-            buckets.stream()
-                    .skip(fromIndex)
-                    .limit(toIndex - fromIndex)
-                    .mapToLong(LongAdder::longValue)
-                    .forEach(adder::add);
+            for (int i = fromIndex; i < toIndex; i++) {
+                sum += buckets.get(i).longValue();
+            }
         } else {
-            buckets.stream().limit(toIndex).mapToLong(LongAdder::longValue).forEach(adder::add);
-            buckets.stream().skip(fromIndex).mapToLong(LongAdder::longValue).forEach(adder::add);
+            for (int i = fromIndex; i < NUMBER_OF_BUCKETS; i++) {
+                sum += buckets.get(i).longValue();
+            }
+            for (int i = 0; i < toIndex; i++) {
+                sum += buckets.get(i).longValue();
+            }
         }
-        long retval = adder.longValue();
-        return retval;
+        return sum;
     }
 }
