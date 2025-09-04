@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicLongArray;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * A triple of simple moving average rates (one, five and fifteen minutes rates) as needed by {@link Meter}.
@@ -38,7 +38,7 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
      * One counter per time bucket/slot (i.e. per second, see TICK_INTERVAL) for the entire
      * time window (i.e. 15 minutes, see TIME_WINDOW_DURATION_MINUTES)
      */
-    private final AtomicLongArray buckets;
+    private final LongAdder[] buckets;
 
     /**
      * Index into buckets, pointing at the bucket containing the oldest counts
@@ -78,7 +78,10 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
         final long startTime = clock.getTick();
         lastTick = new AtomicLong(startTime);
 
-        buckets = new AtomicLongArray(NUMBER_OF_BUCKETS);
+        buckets = new LongAdder[NUMBER_OF_BUCKETS];
+        for (int i = 0; i < NUMBER_OF_BUCKETS; i++) {
+            buckets[i] = new LongAdder();
+        }
         bucketBaseTime = Instant.ofEpochSecond(0L, startTime);
         oldestBucketTime = bucketBaseTime;
         oldestBucketIndex = 0;
@@ -87,7 +90,7 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
 
     @Override
     public void update(long n) {
-        buckets.addAndGet(currentBucketIndex, n);
+        buckets[currentBucketIndex].add(n);
     }
 
     @Override
@@ -158,14 +161,14 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
     private void cleanBucketRange(int fromIndex, int toIndex) {
         if (fromIndex < toIndex) {
             for (int i = fromIndex; i < toIndex; i++) {
-                buckets.set(i, 0L);
+                buckets[i].reset();
             }
         } else {
             for (int i = fromIndex; i < NUMBER_OF_BUCKETS; i++) {
-                buckets.set(i, 0L);
+                buckets[i].reset();
             }
             for (int i = 0; i < toIndex; i++) {
-                buckets.set(i, 0L);
+                buckets[i].reset();
             }
         }
     }
@@ -179,14 +182,14 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
 
         if (fromIndex < toIndex) {
             for (int i = fromIndex; i < toIndex; i++) {
-                sum += buckets.get(i);
+                sum += buckets[i].longValue();
             }
         } else {
             for (int i = fromIndex; i < NUMBER_OF_BUCKETS; i++) {
-                sum += buckets.get(i);
+                sum += buckets[i].longValue();
             }
             for (int i = 0; i < toIndex; i++) {
-                sum += buckets.get(i);
+                sum += buckets[i].longValue();
             }
         }
         return sum;
