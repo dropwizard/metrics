@@ -2,7 +2,6 @@ package io.dropwizard.metrics5;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
@@ -40,7 +39,7 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
      * One counter per time bucket/slot (i.e. per second, see TICK_INTERVAL) for the entire
      * time window (i.e. 15 minutes, see TIME_WINDOW_DURATION_MINUTES)
      */
-    private ArrayList<LongAdder> buckets;
+    private final LongAdder[] buckets;
 
     /**
      * Index into buckets, pointing at the bucket containing the oldest counts
@@ -80,9 +79,9 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
         final long startTime = clock.getTick();
         lastTick = new AtomicLong(startTime);
 
-        buckets = new ArrayList<>(NUMBER_OF_BUCKETS);
+        buckets = new LongAdder[NUMBER_OF_BUCKETS];
         for (int i = 0; i < NUMBER_OF_BUCKETS; i++) {
-            buckets.add(new LongAdder());
+            buckets[i] = new LongAdder();
         }
         bucketBaseTime = Instant.ofEpochSecond(0L, startTime);
         oldestBucketTime = bucketBaseTime;
@@ -92,7 +91,7 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
 
     @Override
     public void update(long n) {
-        buckets.get(currentBucketIndex).add(n);
+        buckets[currentBucketIndex].add(n);
     }
 
     @Override
@@ -164,14 +163,14 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
     private void cleanBucketRange(int fromIndex, int toIndex) {
         if (fromIndex < toIndex) {
             for (int i = fromIndex; i < toIndex; i++) {
-                buckets.get(i).reset();
+                buckets[i].reset();
             }
         } else {
             for (int i = fromIndex; i < NUMBER_OF_BUCKETS; i++) {
-                buckets.get(i).reset();
+                buckets[i].reset();
             }
             for (int i = 0; i < toIndex; i++) {
-                buckets.get(i).reset();
+                buckets[i].reset();
             }
         }
     }
@@ -181,20 +180,21 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
         // increment toIndex to include the current bucket into the sum
         int toIndex = normalizeIndex(calculateIndexOfTick(toTime) + 1);
         int fromIndex = normalizeIndex(toIndex - numberOfBuckets);
-        LongAdder adder = new LongAdder();
+        long sum = 0;
 
         if (fromIndex < toIndex) {
-            buckets.stream()
-                    .skip(fromIndex)
-                    .limit(toIndex - fromIndex)
-                    .mapToLong(LongAdder::longValue)
-                    .forEach(adder::add);
+            for (int i = fromIndex; i < toIndex; i++) {
+                sum += buckets[i].longValue();
+            }
         } else {
-            buckets.stream().limit(toIndex).mapToLong(LongAdder::longValue).forEach(adder::add);
-            buckets.stream().skip(fromIndex).mapToLong(LongAdder::longValue).forEach(adder::add);
+            for (int i = fromIndex; i < NUMBER_OF_BUCKETS; i++) {
+                sum += buckets[i].longValue();
+            }
+            for (int i = 0; i < toIndex; i++) {
+                sum += buckets[i].longValue();
+            }
         }
-        long retval = adder.longValue();
-        return retval;
+        return sum;
     }
 
     @Override
