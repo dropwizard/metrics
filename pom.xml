@@ -151,6 +151,9 @@
             <activation>
                 <jdk>[17,)</jdk>
             </activation>
+            <properties>
+                <errorprone.version>2.42.0</errorprone.version>
+            </properties>
             <modules>
                 <module>metrics-jersey40</module>
                 <module>metrics-jetty12</module>
@@ -167,6 +170,7 @@
                             <compilerArgs>
                                 <arg>-Xlint:all</arg>
                                 <arg>-XDcompilePolicy=simple</arg>
+                                <arg>--should-stop=ifError=FLOW</arg>
                                 <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.*</arg>
                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
