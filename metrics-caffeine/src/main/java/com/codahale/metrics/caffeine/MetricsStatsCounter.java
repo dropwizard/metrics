@@ -28,7 +28,6 @@ import com.codahale.metrics.Timer;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.github.benmanes.caffeine.cache.stats.StatsCounter;
-import org.checkerframework.checker.index.qual.NonNegative;
 
 /**
  * A {@link StatsCounter} instrumented with Dropwizard Metrics.
@@ -110,7 +109,7 @@ public final class MetricsStatsCounter implements StatsCounter {
   }
 
   @Override
-  public void recordEviction(@NonNegative int weight, RemovalCause cause) {
+  public void recordEviction(int weight, RemovalCause cause) {
     evictionsWithCause.get(cause).update(weight);
     evictionWeight.inc(weight);
   }

@@ -4,7 +4,7 @@
 
     <groupId>io.dropwizard.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>4.2.32-SNAPSHOT</version>
+    <version>4.2.38-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
@@ -53,21 +53,21 @@
     </modules>
 
     <properties>
-        <project.build.outputTimestamp>2025-03-30T21:05:15Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-09-15T21:29:57Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <jetty9.version>9.4.57.v20241219</jetty9.version>
-        <jetty10.version>10.0.25</jetty10.version>
-        <jetty11.version>11.0.25</jetty11.version>
-        <jetty12.version>12.0.19</jetty12.version>
+        <jetty9.version>9.4.58.v20250814</jetty9.version>
+        <jetty10.version>10.0.26</jetty10.version>
+        <jetty11.version>11.0.26</jetty11.version>
+        <jetty12.version>12.1.2</jetty12.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <assertj.version>3.27.3</assertj.version>
-        <byte-buddy.version>1.17.5</byte-buddy.version>
-        <mockito.version>5.17.0</mockito.version>
+        <assertj.version>3.27.6</assertj.version>
+        <byte-buddy.version>1.17.8</byte-buddy.version>
+        <mockito.version>5.20.0</mockito.version>
         <junit.version>4.13.2</junit.version>
-        <commons-lang3.version>3.17.0</commons-lang3.version>
-        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+        <commons-lang3.version>3.19.0</commons-lang3.version>
+        <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <errorprone.version>2.31.0</errorprone.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
         <servlet6.version>6.1.0</servlet6.version>
@@ -126,19 +126,6 @@
         <url>https://github.com/dropwizard/metrics/issues/</url>
     </issueManagement>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <name>Nexus Release Repository</name>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
     <profiles>
         <profile>
             <id>jdk8</id>
@@ -167,6 +154,7 @@
             <modules>
                 <module>metrics-jetty12</module>
                 <module>metrics-jetty12-ee10</module>
+                <module>metrics-jetty12-ee11</module>
             </modules>
             <build>
                 <plugins>
@@ -239,7 +227,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.7</version>
+                        <version>3.2.8</version>
                         <configuration>
                             <signer>bc</signer>
                             <bestPractices>true</bestPractices>
@@ -255,23 +243,15 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.7.0</version>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.9.0</version>
+                        <extensions>true</extensions>
                         <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <publishingServerId>ossrh</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <id>nexus-deploy</id>
-                                <phase>deploy</phase>
-                                <goals>
-                                    <goal>deploy</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.cyclonedx</groupId>
@@ -307,7 +287,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.11.2</version>
+                    <version>3.12.0</version>
                     <configuration>
                         <source>8</source>
                         <doclint>none</doclint>
@@ -363,7 +343,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.5.4</version>
                 <configuration>
                     <argLine>@{argLine} -Djava.net.preferIPv4Stack=true</argLine>
                 </configuration>
@@ -371,7 +351,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.6.2</version>
                 <executions>
                     <execution>
                         <id>enforce</id>
@@ -389,7 +369,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.9.0</version>
                 <executions>
                     <execution>
                         <id>analyze</id>
@@ -454,7 +434,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.13</version>
+                <version>0.8.14</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>

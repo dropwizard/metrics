@@ -1,0 +1,29 @@
+---
+# yamllint disable rule:comments rule:line-length
+name: Assign Milestone
+permissions:
+  contents: read
+  pull-requests: write
+# yamllint disable-line rule:truthy
+on:
+  pull_request_target:
+    types: [opened, reopened]
+jobs:
+  assign-milestone:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: 'dropwizard/metrics'
+          ref: ${{ github.base_ref }}
+      - uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+          cache: 'maven'
+      - run: |
+          echo "version=$(./mvnw -ntp -B -fae -q org.apache.maven.plugins:maven-help-plugin:3.4.0:evaluate -Dexpression=project.version -DforceStdout | sed -e 's/-SNAPSHOT//')" >> $GITHUB_ENV
+      - uses: zoispag/action-assign-milestone@1f7abbbd14e2d95194633ead05cd332e140ec12d # v2
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          milestone: "${{ env.version }}"
