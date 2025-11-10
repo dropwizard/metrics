@@ -152,6 +152,7 @@
                 <jdk>[17,)</jdk>
             </activation>
             <modules>
+                <module>metrics-jersey40</module>
                 <module>metrics-jetty12</module>
                 <module>metrics-jetty12-ee10</module>
                 <module>metrics-jetty12-ee11</module>
