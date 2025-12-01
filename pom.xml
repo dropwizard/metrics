@@ -67,7 +67,7 @@
         <mockito.version>5.20.0</mockito.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
-        <errorprone.version>2.42.0</errorprone.version>
+        <errorprone.version>2.45.0</errorprone.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
 
         <sonar.projectKey>dropwizard_metrics</sonar.projectKey>
