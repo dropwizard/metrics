@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   release:
+    if: github.repository == 'dropwizard/metrics'
     runs-on: 'ubuntu-latest'
     env:
       JAVA_OPTS: "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
