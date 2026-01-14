@@ -156,6 +156,7 @@
                 <module>metrics-jetty12</module>
                 <module>metrics-jetty12-ee10</module>
                 <module>metrics-jetty12-ee11</module>
+                <module>metrics-jackson3</module>
             </modules>
             <build>
                 <plugins>
