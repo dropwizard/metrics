@@ -27,14 +27,14 @@ jobs:
       with:
         distribution: 'zulu'
         java-version: ${{ matrix.java_version }}
-    - uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+    - uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
     - name: Cache SonarCloud packages
-      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       if: ${{ env.SONAR_TOKEN != null && env.SONAR_TOKEN != '' && matrix.java_version == '17' }}
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
