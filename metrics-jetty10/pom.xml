@@ -82,7 +82,7 @@
         <dependency>
             <groupId>org.eclipse.jetty.toolchain</groupId>
             <artifactId>jetty-servlet-api</artifactId>
-            <version>4.0.6</version>
+            <version>4.0.9</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
