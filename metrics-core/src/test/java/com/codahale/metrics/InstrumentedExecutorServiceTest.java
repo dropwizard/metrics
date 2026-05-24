@@ -240,8 +240,11 @@ public class InstrumentedExecutorServiceTest {
             assertThat(duration.getCount()).isEqualTo(0);
             assertThat(idle.getCount()).isEqualTo(1);
             assertThat(tasksQueued.getValue()).isEqualTo(0L);
-            assertThat(threadsActive.getValue()).isEqualTo(1);
-            assertThat(threadsRunning.getValue()).isEqualTo(1);
+            int activeThreadCount = threadsActive.getValue();
+            int runningThreadCount = threadsRunning.getValue();
+            assertThat(activeThreadCount).isEqualTo(1);
+            // getRunningThreadCount() is an estimate, so allow 0..activeThreadCount
+            assertThat(runningThreadCount).isBetween(0, activeThreadCount);
         };
 
         Future<?> theFuture = instrumentedExecutorService.submit(runnable);
