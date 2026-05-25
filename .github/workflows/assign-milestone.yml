@@ -22,7 +22,7 @@ jobs:
           java-version: '21'
           cache: 'maven'
       - run: |
-          milestone=$(./mvnw -ntp -B -fae -q org.apache.maven.plugins:maven-help-plugin:3.4.0:evaluate -Dexpression=project.version -DforceStdout | sed -e 's/-SNAPSHOT//')"
+          milestone=$(./mvnw -ntp -B -fae -q org.apache.maven.plugins:maven-help-plugin:3.4.0:evaluate -Dexpression=project.version -DforceStdout | sed -e 's/-SNAPSHOT//')
           gh pr edit "${PR_NUMBER}" --milestone "${milestone}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
