@@ -1,1 +1,1 @@
-sphinx<9
+sphinx<10
