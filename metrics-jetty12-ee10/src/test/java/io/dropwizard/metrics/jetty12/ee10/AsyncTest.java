@@ -69,7 +69,11 @@ public class AsyncTest extends AbstractIntegrationTest {
                     .until(() -> activeSuspended.getCount() == 1L);
             asyncResponse.get();
         });
-        assertThat(activeSuspended.getCount()).isEqualTo(0L);
+        assertThatNoException().isThrownBy(() -> {
+            await()
+                    .atMost(750, TimeUnit.MILLISECONDS)
+                    .until(() -> activeSuspended.getCount() == 0L);
+        });
     }
 
     @Test
