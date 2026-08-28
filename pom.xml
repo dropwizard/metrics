@@ -48,6 +48,7 @@
         <module>metrics-logback13</module>
         <module>metrics-logback14</module>
         <module>metrics-logback15</module>
+        <module>metrics-logback16</module>
         <module>metrics-servlet</module>
         <module>metrics-servlets</module>
     </modules>
