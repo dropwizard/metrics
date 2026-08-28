@@ -18,8 +18,8 @@
     <properties>
         <javaModuleName>com.codahale.metrics.jackson3</javaModuleName>
         <maven.compiler.release>17</maven.compiler.release>
-        <jackson.version>3.1.6</jackson.version>
-        <jackson-databind.version>3.1.6</jackson-databind.version>
+        <jackson3.version>3.2.1</jackson3.version>
+        <jackson3-databind.version>3.2.1</jackson3-databind.version>
     </properties>
 
     <dependencyManagement>
@@ -52,12 +52,12 @@
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
+            <version>${jackson3.version}</version>
         </dependency>
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson-databind.version}</version>
+            <version>${jackson3-databind.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
