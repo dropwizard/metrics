@@ -24,7 +24,7 @@ import com.codahale.metrics.WeightedSnapshot.WeightedSample;
 public class ExponentiallyDecayingReservoir implements Reservoir {
     private static final int DEFAULT_SIZE = 1028;
     private static final double DEFAULT_ALPHA = 0.015;
-    private static final long RESCALE_THRESHOLD = TimeUnit.HOURS.toNanos(1);
+    private static final long DEFAULT_RESCALE_THRESHOLD = TimeUnit.HOURS.toNanos(1);
 
     private final ConcurrentSkipListMap<Double, WeightedSample> values;
     private final ReentrantReadWriteLock lock;
@@ -34,6 +34,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
     private volatile long startTime;
     private final AtomicLong lastScaleTick;
     private final Clock clock;
+    private final long rescaleThreshold;
 
     /**
      * Creates a new {@link ExponentiallyDecayingReservoir} of 1028 elements, which offers a 99.9%
@@ -72,6 +73,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
         this.count = new AtomicLong(0);
         this.startTime = currentTimeInSeconds();
         this.lastScaleTick = new AtomicLong(clock.getTick());
+        this.rescaleThreshold = calculateRescaleThreshold(alpha);
     }
 
     @Override
@@ -118,7 +120,7 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
     private void rescaleIfNeeded() {
         final long now = clock.getTick();
         final long lastScaleTickSnapshot = lastScaleTick.get();
-        if (now - lastScaleTickSnapshot >= RESCALE_THRESHOLD) {
+        if (now - lastScaleTickSnapshot >= rescaleThreshold) {
             rescale(now, lastScaleTickSnapshot);
         }
     }
@@ -203,5 +205,13 @@ public class ExponentiallyDecayingReservoir implements Reservoir {
 
     private void unlockForRegularUsage() {
         lock.readLock().unlock();
+    }
+
+    private long calculateRescaleThreshold(double alpha) {
+        long upperbound = (long) Math.floor(Math.log(Double.MAX_VALUE) / alpha);
+        if (upperbound == 0) {
+            throw new IllegalStateException("Alpha value resulted in a rescale threshold of 0 seconds");
+        }
+        return upperbound >= DEFAULT_RESCALE_THRESHOLD ? DEFAULT_RESCALE_THRESHOLD : TimeUnit.SECONDS.toNanos(upperbound / 2);
     }
 }
