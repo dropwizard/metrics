@@ -8,7 +8,8 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ public class ThreadStatesGaugeSet implements MetricSet {
 
     // do not compute stack traces.
     private final static int STACK_TRACE_DEPTH = 0;
+    private final static int[] ZERO_COUNT = new int[1];
 
     private final ThreadMXBean threads;
     private final ThreadDeadlockDetector deadlockDetector;
@@ -46,32 +48,33 @@ public class ThreadStatesGaugeSet implements MetricSet {
 
     @Override
     public Map<String, Metric> getMetrics() {
-        final Map<String, Metric> gauges = new HashMap<>();
+        final Map<String, Metric> gauges = new LinkedHashMap<>(); // deterministic order
+
+        // expensive methods only once, whether or not "cached"
+        ThreadInfo[] threadInfos = getThreadInfo();
+        Set<String> deadlockedThreads = deadlockDetector.getDeadlockedThreads();
+
+        EnumMap<Thread.State, int[]> byState = new EnumMap<>(Thread.State.class);
+        for (ThreadInfo threadInfo : threadInfos) {
+            Thread.State tState;
+            if (threadInfo != null && (tState = threadInfo.getThreadState()) != null) {
+                byState.computeIfAbsent(tState, (k) -> new int[1])[0]++;
+            }
+        }
 
         for (final Thread.State state : Thread.State.values()) {
             gauges.put(name(state.toString().toLowerCase(), "count"),
-                    (Gauge<Object>) () -> getThreadCount(state));
+                    (Gauge<Object>) () -> byState.getOrDefault(state, ZERO_COUNT)[0]);
         }
 
         gauges.put("count", (Gauge<Integer>) threads::getThreadCount);
         gauges.put("daemon.count", (Gauge<Integer>) threads::getDaemonThreadCount);
         gauges.put("peak.count", (Gauge<Integer>) threads::getPeakThreadCount);
         gauges.put("total_started.count", (Gauge<Long>) threads::getTotalStartedThreadCount);
-        gauges.put("deadlock.count", (Gauge<Integer>) () -> deadlockDetector.getDeadlockedThreads().size());
-        gauges.put("deadlocks", (Gauge<Set<String>>) deadlockDetector::getDeadlockedThreads);
+        gauges.put("deadlock.count", (Gauge<Integer>) deadlockedThreads::size);
+        gauges.put("deadlocks", (Gauge<Set<String>>) () -> deadlockedThreads);
 
         return Collections.unmodifiableMap(gauges);
-    }
-
-    private int getThreadCount(Thread.State state) {
-        final ThreadInfo[] allThreads = getThreadInfo();
-        int count = 0;
-        for (ThreadInfo info : allThreads) {
-            if (info != null && info.getThreadState() == state) {
-                count++;
-            }
-        }
-        return count;
     }
 
     ThreadInfo[] getThreadInfo() {
