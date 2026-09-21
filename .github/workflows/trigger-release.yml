@@ -26,7 +26,7 @@ jobs:
       uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '21'
         cache: 'maven'
         server-id: ossrh
         server-username: ${{ secrets.CI_DEPLOY_USERNAME }}
