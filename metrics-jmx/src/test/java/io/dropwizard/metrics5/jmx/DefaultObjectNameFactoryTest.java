@@ -38,4 +38,42 @@ class DefaultObjectNameFactoryTest {
         assertThat(on.getKeyProperty("foo")).isEqualTo("bar");
         assertThat(on.getKeyProperty("baz")).isEqualTo("biz");
     }
+
+    @Test
+    void quotesTagValuesThatCannotBeUnquoted() {
+        DefaultObjectNameFactory f = new DefaultObjectNameFactory();
+        ObjectName on = f.createName("timer", "com.domain", MetricName.build("requests").tagged("env", "a,b", "note", "say \"hi\""));
+        assertThatCode(() -> new ObjectName(on.toString())).doesNotThrowAnyException();
+        assertThat(on.getKeyProperty("env")).isEqualTo(ObjectName.quote("a,b"));
+        assertThat(on.getKeyProperty("note")).isEqualTo(ObjectName.quote("say \"hi\""));
+        assertThat(on.getKeyProperty("name")).isEqualTo("requests");
+        assertThat(on.getKeyProperty("type")).isEqualTo("timer");
+    }
+
+    @Test
+    void quotesTagValuesThatArePatterns() {
+        DefaultObjectNameFactory f = new DefaultObjectNameFactory();
+        ObjectName on = f.createName("timer", "com.domain", MetricName.build("requests").tagged("glob", "a*b"));
+        assertThatCode(() -> new ObjectName(on.toString())).doesNotThrowAnyException();
+        assertThat(on.getKeyProperty("glob")).isEqualTo(ObjectName.quote("a*b"));
+        assertThat(on.isPropertyValuePattern("glob")).isFalse();
+    }
+
+    @Test
+    void illegalTagKeyDoesNotDropOtherTags() {
+        DefaultObjectNameFactory f = new DefaultObjectNameFactory();
+        ObjectName on = f.createName("timer", "com.domain", MetricName.build("requests").tagged("a=b", "x", "env", "prod"));
+        assertThatCode(() -> new ObjectName(on.toString())).doesNotThrowAnyException();
+        assertThat(on.getKeyProperty("env")).isEqualTo("prod");
+        assertThat(on.getKeyProperty("name")).isEqualTo("requests");
+        assertThat(on.getKeyPropertyList().containsKey("a=b")).isFalse();
+    }
+
+    @Test
+    void tagsDoNotOverrideNameOrType() {
+        DefaultObjectNameFactory f = new DefaultObjectNameFactory();
+        ObjectName on = f.createName("timer", "com.domain", MetricName.build("requests").tagged("name", "hijacked", "type", "hijacked"));
+        assertThat(on.getKeyProperty("name")).isEqualTo("requests");
+        assertThat(on.getKeyProperty("type")).isEqualTo("timer");
+    }
 }
