@@ -2,6 +2,7 @@ package io.dropwizard.metrics5.jmx;
 
 import io.dropwizard.metrics5.MetricName;
 import java.util.Hashtable;
+import java.util.Map;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -20,9 +21,19 @@ public class DefaultObjectNameFactory implements ObjectNameFactory {
             ObjectName objectName;
             Hashtable<String, String> properties = new Hashtable<>();
 
+            // Tags are copied first so name and type cannot be replaced by a tag of the same key.
+            // Values that cannot be unquoted are quoted before construction; an illegal key is
+            // skipped so it does not drop the rest of the name.
+            for (Map.Entry<String, String> tag : name.getTags().entrySet()) {
+                String key = tag.getKey();
+                String value = tag.getValue();
+                if (!isUsableTagKey(key) || value == null) {
+                    continue;
+                }
+                properties.put(key, needsQuote(value) ? ObjectName.quote(value) : value);
+            }
             properties.put("name", name.getKey());
             properties.put("type", type);
-            properties.putAll(name.getTags());
             objectName = new ObjectName(domain, properties);
 
             /*
@@ -66,6 +77,32 @@ public class DefaultObjectNameFactory implements ObjectNameFactory {
             }
         }
         return false;
+    }
+
+    /**
+     * Tag keys are ObjectName property keys, which cannot be quoted. Reserved keys are applied
+     * separately so a tag cannot replace the metric name or type.
+     */
+    private boolean isUsableTagKey(final String key) {
+        if (key == null || key.isEmpty() || "name".equals(key) || "type".equals(key)) {
+            return false;
+        }
+        for (int i = 0; i < key.length(); i++) {
+            char c = key.charAt(i);
+            if (c == '*' || c == '?' || c == '\n' || c == '\r') {
+                return false;
+            }
+            for (char quotableChar : QUOTABLE_CHARS) {
+                if (c == quotableChar) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean needsQuote(final String value) {
+        return shouldQuote(value) || value.indexOf('*') >= 0 || value.indexOf('?') >= 0;
     }
 
 }
