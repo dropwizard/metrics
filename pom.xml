@@ -63,11 +63,11 @@
         <jetty11.version>11.0.26</jetty11.version>
         <jetty12.version>12.1.13</jetty12.version>
         <servlet6.version>6.1.0</servlet6.version>
-        <slf4j.version>2.0.19</slf4j.version>
+        <slf4j.version>2.0.20</slf4j.version>
         <assertj.version>3.27.7</assertj.version>
         <byte-buddy.version>1.18.14-jdk5</byte-buddy.version>
-        <mockito.version>5.23.0</mockito.version>
-        <commons-lang3.version>3.20.0</commons-lang3.version>
+        <mockito.version>5.24.0</mockito.version>
+        <commons-lang3.version>3.21.0</commons-lang3.version>
         <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
         <errorprone.version>2.50.0</errorprone.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
