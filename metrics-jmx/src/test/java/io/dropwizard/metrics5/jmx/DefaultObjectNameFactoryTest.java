@@ -76,4 +76,25 @@ class DefaultObjectNameFactoryTest {
         assertThat(on.getKeyProperty("name")).isEqualTo("requests");
         assertThat(on.getKeyProperty("type")).isEqualTo("timer");
     }
+
+    @Test
+    void quotesTagValuesContainingNewlines() {
+        ObjectName on = new DefaultObjectNameFactory().createName("timer", "com.domain",
+                MetricName.build("requests").tagged("note", "line1\nline2"));
+        assertThat(on.getKeyProperty("note")).isEqualTo(ObjectName.quote("line1\nline2"));
+    }
+
+    @Test
+    void acceptsDoubleQuoteInTagKey() {
+        ObjectName on = new DefaultObjectNameFactory().createName("timer", "com.domain",
+                MetricName.build("requests").tagged("a\"b", "value"));
+        assertThat(on.getKeyProperty("a\"b")).isEqualTo("value");
+    }
+
+    @Test
+    void acceptsCarriageReturnInTagKey() {
+        ObjectName on = new DefaultObjectNameFactory().createName("timer", "com.domain",
+                MetricName.build("requests").tagged("a\rb", "value"));
+        assertThat(on.getKeyProperty("a\rb")).isEqualTo("value");
+    }
 }
