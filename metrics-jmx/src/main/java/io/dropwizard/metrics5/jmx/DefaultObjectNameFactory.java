@@ -89,20 +89,16 @@ public class DefaultObjectNameFactory implements ObjectNameFactory {
         }
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
-            if (c == '*' || c == '?' || c == '\n' || c == '\r') {
+            if (c == '*' || c == '?' || c == '\n' || c == ',' || c == '=' || c == ':') {
                 return false;
-            }
-            for (char quotableChar : QUOTABLE_CHARS) {
-                if (c == quotableChar) {
-                    return false;
-                }
             }
         }
         return true;
     }
 
     private boolean needsQuote(final String value) {
-        return shouldQuote(value) || value.indexOf('*') >= 0 || value.indexOf('?') >= 0;
+        return shouldQuote(value) || value.indexOf('*') >= 0 || value.indexOf('?') >= 0
+                || value.indexOf('\n') >= 0;
     }
 
 }
