@@ -5,6 +5,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 
 import static java.lang.Math.floor;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -170,7 +171,7 @@ public class UniformSnapshot extends Snapshot {
     public void dump(OutputStream output) {
         try (PrintWriter out = new PrintWriter(new OutputStreamWriter(output, UTF_8))) {
             for (long value : values) {
-                out.printf("%d%n", value);
+                out.printf(Locale.ROOT, "%d%n", value);
             }
         }
     }
