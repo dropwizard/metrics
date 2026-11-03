@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -69,16 +70,12 @@ public class ScheduledReporterTest {
     @Test
     public void createWithNullMetricRegistry() {
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        DummyReporter r = null;
         try {
-            r = new DummyReporter(null, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor);
-            Assert.fail("NullPointerException must be thrown !!!");
-        } catch (NullPointerException e) {
-            Assert.assertEquals("registry == null", e.getMessage());
+            assertThatNullPointerException()
+                    .isThrownBy(() -> new DummyReporter(null, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, executor))
+                    .withMessage("registry == null");
         } finally {
-            if (r != null) {
-                r.close();
-            }
+            executor.shutdown();
         }
     }
 
