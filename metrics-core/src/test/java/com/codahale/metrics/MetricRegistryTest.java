@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -619,12 +620,9 @@ public class MetricRegistryTest {
     @Test
     public void registerNullMetric() {
         MetricRegistry registry = new MetricRegistry();
-        try {
-            registry.register("any_name", null);
-            Assert.fail("NullPointerException must be thrown !!!");
-        } catch (NullPointerException e) {
-            Assert.assertEquals("metric == null", e.getMessage());
-        }
+        assertThatNullPointerException()
+                .isThrownBy(() -> registry.register("any_name", null))
+                .withMessage("metric == null");
     }
 
     @Test
