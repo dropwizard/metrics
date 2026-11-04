@@ -384,6 +384,20 @@ public class ExponentiallyDecayingReservoirTest {
         testShortPeriodShouldNotRescale(Long.MAX_VALUE - TimeUnit.MINUTES.toNanos(30));
     }
 
+    @Test
+    public void thresholdScaleWithAlpha() {
+        // todo(nickbar01234): Update test for lock-free implementation after consensus
+        // MAX_DOUBLE = e^(0.75x) means no new samples are added after ~16minutes
+        final ManualClock clock = new ManualClock(0);
+        final ExponentiallyDecayingReservoir reservoir = new ExponentiallyDecayingReservoir(10, 0.75, clock);
+        reservoir.update(1000);
+        clock.addSeconds(16 * 60);
+        reservoir.update(2000);
+
+        Snapshot snapshot = reservoir.getSnapshot();
+        assertThat(snapshot.size()).isEqualTo(2);
+    }
+
     private void testShortPeriodShouldNotRescale(long startTimeNanos) {
         final ManualClock clock = new ManualClock(startTimeNanos);
         final Reservoir reservoir = reservoirFactory.create(10, 1, clock);
@@ -396,7 +410,7 @@ public class ExponentiallyDecayingReservoirTest {
         // wait for 10 millis and take snapshot.
         // this should not trigger a rescale. Note that the number of samples will be reduced to 0
         // because scaling factor equal to zero will remove all existing entries after rescale.
-        clock.addSeconds(20 * 60);
+        clock.addSeconds(5 * 60);
         Snapshot snapshot = reservoir.getSnapshot();
         assertThat(snapshot.getMax()).isEqualTo(1000);
         assertThat(snapshot.getMean()).isEqualTo(1000);
