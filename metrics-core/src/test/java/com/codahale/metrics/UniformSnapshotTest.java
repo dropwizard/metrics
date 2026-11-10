@@ -3,6 +3,7 @@ package com.codahale.metrics;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CountDownLatch;
@@ -130,6 +131,22 @@ public class UniformSnapshotTest {
 
         assertThat(output.toString())
                 .isEqualTo(String.format("1%n2%n3%n4%n5%n"));
+    }
+
+    @Test
+    public void dumpsAsciiDigitsRegardlessOfDefaultLocale() {
+        final Locale defaultLocale = Locale.getDefault();
+        Locale.setDefault(new Locale("ar", "EG"));
+        try {
+            final Snapshot localeSnapshot = new UniformSnapshot(new long[]{1234567});
+            final ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+            localeSnapshot.dump(output);
+
+            assertThat(output.toString()).contains("1234567");
+        } finally {
+            Locale.setDefault(defaultLocale);
+        }
     }
 
     @Test
