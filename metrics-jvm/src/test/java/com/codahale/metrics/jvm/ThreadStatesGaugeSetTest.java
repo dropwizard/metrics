@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -134,5 +135,18 @@ public class ThreadStatesGaugeSetTest {
             .isNotNull();
         assertThat(((Gauge<?>) set.getMetrics().get("deadlocks")).getValue())
             .isNotNull();
+    }
+
+    @Test
+    public void usesLocaleIndependentGaugeNames() {
+        final Locale defaultLocale = Locale.getDefault();
+        Locale.setDefault(new Locale("tr", "TR"));
+        try {
+            final ThreadStatesGaugeSet set = new ThreadStatesGaugeSet(threads, detector);
+            assertThat(set.getMetrics().keySet())
+                .contains("waiting.count", "timed_waiting.count", "terminated.count");
+        } finally {
+            Locale.setDefault(defaultLocale);
+        }
     }
 }

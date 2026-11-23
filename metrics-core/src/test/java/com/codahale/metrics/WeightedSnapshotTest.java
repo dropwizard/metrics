@@ -7,6 +7,7 @@ import org.mockito.ArgumentMatchers;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
@@ -135,6 +136,23 @@ public class WeightedSnapshotTest {
 
         assertThat(output.toString())
                 .isEqualTo(String.format("1%n2%n3%n4%n5%n"));
+    }
+
+    @Test
+    public void dumpsAsciiDigitsRegardlessOfDefaultLocale() {
+        final Locale defaultLocale = Locale.getDefault();
+        Locale.setDefault(new Locale("ar", "EG"));
+        try {
+            final Snapshot localeSnapshot = new WeightedSnapshot(
+                    weightedArray(new long[]{1234567}, new double[]{1}));
+            final ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+            localeSnapshot.dump(output);
+
+            assertThat(output.toString()).contains("1234567");
+        } finally {
+            Locale.setDefault(defaultLocale);
+        }
     }
 
     @Test

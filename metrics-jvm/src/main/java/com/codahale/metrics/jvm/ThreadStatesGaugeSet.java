@@ -9,6 +9,7 @@ import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,7 +50,7 @@ public class ThreadStatesGaugeSet implements MetricSet {
         final Map<String, Metric> gauges = new HashMap<>();
 
         for (final Thread.State state : Thread.State.values()) {
-            gauges.put(name(state.toString().toLowerCase(), "count"),
+            gauges.put(name(state.toString().toLowerCase(Locale.ROOT), "count"),
                     (Gauge<Object>) () -> getThreadCount(state));
         }
 
